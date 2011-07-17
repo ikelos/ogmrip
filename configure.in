@@ -1,0 +1,575 @@
+dnl Process this file with autoconf to produce a configure script.
+
+AC_PREREQ(2.53)
+
+m4_define([ogmrip_major_version], [0])
+m4_define([ogmrip_minor_version], [14])
+m4_define([ogmrip_micro_version], [0])
+m4_define([ogmrip_version], [ogmrip_major_version.ogmrip_minor_version.ogmrip_micro_version])
+
+AC_INIT([OGMRip], [ogmrip_version])
+AC_CONFIG_SRCDIR(src/ogmrip-main.c)
+AM_INIT_AUTOMAKE(ogmrip, AC_PACKAGE_VERSION)
+
+AC_CONFIG_HEADERS(config.h)
+AC_CONFIG_MACRO_DIR(m4)
+
+dnl **************************************************************
+
+OGMRIP_MAJOR_VERSION=ogmrip_major_version
+OGMRIP_MINOR_VERSION=ogmrip_minor_version
+OGMRIP_MICRO_VERSION=ogmrip_micro_version
+OGMRIP_VERSION=ogmrip_version
+AC_SUBST(OGMRIP_MAJOR_VERSION)
+AC_SUBST(OGMRIP_MINOR_VERSION)
+AC_SUBST(OGMRIP_MICRO_VERSION)
+AC_SUBST(OGMRIP_VERSION)
+
+dnl **************************************************************
+
+AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_LIBTOOL
+AC_PROG_LN_S
+
+AC_HEADER_STDC
+AC_C_BIGENDIAN
+AC_SYS_LARGEFILE
+
+AM_MAINTAINER_MODE
+
+PKG_PROG_PKG_CONFIG
+
+CFLAGS="$CFLAGS -g -I/usr/local/include -I.. -Wall -Werror -D_FORTIFY_SOURCE=2"
+CFLAGS="$CFLAGS -DG_DISABLE_DEPRECATED -DGDK_PIXBUF_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED"
+CFLAGS="$CFLAGS -DG_DISABLE_SINGLE_INCLUDES -DGTK_DISABLE_SINGLE_INCLUDES"
+
+CPPFLAGS="$CPPFLAGS -I/usr/local/include -I.. -Wall -D_FORTIFY_SOURCE=2"
+
+LDFLAGS="$LDFLAGS -Wl,--export-dynamic -L/usr/local/lib -L/usr/pkg/lib"
+
+dnl **************************************************************
+
+AC_CHECK_HEADERS(sys/statvfs.h mntent.h sys/mnttab.h sys/vfstab.h sys/cdio.h)
+AC_CHECK_FUNCS(statvfs mkdtemp)
+
+dnl **************************************************************
+
+GTK_DOC_CHECK(1.0)
+
+if test x"$enable_gtk_doc" = x"yes"; then
+  AC_PATH_PROG(XSLTPROC_PROG, xsltproc)
+  if test x"$XSLTPROC_PROG" = x; then
+    AC_MSG_ERROR(Unable to find xsltproc in the PATH. You need xsltproc to build the tutorial. Find it on http://www.xmlsoft.org)
+  fi
+fi
+
+AM_CONDITIONAL(HAVE_XSLTPROC_PROG, [test x"$XSLTPROC_PROG" != x""])
+
+dnl **************************************************************
+
+AC_PATH_PROG(SED_PROG, gsed)
+if test x"$SED_PROG" = x; then
+  AC_PATH_PROG(SED_PROG, sed)
+fi
+if ! "$SED_PROG" --version 2> /dev/null | head -n 1 | grep -q "GNU sed"; then
+  AC_MSG_ERROR(Unable to find GNU sed in the PATH. You need GNU sed to configure OGMRip. Find it on ftp://ftp.gnu.org/gnu/sed)
+fi
+
+dnl **************************************************************
+
+GLIB_REQUIRED=2.28.0
+
+PKG_CHECK_MODULES(GLIB, [glib-2.0 >= $GLIB_REQUIRED gobject-2.0 >= $GLIB_REQUIRED gmodule-2.0 >= $GLIB_REQUIRED gio-2.0 >= $GLIB_REQUIRED])
+CFLAGS="$CFLAGS $GLIB_CFLAGS"
+LIBS="$LIBS $GLIB_LIBS"
+
+GLIB_GSETTINGS
+
+dnl **************************************************************
+
+PKG_CHECK_MODULES(LIBXML, [libxml-2.0])
+CFLAGS="$CFLAGS $LIBXML_CFLAGS"
+LIBS="$LIBS $LIBXML_LIBS"
+
+PKG_CHECK_MODULES(LIBPNG, [libpng], [have_png_support=yes], [have_png_support=no])
+CFLAGS="$CFLAGS $LIBPNG_CFLAGS"
+LIBS="$LIBS $LIBPNG_LIBS"
+
+if test x"$have_png_support" = x"yes"; then
+  AC_DEFINE(HAVE_PNG_SUPPORT, 1, [Define to 1 if png is supported.])
+fi
+
+AM_CONDITIONAL(HAVE_PNG_SUPPORT, [test x"$have_png_support" = x"yes"])
+
+AC_CHECK_LIB(tiff, TIFFOpen, [LIBTIFF_LIBS="-ltiff" && have_tiff_support=yes], [have_tiff_support=no])
+LIBS="$LIBS $LIBTIFF_LIBS"
+
+if test x"$have_tiff_support" = x"yes"; then
+  AC_DEFINE(HAVE_TIFF_SUPPORT, 1, [Define to 1 if tiff is supported.])
+fi
+
+AM_CONDITIONAL(HAVE_TIFF_SUPPORT, [test x"$have_tiff_support" = x"yes"])
+
+dnl **************************************************************
+
+GTK_REQUIRED=2.24
+
+AC_ARG_ENABLE(gtk-support,
+  AC_HELP_STRING([--disable-gtk-support], [disable GTK+ support]),
+  [have_gtk_support="$enableval"], [have_gtk_support="yes"])
+
+if test x"$have_gtk_support" != x"no"; then
+  PKG_CHECK_MODULES(GTK, [gtk+-2.0 >= $GTK_REQUIRED], [have_gtk_support=yes], [have_gtk_support=no])
+fi
+
+if test x"$have_gtk_support" = x"yes"; then
+  AC_DEFINE(HAVE_GTK_SUPPORT, 1, [Define to 1 if gtk+ is supported.])
+fi
+
+AM_CONDITIONAL(HAVE_GTK_SUPPORT, [test x"$have_gtk_support" = x"yes"])
+
+CFLAGS="$CFLAGS $GTK_CFLAGS "
+LIBS="$LIBS $GTK_LIBS"
+
+dnl **************************************************************
+
+AC_ARG_ENABLE(dbus-support,
+  AC_HELP_STRING([--disable-dbus-support], [disable DBus support]),
+  [have_dbus_support="$enableval"], [have_dbus_support="yes"])
+
+if test x"$have_dbus_support" != x"no"; then
+  PKG_CHECK_MODULES(DBUS, [dbus-glib-1 >= 0.7.2], [have_dbus_support=yes], [have_dbus_support=no])
+  if test x"$have_dbus_support" = x"yes"; then
+    AC_DEFINE(HAVE_DBUS_SUPPORT, 1, [Define to 1 if dbus-glib is installed.])
+  fi
+fi
+
+CFLAGS="$CFLAGS $DBUS_CFLAGS "
+LIBS="$LIBS $DBUS_LIBS"
+
+dnl **************************************************************
+
+AC_ARG_ENABLE(enchant-support,
+  AC_HELP_STRING([--disable-enchant-support], [disable Enchant support]),
+  [have_enchant_support="$enableval"], [have_enchant_support="yes"])
+
+if test x"$have_enchant_support" != x"no"; then
+  PKG_CHECK_MODULES(ENCHANT, [enchant >= 1.1.0], [have_enchant_support=yes], [have_enchant_support=no])
+fi
+
+if test x"$have_enchant_support" = x"yes"; then
+  AC_DEFINE(HAVE_ENCHANT_SUPPORT, 1, [Define to 1 if enchant is supported.])
+fi
+
+AM_CONDITIONAL(HAVE_ENCHANT_SUPPORT, [test x"$have_enchant_support" != x"no"])
+
+CFLAGS="$CFLAGS $ENCHANT_CFLAGS "
+LIBS="$LIBS $ENCHANT_LIBS"
+
+dnl **************************************************************
+
+PKG_CHECK_MODULES(ENCA, [enca])
+CFLAGS="$CFLAGS $ENCA_CFLAGS"
+LIBS="$LIBS $ENCA_LIBS"
+
+dnl **************************************************************
+
+AC_CHECK_TYPES([sg_io_hdr_t],[has_sg="yes"],[has_sg="no"],
+[#include <sys/types.h>
+ #include <scsi/sg.h>])
+
+AC_CHECK_TYPES([scsireq_t],[has_scsiio="yes"],[has_scsiio="no"],
+[#include <sys/types.h>
+ #include <sys/scsiio.h>])
+
+AC_CHECK_TYPES([struct uscsi_cmd],[has_uscsi="yes"],[has_uscsi="no"],
+[#include <sys/types.h>
+ #include <sys/scsi/impl/uscsi.h>])
+
+AC_CHECK_TYPES([struct cam_device],[has_cam="yes"],[has_cam="no"],
+[#include <stdio.h>
+ #include <camlib.h>])
+
+if test x"$has_sg" = x"yes"; then
+  :
+elif test x"$has_scsiio" = x"yes"; then
+  :
+elif test x"$has_uscsi" = x"yes"; then
+  :
+elif test x"$has_cam" = x"yes"; then
+  CAM_LIBS="-lcam"
+else
+  AC_MSG_ERROR([Unable to find a supported SCSI interface. You need either SG on Linux, SCSIPI on NetBSD, USCSI on Solaris, or CAM on FreeBSD.])
+fi
+
+LIBS="$LIBS $CAM_LIBS"
+
+dnl **************************************************************
+
+AC_CHECK_LIB(dvdread, DVDOpen, [DVDREAD_LIBS="-ldvdread"], 
+  AC_MSG_ERROR(Unable to find libdvdread. You need libdvdread to use OGMRip. Find it on http://www.dtek.chalmers.se/groups/dvd))
+AC_SUBST(DVDREAD_LIBS)
+
+AC_LANG(C)
+
+LIBS="$LIBS -ldvdread"
+
+AC_LINK_IFELSE([AC_LANG_SOURCE([[
+#include <stdio.h>
+#include <inttypes.h>
+#include <dvdread/dvd_reader.h>
+int main(void) { DVDFileStat (NULL, 0, 0, NULL); return 0; }
+]])],[have_dvd_file_stat="yes"],[have_dvd_file_stat="no"])
+
+if test x"$have_dvd_file_stat" = x"yes"; then
+  AC_DEFINE(HAVE_DVD_FILE_STAT, 1, [Define to 1 if DVDFileStat is available.])
+fi
+
+AC_LINK_IFELSE([AC_LANG_SOURCE([[
+#include <stdio.h>
+#include <inttypes.h>
+#include <dvdread/dvd_reader.h>
+int main(void) { DVDFileSize (NULL); return 0; }
+]])],[have_dvd_file_size="yes"],[have_dvd_file_size="no"])
+
+if test x"$have_dvd_file_size" = x"yes"; then
+  AC_DEFINE(HAVE_DVD_FILE_SIZE, 1, [Define to 1 if DVDFileSize is available.])
+fi
+
+dnl **************************************************************
+
+AC_PATH_PROG(MPLAYER_PROG, mplayer)
+if test x"$MPLAYER_PROG" = x; then
+  AC_MSG_ERROR(Unable to find mplayer in the PATH. You need mplayer to use OGMRip. Find it on http://www.mplayerhq.hu)
+fi
+
+dnl **************************************************************
+
+AC_PATH_PROG(MENCODER_PROG, mencoder)
+if test x"$MENCODER_PROG" = x; then
+  AC_MSG_ERROR(Unable to find mencoder in the PATH. You need mencoder to use OGMRip. Find it on http://www.mplayerhq.hu)
+fi
+
+dnl **************************************************************
+
+AC_ARG_ENABLE(ogm-support,
+  AC_HELP_STRING([--disable-ogm-support], [disable OGM support]),
+  [have_ogm_support="$enableval"], [have_ogm_support="yes"])
+
+AM_CONDITIONAL(HAVE_OGM_SUPPORT, [test x"$have_ogm_support" = x"yes"])
+
+dnl **************************************************************
+
+AC_ARG_ENABLE(mkv-support,
+  AC_HELP_STRING([--disable-mkv-support], [disable Matroska support]),
+  [have_mkv_support="$enableval"], [have_mkv_support="yes"])
+
+AM_CONDITIONAL(HAVE_MKV_SUPPORT, [test x"$have_mkv_support" = x"yes"])
+
+dnl **************************************************************
+
+AC_ARG_ENABLE(mp4-support,
+  AC_HELP_STRING([--disable-mp4-support], [disable Mpeg-4 support]),
+  [have_mp4_support="$enableval"], [have_mp4_support="yes"])
+
+AM_CONDITIONAL(HAVE_MP4_SUPPORT, [test x"$have_mp4_support" = x"yes"])
+
+dnl **************************************************************
+
+AC_ARG_ENABLE(lavf-support,
+  AC_HELP_STRING([--disable-lavf-support], [disable Lavf support]),
+  [have_lavf_support="$enableval"], [have_lavf_support="yes"])
+
+AM_CONDITIONAL(HAVE_LAVF_SUPPORT, [test x"$have_lavf_support" = x"yes"])
+
+dnl **************************************************************
+
+AC_ARG_ENABLE(xvid-support,
+  AC_HELP_STRING([--disable-xvid-support], [disable XviD support]),
+  [have_xvid_support="$enableval"], [have_xvid_support="yes"])
+
+AM_CONDITIONAL(HAVE_XVID_SUPPORT, [test x"$have_xvid_support" = x"yes"])
+
+dnl **************************************************************
+
+AC_ARG_ENABLE(lavc-support,
+  AC_HELP_STRING([--disable-lavc-support], [disable Lavc support]),
+  [have_lavc_support="$enableval"], [have_lavc_support="yes"])
+
+AM_CONDITIONAL(HAVE_LAVC_SUPPORT, [test x"$have_lavc_support" = x"yes"])
+
+dnl **************************************************************
+
+AC_ARG_ENABLE(x264-support,
+  AC_HELP_STRING([--disable-x264-support], [disable X264 support]),
+  [have_x264_support="$enableval"], [have_x264_support="yes"])
+
+AM_CONDITIONAL(HAVE_X264_SUPPORT, [test x"$have_x264_support" = x"yes"])
+
+dnl **************************************************************
+
+AC_ARG_ENABLE(theora-support,
+  AC_HELP_STRING([--disable-theora-support], [disable Theora support]),
+  [have_theora_support="$enableval"], [have_theora_support="yes"])
+
+if test x"$have_theora_support" != x"no"; then
+  PKG_CHECK_MODULES(THEORA, [theora >= 1.0alpha5], [have_theora_support=yes], [have_theora_support=no])
+fi
+
+AM_CONDITIONAL(HAVE_THEORA_SUPPORT, [test x"$have_theora_support" = x"yes"])
+
+CFLAGS="$CFLAGS $THEORA_CFLAGS"
+LIBS="$LIBS $THEORA_LIBS"
+
+dnl **************************************************************
+
+AC_ARG_ENABLE(vorbis-support,
+  AC_HELP_STRING([--disable-vorbis-support], [disable Ogg Vorbis support]),
+  [have_vorbis_support="$enableval"], [have_vorbis_support="yes"])
+
+AM_CONDITIONAL(HAVE_VORBIS_SUPPORT, [test x"$have_vorbis_support" = x"yes"])
+
+dnl **************************************************************
+
+AC_ARG_ENABLE(mp3-support,
+  AC_HELP_STRING([--disable-mp3-support], [disable Mp3 support]),
+  [have_mp3_support="$enableval"], [have_mp3_support="yes"])
+
+AM_CONDITIONAL(HAVE_MP3_SUPPORT, [test x"$have_mp3_support" = x"yes"])
+
+dnl **************************************************************
+
+AC_ARG_ENABLE(aac-support,
+  AC_HELP_STRING([--disable-aac-support], [disable AAC support]),
+  [have_aac_support="$enableval"], [have_aac_support="yes"])
+
+AM_CONDITIONAL(HAVE_AAC_SUPPORT, [test x"$have_aac_support" = x"yes"])
+
+dnl **************************************************************
+
+AC_ARG_ENABLE(srt-support,
+  AC_HELP_STRING([--disable-srt-support], [disable SRT support]),
+  [have_srt_support="$enableval"], [have_srt_support="yes"])
+
+AM_CONDITIONAL(HAVE_SRT_SUPPORT, [test x"$have_srt_support" = x"yes"])
+
+AC_ARG_WITH(ocr,
+  AC_HELP_STRING([--with-ocr=auto|gocr|ocrad|tesseract],
+  [Select the OCR program to use (default gocr)]),,
+  with_ocr=auto)
+
+if test x"$have_srt_support" = x"yes"; then
+  if test x"$with_ocr" = x"auto"; then
+    AC_DEFINE(HAVE_GOCR_SUPPORT, 1, [Define to 1 if gocr should be supported.])
+    AC_DEFINE(HAVE_OCRAD_SUPPORT, 1, [Define to 1 if ocrad should be supported.])
+    AC_DEFINE(HAVE_TESSERACT_SUPPORT, 1, [Define to 1 if ocrad should be supported.])
+  elif test x"$with_ocr" = x"gocr"; then
+    AC_DEFINE(HAVE_GOCR_SUPPORT, 1, [Define to 1 if gocr is should be supported.])
+  elif test x"$with_ocr" = x"ocrad"; then
+    AC_DEFINE(HAVE_OCRAD_SUPPORT, 1, [Define to 1 if ocrad is should be supported.])
+  elif test x"$with_ocr" = x"tesseract"; then
+    AC_DEFINE(HAVE_TESSERACT_SUPPORT, 1, [Define to 1 if tesseract is should be supported.])
+  fi
+fi
+
+dnl **************************************************************
+
+AC_ARG_ENABLE(libnotify-support,
+  AC_HELP_STRING([--disable-libnotify-support], [disable libnotify support]),
+  [have_libnotify_support="$enableval"], [have_libnotify_support="yes"])
+
+if test x"$have_libnotify_support" != x"no"; then
+  PKG_CHECK_MODULES(LIBNOTIFY, [libnotify >= 0.7], [have_libnotify_support=yes], [have_libnotify_support=no])
+fi
+
+if test x"$have_libnotify_support" = x"yes"; then
+  AC_DEFINE(HAVE_LIBNOTIFY_SUPPORT, 1, [Define to 1 if libnotify is supported.])
+fi
+
+CFLAGS="$CFLAGS $LIBNOTIFY_CFLAGS"
+LIBS="$LIBS $LIBNOTIFY_LIBS"
+
+dnl **************************************************************
+
+AC_RUN_IFELSE([AC_LANG_SOURCE([[
+#include <unistd.h>
+int main(void) { return sysconf(_SC_NPROCESSORS_ONLN) == -1 ? 1 : 0; }
+]])],[have_sysconf_nproc=yes],[have_sysconf_nproc=no],[have_sysconf_nproc=no])
+
+if test x"$have_sysconf_nproc" = x"yes" ; then
+  AC_DEFINE(HAVE_SYSCONF_NPROC, 1, [Whether sysconf(_SC_NPROCESSORS_ONLN) is available])
+fi
+
+dnl **************************************************************
+
+GETTEXT_PACKAGE=ogmrip
+AC_SUBST(GETTEXT_PACKAGE)
+AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [GetText Package])
+
+AM_GLIB_GNU_GETTEXT
+# AM_GNU_GETTEXT([external])
+IT_PROG_INTLTOOL([0.35.0])
+
+if test "x${prefix}" = "xNONE"; then 
+  AC_DEFINE_UNQUOTED(LOCALEDIR, "${ac_default_prefix}/${DATADIRNAME}/locale", [Locale directory])
+else 
+  AC_DEFINE_UNQUOTED(LOCALEDIR, "${prefix}/${DATADIRNAME}/locale", [Locale directory])
+fi
+
+dnl **************************************************************
+
+AC_PATH_PROG(GLIB_GENMARSHAL, glib-genmarshal)
+
+dnl **************************************************************
+
+# Before making a release, the OGMRIP_LT_VERSION string should be modified.
+# The string is of the form C:R:A.
+# - If interfaces have been changed or added, but binary compatibility has
+#   been preserved, change to C+1:0:A+1
+# - If binary compatibility has been broken (eg removed or changed interfaces)
+#   change to C+1:0:0
+# - If the interface is the same as the previous version, change to C:R+1:A
+
+OGMDVD_LT_VERSION=1:0:0
+AC_SUBST(OGMDVD_LT_VERSION)
+
+OGMDVD_GTK_LT_VERSION=1:0:0
+AC_SUBST(OGMDVD_GTK_LT_VERSION)
+
+OGMJOB_LT_VERSION=1:0:0
+AC_SUBST(OGMJOB_LT_VERSION)
+
+OGMRIP_LT_VERSION=1:0:0
+AC_SUBST(OGMRIP_LT_VERSION)
+
+OGMRIP_GTK_LT_VERSION=1:0:0
+AC_SUBST(OGMRIP_GTK_LT_VERSION)
+
+dnl **************************************************************
+
+AC_OUTPUT([
+src/Makefile
+avibox/Makefile
+subrip/Makefile
+dvdcpy/Makefile
+theoraenc/Makefile
+libogmdvd/Makefile
+libogmdvd-gtk/Makefile
+libogmjob/Makefile
+libogmrip/Makefile
+libogmrip/ogmrip-version.h
+libogmrip-gtk/Makefile
+plugins/Makefile
+data/Makefile
+data/ogmdvd.pc
+data/ogmdvd-gtk.pc
+data/ogmjob.pc
+data/ogmrip.pc
+data/ogmrip-gtk.pc
+po/Makefile.in
+Makefile
+])
+
+AC_MSG_NOTICE([OGMRip was configured with the following options:])
+
+# if test x"$have_mplayer_dev" = xyes; then
+#   AC_MSG_NOTICE([** MPlayer SVN/CVS detected - USE AT YOUR OWN RISK])
+# fi
+
+if test x"$have_gtk_support" = xyes; then
+  AC_MSG_NOTICE([** The GUI will be build])
+else
+  AC_MSG_NOTICE([   The GUI will not be build])
+fi
+
+if test x"$have_dbus_support" = xyes; then
+  AC_MSG_NOTICE([** DBus support enabled])
+else
+  AC_MSG_NOTICE([   DBus support disabled])
+fi
+
+if test x"$have_enchant_support" = xyes; then
+  AC_MSG_NOTICE([** Enchant support enabled])
+else
+  AC_MSG_NOTICE([   Enchant support disabled])
+fi
+
+if test x"$have_libnotify_support" = xyes; then
+  AC_MSG_NOTICE([** Notify support enabled])
+else
+  AC_MSG_NOTICE([   Notify support disabled])
+fi
+
+if test x"$have_ogm_support" = xyes; then
+  AC_MSG_NOTICE([** Ogg Media support enabled])
+else
+  AC_MSG_NOTICE([   Ogg Media support disabled])
+fi
+
+if test x"$have_mkv_support" = xyes; then
+  AC_MSG_NOTICE([** Matroska support enabled])
+else
+  AC_MSG_NOTICE([   Matroska support disabled])
+fi
+
+if test x"$have_mp4_support" = xyes; then
+  AC_MSG_NOTICE([** Mpeg-4 support enabled])
+else
+  AC_MSG_NOTICE([   Mpeg-4 support disabled])
+fi
+
+if test x"$have_lavf_support" = xyes; then
+  AC_MSG_NOTICE([** Lavf support enabled])
+else
+  AC_MSG_NOTICE([   Lavf support disabled])
+fi
+
+if test x"$have_lavc_support" = xyes; then
+  AC_MSG_NOTICE([** Lavc support enabled])
+else
+  AC_MSG_NOTICE([   Lavc support disabled])
+fi
+
+if test x"$have_xvid_support" = xyes; then
+  AC_MSG_NOTICE([** XviD support enabled])
+else
+  AC_MSG_NOTICE([   XviD support disabled])
+fi
+
+if test x"$have_x264_support" = xyes; then
+  AC_MSG_NOTICE([** X264 support enabled])
+else
+  AC_MSG_NOTICE([   X264 support disabled])
+fi
+
+if test x"$have_theora_support" = xyes; then
+  AC_MSG_NOTICE([** Ogg Theora support enabled])
+else
+  AC_MSG_NOTICE([   Ogg Theora support disabled])
+fi
+
+if test x"$have_mp3_support" = xyes; then
+  AC_MSG_NOTICE([** MP3 support enabled])
+else
+  AC_MSG_NOTICE([   MP3 support disabled])
+fi
+
+if test x"$have_vorbis_support" = xyes; then
+  AC_MSG_NOTICE([** Ogg Vorbis support enabled])
+else
+  AC_MSG_NOTICE([   Ogg Vorbis support disabled])
+fi
+
+if test x"$have_aac_support" = xyes; then
+  AC_MSG_NOTICE([** AAC support enabled])
+else
+  AC_MSG_NOTICE([   AAC support disabled])
+fi
+
+if test x"$have_srt_support" = xyes; then
+  AC_MSG_NOTICE([** SRT support enabled])
+else
+  AC_MSG_NOTICE([   SRT support disabled])
+fi
+

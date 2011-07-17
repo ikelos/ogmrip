@@ -1,0 +1,17 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+datarootdir=@datarootdir@
+datadir=@datadir@
+
+pluginsdir=@libdir@/ogmrip
+profilesdir=@datadir@/ogmrip/profiles
+
+Name: ogmrip
+Description: ogmrip is a library for ripping and encoding DVD.
+Requires: ogmjob ogmdvd enca gmodule-2.0
+Version: @VERSION@
+Libs: -L${libdir} -logmrip -logmrip-mplayer -logmrip-lavc
+Cflags: -I${includedir}/ogmrip
+

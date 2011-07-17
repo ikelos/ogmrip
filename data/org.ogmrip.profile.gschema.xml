@@ -1,0 +1,164 @@
+<?xml version="1.0"?>
+<schemalist>
+  <schema id="org.ogmrip.profile">
+    <key name="name" type="s">
+      <default>''</default>
+      <summary>The name of the profile</summary>
+    </key>
+    <key name="version" type="u">
+      <default>0</default>
+      <summary>The version of the profile</summary>
+    </key>
+    <child name="general" schema="org.ogmrip.profile.general"/>
+    <child name="video" schema="org.ogmrip.profile.video"/>
+    <child name="audio" schema="org.ogmrip.profile.audio"/>
+    <child name="subp" schema="org.ogmrip.profile.subp"/>
+  </schema>
+  <schema id="org.ogmrip.profile.general">
+    <key name="container" type="s">
+      <default>''</default>
+      <summary>The container</summary>
+    </key>
+    <key name="fourcc" type="u">
+      <range min="0" max="4"/>
+      <default>0</default>
+      <summary>The FourCC</summary>
+    </key>
+    <key name="ensure-sync" type="b">
+      <default>true</default>
+      <summary>Whether to improve A/V synchronization</summary>
+    </key>
+    <key name="encoding-method" type="u">
+      <range min="0" max="2"/>
+      <default>0</default>
+      <summary>The encoding method</summary>
+    </key>
+    <key name="target-number" type="u">
+      <default>1</default>
+      <summary>The number of targets</summary>
+    </key>
+    <key name="target-size" type="u">
+      <default>700</default>
+      <summary>The size of the targets</summary>
+    </key>
+  </schema>
+  <schema id="org.ogmrip.profile.video">
+    <key name="codec" type="s">
+      <default>''</default>
+      <summary>The video codec</summary>
+    </key>
+    <key name="bitrate" type="u">
+      <range min="4" max="16000"/>
+      <default>800</default>
+      <summary>The video bitrate</summary>
+    </key>
+    <key name="quantizer" type="d">
+      <range min="1" max="31"/>
+      <default>2</default>
+      <summary>The video quantizer</summary>
+    </key>
+    <key name="quality" type="u">
+      <range min="0" max="3"/>
+      <default>0</default>
+      <summary>The video quality</summary>
+    </key>
+    <key name="passes" type="u">
+      <default>2</default>
+      <summary>The video codec</summary>
+    </key>
+    <key name="denoise" type="b">
+      <default>true</default>
+      <summary>Whether to apply a noise reduction algorithm</summary>
+    </key>
+    <key name="deblock" type="b">
+      <default>false</default>
+      <summary>Whether to apply a deblocking filter</summary>
+    </key>
+    <key name="dering" type="b">
+      <default>false</default>
+      <summary>Whether to apply a deringing filter</summary>
+    </key>
+    <key name="turbo" type="b">
+      <default>true</default>
+      <summary>Whether to disable CPU-intensive options on pass 1</summary>
+    </key>
+    <key name="can-crop" type="b">
+      <default>true</default>
+      <summary>Whether the image can be cropped</summary>
+    </key>
+    <key name="scaler" type="u">
+      <range min="0" max="11"/>
+      <default>8</default>
+      <summary>The software scaler</summary>
+    </key>
+    <key name="min-width" type="u">
+      <default>0</default>
+      <summary>The minimum width</summary>
+    </key>
+    <key name="min-height" type="u">
+      <default>0</default>
+      <summary>The minimum height</summary>
+    </key>
+    <key name="max-width" type="u">
+      <default>0</default>
+      <summary>The maximum width</summary>
+    </key>
+    <key name="max-height" type="u">
+      <default>0</default>
+      <summary>The maximum height</summary>
+    </key>
+    <key name="expand" type="b">
+      <default>false</default>
+      <summary>Whether to expand the image to the maximum size</summary>
+    </key>
+  </schema>
+  <schema id="org.ogmrip.profile.audio">
+    <key name="codec" type="s">
+      <default>''</default>
+      <summary>The audio codec</summary>
+    </key>
+    <key name="quality" type="u">
+      <range min="0" max="10"/>
+      <default>3</default>
+      <summary>The audio quality</summary>
+    </key>
+    <key name="channels" type="u">
+      <range min="0" max="5"/>
+      <default>1</default>
+      <summary>The number of channels</summary>
+    </key>
+    <key name="samplerate" type="u">
+      <range min="0" max="8"/>
+      <default>0</default>
+      <summary>The sample rate</summary>
+    </key>
+    <key name="normalize" type="b">
+      <default>true</default>
+      <summary>Whether to normalize the volume</summary>
+    </key>
+  </schema>
+  <schema id="org.ogmrip.profile.subp">
+    <key name="codec" type="s">
+      <default>''</default>
+      <summary>The subp codec</summary>
+    </key>
+    <key name="forced-only" type="b">
+      <default>true</default>
+      <summary>Whether to encode forced subtitles only</summary>
+    </key>
+    <key name="character-set" type="u">
+      <range min="0" max="2"/>
+      <default>0</default>
+      <summary>The character set</summary>
+    </key>
+    <key name="newline-style" type="u">
+      <range min="0" max="2"/>
+      <default>0</default>
+      <summary>The newline style</summary>
+    </key>
+    <key name="spell-check" type="b">
+      <default>false</default>
+      <summary>Whether to check the spell</summary>
+    </key>
+  </schema>
+</schemalist>

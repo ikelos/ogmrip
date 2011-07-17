@@ -1,0 +1,2511 @@
+# Czech translations for OGMRip package
+# Copyright (C) 2004-2009 Olivier Rolland <billl@users.sourceforge.net>
+# This file is distributed under the same license as the OGMRip package.
+# Luboš Staněk <lubek@users.sourceforge.net>, 2006.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: OGMRip\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-05-04 10:04+0200\n"
+"PO-Revision-Date: 2010-04-07 00:02+0000\n"
+"Last-Translator: Roman Horník <Unknown>\n"
+"Language-Team: čeština <cs@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2010-05-04 08:00+0000\n"
+"X-Generator: Launchpad (build Unknown)\n"
+
+#: ../data/ogmrip-crop.glade.h:1 ../src/ogmrip-crop-dialog.c:262
+#: ../src/ogmrip-progress-dialog.c:246
+msgid "Cropping"
+msgstr "Ořez"
+
+#: ../data/ogmrip-crop.glade.h:2
+msgid "_Bottom"
+msgstr "_Dolů"
+
+#: ../data/ogmrip-crop.glade.h:3
+msgid "_Left"
+msgstr "Do_leva"
+
+#: ../data/ogmrip-crop.glade.h:4
+msgid "_Right"
+msgstr "V_pravo"
+
+#: ../data/ogmrip-crop.glade.h:5
+msgid "_Top"
+msgstr "_Nahoře"
+
+#: ../data/ogmrip-lavc.glade.h:1
+msgid "Allow 4 motion vectors per macroblock (v4mv)"
+msgstr "Povolit 4 vektory pohybu na makroblok (v4mv)"
+
+#: ../data/ogmrip-lavc.glade.h:2
+msgid ""
+"Always use the maximum number of B-frames\n"
+"Avoid B-frames in high motion scenes\n"
+"Places B-frames more or less optimally to yield maximum quality"
+msgstr ""
+"Vždy použít maximální počet B-rámců\n"
+"Vyhnout se B-rámcům při scénách s vysokou snímkovací frekvencí\n"
+"Umisťuje B-rámce více méně optimálně pro dosažení maximální kvality"
+
+#: ../data/ogmrip-lavc.glade.h:5
+msgid "Comparison function for _sub pel motion estimation (subcmp)"
+msgstr "Porovnávací funkce pro odhad  _sub pel pohybu (subcmp)"
+
+#: ../data/ogmrip-lavc.glade.h:6
+msgid "Comparison function for motion estimation _pre pass (precmp)"
+msgstr "Porovnávací funkce pro odhad pohybu _pre pass (precmp)"
+
+#: ../data/ogmrip-lavc.glade.h:7
+msgid "Diamond type and size for motion estimation _pre-pass (predia)"
+msgstr "Diamantový typ a velikost pro odhad pohybu _pre-pass (predia)"
+
+#: ../data/ogmrip-lavc.glade.h:8
+msgid ""
+"Disabled\n"
+"Mpeg-4 reference decoder\n"
+"Libavcodec specific extensions\n"
+"Experimental  codecs and features"
+msgstr ""
+"Vypnuto\n"
+"Referenční dekodér Mpeg-4\n"
+"Specifická rozšíření pro libavcodec\n"
+"Experimentální kodeky a vlastnosti"
+
+#: ../data/ogmrip-lavc.glade.h:12
+msgid ""
+"Disabled\n"
+"Only after I-frames\n"
+"Always"
+msgstr ""
+"Vypnuto\n"
+"Pouze po I-rámcích\n"
+"Vždy"
+
+#: ../data/ogmrip-lavc.glade.h:15
+msgid ""
+"Disabled\n"
+"Only lower the absolute value of coefficients\n"
+"Only change coefficients before the last non-zero coefficient + 1\n"
+"Try all"
+msgstr ""
+"Vypnuto\n"
+"Pouze snížit absolutní hodnotu koeficientů\n"
+"Pouze změnit koeficienty před posledním nenulovým koeficientem + 1\n"
+"Zkusit vše"
+
+#: ../data/ogmrip-lavc.glade.h:19
+msgid "Intra DC _precision in bits (dc)"
+msgstr "Intra DC _přesnost v bitech (dc)"
+
+#: ../data/ogmrip-lavc.glade.h:20
+msgid "M_aximum bitrate in kbit/sec (vrc__maxrate)"
+msgstr "M_aximální bitrate v kbit/s (vrc__maxrate)"
+
+#: ../data/ogmrip-lavc.glade.h:21
+msgid "M_inimum bitrate in kbit/sec (vrc__minrate)"
+msgstr "M_inimální bitrate v kbit/s (vrc__minrate)"
+
+#: ../data/ogmrip-lavc.glade.h:22
+msgid "Motion _Estimation"
+msgstr "Odhad _pohybu"
+
+#: ../data/ogmrip-lavc.glade.h:23
+msgid "Motion _estimation pre-pass (preme)"
+msgstr "Odhad _pohybu pre-pass (preme)"
+
+#: ../data/ogmrip-lavc.glade.h:24
+msgid "Quantizer _compression (vqcomp)"
+msgstr "Komprese _quantizeru (vqcomp)"
+
+#: ../data/ogmrip-lavc.glade.h:25
+msgid "Strategy to choose between I/P/B-frames (vb__strategy)"
+msgstr "Strategie pro výběr mezi I/P/B-rámci (vb__strategy)"
+
+#: ../data/ogmrip-lavc.glade.h:26
+msgid "Try to encode each MB with MV=<0,0> and choose the better one"
+msgstr "Pokusit se převést každý MB s MV=<0,0> a vybrat lepší"
+
+#: ../data/ogmrip-lavc.glade.h:27
+msgid ""
+"Use comparison function given by mbcmp\n"
+"Select the MB mode which needs the fewest bits\n"
+"Select the MB mode which has the best rate distortion"
+msgstr ""
+"Použít porovnávací funkci danou mbcmp\n"
+"Vybrat MB mód, který potřebuje nejméně bitů\n"
+"Vybrat MB mód , který má nejlepší míru zkreslení"
+
+#: ../data/ogmrip-lavc.glade.h:30
+msgid "_Amount of motion predictors from the previous frame (last__pred)"
+msgstr "_Počet předvídání pohybu z předchozího snímku (last__pred)"
+
+#: ../data/ogmrip-lavc.glade.h:31
+msgid "_Buffer size in kbit (vrc__buf__size)"
+msgstr "Velikost vyrovnávací paměti v kbit (vrc__buf__size)"
+
+#: ../data/ogmrip-lavc.glade.h:32
+msgid "_Comparison function for full pel motion estimation (cmp)"
+msgstr "_Porovnávací funkce pro plný odhad pel pohybu (cmp)"
+
+#: ../data/ogmrip-lavc.glade.h:33
+msgid "_Diamond type and size for motion estimation (dia)"
+msgstr "_Diamantový tvar a velikost pro odhad pohybu (dia)"
+
+#: ../data/ogmrip-lavc.glade.h:34 ../data/ogmrip-pref.glade.h:24
+#: ../data/ogmrip-profile-editor.glade.h:82
+msgid "_General"
+msgstr "_Obecné"
+
+#: ../data/ogmrip-lavc.glade.h:35
+msgid "_Macroblock decision algorithm (mbd)"
+msgstr "_Makroblok rozhodovací algoritmus (mbd)"
+
+#: ../data/ogmrip-lavc.glade.h:36
+msgid "_Maximum interval between keyframes in frames (keyint)"
+msgstr "_Maximální interval mezi klíčovými snímky ve snímcích (keyint)"
+
+#: ../data/ogmrip-lavc.glade.h:37
+msgid "_Quantizer noise shaping (qns)"
+msgstr "_Kvantizér tvarování šumu (qns)"
+
+#: ../data/ogmrip-lavc.glade.h:38
+msgid "_Rate Control"
+msgstr "Kontrola frekvence"
+
+#: ../data/ogmrip-lavc.glade.h:39
+msgid "_Strict standard compliance (vstrict)"
+msgstr "_Striktní dodržování standardu (vstrict)"
+
+#: ../data/ogmrip-main.glade.h:1
+msgid "<b>Duration:</b>"
+msgstr "<b>Čas:</b>"
+
+#: ../data/ogmrip-main.glade.h:2
+msgid "<b>_Audio Tracks:</b>"
+msgstr "<b>_Audio stopy:</b>"
+
+#: ../data/ogmrip-main.glade.h:3
+msgid "<b>_Subtitles:</b>"
+msgstr "<b>_Titulky:</b>"
+
+#: ../data/ogmrip-main.glade.h:4
+msgid "<b>_Title:</b>"
+msgstr "<b>_Název:</b>"
+
+#: ../data/ogmrip-main.glade.h:5
+msgid "<b>_Video Stream:</b>"
+msgstr "<b>_Video sekvence:</b>"
+
+#: ../data/ogmrip-main.glade.h:6
+msgid "Angle:"
+msgstr "Úhel:"
+
+#: ../data/ogmrip-main.glade.h:7 ../src/ogmrip-main.c:3096
+#: ../src/ogmrip-options-dialog.c:772
+msgid "E_xtract"
+msgstr "_Extrahovat"
+
+#: ../data/ogmrip-main.glade.h:8 ../src/ogmrip-main.c:3096
+msgid "Extract selected streams"
+msgstr "Extrahovat vybrané sekvence"
+
+#: ../data/ogmrip-main.glade.h:9 ../src/ogmrip-main.c:3095
+msgid "Load a DVD disk, an ISO file, or a DVD structure"
+msgstr "Načíst DVD disk, ISO soubor nebo DVD strukturu"
+
+#: ../data/ogmrip-main.glade.h:10
+msgid "OGMRip"
+msgstr "OGMRip"
+
+#: ../data/ogmrip-main.glade.h:11
+msgid "Open a DVD structure"
+msgstr "Otevřít DVD strukturu"
+
+#: ../data/ogmrip-main.glade.h:12
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-dialog.c:167
+#: ../src/ogmrip-main.c:3095
+msgid "_Load"
+msgstr "_Načíst"
+
+#: ../data/ogmrip-main.glade.h:13
+msgid "_Open"
+msgstr "_Otevřít"
+
+#: ../data/ogmrip-main.glade.h:14
+msgid "_Relative mode"
+msgstr "_Relativní režim"
+
+#: ../data/ogmrip-options.glade.h:1
+msgid "Auto_detect"
+msgstr "Autodetekce"
+
+#: ../data/ogmrip-options.glade.h:2
+msgid "Automatic _cropping"
+msgstr "Automatické _ořezávání"
+
+#: ../data/ogmrip-options.glade.h:3
+msgid "Automatic _scaling"
+msgstr "Automatické š_kálování"
+
+#: ../data/ogmrip-options.glade.h:4
+msgid "Automatic c_ompressibility check"
+msgstr "Automatická zkouška k_omprese"
+
+#: ../data/ogmrip-options.glade.h:5
+msgid "Compressibility Check"
+msgstr "Ověření komprese"
+
+#: ../data/ogmrip-options.glade.h:6 ../src/ogmrip-options-dialog.c:751
+msgid "Options"
+msgstr "Možnosti"
+
+#: ../data/ogmrip-options.glade.h:7
+msgid ""
+"The scaling parameters can only be autodetected if a video bitrate and "
+"cropping parameters are set."
+msgstr ""
+"Parametry škálování můžou být detekovány automaticky pouze tehdy, když je "
+"nastaven bitový tok (bitrate) videa a parametry oříznutí."
+
+#: ../data/ogmrip-options.glade.h:8
+msgid "_Cartoon"
+msgstr "Animované"
+
+#: ../data/ogmrip-options.glade.h:9
+msgid "_Crop"
+msgstr "_Oříznout"
+
+#: ../data/ogmrip-options.glade.h:10
+msgid "_Deinterlace"
+msgstr "_Eliminovat prokládání"
+
+#: ../data/ogmrip-options.glade.h:11
+msgid "_Height:"
+msgstr "_Výška:"
+
+#: ../data/ogmrip-options.glade.h:12
+msgid "_Profile:"
+msgstr "Pro_fil:"
+
+#: ../data/ogmrip-options.glade.h:13
+msgid "_Width:"
+msgstr "Šíř_ka:"
+
+#: ../data/ogmrip-pref.glade.h:1
+msgid "<b>DVD Copy</b>"
+msgstr "<b>Kopírovat DVD</a>"
+
+#: ../data/ogmrip-pref.glade.h:2
+msgid "<b>Misc</b>"
+msgstr "<b>Různé</b>"
+
+#: ../data/ogmrip-pref.glade.h:3
+msgid "<b>Pathes</b>"
+msgstr "<b>Cesty</b>"
+
+#: ../data/ogmrip-pref.glade.h:4
+msgid "<b>Preferred Languages</b>"
+msgstr "<b>Preferované jazyky</b>"
+
+#: ../data/ogmrip-pref.glade.h:5
+msgid "Do _not remove temporary files"
+msgstr "_Neodstraňovat dočasné soubory"
+
+#: ../data/ogmrip-pref.glade.h:6 ../src/ogmrip-pref-dialog.c:218
+msgid "Preferences"
+msgstr "Nastavení"
+
+#: ../data/ogmrip-pref.glade.h:7
+msgid ""
+"Remove the copy\n"
+"Keep the copy on the hard drive\n"
+"Keep the copy and update the GUI\n"
+"Ask the user"
+msgstr ""
+"Odstranit kopii\n"
+"Ponechat kopii na disku\n"
+"Ponechat kopii a aktualizovat GUI\n"
+"Zeptat se uživatele"
+
+#: ../data/ogmrip-pref.glade.h:11
+msgid "Select the output directory"
+msgstr "Vybrat výstupní adresář"
+
+#: ../data/ogmrip-pref.glade.h:12
+msgid "Select the temporary directory"
+msgstr "Vybrat dočasný adresář"
+
+#: ../data/ogmrip-pref.glade.h:13
+msgid ""
+"Title\n"
+"Title - Language\n"
+"Title - Language - Video Codec\n"
+"Title - Language - Video Codec Audio Codec"
+msgstr ""
+"Titul\n"
+"Titul - Jazyk\n"
+"Titul - Jazyk - Video Kodek\n"
+"Titul - Jazyk - Video Kodek Audio Kodek"
+
+#: ../data/ogmrip-pref.glade.h:17
+msgid "_Advanced"
+msgstr "_Pokročilý"
+
+#: ../data/ogmrip-pref.glade.h:18
+msgid "_After the encoding:"
+msgstr "Po převodu:"
+
+#: ../data/ogmrip-pref.glade.h:19
+msgid "_Audio:"
+msgstr "_Audio:"
+
+#: ../data/ogmrip-pref.glade.h:20
+msgid "_Chapters:"
+msgstr "_Kapitoly:"
+
+#: ../data/ogmrip-pref.glade.h:21
+msgid "_Copy DVD on hard drive before encoding"
+msgstr "Z_kopírovat DVD na disk před převodem"
+
+#: ../data/ogmrip-pref.glade.h:22
+msgid "_Create a log file"
+msgstr "_Vytvořit log"
+
+#: ../data/ogmrip-pref.glade.h:23
+msgid "_File Name:"
+msgstr "Název _souboru:"
+
+#: ../data/ogmrip-pref.glade.h:25
+msgid "_Output Path:"
+msgstr "Cesta výstupu:"
+
+#: ../data/ogmrip-pref.glade.h:26
+msgid "_Subtitles:"
+msgstr "_Titulky:"
+
+#: ../data/ogmrip-pref.glade.h:27
+msgid "_Temporary Path:"
+msgstr "_Dočasná cesta:"
+
+#: ../data/ogmrip-pref.glade.h:28
+msgid "_Threads:"
+msgstr "_Vláken:"
+
+#: ../data/ogmrip-profile-editor.glade.h:1
+msgid "1 audio +"
+msgstr "1 audio +"
+
+#: ../data/ogmrip-profile-editor.glade.h:2
+msgid ""
+"48000 Hz\n"
+"44100 Hz\n"
+"32000 Hz\n"
+"24000 Hz\n"
+"22050 Hz\n"
+"16000 Hz\n"
+"12000 Hz\n"
+"11025 Hz\n"
+"8000 Hz"
+msgstr ""
+"48000 Hz\n"
+"44100 Hz\n"
+"32000 Hz\n"
+"24000 Hz\n"
+"22050 Hz\n"
+"16000 Hz\n"
+"12000 Hz\n"
+"11025 Hz\n"
+"8000 Hz"
+
+#: ../data/ogmrip-profile-editor.glade.h:11
+msgid "<b>Codec</b>"
+msgstr "<b>Kodek</b>"
+
+#: ../data/ogmrip-profile-editor.glade.h:12
+msgid "<b>Container</b>"
+msgstr "<b>Kontejner</b>"
+
+#: ../data/ogmrip-profile-editor.glade.h:13
+msgid "<b>Encoding</b>"
+msgstr "Převod"
+
+#: ../data/ogmrip-profile-editor.glade.h:14
+msgid "<b>More Options</b>"
+msgstr "<b> Více možností</b>"
+
+#: ../data/ogmrip-profile-editor.glade.h:15
+msgid "<b>Options</b>"
+msgstr "<b>Možnosti</b>"
+
+#: ../data/ogmrip-profile-editor.glade.h:16
+msgid "<b>Text Options</b>"
+msgstr "<b>Nastavení textu</b>"
+
+#: ../data/ogmrip-profile-editor.glade.h:17
+msgid ""
+"Automatic\n"
+"XviD\n"
+"DivX 4\n"
+"Divx 5\n"
+"FFMpeg"
+msgstr ""
+"Automaticky\n"
+"XviD\n"
+"DivX 4\n"
+"Divx 5\n"
+"FFMpeg"
+
+#: ../data/ogmrip-profile-editor.glade.h:22
+msgid ""
+"Dramatically speeds up pass one using faster algorithms and disabling CPU-"
+"intensive options. This will probably reduce global PSNR a little bit "
+"(around 0.01dB) and change individual frame type and PSNR little bit more "
+"(up to 0.03dB)."
+msgstr ""
+"Dramaticky zrychlí první průchod použitím rychlejších algoritmů a vypnutím "
+"na CPU náročných voleb. Tím nejspíš dojde k malému snížení celkového PNSR "
+"(okolo 0,01dB) a trochu více změní i individuální typ snímku a PNSR (do "
+"0,03dB)."
+
+#: ../data/ogmrip-profile-editor.glade.h:23
+msgid "E_xpand image to maximum size"
+msgstr "Z_většit obrázek na maximální velikost"
+
+#: ../data/ogmrip-profile-editor.glade.h:24
+msgid "Ensure A/V _synchronisation"
+msgstr "Zajistit A/V _synchronizaci"
+
+#: ../data/ogmrip-profile-editor.glade.h:25
+msgid ""
+"Extreme\n"
+"High\n"
+"Normal"
+msgstr ""
+"Extrémní\n"
+"Vysoké\n"
+"Normální"
+
+#: ../data/ogmrip-profile-editor.glade.h:28
+msgid ""
+"Fixed size\n"
+"Constant bitrate\n"
+"Constant quantizer"
+msgstr ""
+"Pevná velikost\n"
+"Konstantní datový tok\n"
+"Konstatní kvantizér"
+
+#: ../data/ogmrip-profile-editor.glade.h:31
+msgid "Four_CC:"
+msgstr "Four_CC:"
+
+#: ../data/ogmrip-profile-editor.glade.h:32
+msgid ""
+"Line feed only (Unix, Mac)\n"
+"Carriage return + Line feed (Dos, Windows)\n"
+"Carriage return only (Other)"
+msgstr ""
+"Pouze řádkový vstup (Unix, Mac)\n"
+"Znak ukončení řádky + řádkový vstup (Dos, Windows)\n"
+"Pouze znak ukončení řádky (Jiné)"
+
+#: ../data/ogmrip-profile-editor.glade.h:35
+msgid "MB"
+msgstr "MB"
+
+#: ../data/ogmrip-profile-editor.glade.h:36
+msgid ""
+"MPEG-4 uses a half pixel precision for its motion search by default. The "
+"standard proposes a mode where encoders are allowed to use quarter pixel "
+"precision. This option usually results in a sharper image. Unfortunately it "
+"has a great impact on bitrate and sometimes the higher bitrate use will "
+"prevent it from giving a better image quality at a fixed bitrate. It's "
+"better to test with and without this option and see whether it is worth "
+"activating."
+msgstr ""
+"MPEG-4 automaticky používá pro detekci pohybu přesnost poloviny pixelu. "
+"Standard navrhuje mód, kde enkodéry mohou použít přesnost čtvrtiny pixelu. "
+"Tato volba obvykle vede k ostřejšímu obrazu. Bohužel vyžaduje podstatně "
+"vyšší datový tok a to někdy vede ke snížené kvalitě videa kvůli omezení "
+"datového toku pro dosažení potřebné velikosti. Je tedy lepší si nejprve "
+"vyzkoušet, zda je obraz lepší se zapnutou nebo vypnutou volbou, a zvážit, "
+"jestli je aktivace této volby žádaná."
+
+#: ../data/ogmrip-profile-editor.glade.h:37
+msgid "M_aximum image size:"
+msgstr "M_aximální velikost obrazu"
+
+#: ../data/ogmrip-profile-editor.glade.h:38
+msgid "M_inimum image size:"
+msgstr "M_inimální velikost obrazu"
+
+#: ../data/ogmrip-profile-editor.glade.h:39
+msgid "Maximizes the volume without distorting the sound."
+msgstr "Maximalizuje hlasitost bez zkreslení zvuku."
+
+#: ../data/ogmrip-profile-editor.glade.h:40
+msgid ""
+"Mono\n"
+"Stereo\n"
+"Surround\n"
+"5.1"
+msgstr ""
+"Mono\n"
+"Stereo\n"
+"Surround\n"
+"5.1"
+
+#: ../data/ogmrip-profile-editor.glade.h:44
+msgid ""
+"No Scaling\n"
+"Fast Bilinear\n"
+"Bilinear\n"
+"Bicubic\n"
+"Experimental\n"
+"Nearest Neighbour\n"
+"Area\n"
+"Luma Bicubic Chroma Bilinear\n"
+"Gauss (best for downscaling)\n"
+"SincR\n"
+"Lanczos (best for upscaling)\n"
+"Bicubic Spline"
+msgstr ""
+"Bez škálování\n"
+"Rychlý bilineární\n"
+"Bilineární\n"
+"Bikubický\n"
+"Experimentální\n"
+"Nejbližší okolí\n"
+"Area\n"
+"Jas bikubicky, barvy bilineárně\n"
+"Gauss (nejlepší při zmenšování)\n"
+"SincR\n"
+"Lanczos (nejlepší při zvětšování)\n"
+"Bikubická křivka"
+
+#: ../data/ogmrip-profile-editor.glade.h:56 ../src/ogmrip-queue-dialog.c:683
+msgid "Profile"
+msgstr "Profil"
+
+#: ../data/ogmrip-profile-editor.glade.h:57
+msgid "Reduce image _noise"
+msgstr "Snížit šum obrazu"
+
+#: ../data/ogmrip-profile-editor.glade.h:58
+msgid "S_caler:"
+msgstr "Š_kálovač"
+
+#: ../data/ogmrip-profile-editor.glade.h:59
+msgid "Sample _Rate:"
+msgstr "Vzorkovací f_rekvence:"
+
+#: ../data/ogmrip-profile-editor.glade.h:60
+msgid "Spell _Checking"
+msgstr "Kontrola _pravopisu"
+
+#: ../data/ogmrip-profile-editor.glade.h:61
+msgid "T_rellis searched quantization"
+msgstr "Kvantizace podle mříže"
+
+#: ../data/ogmrip-profile-editor.glade.h:62
+msgid "T_urbo"
+msgstr "T_urbo"
+
+#: ../data/ogmrip-profile-editor.glade.h:63
+msgid "The audio quality from 0 (very low) to 10 (very high)"
+msgstr "Kvalita audia od 0 (velmi nízká) po 10 (velmi vysoká)"
+
+#: ../data/ogmrip-profile-editor.glade.h:64
+msgid "The maximum number of audio channels"
+msgstr "Maximální počet audio kanálů"
+
+#: ../data/ogmrip-profile-editor.glade.h:65
+msgid ""
+"This filter aims to reduce image noise producing smooth images and making "
+"still images really still (This should enhance compressibility.)."
+msgstr ""
+"Tento filtr se pokouší snížit šum obrazu vytvářením plynulých snímků a "
+"zachováním nepohyblivých snímků zkutečně nepohyblivými (to by mělo vést k "
+"vyšší kompresivitě)."
+
+#: ../data/ogmrip-profile-editor.glade.h:66
+msgid ""
+"Trellis quantization is a kind of adaptive quantization method that saves "
+"bits by modifying quantized coefficients to make them more compressible by "
+"the entropy encoder. Its impact on quality is good."
+msgstr ""
+"Mřížkové kvantování je typ adaptivní kvantovací metody, která šetří bity "
+"modifikováním kvantovacích koeficientů aby byly lépe komprimovatelné "
+"entropním enkodérem. Její dopad na kvalitu je dobrý."
+
+#: ../data/ogmrip-profile-editor.glade.h:67
+msgid ""
+"UTF-8\n"
+"ISO-8859-1\n"
+"ASCII"
+msgstr ""
+"UTF-8\n"
+"ISO-8859-1\n"
+"ASCII"
+
+#: ../data/ogmrip-profile-editor.glade.h:70
+msgid "Use _quarter pel motion compensation"
+msgstr "Použít _quarter pel motion compensation"
+
+#: ../data/ogmrip-profile-editor.glade.h:71
+msgid "Use a deblocking filter"
+msgstr "Použít deblocking filter"
+
+#: ../data/ogmrip-profile-editor.glade.h:72
+msgid "Use a deringing filter"
+msgstr "Použít deringing filter"
+
+#: ../data/ogmrip-profile-editor.glade.h:73
+msgid "_Audio"
+msgstr "_Zvuk"
+
+#: ../data/ogmrip-profile-editor.glade.h:74
+msgid "_Bitrate:"
+msgstr "_Bitrate:"
+
+#: ../data/ogmrip-profile-editor.glade.h:75
+msgid "_Channels:"
+msgstr "_Kanály:"
+
+#: ../data/ogmrip-profile-editor.glade.h:76
+msgid "_Character Set:"
+msgstr "_Znaková sada:"
+
+#: ../data/ogmrip-profile-editor.glade.h:77
+msgid "_Codec:"
+msgstr "_Kodek:"
+
+#: ../data/ogmrip-profile-editor.glade.h:78
+msgid "_Crop image"
+msgstr "_Oříznout obraz"
+
+#: ../data/ogmrip-profile-editor.glade.h:79 ../src/ogmrip-main.c:3100
+msgid "_Edit"
+msgstr "_Upravit"
+
+#: ../data/ogmrip-profile-editor.glade.h:80
+msgid "_Forced subtitles only"
+msgstr "_Pouze vynucené titulky"
+
+#: ../data/ogmrip-profile-editor.glade.h:81
+msgid "_Format:"
+msgstr "_Formát:"
+
+#: ../data/ogmrip-profile-editor.glade.h:83
+msgid "_Method:"
+msgstr "_Metoda:"
+
+#: ../data/ogmrip-profile-editor.glade.h:84
+msgid "_Newline:"
+msgstr "_Novýřádek"
+
+#: ../data/ogmrip-profile-editor.glade.h:85
+msgid "_Normalize"
+msgstr "_Normalizovat"
+
+#: ../data/ogmrip-profile-editor.glade.h:86
+msgid "_Options"
+msgstr "M_ožnosti"
+
+#: ../data/ogmrip-profile-editor.glade.h:87
+msgid "_Passes:"
+msgstr "_Průchody:"
+
+#: ../data/ogmrip-profile-editor.glade.h:88
+msgid "_Quality:"
+msgstr "_Kvalita:"
+
+#: ../data/ogmrip-profile-editor.glade.h:89
+msgid "_Quantizer:"
+msgstr "K_vantizér:"
+
+#: ../data/ogmrip-profile-editor.glade.h:90
+msgid "_Size:"
+msgstr "Veliko_st:"
+
+#: ../data/ogmrip-profile-editor.glade.h:91
+msgid "_Subtitles"
+msgstr "_Titulky"
+
+#: ../data/ogmrip-profile-editor.glade.h:92
+msgid "_Video"
+msgstr "_Video"
+
+#: ../data/ogmrip-profile-editor.glade.h:93
+msgid "kbps"
+msgstr "kbps"
+
+#: ../data/ogmrip-profile-editor.glade.h:94
+msgid "video"
+msgstr "video"
+
+#: ../data/ogmrip-profiles.glade.h:1 ../src/ogmrip-queue-dialog.c:577
+msgid "_Export"
+msgstr "_Exportovat"
+
+#: ../data/ogmrip-profiles.glade.h:2 ../src/ogmrip-queue-dialog.c:576
+msgid "_Import"
+msgstr "_Importovat"
+
+#: ../data/ogmrip-profiles.glade.h:3
+msgid "_Profiles:"
+msgstr "_Profily:"
+
+#: ../data/ogmrip-profiles.glade.h:4
+msgid "_Rename"
+msgstr "_Přejmenovat"
+
+#: ../data/ogmrip-progress.glade.h:1
+msgid "Estimated time left:"
+msgstr "Odhad zbývajícího času:"
+
+#: ../data/ogmrip-progress.glade.h:2 ../src/ogmrip-progress-dialog.c:393
+msgid "Progress"
+msgstr "Průběh"
+
+#: ../data/ogmrip-progress.glade.h:3
+msgid "Unknown"
+msgstr "Neznámý"
+
+#: ../data/ogmrip-progress.glade.h:4
+msgid "_Close the application if the encoding is successful"
+msgstr "_Zavřít aplikaci po úspěšném dokončení převodu"
+
+#: ../data/ogmrip-queue.glade.h:1
+msgid "Move encoding down"
+msgstr "Přesunout převod dolů"
+
+#: ../data/ogmrip-queue.glade.h:2
+msgid "Move encoding to bottom"
+msgstr "Přesunout převod na konec"
+
+#: ../data/ogmrip-queue.glade.h:3
+msgid "Move encoding to top"
+msgstr "Přesunout převod na začátek"
+
+#: ../data/ogmrip-queue.glade.h:4
+msgid "Move encoding up"
+msgstr "Přesunout převod nahoru"
+
+#: ../data/ogmrip-spell.glade.h:1
+msgid "A_dd Word"
+msgstr "Při_dat slovo"
+
+#: ../data/ogmrip-spell.glade.h:2
+msgid "Ignore _All"
+msgstr "Ignorov_at vše"
+
+#: ../data/ogmrip-spell.glade.h:3
+msgid "Mispelled word:"
+msgstr "Chybné slovo:"
+
+#: ../data/ogmrip-spell.glade.h:4
+msgid "Replace _with:"
+msgstr "Nahradit čí_m:"
+
+#: ../data/ogmrip-spell.glade.h:5 ../src/ogmrip-spell-dialog.c:202
+msgid "Spell Checking"
+msgstr "Kontrola pravopisu"
+
+#: ../data/ogmrip-spell.glade.h:6
+msgid "_Ignore"
+msgstr "_Ignorovat"
+
+#: ../data/ogmrip-spell.glade.h:7
+msgid "_Replace"
+msgstr "_Nahradit"
+
+#: ../data/ogmrip-update.glade.h:1
+msgid ""
+"<b><big>Profile updates are available</big></b>\n"
+"Select the profiles you want to update"
+msgstr ""
+"<b><big>Jsou k dispozici aktualizace profilů</big></b>\n"
+"Vyberte profily které chcete aktualizovat"
+
+#: ../data/ogmrip-update.glade.h:3 ../src/ogmrip-main.c:3101
+msgid "Select _All"
+msgstr "Vybrat _vše"
+
+#: ../data/ogmrip-update.glade.h:4 ../src/ogmrip-main.c:3102
+msgid "_Deselect All"
+msgstr "Zrušit _výběr všeho"
+
+#: ../data/ogmrip-x264.glade.h:1
+msgid "<b>Analysis</b>"
+msgstr "<b>Analýza</b>"
+
+#: ../data/ogmrip-x264.glade.h:2
+msgid "<b>Frame type</b>"
+msgstr "<b>Typ rámce</b>"
+
+#: ../data/ogmrip-x264.glade.h:3 ../data/ogmrip-xvid.glade.h:16
+msgid "<b>Other</b>"
+msgstr "<b>Ostatní</b>"
+
+#: ../data/ogmrip-x264.glade.h:4
+msgid "<b>Presets</b>"
+msgstr "<b>Přednastavení</b>"
+
+#: ../data/ogmrip-x264.glade.h:5
+msgid "<b>Rate control</b>"
+msgstr "<b>Řízení poměru </b>"
+
+#: ../data/ogmrip-x264.glade.h:6
+msgid "Adaptive B-frame placement decision algorithm (b_adapt)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:7
+msgid "Adaptive spatial transform size (8x8dct)"
+msgstr "Velikost adaptivní prostorové transformace (8x8dct)"
+
+#: ../data/ogmrip-x264.glade.h:8
+msgid ""
+"Allows B-frames to be used as references for predicting other frames "
+"(b_pyramid)"
+msgstr ""
+"Umožnit B-snímkům, aby byly použity jako reference pro predikci ostatních "
+"snímků (b_pyramid)"
+
+#: ../data/ogmrip-x264.glade.h:9
+msgid ""
+"Allows each 8x8 or 16x8 motion partition to independently select a reference "
+"frame (mixed_refs)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:10
+msgid "Analysis"
+msgstr "Analýza"
+
+#: ../data/ogmrip-x264.glade.h:11
+msgid "Averaging period for vbv_maxrate, in kbits (vbv_bufsize)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:12
+msgid ""
+"Baseline (no 8x8dct, no cabac, no weight_p, no cqm, no bframes)\n"
+"Main (no 8x8dct and no cqm)\n"
+"High (no restriction)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:15
+msgid ""
+"Diamond search, radius 1 (dia - fast)\n"
+"Hexagon search, radius 2 (hex)\n"
+"Uneven multi-hexagon search (umh - slow)\n"
+"Exhaustive search (esa - very slow)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:19
+msgid ""
+"Disabled\n"
+"Blind offset\n"
+"Smart analysis"
+msgstr ""
+"Vypnuto\n"
+"Slepý posun\n"
+"Chytrá analýza"
+
+#: ../data/ogmrip-x264.glade.h:22
+msgid ""
+"Enables rate-distortion optimization of macroblock types in B-frames (brdo)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:23
+msgid "Encoding"
+msgstr "Kódování"
+
+#: ../data/ogmrip-x264.glade.h:24
+msgid ""
+"Flat\n"
+"JVM"
+msgstr ""
+"Plochý\n"
+"JVM"
+
+#: ../data/ogmrip-x264.glade.h:26
+msgid "Fullpixel motion estimation algorithm (me)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:27
+msgid "Maximum GOP size (keyint)"
+msgstr "Maximální velikost GOP (skupiny snímků; keyint)"
+
+#: ../data/ogmrip-x264.glade.h:28
+msgid "Maximum local bitrate, in kbits/second (vbv_maxrate)"
+msgstr "Maximální lokální datový tok v kb/s (vbv_maxrate)"
+
+#: ../data/ogmrip-x264.glade.h:29
+msgid "Maximum motion vector search range (merange)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:30
+msgid ""
+"Maximum number of consecutive B-frames between I- and P-frames (bframes)"
+msgstr ""
+"Maximální počet po sobě jdoucích B-snímků mezi I- a P- snímky (bframes)"
+
+#: ../data/ogmrip-x264.glade.h:31
+msgid ""
+"None\n"
+"Spatial\n"
+"Temporal\n"
+"Auto"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:35
+msgid ""
+"None\n"
+"Strict\n"
+"Normal"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:38
+msgid "Number of frames for frametype lookahead (rc-lookahead)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:39
+msgid ""
+"Number of previous frames used as predictors in B- and  P-frames (frameref)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:40
+msgid "Prediction mode for 'direct' motion vectors (direct_pred)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:41
+msgid "Preset quantization matrices (cqm)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:42
+msgid "Profile of the output stream (profile)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:43
+msgid "Set the bitstream's level (level_idc)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:44
+msgid "Strength of rate-distortion psychovisual optimization (psy-rd)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:45
+msgid "Strength of trellis psychovisual optimization (psy-trellis)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:46
+msgid "Subpel refinement quality (subq)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:47
+msgid "Use access unit delimiters (aud)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:48
+msgid "Use context-adaptive binary arithmetic coding (cabac)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:49
+msgid "Use global header (global_header)"
+msgstr "Použít globální záhlaví (global_header)"
+
+#: ../data/ogmrip-x264.glade.h:50
+msgid "Use small macroblocks (partitions)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:51
+msgid "Use weighted prediction in B-frames (weight_b)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:52
+msgid "Weighted prediction for P-frames (weight_p)"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:1
+msgid ""
+"0 - Off\n"
+"1 - Mode decision\n"
+"2 - Limited search\n"
+"3 - Medium search\n"
+"4 - Wide search"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:6
+msgid ""
+"0 - Off\n"
+"1 - Very low\n"
+"2 - Low\n"
+"3 - Medium\n"
+"4 - High\n"
+"5 - Very high\n"
+"6 - Ultra high"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:13
+msgid "<b>B-VOPs</b>"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:14
+msgid "<b>General</b>"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:15
+msgid "<b>Motion Precision</b>"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:17
+msgid "<b>Pixel aspect ratio</b>"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:18
+msgid "<b>Restrictions</b>"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:19
+msgid "Adaptative quantization (b_adapt)"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:20
+msgid "Allow vector candidates for B-frames (bvhq)"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:21
+msgid "Closed GOP (closed_gop)"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:22
+msgid "Enable  a  chroma  optimizer  prefilter (chroma_opt)"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:23
+msgid "Frame drop ratio (frame_drop_ratio):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:24
+msgid "Global motion compensation (gmc)"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:25
+msgid "Interlaced encoding (interlacing)"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:26
+msgid "Max B-frame quantizer (max_bquant):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:27
+msgid "Max I-frame quantizer (max_iquant):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:28
+msgid "Max P-frame quantizer (max_pquant):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:29
+msgid "Max consecutive B-VOPs (max_bframes):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:30
+msgid "Maximum I-frame interval (max_key_interval):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:31
+msgid "Min B-frame quantizer (min_bquant):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:32
+msgid "Min I-frame quantizer (min_iquant):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:33
+msgid "Min P-frame quantizer (min_pquant):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:34
+msgid "Misc"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:35
+msgid "Motion"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:36
+msgid "Motion search precision (me_quality):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:37
+msgid ""
+"No restrictions\n"
+"Simple level 0\n"
+"Simple level 1\n"
+"Simple level 2\n"
+"Simple level 3\n"
+"Advanced simple level 0\n"
+"Advanced simple level 1\n"
+"Advanced simple level 2\n"
+"Advanced simple level 3\n"
+"Advanced simple level 4\n"
+"Advanced simple level 5\n"
+"DXN handheld\n"
+"DXN portable NTSC\n"
+"DXN portable PAL\n"
+"DXN home theater NTSC\n"
+"DXN home theater PAL \n"
+"DXN HDTV"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:54
+msgid ""
+"None\n"
+"PC content\n"
+"PAL standard 4:3 PAR  \n"
+"PAL standard 16:9 PAR \n"
+"NTSC standard 4:3 PAR \n"
+"NTSC standard 16:6 PAR\n"
+"Custom"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:61
+msgid "Packed bitstream (packed)"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:62
+msgid "Pixel aspect ratio (par):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:63
+msgid "Profile (profile):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:64
+msgid "Quantization"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:65
+msgid "Quantization type (quant_type):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:66
+msgid "Quantizer offset (bquant_offset):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:67
+msgid "Quantizer ratio (bquant_ratio):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:68
+msgid "Use chroma motion (chroma_me)"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:69
+msgid "VHQ mode (vhq):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:70
+msgid "Width x height:"
+msgstr "Šířka x výška"
+
+#: ../data/ogmrip-xvid.glade.h:71
+msgid ""
+"h263\n"
+"mpeg"
+msgstr ""
+"h263\n"
+"mpeg"
+
+#: ../data/profiles.xml.in.h:1
+msgid ""
+"&lt;b&gt;DivX for Standalone Player&lt;/b&gt;&#xA;2-pass, 1x700MB (AVI + "
+"XviD + MP3)"
+msgstr ""
+"&lt;b&gt;DivX pro Standalone Player&lt;/b&gt;&#xA;2-pass, 1x700MB (AVI + "
+"XviD + MP3)"
+
+#: ../data/profiles.xml.in.h:2
+msgid "&lt;b&gt;PC, High Quality&lt;/b&gt;&#xA;Quantizer 2 (MKV + X264 + AAC)"
+msgstr ""
+"&lt;b&gt;PC, Vysoká kvalita&lt;/b&gt;&#xA;Quantizer 2 (MKV + X264 + AAC)"
+
+#: ../data/profiles.xml.in.h:3
+msgid ""
+"&lt;b&gt;PC, Low Quality&lt;/b&gt;&#xA;1-pass, 1x700MB (OGM + Lavc + Vorbis)"
+msgstr ""
+"&lt;b&gt;PC, Nízká kvalita&lt;/b&gt;&#xA;1-pass, 1x700MB (OGM + Lavc + "
+"Vorbis)"
+
+#: ../libogmdvd/ogmdvd-disc.c:113
+#, c-format
+msgid "No such file or directory"
+msgstr "Takový soubor ani adresář neexistuje"
+
+#: ../libogmdvd/ogmdvd-disc.c:117
+#, c-format
+msgid "Permission denied to access device"
+msgstr "Přístup k zařízení odepřen"
+
+#: ../libogmdvd/ogmdvd-disc.c:123
+#, c-format
+msgid "Tray seems to be open"
+msgstr "Zdá se, že je plato mechaniky otevřené"
+
+#: ../libogmdvd/ogmdvd-disc.c:125
+#, c-format
+msgid "Device does not contain a valid DVD video"
+msgstr "Zařízení neobsahuje platné DVD video"
+
+#: ../libogmdvd/ogmdvd-disc.c:128
+#, c-format
+msgid "Path does not contain a valid DVD structure"
+msgstr "Cesta neobsahuje platnou DVD strukturu"
+
+#: ../libogmdvd/ogmdvd-disc.c:130
+#, c-format
+msgid "No such directory, block device or iso file"
+msgstr "Není takový adresář, blokové zařízení nebo iso soubor"
+
+#: ../libogmdvd/ogmdvd-disc.c:629
+#, c-format
+msgid "Cannot open video manager"
+msgstr ""
+
+#: ../libogmdvd/ogmdvd-disc.c:692 ../libogmrip/ogmrip-encoding.c:3402
+#, c-format
+msgid "Device does not contain the expected DVD"
+msgstr "Zařízení neobsahuje očekávané DVD"
+
+#: ../libogmdvd/ogmdvd-title.c:94
+#, c-format
+msgid "Cannot open video titleset"
+msgstr ""
+
+#: ../libogmdvd-gtk/ogmdvd-chapter-list.c:108
+#: ../libogmdvd-gtk/ogmdvd-chapter-list.c:246
+msgid "Chapter"
+msgstr "Kapitola"
+
+#: ../libogmdvd-gtk/ogmdvd-chapter-list.c:112
+msgid "Duration"
+msgstr "Čas"
+
+#: ../libogmdvd-gtk/ogmdvd-chapter-list.c:116
+msgid "Label"
+msgstr "Popisek"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-dialog.c:122
+msgid "Open DVD Disk"
+msgstr "Otevřít disk DVD"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-dialog.c:146
+msgid "_Eject"
+msgstr "_Vysunout"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-dialog.c:177
+msgid "<b>Select _DVD Drive:</b>"
+msgstr "<b>Vybrat _DVD jednotku</b>"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:220
+msgid "Select an ISO file"
+msgstr "Vybrat ISO soubor"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:220
+msgid "Select a DVD structure"
+msgstr "Vybrat DVD strukturu"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:245
+msgid "ISO images"
+msgstr "ISO obrazy"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:383
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:534
+msgid ""
+"<b>No DVD</b>\n"
+"No device"
+msgstr ""
+"<b>Žádné DVD</b>\n"
+"Žádné zařízení"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:407
+msgid "Unknown Drive"
+msgstr "Neznámá jednotka"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:543
+msgid "Select a DVD structure..."
+msgstr "Vybrat DVD strukturu..."
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:547
+msgid "Select an ISO file..."
+msgstr "Vybrat ISO soubor..."
+
+#: ../libogmdvd-gtk/ogmdvd-title-chooser-widget.c:234
+msgid "hours"
+msgstr "hodiny"
+
+#: ../libogmdvd-gtk/ogmdvd-title-chooser-widget.c:236
+msgid "minutes"
+msgstr "minuty"
+
+#: ../libogmdvd-gtk/ogmdvd-title-chooser-widget.c:238
+msgid "seconds"
+msgstr "sekundy"
+
+#: ../libogmdvd-gtk/ogmdvd-title-chooser-widget.c:240
+#: ../src/ogmrip-queue-dialog.c:679
+msgid "Title"
+msgstr "Titul"
+
+#: ../libogmrip/ogmrip-aac.c:183
+msgid "Advanced Audio Coding (AAC)"
+msgstr "Advanced Audio Coding (AAC)"
+
+#: ../libogmrip/ogmrip-aac.c:207
+#, c-format
+msgid "MPlayer and FAAC are missing"
+msgstr "MPlayer a FAAC nejsou k dispozici"
+
+#: ../libogmrip/ogmrip-aac.c:209 ../libogmrip/ogmrip-mp3.c:235
+#: ../libogmrip/ogmrip-vorbis.c:207 ../libogmrip/ogmrip-wav.c:124
+#, c-format
+msgid "MPlayer is missing"
+msgstr "MPlayer není k dispozici"
+
+#: ../libogmrip/ogmrip-aac.c:211
+#, c-format
+msgid "FAAC is missing"
+msgstr "FAAC chybí"
+
+#: ../libogmrip/ogmrip-acopy.c:157
+msgid "Copy (for AC3 or DTS)"
+msgstr "Kopírovat (pro AC3 nebo DTS)"
+
+#: ../libogmrip/ogmrip-avi.c:300
+msgid "Audio-Video Interlace (AVI)"
+msgstr "Audio-Video Interlace (AVI)"
+
+#: ../libogmrip/ogmrip-encoding.c:1788
+#, c-format
+msgid "Unknown error while extracting chapters"
+msgstr "Neznámá chyba při extrakci kapitol"
+
+#: ../libogmrip/ogmrip-encoding.c:1883
+#, c-format
+msgid "Unknown error while extracting subtitle stream"
+msgstr "Neznámá chyba při extrakci titulků"
+
+#: ../libogmrip/ogmrip-encoding.c:1999
+#, c-format
+msgid "Unknown error while extracting audio stream"
+msgstr "Neznámá chyba při extrakci audio stopy"
+
+#: ../libogmrip/ogmrip-encoding.c:2243
+#, c-format
+msgid "Unknown error while extracting video stream"
+msgstr "Neznámá chyba při extrakci audio stopy"
+
+#: ../libogmrip/ogmrip-encoding.c:2281
+#, c-format
+msgid "Unknown error while merging"
+msgstr "Neznámá chyba při spojování"
+
+#: ../libogmrip/ogmrip-encoding.c:3028
+#, c-format
+msgid "The container and the video codec are incompatible."
+msgstr "Kontejner a video kodek jsou nekompatibilní."
+
+#: ../libogmrip/ogmrip-encoding.c:3063
+#, c-format
+msgid "Your version of MPlayer does not support DTS streams"
+msgstr "Vaše verze Mplayeru nepodporuje DTS typ dat"
+
+#: ../libogmrip/ogmrip-encoding.c:3074
+#, c-format
+msgid "The container and the audio codec are incompatible."
+msgstr "Kontejner a audio kodek jsou nekompatibilní."
+
+#: ../libogmrip/ogmrip-encoding.c:3098
+#, c-format
+msgid "It is not possible to hardcode multiple subtitle streams"
+msgstr ""
+
+#: ../libogmrip/ogmrip-encoding.c:3109
+#, c-format
+msgid "The container and the subtitles codec are incompatible."
+msgstr "Kontejner a kodek titulků jsou nekompatibilní."
+
+#: ../libogmrip/ogmrip-encoding.c:3122
+#, c-format
+msgid "The container and the audio file are incompatible."
+msgstr "Kontejner a audio soubor jsou nekompatibilní."
+
+#: ../libogmrip/ogmrip-encoding.c:3135
+#, c-format
+msgid "The container and the subtitles file are incompatible."
+msgstr "Kontejner a titulky jsou nekompatibilní."
+
+#: ../libogmrip/ogmrip-encoding.c:3148
+#, c-format
+msgid "The selected container does not support multiple audio streams"
+msgstr "Vybraný kontejner nepodporuje více audio stop"
+
+#: ../libogmrip/ogmrip-encoding.c:3161
+#, c-format
+msgid "The selected container does not support multiple subtitles streams"
+msgstr "Vybraný kontejner nepodporuje více titulků"
+
+#: ../libogmrip/ogmrip-encoding.c:3177
+#, c-format
+msgid "No container has been selected."
+msgstr "Nebyl vybrán kontejner"
+
+#: ../libogmrip/ogmrip-encoding.c:3243 ../libogmrip/ogmrip-encoding.c:3253
+#, c-format
+msgid "Failed to get mount point of '%s'"
+msgstr "Nepovedlo se získat přípojný bod '%s'"
+
+#: ../libogmrip/ogmrip-encoding.c:3266
+#, c-format
+msgid "Not enough space to store output and temporary files (%sMB needed)."
+msgstr ""
+"Nedostatek místa k uložení souboru výstupu a dočasných souborů (%sMB "
+"vyžadováno)."
+
+#: ../libogmrip/ogmrip-encoding.c:3279
+#, c-format
+msgid "Not enough space to store the temporary files (%sMB needed)."
+msgstr "Nedostatek místa k uložení dočasných souborů (%sMB vyžadováno)."
+
+#: ../libogmrip/ogmrip-encoding.c:3291
+#, c-format
+msgid "Not enough space to store the output file (%sMB needed)."
+msgstr "Nedostatek místa k uložení souboru výstupu (%sMB vyžadováno)."
+
+#: ../libogmrip/ogmrip-encoding.c:3363 ../libogmrip/ogmrip-encoding.c:3372
+#: ../libogmrip/ogmrip-encoding.c:3389
+#, c-format
+msgid "The file %s does not seem to contain a valid encoding"
+msgstr ""
+
+#: ../libogmrip/ogmrip-encoding.c:5823
+#, c-format
+msgid "A file named '%s' already exists."
+msgstr "Název souboru '%s' již existuje."
+
+#: ../libogmrip/ogmrip-encoding.c:5997
+#, c-format
+msgid "Unknown error while copying the DVD on the hard drive"
+msgstr "Neznámá chyba při kopírování DVD na disk"
+
+#: ../libogmrip/ogmrip-encoding.c:6047
+#, c-format
+msgid ""
+"Cannot perform a compressibility test when the video codec is not defined."
+msgstr ""
+
+#: ../libogmrip/ogmrip-encoding.c:6054
+#, c-format
+msgid ""
+"Cannot perform a compressibility test when cropping parameters are not "
+"defined."
+msgstr "Test komprese nelze provést, dokud nejsou definované parametry ořezu."
+
+#: ../libogmrip/ogmrip-encoding.c:6061
+#, c-format
+msgid ""
+"Cannot perform a compressibility test when scaling parameters are not "
+"defined."
+msgstr ""
+
+#: ../libogmrip/ogmrip-encoding.c:6068
+#, c-format
+msgid ""
+"Cannot perform a compressibility test when encoding at constant quantizer."
+msgstr ""
+
+#: ../libogmrip/ogmrip-file.c:512 ../libogmrip/ogmrip-file.c:773
+#: ../libogmrip/ogmrip-file.c:843 ../libogmrip/ogmrip-file.c:987
+#, c-format
+msgid "Unknown error while identifying '%s'"
+msgstr "Neznámá chyba při identifiaci '%s'"
+
+#: ../libogmrip/ogmrip-file.c:541 ../libogmrip/ogmrip-file.c:1026
+#, c-format
+msgid "Cannot identify file '%s': %s"
+msgstr "Nemohu identifikovat soubor '%s': %s"
+
+#: ../libogmrip/ogmrip-file.c:553 ../libogmrip/ogmrip-file.c:1038
+#, c-format
+msgid "Cannot get bitrate of file '%s'"
+msgstr "Nemohu zjistit bitrate souboru '%s'"
+
+#: ../libogmrip/ogmrip-file.c:560
+#, c-format
+msgid "Cannot get rate of file '%s'"
+msgstr "Nemohu zjistit vzorkovací frekvenci souboru '%s'"
+
+#: ../libogmrip/ogmrip-file.c:567 ../libogmrip/ogmrip-file.c:1045
+#, c-format
+msgid "Cannot get length of file '%s'"
+msgstr "Nemohu zjistit délku souboru '%s'"
+
+#: ../libogmrip/ogmrip-file.c:574 ../libogmrip/ogmrip-file.c:793
+#: ../libogmrip/ogmrip-file.c:863 ../libogmrip/ogmrip-file.c:1052
+#, c-format
+msgid "Cannot get format of file '%s'"
+msgstr "Nemohu zjistit formát souboru '%s'"
+
+#: ../libogmrip/ogmrip-file.c:581
+#, c-format
+msgid "Cannot get number of channels of file '%s'"
+msgstr "Nemohu zjistit počet kanálů v souboru '%s'"
+
+#: ../libogmrip/ogmrip-file.c:588
+#, c-format
+msgid "File '%s' contains video tracks"
+msgstr "Soubor '%s' obsahuje video stopy"
+
+#: ../libogmrip/ogmrip-file.c:596
+#, c-format
+msgid "Format of file '%s' is not supported"
+msgstr "Formát souboru '%s' není podporován"
+
+#: ../libogmrip/ogmrip-file.c:607 ../libogmrip/ogmrip-file.c:805
+#: ../libogmrip/ogmrip-file.c:875 ../libogmrip/ogmrip-file.c:1091
+#, c-format
+msgid "Unknown error while opening '%s': %s"
+msgstr "Neznámá chyba při otevírání '%s': %s"
+
+#: ../libogmrip/ogmrip-file.c:1059
+#, c-format
+msgid "Cannot get width of video file '%s'"
+msgstr "Nemohu zjistit šířku video souboru '%s'"
+
+#: ../libogmrip/ogmrip-file.c:1066
+#, c-format
+msgid "Cannot get height of video file '%s'"
+msgstr "Nemohu zjistit výšku souboru '%s'"
+
+#: ../libogmrip/ogmrip-file.c:1073
+#, c-format
+msgid "Cannot get aspect ratio of video file '%s'"
+msgstr "Nemohu zjistit poměr stran video souboru '%s'"
+
+#: ../libogmrip/ogmrip-file.c:1080
+#, c-format
+msgid "Cannot get frame rate of video file '%s'"
+msgstr "Nemohu zjistit snímkovací frekvenci video souboru '%s'"
+
+#: ../libogmrip/ogmrip-fs.c:103 ../libogmrip/ogmrip-fs.c:297
+#, c-format
+msgid "Failed to create directory '%s': %s"
+msgstr "Nepovedlo se vytvořit adresář '%s': %s"
+
+#: ../libogmrip/ogmrip-fs.c:160
+#, c-format
+msgid "Failed to unlink file '%s': %s"
+msgstr "Nepodařilo se odpojit soubor '%s': %s"
+
+#: ../libogmrip/ogmrip-fs.c:174
+#, c-format
+msgid "Failed to remove directory '%s': %s"
+msgstr "Nepovedlo se odstranit adresář '%s': %s"
+
+#: ../libogmrip/ogmrip-fs.c:205 ../libogmrip/ogmrip-fs.c:407
+#, c-format
+msgid "Failed to create file '%s': %s"
+msgstr "Nelze vytvořit soubor '%s': %s"
+
+#: ../libogmrip/ogmrip-fs.c:249
+#, c-format
+msgid "Failed to create fifo '%s': %s"
+msgstr "Nepovedlo se vytvořit fifo '%s': %s"
+
+#: ../libogmrip/ogmrip-fs.c:349
+#, c-format
+msgid "Failed to link '%s': %s"
+msgstr "Nepovedlo se spojit '%s': %s"
+
+#: ../libogmrip/ogmrip-fs.c:385
+#, c-format
+msgid "Template '%s' doesn't end with XXXXXX"
+msgstr "Šablona '%s' nekončí XXXXXX"
+
+#: ../libogmrip/ogmrip-fs.c:396
+#, c-format
+msgid "Template '%s' invalid, should not contain a '/'"
+msgstr "Šablona '%s' je neplatná, nemá obsahovat '/'"
+
+#: ../libogmrip/ogmrip-fs.c:465
+#, c-format
+msgid "Failed to stat the file system containing '%s': %s"
+msgstr "Nepovedlo se najít soubor obsahující '%s': %s"
+
+#: ../libogmrip/ogmrip-fs.c:508
+#, c-format
+msgid "Failed to stat '%s': %s"
+msgstr "Nepovedlo se najít '%s': %s"
+
+#: ../libogmrip/ogmrip-fs.c:515
+#, c-format
+msgid "Failed to change to directory '%s': %s"
+msgstr "Nepovedlo se přejít do adresáře '%s': %s"
+
+#: ../libogmrip/ogmrip-fs.c:524
+#, c-format
+msgid "Failed to stat '..': %s"
+msgstr "Nepovedlo se najít '..': %s"
+
+#: ../libogmrip/ogmrip-fs.c:534
+#, c-format
+msgid "Failed to change to directory '..': %s"
+msgstr "Nepodařilo se změnit adresář '..': %s"
+
+#: ../libogmrip/ogmrip-hardsub.c:44
+msgid "Hardcoded subtitle"
+msgstr ""
+
+#: ../libogmrip/ogmrip-lavc-mpeg4.c:65
+msgid "Lavc Mpeg-4"
+msgstr "Lavc Mpeg-4"
+
+#: ../libogmrip/ogmrip-mkv.c:463
+msgid "Matroska Media (MKV)"
+msgstr "Matroska Media (MKV)"
+
+#: ../libogmrip/ogmrip-mkv.c:501 ../libogmrip/ogmrip-mkv.c:519
+#, c-format
+msgid "mkvmerge is missing"
+msgstr "mkvmerge není k dispozici"
+
+#: ../libogmrip/ogmrip-mov.c:66
+#, c-format
+msgid "An MOV file must contain a video stream."
+msgstr "Soubor MOV musí obsahovat video tok."
+
+#: ../libogmrip/ogmrip-mov.c:144
+msgid "QuickTime Media (MOV)"
+msgstr "QuickTime Media (MOV)"
+
+#: ../libogmrip/ogmrip-mov.c:179 ../libogmrip/ogmrip-srt.c:556
+#: ../libogmrip/ogmrip-vobsub.c:282 ../libogmrip/ogmrip-x264.c:921
+#: ../libogmrip/ogmrip-xvid.c:928
+#, c-format
+msgid "MEncoder is missing"
+msgstr "MEncoder není k dispozici"
+
+#: ../libogmrip/ogmrip-mov.c:191
+#, c-format
+msgid "MEncoder is build without lavf support"
+msgstr "MEncoder je zkompilován bez lavf podpory"
+
+#: ../libogmrip/ogmrip-mp3.c:209
+msgid "MPEG-1 layer III (MP3)"
+msgstr "MPEG-1 layer III (MP3)"
+
+#: ../libogmrip/ogmrip-mp3.c:233
+#, c-format
+msgid "MPlayer and LAME are missing"
+msgstr "MPlayer a LAME nejsou k dispozici"
+
+#: ../libogmrip/ogmrip-mp3.c:237
+#, c-format
+msgid "LAME is missing"
+msgstr "LAME není k dispozici"
+
+#: ../libogmrip/ogmrip-mp4.c:654
+msgid "Mpeg-4 Media (MP4)"
+msgstr "Mpeg-4 Media (MP4)"
+
+#: ../libogmrip/ogmrip-mp4.c:688
+#, c-format
+msgid "MP4Box is missing"
+msgstr "MP4Box není k dispozici"
+
+#: ../libogmrip/ogmrip-novideo.c:32
+msgid "No Video"
+msgstr "Bez videa"
+
+#: ../libogmrip/ogmrip-ogg.c:433
+msgid "Ogg Media (OGM)"
+msgstr "Ogg Media (OGM)"
+
+#: ../libogmrip/ogmrip-ogg.c:477
+#, c-format
+msgid "ogmmerge and ogmsplit are missing"
+msgstr "ogmmerge a ogmsplit nejsou k dispozici"
+
+#: ../libogmrip/ogmrip-ogg.c:479
+#, c-format
+msgid "ogmmerge is missing"
+msgstr "ogmmerge není k dispozici"
+
+#: ../libogmrip/ogmrip-ogg.c:481
+#, c-format
+msgid "ogmsplit is missing"
+msgstr "ogmsplit není k dispozici"
+
+#: ../libogmrip/ogmrip-plugin.c:152
+#, c-format
+msgid "Plugin %s disabled"
+msgstr "Zásuvný modul %s odpojen"
+
+#: ../libogmrip/ogmrip-plugin.c:154
+msgid "some requirements are not available"
+msgstr "některé požadavky nejsou dostupné"
+
+#: ../libogmrip/ogmrip-settings.c:1648 ../libogmrip/ogmrip-settings.c:1786
+#, c-format
+msgid "Failed to open '%s'"
+msgstr "Nelze otevřít '%s'"
+
+#: ../libogmrip/ogmrip-settings.c:1656 ../libogmrip/ogmrip-settings.c:1667
+#: ../libogmrip/ogmrip-settings.c:1680 ../libogmrip/ogmrip-settings.c:1697
+#: ../libogmrip/ogmrip-settings.c:1705 ../libogmrip/ogmrip-settings.c:1794
+#: ../libogmrip/ogmrip-settings.c:1805 ../libogmrip/ogmrip-settings.c:1818
+#: ../libogmrip/ogmrip-settings.c:1835 ../libogmrip/ogmrip-settings.c:1843
+#, c-format
+msgid "'%s' does not contain a valid profile"
+msgstr "'%s' neobsahuje platný profil"
+
+#: ../libogmrip/ogmrip-srt.c:540
+msgid "SRT text"
+msgstr "SRT text"
+
+#: ../libogmrip/ogmrip-srt.c:593
+#, c-format
+msgid "GOCR, Ocrad and Tesseract are missing"
+msgstr "GOCR, Ocrad a Tesseract nejsou k dispozici"
+
+#: ../libogmrip/ogmrip-theora.c:215
+msgid "Ogg Theora"
+msgstr "Ogg Theora"
+
+#: ../libogmrip/ogmrip-vobsub.c:270
+msgid "VobSub"
+msgstr "VobSub"
+
+#: ../libogmrip/ogmrip-vorbis.c:181
+msgid "Ogg Vorbis"
+msgstr "Ogg Vorbis"
+
+#: ../libogmrip/ogmrip-vorbis.c:205
+#, c-format
+msgid "MPlayer and OggEnc are missing"
+msgstr "MPlayer a OggEnc nejsou k dispozici"
+
+#: ../libogmrip/ogmrip-vorbis.c:209
+#, c-format
+msgid "OggEnc is missing"
+msgstr "OggEnc není k dispozici"
+
+#: ../libogmrip/ogmrip-wav.c:113
+msgid "Wave (uncompressed PCM)"
+msgstr "Wave (nekomprimované PCM)"
+
+#: ../libogmrip/ogmrip-x264.c:828
+msgid "X264"
+msgstr "X264"
+
+#: ../libogmrip/ogmrip-x264.c:933
+#, c-format
+msgid "MEncoder is build without X264 support"
+msgstr "MEncoder je zkompilován bez X264 podpory"
+
+#: ../libogmrip/ogmrip-xvid.c:910
+msgid "XviD"
+msgstr "XviD"
+
+#: ../libogmrip/ogmrip-xvid.c:940
+#, c-format
+msgid "MEncoder is built without XviD support"
+msgstr "MEncoder je zkompilován bez XviD podpory"
+
+#: ../libogmrip-gtk/ogmrip-chapter-list.c:109
+msgid "Extract?"
+msgstr "Extrahovat?"
+
+#: ../libogmrip-gtk/ogmrip-chooser-list.c:104
+msgid "More options"
+msgstr "Další volby"
+
+#: ../libogmrip-gtk/ogmrip-chooser-list.c:109
+msgid "Add a stream"
+msgstr "Přidat položku"
+
+#: ../libogmrip-gtk/ogmrip-chooser-list.c:118
+msgid "Remove the stream"
+msgstr "Odebrat položku"
+
+#: ../libogmrip-gtk/ogmrip-helper.c:1096
+msgid "Please insert the DVD required to encode this title."
+msgstr "Prosím vložit DVD k převodu tohoto titulu."
+
+#: ../libogmrip-gtk/ogmrip-lavc-options.c:128
+msgid "Lavc Options"
+msgstr "Volby lavc"
+
+#: ../libogmrip-gtk/ogmrip-x264-options.c:247
+msgid "X264 Options"
+msgstr "Volby x264"
+
+#: ../libogmrip-gtk/ogmrip-x264-options.c:299
+msgid "Transformed Exhaustive search (tesa - even slower)"
+msgstr ""
+
+#: ../libogmrip-gtk/ogmrip-xvid-options.c:171
+msgid "XviD Options"
+msgstr "Možnosti XviD"
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:236
+msgid "Select an audio file"
+msgstr "Vyberte soubor audio"
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:334
+msgid "Select a subtitles file"
+msgstr "Vyberte soubor titulků"
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:430
+#: ../src/ogmrip-audio-options.c:156 ../src/ogmrip-subp-options.c:156
+msgid "_Language:"
+msgstr "_Jazyk:"
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:592
+msgid "No audio"
+msgstr "Bez zvuku"
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:609
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:614
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:621
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:625
+msgid "Track"
+msgstr "Stopa"
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:649
+msgid "No subtitle"
+msgstr "Žádné titulky"
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:661
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:664
+msgid "Subtitle"
+msgstr "Titulky"
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:714
+msgid "Other..."
+msgstr "Jiné..."
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:866
+msgid "Unknown error while opening file"
+msgstr "Neznámá chyba při otevírání souboru"
+
+#: ../src/ogmrip-audio-options.c:115
+msgid "Audio Track Options"
+msgstr "Možnosti audio stopy"
+
+#: ../src/ogmrip-audio-options.c:127 ../src/ogmrip-subp-options.c:127
+msgid "<b>Track</b>"
+msgstr "<b>Stopa</b>"
+
+#: ../src/ogmrip-audio-options.c:144 ../src/ogmrip-subp-options.c:144
+msgid "_Name:"
+msgstr "_Název:"
+
+#: ../src/ogmrip-audio-options.c:162 ../src/ogmrip-options-dialog.c:738
+#: ../src/ogmrip-subp-options.c:162
+msgid "None"
+msgstr "Žádné"
+
+#: ../src/ogmrip-audio-options.c:168 ../src/ogmrip-subp-options.c:168
+msgid "Use _profile settings"
+msgstr "Použít nastavení _profilu"
+
+#: ../src/ogmrip-crop-dialog.c:224
+#, c-format
+msgid "Frame %lu of %lu"
+msgstr "Snímek %lu z %lu"
+
+#: ../src/ogmrip-main.c:163
+msgid ""
+"Please, check http://ogmrip.sourceforge.net to see if this is a known issue."
+msgstr ""
+"Prosím, podívejte se na http://ogmrip.sourceforge.net zda se jedná o již "
+"známý problém."
+
+#: ../src/ogmrip-main.c:164
+msgid ""
+"You really should join the log file if you open a bug report or ask "
+"questions on the forum."
+msgstr ""
+
+#: ../src/ogmrip-main.c:168
+msgid "Please, choose some others."
+msgstr "Prosím, vyberte některé jiné."
+
+#: ../src/ogmrip-main.c:171
+msgid "Please, choose one audio stream only."
+msgstr "Prosím vyberte pouze jednu audio stopu."
+
+#: ../src/ogmrip-main.c:175
+msgid "Please, choose one subtitles stream only."
+msgstr "Prosím, vyberte pouze jedny titulky."
+
+#: ../src/ogmrip-main.c:179
+msgid "This is an unexpected error and should not happen."
+msgstr "Toto je neočekávaná chyba, která by se neměla stát."
+
+#: ../src/ogmrip-main.c:180
+msgid "Please, fill a bug report at http://ogmrip.sourceforge.net."
+msgstr "Vyplňte prosím hlášení o chybě na http://ogmrip.sourceforge.net."
+
+#: ../src/ogmrip-main.c:241
+msgid "Could not create dictionary"
+msgstr "Nepodařilo se vytvořit adresář"
+
+#: ../src/ogmrip-main.c:241
+msgid "Spell will not be checked."
+msgstr "Pravopis nebude kontrolován."
+
+#: ../src/ogmrip-main.c:567
+msgid ""
+"Do you want to remove the copy of the DVD,\n"
+"keep it on the hard drive, or\n"
+"keep it and update the GUI ?"
+msgstr ""
+"Chcete odstranit kopii DVD,\n"
+"ponechat na disku, nebo\n"
+"ponechat a aktualizovat GUI?"
+
+#: ../src/ogmrip-main.c:588
+msgid "_Remove"
+msgstr "Odst_ranit"
+
+#: ../src/ogmrip-main.c:609
+msgid "_Keep"
+msgstr "_Ponechat"
+
+#: ../src/ogmrip-main.c:630
+msgid "_Update"
+msgstr "_Aktualizovat"
+
+#: ../src/ogmrip-main.c:1016
+#, c-format
+msgid "Audio stream %d seems to be empty. It has not been merged."
+msgstr "Zdroj audia %d je patrně prázdný. Nebyl připojen."
+
+#: ../src/ogmrip-main.c:1050
+#, c-format
+msgid "Subtitle stream %d seems to be empty. It has not been merged."
+msgstr "Zdroj titulků %d je patrně prázdný. Nebyl připojen."
+
+#: ../src/ogmrip-main.c:1423 ../src/ogmrip-main.c:1631
+#, c-format
+msgid "Could not open the DVD"
+msgstr "Nelze otevřít DVD"
+
+#: ../src/ogmrip-main.c:1431
+msgid "No available profile"
+msgstr "Profil není k dispozici"
+
+#: ../src/ogmrip-main.c:1431
+msgid "You must create at least one profile before you can encode."
+msgstr "Je nutné vytvořit nejméně jeden profil před převodem."
+
+#: ../src/ogmrip-main.c:1519
+#, c-format
+msgid ""
+"A file named '%s' already exists.\n"
+"Do you want to replace it?"
+msgstr ""
+"Soubor jménem '%s' již existuje.\n"
+"Chcete jej nahradit?"
+
+#: ../src/ogmrip-main.c:1600 ../src/ogmrip-main.c:1636
+#: ../src/ogmrip-main.c:2102 ../src/ogmrip-profiles-dialog.c:613
+#, c-format
+msgid "Unknown error"
+msgstr "Neznámá chyba"
+
+#: ../src/ogmrip-main.c:1610
+msgid "The compressibility test completed successfully."
+msgstr "Test komprese byl úspěšně dokončen."
+
+#: ../src/ogmrip-main.c:1611
+msgid "The scaling parameters have been adjusted to optimize the quality."
+msgstr ""
+
+#: ../src/ogmrip-main.c:1636
+msgid "Could not read the DVD"
+msgstr "Nelze číst DVD"
+
+#: ../src/ogmrip-main.c:1813
+#, c-format
+msgid "Unknown error while exporting the chapters"
+msgstr "Neznámá chyba při exportu kapitol"
+
+#: ../src/ogmrip-main.c:2182
+msgid "The DVD has been successfully encoded, but..."
+msgstr "DVD bylo úspěšně převedeno"
+
+#: ../src/ogmrip-main.c:2297
+msgid "Are you sure you want to cancel the encoding process?"
+msgstr "Opravdu chcete ukončit převod?"
+
+#: ../src/ogmrip-main.c:2441
+msgid "Can't play DVD title"
+msgstr "Nemohu přehrát DVD titul"
+
+#: ../src/ogmrip-main.c:2518
+msgid "Select a chapters file"
+msgstr "Vyberte soubor kapitol"
+
+#: ../src/ogmrip-main.c:2539
+#, c-format
+msgid "Could not open the chapters file '%s'"
+msgstr "Nepovedlo se otevřít soubor kapitol '%s'"
+
+#: ../src/ogmrip-main.c:2554
+msgid "Select a file"
+msgstr "Zvolte soubor"
+
+#: ../src/ogmrip-main.c:2669
+msgid "translator-credits"
+msgstr ""
+"Luboš Staněk <lubek@users.sourceforge.net>\n"
+"\n"
+"Launchpad Contributions:\n"
+"  Belisarivs https://launchpad.net/~v-pelcak\n"
+"  Jiří Jindra https://launchpad.net/~j-jindr\n"
+"  Luboš Staněk https://launchpad.net/~lubek\n"
+"  Rinu https://launchpad.net/~rinu-seznam\n"
+"  Roman Horník https://launchpad.net/~roman.hornik\n"
+"  luisah https://launchpad.net/~luisah-linux-gmail\n"
+"  sirkubador https://launchpad.net/~sirkubador"
+
+#: ../src/ogmrip-main.c:2686
+msgid "A DVD Encoder for GNOME"
+msgstr "DVD enkodér pro GNOME"
+
+#: ../src/ogmrip-main.c:3094
+msgid "_File"
+msgstr "_Soubor"
+
+#: ../src/ogmrip-main.c:3097
+msgid "_Import Chapters..."
+msgstr "_Importovat kapitoly..."
+
+#: ../src/ogmrip-main.c:3097
+msgid "Import chapter information"
+msgstr "Importovat informaci o kapitolách"
+
+#: ../src/ogmrip-main.c:3098
+msgid "_Export Chapters..."
+msgstr "_Exportovat kapitoly..."
+
+#: ../src/ogmrip-main.c:3098
+msgid "Export chapter information"
+msgstr "Exportovat informaci o kapitolách"
+
+#: ../src/ogmrip-main.c:3099
+msgid "Exit OGMRip"
+msgstr "Ukončit OGMRip"
+
+#: ../src/ogmrip-main.c:3101
+msgid "Select all chapters"
+msgstr "Vybrat všechny kapitoly"
+
+#: ../src/ogmrip-main.c:3102
+msgid "Deselect all chapters"
+msgstr "Zrušit výběr všech kapitol"
+
+#: ../src/ogmrip-main.c:3103
+msgid "Pro_files"
+msgstr "Pro_fily"
+
+#: ../src/ogmrip-main.c:3103
+msgid "Edit the profiles"
+msgstr "Editovat profily"
+
+#: ../src/ogmrip-main.c:3104
+msgid "Edit the preferences"
+msgstr "Upravit nastavení"
+
+#: ../src/ogmrip-main.c:3105
+msgid "_Encodings"
+msgstr "Převody"
+
+#: ../src/ogmrip-main.c:3105
+msgid "Edit the encodings"
+msgstr "Upravit převody"
+
+#: ../src/ogmrip-main.c:3106
+msgid "_Help"
+msgstr "_Nápověda"
+
+#: ../src/ogmrip-main.c:3107
+msgid "_About"
+msgstr "O _aplikaci"
+
+#: ../src/ogmrip-main.c:3107
+msgid "About OGMRip"
+msgstr "O aplikaci OGMRip"
+
+#: ../src/ogmrip-options-dialog.c:497
+msgid "Detecting cropping parameters"
+msgstr "Detekuji parametry ořezávání"
+
+#: ../src/ogmrip-options-dialog.c:497
+msgid "Please wait"
+msgstr "Prosím čekejte"
+
+#: ../src/ogmrip-options-dialog.c:738
+msgid "Extra Small"
+msgstr "Extra malé"
+
+#: ../src/ogmrip-options-dialog.c:738
+msgid "Small"
+msgstr "Malé"
+
+#: ../src/ogmrip-options-dialog.c:738
+msgid "Medium"
+msgstr "Střední"
+
+#: ../src/ogmrip-options-dialog.c:739
+msgid "Large"
+msgstr "Velké"
+
+#: ../src/ogmrip-options-dialog.c:739
+msgid "Extra Large"
+msgstr "Velmi velké"
+
+#: ../src/ogmrip-options-dialog.c:739
+msgid "Full"
+msgstr "Plné"
+
+#: ../src/ogmrip-options-dialog.c:739
+msgid "User Defined"
+msgstr "Uživatelem definované"
+
+#: ../src/ogmrip-options-dialog.c:762
+msgid "En_queue"
+msgstr "Zařadit do _fronty"
+
+#: ../src/ogmrip-pref-dialog.c:247
+msgid "No preferred audio language"
+msgstr "Žádný preferovaný jazyk zvuku"
+
+#: ../src/ogmrip-pref-dialog.c:253
+msgid "No preferred subtitle language"
+msgstr "Žádný preferovaný jazyk titulků"
+
+#: ../src/ogmrip-pref-dialog.c:259
+msgid "No chapters language"
+msgstr "Žádný jazyk kapitol"
+
+#: ../src/ogmrip-profiles.c:120
+#, c-format
+msgid "The container '%s' is not available"
+msgstr "Kontejner '%s' není dostupný"
+
+#: ../src/ogmrip-profiles.c:137
+#, c-format
+msgid "The video codec '%s' is not available"
+msgstr "Video kodek '%s' není dostupný"
+
+#: ../src/ogmrip-profiles.c:152
+#, c-format
+msgid "The audio codec '%s' is not available"
+msgstr "Audio kodek '%s' není dostupný"
+
+#: ../src/ogmrip-profiles.c:166
+#, c-format
+msgid "The subtitles codec '%s' is not available"
+msgstr "Kodek titulků '%s' není dostupný"
+
+#: ../src/ogmrip-profile-editor.c:635
+msgid "User"
+msgstr "Uživatel"
+
+#: ../src/ogmrip-profile-editor.c:731
+msgid "_Reset"
+msgstr "_Resetovat"
+
+#: ../src/ogmrip-profiles-dialog.c:200
+msgid "Rename profile"
+msgstr "Přejmenovat profil"
+
+#: ../src/ogmrip-profiles-dialog.c:200
+msgid "New profile"
+msgstr "Nový profil"
+
+#: ../src/ogmrip-profiles-dialog.c:216
+msgid "_Profile name:"
+msgstr "Název _profilu:"
+
+#: ../src/ogmrip-profiles-dialog.c:346
+#, c-format
+msgid "Editing profile \"%s\""
+msgstr "Upravit profil \"%s\""
+
+#: ../src/ogmrip-profiles-dialog.c:385
+msgid "Copy of"
+msgstr "Kopie"
+
+#: ../src/ogmrip-profiles-dialog.c:473 ../src/ogmrip-profiles-dialog.c:474
+msgid "Cannot remove profile"
+msgstr "Profil nelze odstranit"
+
+#: ../src/ogmrip-profiles-dialog.c:487 ../src/ogmrip-profiles-dialog.c:488
+msgid "Delete profile ?"
+msgstr "Smazat profil?"
+
+#: ../src/ogmrip-profiles-dialog.c:562
+msgid "Export profile as"
+msgstr "Exportovat profil jako"
+
+#: ../src/ogmrip-profiles-dialog.c:590
+msgid "Select profile to import"
+msgstr "Vyberte profil pro import"
+
+#: ../src/ogmrip-profiles-dialog.c:611
+msgid "Cannot load profile"
+msgstr "Nelze načíst profil"
+
+#: ../src/ogmrip-profiles-dialog.c:671
+msgid "Edit Profiles"
+msgstr "Upravit profily"
+
+#: ../src/ogmrip-progress-dialog.c:128 ../src/ogmrip-progress-dialog.c:386
+msgid "Suspend"
+msgstr "Pozastavit"
+
+#: ../src/ogmrip-progress-dialog.c:144 ../src/ogmrip-progress-dialog.c:382
+msgid "Resume"
+msgstr "Pokračovat"
+
+#: ../src/ogmrip-progress-dialog.c:216
+msgid "Analyzing video stream"
+msgstr "Analýza video proudu"
+
+#: ../src/ogmrip-progress-dialog.c:219
+msgid "Extracting chapters information"
+msgstr "Extrahuji informaci o kapitolách"
+
+#: ../src/ogmrip-progress-dialog.c:222
+msgid "Encoding video title"
+msgstr "Převod video titulu"
+
+#: ../src/ogmrip-progress-dialog.c:226
+#, c-format
+msgid "Extracting audio stream %d"
+msgstr "Extrahuji audio stopu %d"
+
+#: ../src/ogmrip-progress-dialog.c:232
+#, c-format
+msgid "Extracting subtitle stream %d"
+msgstr "Extrahuji titulky %d"
+
+#: ../src/ogmrip-progress-dialog.c:237
+msgid "Merging audio and video streams"
+msgstr "Spojuji audio a video stopy"
+
+#: ../src/ogmrip-progress-dialog.c:240
+msgid "DVD backup"
+msgstr "DVD záloha"
+
+#: ../src/ogmrip-progress-dialog.c:243
+msgid "Compressibility Test"
+msgstr "Test komprese"
+
+#: ../src/ogmrip-progress-dialog.c:282
+#, c-format
+msgid "%s: %02.0lf%% done"
+msgstr "%s: %02.01f%% hotovo"
+
+#: ../src/ogmrip-queue-dialog.c:450
+msgid "Load encoding"
+msgstr "Načíst převod"
+
+#: ../src/ogmrip-queue-dialog.c:488
+#, c-format
+msgid "Cannot load encoding from '%s'"
+msgstr "Nelze načíst k převodu z '%s'"
+
+#: ../src/ogmrip-queue-dialog.c:514
+msgid "Save encoding"
+msgstr "Uložit převod"
+
+#: ../src/ogmrip-queue-dialog.c:612
+msgid "Encoding Queue"
+msgstr "Fronta převodů"
+
+#: ../src/ogmrip-queue-dialog.c:670
+msgid "Run"
+msgstr "Běží"
+
+#: ../src/ogmrip-queue-dialog.c:675
+msgid "Name"
+msgstr "Název"
+
+#: ../src/ogmrip-queue-dialog.c:762
+msgid "This encoding will have the same output file name as another one."
+msgstr ""
+"Výstupní soubor tohoto převodu bude sdílet stejný název s jiným souborem."
+
+#: ../src/ogmrip-queue-dialog.c:763 ../src/ogmrip-queue-dialog.c:775
+msgid "Do you want to enqueue it anyway ?"
+msgstr "Chcete to přesto zařadit do fronty?"
+
+#: ../src/ogmrip-queue-dialog.c:774
+msgid ""
+"A file with the same name as the output file of the encoding already exists."
+msgstr "Tento název již používá jiný výstupní soubor."
+
+#: ../src/ogmrip-subp-options.c:115
+msgid "Subtitles Options"
+msgstr "Možnosti titulků"
+
+#: ../src/ogmrip-update-dialog.c:136
+msgid "Update profiles"
+msgstr "Aktualizace profilů"
+
+#: ../data/ogmrip.desktop.in.h:1
+msgid "A DVD encoder"
+msgstr "DVD enkodér"
+
+#: ../data/ogmrip.desktop.in.h:2
+msgid "DVD Encoder OGMRip"
+msgstr "DVD enkodér OGMRIP"
+
+#~ msgid "Could not detect scaling parameters"
+#~ msgstr "Nepovedlo se vybrat parametry změny velikosti"
+
+#~ msgid "There is no video codec available"
+#~ msgstr "Není dostupný žádný video kodek"
+
+#~ msgid "Could not detect cropping parameters"
+#~ msgstr "Nepovedlo se nastavit parametry ořezání"
+
+#~ msgid ""
+#~ "Carriage return only (Unix)\n"
+#~ "Carriage return + Line feed (DOS)"
+#~ msgstr ""
+#~ "Unixové oddělování řádku\n"
+#~ "DOSové oddělování řádku"
+
+#~ msgid "End of _line:"
+#~ msgstr "Konec řá_dku:"
+
+#~ msgid "Please, fill a bug report at http://ogmrip.sf.net."
+#~ msgstr "Prosím, vyplňte chybové hlášení na http://ogmrip.sf.net."
+
+#~ msgid ""
+#~ "Fast Bilinear\n"
+#~ "Bilinear\n"
+#~ "Bicubic\n"
+#~ "Experimental\n"
+#~ "Nearest Neighbour\n"
+#~ "Area\n"
+#~ "Luma Bicubic Chroma Bilinear\n"
+#~ "Gauss (best for downscaling)\n"
+#~ "SincR\n"
+#~ "Lanczos (best for upscaling)\n"
+#~ "Bicubic Spline"
+#~ msgstr ""
+#~ "Rychlý Bilineární\n"
+#~ "Bilineární\n"
+#~ "Bikubický\n"
+#~ "Experimentální\n"
+#~ "Nejbližší soused\n"
+#~ "Oblast\n"
+#~ "Luma Bicubic Chroma Bilinear\n"
+#~ "Gaussovský (nejlepší pro zmenšování)\n"
+#~ "SincR\n"
+#~ "Lanczos (nejlepší pro zvětšování)\n"
+#~ "Bikubický Spline"
+
+#~ msgid "Please, check http://ogmrip.sf.net to see if this is a known issue."
+#~ msgstr ""
+#~ "Prosím, podívejte se na http://ogmrip.sf.net jestli je tento problém již "
+#~ "znám."
+
+#~ msgid "Select a DVD Structure"
+#~ msgstr "Vyberte strukturu DVD"
+
+#~ msgid "Could not export the chapters"
+#~ msgstr "Nepovedlo se exportovat kapitoly."
+
+#~ msgid "_Log commands output"
+#~ msgstr "_Zaznamenávat výstup příkazů"
+
+#~ msgid "The selected container does not support DTS streams"
+#~ msgstr "Vybraný kontejner nepodporuje DTS data"
+
+#~ msgid "Load a DVD disk"
+#~ msgstr "Načíst disk DVD"
+
+#~ msgid "Bits per pixel:"
+#~ msgstr "Bitů na pixel"
+
+#~ msgid "Inverse _telecine"
+#~ msgstr "Inverzní _telecine"
+
+#~ msgid ""
+#~ "None\n"
+#~ "Decimate by 2\n"
+#~ "Decimate by 3"
+#~ msgstr ""
+#~ "Žádné\n"
+#~ "Podělit dvěma\n"
+#~ "Podělit třemi"
+
+#~ msgid ""
+#~ "None\n"
+#~ "Linear Blend\n"
+#~ "Linear Interpolating\n"
+#~ "Cubic Interpolating\n"
+#~ "Median\n"
+#~ "Ffmpeg\n"
+#~ "FIR Lowpass\n"
+#~ "Kernel\n"
+#~ "Yadif (Best)"
+#~ msgstr ""
+#~ "Žádné\n"
+#~ "Lineární prolínání\n"
+#~ "Lineární interpolace\n"
+#~ "Kubická interpolace\n"
+#~ "Medián\n"
+#~ "Ffmpeg\n"
+#~ "FIR Dolní propust\n"
+#~ "Kernel\n"
+#~ "Yadif (Nejlepší)"
+
+#~ msgid "_Deinterlacer:"
+#~ msgstr "O_dstranění prokládání"
+
+#~ msgid "_Frame drop:"
+#~ msgstr "Zahazování snímků"
+
+#~ msgid "_Progressive"
+#~ msgstr "_Progresivní"
+
+#~ msgid "Tray seems to be opened"
+#~ msgstr "Dvířka mechaniky se zdají být otevřená"
+
+#~ msgid "Reset"
+#~ msgstr "Resetovat"
+
+#~ msgid "Encoding video title %d"
+#~ msgstr "Enkóduji video titul %d"
+
+#~ msgid "Calculating bitrate, cropping, scaling"
+#~ msgstr "Kalkuluji bitrate, ořez, škálování"
+
+#~ msgid "A DVD encoder for GNOME"
+#~ msgstr "DVD enkodér"

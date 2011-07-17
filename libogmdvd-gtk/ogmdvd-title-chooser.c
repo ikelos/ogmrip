@@ -1,0 +1,111 @@
+/* OGMDvd - A wrapper library around libdvdread
+ * Copyright (C) 2004-2010 Olivier Rolland <billl@users.sourceforge.net>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+/**
+ * SECTION:ogmdvd-title-chooser
+ * @title: OGMDvdTitleChooser
+ * @include: ogmdvd-title-chooser.h
+ * @short_description: DVD title chooser interface used by OGMDvdTitleChooserWidget
+ */
+
+#include "ogmdvd-title-chooser.h"
+
+static void ogmdvd_title_chooser_class_init (gpointer g_iface);
+
+GType
+ogmdvd_title_chooser_get_type (void)
+{
+  static GType title_chooser_type = 0;
+
+  if (!title_chooser_type)
+  {
+    title_chooser_type = g_type_register_static_simple (G_TYPE_INTERFACE,
+        "OGMDvdTitleChooser",
+        sizeof (OGMDvdTitleChooserIface),
+        (GClassInitFunc) ogmdvd_title_chooser_class_init,
+        0, NULL, 0);
+
+    g_type_interface_add_prerequisite (title_chooser_type, GTK_TYPE_WIDGET);
+  }
+
+  return title_chooser_type;
+}
+
+static void
+ogmdvd_title_chooser_class_init (gpointer g_iface)
+{
+  g_object_interface_install_property (g_iface,
+      g_param_spec_pointer ("disc", "Disc property", "The DVD disc",
+        G_PARAM_READWRITE));
+
+  g_object_interface_install_property (g_iface,
+      g_param_spec_pointer ("title", "Title property", "The active DVD title",
+        G_PARAM_READABLE));
+}
+
+/**
+ * ogmdvd_title_chooser_set_disc:
+ * @chooser: An #OGMDvdTitleChooser
+ * @disc: An #OGMDvdDisc
+ *
+ * Sets the #OGMDvdDisc to select the title from.
+ */
+void
+ogmdvd_title_chooser_set_disc (OGMDvdTitleChooser *chooser, OGMDvdDisc *disc)
+{
+  g_return_if_fail (OGMDVD_IS_TITLE_CHOOSER (chooser));
+
+  OGMDVD_TITLE_CHOOSER_GET_IFACE (chooser)->set_disc (chooser, disc);
+}
+
+/**
+ * ogmdvd_title_chooser_get_disc:
+ * @chooser: An #OGMDvdTitleChooser
+ *
+ * Returns the #OGMDvdDisc which was passed to ogmdvd_title_chooser_set_disc().
+ *
+ * Returns: The current #OGMDvdDisc
+ */
+OGMDvdDisc *
+ogmdvd_title_chooser_get_disc (OGMDvdTitleChooser *chooser)
+{
+  g_return_val_if_fail (OGMDVD_IS_TITLE_CHOOSER (chooser), NULL);
+
+  return OGMDVD_TITLE_CHOOSER_GET_IFACE (chooser)->get_disc (chooser);
+}
+
+/**
+ * ogmdvd_title_chooser_get_active:
+ * @chooser: An #OGMDvdTitleChooser
+ *
+ * Returns the active #OGMDvdTitle.
+ *
+ * Returns: The active #OGMDvdTitle
+ */
+OGMDvdTitle *
+ogmdvd_title_chooser_get_active (OGMDvdTitleChooser *chooser)
+{
+  g_return_val_if_fail (OGMDVD_IS_TITLE_CHOOSER (chooser), NULL);
+
+  return OGMDVD_TITLE_CHOOSER_GET_IFACE (chooser)->get_active (chooser);
+}
+

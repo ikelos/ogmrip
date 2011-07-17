@@ -1,0 +1,28 @@
+.TH DVDCPY 1 "January 20, 2007" Linux "User Manuals"
+.SH NAME
+dvdcpy \- copy selected data from dvd
+.SH SYNOPSIS
+dvdcpy [-hm] [-o output] [-t title] device
+.SH DESCRIPTION
+.B dvdcpy
+copies the selected titles and/or menu structure of a DVD inserted into
+.IR device .
+The DVD does not have to be mounted. The options are as follows:
+.TP
+.B -h, --help
+Display usage and quit.
+.TP
+.B -m, --menu
+Selects menu structure for copy.
+.TP
+.BI "-o, --output " output
+Saves result into directory
+.IR output .
+If not specified, default name is backup. The directory is created as needed.
+.TP
+.BI "-t, --title " title
+Selects title number 
+.I title
+for copy.
+.SH AUTHORS
+Manual page by Marc Espie, Olivier Rolland

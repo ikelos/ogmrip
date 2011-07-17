@@ -1,0 +1,10 @@
+[Desktop Entry]
+_Name=DVD Encoder OGMRip
+_Comment=A DVD encoder
+Exec=ogmrip
+Icon=ogmrip
+StartupNotify=true
+Terminal=false
+Type=Application
+Categories=GNOME;AudioVideo;
+MimeType=x-content/video-dvd;application/x-cd-image;

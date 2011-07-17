@@ -1,0 +1,8394 @@
+19 Jun 2011 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip-crop.glade
+	* data/ogmrip-lavc.glade
+	* data/ogmrip-main.glade
+	* data/ogmrip-options.glade
+	* data/ogmrip-pref.glade
+	* data/ogmrip-profile-editor.glade
+	* data/ogmrip-profiles.glade
+	* data/ogmrip-progress.glade
+	* data/ogmrip-queue.glade
+	* data/ogmrip-spell.glade
+	* data/ogmrip-update.glade
+	* data/ogmrip-x264.glade
+	* data/ogmrip-xvid.glade
+
+	Switched to GtkBuilder
+
+13 Jun 2011 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+	* Makefile.am
+	* dvdcpy/Makefile.am
+	* libogmdvd-gtk/Makefile.am
+	* libogmdvd/Makefile.am
+	* libogmjob/Makefile.am
+	* libogmrip-gtk/Makefile.am
+	* libogmrip/Makefile.am
+	* plugins/Makefile.am
+	* src/Makefile.am
+	* subrip/Makefile.am
+	* theoraenc/Makefile.am
+
+	Improved build system
+
+	* configure.in
+	* data/ogmrip-crop.glade
+	* data/ogmrip-main.glade
+	* data/ogmrip-options.glade
+	* data/ogmrip-pref.glade
+	* data/ogmrip-profile-editor.glade
+	* data/ogmrip-profiles.glade
+	* data/ogmrip-progress.glade
+	* data/ogmrip-queue.glade
+	* data/ogmrip-spell.glade
+	* data/ogmrip-update.glade
+	* data/ogmrip-x264.glade
+	* data/ogmrip-xvid.glade
+	* libogmrip-gtk/ogmrip-chooser-list.c
+	* libogmrip-gtk/ogmrip-helper.h
+	* plugins/ogmrip-lavc-options.c
+	* plugins/ogmrip-x264-options.c
+	* plugins/ogmrip-xvid-options.c
+	* po/fr.po
+	* po/POTFILES.in
+	* src/ogmrip-audio-options.c
+	* src/ogmrip-crop-dialog.c
+	* src/ogmrip-main.c
+	* src/ogmrip-options-dialog.c
+	* src/ogmrip-pref-dialog.c
+	* src/ogmrip-profile-editor.c
+	* src/ogmrip-profiles-dialog.c
+	* src/ogmrip-progress-dialog.c
+	* src/ogmrip-queue-dialog.c
+	* src/ogmrip-spell-dialog.c
+	* src/ogmrip-subp-options.c
+	* src/ogmrip-update-dialog.c
+
+	Switched to GtkBuilder
+
+	* libogmrip/ogmrip-edl.c
+	* libogmrip/ogmrip-edl.h
+	* libogmrip/ogmrip-codec.c
+	* libogmrip/ogmrip-codec.h
+	* libogmrip/ogmrip-mplayer.c
+	* libogmrip/Makefile.am
+
+	Removed EDL support
+
+12 Jun 2011 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+
+	Used AC_LANG_SOURCE
+
+	* src/ogmrip-queue-dialog.c
+
+	Removed export/import of job
+
+	* configure.in
+	* src/ogmrip-progress-dialog.c
+
+	Removed support for libnotify < 0.7
+
+23 Nov 2010 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-update-dialog.c
+	* src/ogmrip-profiles-dialog.c
+	* src/ogmrip-queue-dialog.c
+	* src/ogmrip-profile-editor.c
+	* src/ogmrip-pref-dialog.c
+	* src/ogmrip-progress-dialog.c
+	* libogmrip-gtk/ogmrip-xvid-options.c
+	* libogmrip-gtk/ogmrip-x264-options.c
+
+	Fixed compability with gtk+ >= 2.22
+
+	* configure.in
+	* src/ogmrip-progress-dialog.c
+
+	Fixed compability with libnotify >= 0.7
+
+21 Oct 2010 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-video-codec.c
+
+	Improved telecined/progressive/interlaced detection
+
+18 Oct 2010 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-encoding.c
+	* src/ogmrip-gconf.c
+
+	Fixed lossless video encoding
+
+28 Sep 2010 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-encoding.c
+	* src/ogmrip-main.c
+	* src/ogmrip-pref-dialog.c
+	* src/ogmrip-gconf.c
+	* data/ogmrip-pref.glade
+
+	Added an option to change the number of threads
+	
+26 Sep 2010 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-mplayer.c
+
+	Fixed slow playback with deinterlacing
+
+13 Sep 2010 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-profile-editor.c
+
+	Fixed audio quality
+
+	* data/ogmrip-x264.glade
+
+	Fixed maximum number of B frames
+
+22 Aug 2010 Olivier Rolland <billl@users.sf.net>
+
+	Released OGMRip-0.13.6
+
+21 Aug 2010 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-x264.c
+
+	Fixed encoding with nombtree
+
+13 Aug 2010 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed suspend inhibition
+
+	* libogmrip/ogmrip-mplayer.c
+	* libogmrip/ogmrip-mp4.c
+	* libogmrip/ogmrip-player.c
+	* libogmrip/ogmrip-version.h.in
+	* libogmrip/ogmrip-video-codec.c
+	* libogmrip/ogmrip-version.c
+	* src/ogmrip-crop-dialog.c
+
+	Added -nosub support
+
+12 Aug 2010 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-profiles-dialog.c
+	* src/ogmrip-main.c
+	* src/ogmrip-options-dialog.c
+	* src/ogmrip-progress-dialog.c
+	* libogmdvd-gtk/ogmdvd-drive-chooser-dialog.c
+	* libogmrip-gtk/ogmrip-helper.c
+	* libogmrip-gtk/ogmrip-helper.h
+	* data/ogmrip-profiles.glade
+
+	Fixed respect gtk-button-images setting
+
+	* libogmrip/ogmrip-mplayer.c
+
+	Fixed subtitles synchronisation
+
+	* libogmrip/ogmrip-x264.c
+
+	Added support for slow_firstpass
+
+	* libogmrip/ogmrip-mkv.c
+
+	Added support for VP8
+
+	* libogmrip/ogmrip-mkv.c
+
+	Fixed Dirac support
+
+10 Aug 2010 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-xvid.c
+	* libogmrip/ogmrip-x264.c
+
+	Fixed autodetection of codec options
+
+27 Jul 2010 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-progress-dialog.c
+
+	Fixed disconnecting the signal
+
+	* libogmrip/ogmrip-file.c
+
+	Improved external files support
+
+	* src/ogmrip-options-dialog.c
+
+	Fixed autodetection and custom croppping parameters
+
+17 Jul 2010 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed default audio and subp streams
+
+	* libogmrip/ogmrip-encoding.c
+
+	Fixed return value
+
+15 Jul 2010 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-mkv.c
+
+	Added Flac support
+
+	* libogmdvd-gtk/ogmdvd-drive-chooser-dialog.co
+
+	Fixed mnemonics
+
+03 Jul 2010 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-spell-dialog.c
+	* src/ogmrip-update-dialog.c
+	* src/ogmrip-profiles-dialog.c
+	* src/ogmrip-queue-dialog.c
+	* src/ogmrip-profile-editor.c
+	* src/ogmrip-main.c
+	* src/ogmrip-options-dialog.c
+	* src/ogmrip-pref-dialog.c
+	* src/ogmrip-audio-options.c
+	* src/ogmrip-crop-dialog.c
+	* src/ogmrip-progress-dialog.c
+	* src/ogmrip-subp-options.c
+	* libogmdvd-gtk/ogmdvd-drive-chooser-widget.c
+	* libogmdvd-gtk/ogmdvd-drive-chooser-dialog.c
+	* libogmrip-gtk/ogmrip-xvid-options.c
+	* libogmrip-gtk/ogmrip-chooser-list.c
+	* libogmrip-gtk/ogmrip-lavc-options.c
+	* libogmrip-gtk/ogmrip-helper.c
+	* libogmrip-gtk/ogmrip-x264-options.c
+
+	Fixed compilation with -DGSEAL_ENABLE
+
+	* src/ogmrip-profile-editor.c
+	* data/ogmrip-profile-editor.glade
+
+	Disabled audio quality spin when not relevant (patch from Sm17H)
+
+	* libogmrip-gtk/ogmrip-chooser-list.c
+
+	Fixed ogmrip_chooser_list_nth
+
+	* libogmrip/ogmrip-mp3.c
+
+	Fixed conversion to mp3
+
+24 Jun 2010 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-encoding.c
+
+	Fixed multiple subp streams support
+
+15 Jun 2010 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-encoding.c
+
+	Fixed bitrate in compressibility test
+
+	* libogmrip/ogmrip-mplayer.c
+
+	Fixed mcdeint when not available
+
+14 Jun 2010 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-mplayer.c
+
+	Fixed hardcoded subtitles
+
+	* subrip/subp2pgm.c
+	* subrip/subptools.c
+
+	Improved error output and resiliency
+
+13 Jun 2010 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-aac.c
+	* libogmrip/ogmrip-mp3.c
+
+	Extract to PCM instead of WAV
+
+	* src/ogmrip-options-dialog.c
+
+	Fixed crash when scale and/or cropped are disabled
+
+	* src/ogmrip-options-dialog.c
+
+	Fixed selecting the active profile
+
+	* src/ogmrip-main.c
+
+	Fixed profiles with hardcodec subtitles
+
+07 Jun 2010 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-encoding.c
+
+	Fixed cleaning temporary files
+
+	* libogmrip/ogmrip-mp4.c
+
+	Fixed AC3 support
+
+	* data/ogmrip-xvid.glade
+	* libogmrip/ogmrip-mplayer.c
+	* libogmrip/ogmrip-video-codec.c
+	* libogmrip/ogmrip-video-codec.h
+	* libogmrip/ogmrip-xvid.c
+
+	Improved interlaced video support
+
+30 May 2010 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-enums.h
+
+	Added support for VP8
+
+20 May 2010 Olivier Rolland <billl@users.sf.net>
+
+	Released OGMRip-0.13.5
+
+04 May 2010 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-options-dialog.c
+
+	Fixed selection of the default profile
+
+	* libogmrip/ogmrip-video-codec.c
+
+	Improved scaling
+
+	* libogmrip-gtk/ogmrip-source-chooser-widget.c
+
+	Improved widget and fixed assertions in gtk+
+
+03 May 2010 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-encoding.c
+
+	Fixed compressibility test
+
+	* libogmrip/ogmrip-video-codec.c
+
+	Fixed scaling with max/min sizes
+
+24 Apr 2010 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd-gtk/Makefile.am
+
+	Fixed cleanfiles
+
+	* libogmrip/ogmrip-encoding.c
+
+	Fixed test progression
+
+	* src/ogmrip-options-dialog.c
+	* src/ogmrip-options-dialog.h
+
+	Fixed response type
+
+	* subrip/subp2pgm.c
+
+	Fixed compilation against libpng14
+
+	* libogmrip/ogmrip-x264.c
+
+	Improved n-pass support
+	
+	* src/ogmrip-queue-dialog.c
+	* src/ogmrip-main.c
+	* src/ogmrip-options-dialog.c
+	* src/ogmrip-options-dialog.h
+	* data/ogmrip-options.glade
+
+	Improved options dialog
+
+22 Apr 2010 Olivier Rolland <billl@users.sf.net>
+
+	* subrip/vobsub.c
+	* subrip/spudec.c
+
+	Synchronized with mplayer
+
+13 Apr 2010 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-xvid.c
+	* libogmrip/ogmrip-x264.c
+
+	Fixed checking codec options
+
+26 Mar 2010 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+	* dvdcpy/dvdcpy.c
+	* theoraenc/theoraenc.c
+
+	Improved portability by using AC_SYS_LARGEFILE
+
+	* libogmrip/ogmrip-mkv.c
+
+	Add support for Dirac in Matroska
+
+24 Mar 2010 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+	* src/ogmrip-options-dialog.c
+	* libogmrip-gtk/ogmrip-source-chooser-widget.c
+
+	Fixed compilation with gtk+ >= 2.19
+
+21 Mar 2010 Olivier Rolland <billl@users.sf.net>
+
+	Released OGMRip-0.13.4
+
+21 Mar 2010 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+	* src/ogmrip-options-dialog.c
+	* src/ogmrip-progress-dialog.c
+	* libogmrip-gtk/ogmrip-source-chooser-widget.c
+
+	Fixed compilation with gtk+ >= 2.19
+
+	* libogmrip/ogmrip-fs.c
+
+	Fixed change of directory
+
+	* libogmrip/ogmrip-encoding.c
+
+	Fixed task signal parameters
+
+11 Mar 2010 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-player.c
+	* libogmdvd/ogmdvd-priv.h
+	* libogmdvd/ogmdvd-title.c
+	* libogmdvd/ogmdvd-disc.c
+
+	Fixed chapters
+
+07 Mar 2010 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip-dvd/ogmdvd-disc.c
+
+	Fixed chapters
+
+21 Feb 2010 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-profile-editor.c
+
+	Fixed threads support
+
+	* libogmrip/ogmrip-x264.c
+	* libogmrip-gtk/ogmrip-x264-options.c
+
+	Improved x264 support
+
+	* libogmrip/ogmrip-xvid.h
+	* libogmrip/ogmrip-xvid.c
+	* libogmrip-gtk/ogmrip-xvid-options.c
+	* data/ogmrip-xvid.glade
+
+	Added maximum key interval support
+
+19 Feb 2010 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-encoding.c
+	* libogmrip/ogmrip-video-codec.c
+	* src/ogmrip-options-dialog.c
+
+	Fixed integer overflow when computing aspect ratios
+
+18 Feb 2010 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-x264.c
+	* libogmrip-gtk/ogmrip-x264-options.c
+	* data/ogmrip-x264.glade
+
+	Added keyint option
+
+	* libogmrip/ogmrip-encoding.c
+	* libogmrip/ogmrip-encoding.h
+	* libogmrip/ogmrip-video-codec.c
+	* libogmrip/ogmrip-video-codec.h
+	* data/ogmrip-profile-editor.glade
+	* src/ogmrip-main.c
+	* src/ogmrip-profile-editor.c
+	* src/ogmrip-gconf.c
+	* src/ogmrip-gconf.h
+
+	Added minimum width and height
+
+12 Feb 2010 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-x264.c
+
+	Added workaround against "2nd pass has more frames than 1st pass"
+
+	* libogmjob/ogmjob-exec.c
+	* libogmrip/ogmrip-encoding.c
+	* libogmrip/ogmrip-encoding.h
+	* src/ogmrip-main.c
+	* src/ogmrip-options-dialog.c
+	* src/ogmrip-queue-dialog.c
+
+	Improved error reporting
+
+01 Feb 2010 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-xvid.c
+
+	Changed quant_type in high quality
+
+	* libogmrip/ogmrip-x264.c
+
+	Improved x264 support
+
+	* src/ogmrip-main.c
+
+	Fixed spell checking when there is no language
+
+05 Jan 2010 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip.pc.in
+
+	Improved plugins and profiles support
+
+03 Jan 2010 Olivier Rolland <billl@users.sf.net>
+
+	* docs/tutorial/en/download.xml
+	* docs/tutorial/fr/download.xml
+	* docs/tutorial/data/arch.png
+	* docs/tutorial/data/Makefile.am
+
+	Added package for Arch Linux (thanks to Jaroslav Lichtblau)
+
+23 Dec 2009 Olivier Rolland <billl@users.sf.net>
+
+	Released OGMRip-0.13.3
+
+23 Dec 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed inhibition
+
+	* libogmrip/ogmrip-mplayer.c
+
+	Improved A/V sync
+
+21 Dec 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+	* src/ogmrip-options-dialog.c
+
+	Fixed selected profile
+
+	* libogmrip/ogmrip-encoding.c
+
+	Fixed codec-container compatibility detection
+
+17 Dec 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-mkv.c
+
+	Fixed progression
+
+	* libogmrip/ogmrip-encoding.c
+
+	Disabled compressibility test when codec can't scale
+
+	* src/ogmrip-options-dialog.c
+
+	Fixed display when codec can't scale
+
+15 Dec 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-settings.h
+	* libogmrip/ogmrip-settings.c
+	* libogmrip/ogmrip-encoding.c
+	* src/ogmrip-main.c
+
+	Fixed settings while encoding
+
+	* configure.in
+
+	Removed -Werror
+
+08 Dec 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd-drive.c
+
+	Fixed name of function
+
+	* libogmrip/ogmrip-xvid.c
+	* libogmrip/ogmrip-x264.c
+	* libogmrip/ogmrip-version.c
+	* libogmrip/ogmrip-mkv.c
+
+	Fixed memory leaks
+
+29 Nov 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-file.c
+
+	Fixed external vobsub support
+
+27 Nov 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/Makefile.am
+
+	Fixed linking issues with --as-needed
+
+	* libogmrip/ogmrip-x264.c
+
+	Fixed b_pyramid support
+
+26 Nov 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-x264.c
+	* libogmrip/ogmrip-x264.h
+	* libogmrip-gtk/ogmrip-x264-options.c
+	* data/ogmrip-x264.glade
+
+	Improved x264 support
+
+	* libogmrip/ogmrip-xvid.c
+	* libogmrip-gtk/ogmrip-xvid-options.c
+	* data/ogmrip-xvid.glade
+
+	Improved XviD support
+
+	* libogmdvd/ogmdvd-drive.c
+
+	Fixed compilation with glib >= 2.22
+
+23 Nov 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-settings.c
+
+	Sorted keys when exporting settings
+
+	* libogmrip/ogmrip-xvid.c
+
+	Reactivated b_adapt for XviD
+
+	* libogmrip/ogmrip-xvid.h
+	* libogmrip/ogmrip-xvid.c
+	* data/ogmrip-xvid.glade
+	* libogmrip-gtk/ogmrip-xvid-options.c
+
+	Removed unused cartoon option from XviD
+
+18 Nov 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-encoding.c
+	* libogmrip/ogmrip-video-codec.c
+
+	Fixed leaks
+
+	* libogmrip/ogmrip-encoding.c
+
+	Fixed compressibility test
+
+	* libogmrip/ogmrip-mplayer.c
+
+	Fixed wav format with newer versions of mplayer
+
+	* libogmrip/ogmrip-encoding.c
+	* src/ogmrip-main.c
+
+		Fixed selecting profiles
+
+11 Nov 2009 Olivier Rolland <billl@users.sf.net>
+
+	* docs/tutorial/en/download.xml
+	* docs/tutorial/fr/download.xml
+	* docs/tutorial/data/salix.png
+	* docs/tutorial/data/Makefile.am
+
+	Added package for salix (thanks to Frédéric)
+
+05 Nov 2009 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip-x264.glade
+	* libogmrip/ogmrip-x264.c
+	* libogmrip/ogmrip-x264.h
+	* libogmrip-gtk/ogmrip-x264-options.c
+	* src/ogmrip-profile-editor.c
+
+	Fixed x264 support with build 78
+
+16 Oct 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-fs.c
+
+	FIFOs are now created in the system temporary directory
+
+	* libogmrip/ogmrip-version.c
+
+	Improved DTS support
+
+07 Sep 2009 Olivier Rolland <billl@users.sf.net>
+
+	Released OGMRip-0.13.2
+
+07 Oct 2009 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+
+	Removed dependency on eject
+
+05 Oct 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-pref-dialog.c
+
+	Fixed custom temporary directory
+
+03 Oct 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-options-dialog.c
+
+	Disabled compressibility check when disabling automatic scaling
+
+	* libogmrip/ogmrip-encoding-manager.c
+
+	Fixed space checking
+
+01 Oct 2009 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip-spell.glade
+
+	Fixed textview usage
+
+28 Sep 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-x264.c
+	* libogmrip-gtk/ogmrip-x264-options.c
+	* data/ogmrip-x264.glade
+
+	Improved x264 support
+
+	* README
+	* configure.in
+	* libogmdvd/Makefile.am
+	* libogmdvd/ogmdvd-device.c
+	* libogmdvd/ogmdvd-device.h
+	* libogmdvd/ogmdvd-drive.c
+	* libogmdvd/ogmdvd-drive.h
+	* libogmdvd/ogmdvd-monitor.c
+	* libogmdvd/ogmdvd-monitor.h
+	* libogmdvd/ogmdvd-transport.c
+	* libogmdvd/ogmdvd-transport.h
+	* libogmdvd/ogmdvd.h
+	* libogmdvd-gtk/Makefile.am
+	* libogmrip-gtk/ogmrip-helper.c
+	* libogmdvd-gtk/ogmdvd-drive-chooser-dialog.c
+	* libogmdvd-gtk/ogmdvd-drive-chooser-widget.c
+	* src/Makefile.am
+	* src/ogmrip-main.c
+
+	Halectomy
+
+	* configure.in
+	* libogmdvd/ogmdvd-device.c
+
+	Fixed halectomy on freebsd
+
+23 Sep 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-encoding.c
+
+	Fixed fourcc, target' size and number and label
+
+	* libogmrip/ogmrip-x264.c
+
+	Fixed x264 capabilities detection
+
+20 Sep 2009 Olivier Rolland <billl@users.sf.net>
+
+	Released OGMRip-0.13.1
+
+20 Sep 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-video-codec.c
+	* libogmrip/ogmrip-xvid.c
+	* libogmrip/ogmrip-lavc.c
+	* libogmrip/ogmrip-x264.c
+	* data/ogmrip-profile-editor.glade
+
+	Added support for x264 lossless
+
+	* src/ogmrip-main.c
+
+	Added power manager inhibition
+
+	* libogmrip/ogmrip-x264.h
+	* libogmrip/ogmrip-x264.c
+	* data/ogmrip-x264.glade
+	* libogmrip-gtk/ogmrip-x264-options.c
+
+	Improved x264 support
+
+	* libogmrip/ogmrip-encoding.h
+	* libogmrip/ogmrip-encoding.c
+	* data/ogmrip.schemas.in
+	* src/ogmrip-gconf.h
+	* src/ogmrip-gconf.c
+	* src/ogmrip-main.c
+
+	Added an option to disable automatic subtitles hardcoding
+
+19 Sep 2009 Olivier Rolland <billl@users.sf.net>
+
+	* autogen.sh
+
+	Added support for automake 1.11
+
+09 Sep 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed segfault when no profile is available
+
+26 Aug 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd-disc.c
+
+	Made DVD video manager mandatory
+
+	* src/ogmrip-main.c
+	* src/ogmrip-options-dialog.c
+
+	Fixed options reuse (again)
+
+08 Aug 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-mp4.c
+
+	Fixed isma support with subtitles
+
+	* src/ogmrip-main.c
+
+	Fixed external subptitles support
+
+31 Jul 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-file.c
+
+	Fixed compressibility test
+
+	* libogmrip/ogmrip-encoding.c
+
+	Fixed hardsubs (patch from axel__17)
+
+30 Jul 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed FourCC
+
+29 Jul 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed exporting chapters
+
+	* src/ogmrip-main.c
+	* src/ogmrip-options-dialog.c
+	* src/ogmrip-progress-dialog.c
+	* libogmrip/ogmrip-encoding.c
+
+	Fixed options reuse in encodings
+
+28 Jul 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-settings.c
+
+	Fixed exporting profiles with unknown keys
+
+	* libogmrip/ogmrip-encoding.c
+
+	Improved log readability (patch from axel__17)
+
+27 Jul 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-profiles-dialog.c
+
+	Fixed exporting profiles
+
+26 Jul 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-encoding.c
+	* src/ogmrip-main.c
+
+	Fixed profiles support
+
+	* libogmrip/ogmrip-mp4.c
+
+	Added alternate group information
+
+	* libogmdvd-gtk/ogmdvd-drive-chooser-widget.c
+
+	Fixed dialog title when loading ISO files
+
+	* src/ogmrip-main.c
+
+	Fixed changing profiles
+
+	* src/ogmrip-main.c
+
+	Fixed loading DVD from the command line
+
+25 Jul 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-encoding.c
+
+	Fixed non-automatic cropping and scaling
+
+24 Jul 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-encoding.c
+
+	Fixed encoding with hardsubs
+
+	* data/ogmrip-profile-editor.glade
+
+	Fixed page size
+
+	* configure.in
+	* libogmdvd-gtk/ogmdvd-drive-freebsd.c
+	* libogmdvd-gtk/ogmdvd-drive-common.c
+	* libogmdvd-gtk/Makefile.am
+	* libogmdvd-gtk/transport.c
+
+	Fixed compilation on freebsd
+
+	* libogmrip/ogmrip-file.c
+
+	Fixed external AAC files support (patch from axel__17)
+
+23 Jul 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-file.c
+
+	Fixed external subtitles support (patch from axel__17)
+
+20 Jul 2009 Olivier Rolland <billl@users.sf.net>
+
+	* dvdcpy/dvdcpy.c
+
+	Fixed compilation on 64 bit.
+
+	* libogmrip-gtk/ogmrip-helper.c
+
+	Fixed translation of containers and codecs description
+
+19 Jul 2009 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+	* libogmdvd-gtk/ogmdvd-cell-renderer-language.h
+	* libogmdvd-gtk/ogmdvd-chapter-list.c
+	* libogmdvd-gtk/ogmdvd-chapter-list.h
+	* libogmdvd-gtk/ogmdvd-drive-chooser-dialog.c
+	* libogmdvd-gtk/ogmdvd-drive-chooser-dialog.h
+	* libogmdvd-gtk/ogmdvd-drive-chooser.h
+	* libogmdvd-gtk/ogmdvd-drive-chooser-widget.c
+	* libogmdvd-gtk/ogmdvd-drive-chooser-widget.h
+	* libogmdvd-gtk/ogmdvd-title-chooser.h
+	* libogmdvd-gtk/ogmdvd-title-chooser-widget.c
+	* libogmdvd-gtk/ogmdvd-title-chooser-widget.h
+	* libogmrip-gtk/ogmrip-chapter-list.c
+	* libogmrip-gtk/ogmrip-chooser-list.c
+	* libogmrip-gtk/ogmrip-chooser-list.h
+	* libogmrip-gtk/ogmrip-lavc-options.c
+	* libogmrip-gtk/ogmrip-options-plugin.h
+	* libogmrip-gtk/ogmrip-source-chooser.h
+	* libogmrip-gtk/ogmrip-source-chooser-widget.c
+	* libogmrip-gtk/ogmrip-source-chooser-widget.h
+	* libogmrip-gtk/ogmrip-x264-options.c
+	* libogmrip-gtk/ogmrip-xvid-options.c
+	* src/ogmrip-crop-dialog.h
+	* src/ogmrip-options-dialog.h
+	* src/ogmrip-queue-dialog.h
+
+	Added very preliminary support for gnome 3
+
+18 Jul 2009 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+
+	Fixed compilation against libdvdread-4.1.3
+
+15 Jul 2009 Olivier Rolland <billl@users.sf.net>
+
+	Released OGMRip-0.13.0
+
+15 Jul 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-plugin.h
+	* libogmrip/ogmrip-plugin.c
+	* libogmrip-gtk/Makefile.am
+	* libogmrip-gtk/ogmrip-xvid-options.c
+	* libogmrip-gtk/ogmrip-x264-options.c
+
+	Improved portability
+
+	* src/ogmrip-main.c
+
+	Fixed list of profiles
+
+14 Jul 2009 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip-profile-editor.glade
+	* src/ogmrip-profile-editor.c
+	* src/ogmrip-pref-dialog.c
+	* src/ogmrip-gconf.h
+
+	Improved profiles support
+
+	* dvdcpy/dvdcpy.c
+	* libogmrip/ogmrip-dvdcpy.c
+
+	Improved error resiliency
+
+	* src/ogmrip-main.c
+
+	Fixed profiles loading
+
+	* src/ogmrip-profile-editor.c
+	* data/ogmrip-profile-editor.glade
+
+	Improved ergonomy
+
+13 Jul 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-profiles-dialog.c
+
+	Fixed copying profiles with unknown keys
+
+12 Jul 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-queue-dialog.c
+
+	Fixed used uninitialised
+
+	* src/ogmrip-main.c
+
+	Fixed default profile
+
+	* src/ogmrip-pref-dialog.c
+
+	Fixed default language
+
+09 Jul 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-profiles.c
+
+	Improved profiles updating
+
+08 Jul 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-settings.h
+	* libogmrip/ogmrip-settings.c
+	* data/profiles.xml.in
+	* data/ogmrip-update.glade
+	* data/Makefile.am
+	* src/ogmrip-profiles.h
+	* src/ogmrip-profiles.c
+	* src/ogmrip-profiles-dialog.h
+	* src/ogmrip-profiles-dialog.c
+	* src/ogmrip-update-dialog.h
+	* src/ogmrip-update-dialog.c
+	* src/ogmrip-profile-editor.c
+	* src/ogmrip-options-dialog.c
+	* src/ogmrip-main.c
+	* src/Makefile.am
+
+	Added profiles updating
+
+28 Jun 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/Makefile.am
+	* libogmrip/ogmrip-plugin.h
+	* libogmrip/ogmrip-plugin.c
+	* libogmrip/ogmrip-novideo.h
+	* libogmrip/ogmrip-novideo.c
+	* libogmrip/ogmrip-avi.c
+	* libogmrip/ogmrip-mkv.c
+	* libogmrip/ogmrip-mov.c
+	* libogmrip/ogmrip-mp4.c
+	* libogmrip/ogmrip-ogg.c
+	* libogmrip/ogmrip-encoding.h
+	* libogmrip/ogmrip-encoding.c
+	* libogmrip-gtk/ogmrip-options-plugin.c
+	* data/ogmrip-profile-editor.glade
+	* src/ogmrip-options-dialog.c
+	* src/ogmrip-profiles-dialog.c
+	* src/ogmrip-profile-editor.c
+	* src/ogmrip-main.c
+
+	Added support for encodings without video streams
+
+26 Jun 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-settings.h
+	* libogmrip/ogmrip-settings.c
+	* libogmrip/ogmrip-lavc.c
+	* libogmrip/ogmrip-x264.c
+	* libogmrip/ogmrip-xvid.c
+
+	Improved per-codec options
+
+23 Jun 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-enums.h
+	* libogmrip/ogmrip-encoding.h
+	* libogmrip/ogmrip-encoding.c
+	* libogmrip/ogmrip-options.h
+	* libogmrip/ogmrip-subp-codec.c
+	* libogmrip/ogmrip-subp-codec.h
+	* libogmrip/ogmrip-srt.c
+	* src/ogmrip-profile-editor.c
+	* src/ogmrip-subp-options.c
+	* src/ogmrip-gconf.h
+	* src/ogmrip-gconf.c
+	* src/ogmrip-main.c
+	* subrip/subptools.c
+	* data/profiles.xml.in
+	* data/ogmrip-profile-editor.glade
+
+	Improved newline support in text subtitles
+
+	* libogmrip/ogmrip-settings.c
+	* libogmrip/ogmrip-settings.h
+
+	Fixed profiles loading
+
+	* libogmrip/ogmrip-mp4.c
+	* libogmrip/ogmrip-x264.c
+	* libogmrip/ogmrip-mkv.c
+
+	Improved x264/mp4/mkv support
+
+21 Jun 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-settings.c
+
+	Fixed localization in profiles xml files
+
+	* src/ogmrip-profiles-dialog.c
+
+	Fixed copying profiles
+
+19 Jun 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-mkv.c
+
+	Fixed AAC support in Matroska with mkvmerge < 2.8
+
+	* libogmjob/ogmjob-spawn.h
+	* libogmjob/ogmjob-bin.c
+	* libogmjob/ogmjob-exec.c
+	* libogmjob/ogmjob-pipeline.c
+	* libogmjob/ogmjob-queue.c
+	* libogmrip/ogmrip-chapters.c
+	* libogmrip/ogmrip-encoding.c
+	* libogmrip/ogmrip-encoding-manager.c
+	* libogmrip/ogmrip-mkv.c
+	* libogmrip/ogmrip-mp4.c
+	* libogmrip/ogmrip-ogg.c
+	* libogmrip/ogmrip-srt.c
+	* libogmrip/ogmrip-vobsub.c
+	* src/ogmrip-crop-dialog.c
+	* src/ogmrip-main.c
+	* src/ogmrip-queue-dialog.c
+
+	Improved API of libogmjob
+
+	* libogmrip/ogmrip-encoding.h
+	* libogmrip/ogmrip-encoding.c
+	* src/ogmrip-queue-dialog.c
+	* src/ogmrip-main.c
+
+	Improved log file generation
+
+15 Jun 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-encoding.c
+
+	Fixed chapter names
+
+	* libogmrip/ogmrip-encoding.c
+	* src/ogmrip-progress-dialog.c
+
+	Fixed analyzing and cropping cancellation and progress label
+
+14 Jun 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-audio-options.c
+	* src/ogmrip-subp-options.c
+
+	Fixed default reponse
+
+	* src/ogmrip-audio-options.c
+	* src/ogmrip-subp-options.c
+
+	Added undefined language
+
+	* libogmrip/ogmrip-encoding.c
+	* libogmrip/ogmrip-encoding.h
+	* src/ogmrip-main.c
+
+	Improved encoding support
+
+09 Jun 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-encoding.c
+
+	Fixed compressibility test
+
+	* ogmrip/libogmrip/ogmrip-x264.c
+
+	Set global_header by default
+
+08 Jun 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-encoding.c
+	* src/ogmrip-queue-dialog.h
+	* src/ogmrip-queue-dialog.c
+	* src/ogmrip-main.c
+
+	Added preliminary support for exporting and importing encodings
+
+07 Jun 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip-gtk/ogmrip-gconf-settings.c
+
+	Fixed key string
+
+	* src/ogmrip-gconf.h
+	* src/ogmrip-encoding.h
+	* src/ogmrip-encoding.c
+	* src/ogmrip-options.h
+	* src/ogmrip-options.c
+	* src/ogmrip-main.c
+
+	Improved encoding support
+
+	* src/ogmrip-options-dialog.c
+
+	Fixed title unref
+
+	* libogmrip/Makefile.am
+	* libogmrip/ogmrip-encoding.c
+	* libogmrip/ogmrip-encoding.h
+	* libogmrip/ogmrip-encoding-manager.c
+	* libogmrip/ogmrip-encoding-manager.h
+	* libogmrip/ogmrip.h
+	* libogmrip/ogmrip-options.c
+	* libogmrip/ogmrip-options.h
+	* src/Makefile.am
+	* src/ogmrip-progress-dialog.c
+
+	Moved encoding and encoding-manager to libogmrip
+
+03 Jun 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-marshal.list
+	* src/ogmrip-profiles-dialog.h
+
+	Cleanup
+
+	* libogmrip-gtk/ogmrip-chooser-list.h
+	* libogmrip-gtk/ogmrip-chooser-list.c
+	* src/ogmrip-encoding-manager.h
+	* src/ogmrip-encoding-manager.c
+	* src/ogmrip-main.c
+
+	Improved API
+
+	* src/ogmrip-encoding.c
+	* src/ogmrip-gconf.c
+	* src/ogmrip-gconf.h
+
+	Improved custom aspect ratio support
+
+02 Jun 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+	* src/ogmrip-audio-options.c
+	* src/ogmrip-subp-options.c
+
+	Fixed audio and subp options
+
+	* configure.in
+
+	Increased versions of libraries
+
+28 May 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-vorbis.c
+
+	Improved vorbis support
+
+	* data/ogmrip-profile-editor.glade
+	* src/ogmrip-profiles-dialog.h
+	* src/ogmrip-profile-editor.c
+
+	Disabled audio options when copying
+
+	* libogmrip/ogmrip-settings.c
+
+	Fixed settings property from key
+
+	* libogmjob/ogmjob-exec.c
+	* libogmjob/ogmjob-spawn.c
+
+	Fixed spawn cancelling
+
+	* libogmrip/ogmrip-video-codec.c
+
+	Improved title analyzing
+
+12 May 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/Makefile.am
+	* src/ogmrip-options.h
+	* src/ogmrip-options.c
+	* src/ogmrip-audio-options.h
+	* src/ogmrip-audio-options.c
+	* src/ogmrip-subp-options.h
+	* src/ogmrip-subp-options.c
+	* src/ogmrip-encoding.h
+	* src/ogmrip-encoding.c
+	* src/ogmrip-main.c
+
+	Improved per-stream options
+
+09 May 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-encoding-manager.c
+
+	Improved error resiliency
+
+	* libogmrip/ogmrip-video-codec.h
+	* libogmrip/ogmrip-video-codec.c
+	* src/ogmrip-gconf.h
+	* src/ogmrip-gconf.c
+	* src/ogmrip-encoding.h
+	* src/ogmrip-encoding.c
+	* src/ogmrip-options-dialog.c
+
+	Added preliminary support for custom aspect ratio
+
+	* libogmdvd/ogmdvd-labels.c
+	* libogmdvd-gtk/ogmdvd-gtk.h
+	* libogmdvd-gtk/ogmdvd-cell-renderer-language.c
+	* libogmdvd-gtk/ogmdvd-cell-renderer-language.h
+	* libogmdvd-gtk/Makefile.am
+	* libogmrip-gtk/ogmrip-source-chooser-widget.c
+	* libogmrip-gtk/ogmrip-helper.h
+	* libogmrip-gtk/ogmrip-helper.c 
+	* src/ogmrip-pref-dialog.c 
+	* data/ogmrip-pref.glade
+
+	Improved language support
+
+06 May 2009 Olivier Rolland <billl@users.sf.net>
+
+	* avibox/avibox.1
+	* avibox/Makefile.am
+
+	Added avibox man page
+
+04 May 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed the sensitivity of the extract button
+
+30 Apr 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-queue-dialog.c
+	* src/ogmrip-main.c
+	* src/ogmrip-encoding.c
+	* src/ogmrip-options-dialog.c
+
+	Fixed memory management
+
+	* src/ogmrip-main.c
+
+	Fixed encoding usage
+
+	* libogmrip/ogmrip-version.c
+
+	Fixed DTS detection
+
+29 Apr 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd-title.c
+	* libogmdvd/ogmdvd-disc.h
+	* libogmrip/ogmrip-settings.h
+	* libogmrip/ogmrip-keyfile-settings.c
+	* libogmrip/Makefile.am
+	* libogmrip/ogmrip-settings.c
+	* libogmrip-gtk/ogmrip-helper.c
+	* libogmrip-gtk/ogmrip-helper.h
+	* libogmrip-gtk/ogmrip-gconf-settings.c
+	* src/Makefile.am
+	* src/ogmrip-encoding-manager.h
+	* src/ogmrip-progress-dialog.h
+	* src/ogmrip-queue-dialog.c
+	* src/ogmrip-main.c
+	* src/ogmrip-queue-dialog.h
+	* src/ogmrip-profiles-dialog.c
+	* src/ogmrip-marshal.list
+	* src/ogmrip-profiles-dialog.h
+	* src/ogmrip-encoding.c
+	* src/ogmrip-options-dialog.c
+	* src/ogmrip-encoding.h
+	* src/ogmrip-encoding-manager.c
+	* src/ogmrip-progress-dialog.c
+
+	Added preliminary support for the new encoding manager
+
+28 Apr 2009 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip.desktop.in
+
+	Fixed desktop entry
+
+23 Apr 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-avi.c
+
+	Fixed AVI support
+
+20 Apr 2009 Olivier Rolland <billl@users.sf.net>
+
+	* ogmrip-encoding.h
+	* ogmrip-encoding.c
+	* ogmrip-main.c
+
+	Fixed reuse of DVD copy
+
+13 Apr 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-progress-dialog.c
+
+	Fixed progression of compressibility test
+
+	* src/ogmrip-main.c
+	* src/ogmrip-encoding.c
+
+	Fixed DVD handling
+
+	* libogmrip-gtk/ogmrip-helper.c
+
+	UI improvement
+
+12 Apr 2009 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip-options.glade
+	* src/ogmrip-options-dialog.c
+	* src/ogmrip-queue-dialog.c
+
+	UI improvements
+
+	* libogmdvd/ogmdvd-labels.c
+
+	Fixed mono channel
+
+	* src/ogmrip-main.c
+	* src/ogmrip-encoding.h
+	* src/ogmrip-encoding.c
+	* src/ogmrip-task-manager.c
+
+	Fixed task manager
+
+	* src/ogmrip-main.c
+
+	Fixed DVD handling
+
+	* libogmrip-gtk/ogmrip-helper.c
+
+	Fixed changing DVD
+
+11 Apr 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed memory leak
+
+	* src/ogmrip-encoding.c
+
+	Fixed compressibility test
+
+	* avibox/avibox.c
+
+	Improved progress
+
+	* libogmdvd/ogmdvd-title.h
+	* libogmdvd/ogmdvd-title.c
+	* src/ogmrip-encoding.c
+	* src/ogmrip-task-manager.c
+
+	Improved DVD rip
+
+10 Apr 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd-title.c
+	* libogmdvd/ogmdvd-disc.c
+	* libogmdvd/ogmdvd-priv.h
+	* libogmdvd/ogmdvd-stream.c
+
+	Fixed segfault
+
+	* src/ogmrip-encoding.c
+
+	Fixed return values
+
+07 Apr 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+	* src/ogmrip-encoding.c
+	* src/ogmrip-options-dialog.c
+	* src/ogmrip-pref-dialog.c
+	* src/ogmrip-encoding.h
+	* src/ogmrip-gconf.c
+	* src/ogmrip-options-dialog.h
+	* src/ogmrip-crop-dialog.c
+	* src/ogmrip-gconf.h
+	* data/ogmrip-options.glade
+	* data/ogmrip-pref.glade
+
+	Fixed and improved automatic compressibility test
+
+06 Apr 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-file.c
+
+	Fixed memory leak
+
+	* libogmdvd/ogmdvd-title.c
+	* libogmdvd/ogmdvd-disc.c
+	* libogmdvd/ogmdvd-stream.c
+
+	Fixed reference leak
+
+04 Apr 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip-gtk/Makefile.am
+	* libogmrip-gtk/ogmrip-marshal.list
+	* src/Makefile.am
+	* src/ogmrip-marshal.list
+	* src/ogmrip-encoding.h
+	* src/ogmrip-encoding.c
+	* src/ogmrip-queue-dialog.c
+	* src/ogmrip-task-manager.c
+	* src/ogmrip-main.c
+
+	Improved encoding support
+
+	* src/ogmrip-main.c
+
+	Fixed DVD backup
+
+	* data/ogmrip.schemas.in
+	* data/ogmrip-pref.glade
+	* src/ogmrip-gconf.h
+	* src/ogmrip-gconf.c
+	* src/ogmrip-pref-dialog.c
+	* src/ogmrip-encoding.c
+
+	Added preliminary support for automatic compressibility check
+
+31 Mar 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-task-manager.c
+	* src/ogmrip-queue-dialog.c
+	* src/ogmrip-main.c
+	* src/ogmrip-encoding.c
+	* src/ogmrip-options-dialog.c
+	* src/ogmrip-encoding.h
+
+	Changed OGMRipEncoding to a GObject
+
+30 Mar 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-avi.c
+	* avibox/avibox.c
+
+	Added custom fourcc support
+
+25 Mar 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-subp-codec.h
+	* libogmrip/ogmrip-subp-codec.c
+	* libogmrip/ogmrip-audio-codec.h
+	* libogmrip/ogmrip-audio-codec.c
+	* libogmrip/ogmrip-mkv.c
+	* src/ogmrip-audio-options.h
+	* src/ogmrip-audio-options.c
+	* src/ogmrip-subp-options.h
+	* src/ogmrip-subp-options.c
+	* src/ogmrip-encoding.h
+	* src/ogmrip-encoding.c
+	* src/ogmrip-main.c
+
+	Added track naming support
+
+22 Mar 2009 Olivier Rolland <billl@users.sf.net>
+
+	* avibox/avilib.c
+
+	Fixed compilation issue
+
+	* configure.in
+	* autogen.sh
+
+	Removed -Werror but added _FORTIFY_SOURCE=2 by default
+
+21 Mar 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-lavc.c 
+	* libogmrip-gtk/ogmrip-lavc-options.c
+
+	Fixed lavc plugins
+
+	* libogmrip/ogmrip-x264.c
+	* libogmrip/ogmrip-x264.h
+	* libogmrip-gtk/ogmrip-x264-options.c
+	* data/ogmrip-x264.glade
+
+	Improved x264 support
+
+	* src/ogmrip-encoding.c
+
+	Fixed notifications
+
+	* libogmrip/ogmrip-lavc.c
+
+	Fixed m4mv support
+
+	* avibox/aud_scan.h
+	* avibox/platform.c
+	* avibox/avilib.c
+	* avibox/Makefile.am
+	* avibox/avibox.c
+	* avibox/platform.h
+	* avibox/avimisc.c
+	* avibox/avilib.h
+	* avibox/aud_scan.c
+	* libogmrip/ogmrip-avi.c
+	* Makefile.am
+	* configure.in
+
+	Added preliminary support for avibox
+
+	* /devel/ogmrip/trunk/ogmrip
+
+	Remove unneeded code
+
+	* configure.in
+	* dvdcpy/dvdcpy.c
+	* libogmdvd/ogmdvd-priv.c
+	* libogmdvd/ogmdvd-disc.c
+
+	Improved libdvdread support
+
+18 Mar 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-encoding.c
+
+	Fixed notifiers removal
+
+	* libogmrip/ogmrip-mp3.c
+
+	Fixed presets
+
+15 Mar 2009 Olivier Rolland <billl@users.sf.net>
+
+	* data/Makefile.am
+
+	Fixed ogmrip.schemas generation
+
+06 Mar 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-options-dialog.c
+
+	Fixed deinterlacer
+
+02 Mar 2009 Olivier Rolland <billl@users.sf.net>
+
+	* po/LINGUAS
+	* po/sk.po
+
+	Added slovak translation, thanks to Tomä Vadina
+
+01 Mar 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-wav.c
+
+	Improved wave support
+
+	* src/ogmrip-task-manager.c
+
+	Fixed segfault
+
+	* subrip/vobsub.c
+	* subrip/spudec.c
+	* subrip/vobsub.h
+	* subrip/spudec.h
+
+	Synced with mplayer
+
+24 Feb 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-video-codec.c
+
+	Improved autocrop
+
+23 Feb 2009 Olivier Rolland <billl@users.sf.net>
+
+	* ogmrip/libogmrip/ogmrip-settings.h
+	* ogmrip/libogmrip/ogmrip-settings.c
+	* ogmrip/libogmrip/ogmrip-codec.h
+	* ogmrip/libogmrip/ogmrip-codec.c
+	* ogmrip/libogmrip/ogmrip-container.h
+	* ogmrip/libogmrip/ogmrip-container.c
+	* ogmrip/libogmrip/ogmrip-lavc.h
+	* ogmrip/libogmrip/ogmrip-lavc.c
+	* ogmrip/libogmrip/ogmrip-lavc-mpeg4.c
+	* ogmrip/libogmrip/ogmrip-x264.h
+	* ogmrip/libogmrip/ogmrip-x264.c
+	* ogmrip/libogmrip/ogmrip-xvid.h
+	* ogmrip/libogmrip/ogmrip-xvid.c
+	* ogmrip/libogmrip-gtk/ogmrip-options-plugin.h
+	* ogmrip/libogmrip-gtk/ogmrip-options-plugin.c
+	* ogmrip/libogmrip-gtk/ogmrip-lavc-options.c
+	* ogmrip/libogmrip-gtk/ogmrip-x264-options.c
+	* ogmrip/libogmrip-gtk/ogmrip-xvid-options.c
+	* ogmrip/src/ogmrip-main.c
+
+	Improved per-codec options
+
+15 Feb 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-avi.c
+
+	Fixed dirac support
+
+14 Feb 2009 Olivier Rolland <billl@users.sf.net>
+
+	* data/profiles.xml.in
+	* libogmrip/ogmrip-settings.c
+	* libogmrip-gtk/ogmrip-gconf-settings.c
+	* libogmrip-gtk/ogmrip-x264-options.c
+	* src/ogmrip-profiles-dialog.c
+	* src/ogmrip-main.c
+
+	Fixed issues with profiles
+
+11 Feb 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-encoding.c
+
+	Fixed support of ISO files
+
+	* src/ogmrip-main.c
+
+	Fixed memory release
+
+	* src/ogmrip-queue-dialog.c
+
+	Fixed encoding removal
+
+04 Feb 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-progress-dialog.c
+
+	Added support for gtk+ >= 2.15
+
+	* libogmdvd-gtk/ogmdvd-drive-chooser-widget.c
+
+	Fixed filter for ISO images
+
+	* libogmrip/ogmrip-mp4.c
+
+	Added support for AC3 (patch from Kurtnoise)
+
+02 Feb 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-progress-dialog.h
+	* src/ogmrip-progress-dialog.c
+	* src/ogmrip-main.c
+
+	Fixed ETA in pulse mode
+
+	* src/ogmrip-options-dialog.c
+
+	Fixed autocrop and autoscale button checking
+
+	* src/ogmrip-options-dialog.c
+
+	Fixed encoding same title with different audio, subp or chapters
+
+	* src/ogmrip-main.c
+
+	Fixed compressibility test
+
+01 Feb 2009 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-settings.h
+	* libogmrip/ogmrip-settings.c
+	* libogmrip-gtk/ogmrip-gconf-settings.c
+	* src/ogmrip-profiles-dialog.c
+	* src/ogmrip-encoding.c
+
+	Fixed profiles import
+
+26 Jan 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+	* src/ogmrip-task-manager.c
+	* src/ogmrip-progress-dialog.c
+
+	Improved compressibility test
+
+	* libogmrip/ogmrip-enums.h
+	* libogmrip/ogmrip-video-codec.c
+	* libogmrip/ogmrip-lavc.c
+	* libogmrip/ogmrip-x264.c
+	* libogmrip/ogmrip-xvid.c
+	* libogmrip-gtk/Makefile.am
+	* src/ogmrip-encoding.c
+	* data/ogmrip-xvid.glade
+
+	Fixed user preset
+
+	* docs/tutorial/data/style.css
+
+	Fixed vertical-align
+
+25 Jan 2009 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-options-dialog.c
+	* src/ogmrip-encoding.h
+	* src/ogmrip-encoding.c
+	* src/ogmrip-main.c
+
+	Fixed compressibility test
+
+14 Dec 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-encoding.h
+	* src/ogmrip-encoding.c
+	* src/ogmrip-options-dialog.c
+
+	Fixed encoding support
+
+	* libogmrip/ogmrip-container.h
+	* libogmrip/ogmrip-container.c
+	* src/ogmrip-main.c
+
+	Improved compressibility test
+
+12 Dec 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-video-codec.c
+	* libogmrip/ogmrip-mplayer.c
+	* libogmrip/ogmrip-player.c
+	* src/ogmrip-main.c
+
+	Fixed compressibility test
+
+11 Dec 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed task manager
+
+	* configure.in
+	* libogmrip-gtk/ogmrip-chooser-list.c
+
+	Upgraded to gtk+ 2.12
+
+	* data/ogmrip.desktop.in
+
+	Added mime types
+
+	* src/ogmrip-encoding.c
+
+	Fixed removal of DVD copy
+
+	* src/ogmrip-options-dialog.c
+
+	Fixed crop/scale interactions
+
+08 Dec 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-task-manager.c
+
+	Fixed segfault
+
+	* src/ogmrip-encoding.c
+
+	Fixed custom audio and subp options
+
+	* libogmrip/ogmrip-file.c
+
+	Fixed external subp support
+
+	* src/ogmrip-main.c
+
+	Fixed unlink of temporary files
+
+07 Dec 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/Makefile.am
+	* libogmrip/ogmrip-settings.h
+	* libogmrip/ogmrip-settings.c
+	* libogmrip/ogmrip-lavc.h
+	* libogmrip/ogmrip-lavc.c
+	* libogmrip/ogmrip-x264.h
+	* libogmrip/ogmrip-x264.c
+	* libogmrip/ogmrip-xvid.h
+	* libogmrip/ogmrip-xvid.c
+	* libogmrip-gtk/Makefile.am
+	* libogmrip-gtk/ogmrip-helper.c
+	* libogmrip-gtk/ogmrip-helper.h
+	* libogmrip-gtk/ogmrip-lavc-options.c
+	* libogmrip-gtk/ogmrip-x264-options.c
+
+	Improved plugins support
+
+	* libogmrip-gtk/Makefile.am
+	* libogmrip-gtk/ogmrip-xvid-options.c
+	* data/Makefile.am
+	* data/ogmrip-xvid.glade
+
+	Added xvid options plugin
+
+	* libogmdvd-gtk/ogmdvd-drive-chooser-widget.c
+
+	Fixed adding/removing media
+
+	* libogmrip/Makefile.am
+	* libogmrip/ogmrip-lavc-mpeg4.h
+	* libogmrip/ogmrip-lavc-mpeg4.c
+	* libogmrip-gtk/ogmrip-lavc-options.c
+
+	Fixed lavc plugin
+
+24 Dec 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd-title.c
+	* libogmdvd-gtk/ogmdvd-drive-chooser.c
+	* libogmrip/ogmrip-fs.c
+	* libogmrip-gtk/ogmrip-helper.c
+	* docs/reference/ogmdvd/ogmdvd-sections.txt
+	* docs/reference/ogmdvd/tmpl/ogmdvd-title.sgml
+	* docs/reference/ogmrip-gtk/ogmrip-gtk-sections.txt
+	* docs/reference/ogmrip-gtk/tmpl/ogmrip-gtk-unused.sgml
+	* docs/reference/ogmrip-gtk/tmpl/ogmrip-helper.sgml
+	* docs/reference/ogmdvd-gtk/ogmdvd-gtk-sections.txt
+	* docs/reference/ogmdvd-gtk/Makefile.am
+	* docs/reference/ogmdvd-gtk/tmpl/ogmdvd-gtk-unused.sgml
+	* docs/reference/ogmdvd-gtk/tmpl/ogmdvd-drive-chooser.sgml
+	* docs/reference/ogmrip/ogmrip-sections.txt
+	* docs/reference/ogmrip/Makefile.am
+	* docs/reference/ogmrip/tmpl/ogmrip-fs.sgml
+	* docs/reference/ogmrip/tmpl/ogmrip-video-codec.sgml
+
+	Documentation
+
+	* src/ogmrip-task-manager.c
+	* src/ogmrip-main.c
+
+	Improved task manager support
+
+	* src/ogmrip-encoding.h
+	* src/ogmrip-encoding.c
+	* src/ogmrip-main.c
+
+	Added compressibility test when encoding by size
+
+23 Dec 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-gconf.h
+	* src/ogmrip-task-manager.h
+	* src/ogmrip-task-manager.c
+	* src/ogmrip-queue-dialog.h
+	* src/ogmrip-queue-dialog.c
+	* src/ogmrip-main.c
+	* src/Makefile.am
+
+	Added task manager
+
+	* po/POTFILES.in
+
+	Fixed make check
+
+	* subrip/subp2pgm.c
+
+	Improved subp support
+
+17 Dec 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-mplayer.c
+
+	Improved WAV extraction
+
+	* libogmrip/ogmrip-mp4.c
+
+	Fixed MP4 support with more than one audio stream
+
+	* data/ogmrip-x264.glade
+
+	Fixed psy_trellis support
+
+	* src/ogmrip-encoding.c
+
+	Fixed encoding support
+
+11 Dec 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-profiles-dialog.h
+	* src/ogmrip-profiles-dialog.c
+	* src/ogmrip-main.c
+
+	Added support for logging the current profile
+
+	* src/ogmrip-main.c
+	* src/ogmrip-encoding.c
+	* src/ogmrip-encoding.h
+
+	Fixed output filenames
+
+10 Dec 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-encoding.c
+
+	Fixed external audio and subp files support
+	
+	* src/ogmrip-encoding.c
+
+	Fixed encodings when the current profile is modified
+
+	* src/ogmrip-main.c
+	* src/ogmrip-profile-editor.c
+	* src/ogmrip-profiles-dialog.h
+	* src/ogmrip-profiles-dialog.c
+	* libogmrip-gtk/ogmrip-helper.c
+	* libogmrip-gtk/ogmrip-helper.h
+
+	Added profiles reset
+
+09 Dec 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip-gtk/ogmrip-helper.h
+	* libogmrip-gtk/ogmrip-helper.c
+	* src/ogmrip-encoding.c
+	* src/ogmrip-encoding.h
+	* src/ogmrip-options-dialog.c
+	* src/ogmrip-main.c
+	* subrip/subptools.c
+
+	Cleanup
+
+08 Dec 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd-title.h
+	* libogmdvd/ogmdvd-title.c
+	* src/ogmrip-encoding.c
+
+	Added extraction of forced subtitles of the language of the first
+	audio track
+
+07 Dec 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-video-codec.h
+	* libogmrip/ogmrip-video-codec.c
+	* libogmrip/ogmrip-mplayer.c
+	* src/ogmrip-encoding.c
+
+	Fixed forced subs when hardcoding
+
+02 Dec 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd-disc.c
+
+	Fixed support for libdvdread <= 0.9.4
+
+30 Nov 2008 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+
+	Added support for libdvdread 0.9.4 (and 4.1.3)
+
+29 Nov 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-encoding.c
+
+	Fixed changing profile
+
+	* libogmrip/ogmrip-video-codec.c
+	* src/ogmrip-main.c
+
+	Increased default number of frames to analyze
+
+	* data/ogmrip-main.glade
+	* data/ogmrip-ui.xml
+	* libogmdvd-gtk/ogmdvd-marshal.list
+	* libogmdvd-gtk/ogmdvd-drive-chooser-widget.c
+	* libogmdvd-gtk/ogmdvd-drive-chooser-dialog.c
+	* libogmdvd-gtk/ogmdvd-drive-chooser.c
+	* libogmdvd-gtk/ogmdvd-drive-chooser.h
+	* libogmdvd-gtk/ogmdvd-drive.c
+	* libogmdvd-gtk/Makefile.am
+	* src/ogmrip-main.c
+
+	Improved drive chooser
+
+	* subrip/vobsub.c
+
+	Improved portability
+
+21 Nov 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-x264.c
+	* libogmrip/ogmrip-xvid.c
+
+	Fixed maximum number of threads
+
+	* libogmrip/ogmrip-fs.c
+	* libogmrip/ogmrip-fs.h
+	* src/ogmrip-main.c
+
+	Fixed path from command line
+
+19 Nov 2008 Olivier Rolland <billl@users.sf.net>
+
+	* dvdcpy/dvdcpy.c
+
+	Fixed read status
+
+18 Nov 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-encoding.c
+
+	Fixed extraction after backup
+
+17 Nov 2008 Olivier Rolland <billl@users.sf.net>
+
+	* dvdcpy/dvdcpy.c
+
+	Added some improvements
+
+	* src/ogmrip-main.c
+
+	Improved log
+
+12 Nov 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd-disc.c
+	* libogmdvd-gtk/ogmdvd-drive-chooser-widget.c
+	* src/ogmrip-progress-dialog.c
+
+	Escaped DVD title
+
+04 Nov 2008 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+	* dvdcpy/dvdcpy.c
+	* subrip/subptools.c
+	* libogmrip/ogmrip-fs.c
+	* libogmrip-gtk/ogmrip-helper.c
+
+	Improved portability
+
+03 Nov 2008 Olivier Rolland <billl@users.sf.net>
+
+	* subrip/spudec.c
+
+	Improved subp normalization
+
+02 Nov 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-encoding.c
+	* src/ogmrip-options-dialog.c
+
+	Fixed whether to copy the DVD
+
+01 Nov 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+	* src/ogmrip-encoding.h
+	* src/ogmrip-encoding.c
+	* src/ogmrip-options-dialog.h
+	* src/ogmrip-options-dialog.c
+	* src/ogmrip-queue-dialog.c
+
+	Completed editable encodings 
+
+	* src/ogmrip-audio-options.c
+	* src/ogmrip-subp-options.c
+
+	Fixed per-stream options
+
+	* src/ogmrip-main.c
+	* libogmdvd/ogmdvd-disc.c
+
+	Fixed invalid DVD pathes
+
+31 Oct 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd-title.c
+
+	Fixed chapters length
+
+28 Oct 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-codec.c
+
+	Added more verifications
+
+	* libogmrip/ogmrip-avi.c
+	* libogmrip/ogmrip-mp4.c
+	* libogmrip/ogmrip-ogg.c
+	* libogmrip/ogmrip-mkv.c
+	* libogmrip/ogmrip-mov.c
+	* src/ogmrip-encoding.h
+	* src/ogmrip-encoding.c
+	* src/ogmrip-main.c
+
+	Added preliminary support for encodings without video
+
+	* src/ogmrip-spell-dialog.c
+	* src/ogmrip-profiles-dialog.c
+	* src/ogmrip-profile-editor.c
+	* src/ogmrip-options-dialog.c
+	* src/ogmrip-pref-dialog.c
+	* src/ogmrip-crop-dialog.c
+	* src/ogmrip-progress-dialog.c
+	* libogmjob/ogmjob-exec.c
+
+	Added a few ifdefs
+
+27 Oct 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip-gtk/ogmrip-gconf-settings.c
+
+	Removed gconf error messages
+
+	* src/ogmrip-queue-dialog.c
+	* src/ogmrip-main.c
+	* src/ogmrip-encoding.c
+	* src/ogmrip-options-dialog.c
+	* src/ogmrip-encoding.h
+
+	Made encodings editable
+
+	* src/ogmrip-main.c
+	* src/ogmrip-progress-dialog.h
+	* src/ogmrip-progress-dialog.c
+
+	Removed quit button in progress dialog when performing a
+	compressibility test
+
+26 Oct 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd-priv.c
+	* libogmdvd/ogmdvd-title.c
+	* libogmdvd/ogmdvd-disc.c
+	* libogmdvd/ogmdvd-priv.h
+	* libogmdvd/ogmdvd-title.h
+	* libogmdvd/ogmdvd-disc.h
+	* libogmdvd/ogmdvd-stream.c
+	* libogmdvd/ogmdvd-audio.c
+	* libogmdvd/ogmdvd-subp.c
+	* libogmrip/ogmrip-fs.c
+	* libogmdvd-gtk/ogmdvd-drive-chooser-widget.c
+	* libogmdvd-gtk/ogmdvd-chapter-list.c
+	* libogmrip-gtk/ogmrip-helper.c
+	* libogmrip-gtk/ogmrip-helper.h
+	* src/ogmrip-options-dialog.c
+	* src/ogmrip-profiles-dialog.c
+	* src/ogmrip-queue-dialog.h
+	* src/ogmrip-queue-dialog.c
+	* src/ogmrip-encoding.h
+	* src/ogmrip-encoding.c
+	* src/ogmrip-main.c
+
+	Greatly improved queue support
+
+	* src/ogmrip-queue-dialog.c
+
+	Checked for already existing files
+
+	* data/ogmrip-profile-editor.glade
+
+	Added some tooltips
+
+	* src/ogmrip-options-dialog.c
+
+	Fixed manual cropping
+
+	* libogmdvd/ogmdvd-disc.c
+	* libogmdvd/ogmdvd-priv.h
+
+	Fixed subp language
+
+	* libogmrip/Makefile.am
+	* libogmrip/ogmrip-aac.c
+	* libogmrip/ogmrip-aac.h
+	* libogmrip/ogmrip-acopy.c
+	* libogmrip/ogmrip-acopy.h
+	* libogmrip/ogmrip-avi.c
+	* libogmrip/ogmrip-avi.h
+	* libogmrip/ogmrip-lavc-mpeg4.c
+	* libogmrip/ogmrip-lavc-mpeg4.h
+	* libogmrip/ogmrip-mkv.c
+	* libogmrip/ogmrip-mkv.h
+	* libogmrip/ogmrip-mov.c
+	* libogmrip/ogmrip-mov.h
+	* libogmrip/ogmrip-mp3.c
+	* libogmrip/ogmrip-mp3.h
+	* libogmrip/ogmrip-mp4.c
+	* libogmrip/ogmrip-mp4.h
+	* libogmrip/ogmrip-ogg.c
+	* libogmrip/ogmrip-ogg.h
+	* libogmrip/ogmrip-srt.c
+	* libogmrip/ogmrip-srt.h
+	* libogmrip/ogmrip-theora.c
+	* libogmrip/ogmrip-theora.h
+	* libogmrip/ogmrip-vobsub.c
+	* libogmrip/ogmrip-vobsub.h
+	* libogmrip/ogmrip-vorbis.c
+	* libogmrip/ogmrip-vorbis.h
+	* libogmrip/ogmrip-wav.c
+	* libogmrip/ogmrip-wav.h
+	* libogmrip/ogmrip-x264.c
+	* libogmrip/ogmrip-x264.h
+	* libogmrip/ogmrip-xvid.c
+	* libogmrip/ogmrip-xvid.h
+	* libogmrip-gtk/ogmrip-x264-options.c
+
+	Removed uneeded code
+
+24 Oct 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-mplayer.c
+
+	Fixed output FPS
+
+19 Oct 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip-gtk/ogmrip-helper.c
+	* src/ogmrip-encoding.c
+	* src/ogmrip-encoding.h
+	* src/ogmrip-progress-dialog.c
+	* src/ogmrip-progress-dialog.h
+	* src/ogmrip-queue-dialog.c
+	* src/ogmrip-queue-dialog.h
+	* src/ogmrip-main.c
+
+	Improved queue support
+
+17 Oct 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-x264.c
+	* libogmrip-gtk/ogmrip-x264-options.c
+	* data/ogmrip-x264.glade
+
+	Improved x264 support
+
+14 Oct 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd-title.c
+	* libogmdvd/ogmdvd-disc.c
+
+	Improved resiliency with broken DVD
+
+	* src/ogmrip-profiles-dialog.c
+	* src/ogmrip-main.c
+	* src/ogmrip-encoding.c
+	* src/ogmrip-options-dialog.c
+
+	Used sections instead of profiles
+
+	* libogmrip-gtk/ogmrip-gconf-settings.c
+
+	Allowed building sections without leading '/'
+
+13 Oct 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-queue-dialog.c
+	* src/ogmrip-main.c
+	* src/ogmrip-options-dialog.c
+	* src/ogmrip-options-dialog.h
+	* libogmrip-gtk/ogmrip-helper.c
+	* libogmrip-gtk/ogmrip-helper.h
+
+	Improved encoding queue support
+
+	* src/ogmrip-gconf.c
+
+	Fixed quantizer support
+
+12 Oct 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-version.c
+
+	Added a way to override mplayer's version number
+
+11 Oct 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-profiles-dialog.c
+	* libogmrip-gtk/ogmrip-gconf-settings.c
+	* data/profiles.xml.in
+
+	Fixed profiles copy, removal and export
+
+09 Oct 2008 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip-main.glade
+	* data/ogmrip-options.glade
+	* data/ogmrip-x264.glade
+	* src/ogmrip-options-dialog.c
+
+	Improved ergonomy
+
+	* libogmrip/ogmrip-file.c
+
+	Added -noconfig
+
+06 Oct 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+	* src/ogmrip-profile-editor.c
+	* src/ogmrip-encoding.c
+
+	Fixed constant bitrate (again)
+
+05 Oct 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-hardsub.c
+	* libogmrip/ogmrip-hardsub.h
+	* libogmrip/ogmrip-plugin.c
+	* libogmrip/ogmrip.h
+	* libogmrip/Makefile.am
+	* libogmrip-gtk/ogmrip-helper.c
+	* src/ogmrip-encoding.c
+	* src/ogmrip-encoding.h
+	* src/ogmrip-gconf.c
+	* src/ogmrip-gconf.h
+
+	Added full hardsub support
+
+04 Oct 2008 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip-simple-editor.glade
+	* data/ogmrip-main.glade
+	* data/ogmrip-profile-editor.glade
+	* data/ogmrip-lavc.glade
+	* data/ogmrip-options.glade
+	* data/ogmrip-pref.glade
+	* data/ogmrip-crop.glade
+	* data/ogmrip-x264.glade
+
+	Set page-size ready for gtk+-2.14
+
+	* libogmdvd-gtk/ogmdvd-drive-chooser-widget.h
+	* libogmdvd-gtk/ogmdvd-drive-chooser-dialog.h
+	* libogmrip/ogmrip-player.c
+
+	Fixed compilation issue
+
+	* libogmdvd/ogmdvd-disc.c
+
+	Fixed DVD id extraction
+
+	* libogmrip-gtk/ogmrip-helper.c
+	* libogmrip-gtk/ogmrip-helper.h
+
+	Added new helper functions
+
+	* src/ogmrip-profile-editor.c
+
+	Fixed constant bitrate
+
+	* src/ogmrip-main.c
+	* src/ogmrip-encoding.c
+	* src/ogmrip-encoding.h
+	* src/ogmrip-options-dialog.c
+	* src/ogmrip-options-dialog.h
+	* src/ogmrip-progress-dialog.c
+	* src/ogmrip-progress-dialog.h
+	* libogmrip/ogmrip-mplayer.c
+	* libogmrip/ogmrip-codec.c
+	* libogmrip/ogmrip-codec.h
+	* libogmrip/ogmrip-file.c       
+	* libogmrip/ogmrip-file.h               
+
+	Preliminary support for compressibility test
+
+28 Sep 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-queue-dialog.c
+	* src/ogmrip-main.c
+	* src/ogmrip-queue-dialog.h
+	* src/ogmrip-options-dialog.c
+	* src/ogmrip-encoding.h
+	* src/ogmrip-options-dialog.h
+
+	Improved encoding queues support
+
+	* data/ogmrip-ui.xml
+
+	Improved ergonomy (slightly)
+
+26 Sep 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+	* src/ogmrip-encoding.c
+	* src/ogmrip-encoding.h
+
+	Fixed hardcoded subtitles and spell checking
+
+25 Sep 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-mp4.c
+
+	Fixed mp4 support
+
+	* libogmrip-gtk/ogmrip-x264-options.c
+
+	Fixed me option
+
+	* data/ogmrip-profile-editor.glade
+
+	Fixed edit button label
+
+	* data/ogmrip-x264.glade
+
+	Added mencoder optionînames
+
+23 Sep 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-encoding.c
+
+	Fixed chapters language
+
+22 Sep 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-profile-editor.c
+
+	Fixed quantizer selection
+
+	* data/ogmrip-x264.glade
+	* libogmrip-gtk/ogmrip-gconf-settings.c
+	* libogmrip-gtk/ogmrip-helper.c
+	* libogmrip-gtk/ogmrip-lavc-options.c
+	* libogmrip-gtk/ogmrip-x264-options.c
+	* libogmrip/ogmrip-keyfile-settings.c
+	* libogmrip/ogmrip-settings.c
+	* libogmrip/ogmrip-settings.h
+	* src/ogmrip-gconf.c
+	* src/ogmrip-profile-editor.c
+	* src/ogmrip-profiles-dialog.c
+
+	Fixed options plugins (again)
+
+21 Sep 2008 Olivier Rolland <billl@users.sf.net>
+
+	* subrip/subp2pgm.c
+
+	Fixed empty subtitles (patch from Alex L. Mauer)
+
+20 Sep 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-x264.c
+	* libogmrip-gtk/ogmrip-lavc-options.c
+	* libogmrip-gtk/ogmrip-helper.c
+	* libogmrip-gtk/ogmrip-helper.h
+	* libogmrip-gtk/ogmrip-options-plugin.c
+	* libogmrip-gtk/ogmrip-options-plugin.h
+	* libogmrip-gtk/ogmrip-x264-options.c
+	* src/ogmrip-profiles-dialog.c
+	* src/ogmrip-main.c
+
+	Fixed options plugins
+
+19 Sep 2008 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip-main.glade
+	* data/ogmrip-queue.glade
+	* data/ogmrip-options.glade
+	* libogmrip/Makefile.am
+	* libogmrip/ogmrip-player.c
+	* libogmrip/ogmrip-player.h
+	* libogmrip/ogmrip.h
+	* libogmrip-gtk/ogmrip-chooser-list.c
+	* libogmrip-gtk/ogmrip-chooser-list.h
+	* src/ogmrip-main.c
+
+	Added DVD player
+
+	* src/ogmrip-encoding.c
+
+	Fixed DVD backup (again)
+
+	* libogmrip/ogmrip-player.c
+
+	Fixed compilation error
+
+18 Sep 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+	* src/ogmrip-encoding.c
+	* src/ogmrip-encoding.h
+
+	Fixed DVD backup
+
+	* libogmrip/ogmrip-srt.c
+
+	Improved tesseract support
+
+	* libogmrip/ogmrip-mplayer.c
+	* libogmrip/ogmrip-codec.c
+	* libogmrip/ogmrip-codec.h
+
+	Improved API 
+
+	* src/ogmrip-main.c
+	* src/ogmrip-encoding.c
+	* src/ogmrip-encoding.h
+
+	Added some functions to save the queue
+
+16 Sep 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+	* src/ogmrip-encoding.c
+
+	Improved log file content
+
+	* data/profiles.xml.in
+
+	Fixed some profiles
+
+	* src/ogmrip-queue-dialog.c
+
+	Fixed title number
+
+	* src/ogmrip-main.c
+
+	Fixed DVD title dereferencing
+
+	* src/ogmrip-options-dialog.c
+
+	Fixed cropping
+
+15 Sep 2008 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+	* src/ogmrip-profile-editor.c
+	* src/ogmrip-main.c
+	* src/ogmrip-encoding.c
+	* src/ogmrip-pref-dialog.c
+	* src/ogmrip-gconf.c
+	* src/ogmrip-gconf.h
+	* data/ogmrip-main.glade
+	* data/ogmrip-profile-editor.glade
+	* data/ogmrip-pref.glade
+
+	Added number of cpu/core autodetection
+
+	* libogmrip/ogmrip-mplayer.c
+
+	Improved audio streams support
+
+14 Sep 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed DVD reference counting
+
+	* libogmrip/ogmrip-vorbis.c
+	* libogmrip/ogmrip-aac.c
+	* libogmrip/ogmrip-mp3.c
+
+	Used wave instead of pcm for audio extraction
+
+	* src/ogmrip-main.c
+
+	Fixed scale and crop
+
+13 Sep 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed DVD backup
+
+10 Sep 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-options-dialog.c
+
+	Fixed profile selection
+
+08 Sep 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-queue-dialog.c
+	* src/ogmrip-main.c
+	* src/ogmrip-queue-dialog.h
+	* src/ogmrip-encoding.c
+	* src/ogmrip-encoding.h
+	* libogmrip-gtk/ogmrip-helper.c
+	* libogmrip-gtk/ogmrip-helper.h
+
+	Improved support for encoding queues
+
+07 Sep 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-enums.h
+	* libogmrip/ogmrip-avi.c
+
+	Added Dirac support
+
+	* src/ogmrip-progress-dialog.h
+	* src/ogmrip-queue-dialog.c
+	* src/ogmrip-main.c
+	* src/ogmrip-queue-dialog.h
+	* src/ogmrip-encoding.c
+	* src/ogmrip-options-dialog.c
+	* src/ogmrip-encoding.h
+	* src/ogmrip-options-dialog.h
+	* src/Makefile.am
+	* src/ogmrip-progress-dialog.c
+	* libogmdvd-gtk/ogmdvd-drive.c
+	* data/ogmrip-queue.glade
+	* data/ogmrip-options.glade
+	* data/ogmrip-ui.xml
+	* data/Makefile.am
+
+	Added preliminary support for encoding queues
+
+31 Aug 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmjob/ogmjob-exec.c
+	* libogmjob/ogmjob-spawn.h
+	* libogmrip/ogmrip-enums.h
+	* libogmrip/ogmrip-settings.c
+	* libogmrip/ogmrip-settings.h
+	* libogmrip/ogmrip.h
+	* libogmrip/ogmrip-keyfile-settings.c
+	* libogmrip/ogmrip-keyfile-settings.h
+	* libogmrip/Makefile.am
+	* libogmrip-gtk/ogmrip-preferences.h
+	* libogmrip-gtk/ogmrip-lavc-options.c
+	* libogmrip-gtk/ogmrip-gconf-settings.c
+	* libogmrip-gtk/ogmrip-gtk.h
+	* libogmrip-gtk/ogmrip-x264-options.c
+	* libogmrip-gtk/ogmrip-options-plugin.h
+	* libogmrip-gtk/Makefile.am
+	* libogmrip-gtk/ogmrip-gconf-settings.h
+	* libogmrip-gtk/ogmrip-preferences.c
+	* src/ogmrip-progress-dialog.h
+	* src/ogmrip-subp-options.h
+	* src/ogmrip-main.c
+	* src/ogmrip-profile-editor.c
+	* src/ogmrip-profile-editor.h
+	* src/ogmrip-pref-dialog.c
+	* src/ogmrip-audio-options.c
+	* src/ogmrip-pref-dialog.h
+	* src/ogmrip-audio-options.h
+	* src/ogmrip-crop-dialog.c
+	* src/ogmrip-crop.c
+	* src/ogmrip-progress.c
+	* src/ogmrip-crop-dialog.h
+	* src/ogmrip-crop.h
+	* src/ogmrip-progress.h
+	* src/ogmrip-spell-dialog.c
+	* src/ogmrip-spell.c
+	* src/ogmrip-profiles-dialog.c
+	* src/ogmrip-spell-dialog.h
+	* src/ogmrip-profiles.c
+	* src/ogmrip-spell.h
+	* src/ogmrip-profiles-dialog.h
+	* src/ogmrip-encoding.c
+	* src/ogmrip-profiles.h
+	* src/ogmrip-options-dialog.c
+	* src/ogmrip-encoding.h
+	* src/ogmrip-options.c
+	* src/ogmrip-gconf.c
+	* src/ogmrip-pref.c
+	* src/ogmrip-options-dialog.h
+	* src/Makefile.am
+	* src/ogmrip-options.h
+	* src/ogmrip-gconf.h
+	* src/ogmrip-progress-dialog.c
+	* src/ogmrip-pref.h
+	* src/ogmrip-subp-options.c
+	* subrip/subp2pgm.c
+
+	Replaced OGMRipPreferences by OGMRipSettings
+	Added OGMRipEncoding (will be used for encoding queues)
+
+	* src/ogmrip-pref-dialog.c
+
+	Fixed file chooser bindings
+
+02 Aug 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-version.c
+
+	Fixed version checking
+
+01 Aug 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-mplayer.c
+	* libogmrip/ogmrip-video-codec.c
+
+	Fixed -noconfig with older versions
+
+31 Jul 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-mplayer.c
+	* libogmrip/ogmrip-video-codec.c
+
+	Added -noconfig all to all mplayer/mencoder command lines
+
+27 Jul 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-plugin.c
+
+	Fixed error message
+
+	* src/ogmrip-main.c
+	* src/ogmrip-options.c
+	* src/ogmrip-options.h
+	* data/ogmrip-options.glade
+
+	Improved ergonomy
+
+	* src/ogmrip-main.c
+	* src/ogmrip-options.h
+	* src/ogmrip-options.c
+	* libogmjob/ogmjob-exec.c
+	* libogmrip/ogmrip-video-codec.c
+	* libogmrip/ogmrip-video-codec.h
+	* data/ogmrip-options.glade
+
+	Added preliminary progressive, interlaced, telecine autodetection
+
+26 Jul 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-audio-options.c
+	* src/ogmrip-crop.c
+	* src/ogmrip-gconf.h
+	* src/ogmrip-main.c
+	* src/ogmrip-options.c
+	* src/ogmrip-pref.c
+	* src/ogmrip-profile-editor.c
+	* src/ogmrip-profiles.c
+	* src/ogmrip-progress.c
+	* src/ogmrip-spell.c
+	* src/ogmrip-subp-options.c
+	* libogmrip/ogmrip-plugin.c
+
+	Fixed directory separator
+
+	* src/ogmrip-main.c
+	* libogmrip/ogmrip-plugin.c
+	* libogmrip-gtk/ogmrip-options-plugin.c
+
+	Added user directories for plugins and profiles
+
+	* ogmrip/libogmrip/ogmrip-aac.c
+	* ogmrip/libogmrip/ogmrip-avi.c
+	* ogmrip/libogmrip/ogmrip-mkv.c
+	* ogmrip/libogmrip/ogmrip-mov.c
+	* ogmrip/libogmrip/ogmrip-mp3.c
+	* ogmrip/libogmrip/ogmrip-mp4.c
+	* ogmrip/libogmrip/ogmrip-ogg.c
+	* ogmrip/libogmrip/ogmrip-plugin.c
+	* ogmrip/libogmrip/ogmrip-plugin.h
+	* ogmrip/libogmrip/ogmrip-srt.c
+	* ogmrip/libogmrip/ogmrip-theora.c
+	* ogmrip/libogmrip/ogmrip-vobsub.c
+	* ogmrip/libogmrip/ogmrip-vorbis.c
+	* ogmrip/libogmrip/ogmrip-wav.c
+	* ogmrip/libogmrip/ogmrip-x264.c
+	* ogmrip/libogmrip/ogmrip-xvid.c
+
+	Improved display of missing requirements
+
+24 Jul 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-profiles.c
+
+	Fixed profiles with empty names (patch from Alex L. Mauer)
+
+	* src/ogmrip-main.c
+
+	Fixed profiles list when no prefered audio and subp language is
+	selected
+
+23 Jul 2008 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+	* dvdcpy/dvdcpy.c
+	* libogmjob/ogmjob-exec.c
+	* src/ogmrip-profiles.c
+	* subrip/subp2pgm.c
+
+	Fixed compilation issues
+
+	* libogmdvd-gtk/ogmdvd-drive-hal.c
+
+	Fixed HAL support
+
+	* src/ogmrip-main.c
+	* src/ogmrip-profile-editor.c
+	* src/ogmrip-audio-options.c
+	* src/ogmrip-subp-options.c
+	* libogmrip-gtk/ogmrip-helper.c
+	* libogmrip-gtk/ogmrip-helper.h
+
+	Cleanup
+
+	* libogmdvd-gtk/ogmdvd-drive.c
+
+	Fixed device
+
+20 Jul 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+	* libogmrip/ogmrip-mplayer.c
+	* libogmrip/ogmrip-video-codec.c
+	* libogmrip/ogmrip-video-codec.h
+
+	Added preliminary support for hardcoded subtitles
+
+	* src/ogmrip-main.c
+	* src/ogmrip-audio-options.c
+	* src/ogmrip-subp-options.c
+	* src/ogmrip-profile-editor.c
+	* libogmrip-gtk/ogmrip-helper.c
+	* libogmrip-gtk/ogmrip-helper.h
+
+	Cleanup
+
+19 Jul 2008 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+	* Makefile.am
+	* libogmdvd-gtk/Makefile.am
+	* libogmdvd-gtk/dvd_plus_rw_utils.c
+	* libogmdvd-gtk/ogmdvd-drive.c
+	* libogmdvd-gtk/ogmdvd-drive-chooser.c
+	* libogmdvd-gtk/ogmdvd-drive-chooser-dialog.c
+	* libogmdvd-gtk/ogmdvd-drive-chooser.h
+	* libogmdvd-gtk/ogmdvd-drive-chooser-widget.c
+	* libogmdvd-gtk/ogmdvd-drive-common.c
+	* libogmdvd-gtk/ogmdvd-drive-freebsd.c
+	* libogmdvd-gtk/ogmdvd-drive.h
+	* libogmdvd-gtk/ogmdvd-drive-hal.c
+	* libogmdvd-gtk/ogmdvd-drive-linux.c
+	* libogmdvd-gtk/transport.c
+	* libogmdvd-gtk/transport.h
+	* libogmrip-gtk/Makefile.am
+	* src/Makefile.am
+	* src/ogmrip-main.c
+
+	Got rid of libbacon and c++
+
+16 Jul 2008 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+	* Makefile.am
+	* docs/reference/ogmdvd-gtk/Makefile.am
+	* docs/reference/ogmjob/Makefile.am
+	* docs/reference/ogmrip-gtk/Makefile.am
+	* docs/reference/ogmrip/Makefile.am
+	* libbacon/Makefile.am
+	* libogmdvd-gtk/Makefile.am
+	* libogmdvd-gtk/ogmdvd-gtk-fake.cpp
+	* src/Makefile.am
+	* src/ogmrip-fake.cpp
+
+	Fixed more linking issues with --as-needed (initial patch from
+	aballier_at_gentoo.org)
+
+15 Jul 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/Makefile.am
+	* libogmjob/Makefile.am
+	* libogmrip-gtk/Makefile.am
+	* libogmrip/Makefile.am
+
+	Fixed linking with --as-needed
+
+14 Jul 2008 Olivier Rolland <billl@users.sf.net>
+
+	Released OGMRip-0.12.1
+
+14 Jul 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-lavc.c
+	* libogmrip/ogmrip-video-codec.c
+
+	Fixed compilation issues with gcc-4.3
+
+07 Jun 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed default profile
+
+	* libogmrip/ogmrip-mplayer.c
+
+	Fixed AAC and AC3/DTS support in AVI
+
+28 Jun 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+	* src/ogmrip-options.c
+	* src/ogmrip-options.h
+	* libogmrip-gtk/ogmrip-chooser-list.c
+	* libogmrip-gtk/ogmrip-chooser-list.h
+	* docs/reference/ogmrip-gtk/ogmrip-gtk-sections.txt
+	* docs/reference/ogmrip-gtk/tmpl/ogmrip-chooser-list.sgml
+
+	Only profiles supporting as many audio tracks and subtitles as
+	selected are displayed in the options dialog
+
+15 Jun 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-avi.c
+
+	Fixed extension when copying subtitles
+
+	* src/ogmrip-profiles.c
+	* data/ogmrip-profiles.glade
+	* po/fr.po
+
+	Added copy of profiles
+
+14 Jun 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-profile-editor.c
+
+	Fixed default container and codec
+
+08 Jun 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip-gtk/Makefile.am
+	* libogmrip/ogmrip-plugin.c
+	* src/ogmrip-profiles.c
+
+	Fixed some unwanted error messages
+
+08 Jun 2008 Olivier Rolland <billl@users.sf.net>
+
+	Released OGMRip-0.12.0
+
+08 Jun 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-srt.c
+
+	Improved tesseract support
+
+	* data/ogmrip.schemas.in
+
+	Copy DVD by default
+
+	* libogmrip/ogmrip-subp-codec.h
+	* libogmrip/ogmrip-audio-codec.h
+
+	Cleanup
+
+07 Jun 2008 Olivier Rolland <billl@users.sf.net>
+
+	* dvdcpy/dvdcpy.c
+	* libogmrip/ogmrip-vobsub.c
+	* subrip/subp2pgm.c
+
+	Cleanup
+
+05 Jun 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-mplayer.c
+	* libogmrip/ogmrip-video-codec.c
+	* libogmrip/ogmrip-video-codec.h
+	* src/ogmrip-main.c
+	* src/ogmrip-gconf.h
+
+	Merged expand and max sizes
+
+	* libogmrip/ogmrip-x264.c
+	* libogmrip-gtk/ogmrip-x264-options.c
+	* data/ogmrip-x264.glade
+
+	Added global_header option
+
+04 Jun 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-video-codec.c
+	* libogmrip/ogmrip-video-codec.h
+	* src/ogmrip-main.c
+	* src/ogmrip-gconf.h
+
+	Added maximum size
+
+	* libogmrip/ogmrip-vobsub.c
+	* data/ogmrip-profile-editor.glade
+
+	Added forced subs support for vobsub
+
+02 Jun 2008 Olivier Rolland <billl@users.sf.net>
+
+	* Makefile.am
+	* data/Makefile.am
+	* docs/reference/ogmjob/Makefile.am
+	* docs/tutorial/data/Makefile.am
+	* docs/tutorial/en/Makefile.am
+	* docs/tutorial/fr/Makefile.am
+
+	Fixed distcheck
+
+29 May 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-srt.c
+	* libogmrip/ogmrip-subp-codec.c
+	* src/ogmrip-audio-options.c
+	* src/ogmrip-subp-options.c
+
+	Fixed forced subtitles support
+
+	* src/ogmrip-main.c
+
+	Removed unneeded checks
+
+27 May 2008 Olivier Rolland <billl@users.sf.net>
+
+	* subrip/subp2pgm.c
+	* subrip/vobsub.c
+	* subrip/spudec.c
+	* subrip/vobsub.h
+	* subrip/Makefile.am
+	* subrip/spudec.h
+
+	Fixed subp2pgm
+
+26 May 2008 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip-main.glade
+	* libogmrip/ogmrip-video-codec.c
+	* src/ogmrip-main.c
+
+	Added multi-angle support
+
+16 May 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-vorbis.c
+	* libogmrip/ogmrip-srt.c
+	* libogmrip/ogmrip-wav.c
+	* libogmrip/ogmrip-aac.c
+	* libogmrip/ogmrip-mp3.c
+	* libogmrip/ogmrip-vobsub.c
+	* libogmrip/ogmrip-mplayer.c
+	* libogmrip/ogmrip-mplayer.h
+
+	Cleanup API
+
+	* subrip/subptools.c
+
+	Fixed SRT support
+
+	* libogmrip/ogmrip-srt.c
+
+	Use tesseract by default
+
+12 May 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-vobsub.c
+	* theoraenc/theoraenc.c
+
+	Fixed compilation on SE-Linux (patch from JiÅÃ­ Moravec)
+
+	* configure.in
+
+	Fixed gtk-doc support
+
+11 May 2008 Olivier Rolland <billl@users.sf.net>
+
+	* subrip/subp2pgm.c
+
+	Improved palette normalization
+
+06 May 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-mp4.c
+
+	Added -brand mp42
+
+05 May 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-mplayer.c
+	* libogmrip/ogmrip-xvid.c
+	* libogmrip/ogmrip-mplayer.h
+	* libogmrip/ogmrip-lavc.c
+	* libogmrip/ogmrip-x264.c
+	* libogmrip/ogmrip-acopy.c
+	* libogmrip/ogmrip-theora.c
+
+	Cleaned up the API
+
+	* src/ogmrip-profiles.c
+	* src/ogmrip-main.c
+	* src/ogmrip-options.c
+	* src/ogmrip-options.h
+	* src/ogmrip-gconf.h
+
+	Improved ergonomy
+
+	* libogmrip/ogmrip-srt.c
+
+	Fixed temporary directory
+
+	* subrip/subp2pgm.c
+	* libogmrip/ogmrip-srt.c
+
+	Improved OCR support
+
+	* data/ogmrip-gtk.pc.in
+	* data/ogmrip.pc.in
+
+	Added variables for plugins
+
+04 May 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-lavc.c
+	* libogmrip/ogmrip-x264.c
+
+	Fixed lavc and x264 presets
+
+	* libogmrip/ogmrip-mp4.c
+
+	Fixed number of audio and subtitles streams
+	Fixed support of video streams with b frames
+
+	* data/ogmrip-profile-editor.glade
+	* libogmrip/ogmrip-video-codec.c
+	* src/ogmrip-profile-editor.c
+
+	Forced 1-pass mode when encoding with a fixed quantizer
+
+	* libogmrip/ogmrip-video-codec.c
+
+	Improved compliance with non-standard DVD
+
+	* src/ogmrip-profiles.c
+	* src/ogmrip-profiles.h
+	* src/ogmrip-options.c
+
+	Improved ergonomy (slightly)
+
+	* libogmrip/ogmrip-mplayer.c
+	* libogmrip/ogmrip-video-codec.c
+	* libogmrip/ogmrip-video-codec.h
+	* src/ogmrip-main.c
+	* src/ogmrip-gconf.h
+
+	Fixed max resolution in profiles
+
+03 May 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-profiles.c
+	* src/ogmrip-profiles.h
+	* src/ogmrip-main.c
+	* data/profiles.xml.in
+	* data/Makefile.am
+
+	Improved profiles support
+
+	* src/ogmrip-pref.c
+
+	Cleanup
+
+	 * src/ogmrip-main.c
+	 * src/ogmrip-options.c
+	 * src/ogmrip-options.h
+	 * src/ogmrip-gconf.h
+
+	 Added options to disable cropping and scaling and to force a
+	 resolution in profiles
+
+02 May 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-profiles.c
+
+	Added support for localized profiles
+
+27 Apr 2008 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+	* subrip/Makefile.am
+	* subrip/subp2pgm.c
+	* subrip/subptools.c
+
+	Improved TIFF and PNG support
+
+24 Apr 2008 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+	* libogmrip/ogmrip-srt.c
+	* libogmrip/ogmrip-srt.h
+	* subrip/subp2pgm.1
+	* subrip/subp2pgm.c
+	* subrip/srtutil.1
+	* subrip/srtutil.c
+	* subrip/Makefile.am
+	* subrip/subptools.1
+	* subrip/subptools.c
+
+	Improved subtitles support
+	Added tesseract OCR support
+
+	* src/ogmrip-profile-editor.c
+
+	Disabled simple mode
+
+20 Apr 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-progress.c
+	* libogmjob/ogmjob-exec.c
+
+	Added pulse support
+
+	* libogmrip/Makefile.am
+	* libogmrip-gtk/Makefile.am
+
+	Fixed compilation issues (once more)
+
+	* README
+
+	Added requirements for notification support
+
+	* data/ogmrip.pc.in
+
+	Added libogmrip-mplayer and libogmrip-lavc
+
+	* libogmjob/ogmjob-exec.c
+	* libogmjob/ogmjob-pipeline.c
+	* libogmjob/ogmjob-queue.c
+
+	Fixed pulse support
+
+14 Apr 2008 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+	* libogmrip/Makefile.am
+	* docs/tutorial/en/Makefile.am
+	* docs/tutorial/fr/Makefile.am
+	* INSTALL
+
+	Improved autotools scripts
+
+	* libogmrip/ogmrip-video-codec.c
+
+	Renamed the bframes property
+
+13 Apr 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+	* data/ogmrip-ui.xml
+
+	Added profiles edition
+
+	* libogmrip/ogmrip-x264.c
+
+	Set maximum number of thread to 16
+
+	* src/ogmrip-profile-editor.c
+
+	Fixed video user preset combo item
+
+	* data/ogmrip-profile-editor.glade
+	* data/ogmrip-simple-editor.glade
+
+	UI improvements
+
+	* libogmrip/ogmrip-mp4.c
+	* libogmrip/ogmrip-mp4.h
+	* README
+
+	Switched to gpac for mp4 support
+
+	* Makefile.am
+
+	Fixed subdirs order
+
+12 Apr 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip-gtk/Makefile.am
+	* data/Makefile.am
+
+	Fixed compilation issues
+
+23 Mar 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-x264.c
+	* libogmrip-gtk/ogmrip-x264-options.c
+	* data/ogmrip-x264.glade
+
+	Fixed 8x8dct properties
+
+	* src/ogmrip-profile-editor.c
+	* src/ogmrip-main.c
+	* src/ogmrip-options.c
+	* src/ogmrip-pref.c
+	* src/ogmrip-gconf.h
+	* data/ogmrip-simple-editor.glade
+	* data/ogmrip-profile-editor.glade
+	* data/ogmrip-options.glade
+	* data/ogmrip-pref.glade
+
+	Redesigned the preferences, options and profile editor dialogs
+
+09 Mar 2008 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip-lavc.glade
+	* libogmrip-gtk/ogmrip-lavc-options.c
+	* libogmrip/ogmrip-lavc.c
+	* libogmrip/ogmrip-lavc.h
+	* libogmrip/ogmrip-x264.c
+
+	Improved Lavc support
+
+08 Mar 2008 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+	* libogmrip-gtk/Makefile.am
+	* libogmrip/Makefile.am
+	* libogmrip/ogmrip-aac.c
+	* libogmrip/ogmrip-acopy.c
+	* libogmrip/ogmrip-avi.c
+	* libogmrip/ogmrip-lavc.c
+	* libogmrip/ogmrip-lavc-mpeg4.c
+	* libogmrip/ogmrip-mkv.c
+	* libogmrip/ogmrip-mov.c
+	* libogmrip/ogmrip-mp3.c
+	* libogmrip/ogmrip-mp4.c
+	* libogmrip/ogmrip-mplayer.c
+	* libogmrip/ogmrip-ogg.c
+	* libogmrip/ogmrip-srt.c
+	* libogmrip/ogmrip-theora.c
+	* libogmrip/ogmrip-version.c
+	* libogmrip/ogmrip-version.h.in
+	* libogmrip/ogmrip-video-codec.c
+	* libogmrip/ogmrip-vobsub.c
+	* libogmrip/ogmrip-vorbis.c
+	* libogmrip/ogmrip-wav.c
+	* libogmrip/ogmrip-x264.c
+	* libogmrip/ogmrip-xvid.c
+	* Makefile.am
+	* src/ogmrip-crop.c
+	* src/ogmrip-main.c
+
+	Preliminary support for runtime selection
+
+	* configure.in
+
+	Fixed HAL support
+
+05 Mar 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-profile-editor.c
+
+	Fixed gconf
+
+05 Mar 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-profiles.c
+	* src/ogmrip-profile-editor.c
+	* src/ogmrip-pref.c
+	* data/ogmrip-simple-editor.glade
+	* data/ogmrip-pref.glade
+
+	Improved expert support
+
+	* libogmrip-gtk/ogmrip-options-plugin.c
+
+	Improved options plugins support
+
+	* data/ogmrip-lavc.glade
+	* data/ogmrip-x264.glade
+
+	Small UI improvements
+
+03 Mar 2008 Olivier Rolland <billl@users.sf.net>
+
+	* dvdcpy/dvdcpy.c
+
+	Small improvement
+
+02 Mar 2008 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip-gtk.pc.in
+	* dvdcpy/dvdcpy.c
+	* libogmrip-gtk/ogmrip-helper.h
+	* libogmrip-gtk/ogmrip-preferences.c
+	* libogmrip-gtk/ogmrip-preferences.h
+	* libogmrip/ogmrip-video-codec.h
+	* src/ogmrip-profile-editor.c
+
+	Improvements, fixes and cleanups
+
+	* data/Makefile.am
+	* data/ogmrip-lavc.glade
+	* data/profiles.xml.in
+	* libogmrip-gtk/Makefile.am
+	* libogmrip-gtk/ogmrip-lavc-options.c
+	* libogmrip/ogmrip-lavc.c
+	* libogmrip/ogmrip-lavc.h
+	* libogmrip/ogmrip-lavc-mpeg4.c
+
+	Improved lavc support
+
+28 Feb 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-lavc.c
+	* libogmrip/ogmrip-lavc.h
+	* libogmrip/ogmrip-lavc-mpeg4.c
+	* libogmrip/ogmrip-lavc-mpeg4.h
+	* libogmrip/Makefile.am
+
+	Added preliminary support for lavc video codecs
+
+26 Feb 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd-title.c
+	* libogmdvd/ogmdvd-stream.c
+	* libogmdvd/ogmdvd-stream.h
+
+	Improved DVD support
+
+	* libogmrip/ogmrip-fs.c
+	* libogmrip/ogmrip-mplayer.c
+	* libogmrip/ogmrip-theora.c
+	* libogmrip/ogmrip-aac.c
+	* libogmrip/ogmrip-mp3.c
+	* libogmrip/ogmrip-vorbis.c
+
+	Improved error handling (again)
+
+24 Feb 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-ogg.c
+	* libogmrip/ogmrip-mkv.c
+
+	Fixed sync delay
+
+	* libbacon/transport.hxx
+
+	Fixed support for latest g++
+
+27 Jan 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-x264.C
+
+	Added codec specific options
+
+	* src/ogmrip-profiles.c
+	* src/ogmrip-profiles.h
+
+	Added checks for container and codecs
+
+	* libogmrip/Makefile.am
+	* libogmrip/ogmrip-plugin.c
+	* libogmrip/ogmrip-plugin.h
+	* src/ogmrip-gconf.c
+	* src/ogmrip-gconf.h
+
+	Improved plugins management
+
+	* libogmrip/ogmrip-audio-codec.c
+
+	Cleanup
+
+	* data/Makefile.am
+	* data/ogmrip-profile-editor.glade
+	* data/ogmrip-x264.glade
+	* libogmrip-gtk/Makefile.am
+	* libogmrip-gtk/ogmrip-gtk.h
+	* libogmrip-gtk/ogmrip-options-plugin.c
+	* libogmrip-gtk/ogmrip-options-plugin.h
+	* libogmrip-gtk/ogmrip-x264-options.c
+	* src/ogmrip-main.c
+	* src/ogmrip-profile-editor.c
+
+	Added preliminary support for per-codec options
+
+	* data/ogmrip-pref.glade
+	* data/ogmrip.schemas.in
+	* src/ogmrip-pref.c
+
+	Added preliminary support for expert mode
+
+	* data/Makefile.am
+	* data/ogmrip-profile-editor.glade
+	* data/ogmrip-simple-editor.glade
+	* src/ogmrip-profile-editor.c
+
+	Improved expert mode
+
+20 Jan 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-mplayer.c
+	* libogmrip/ogmrip-xvid.c
+	* libogmrip/ogmrip-mplayer.h
+	* libogmrip/ogmrip-xvid.h
+	* libogmrip/ogmrip-lavc.c
+	* libogmrip/ogmrip-lavc.h
+	* libogmrip/ogmrip-mp4.c
+	* libogmrip/ogmrip-vorbis.c
+	* libogmrip/ogmrip-srt.c
+	* libogmrip/ogmrip-vorbis.h
+	* libogmrip/ogmrip-ogg.c
+	* libogmrip/ogmrip-srt.h
+	* libogmrip/ogmrip-wav.c
+	* libogmrip/ogmrip-plugin.c
+	* libogmrip/ogmrip-wav.h
+	* libogmrip/ogmrip-x264.c
+	* libogmrip/ogmrip-plugin.h
+	* libogmrip/ogmrip.h
+	* libogmrip/ogmrip-x264.h
+	* libogmrip/ogmrip-acopy.c
+	* libogmrip/ogmrip-avi.c
+	* libogmrip/ogmrip-acopy.h
+	* libogmrip/ogmrip-theora.c
+	* libogmrip/ogmrip-aac.c
+	* libogmrip/ogmrip-subp-codec.c
+	* libogmrip/ogmrip-theora.h
+	* libogmrip/ogmrip-subp-codec.h
+	* libogmrip/ogmrip-aac.h
+	* libogmrip/ogmrip-mp3.c
+	* libogmrip/ogmrip-vobsub.c
+	* libogmrip/ogmrip-mp3.h
+	* libogmrip/ogmrip-vobsub.h
+	* libogmrip/ogmrip-audio-codec.c
+	* libogmrip/ogmrip-video-codec.c
+	* libogmrip/ogmrip-audio-codec.h
+	* libogmrip/ogmrip-container.c
+	* libogmrip/ogmrip-video-codec.h
+	* libogmrip/ogmrip-container.h
+	* libogmrip/ogmrip-dvdcpy.c
+	* libogmrip/Makefile.am
+	* libogmrip/ogmrip-mkv.c
+	* libogmrip/ogmrip-dvdcpy.h
+	* libogmrip/ogmrip-mov.c
+	* src/ogmrip-main.c
+	* src/ogmrip-options.c
+
+	Improved API
+
+	* dvdcpy/Makefile.am
+	* libogmdvd-gtk/Makefile.am
+	* subrip/Makefile.am
+	* libogmjob/Makefile.am
+	* Makefile.am
+
+	Cleanup
+
+19 Jan 2008 Olivier Rolland <billl@users.sf.net>
+
+	* subrip/srtutil.c
+
+	Improved error resiliency
+	Patch from Jakob Truelsen (antialize at users.sourceforge.net)
+
+16 Jan 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-fs.c
+	* libogmrip/ogmrip-fs.h
+	* src/ogmrip-main.c
+
+	Improved error handling (again)
+
+15 Jan 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed error handling
+
+	* src/ogmrip-profiles.c
+
+	Small UI improvement
+
+14 Jan 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-progress.c
+	* src/ogmrip-progress.h
+	* data/ogmrip-progress.data
+
+	Improved progress dialog
+
+	* libogmrip/ogmrip-mplayer.c
+	* libogmrip/ogmrip-ogg.c
+	* libogmrip/ogmrip-mkv.c
+	* src/ogmrip-main.c
+
+	Fixed merge with empty streams
+
+	* src/ogmrip-main.c
+
+	Fixed crash
+
+	* libogmrip/ogmrip-fs.c
+	* libogmrip/ogmrip-fs.h
+	* configure.in
+
+	Improved error handling
+
+10 Jan 2008 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Improved reuse of copied DVD (again)
+
+	* src/ogmrip-profiles.c
+
+	Small UI improvement
+
+	* data/profiles.xml.in
+	* data/profiles.xml
+	* data/Makefile.am
+	* po/POTFILES.in
+
+	Preliminary translation support of profiles name
+
+	* src/ogmrip-main.c
+
+	Improved support of directory structures
+
+06 Jan 2008 Olivier Rolland <billl@users.sf.net>
+
+	* data/Makefile.am
+	* data/ogmrip-options.glade
+	* data/ogmrip-pref.glade
+	* data/ogmrip-profile-editor.glade
+	* data/ogmrip-profiles.glade
+	* data/profiles.xml
+	* libogmrip-gtk/Makefile.am
+	* libogmrip-gtk/ogmrip-gtk.h
+	* libogmrip-gtk/ogmrip-marshal.list
+	* libogmrip-gtk/ogmrip-preferences.c
+	* libogmrip-gtk/ogmrip-preferences.h
+	* src/Makefile.am
+	* src/ogmrip-audio-options.c
+	* src/ogmrip-gconf.h
+	* src/ogmrip-main.c
+	* src/ogmrip-options.c
+	* src/ogmrip-pref.c
+	* src/ogmrip-profile-editor.c
+	* src/ogmrip-profile-editor.h
+	* src/ogmrip-profiles.c
+	* src/ogmrip-profiles.h
+	* src/ogmrip-subp-options.c
+
+	Added support for profiles
+
+	* libogmdvd/ogmdvd-disc.c
+	* libogmdvd/ogmdvd-disc.h
+	* libogmrip/ogmrip-fs.c
+	* src/ogmrip-main.c
+
+	Improved reuse of copied DVD
+
+01 Jan 2008 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd-audio.c
+	* libogmdvd/ogmdvd-audio.h
+	* libogmdvd/ogmdvd-parser.c
+	* libogmdvd/ogmdvd-parser.h
+	* libogmdvd/ogmdvd-priv.h
+	* libogmdvd/ogmdvd-reader.h
+	* libogmdvd/ogmdvd-title.c
+	* libogmdvd/ogmdvd-title.h
+
+	Fixed and improved title probing
+
+	* libogmrip/ogmrip-plugin.c
+
+	Fixed module close
+
+	* libogmrip/Makefile.am
+
+	Fixed lib dependencies
+
+	* libogmrip/ogmrip-video.c
+
+	Added properties
+
+	* libogmrip-gtk/ogmrip-preferences.c
+	* libogmrip-gtk/ogmrip-preferences.h
+
+	Improved API
+
+	* libogmrip-gtk/ogmrip-source-chooser-widget.c
+
+	Added support for audio bitrate
+
+	* src/ogmrip-main.c
+	* src/ogmrip-gconf.c
+	* src/ogmrip-pref.c
+	* src/ogmrip-gconf.h
+
+	Minor improvements
+
+	* libogmrip/ogmrip-acopy.h
+	* libogmrip/ogmrip-avi.h
+	* libogmrip/ogmrip-theora.h
+	* libogmrip/ogmrip-aac.h
+	* libogmrip/ogmrip-mp3.h
+	* libogmrip/ogmrip-vobsub.h
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-vorbis.h
+	* libogmrip/ogmrip-srt.h
+	* libogmrip/ogmrip-ogg.h
+	* libogmrip/ogmrip-dvdcpy.h
+
+	Cleanup
+
+22 Dec 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-x264.c
+	* libogmrip/ogmrip-mplayer.c
+	* libogmrip/ogmrip-xvid.c
+	* libogmrip/ogmrip-mplayer.h
+	* libogmrip/ogmrip-lavc.c
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-video.h
+	* src/ogmrip-main.c
+
+	Moved n-pass support in the backend
+
+	* dvdcpy/dvdcpy.c
+
+	Improved error resiliency
+
+15 Dec 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-fs.c
+	* libogmjob/ogmjob-log.c
+
+	Improved log
+
+	* libogmdvd/ogmdvd-reader.c
+
+	Fixed extraction by cells
+
+26 Nov 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmjob/ogmjob-exec.c
+
+	Fixed X cpu usage
+
+25 Nov 2007 Olivier Rolland <billl@users.sf.net>
+
+	* subrip/subp2pgm.c
+	* subrip/mp_msg.c
+	* subrip/mp_msg.h
+	* subrip/spudec.c
+	* subrip/spudec.h
+	* subrip/subrip.c
+	* subrip/vobsub.c
+	* subrip/vobsub.h
+	* subrip/Makefile.am
+
+	Fixed ppm extraction
+
+24 Nov 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-x264.c
+	* libogmrip/ogmrip-xvid.c
+	* libogmrip/ogmrip-lavc.c
+	* src/ogmrip-progress.c
+	* src/ogmrip-progress.h
+	* src/ogmrip-main.c
+	* src/ogmrip-options.c
+	* src/ogmrip-options.h
+	* data/ogmrip-options.glade
+
+	Added preliminary support for automatic compressibility test
+
+20 Nov 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd-reader.c
+	* libogmdvd/ogmdvd-reader.h
+
+	Added cells support
+
+18 Nov 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-acopy.c
+	* libogmrip/ogmrip-file.c
+	* libogmrip/ogmrip-file.h
+	* libogmrip/ogmrip-mp3.c
+	* libogmrip/ogmrip-audio.c
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-container.c
+
+	Improved overhead calculation
+
+16 Nov 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-video.c
+
+	Improved autocrop (again)
+
+11 Nov 2007 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-pref.c
+
+	Fixed internationalization of plugin's descriptions
+
+	* libogmrip/ogmrip-file.c
+	* libogmrip/ogmrip-avi.c
+	* libogmrip/ogmrip-enums.h
+	* libogmrip/ogmrip-mkv.c
+	* docs/reference/ogmrip/tmpl/ogmrip-enums.sgml
+
+	Added support for Mpeg-1 and Mpeg-2 video files
+
+10 Nov 2007 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-crop.c
+
+	Improved frame grab
+
+	* libogmrip/ogmrip-video.c
+
+	Improved autocrop
+
+07 Nov 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-x264.c
+	* libogmrip/ogmrip-xvid.c
+	* libogmrip/ogmrip-lavc.c
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-video.h
+
+	Added preliminary support for per-codec options
+
+	* libogmrip/ogmrip-mp4.c
+	* libogmrip/ogmrip-mov.c
+
+	Added support for mplayer >Ù= 1.0rc2
+	
+21 Oct 2007 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-prÅgress.c
+
+	Fixed ETA after suspend/resume
+
+20 Oct 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/Makefile.am
+	* libogmdvd/ogmdvd-contrib.c
+	* libogmdvd/ogmdvd-contrib.h
+	* libogmdvd/ogmdvd-disc.c
+	* libogmdvd/ogmdvd.h
+	* libogmdvd/ogmdvd-parser.c
+	* libogmdvd/ogmdvd-parser.h
+	* libogmdvd/ogmdvd-priv.h
+	* libogmdvd/ogmdvd-reader.c
+	* libogmdvd/ogmdvd-reader.h
+	* libogmdvd/ogmdvd-types.h
+	* docs/reference/ogmdvd/ogmdvd-sections.txt
+	* docs/reference/ogmdvd/ogmdvd.xml
+	* docs/reference/ogmdvd/tmpl/ogmdvd-disc.sgml
+	* docs/reference/ogmdvd/tmpl/ogmdvd-parser.sgml
+	* docs/reference/ogmdvd/tmpl/ogmdvd-reader.sgml
+	* docs/reference/ogmdvd/tmpl/ogmdvd-title.sgml
+	* docs/reference/ogmdvd/tmpl/ogmdvd-types.sgml
+	* docs/reference/ogmrip/ogmrip-sections.txt
+	* docs/reference/ogmrip/tmpl/ogmrip-codec.sgml
+	* docs/reference/ogmrip/tmpl/ogmrip-container.sgml
+	* docs/reference/ogmrip/tmpl/ogmrip-fs.sgml
+	* docs/reference/ogmrip/tmpl/ogmrip-unused.sgml
+	* docs/reference/ogmrip/tmpl/ogmrip-video.sgml
+
+	Added functions to extract the bitrate of audio tracks
+
+	* libogmrip/ogmrip-codec.c
+	* libogmrip/ogmrip-codec.h
+	* libogmrip/ogmrip-mplayer.c
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-video.h
+	* src/ogmrip-main.c
+	* src/ogmrip-options.c
+	* src/ogmrip-options.h
+	* data/ogmrip-options.glade
+	* docs/reference/ogmrip/ogmrip-sections.txt
+	* docs/reference/ogmrip/tmpl/ogmrip-codec.sgml
+	* docs/reference/ogmrip/tmpl/ogmrip-unused.sgml
+
+	Improved support of telecine and progressive titles
+
+	* libogmrip/ogmrip-x264.c
+
+	Added support for auto threads
+
+	* configure.in
+
+	Added endianness detection
+
+	* libogmrip/ogmrip-enums.h
+	* libogmrip/ogmrip-lavc.c
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-x264.c
+	* libogmrip/ogmrip-xvid.c
+	* data/ogmrip-pref.glade
+	* data/ogmrip.schemas.in
+	* docs/reference/ogmrip/tmpl/ogmrip-enums.sgml
+
+	Renamed video quality presets
+
+	* configure.in
+
+	Starting 0.12 dev
+
+19 Oct 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-mplayer.c
+
+	Fixed progression with progressive titles
+
+	* libogmrip/ogmrip-codec.c
+	* libogmrip/ogmrip-file.c
+	* src/ogmrip-main.c
+
+	Cleanup
+
+	* configure.in
+
+	Typo
+
+16 Oct 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd-gtk/ogmdvd-chapter-list.c
+	* libogmdvd/ogmdvd-title.c
+	* libogmdvd/ogmdvd-title.h
+	* libogmrip/ogmrip-chapters.c
+	* libogmrip/ogmrip-codec.c
+	* libogmrip/ogmrip-codec.h
+	* libogmrip/ogmrip-container.c
+	* libogmrip/ogmrip-file.c
+	* libogmrip/ogmrip-file.h
+	* libogmrip/ogmrip-mplayer.c
+	* libogmrip/ogmrip-video.c
+	* src/ogmrip-crop.c
+	* src/ogmrip-main.c
+
+	Fixed overhead calculation
+
+14 Oct 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-mp3.c
+
+	Removed the -t option to improve compatibility
+
+09 Oct 2007 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+	* theoraenc/theoraenc.c
+
+	Removed unneeded dependencies
+
+08 Oct 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-mplayer.c
+
+	Fixed support of mixed progressive and telecine video (again)
+
+	* configure.in
+
+	Fixed theoraenc requirements
+
+07 Oct 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-xvid.c
+
+	Fixed options for standalone players
+
+	* src/ogmrip-pref.c
+
+	Fixed temporary directory
+
+	* src/ogmrip-pref.c
+
+	Fixed spell check when enchant is disabled
+
+06 Oct 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-mplayer.c
+
+	Fixed support of mixed progressive and telecine video
+
+	* libogmripâ ogmrip-fs.c
+
+	Fixed removing directories
+
+30 Sep 2007 Olivier Rolland <billl@users.sf.net>
+
+	Released OGMRip-0.11
+
+30 Sep 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-xvid.c
+
+	Added par=vga11 for compatibility with standalone players
+
+	* libogmrip/ogmrip-subp.c
+	* libogmrip/ogmrip-codec.c
+	* libogmrip/ogmrip-audio.c
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-container.c
+	* src/ogmrip-main.c
+	* libogmdvd-gtk/ogmdvd-title-chooser-widget.c
+	* libogmdvd-gtk/ogmdvd-drive-chooser-widget.c
+	* libogmdvd-gtk/ogmdvd-chapter-list.c
+	* libogmjob/ogmjob-exec.c
+	* libogmjob/ogmjob-container.c
+	* libogmrip-gtk/ogmrip-chooser-list.c
+	* libogmrip-gtk/ogmrip-source-chooser-widget.c
+
+	Fixed disposition and finalization
+
+	* src/ogmrip-main.c
+
+	Fixed compilation with mplayer < 1.0pre8
+
+29 Sep 2007 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed suppression after copying
+
+	* libogmrip/ogmrip-video.c
+
+	Fixed crop internal
+
+28 Sep 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-mplayer.c
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-video.h
+	* src/ogmrip-main.c
+
+	Fixed deinterlacing
+
+11 Sep 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-ogg.c
+
+	Fixed compilation on 64-bit platforms
+
+10 Sep 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip-gtk/Makefile.am
+	* libogmrip-gtk/ogmrip-gtk.h
+	* libogmrip-gtk/ogmrip-helper.h
+	* libogmrip-gtk/ogmrip-preferences.c
+	* libogmrip-gtk/ogmrip-preferences.h
+	* src/ogmrip-audio-options.c
+	* src/ogmrip-gconf.c
+	* src/ogmrip-gconf.h
+	* src/ogmrip-main.c
+	* src/ogmrip-pref.c
+	* src/ogmrip-subp-options.c
+
+	Completely rewritten the preferences system
+
+09 Sep 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-ogg.c
+
+	Disabled merging chapters on platforms other than 32-bit
+
+	* libogmrip/ogmrip-xvid.c
+	* libogmrip/ogmrip-lavc.c
+
+	Fixed constant quantizer mode
+
+	* libogmrip/ogmrip-fs.c
+	* libogmjob/ogmjob-spawn.c
+
+	Used ogmjob_log instead of g_print
+
+	* libogmrip/ogmrip-mplayer.c
+	* src/ogmrip-main.c
+
+	* libogmrip/ogmrip-mplayer.c
+	* src/ogmrip-main.c
+
+	Improved pullup support
+
+06 Sep 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-plugin.c
+
+	Added warnings when plugin loading failed
+
+	* libogmrip/ogmrip-aac.c
+	* libogmrip/ogmrip-chapters.c
+	* libogmrip/ogmrip-dvdcpy.c
+	* libogmrip/ogmrip-lavc.c
+	* libogmrip/ogmrip-mov.c
+	* libogmrip/ogmrip-mp4.c
+	* libogmrip/ogmrip-srt.c
+	* libogmrip/ogmrip-theora.c
+	* libogmrip/ogmrip-vobsub.c
+	* libogmrip/ogmrip-vorbis.c
+	* libogmrip/ogmrip-wav.c
+	* libogmrip/ogmrip-xvid.c
+
+	Improved object instanciation
+
+	* libogmrip/ogmrip-audio.c
+	* libogmrip/ogmrip-audio.h
+	* libogmrip/ogmrip-acopy.c
+	* libogmrip/ogmrip-mp3.c
+
+	Improved support of samples per frame
+
+	* libogmrip/ogmrip-container.c
+	* libogmrip/ogmrip-container.h
+	* libogmrip/ogmrip-avi.c
+	* libogmrip/ogmrip-mkv.c
+
+	Improved support of overhead
+
+	* libogmrip/ogmrip-x264.c
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-video.h
+	* libogmrip/ogmrip-ogg.c
+	* libogmrip/ogmrip-container.c
+	* libogmrip/ogmrip-container.h
+	* libogmrip/ogmrip-mkv.c
+
+	Added support of start delay
+
+	* libogmrip/ogmrip-ogg.c
+	* libogmrip/ogmrip-mkv.c
+	* src/ogmrip-main.c
+
+	Fixed start delay support
+
+	* libogmrip/ogmrip-mplayer.c
+	* src/ogmrip-main.c
+
+	Changed sample rate in ensure sync mode
+
+	* libogmrip/ogmrip-x264.c
+	* libogmrip/ogmrip-video.c
+	* src/ogmrip-main.c
+
+	Removed turbo in the last pass
+
+05 Sep 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-mplayer.c
+
+	Forced output framerate to 24000/1001 when using pullup
+
+	* libogmrip/Makefile.am
+
+	Avoided version in plugins
+
+	* libogmrip/ogmrip-x264.c
+
+	Improved constant quality mode
+
+04 Sep 2007 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-pref.c
+
+	Fixed language selection
+
+	* configure.in
+
+	Improved DTS support detection
+
+	* libogmrip/ogmrip-plugin.h
+	* libogmrip/ogmrip-x264.c
+	* libogmrip/ogmrip-xvid.c
+	* libogmrip/ogmrip-acopy.c
+	* libogmrip/ogmrip-avi.c
+	* libogmrip/ogmrip-theora.c
+	* libogmrip/ogmrip-aac.c
+	* libogmrip/ogmrip-lavc.c
+	* libogmrip/ogmrip-mp3.c
+	* libogmrip/ogmrip-mp4.c
+	* libogmrip/ogmrip-vobsub.c
+	* libogmrip/ogmrip-vorbis.c
+	* libogmrip/ogmrip-srt.c
+	* libogmrip/ogmrip-ogg.c
+	* libogmrip/ogmrip-wav.c
+	* libogmrip/ogmrip-mkv.c
+	* libogmrip/ogmrip-plugin.c
+	* libogmrip/ogmrip-mov.c
+	* src/ogmrip-main.c
+
+	Improved plugin system
+
+	* src/ogmrip-options.c
+
+	Hidden compressibility check button
+
+02 Sep 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd-title.c
+	* libogmdvd/ogmdvd-title.h
+
+	Added functions to get lists of audio and subtitles streams
+
+	* libogmdvd/ogmdvd-disc.c
+	* libogmdvd/ogmdvd-disc.h
+
+	Added a function to get the list of the video titles
+
+	* libogmdvd/ogmdvd-title.c
+	* libogmdvd/ogmdvd-disc.c
+
+	Added preliminary support for DVD structures without video manager
+
+31 Aug 2007 Olivier Rolland <billl@users.sf.net>
+
+	* subrip/srtutil.c
+
+	Fixed compilation error
+
+27 Aug 2007 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip.schemas.in
+
+	Fixed video codec's type
+
+	* libogmjob/ogmjob-queue.c
+	* libogmjob/ogmjob-pipeline.c
+
+	Fixed handler disconnexion
+
+26 Aug 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-mplayer.c
+
+	Improved A/V sync
+
+	* libogmjob/ogmjob-exec.c
+
+	Removed invalid signal emission 
+
+14 Aug 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-audio.c
+	* libogmrip/ogmrip-chapters.c
+	* libogmrip/ogmrip-codec.c
+	* libogmrip/ogmrip-codec.h
+	* libogmrip/ogmrip-container.c
+	* libogmrip/ogmrip-container.h
+	* libogmrip/ogmrip-dvdcpy.c
+	* libogmrip/ogmrip-edl.c
+	* libogmrip/ogmrip-edl.h
+	* libogmrip/ogmrip-enums.h
+	* libogmrip/ogmrip-file.c
+	* libogmrip/ogmrip-file.h
+	* libogmrip/ogmrip-fs.c
+	* libogmrip/ogmrip-fs.h
+	* libogmrip/ogmrip-plugin.c
+	* libogmrip/ogmrip-plugin.h
+	* libogmrip/ogmrip-subp.c
+	* libogmrip/ogmrip-subp.h
+	* libogmrip/ogmrip-version.h.in
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-video.h
+	* docs/reference/ogmrip/ogmrip.types
+	* docs/reference/ogmrip/Makefile.am
+	* docs/reference/ogmrip/ogmrip-sections.txt
+	* docs/reference/ogmrip/ogmrip.xml
+	* docs/reference/ogmrip/tmpl/ogmrip-audio.sgml
+	* docs/reference/ogmrip/tmpl/ogmrip-chapters.sgml
+	* docs/reference/ogmrip/tmpl/ogmrip-codec.sgml
+	* docs/reference/ogmrip/tmpl/ogmrip-container.sgml
+	* docs/reference/ogmrip/tmpl/ogmrip-dvdcpy.sgml
+	* docs/reference/ogmrip/tmpl/ogmrip-edl.sgml
+	* docs/reference/ogmrip/tmpl/ogmrip-enums.sgml
+	* docs/reference/ogmrip/tmpl/ogmrip-file.sgml
+	* docs/reference/ogmrip/tmpl/ogmrip-fs.sgml
+	* docs/reference/ogmrip/tmpl/ogmrip-plugin.sgml
+	* docs/reference/ogmrip/tmpl/ogmrip-subp.sgml
+	* docs/reference/ogmrip/tmpl/ogmrip-unused.sgml
+	* docs/reference/ogmrip/tmpl/ogmrip-video.sgml
+
+	Documentation
+
+11 Aug 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd-gtk/ogmdvd-chapter-list.c
+	* libogmdvd-gtk/ogmdvd-drive-chooser.c
+	* libogmdvd-gtk/ogmdvd-drive-chooser-dialog.c
+	* libogmdvd-gtk/ogmdvd-drive-chooser-widget.c
+	* libogmdvd-gtk/ogmdvd-title-chooser.c
+	* libogmdvd-gtk/ogmdvd-title-chooser-widget.c
+	* docs/reference/ogmdvd-gtk/Makefile.am
+	* docs/reference/ogmdvd-gtk/ogmdvd-gtk-sections.txt
+	* docs/reference/ogmdvd-gtk/ogmdvd-gtk.types
+	* docs/reference/ogmdvd-gtk/ogmdvd-gtk.xml
+	* docs/reference/ogmdvd-gtk/tmpl/ogmdvd-chapter-list.sgml
+	* docs/reference/ogmdvd-gtk/tmpl/ogmdvd-drive-chooser-dialog.sgml
+	* docs/reference/ogmdvd-gtk/tmpl/ogmdvd-drive-chooser.sgml
+	* docs/reference/ogmdvd-gtk/tmpl/ogmdvd-drive-chooser-widget.sgml
+	* docs/reference/ogmdvd-gtk/tmpl/ogmdvd-title-chooser.sgml
+	* docs/reference/ogmdvd-gtk/tmpl/ogmdvd-title-chooser-widget.sgml
+	* libogmjob/ogmjob-bin.c
+	* libogmjob/ogmjob-container.c
+	* libogmjob/ogmjob-exec.c
+	* libogmjob/ogmjob-list.c
+	* libogmjob/ogmjob-log.c
+	* libogmjob/ogmjob-pipeline.c
+	* libogmjob/ogmjob-queue.c
+	* libogmjob/ogmjob-spawn.c
+	* docs/reference/ogmjob/Makefile.am
+	* docs/reference/ogmjob/ogmjob.types
+	* docs/reference/ogmjob/tmpl/ogmjob-bin.sgml
+	* docs/reference/ogmjob/tmpl/ogmjob-container.sgml
+	* docs/reference/ogmjob/tmpl/ogmjob-enums.sgml
+	* docs/reference/ogmjob/tmpl/ogmjob-exec.sgml
+	* docs/reference/ogmjob/tmpl/ogmjob-list.sgml
+	* docs/reference/ogmjob/tmpl/ogmjob-log.sgml
+	* docs/reference/ogmjob/tmpl/ogmjob-pipeline.sgml
+	* docs/reference/ogmjob/tmpl/ogmjob-queue.sgml
+	* docs/reference/ogmjob/tmpl/ogmjob-spawn.sgml
+	* docs/reference/ogmjob/tmpl/ogmjob-unused.sgml
+	* libogmrip-gtk/ogmrip-chapter-list.c
+	* libogmrip-gtk/ogmrip-chooser-list.c
+	* libogmrip-gtk/ogmrip-helper.c
+	* libogmrip-gtk/ogmrip-source-chooser.c
+	* libogmrip-gtk/ogmrip-source-chooser-widget.c
+	* docs/reference/ogmrip-gtk/Makefile.am
+	* docs/reference/ogmrip-gtk/ogmrip-gtk.types
+	* docs/reference/ogmrip-gtk/ogmrip-gtk.xml
+	* docs/reference/ogmrip-gtk/tmpl/ogmrip-chapter-list.sgml
+	* docs/reference/ogmrip-gtk/tmpl/ogmrip-chooser-list.sgml
+	* docs/reference/ogmrip-gtk/tmpl/ogmrip-gtk-unused.sgml
+	* docs/reference/ogmrip-gtk/tmpl/ogmrip-helper.sgml
+	* docs/reference/ogmrip-gtk/tmpl/ogmrip-source-chooser.sgml
+	* docs/reference/ogmrip-gtk/tmpl/ogmrip-source-chooser-widget.sgml
+
+	Documentation
+
+09 Aug 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd-disc.c
+	* libogmdvd/ogmdvd-disc.h
+
+	Added valid error codes
+
+	* libogmdvd/ogmdvd-title.c
+	* libogmdvd/ogmdvd-disc.c
+	* libogmdvd/ogmdvd-priv.h
+	* libogmdvd/ogmdvd-disc.h
+	* libogmdvd/ogmdvd-stream.c
+	* libogmdvd/ogmdvd-enums.h
+	* libogmdvd/ogmdvd-audio.c
+	* libogmdvd/ogmdvd-labels.c
+	* libogmdvd/ogmdvd-subp.c
+	* docs/reference/ogmdvd/ogmdvd-sections.txt
+	* docs/reference/ogmdvd/tmpl/ogmdvd-audio.sgml
+	* docs/reference/ogmdvd/tmpl/ogmdvd-title.sgml
+	* docs/reference/ogmdvd/tmpl/ogmdvd-disc.sgml
+	* docs/reference/ogmdvd/tmpl/ogmdvd-labels.sgml
+	* docs/reference/ogmdvd/tmpl/ogmdvd-unused.sgml
+	* docs/reference/ogmdvd/tmpl/ogmdvd-types.sgml
+	* docs/reference/ogmdvd/tmpl/ogmdvd-enums.sgml
+	* docs/reference/ogmdvd/tmpl/ogmdvd-subp.sgml
+	* docs/reference/ogmdvd/tmpl/ogmdvd-stream.sgml
+
+	Documentation
+
+08 Aug 2007 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+	* src/ogmrip-options.c
+	* src/ogmrip-options.h
+	* data/ogmrip-options.glade
+
+	Added cartoon option
+
+	* src/ogmrip-pref.c
+
+	Fixed unknown lang code
+
+	* libogmrip/ogmrip-x264.c
+
+	Improved options
+
+	* subrip/srtutil.1
+
+	Fixed typos
+
+	* configure.in
+	* docs/tutorial
+	* docs/tutorial/en
+	* docs/tutorial/en/shots
+	* docs/tutorial/en/shots/ogmrip-pref-audio-small.png
+	* docs/tutorial/en/shots/ogmrip-subp-options.png
+	* docs/tutorial/en/shots/ogmrip-pref-subp.png
+	* docs/tutorial/en/shots/ogmrip-pref-advanced-small.png
+	* docs/tutorial/en/shots/ogmrip-pref-video-small.png
+	* docs/tutorial/en/shots/ogmrip-pref-general.png
+	* docs/tutorial/en/shots/ogmrip-subp-options-small.png
+	* docs/tutorial/en/shots/ogmrip-pref-subp-small.png
+	* docs/tutorial/en/shots/ogmrip-audio-options.png
+	* docs/tutorial/en/shots/ogmrip-pref-audio.png
+	* docs/tutorial/en/shots/ogmrip-pref-general-small.png
+	* docs/tutorial/en/shots/ogmrip-pref-advanced.png
+	* docs/tutorial/en/shots/ogmrip-pref-video.png
+	* docs/tutorial/en/shots/ogmrip-audio-options-small.png
+	* docs/tutorial/en/download.xml
+	* docs/tutorial/en/index.xml
+	* docs/tutorial/en/sidebar.xml
+	* docs/tutorial/en/Makefile.am
+	* docs/tutorial/en/manual.xml
+	* docs/tutorial/en/reference.xml
+	* docs/tutorial/fr
+	* docs/tutorial/fr/shots
+	* docs/tutorial/fr/shots/ogmrip-pref-audio-small.png
+	* docs/tutorial/fr/shots/ogmrip-subp-options.png
+	* docs/tutorial/fr/shots/ogmrip-pref-subp.png
+	* docs/tutorial/fr/shots/ogmrip-pref-advanced-small.png
+	* docs/tutorial/fr/shots/ogmrip-pref-video-small.png
+	* docs/tutorial/fr/shots/ogmrip-pref-general.png
+	* docs/tutorial/fr/shots/ogmrip-subp-options-small.png
+	* docs/tutorial/fr/shots/ogmrip-pref-subp-small.png
+	* docs/tutorial/fr/shots/ogmrip-pref-general-small.png
+	* docs/tutorial/fr/shots/ogmrip-main.png
+	* docs/tutorial/fr/shots/ogmrip-main-small.png
+	* docs/tutorial/fr/shots/ogmrip-audio-options.png
+	* docs/tutorial/fr/shots/ogmrip-pref-audio.png
+	* docs/tutorial/fr/shots/ogmrip-pref-advanced.png
+	* docs/tutorial/fr/shots/ogmrip-audio-options-small.png
+	* docs/tutorial/fr/shots/ogmrip-pref-video.png
+	* docs/tutorial/fr/download.xml
+	* docs/tutorial/fr/index.xml
+	* docs/tutorial/fr/sidebar.xml
+	* docs/tutorial/fr/Makefile.am
+	* docs/tutorial/fr/manual.xml
+	* docs/tutorial/fr/reference.xml
+	* docs/tutorial/Makefile.am
+	* docs/tutorial/data
+	* docs/tutorial/data/suse.png
+	* docs/tutorial/data/fedora.png
+	* docs/tutorial/data/debian.png
+	* docs/tutorial/data/ubuntu.png
+	* docs/tutorial/data/style.css
+	* docs/tutorial/data/html.xsl
+	* docs/tutorial/data/Makefile.am
+	* docs/tutorial/data/freebsd.png
+	* docs/tutorial/data/gentoo.png
+	* docs/Makefile.am
+
+	Added english and french tutorial
+
+	* docs/reference/ogmrip-gtk/ogmrip-gtk.types
+	* docs/reference/ogmdvd-gtk/ogmdvd-gtk.types
+	* docs/reference/ogmjob/ogmjob.types
+	* docs/reference/ogmrip/ogmrip.types
+
+	Added object hierarchy
+
+23 Jul 2007 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+	* src/ogmrip-audio-options.c
+	* src/ogmrip-gconf.c
+	* src/ogmrip-pref.c
+	* src/Makefile.am
+	* src/ogmrip-gconf.h
+	* src/ogmrip-subp-options.c
+	* data/ogmrip.schemas.in
+	* data/ogmrip-pref.glade
+
+	Fixed and improved gconf support
+
+15 Jul 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip-gtk/ogmrip-chooser-list.c
+
+	Cleanup
+
+	* libogmdvd-gtk/Makefile.am
+	* libogmrip-gtk/Makefile.am
+
+	Added LIBADD
+
+	* configure.in
+	* data/Makefile.am
+	* data/ogmrip.pc.in
+	* libogmrip/Makefile.am
+	* libogmrip/ogmrip-aac.c
+	* libogmrip/ogmrip-acopy.c
+	* libogmrip/ogmrip-avi.c
+	* libogmrip/ogmrip-chapters.c
+	* libogmrip/ogmrip-container.c
+	* libogmrip/ogmrip-dvdcpy.c
+	* libogmrip/ogmrip-dvdcpy.h
+	* libogmrip/ogmrip-edl.c
+	* libogmrip/ogmrip-enums.h
+	* libogmrip/ogmrip-file.c
+	* libogmrip/ogmrip-file.h
+	* libogmrip/ogmrip-fs.c
+	* libogmrip/ogmrip-fs.h
+	* libogmrip/ogmrip.h
+	* libogmrip/ogmrip-lavc.c
+	* libogmrip/ogmrip-mkv.c
+	* libogmrip/ogmrip-mov.c
+	* libogmrip/ogmrip-mp3.c
+	* libogmrip/ogmrip-mp4.c
+	* libogmrip/ogmrip-mplayer.c
+	* libogmrip/ogmrip-mplayer.h
+	* libogmrip/ogmrip-ogg.c
+	* libogmrip/ogmrip-plugin.c
+	* libogmrip/ogmrip-plugin.h
+	* libogmrip/ogmrip-srt.c
+	* libogmrip/ogmrip-theora.c
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-vobsub.c
+	* libogmrip/ogmrip-vorbis.c
+	* libogmrip/ogmrip-wav.c
+	* libogmrip/ogmrip-x264.c
+	* libogmrip/ogmrip-xvid.c
+	* src/ogmrip-audio-options.c
+	* src/ogmrip-main.c
+	* src/ogmrip-options.c
+	* src/ogmrip-pref.c
+	* src/ogmrip-subp-options.c
+	* po/POTFILES.in
+
+	Switched to plugin system
+
+08 Jul 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd-gtk/ogmdvd-title-chooser-widget.c
+
+	Fixed disc unref
+
+06 Jul 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+
+	Improved chapters handling
+
+04 Jul 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip.h
+	* libogmrip/ogmrip-init.c
+	* libogmrip/Makefile.am
+	* configure.in
+	* src/ogmrip-crop.c
+	* src/ogmrip-main.c
+	* data/Makefile.am
+
+	Fixed compatibility matrix
+
+03 Jul 2007 Olivier Rolland <billl@users.sf.net>
+
+	* dvdcpy/dvdcpy.c
+
+	Fixed copy of DVD with no menu or backup
+
+02 Jul 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-xml.h
+	* libogmrip/ogmrip-file.c
+	* libogmrip/ogmrip-file.h
+	* libogmrip/ogmrip-init.c
+	* libogmrip/ogmrip-init.h
+	* libogmrip/ogmrip-xml.c
+	* src/ogmrip-main.c
+	* data/ogmrip.xsd
+	* data/ogmrip.xml.in.in
+
+	Improved external files support
+
+01 Jul 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-video.h
+	* src/ogmrip-main.c
+
+	Improved quantizer support
+
+	* data/ogmrip-ui.xml
+	* libogmdvd-gtk/ogmdvd-chapter-list.c
+	* libogmdvd-gtk/ogmdvd-chapter-list.h
+	* src/ogmrip-main.c
+
+	Added support for importing and exporting chapters
+
+	* data/ogmrip-main.glade
+
+	Fixed scrolling chapters list
+
+	* src/ogmrip-main.c
+
+	Added support for importing matroska chapter files
+
+30 Jun 2007 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed build
+
+22 Jun 2007 Olivier Rolland <billl@users.sf.net>
+
+	* docs/reference/ogmdvd/Makefile.am
+	* docs/reference/ogmdvd-gtk/Makefile.am
+	* docs/reference/ogmjob/Makefile.am
+	* docs/reference/ogmrip/Makefile.am
+	* docs/reference/ogmrip-gtk/Makefile.am
+
+	Fixed gtk-doc
+
+14 Jun 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd-gtk/ogmdvd-title-chooser-widget.c
+	* libogmdvd-gtk/ogmdvd-drive-chooser-widget.c
+	* data/ogmrip.schemas.in
+
+	Fixed compilation and installation issues
+
+03 Jun 2007 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-options.c
+	* libogmrip-gtk/ogmrip-helper.c
+
+	Improved HIG compliancy
+
+02 Jun 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-edl.c
+	* libogmrip/ogmrip-edl.h
+	* libogmrip/ogmrip-codec.c
+	* libogmrip/ogmrip-backend.c
+
+	Improved EDL support
+
+	* libogmrip/ogmrip-file.c
+
+	Fixed audio and video formats
+
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-audio.c
+	* libogmrip/ogmrip-audio.h
+	* src/ogmrip-main.c
+
+	Improved A/V sync
+
+20 May 2007 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+	* src/ogmrip-pref.c
+	* src/ogmrip-gconf.h
+	* data/ogmrip.schemas.in
+	* data/ogmrip-pref.glade
+
+	Improved usability for DVD copy
+
+	* dvdcpy/dvdcpy.c
+
+	Fixed typo
+
+	* src/ogmrip-main.c
+	* src/ogmrip-options.c
+	* src/ogmrip-options.h
+
+	Options are kept as long as the selected DVD title does not change
+
+	* configure.in
+
+	Fixed DTS support detection
+
+19 May 2007 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+	* data/Makefile.am
+	* data/ogmrip-gtk.pc.in
+	* data/ogmrip-main.glade
+	* docs/reference/Makefile.am
+	* docs/reference/ogmdvd-gtk/Makefile.am
+	* docs/reference/ogmdvd-gtk/ogmdvd-gtk.xml
+	* docs/reference/ogmdvd-gtk/tmpl/ogmdvd-audio-chooser.sgml
+	* docs/reference/ogmdvd-gtk/tmpl/ogmdvd-drive-chooser-dialog.sgml
+	* docs/reference/ogmdvd-gtk/tmpl/ogmdvd-drive-chooser.sgml
+	* docs/reference/ogmdvd-gtk/tmpl/ogmdvd-drive-chooser-widget.sgml
+	* docs/reference/ogmdvd-gtk/tmpl/ogmdvd-gtk-unused.sgml
+	* docs/reference/ogmdvd-gtk/tmpl/ogmdvd-source-chooser.sgml
+	* docs/reference/ogmdvd-gtk/tmpl/ogmdvd-subtitle-chooser.sgml
+	* docs/reference/ogmdvd-gtk/tmpl/ogmdvd-title-chooser.sgml
+	* docs/reference/ogmdvd-gtk/tmpl/ogmdvd-title-chooser-widget.sgml
+	* docs/reference/ogmrip-gtk
+	* docs/reference/ogmrip-gtk/Makefile.am
+	* docs/reference/ogmrip-gtk/ogmrip-gtk.xml
+	* docs/reference/ogmrip-gtk/tmpl
+	* docs/reference/ogmrip-gtk/tmpl/ogmrip-chapter-list.sgml
+	* docs/reference/ogmrip-gtk/tmpl/ogmrip-chooser-list.sgml
+	* docs/reference/ogmrip-gtk/tmpl/ogmrip-gtk-unused.sgml
+	* docs/reference/ogmrip-gtk/tmpl/ogmrip-helper.sgml
+	* docs/reference/ogmrip-gtk/tmpl/ogmrip-marshal.sgml
+	* docs/reference/ogmrip-gtk/tmpl/ogmrip-source-chooser.sgml
+	* docs/reference/ogmrip-gtk/tmpl/ogmrip-source-chooser-widget.sgml
+	* docs/reference/ogmrip/tmpl/ogmrip-container.sgml
+	* docs/reference/ogmrip/tmpl/ogmrip-edl.sgml
+	* docs/reference/ogmrip/tmpl/ogmrip-fs.sgml
+	* docs/reference/ogmrip/tmpl/ogmrip-init.sgml
+	* docs/reference/ogmrip/tmpl/ogmrip-video.sgml
+	* docs/reference/ogmrip/tmpl/ogmrip-xml.sgml
+	* libogmdvd-gtk/Makefile.am
+	* libogmdvd-gtk/ogmdvd-audio-chooser.c
+	* libogmdvd-gtk/ogmdvd-audio-chooser.h
+	* libogmdvd-gtk/ogmdvd-drive-chooser.c
+	* libogmdvd-gtk/ogmdvd-drive-chooser-dialog.c
+	* libogmdvd-gtk/ogmdvd-drive-chooser-dialog.h
+	* libogmdvd-gtk/ogmdvd-drive-chooser.h
+	* libogmdvd-gtk/ogmdvd-drive-chooser-widget.c
+	* libogmdvd-gtk/ogmdvd-drive-chooser-widget.h
+	* libogmdvd-gtk/ogmdvd-drive-dialog.c
+	* libogmdvd-gtk/ogmdvd-drive-dialog.h
+	* libogmdvd-gtk/ogmdvd-gtk.h
+	* libogmdvd-gtk/ogmdvd-source-chooser.c
+	* libogmdvd-gtk/ogmdvd-source-chooser.h
+	* libogmdvd-gtk/ogmdvd-source-private.h
+	* libogmdvd-gtk/ogmdvd-subtitle-chooser.c
+	* libogmdvd-gtk/ogmdvd-subtitle-chooser.h
+	* libogmdvd-gtk/ogmdvd-title-chooser.c
+	* libogmdvd-gtk/ogmdvd-title-chooser.h
+	* libogmdvd-gtk/ogmdvd-title-chooser-widget.c
+	* libogmdvd-gtk/ogmdvd-title-chooser-widget.h
+	* libogmrip-gtk
+	* libogmrip-gtk/Makefile.am
+	* libogmrip-gtk/ogmrip-chapter-list.c
+	* libogmrip-gtk/ogmrip-chapter-list.h
+	* libogmrip-gtk/ogmrip-chooser-list.c
+	* libogmrip-gtk/ogmrip-chooser-list.h
+	* libogmrip-gtk/ogmrip-gtk.h
+	* libogmrip-gtk/ogmrip-helper.c
+	* libogmrip-gtk/ogmrip-helper.h
+	* libogmrip-gtk/ogmrip-marshal.list
+	* libogmrip-gtk/ogmrip-source-chooser.c
+	* libogmrip-gtk/ogmrip-source-chooser.h
+	* libogmrip-gtk/ogmrip-source-chooser-widget.c
+	* libogmrip-gtk/ogmrip-source-chooser-widget.h
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-file.c
+	* libogmrip/ogmrip-video.c
+	* Makefile.am
+	* src/Makefile.am
+	* src/ogmrip-chapter-list.c
+	* src/ogmrip-chapter-list.h
+	* src/ogmrip-chooser-list.c
+	* src/ogmrip-chooser-list.h
+	* src/ogmrip-helper.c
+	* src/ogmrip-helper.h
+	* src/ogmrip-main.c
+
+	Partial rewrite of libogmdvd-gtk and creation of libogmrip-gtk
+
+	* configure.in
+
+	Added --with-mplayer-version to force the version number of mplayer
+
+	* src/ogmrip-main.c
+
+	Fixed DVD backup
+
+	* src/ogmrip-main.c
+	* libogmdvd-gtk/ogmdvd-title-chooser-widget.c
+	* libogmrip-gtk/ogmrip-source-chooser-widget.c
+
+	DVD copies can be kept and the GUI updated
+
+14 May 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-video.h
+	* src/ogmrip-main.c
+	* src/ogmrip-options.c
+
+	Improved scaling/cropping
+	
+13 May 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-video.h
+	* src/ogmrip-progress.c
+	* data/ogmrip-options.glade
+
+	Added support for the yadif deinterlacer
+
+	* src/ogmrip-progress.c
+
+	Added a popup menu to the status icon
+
+	* libogmrip/ogmrip-xml.h
+	* libogmrip/ogmrip-init.c
+	* libogmrip/ogmrip-init.h
+	* libogmrip/ogmrip-container.c
+	* libogmrip/ogmrip-xml.c
+	* src/ogmrip-main.c
+	* data/ogmrip.xsd
+	* data/ogmrip.xml.in.in
+
+	Forced 0 b frames when encoding in MP4 in the backend, not in the GUI
+	anymore
+
+	* libogmrip/ogmrip-backend.c
+
+	Improved x264 options
+
+12 May 2007 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+
+	Added check for g++ when building the GUI
+
+	* libogmrip/ogmrip-fs.c
+	* libogmrip/ogmrip-fs.h
+
+	Fixed a leak
+
+	* libogmrip/ogmrip-backend.c
+
+	Improved aac in mp4/avi support
+
+11 May 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-xml.h
+	* libogmrip/ogmrip-init.c
+	* libogmrip/ogmrip-init.h
+	* libogmrip/ogmrip-xml.c
+	* src/ogmrip-subp-options.h
+	* src/ogmrip-chooser-list.c
+	* src/ogmrip-helper.c
+	* src/ogmrip-chooser-list.h
+	* src/ogmrip-main.c
+	* src/ogmrip-helper.h
+	* src/ogmrip-audio-options.c
+	* src/Makefile.am
+	* src/ogmrip-audio-options.h
+	* src/ogmrip-subp-options.c
+	* libogmdvd-gtk/ogmdvd-gtk.h
+	* libogmdvd-gtk/ogmdvd-subtitle-chooser.c
+	* libogmdvd-gtk/ogmdvd-stream-chooser.c
+	* libogmdvd-gtk/ogmdvd-subtitle-chooser.h
+	* libogmdvd-gtk/ogmdvd-stream-chooser.h
+	* libogmdvd-gtk/ogmdvd-source-chooser.c
+	* libogmdvd-gtk/ogmdvd-audio-chooser.c
+	* libogmdvd-gtk/ogmdvd-source-chooser.h
+	* libogmdvd-gtk/ogmdvd-audio-chooser.h
+	* libogmdvd-gtk/ogmdvd-stream-private.h
+	* libogmdvd-gtk/Makefile.am
+	* libogmdvd-gtk/ogmdvd-source-private.h
+	* data/ogmrip-main.glade
+	* data/ogmrip-pref.glade
+	* po/POTFILES.in
+
+	Added per-codec options
+
+	* libogmdvd-gtk/Makefile.am
+
+	Fixed EXTRA_DIST
+
+	* libogmrip/ogmrip-container.c
+	* libogmrip/ogmrip-container.h
+	* src/ogmrip-helper.c
+	* src/ogmrip-main.c
+	* src/ogmrip-helper.h
+	* src/ogmrip-pref.c
+	* src/ogmrip-gconf.h
+	* data/ogmrip.schemas.in
+	* data/ogmrip-pref.glade
+
+	Added chapter language
+
+	* libogmrip/ogmrip-backend.c
+	* src/ogmrip-subp-options.h
+	* src/ogmrip-chooser-list.c
+	* src/ogmrip-chooser-list.h
+	* src/ogmrip-main.c
+	* src/ogmrip-pref.c
+	* src/ogmrip-gconf.h
+	* src/ogmrip-subp-options.c
+	* subrip/spudec.c
+	* subrip/subrip.c
+	* data/ogmrip.schemas.in
+	* data/ogmrip-pref.glade
+
+	Added preliminary support for forced subtitles
+
+07 May 2007 Olivier Rolland <billl@users.sf.net>
+
+	* autogen.sh
+
+	Added support for automake-1.10 (patch from Bastien Nocera)
+
+06 May 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-backend.h
+
+	Fixed compilation
+
+	* configure.in
+
+	Removed used devel-mode
+
+05 May 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-edl.c
+	* libogmrip/ogmrip-edl.h
+	* libogmrip/ogmrip-codec.c
+	* libogmrip/ogmrip-codec.h
+	* libogmrip/Makefile.am
+	* configure.in
+
+	Added support for edit decision lists (EDL)
+
+	* src/ogmrip-progress.c
+	* src/ogmrip-main.c
+
+	Added progression in title and icon
+
+	* libogmjob/ogmjob-exec.c
+	* libogmjob/ogmjob-spawn.c
+	* libogmjob/ogmjob-spawn.h
+	* libogmjob/ogmjob-container.c
+	* src/ogmrip-helper.c
+	* src/ogmrip-helper.h
+	* src/ogmrip-progress.c
+
+	Added suspend/resume support
+
+03 May 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-file.c
+	* libogmrip/ogmrip-file.h
+
+	Added support for external vobsub files
+
+01 May 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-file.c
+	* libogmrip/ogmrip-file.h
+	* libogmrip/ogmrip-backend.c
+	* src/ogmrip-main.c
+	* configure.in
+
+	Improved support of external files
+
+	* libogmrip/ogmrip-file.c
+	* libogmrip/ogmrip-backend.c
+
+	Fixed external files support
+
+	* libogmrip/ogmrip-video.h
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-backend.c
+
+	Added support for quantizer
+
+15 Apr 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-file.c
+
+	Improved support of external audio files
+
+14 Apr 2007 Olivier Rolland <billl@users.sf.net>
+
+	* dvdcpy/Makefile.am
+	* subrip/Makefile.am
+
+	Added man pages
+
+	* data/ogmrip.pc.in
+
+	Added dependency on enca
+
+01 Apr 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd-gtk/ogmdvd-audio-chooser.c
+	* libogmdvd-gtk/ogmdvd-stream-chooser.c
+	* libogmdvd-gtk/ogmdvd-stream-chooser.h
+	* libogmdvd-gtk/ogmdvd-stream-private.h
+	* libogmdvd-gtk/ogmdvd-subtitle-chooser.c
+	* libogmrip/ogmrip-file.c
+	* libogmrip/ogmrip-file.h
+	* src/ogmrip-chooser-list.c
+
+	Added language selection for external audio and subtitle files
+
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-backend.h
+
+	Added external subtitle file detection
+
+	* configure.in
+	* libogmdvd-gtk/ogmdvd-subtitle-chooser.c
+	* libogmrip/ogmrip-file.c
+
+	Added encoding detection for external subtitle files using enca
+
+	* libogmdvd/ogmdvd-disc.c
+
+	Added device permissions checking
+
+26 Mar 2007 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed preferences dialog response
+
+13 Mar 2007 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+
+	Simplified detection of svn mplayer
+
+	* libogmdvd-gtk/ogmdvd-title-chooser.c
+
+	Added title length
+
+12 Mar 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd-disc.c
+
+	Added a check for device permissions
+
+11 Mar 2007 Olivier Rolland <billl@users.sf.net>
+
+	* ogmrip-main.c
+
+	Fixed preferences
+
+	* libogmrip/ogmrip-backend.c
+
+	Fixed segfault/memory error
+
+	* README
+	* configure.in
+
+	Fixed dvdread version dependency
+
+05 Mar 2007 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-options.c
+
+	Added notifications again
+
+04 Mar 2007 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-crop.c
+	* src/ogmrip-progress.c
+	* src/ogmrip-crop.h
+	* src/ogmrip-progress.h
+	* src/ogmrip-spell.c
+	* src/ogmrip-main.c
+	* src/ogmrip-spell.h
+	* src/ogmrip-options.c
+	* src/ogmrip-pref.c
+	* src/ogmrip-options.h
+	* src/ogmrip-pref.h
+	* data/ogmrip-spell.glade
+	* data/ogmrip-options.glade
+	* data/ogmrip-crop.glade
+	* data/ogmrip-progress.glade
+
+	Made all dialogs gtk+ widgets
+	Removed all gconf notifications
+
+03 Mar 2007 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-options.c
+
+	Fixed PAL deinterlacing
+
+01 Mar 2007 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-crop.c
+	* src/ogmrip-progress.c
+	* src/ogmrip-options.c
+	* src/ogmrip-pref.c
+
+	Fixed delete events
+
+26 Feb 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+
+	Fixed AAC encoding (but it's still out of sync in AVI/MP4)
+
+	* src/ogmrip-main.c
+	* src/ogmrip-options.c
+	* po/fr.po
+
+	Added an option to not scale
+
+18 Feb 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd-gtk/ogmdvd-audio-chooser.c
+	* libogmrip/ogmrip-file.c
+	* libogmrip/ogmrip-file.h
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-container.c
+	* src/ogmrip-chooser-list.c
+	* src/ogmrip-chooser-list.h
+	* src/ogmrip-main.c
+
+	Fixed and improved external files support
+
+	* src/ogmrip-chooser-list.c
+	* src/ogmrip-helper.c
+	* src/ogmrip-helper.h
+
+	Cleanup
+
+	* src/ogmrip-chooser-list.c
+	* src/ogmrip-main.c
+	* src/ogmrip-pref.c
+	* src/ogmrip-gconf.h
+	* data/ogmrip.schemas.in
+	* data/ogmrip-pref.glade
+
+	Added an option to specify the number of channels
+
+17 Feb 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-file.h
+	* libogmdvd-gtk/ogmdvd-stream-chooser.h
+	* subrip/srtutil.c
+	* libogmdvd/ogmdvd-disc.c
+	* libogmdvd/ogmdvd-enums.h
+	* libbacon/nautilus-burn-drive.h
+
+	Improved C90 compliancy
+
+	* po/LINGUAS
+	* po/en.po
+
+	Removed useless english translation
+
+	* libogmdvd/ogmdvd-title.c
+
+	Improved support of buggy DVD
+
+12 Feb 2007 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed cancelation of dvd copy
+
+	* src/ogmrip-main.c
+	* libogmdvd/ogmdvd-disc.c
+
+	Added some more error messages
+
+31 Jan 2007 Olivier Rolland <billl@users.sf.net>
+
+	* data/Makefile.am
+	* Makefile.am
+
+	Fixed install of some components
+
+	* libogmrip/ogmrip-init.c
+	* libogmrip/ogmrip-init.h
+	* src/ogmrip-main.c
+
+	Made OGMRip exits if no ogmrip.xml
+
+	* src/ogmrip-pref.c
+
+	Enforced some gconf and pref values
+
+
+28 Jan 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd-gtk/ogmdvd-drive-chooser.c
+	* libbacon/nautilus-burn-drive.c
+	* libbacon/nautilus-burn-drive-hal.c
+
+	Added support from HAL on FreeBSD with atapicam
+
+	* configure.in
+	* libogmrip/ogmrip-backend.c
+
+	Added support for mkvmerge-2 thanks to an unknown contributor
+
+	* autogen.sh
+
+	Updated to gnome-common-2.12
+
+27 Jan 2007 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-progress.c
+	* data/ogmrip-progress.glade
+
+	Fixed libnotify support
+
+24 Jan 2007 Olivier Rolland <billl@users.sf.net>
+
+	* dvdcpy/Makefile.am
+	* dvdcpy/dvdcpy.1
+	* subrip/Makefile.am
+	* subrip/srtutil.1
+	* subrip/subp2pgm.1
+
+	Added man pages thanks to Marc Espie
+
+	* subrip/srtutil.c
+
+	Removed hour expansion limitation thanks to Marc Espie
+
+	* libogmdvd/ogmdvd-priv.c
+
+	Fixed some includes
+
+	* libogmjob/ogmjob-exec.c
+
+	Fixed status when the child process is terminated by a signal
+
+	* libogmrip/ogmrip-backend.h
+
+	Cleanup
+
+	* configure.in
+	* libogmrip/Makefile.am
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-backend.h
+	* libogmrip/ogmrip-init.c
+	* libogmrip/ogmrip-mov.c
+	* libogmrip/ogmrip-mov.h
+	* data/ogmrip.xml.in.in
+
+	Added preliminary support for the QuickTime container
+
+	* src/ogmrip-main.c
+
+	Fixed video codec options when encoding in MP4 or MOV
+
+	* subrip/mp_msg.c
+	* subrip/subrip.c
+
+	Made subp2pgm less verbose based on an idea from Marc Espie
+
+	* libogmrip/ogmrip-backend.c
+
+	Use turbo=2 when turbo is checked, turbo=1 otherwise for x264
+
+06 Jan 2007 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+	* src/ogmrip-main.c
+	* src/ogmrip-pref.c
+	* src/ogmrip-gconf.h
+	* data/ogmrip.schemas.in
+	* data/ogmrip-pref.glade
+
+	Added options to change the sample rate of audio streams
+
+24 Dec 2006 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip-options.glade
+	* src/ogmrip-options.c
+
+	Added deinterlacer option for PAL DVDs
+
+23 Dec 2006 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+
+	Cleanup
+
+	* libogmdvd-gtk/ogmdvd-audio-chooser.c
+	* libogmdvd-gtk/ogmdvd-subtitle-chooser.c
+
+	Set widget insensitive when no stream is available
+
+	* src/ogmrip-main.c
+
+	Improved pointers management
+
+17 Dec 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+
+	Fixed deinterlacing
+
+16 Dec 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+	* src/ogmrip-crop.c
+	* src/ogmrip-crop.h
+	* src/ogmrip-options.c
+
+	Added deinterlacer filter when cropping
+
+	* configure.in
+	* libbacon/nautilus-burn-drive.c
+
+	Fixed drive ejection
+
+	* subrip/srtutil.c
+
+	Fixed substitution
+
+15 Dec 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+
+	Updated x264 options
+
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-xml.c
+	* src/ogmrip-main.c
+	* src/ogmrip-options.c
+	* src/ogmrip-chapter-list.c
+	* libogmdvd-gtk/ogmdvd-stream-chooser.c
+	* libogmdvd-gtk/ogmdvd-chapter-list.c
+	* libogmdvd-gtk/ogmdvd-drive-chooser.c
+
+	Fixed memory leaks
+
+	* src/ogmrip-crop.c
+
+	Fixed close from wm
+
+	* libogmdvd-gtk/ogmdvd-title-chooser.c
+
+	Improved memory consumption
+
+	* libogmdvd-gtk/ogmdvd-subtitle-chooser.c
+	* libogmdvd-gtk/ogmdvd-audio-chooser.c
+
+	Added some checks when streams do not exist
+
+20 Nov 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+
+	Fixed x264 suboptions with mplayer-1.0rc1 (thanks to Adam Iglewski)
+
+08 Nov 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+
+	Fixed some mp3 quality settings
+
+07 Nov 2006 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+	* src/Makefile.am
+
+	Fixed debug mode
+
+03 Nov 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd-disc.c
+
+	Fixed DVD label charset
+
+01 Nov 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-video.h
+	* src/ogmrip-main.c
+	* src/ogmrip-pref.c
+	* src/ogmrip-gconf.h
+	* data/ogmrip.schemas.in
+	* data/ogmrip-options.glade
+
+	Added deblocking and deringing filters
+
+	* libogmrip/ogmrip-backend.c
+
+	Added lowpass FIR deinterlacer
+
+29 Oct 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd-gtk/ogmdvd-audio-chooser.c
+	* libogmdvd-gtk/ogmdvd-subp-chooser.c
+
+	Fixed build on some systems
+
+29 Oct 2006 Olivier Rolland <billl@users.sf.net>
+
+	* Merged development branch in HEAD
+
+23 Oct 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-xvid.c
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/Makefile.am
+	* libogmrip/ogmrip-version.h.in
+	* configure.in
+	* src/ogmrip-crop.c
+	* src/ogmrip-main.c
+
+	Added support for mplayer-1.0rc1
+
+	* configure.in
+	* data/ogmrip-progress.glade
+	* src/Makefile.am
+	* src/ogmrip-main.c
+	* src/ogmrip-progress.c
+
+	Added support for libnotify
+
+22 Oct 2006 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+
+	Released OGMRip-0.10.0
+
+21 Oct 2006 Olivier Rolland <billl@users.sf.net>
+
+	* ChangeLog
+	* libogmdvd/ogmdvd.c
+
+	Fixed compilation on amd64 in maintainer mode
+
+	* dvdcpy/dvdcpy.c
+	* libogmrip/ogmrip-backend.c
+	* subrip/srtutil.c
+	* subrip/subrip.c
+	* theoraenc/theoraenc.c
+
+	Fixed options and usage
+
+20 Oct 2006 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip-options.glade
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-video.h
+	* src/ogmrip-main.c
+	* src/ogmrip-options.c
+	* src/ogmrip-options.h
+
+	Added support for bits per pixzl
+
+19 Oct 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd-gtk/Makefile.am
+	* libogmdvd-gtk/ogmdvd-audio-chooser.c
+	* libogmdvd-gtk/ogmdvd-audio-chooser.h
+	* libogmdvd-gtk/ogmdvd-gtk.h
+	* libogmdvd-gtk/ogmdvd-subtitle-chooser.c
+	* libogmdvd-gtk/ogmdvd-subtitle-chooser.h
+	* libogmdvd-gtk/ogmdvd-stream-chooser.c
+	* libogmdvd-gtk/ogmdvd-stream-chooser.h
+	* libogmdvd-gtk/ogmdvd-stream-private.h
+	* libogmrip/ogmrip-avi.c
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-backend.h
+	* libogmrip/ogmrip-container.c
+	* libogmrip/ogmrip-container.h
+	* libogmrip/ogmrip-file.c
+	* libogmrip/ogmrip-file.h
+	* src/ogmrip-chooser-list.c
+	* src/ogmrip-chooser-list.h
+	* src/ogmrip-main.c
+	* src/ogmrip-pref.c
+
+	Added preliminary support for external files
+
+	* data/ogmrip-pref.glade
+
+	Fixed typo
+
+11 Oct 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/Makefile.am
+	* libogmdvd/ogmdvd-priv.c
+	* libogmjob/Makefile.am
+	* libogmjob/ogmjob-exec.c
+	* libogmjob/ogmjob-spawn.c
+	* libogmrip/Makefile.am
+	* libogmrip/ogmrip-fs.c
+	* src/Makefile.am
+
+	Improved debugging system
+
+10 Oct 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+	* dvdcpy/dvdcpy.c
+
+	Fixed compilation on amd64
+
+	* libogmrip/ogmrip-backend.c
+
+	Fixed compilation with mplayer < 1.0pre8
+
+	* libogmrip/ogmrip-container.c
+
+	Fixed audio overhead
+
+	* src/ogmrip-main.c
+
+	Fixed compilation when mp4 is not available
+
+08 Oct 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/Makefile.am
+	* libogmdvd/ogmdvd.h
+	* libogmdvd/ogmdvd-audio.c
+	* libogmdvd/ogmdvd-audio.h
+	* libogmdvd/ogmdvd-disc.c
+	* libogmdvd/ogmdvd-disc.h
+	* libogmdvd/ogmdvd-enums.h
+	* libogmdvd/ogmdvd-labels.c
+	* libogmdvd/ogmdvd-labels.h
+	* libogmdvd/ogmdvd-priv.c
+	* libogmdvd/ogmdvd-priv.h
+	* libogmdvd/ogmdvd-stream.c
+	* libogmdvd/ogmdvd-stream.h
+	* libogmdvd/ogmdvd-subp.c
+	* libogmdvd/ogmdvd-subp.h
+	* libogmdvd/ogmdvd-title.c
+	* libogmdvd/ogmdvd-title.h
+	* libogmdvd/ogmdvd-types.h
+	* libogmdvd/ogmdvd.c
+	* libogmrip/ogmrip-audio.c
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-subp.c
+	* libogmrip/ogmrip-video.c
+	* src/ogmrip-main.c
+
+	Improved libogmdvd
+
+05 Oct 2006 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+
+	Started 0.11.0 development
+
+	* data/ogmrip-pref.glade
+	* data/ogmrip.schemas.in
+	* data/ogmrip.xml.in.in
+	* data/ogmrip.xsd
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-init.c
+	* libogmrip/ogmrip-init.h
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-xml.c
+	* libogmrip/ogmrip-xml.h
+	* src/ogmrip-gconf.h
+	* src/ogmrip-main.c
+	* src/ogmrip-pref.c
+
+	Added support for n-pass encoding
+
+	* data/ogmrip-pref.glade
+	* data/ogmrip.schemas.in
+	* data/ogmrip.xml.in.in
+	* data/ogmrip.xsd
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-init.c
+	* libogmrip/ogmrip-init.h
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-video.h
+	* libogmrip/ogmrip-xml.c
+	* libogmrip/ogmrip-xml.h
+	* src/ogmrip-gconf.h
+	* src/ogmrip-main.c
+	* src/ogmrip-pref.c
+
+	Added support for threads
+
+	* subrip/srttool.c
+	* subrip/srtutil.c
+	* subrip/Makefile.am
+	* libogmrip/ogmrip-backend.c
+
+	Added srtutil, removed srttool
+
+	* data/ogmrip-pref.glade
+	* data/ogmrip.schemas.in
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-subp.c
+	* libogmrip/ogmrip-subp.h
+	* src/ogmrip-gconf.h
+	* src/ogmrip-main.c
+	* src/ogmrip-pref.c
+	* subrip/srtutil.c
+
+	Added character set and end of line style support for text subtitles
+
+	* data/ogmrip-pref.glade
+	* data/ogmrip.schemas.in
+	* libogmjob/Makefile.am
+	* libogmjob/ogmjob-exec.c
+	* libogmjob/ogmjob.h
+	* libogmjob/ogmjob-log.c
+	* libogmjob/ogmjob-log.h
+	* src/ogmrip-gconf.h
+	* src/ogmrip-main.c
+	* src/ogmrip-pref.c
+
+	Added support for logging all command's outputs
+
+	* configure.in
+	* libogmrip/ogmrip-backend.c
+
+	Added support for ocrad
+
+05 Oct 2006 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+	* dvdcpy/dvdcpy.c
+	* theoraenc/theoraenc.c
+
+	Fixed large file support
+
+02 Oct 2006 Olivier Rolland <billl@users.sf.net>
+
+	* dvdcpy/dvdcpy.c
+
+	Fixed dvdcpy with libdvdread 0.9.6
+
+	* configure.in
+	* theoraenc/theoraenc.c
+
+	Fixed 64 bits support
+	
+	* libogmrip/ogmrip-backend.c
+
+	Fixed aac in avi and mp4
+
+30 Sep 2006 Olivier Rolland <billl@users.sf.net>
+
+	* dvdcpy/dvdcpy.c
+	* libogmrip/ogmrip-backend.c
+
+	Fixed dvdcpy with libdvdread >= 0.9.5
+
+	* libogmdvd/ogmdvd.c
+
+	Fixed ogmdvd_disc_open with libdvdread >= 0.9.5
+
+	* libogmrip/ogmrip-mkv.c
+	* libogmjob/ogmjob-exec.c
+	* libogmjob/ogmjob-exec.h
+	* src/ogmrip-main.c
+
+	Fixed error detection
+
+	* libogmrip/ogmrip-backend.c
+
+	Improved crop detection
+
+	* libogmjob/ogmjob-exec.c
+
+	Log stdout and stderr in debug mode
+
+28 Sep 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd.c
+	* dvdcpy/dvdcpy.c
+
+	Fixed dvd file size
+
+27 Sep 2006 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+	* po/LINGUAS
+
+	Switched to LINGUAS support
+
+26 Sep 2006 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+	* po/cs.po
+
+	Added Czech translation thanks to LuboÅ¡ StanÄk
+
+18 Sep 2006 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Forced 0 b frames in mp4 containers
+
+	* src/ogmrip-crop.c
+	* libogmrip/ogmrip-backend.c
+
+	Added -nolirc to mplayer command lines
+
+14 Sep 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-container.c
+
+	Fixed target number
+
+	* libogmrip/ogmrip-backend.c
+
+	Fixed cropdetect with mplayer >= 1.0pre7
+
+09 Sep 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-container.c
+
+	Forbade target's size and number to be 0
+
+	* libogmrip/ogmrip-video.c
+
+	Forbade bitrate to be 0
+
+04 Sep 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-ogg.c
+
+	Fixed temporary merge file
+
+01 Sep 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+
+	Fixed avi and mp4 options
+
+26 Aug 2006 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+	* autogen.sh
+	* libbacon/nautilus-burn-drive.c
+	* libbacon/nautilus-burn-drive-hal.c
+
+	Improved HAL detection
+
+23 Aug 2006 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip-options.glade
+	* data/ogmrip-pref.glade
+	* data/ogmrip-progress.glade
+
+	Fixed spin buttons and tooltips
+
+	* src/ogmrip-main.c
+
+	Fixed filename
+
+20 Aug 2006 Olivier Rolland <billl@users.sf.net>
+
+	Released OGMRip-0.10.0-rc3
+
+20 Aug 2006 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip-options.glade
+	* data/ogmrip-pref.glade
+	* data/ogmrip-progress.glade
+
+	Fixed translatable strings
+
+19 Aug 2006 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed a memomry leak
+
+	* src/ogmrip-main.c
+
+	Added checks if output file already exists
+
+	* src/ogmrip-options.c
+
+	Fixed manual scaling
+
+	* data/ogmrip-options.glade
+	* data/ogmrip-pref.glade
+	* data/ogmrip-progress.glade
+
+	Fixed frame relief
+
+17 Aug 2006 Olivier Rolland <billl@users.sf.net>
+
+	* dvdcpy/Makefile.am
+
+	Fixed libs
+
+16 Aug 2006 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed keep subp file
+
+13 Aug 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-fs.h
+
+	Fixed header
+
+	* libogmrip/ogmrip-subp.c
+
+	Fixed properties
+
+	* libogmrip/ogmrip-xml.c
+
+	Fixed signed/unsigned comparison
+
+11 Aug 2006 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+
+	Fixed configure without gconf
+
+06 Aug 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd.c
+
+	Fixed aspect ratio
+
+26 Jul 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+
+	Fixed theora encoding
+
+22 Jul 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd.c
+
+	Fixed aspect ratio
+
+18 Jul 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+
+	Fixed autocrop whatever the language mplayer is compiled with
+
+13 Jul 2006 Olivier Rolland <billl@users.sf.net>
+
+	* data/Makefile.am
+	* data/ogmrip.xsd
+	* data/xml.xsd
+
+	Added xml.xsd to fix validation when no internet connection
+
+10 Jul 2006 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed build with mplayer <= 1.0 pre7
+
+09 Jul 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+
+	Fixed mp3 presets
+
+06 Jul 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+	* src/ogmrip-options.c
+
+	Fixed x264 and manual video bitrate
+
+04 Jul 2006 Olivier Rolland <billl@users.sf.net>
+
+	Released OGMRip-0.10.0-rc2
+
+04 Jul 2006 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed codec selection
+
+27 Jun 2006 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-options.c
+
+	Fixed NTSC options display
+
+	* libogmrip/ogmrip-backend.c
+
+	Fixed faac and x264 support
+
+	* libogmrip/Makefile.am
+
+	Fixed cleanup
+
+	* configure.in
+
+	Fixed ldflags
+
+25 Jun 2006 Olivier Rolland <billl@users.sf.net>
+
+	Released OGMRip-0.10.0-rc1
+
+25 Jun 2006 Olivier Rolland <billl@users.sf.net>
+
+	* dvdcpy/dvdcpy.c
+
+	Some fixes
+
+	* configure.in
+
+	Set version
+
+	* libogmrip/ogmrip-backend.c
+
+	Fixed mp3 presets
+
+	* libogmrip/ogmrip-backend.c
+
+	Fixed volnorm
+
+	* libogmrip/ogmrip-audio.c
+
+	Fixed properties
+	
+18 Jun 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-xml.h
+	* libogmrip/ogmrip-init.c
+	* libogmrip/ogmrip-init.h
+	* libogmrip/ogmrip-xml.c
+	* src/ogmrip-main.c
+	* src/ogmrip-pref.c
+
+	Fixed API
+
+17 Jun 2006 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip.xsd
+	* data/ogmrip.xml.in.in
+
+	Simplified XML format
+
+16 Jun 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-chapters.c
+
+	Cleanup
+
+	* src/ogmrip-crop.c
+
+	Fixed frame grab
+
+	* src/ogmrip-crop.c
+	* data/ogmrip-crop.glade
+
+	Improved manual cropping
+
+15 Jun 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-xml.c
+	* src/ogmrip-main.c
+	* src/ogmrip-pref.c
+
+	Some fixes
+
+	* src/ogmrip-main.c
+
+	Some more fixes
+
+	* libogmrip/ogmrip-backend.c
+
+	Improved cropping detection in devel mode
+
+12 Jun 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-video.c
+
+	Synced codec options with mplayer docs
+
+11 Jun 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+
+	Fixed build when mplayer < 1.0pre8
+
+	* src/ogmrip-chapter-list.c
+	* src/ogmrip-chapter-list.h
+
+	Fixed get_selected when the last chapter is selected
+
+	* configure.in
+	* data/Makefile.am
+	* data/ogmrip.xml.in
+	* data/ogmrip.xml.in.in
+	* po/POTFILES.in
+
+	Construct data/ogmrip.xml automatically
+
+	* src/ogmrip-main.c
+	* src/ogmrip-pref.c
+	* data/ogmrip-pref.glade
+
+	Finished compatibility matrix support
+
+	* src/ogmrip-pref.c
+
+	Fixed container/codec selection
+
+09 Jun 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-lavc.c
+	* libogmrip/ogmrip-lavc.h
+
+	Added support to control global headers
+
+	* libogmrip/ogmrip-audio.c
+	* libogmrip/ogmrip-audio.h
+
+	Added support to change the sample rate 
+
+	* libogmrip/ogmrip-backend.c
+
+	Updated to support new options
+
+06 Jun 2006 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+
+	Added support for mplayer svn
+
+	* libogmrip/ogmrip-backend.c
+
+	Use mplayer for cropping parameters detection
+
+	* libogmrip/ogmrip-chapters.c
+	* libogmrip/ogmrip-vobsub.c
+	* src/ogmrip-main.c
+
+	Fixed removal of temporary files
+
+03 Jun 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-avi.c
+
+	Fixed subtitles copy
+
+	* src/ogmrip-pref.c
+
+	Fixed container/audio/subp checks
+
+31 Mai 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-aac.c
+	* libogmrip/ogmrip-codec.c
+	* libogmrip/ogmrip-mp3.c
+	* libogmrip/ogmrip-theora.c
+	* libogmrip/ogmrip-vorbis.c
+
+	Fixed headers
+
+	* libogmrip/ogmrip-xvid.c
+	* libogmrip/ogmrip-fs.h
+
+	Fixed g_chdir when glib < 2.8.0
+
+	* src/ogmrip-main.c
+	* src/ogmrip-pref.c
+	* data/ogmrip-pref.glade
+
+	Fixed codec selection
+
+29 Mai 2006 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+	* src/Makefile.am
+
+	Improvements
+
+	* src/ogmrip-main.c
+
+	Fixed gint64 format on 64 bits architectures
+
+28 Mai 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-container.c
+	* src/ogmrip-main.c
+
+	Bug fixes
+
+	* src/ogmrip-main.c
+
+	Fixed rip size and space used
+
+	* libogmrip/ogmrip-subp.c
+	* libogmrip/ogmrip-codec.c
+	* libogmrip/ogmrip-audio.c
+	* libogmrip/ogmrip-container.c
+
+	Added properties
+
+	* libogmrip/ogmrip-xml.h
+	* libogmrip/ogmrip-init.c
+	* libogmrip/ogmrip-init.h
+	* libogmrip/ogmrip-xml.c
+
+	Changed API
+
+	* libogmrip/ogmrip-avi.c
+	* libogmrip/ogmrip-mp4.c
+	* libogmrip/ogmrip-ogg.c
+	* libogmrip/ogmrip-mkv.c
+
+	Cleanup
+
+26 Mai 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-ogg.c
+	* src/ogmrip-main.c
+	* libogmdvd/ogmdvd.c
+
+	Fixed some signedness
+
+25 Mai 2006 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-gconf.h
+
+	Cleanup
+
+	* data/ogmdvd-gtk.pc.in
+	* data/ogmdvd.pc.in
+	* data/ogmrip.pc.in
+
+	Fixed requirements and cflags
+
+	* libogmdvd-gtk/ogmdvd-chapter-list.c
+	* libogmdvd-gtk/ogmdvd-chapter-list.h
+
+	Added a function to get chapters label
+
+	* configure.in
+
+	Added ogmrip-chapters.h to ogmrip.h
+
+	* libogmrip/ogmrip-acopy.c
+	* libogmrip/ogmrip-codec.c
+	* libogmrip/ogmrip-avi.c
+	* libogmrip/ogmrip-codec.h
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-mp3.c
+	* libogmrip/ogmrip-mp4.c
+	* libogmrip/ogmrip-audio.c
+	* libogmrip/ogmrip-vorbis.c
+	* libogmrip/ogmrip-audio.h
+	* libogmrip/ogmrip-ogg.c
+	* libogmrip/ogmrip-container.c
+	* libogmrip/ogmrip-container.h
+	* libogmrip/ogmrip-mkv.c
+	* libogmrip/ogmrip-wav.c
+
+	Reviewed and cleanup libogmrip
+
+	* src/ogmrip-progress.c
+	* src/ogmrip-chapter-list.h
+	* src/ogmrip-helper.c
+	* src/ogmrip-main.c
+	* src/ogmrip-chapter-list.c
+
+	Updated to libogmrip API
+
+23 Mai 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-xml.c
+	* theoraenc/theoraenc.c
+
+	Fixed signedness
+
+21 Mai 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-chapters.c
+	* libogmrip/ogmrip-chapters.h
+
+	Added chapters codec
+
+16 Mai 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/Makefile.am
+
+	Fixed ogmrip.h installation
+
+15 Mai 2006 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+
+	Constructed libogmrip/ogmrip.h automatically
+
+	* libogmdvd-gtk/Makefile.am
+
+	Fixed library version info
+
+12 Mai 2006 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip.xsd
+	* data/ogmrip.xml.in
+	* libogmrip/ogmrip-xml.c
+	* libogmrip/ogmrip-xml.h
+	* libogmrip/ogmrip-init.c
+	* libogmrip/ogmrip-init.h
+
+	Improved compatibility matrix support
+
+9 Mai 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-xml.h
+	* libogmrip/ogmrip-init.c
+	* libogmrip/ogmrip-init.h
+	* libogmrip/ogmrip-xml.c
+	* data/ogmrip.xsd
+	* data/ogmrip.xml.in
+
+	Continued compatibility matrix support
+
+8 Mai 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/Makefile.am
+	* libogmrip/ogmrip-xml.c
+	* data/ogmrip.xsd
+	* data/ogmrip.xml.in
+	* data/Makefile.am
+
+	Added schema validation
+
+	* libogmrip/ogmrip.h
+	* libogmrip/ogmrip-init.c
+	* libogmrip/ogmrip-init.h
+	* libogmrip/ogmrip-xml.c
+	* libogmrip/Makefile.am
+
+	Continued compatibility matrix support
+
+7 Mai 2006 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+
+	Fixed typos
+
+	* libogmrip/ogmrip-backend.c
+
+	Fixed crop detection with mplayer > 1.0pre7
+
+	* configure.in
+	* data/ogmrip.xml.in
+	* libogmrip/Makefile.am
+	* libogmrip/ogmrip-xml.c
+	* libogmrip/ogmrip-xml.h
+
+	Added preliminary support for the compatibility matrix
+	
+6 Mai 2006 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+	* libogmrip/Makefile.am
+	* libogmrip/ogmrip-aac.c
+	* libogmrip/ogmrip-aac.h
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-backend.h
+	* libogmrip/ogmrip-mp4.c
+	* libogmrip/ogmrip-mp4.h
+
+	Added preliminary support for mp4 container and aac audio
+
+	* libogmrip/ogmrip-lavc.c
+
+	Fixed default options
+
+	* ChangeLog
+	* Makefile.am
+	* configure.in
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-theora.c
+	* libogmrip/ogmrip-theora.h
+	* theoraenc/Makefile.am
+	* theoraenc/theoraenc.c
+
+	Continued theora support
+
+3 Mai 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libbacon/nautilus-burn-drive-hal.c
+
+	Fixed libhal < 5 support
+
+	* libogmrip/ogmrip-video.c
+
+	Fixed scale width when autoscaling
+
+	* configure.in
+
+	Added mplayer CVS support
+	Print a sumary of the supported features
+
+9 Apr 2006 Olivier Rolland <billl@users.sf.net>
+
+	* dvdcpy/dvdcpy.c
+	* libogmdvd/ogmdvd.c
+
+	Fixed libdvdread-0.9.5 support
+
+23 Mar 2006 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-crop.c
+
+	Fixed invalid function call with mplayer < 1.0pre6
+
+	* dvdcpy/dvdcpy.c
+	* libogmdvd/ogmdvd.c
+
+	Added support for libdvdread-0.9.5
+
+19 Mar 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-x264.c
+	* libogmrip/ogmrip-x264.h
+	* libogmrip/ogmrip-subp.c
+	* libogmrip/ogmrip-xvid.c
+	* libogmrip/ogmrip-codec.c
+	* libogmrip/ogmrip-xvid.h
+	* libogmrip/ogmrip-codec.h
+	* libogmrip/ogmrip-lavc.c
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-lavc.h
+	* libogmrip/ogmrip-audio.c
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-container.c
+	* libogmrip/ogmrip-container.h
+	* libogmrip/ogmrip-dvdcpy.c
+	* libogmrip/ogmrip-dvdcpy.h
+	* src/ogmrip-crop.c
+	* src/ogmrip-crop.h
+	* src/ogmrip-chooser-list.c
+	* src/ogmrip-main.c
+	* src/ogmrip-options.c
+	* src/ogmrip-chapter-list.c
+	* src/ogmrip-options.h
+	* libogmdvd-gtk/ogmdvd-title-chooser.c
+	* libogmdvd-gtk/ogmdvd-title-chooser.h
+	* libogmdvd-gtk/ogmdvd-subtitle-chooser.c
+	* libogmdvd-gtk/ogmdvd-chapter-list.c
+	* libogmdvd-gtk/ogmdvd-subtitle-chooser.h
+	* libogmdvd-gtk/ogmdvd-audio-chooser.c
+	* libogmdvd-gtk/ogmdvd-chapter-list.h
+	* libogmdvd-gtk/ogmdvd-audio-chooser.h
+	* libogmdvd-gtk/ogmdvd-drive-chooser.c
+	* libogmdvd/ogmdvd.c
+	* libogmdvd/ogmdvd.h
+
+	Updated/Cleaned/Reviewed libogmdvd API
+
+	* libogmjob/ogmjob-exec.c
+	* libogmjob/ogmjob-spawn.c
+	* libogmjob/ogmjob-exec.h
+	* libogmjob/ogmjob-enums.h
+	* libogmjob/ogmjob-spawn.h
+	* libogmjob/ogmjob-bin.c
+	* libogmjob/ogmjob-bin.h
+	* libogmjob/ogmjob-marshal.list
+	* libogmjob/ogmjob-container.c
+	* libogmjob/ogmjob-queue.c
+	* libogmjob/ogmjob-container.h
+	* libogmjob/ogmjob-queue.h
+	* libogmjob/ogmjob-pipeline.c
+	* libogmjob/ogmjob.h
+	* libogmjob/ogmjob-pipeline.h
+	* libogmjob/ogmjob-list.c
+	* libogmjob/Makefile.am
+	* libogmjob/ogmjob-list.h
+	* libogmrip/ogmrip-x264.c
+	* libogmrip/ogmrip-x264.h
+	* libogmrip/ogmrip-xvid.c
+	* libogmrip/ogmrip-acopy.c
+	* libogmrip/ogmrip-codec.c
+	* libogmrip/ogmrip-avi.c
+	* libogmrip/ogmrip-xvid.h
+	* libogmrip/ogmrip-acopy.h
+	* libogmrip/ogmrip-theora.c
+	* libogmrip/ogmrip-codec.h
+	* libogmrip/ogmrip-avi.h
+	* libogmrip/ogmrip-lavc.c
+	* configure.in
+	* Makefile.am
+
+	Renamed libogmspawn to libjob
+
+9 Mar 2006 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-crop.c
+
+	Fixed frame extraction
+
+4 Mar 2006 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed dvd size when it's not copied
+
+	* libogmrip/ogmripÂ­backend.c
+	* libogmrip/ogmripÂ­audio.c
+
+	Fixed multichannel support
+
+2 Mar 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+
+	Put back chapter selection at the right place
+
+	* src/ogmrip-main.c
+
+	Added comments
+
+26 Feb 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd.c
+
+	Fixed chapters length when full length
+
+	* src/ogmrip-helper.c
+	* src/ogmrip-helper.h
+
+	Added a function to get a filename in gconf 
+
+	* src/ogmrip-main.c
+
+	Updated to use new functions from ogmdvd.c and ogmrip-helper.c
+
+	* src/ogmrip-main.c
+
+	Fixes and simplifications
+
+25 Feb 2006 Olivier Rolland <billl@users.sf.net>
+
+	* Makefile.am
+	* configure.in
+	* src/ogmrip-main.c
+
+	Updated for libogmdvd-gtk integration
+
+	* libogmdvd-gtk
+
+	New files
+
+	* src/ogmrip-dvd-chooser.c
+	* src/ogmrip-dvd-chooser.h
+	* src/ogmrip-dvd-dialog.c
+	* src/ogmrip-dvd-dialog.h
+
+	Removed files
+
+22 Feb 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-fs.c
+	* libogmrip/ogmrip-fs.h
+
+	New files
+
+	* libogmrip/ogmrip-tool.c
+	* libogmrip/ogmrip-tool.h
+
+	Removed files
+
+	* libogmrip/Makefile.am;
+	* libogmrip/ogmrip-backend.c;
+	* libogmrip/ogmrip-dvdcpy.c;
+	* libogmrip/ogmrip-mp3.c;
+	* libogmrip/ogmrip-srt.c;
+	* libogmrip/ogmrip-theora.c;
+	* libogmrip/ogmrip-vobsub.c;
+	* libogmrip/ogmrip-vorbis.c;
+	* libogmrip/ogmrip.h;
+	* src/ogmrip-crop.c
+	* src/ogmrip-gconf.h
+	* src/ogmrip-helper.c
+	* src/ogmrip-helper.h
+	* src/ogmrip-main.c
+	* src/ogmrip-pref.c
+
+	Replaced ogmrip-tools by ogmrip-fs
+
+	* libogmrip/ogmrip-fs.c
+	* libogmrip/ogmrip-fs.h
+
+	Added error handling
+
+	* src/ogmrip-helper.c
+	* src/ogmrip-helper.h
+	* src/ogmrip-main.c
+
+	Cleanup
+
+	* libogmdvd/ogmdvd.c;
+	* libogmdvd/ogmdvd.h;
+	* src/ogmrip-dvd-chooser.c;
+	* src/ogmrip-helper.c;
+	* src/ogmrip-helper.h;
+	* src/ogmrip-main.c;
+
+	Moved error handling in ogmdvd
+
+21 Feb 2006 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed file deletion when container is avi
+
+19 Feb 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-video.c 
+	* libogmrip/ogmrip-video.h
+	* src/ogmrip-main.c 
+
+	Fixed ensure sync by setting an audio stream
+	
+	* libogmrip/ogmrip-backend.c 
+
+	Temporary fix against mplayer cvs
+
+11 Feb 2006 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-crop.c
+
+	Fixed when no image is produced
+
+13 Jan 2006 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd.c
+
+	Fixed subp id with respect to aspect ratio
+
+	* libogmdvd/ogmdvd.h
+
+	Fixed typo
+	
+26 Dec 2005 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+	* src/ogmrip-main.c
+
+	Check DTS support
+	
+23 Dec 2005 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Improvements
+
+	* src/Makefile.am
+
+	Fixed link order (--as-needed support)
+
+	* src/ogmrip-dvd-chooser.c
+	* src/ogmrip-dvd-dialog.c
+	* libbacon/nautilus-burn-drive.c
+
+	Fixed seg fault when drive is not a dvd drive
+
+17 Dec 2005 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip.schemas
+	* data/ogmrip-pref.glade
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-video.h
+	* src/ogmrip-gconf.h
+	* src/ogmrip-main.c
+	* src/ogmrip-pref.c
+
+	Added an option to enforce A/V sync
+
+12 Dec 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+
+	Updated x264 settings
+
+	* libogmrip/ogmrip-codec.c
+
+	Fixed length when framerate has changed
+
+11 Dec 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libbacon/nautilus-burn-drive-common.c
+	* libbacon/nautilus-burn-drive-freebsd.h
+	* libbacon/nautilus-burn-drive.h
+
+	Fixed freebsd support
+
+8 Dec 2005 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed encoding Mp3 or Vorbis audio streams in AVI containers
+	
+1 Dec 2005 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Added support for passing a block device, a directory or an iso file on the
+	command line
+
+	* src/ogmrip-pref.c
+	* data/ogmrip-pref.glade
+
+	Fixed folder chooser button
+
+30 Nov 2005 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+	* po/de.po
+
+	Added german translation thanks to Ernst Rohlicek jun.
+	<ernst.rohlicek@reflex.at>
+
+27 Nov 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/Makefile.am
+
+	Fixed extra headers
+
+	* src/ogmrip-main.c
+
+	Checked for OGM container and DTS streams
+
+	* src/ogmrip-main.c
+
+	UI improvements
+
+	* libogmrip/ogmrip-avic.
+	* libogmrip/ogmrip-xvid.c
+
+	Fixed mplayer-1.0 pre7 support
+
+	* libogmrip/ogmrip-backend.c
+
+	Fixed OGM metadata
+
+	* libogmrip/ogmrip-codec.c
+	* libogmrip/ogmrip-codec.h
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-video.h
+	* libogmrip/ogmrip-backend.c
+	* src/ogmrip-main.c
+
+	Fixed A/V desync with progressive input
+
+	* subrip/subrip.c
+
+	Fixed missing subtitles
+
+25 Nov 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-avi.c
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-backend.h
+	* libogmrip/ogmrip-container.c
+	* libogmrip/ogmrip-container.h
+
+	Fixed subp copy
+
+	* src/ogmrip-gconf.h
+	* src/ogmrip-main.c
+	* src/ogmrip-pref.c
+	* data/ogmrip-pref.glade
+	* data/ogmrip.schemas.in
+
+	Added an option to override the video fourcc
+
+22 Nov 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-avi.c
+
+	Added subp copy when container does not support subp
+
+	* src/ogmrip-main.c
+	* src/ogmrip-pref.c
+
+	Fixed subp support
+
+18 Nov 2005 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+	* src/ogmrip-helper.c
+	* src/ogmrip-dvd-dialog.c
+	* src/ogmrip-dvd-dialog.h
+	* src/ogmrip-dvd-chooser.c
+	* src/ogmrip-dvd-chooser.h
+	* libbacon/nautilus-burn-drive.c
+	* libbacon/nautilus-burn-drive-freebsd.c
+	* libbacon/nautilus-burn-drive-linux.c
+	* libbacon/nautilus-burn-drive-common.c
+	* libbacon/nautilus-burn-drive-hal.c
+	* libbacon/dvd_plus_rw_utils.cpp
+	* libbacon/transport.hxx
+
+	Synced with nautilus-cd-burner
+
+	* src/Makefile.am
+
+	Added hal-0.5 libs
+
+	* configure.in
+
+	Added dbus requirements for hal >= 0.5
+
+14 Nov 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+
+	Fixed merging in OGM containers
+
+13 Nov 2005 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip-pref.glade
+	* data/ogmrip.schemas.in
+	* libogmrip/ogmrip-backend.c
+	* src/ogmrip-gconf.h
+	* src/ogmrip-pref.c
+
+	Added vobsub subtitles support for avi and mkv containers
+
+	* libbacon/nautilus-burn-drive-linux.c
+	* libogmrip/ogmrip-avi.c
+	* libogmrip/ogmrip-xvid.c
+	* src/ogmrip-helper.c
+
+	Use gstdio wrapppers
+
+	* libogmrip/ogmrip-vobsub.c
+
+	Removal of .idx and .sub files
+
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-container.h
+	* libogmrip/ogmrip-container.c
+	* src/ogmrip-main.c
+
+	Removed support for the deprecated frameno video codec with the upcoming
+	MPlayer 1.0 pre8
+
+	* libogmrip/ogmrip-backend.c
+
+	Added support for volume normalization method 2
+
+	* libogmrip/ogmrip-backend.c
+
+	Added support to force the fourcc
+
+26 Sep 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-xvid.c
+	* src/ogmrip-main.c
+
+	Removed xvid pass log file workaround with MPlayer 1.0 pre8
+
+25 Sep 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-avi.c
+	* libogmrip/ogmrip-xvid.c
+	* src/ogmrip-main.c
+
+	Carried on support for MPlayer 1.0 pre8
+
+	* libogmrip/ogmrip-backend.c
+
+	Tried again to fix A/V desync
+	Vobsub extraction speed up
+
+	* libogmrip/ogmrip-subp.c
+	* libogmrip/ogmrip-subp.h
+	* libogmrip/ogmrip-backend.c
+
+	Added support for displaying forced subtitles only
+
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-video.h
+	* libogmrip/ogmrip-backend.c
+
+	Added support for multi angle
+
+	* libogmrip/ogmrip-audio.c
+	* libogmrip/ogmrip-audio.h
+	* libogmrip/ogmrip-backend.c
+
+	Added support for audio channels
+
+23 Sep 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-avi.c
+	* src/ogmrip-main.c
+
+	Added preliminary support for MPlayer 1.0 pre8
+	Removed frameno video codec when copying audio streams
+
+	* src/ogmrip-pref.c
+
+	Fixed temporary dir setting
+
+	* libogmrip/ogmrip-backend.c
+
+	Fixed support for mpeg and dts audio streams
+
+22 Sep 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd.c
+
+	Improvements
+
+24 Aug 2005 Olivier Rolland <billl@users.sf.net>
+
+	* dvdcpy/dvdcpy.c
+
+	Fixed some signedness (still)
+
+23 Aug 2005 Olivier Rolland <billl@users.sf.net>
+
+	* subrip/subrip.c
+	* subrip/vobsub.c
+	* subrip/vobsub.h
+	* libogmrip/ogmrip-audio.c
+	* libogmrip/ogmrip-codec.c
+	* libogmrip/ogmrip-codec.h
+	* libogmrip/ogmrip-lavc.c
+	* libogmrip/ogmrip-video.c
+	* src/ogmrip-main.c
+
+	Fixed some signedness (again)
+
+22 Aug 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmspawn/ogmsp-spawn.c
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-xvid.c
+	* src/ogmrip-crop.h
+	* src/ogmrip-options.h
+	* src/ogmrip-main.c
+
+	Cleanup
+
+	* src/ogmrip-main.c
+	* libogmrip/ogmrip-avi.c
+
+	Improved handling of frameno.avi
+
+	* libogmrip/ogmrip-codec.c
+	* libogmrip/ogmrip-codec.h
+
+	Fixed chapters selection
+
+20 Aug 2005 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-pref.c
+
+	Fixed prefered languages selection
+
+22 Jun 2005 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip-pref.glade
+	* data/ogmrip.schemas.in
+
+	Added a video quality setting
+
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-video.h
+	* src/ogmrip-gconf.h
+	* src/ogmrip-main.c
+	* src/ogmrip-pref.c
+
+	Added support for video quality
+
+21 Jun 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd.c
+	* libogmrip/ogmrip-audio.c
+	* libogmrip/ogmrip-codec.c
+	* libogmrip/ogmrip-container.c
+	* libogmrip/ogmrip-subp.c
+	* libogmrip/ogmrip-video.c
+	* src/ogmrip-crop.c
+	* src/ogmrip-dvd-chooser.c
+	* src/ogmrip-main.c
+	* src/ogmrip-options.c
+	* src/ogmrip-progress.c
+
+	Tried to fix double free or corruption
+
+	* libogmrip/ogmrip-backend.c
+
+	Tracked down A/V desync
+
+20 Jun 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-codec.c
+	* libogmrip/ogmrip-codec.h
+
+	Fixed some signedness
+
+05 Jun 2005 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+
+	Improved mplayer version detection
+
+	*	libogmrip/ogmrip-backend.c
+
+	Fixed progressive NTSC dvd encoding
+
+	* data/ogmrip-options.glade
+	* src/ogmrip-options.c
+
+	Minor UI improvement
+
+28 Jun 2005 Olivier Rolland <billl@users.sf.net>
+
+	Released OGMRip-0.9.0
+	
+18 Jun 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmspawn/ogmsp-spawn.c
+	* libogmspawn/ogmsp-spawn.h
+
+	Added preliminary support for modifying spawn's scheduling priority
+
+	* src/ogmrip-main.c
+
+	Fixed extract cleanup
+
+	* libogmrip/ogmrip-backend.c
+
+	Tweaked x264 options
+
+17 Jun 2005 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip-main.glade
+	* src/Makefile.am
+	* src/ogmrip-dvd-chooser.c
+	* src/ogmrip-dvd-chooser.h
+	* src/ogmrip-dvd-dialog.c
+	* src/ogmrip-dvd-dialog.h
+	* src/ogmrip-main.c
+
+	Improved DVD chooser and dialog
+
+16 Jun 2005 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+	* src/ogmrip-options.c
+	* data/ogmrip-options.glade
+
+	UI Improvements
+
+15 Jun 2005 Olivier Rolland <billl@users.sf.net>
+
+	* dvdcpy/*.c
+	* libogmdvd/*.c
+	* libogmdvd/*.h
+	* libogmrip/*.c
+	* libogmrip/*.h
+	* libogmspawn/*.c
+	* libogmspawn/*.h
+	* src/*.c
+	* src/*.h
+
+	Fixed headers
+
+	* libogmdvd/ogmdvd.c
+
+	Fixed a memory leaked
+
+	* data/ogmrip-main.glade
+	* src/ogmrip-main.c
+
+	Added an eject button
+
+14 Jun 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd.c
+	* libogmdvd/ogmdvd.h
+
+	Added functions to deal with angles and quatization
+
+07 Jun 2005 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip-pref.glade
+	* src/ogmrip-pref.C
+
+	Added an option to not remove temporary files
+
+	* src/ogmrip-main.c
+	* src/ogmrip-options.c
+
+	Merged code in devel mode
+
+	* src/ogmrip-helper.c
+	* src/ogmrip-helper.h
+	* src/ogmrip-main.c
+
+	Added code to remove copied dvd
+
+06 Jun 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-container.c
+	* libogmrip/ogmrip-container.h
+	* src/ogmrip-main.c
+
+	Renamed some functions
+
+	* libogmrip/ogmrip-ogg.c
+	* libogmrip/ogmrip-mkv.c
+
+	Tweaked overhead size calculator
+
+05 Jun 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd.c
+	* libogmdvd/ogmdvd.h
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-backend.h
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-video.h
+	* src/ogmrip-crop.c
+	* src/ogmrip-main.c
+	* src/ogmrip-options.c
+
+	Fixed API for aspect and rate
+
+	* libogmrip/ogmrip-backend.c
+
+	Tweaked video filters chain
+
+	* libofmrip/ogmrip-avi.c
+
+	Fixed overhead calculator
+
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-backend.c
+
+	Set bitrate in bps instead of kbps
+
+04 Jun 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-avi.c
+	* libogmrip/ogmrip-container.c
+	* libogmrip/ogmrip-container.h
+	* libogmrip/ogmrip-mkv.c
+	* libogmrip/ogmrip-ogg.c
+
+	Added per container overhead calculator
+	
+	* src/ogmrip-helper.c
+	* src/ogmrip-helper.h
+
+	Code cleanup
+
+03 Jun 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-ogg.c
+	* libogmrip/ogmrip-ogg.c
+
+	New files
+
+	* libogmrip/Makefile.am
+	* libogmrip/ogmrip-avi.c
+	* libogmrip/ogmrip-avi.h
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-backend.h
+	* libogmrip/ogmrip-container.c
+	* libogmrip/ogmrip-container.h
+	* libogmrip/ogmrip-mkv.c
+	* libogmrip/ogmrip-mkv.h
+	* libogmrip/ogmrip.h
+	* src/ogmrip-main.c
+
+	Changed container's API
+
+	* libogmrip/ogmrip-merge.c
+	* libogmrip/ogmrip-merge.h
+	* libogmrip/ogmrip-misc.c
+	* libogmrip/ogmrip-misc.h
+	* libogmrip/ogmrip-mux.c
+	* libogmrip/ogmrip-mux.h
+	* libogmrip/ogmrip-split.c
+	* libogmrip/ogmrip-split.h
+
+	Removed files
+
+	* src/ogmrip-helper.c
+
+	Fixed support for amd64
+
+	* libbacon/dvd_plus_rw_utils.cpp
+	* libbacon/transport.hxx
+
+	Synced with nautilus-cd-burner-2005-11-07
+	
+01 Jun 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libbacon/nautilus-burn-drive.c
+	* libbacon/nautilus-burn-drive.h
+
+	Added nautilus_burn_drive_door_is_open
+
+	* src/ogmrip-dvd-chooser.c
+	* src/ogmrip-dvd-chooser.h
+
+	Dedicated to video dvd
+
+	* src/ogmrip-main.c
+
+	Updated to new dvd chooser
+
+	* src/ogmrip-pref.c
+
+	Fixed preferences of optional features
+
+	* libogmrip/ogmrip-video.c
+
+	Fixed bitrate calculation
+
+29 May 2005 Olivier Rolland <billl@users.sf.net>
+
+	* po/pl.po
+	* configure.in
+
+	Added Polish translation by VoJcEK
+
+25 May 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd.c
+
+	Fixed dvd title
+
+24 May 2005 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed error propagation
+
+	* libogmspawn/ogmsp-exec.c
+
+	Fixed cancelation result value
+
+23 May 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+
+	Tweaked x264 switches
+
+	* dvdcpy/dvdcpy.c
+
+	Fixed VTS size
+
+	* src/ogmrip-pref.c
+
+	Fixed radio button preferences
+
+	* libogmrip/ogmrip-srt.c
+	* libogmrip/ogmrip-video.c
+	* libogmspawn/ogmsp-bin.c
+	* libogmspawn/ogmsp-exec.c
+	* libogmspawn/ogmsp-pipeline.c
+	* libogmspawn/ogmsp-queue.c
+	* libogmspawn/ogmsp-spawn.c
+	* libogmspawn/ogmsp-spawn.h
+	* src/ogmrip-crop.c
+	* src/ogmrip-main.c
+
+	Added error propagation
+
+	* libbacon/nautilus-burn-drive-freebsd.c
+
+	Fixed FreeBSD support
+
+22 May 2005 Olivier Rolland <billl@users.sf.net>
+
+	* data/Makefile.am
+	* data/ogmrip-ui.xml
+	* src/ogmrip-helper.c
+	* src/ogmrip-helper.h
+	* src/ogmrip-main.c
+
+	Added UI definition file
+
+	* libbacon/Makefile.am
+	* libbacon/nautilus-burn-drive.c
+	* libbacon/nautilus-burn-drive.h
+	* libbacon/nautilus-burn-drive-common.c
+	* libbacon/nautilus-burn-drive-common.h
+	* libbacon/nautilus-burn-drive-freebsd.c
+	* libbacon/nautilus-burn-drive-freebsd.h
+	* libbacon/nautilus-burn-drive-hal.c
+	* libbacon/nautilus-burn-drive-hal.h
+	* libbacon/nautilus-burn-drive-linux.c
+	* libbacon/nautilus-burn-drive-linux.h
+	* src/ogmrip-dvd-chooser.c
+	* src/ogmrip-helper.c
+
+	Code cleanup
+
+	* data/ogmrip-main.glade
+	* src/ogmrip-dvd-chooser.c
+
+	UI improvements
+
+21 May 2005 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-helper.c
+	* src/ogmrip-helper.h
+	* src/ogmrip-main.c
+	* src/ogmrip-options.c
+	* src/ogmrip-pref.c
+
+	Code cleanup
+
+	* data/ogmrip-options.glade
+	* data/ogmrip-pref.glade
+
+	Added some tooltips
+
+20 May 2005 Olivier Rolland <billl@users.sf.net>
+
+	*	src/ogmrip-options.c
+
+	Fixed unref of video streams
+
+19 May 2005 Olivier Rolland <billl@users.sf.net>
+
+	* Makefile.am
+	* configure.in
+	* dvdcpy/dvdcpy.c
+	* dvdcpy/Makefile.am
+	* libogmrip/ogmrip-dvdcpy.c
+	* libogmrip/ogmrip-dvdcpy.h
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-backend.h
+	* src/ogmrip-main.c
+
+	Added support for copying dvd to hd
+
+17 May 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libbacon/dvd_plus_rw_utils.cpp
+	* nlibbacon/autilus-burn-drive.c
+	* libbacon/nautilus-burn-drive.h
+	* libbacon/transport.hxx
+
+	Updated to 20050511
+	Added preliminary libhal-0.5 support
+
+16 May 2005 Olivier Rolland <billl@users.sf.net>
+
+	* README
+	* Makefile.am
+	* configure.in
+	* data/ogmrip-crop.glade
+	* data/ogmrip-main.glade
+	* data/ogmrip-options.glade
+	* data/ogmrip-pref.glade
+	* data/ogmrip-progress.glade
+	* data/ogmrip-spell.glade
+	* libbacon/Makefile.am
+	* src/Makefile.am
+	* src/ogmrip-crop.c
+	* src/ogmrip-helper.c
+	* src/ogmrip-helper.h
+	* src/ogmrip-main.c
+	* src/ogmrip-options.c
+	* src/ogmrip-pref.c
+	* src/ogmrip-progress.c
+	* src/ogmrip-spell.c
+	* src/ogmrip-spell.h
+
+	Removed GNOME dependancy
+
+04 May 2005 Olivier Rolland <billl@users.sf.net>
+
+	Released OGMRip-0.8.2
+
+25 Apr 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/Makefile.am
+	* src/Makefile.am
+
+	Applied a patch from Mike Castle to enable building outside of srcdir
+
+	* data/ogmrip-main.glade
+	* data/ogmrip-options.glade
+
+	UI Improvements
+
+	* libogmdvd/ogmdvd.c
+	* libogmdvd/ogmdvd.h
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-video.h
+	* src/ogmrip-crop.c
+	* src/ogmrip-main.c
+	* src/ogmrip-options.c
+
+	API Improvements
+
+24 Apr 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+	* src/ogmrip-main.c
+
+	Fixed splitting matroska files
+
+22 Apr 2005 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-helper.c
+
+	Fixed NetBSD support
+
+21 Apr 2005 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+
+	Version bump
+
+	* libbacon/nautilus-burn-drive.c
+	* libbacon/transport.hxx
+	* subrip/srttool.c
+
+	Fixed NetBSD support
+
+	* libbacon/nautilus-burn-drive.c
+
+	Fixed compilation error without HAL support
+
+	* libogmrip/ogmrip-backend.c
+
+	Fixed merge of AC3 audio streams in matroska containers
+
+20 Apr 2005 Olivier Rolland <billl@users.sf.net>
+
+	Released OGMRip-0.8.1
+
+19 Apr 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libbacon/Makefile.am
+	* libbacon/dvd_plus_rw_utils.cpp
+	* libbacon/transport.hxx
+	* src/ogmrip-dvd-chooser.c
+	* src/ogmrip-dvd-chooser.h
+	* src/ogmrip-helper.c
+	* src/ogmrip-helper.h
+
+	Updated to libbacon 2.10.1
+	
+	* libbacon/cd-drive.c
+	* libbacon/cd-drive.h
+
+	Removed files
+
+	* libbacon/nautilus-burn-drive.c
+	* libbacon/nautilus-burn-drive.h
+
+	New files
+
+	* configure.in
+	* libbacon/Makefile.am
+	* src/Makefile.am
+
+	Added HAL support
+
+18 Apr 2005 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed UI issues
+	Fixed non video size issue
+
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-xvid.c
+
+	Fixed support for mplayer-1.0pre7
+
+	* libbacon/transport.cxx
+	* libbacon/cd-drive.c
+	* src/ogmrip-helper.c
+
+	Added support for NetBSD
+
+17 Apr 2005 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+
+	Fixed issue with CVS versions of mplayer
+
+	* libogmrip/ogmrip-video.h
+	* libogmrip/ogmrip-video.c
+
+	Changed prototype of set_ofps to use fractions instead of floats
+
+	* libogmrip/ogmrip-backend.c
+
+	Fixed sscanf of floats whatever the locale
+
+	* src/ogmripÂ­main.c
+
+	Added support for mplayer-1.0pre7
+
+15 Apr 2005 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+
+	Applied a patch from Ian Perry to make configure use sed --version instead
+	of -V.
+
+14 Apr 2005 Olivier Rolland <billl@users.sf.net>
+
+	Released OGMRip-0.8.0
+
+14 Apr 2005 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed compilation issues
+
+	* libogmdvd/ogmdvd.c
+
+	Fixed channels names
+
+	* configure.in
+
+	Required libglade >= 2.5
+
+15 Mar 2005 Olivier Rolland <billl@users.sf.net>
+
+	*	configure.in
+
+	Version bump
+
+	* src/ogmrip-main.c
+
+	Merge with devel mode
+	
+08 Mar 2005 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-helper.c
+	* src/ogmrip-helper.h
+	* src/ogmrip-main.c
+
+	UI improvements
+
+07 Mar 2005 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-helper.c
+	* src/ogmrip-main.c
+
+	Fixed UI issues
+
+05 Mar 2005 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip-pref.glade
+	* data/ogmrip.schemas
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-video.h
+	* src/ogmrip-gconf.h
+	* src/ogmrip-main.c
+	* src/ogmrip-pref.c
+
+	Added denoise option
+
+	* data/ogmrip-options.glade
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-video.h
+	* src/ogmrip-options.c
+	* src/ogmrip-options.h
+	* src/ogmrip-main.c
+
+	Added telecine, progressive and deinterlace support
+
+03 Mar 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-mp3.c
+	* libogmrip/ogmrip-mux.c
+	* libogmrip/ogmrip-srt.c
+	* libogmrip/ogmrip-theora.c
+	* libogmrip/ogmrip-tools.c
+	* libogmrip/ogmrip-vorbis.c
+	* src/ogmrip-crop.c
+	* src/ogmrip-helper.c
+
+	Added support for gtk+-2.6
+
+	* ogmrip-helper.c
+	* ogmrip-helper.h
+	* ogmrip-main.c
+
+	Many fixes
+
+03 Mar 2005 Olivier Rolland <billl@users.sf.net>
+
+	Released OGMRip-0.7.1
+
+28 Feb 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+	* src/ogmrip-main.c
+
+	Fixed merging ac3 streams in avi containers
+
+	* libogmrip/ogmrip-video.c
+
+	Clamped video bitrate
+
+	* configure.in
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-xvid.c
+	* src/ogmrip-crop.c
+	* src/ogmrip-main.c
+
+	Added support for mplayer-cvs
+
+26 Feb 2005 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+	* data/ogmrip-main.glade
+
+	Added support for multiple audio and subtitle streams
+
+25 Feb 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+
+	Reviewed default encoders options
+
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-video.h
+	* libogmrip/ogmrip-lavc.c
+	* libogmrip/ogmrip-lavc.h
+	* libogmrip/ogmrip-xvid.c
+	* libogmrip/ogmrip-xvid.h
+
+	Added some options
+
+24 Feb 2005 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+	* libogmrip/ogmrip-backend.c
+	* src/ogmrip-main.c
+	* src/ogmrip-pref.c
+
+	Fixes
+
+23 Feb 2005 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+	* data/ogmrip-pref.glade
+	* libogmrip/Makefile.am
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-backend.h
+	* libogmrip/ogmrip-x264.c
+	* libogmrip/ogmrip-x264.h
+	* src/ogmrip-main.c
+	* src/ogmrip-pref.c
+
+	Added x264 support
+	
+22 Feb 2005 Olivier Rolland <billl@users.sf.net>
+
+	Released OGMRip-0.7.0
+
+18 Feb 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+
+	Added -noframedrop
+
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-backend.h
+
+	Added preliminary theora support
+
+17 Feb 2005 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Lot of cleanup
+
+16 Feb 2005 Olivier Rolland <billl@users.sf.net>
+
+	* subrip/srttool.c
+	* subrip/subrip.c
+
+	Added some polish
+
+	* src/ogmrip-helper.c
+	* src/ogmrip-helper.h
+	* src/ogmrip-main.c
+	* src/ogmrip-main.h
+
+	Simplified functions to get space left on device
+	Checked space when output and tmp files are on the same device
+
+15 Feb 2005 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Added OGMRip's icon in the about dialog
+
+	* src/ogmrip-progress.c
+
+	Fixed ETA
+
+	* src/ogmrip-main.c
+	* data/ogmrip-main.glade
+
+	Changed some icons
+
+14 Feb 2005 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-options.c
+	* data/ogmrip-options.glade
+
+	Fixed scale parameters calculation
+	Handled autoscale button sensitivity
+	
+07 Feb 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libbacon/cd-drive.c
+	* libbacon/dvd_plus_rw_utils.cpp
+	* libbacon/transport.hxx
+	* subrip/spudec.h
+	* subrip/vobsub.c
+
+	Fixed all warnings
+
+	* libbacon/Makefile.am
+	* libogmdvd/Makefile.am
+	* libogmrip/Makefile.am
+	* libogmspawn/Makefile.am
+	* src/Makefile.am
+	* subrip/Makefile.am
+	* configure.in
+
+	Factorized -Wall -Werror
+
+07 Feb 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libbacon/bacon-cd-selection.h
+	* libbacon/bacon-cd-selection.c
+	* src/ogmrip-dvd-chooser.h
+	* src/ogmrip-dvd-chooser.c
+	* data/ogmrip-main.glade
+	* src/ogmrip-main.c
+
+	Replaced BaconCdSelection by OGMRipDvdChooser which
+	is dedicated to DVD drives
+
+05 Feb 2005 Olivier Rolland <billl@users.sf.net>
+
+	*	src/ogmrip-crop.c
+
+	Fixed jpeg output directory using mplayer 1.0pre6
+
+	* data/ogmrip-pref.glade
+
+	Redesigned dialog
+
+	* src/ogmrip-main.c
+	* src/ogmrip-pref.c
+
+	Removed default DVD drive
+
+	* src/ogmrip-main.c
+	* data/ogmrip-main.glade
+
+	Added a 'Load DVD disk' action
+	Added a 'Open DVD structure' action
+
+25 Jan 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libbacon/bacon-cd-selection.c
+
+	Added a property to only select DVDs
+
+	* src/ogmrip-pref.c
+
+	Select only DVDs
+
+11 Jan 2005 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-helper.c
+	* src/ogmrip-helper.h
+	* src/ogmrip-gconf.h
+	* src/ogmrip-main.h
+	* src/ogmrip-pref.c
+	* src/ogmrip-pref.h
+	* data/ogmrip-pref.glade
+
+	Added support for a custom tmp dir
+
+	* src/ogmrip-main.c
+	* data/ogmrip-options.glade
+
+	Options dialog is no more accessible via a menu item. It's
+	now always displayed when the extract button is pressed.
+
+07 Jan 2005 Olivier Rolland <billl@users.sf.net>
+
+	* po/Äs.po
+
+	New translation file by David Lara
+
+	* src/ogmrip-main.c
+
+	Added a tranlator tab in the about dialog
+
+	* libogmdvd/ogmdvd.c
+
+	Fixed audio type
+
+	* configure.in
+
+	Added --enable-devel-mode
+
+06 Jan 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-xvid.c
+
+	Workaround against xvid-twopass.stats
+
+	* src/ogmrip-crop.h
+	* src/ogmrip-crop.c
+	* data/ogmrip-crop.glade
+
+	New files for custom cropping parameters
+
+05 Jan 2005 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-codec.c
+
+	Fixes and optimizations
+
+	* libogmdvd/ogmdvd.c
+
+	Fixes
+
+	* src/ogmrip-helper.c
+
+	Space left fixes
+
+04 Jan 2005 Olivier Rolland <billl@users.sf.net>
+
+	Release of OGMRip-0.6.2
+
+04 Jan 2005 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+
+	Fixed sed/gsed use on freebsd
+
+	* libogmrip/ogmrip-backend.c
+
+	Fixed cropping values
+
+26 Dec 2004 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+	* src/ogmrip-backend.c
+
+	mplayer-1.0pre6 support
+
+10 Dec 2004 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-options.h
+	* src/ogmrip-options.c
+	* data/ogmrip-options.glade
+
+	New files
+
+	* src/ogmrip-main.c
+
+	Added an options menu item
+	Preliminary support for custom crop, scale and bitrate parameters
+
+5 Dec 2004 Olivier Rolland <billl@users.sf.net>
+
+	Release of OGMRip-0.6.0
+
+5 Dec 2004 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.c
+
+	Fixed ogmsplit progress
+	
+3 Dec 2004 Olivier Rolland <billl@users.sf.net>
+
+	* libogmspawn/ogmsp-exec.c
+
+	Added close_on_unref for channels
+	Many improvements
+	API change
+
+	* libogmrip/*.c
+
+	OGMSpawn API change
+
+	* libogmdvd/ogmdvd.c
+
+	Removed language duplicates
+
+2 Dec 2004 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed sensitivity of the relative check box
+
+1 Dec 2004 Olivier Rolland <billl@users.sf.net>
+
+	* subrip/Makefile.am
+	* subrip/mp_msg.c
+	* subrip/mp_msg.h
+	* subrip/spudec.c
+	* subrip/spudec.h
+	* subrip/subrip.c
+	* subrip/vobsub.c
+	* subrip/vobsub.h
+	* subrip/srttool.c
+
+	New files
+
+	* libogmrip/ogmrip-backend.c
+
+	Switched to subp2pgm
+
+30 Nov 2004 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+
+	Fixed gnome and enchant detection
+
+	* src/ogmrip-main.c
+
+	Duration displays the length of the selected chapters
+	Can't extract when no chapter selected
+
+29 Nov 2004 Olivier Rolland <billl@users.sf.net>
+
+	* data/ogmrip.schemas
+
+	Added pref_audio to select the preferred audio language
+	Added pref_subp to select the preferred subtitles language
+
+	* src/ogmrip-main.c
+
+	Automatic selection of the longest video title
+	Automatic selection of preferred audio and subtitles languages
+
+28 Nov 2004 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-spell.c
+	* src/ogmrip-spell.h
+	* data/ogmrip-spell.glade
+
+	New files
+
+	* src/ogmrip-main.c
+
+	Preliminary spell checking support
+
+	* data/ogmrip.schemas
+
+	Added spell_check option
+	
+27 Nov 2004 Olivier Rolland <billl@users.sf.net>
+
+	* libogmdvd/ogmdvd.c
+
+	Added support for iso639_2 language codes
+
+	* libogmrip/ogmrip-vobsub.c
+	* libogmrip/ogmrip-vobsub.h
+
+	New files
+
+25 Nov 2004 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Added support for ripping contiguous chapters
+
+	* src/ogmrip-gconf.h
+	* data/ogmrip.schemas
+
+	Removed start_chapter, end_chapter and relative
+
+	* libogmrip/ogmrip-backend.c
+
+	Added matroska support for subtitles
+
+	* data/ogmrip-main.glade
+
+	Added subtitles combo and relative check
+
+24 Nov 2004 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+
+	vobsub2pgm, srttool and gocr checks
+
+	* src/ogmrip-pref.c
+	* data/ogmrip-pref.glade
+
+	Added container selection support
+
+	* libogmrip/ogmrip-mux.c
+	* libogmrip/ogmrip-mux.h
+
+	Added support for subtitles
+
+	* libogmspawn/ogmsp-exec.c
+	* libogmspawn/ogmsp-exec.h
+
+	Added many improvements
+
+	* data/ogmrip.schemas
+
+	Added a keep_temp option in gconf to keep temporary files
+
+23 Nov 2004 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Fixed chapters extraction
+
+	* libogmrip/ogmrip-video.c
+
+	Fixed autocrop
+
+	* libbacon
+
+	Updated to the last CVS version
+
+22 Nov 2004 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-subp.c
+	* libogmrip/ogmrip-subp.h
+	* libogmrip/ogmrip-srt.c
+	* libogmrip/ogmrip-srt.h
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-backend.h
+
+	Added preliminary srt subtitles support
+
+	* libogmspawn/ogmsp-queue.c
+
+	Added missing constructor
+
+21 Nov 2004 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+
+	Fixed xvid and lavc test for different versions of mencoder
+
+	* libogmrip/ogmrip-avi.c
+	* libogmrip/ogmrip-avi.h
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-backend.h
+	* src/ogmrip-main.c
+
+	Added preliminary avi container support
+
+	* src/ogmrip-main.c
+	* data/ogmrip-pref.glade
+
+	Added a new filename policy
+
+	* libogmrip/ogmrip-backend.c
+
+	Fixed matroska merge/split command
+	
+20 Nov 2004 Olivier Rolland <billl@users.sf.net>
+
+	* libogmspawn/ogmsp-exec.c
+
+	Changed watch priority
+	Fixed progression
+	
+	* libogmrip/ogmrip-backend.c
+
+	Fixed crop detection
+	Fixed crop progression
+
+	* libogmrip/ogmrip-ac3.c
+	* libogmrip/ogmrip-lavc.c
+	* libogmrip/ogmrip-merge.c
+	* libogmrip/ogmrip-mkv.c
+	* libogmrip/ogmrip-mp3.c
+	* libogmrip/ogmrip-split.c
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-vorbis.c
+	* libogmrip/ogmrip-wav.c
+	* libogmrip/ogmrip-xvid.c
+	* libogmspawn/ogmsp-exec.c
+
+	Changed ogmsp_exec_add_watch prototype
+
+	* libogmrip/ogmrip-ac3.h
+	* libogmrip/ogmrip-ac3.c
+
+	Files removed
+
+	* libogmrip/ogmrip-acopy.h
+	* libogmrip/ogmrip-acopy.c
+
+	New files
+
+	* libogmrip/ogmrip-backend.h
+	* libogmrip/ogmrip-backend.c
+
+	Added support for audio copy
+
+	* libogmrip/ogmrip-backend.c
+
+	Fixed merge command
+
+19 Nov 2004 Olivier Rolland <billl@users.sf.net>
+
+	* configure.in
+
+	Fixed --disable-gnome-support switch
+
+18 Nov 2004 Olivier Rolland <billl@users.sf.net>
+
+	* all files
+
+	Fixed license headers
+
+	* libogmspawn/ogmsp-exec.c
+
+	Added debug messages
+	Buf fix (watch was called twice)
+	Fixed a memory leak
+	Read the whole buffer instead of a single line
+
+18 Nov 2004 Olivier Rolland <billl@users.sf.net>
+	
+	First public release
+
+14 Oct 2004 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-helper.c
+
+	Bug fix on freebsd
+
+	* src/ogmrip-main.c
+	* src/ogmrip-gconf.h
+
+	Added support for audio/video containers through gconf keys
+
+	* libogmrip/ogmrip-mkv.h
+	* libogmrip/ogmrip-mkv.c
+	* libogmrip/ogmrip-backend.h
+	* libogmrip/ogmrip-backend.c
+
+	Added matroska support
+
+13 Oct 2004 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-backend.h
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-merge.h
+	* libogmrip/ogmrip-merge.c
+	* libogmrip/ogmrip-mux.h
+	* libogmrip/ogmrip-mux.c
+	* src/ogmrip-main.c
+
+	Added OGMRipMux as an ancestor of OGMRipMerge
+
+12 Oct 2004 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-pref.c
+
+	Use value-changed signal instead of changed on spin buttons
+
+7 Oct 2004 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-helper.c
+	* src/ogmrip-helper.c
+	* src/ogmrip-progress.c
+	* src/ogmrip-pref.c
+	* src/ogmrip-main.c
+
+	Set dialogs icon
+
+5 Oct 2004 Olivier Rolland <billl@users.sf.net>
+	
+	* libbacon/cd-drive.c
+	* src/ogmrip-helper.c
+
+	Improved FreeBSD support
+
+4 Oct 2004 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-misc.c
+	* libogmrip/ogmrip-misc.h
+
+	New files
+	
+	* libogmdvd/ogmdvd.c
+
+	Added full language names
+
+	* src/ogmrip-main.c
+	* src/ogmrip-pref.c
+
+	Created the pref dialog on startup so the gconf notifications are always
+	active
+
+2 Oct 2004 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip.h
+	* libogmspawn/ogmspawn.h
+
+	New files
+
+	* data/ogmrip.pc.in
+	* data/ogmspawn.pc.in
+	* data/ogmdvd.pc.in
+
+	New files
+
+30 Sep 2004 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+
+	Ensures that the merge is done in a temporary directory if more than one
+	target is expected
+	Use g_filename_from_utf8
+
+	* src/ogmrip-main.c
+	* src/ogmrip-helper.h
+	* src/ogmrip-helper.c
+
+	Added checks for space left on filesystem
+
+	* libogmrip/ogmrip-backend.c
+	* libogmrip/ogmrip-backend.h
+	* libogmrip/ogmrip-video.c
+	* libogmrip/ogmrip-video.h
+	* libogmrip/ogmrip-lavc.c
+	* libogmrip/ogmrip-lavc.h
+	* libogmrip/ogmrip-xvid.c
+	* libogmrip/ogmrip-xvid.h
+	* data/ogmrip-pref.glade
+	* data/ogmrip.schemas
+	* src/ogmrip-gconf.h
+	* src/ogmrip-main.h
+
+	Added per-codec options and factorized common options of lavc and xvid
+
+	* libogmrip/ogmrip-main.c
+	* libogmrip/ogmrip-main.h
+	* data/ogmrip.schemas
+
+	Added a noaudio option in gconf to avoid encoding audio tracks
+
+39 Sep 2004 Olivier Rolland <billl@users.sf.net>
+
+	* libogmrip/ogmrip-ogg.h
+	* libogmrip/ogmrip-ogg.c
+	* libogmrip/ogmrip-vorbis.h
+	* libogmrip/ogmrip-vorbis.c
+
+	Renamed ogg to vorbis
+
+	* libogmdvd/ogmdvd.h
+	* libogmdvd/ogmdvd.c
+
+	Added subp support
+
+	* po/en.po
+	* po/fr.po
+
+	Updates
+
+	* libogmsp/ogmsp-spawn.c
+	* libogmsp/ogmsp-container.c
+
+	Added a parent property for cancellation propagation and avoid spawns to be
+	added to multiple containers
+
+	* libogmrip/ogmrip-backend.c
+
+	Added support for old versions of mplayer which do no support the dvd://%d
+	scheme but a -dvd %d option
+	
+	* src/ogmrip-main.c
+	* data/ogmrip-pref.glade
+
+	Added some sanity checks
+	Added name pattern support
+
+28 Sep 2004 Olivier Rolland <billl@users.sf.net>
+
+	* src/ogmrip-main.c
+	* src/ogmrip-gconf.h
+
+	Added support for encoding range of chapters through gconf keys
+	
+	* Makefile.am
+	* data/Makefile.am
+
+	Added some EXTRA_DIST for the dist to build cleanly
+
+	* src/ogmrip-main.c
+
+	Added support for the overall progressbar
+	Added support for the estimated time remaining
+	Added support for eject after encoding
+
+	* libogmrip/ogmrip-ac3.c
+	* libogmrip/ogmrip-ac3.h
+
+	Added support for AC3 encoding
+
+	* data/ogmrip-progress.glade
+
+	Improved layout
+
+	* po/fr.po
+	* po/en.po
+
+	Fixed some typos

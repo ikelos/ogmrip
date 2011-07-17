@@ -1,0 +1,15 @@
+<profile name="default-avi" version="1.0">
+  <key name="name">'&lt;b&gt;DivX for Standalone Player&lt;/b&gt;&#xA;2-pass, 1x700MB (AVI + XviD + MP3)'</key>
+  <section name="general">
+    <key name="container">'avi'</key>
+  </section>
+  <section name="video">
+    <key name="codec">'xvid'</key>
+  </section>
+  <section name="audio">
+    <key name="codec">'mp3'</key>
+  </section>
+  <section name="subp">
+    <key name="codec">'srt'</key>
+  </section>
+</profile>

@@ -1,0 +1,2367 @@
+# Russian translation for ogmrip
+# Copyright (c) 2007 Rosetta Contributors and Canonical Ltd 2007
+# This file is distributed under the same license as the ogmrip package.
+# Sergey "Shnatsel" Davidoff <shnatsel@gmail.com>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ogmrip\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-05-04 10:04+0200\n"
+"PO-Revision-Date: 2010-02-05 14:09+0000\n"
+"Last-Translator: Sergey \"Shnatsel\" Davidoff <Shnatsel@gmail.com>\n"
+"Language-Team: Russian <ru@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2010-05-04 08:00+0000\n"
+"X-Generator: Launchpad (build Unknown)\n"
+
+#: ../data/ogmrip-crop.glade.h:1 ../src/ogmrip-crop-dialog.c:262
+#: ../src/ogmrip-progress-dialog.c:246
+msgid "Cropping"
+msgstr "Кадрирование"
+
+#: ../data/ogmrip-crop.glade.h:2
+msgid "_Bottom"
+msgstr "_Снизу"
+
+#: ../data/ogmrip-crop.glade.h:3
+msgid "_Left"
+msgstr "С_лева"
+
+#: ../data/ogmrip-crop.glade.h:4
+msgid "_Right"
+msgstr "_Справа"
+
+#: ../data/ogmrip-crop.glade.h:5
+msgid "_Top"
+msgstr "_Сверху"
+
+#: ../data/ogmrip-lavc.glade.h:1
+msgid "Allow 4 motion vectors per macroblock (v4mv)"
+msgstr ""
+
+#: ../data/ogmrip-lavc.glade.h:2
+msgid ""
+"Always use the maximum number of B-frames\n"
+"Avoid B-frames in high motion scenes\n"
+"Places B-frames more or less optimally to yield maximum quality"
+msgstr ""
+"Всегда использовать маскимальное колличество В-кадров\n"
+"Избегать В-кадров в динамичных сценах\n"
+"Размещать В-кадры более-менее оптимально для получения максимального качества"
+
+#: ../data/ogmrip-lavc.glade.h:5
+msgid "Comparison function for _sub pel motion estimation (subcmp)"
+msgstr ""
+
+#: ../data/ogmrip-lavc.glade.h:6
+msgid "Comparison function for motion estimation _pre pass (precmp)"
+msgstr ""
+
+#: ../data/ogmrip-lavc.glade.h:7
+msgid "Diamond type and size for motion estimation _pre-pass (predia)"
+msgstr ""
+
+#: ../data/ogmrip-lavc.glade.h:8
+msgid ""
+"Disabled\n"
+"Mpeg-4 reference decoder\n"
+"Libavcodec specific extensions\n"
+"Experimental  codecs and features"
+msgstr ""
+"Отключено\n"
+"Mpeg-4 reference decoder\n"
+"Специфические расширения Libavcodec\n"
+"Экспериментальные кодеки и настройки"
+
+#: ../data/ogmrip-lavc.glade.h:12
+msgid ""
+"Disabled\n"
+"Only after I-frames\n"
+"Always"
+msgstr ""
+"Отключено\n"
+"Только после независимых кадров\n"
+"Всегда"
+
+#: ../data/ogmrip-lavc.glade.h:15
+msgid ""
+"Disabled\n"
+"Only lower the absolute value of coefficients\n"
+"Only change coefficients before the last non-zero coefficient + 1\n"
+"Try all"
+msgstr ""
+"Отключено\n"
+"Только уменьшать абсолютные значения коэффициента\n"
+"Изменять коэффициенты только перед последним ненулевым коэффициентом + 1\n"
+"Попробовать все"
+
+#: ../data/ogmrip-lavc.glade.h:19
+msgid "Intra DC _precision in bits (dc)"
+msgstr ""
+
+#: ../data/ogmrip-lavc.glade.h:20
+msgid "M_aximum bitrate in kbit/sec (vrc__maxrate)"
+msgstr "Максимальный битрейт в кбит/сек (vrc__maxrate)"
+
+#: ../data/ogmrip-lavc.glade.h:21
+msgid "M_inimum bitrate in kbit/sec (vrc__minrate)"
+msgstr "Минимальный битрейт в кбит/сек (vrc__minrate)"
+
+#: ../data/ogmrip-lavc.glade.h:22
+msgid "Motion _Estimation"
+msgstr "Обнаружение движения"
+
+#: ../data/ogmrip-lavc.glade.h:23
+msgid "Motion _estimation pre-pass (preme)"
+msgstr ""
+
+#: ../data/ogmrip-lavc.glade.h:24
+msgid "Quantizer _compression (vqcomp)"
+msgstr "Сжатие _квантователем (vqcomp)"
+
+#: ../data/ogmrip-lavc.glade.h:25
+msgid "Strategy to choose between I/P/B-frames (vb__strategy)"
+msgstr "Стратегия выбора между I/P/B-кадрами (vb__strategy)"
+
+#: ../data/ogmrip-lavc.glade.h:26
+msgid "Try to encode each MB with MV=<0,0> and choose the better one"
+msgstr ""
+
+#: ../data/ogmrip-lavc.glade.h:27
+msgid ""
+"Use comparison function given by mbcmp\n"
+"Select the MB mode which needs the fewest bits\n"
+"Select the MB mode which has the best rate distortion"
+msgstr ""
+
+#: ../data/ogmrip-lavc.glade.h:30
+msgid "_Amount of motion predictors from the previous frame (last__pred)"
+msgstr "_Количество предсказателей движения из предыдущего кадра (last__pred)"
+
+#: ../data/ogmrip-lavc.glade.h:31
+msgid "_Buffer size in kbit (vrc__buf__size)"
+msgstr "_Размер буфера в килобитах (vrc__buf__size)"
+
+#: ../data/ogmrip-lavc.glade.h:32
+msgid "_Comparison function for full pel motion estimation (cmp)"
+msgstr ""
+
+#: ../data/ogmrip-lavc.glade.h:33
+msgid "_Diamond type and size for motion estimation (dia)"
+msgstr ""
+
+#: ../data/ogmrip-lavc.glade.h:34 ../data/ogmrip-pref.glade.h:24
+#: ../data/ogmrip-profile-editor.glade.h:82
+msgid "_General"
+msgstr "_Общие"
+
+#: ../data/ogmrip-lavc.glade.h:35
+msgid "_Macroblock decision algorithm (mbd)"
+msgstr "_Алгоритм распознавания макроблоков (mbd)"
+
+#: ../data/ogmrip-lavc.glade.h:36
+msgid "_Maximum interval between keyframes in frames (keyint)"
+msgstr "Максимальный интервал между ключевыми кадрами в кадрах (keyint)"
+
+#: ../data/ogmrip-lavc.glade.h:37
+msgid "_Quantizer noise shaping (qns)"
+msgstr ""
+
+#: ../data/ogmrip-lavc.glade.h:38
+msgid "_Rate Control"
+msgstr ""
+
+#: ../data/ogmrip-lavc.glade.h:39
+msgid "_Strict standard compliance (vstrict)"
+msgstr "_Строгое соблюдение стандарта (vstrict)"
+
+#: ../data/ogmrip-main.glade.h:1
+msgid "<b>Duration:</b>"
+msgstr "<b>Продолжительность:</b>"
+
+#: ../data/ogmrip-main.glade.h:2
+msgid "<b>_Audio Tracks:</b>"
+msgstr "<b>_Аудио дорожки:</b>"
+
+#: ../data/ogmrip-main.glade.h:3
+msgid "<b>_Subtitles:</b>"
+msgstr "<b>_Субтитры:</b>"
+
+#: ../data/ogmrip-main.glade.h:4
+msgid "<b>_Title:</b>"
+msgstr "<b>_Заголовок:</b>"
+
+#: ../data/ogmrip-main.glade.h:5
+msgid "<b>_Video Stream:</b>"
+msgstr "<b>_Видео поток:</b>"
+
+#: ../data/ogmrip-main.glade.h:6
+msgid "Angle:"
+msgstr "Угол:"
+
+#: ../data/ogmrip-main.glade.h:7 ../src/ogmrip-main.c:3096
+#: ../src/ogmrip-options-dialog.c:772
+msgid "E_xtract"
+msgstr "_Извлечь"
+
+#: ../data/ogmrip-main.glade.h:8 ../src/ogmrip-main.c:3096
+msgid "Extract selected streams"
+msgstr "Извлечь выбранные дорожки"
+
+#: ../data/ogmrip-main.glade.h:9 ../src/ogmrip-main.c:3095
+msgid "Load a DVD disk, an ISO file, or a DVD structure"
+msgstr "Загрузите DVD-диск, ISO-образ или каталог DVD"
+
+#: ../data/ogmrip-main.glade.h:10
+msgid "OGMRip"
+msgstr "OGMRip"
+
+#: ../data/ogmrip-main.glade.h:11
+msgid "Open a DVD structure"
+msgstr "Открыть структуру DVD"
+
+#: ../data/ogmrip-main.glade.h:12
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-dialog.c:167
+#: ../src/ogmrip-main.c:3095
+msgid "_Load"
+msgstr "_Загрузить"
+
+#: ../data/ogmrip-main.glade.h:13
+msgid "_Open"
+msgstr "_Открыть"
+
+#: ../data/ogmrip-main.glade.h:14
+msgid "_Relative mode"
+msgstr "_Режим сравнения"
+
+#: ../data/ogmrip-options.glade.h:1
+msgid "Auto_detect"
+msgstr "Автообнаружение"
+
+#: ../data/ogmrip-options.glade.h:2
+msgid "Automatic _cropping"
+msgstr "Автоматическое _кадрирование"
+
+#: ../data/ogmrip-options.glade.h:3
+msgid "Automatic _scaling"
+msgstr "Автоматическое _масштабирование"
+
+#: ../data/ogmrip-options.glade.h:4
+msgid "Automatic c_ompressibility check"
+msgstr "Автоматическая проверка с_жимаемости"
+
+#: ../data/ogmrip-options.glade.h:5
+msgid "Compressibility Check"
+msgstr "Проверка сжимаемости"
+
+#: ../data/ogmrip-options.glade.h:6 ../src/ogmrip-options-dialog.c:751
+msgid "Options"
+msgstr "Параметры"
+
+#: ../data/ogmrip-options.glade.h:7
+msgid ""
+"The scaling parameters can only be autodetected if a video bitrate and "
+"cropping parameters are set."
+msgstr ""
+"Параменты маштабирования могут быть автоопределены только если установлены "
+"видео-битрейт и параметры кдрирования."
+
+#: ../data/ogmrip-options.glade.h:8
+msgid "_Cartoon"
+msgstr "Мультипликация"
+
+#: ../data/ogmrip-options.glade.h:9
+msgid "_Crop"
+msgstr "_Кадрировать"
+
+#: ../data/ogmrip-options.glade.h:10
+msgid "_Deinterlace"
+msgstr "_Деинтерлейсинг"
+
+#: ../data/ogmrip-options.glade.h:11
+msgid "_Height:"
+msgstr "Высота:"
+
+#: ../data/ogmrip-options.glade.h:12
+msgid "_Profile:"
+msgstr "_Профиль:"
+
+#: ../data/ogmrip-options.glade.h:13
+msgid "_Width:"
+msgstr "Ширина:"
+
+#: ../data/ogmrip-pref.glade.h:1
+msgid "<b>DVD Copy</b>"
+msgstr "<b>Копия DVD</b>"
+
+#: ../data/ogmrip-pref.glade.h:2
+msgid "<b>Misc</b>"
+msgstr "<b>Прочее</b>"
+
+#: ../data/ogmrip-pref.glade.h:3
+msgid "<b>Pathes</b>"
+msgstr "<b>Пути</b>"
+
+#: ../data/ogmrip-pref.glade.h:4
+msgid "<b>Preferred Languages</b>"
+msgstr "<b>Предпочитаемые языки</b>"
+
+#: ../data/ogmrip-pref.glade.h:5
+msgid "Do _not remove temporary files"
+msgstr "Не удалять временные файлы"
+
+#: ../data/ogmrip-pref.glade.h:6 ../src/ogmrip-pref-dialog.c:218
+msgid "Preferences"
+msgstr "Параметры"
+
+#: ../data/ogmrip-pref.glade.h:7
+msgid ""
+"Remove the copy\n"
+"Keep the copy on the hard drive\n"
+"Keep the copy and update the GUI\n"
+"Ask the user"
+msgstr ""
+"Удалить копию\n"
+"Оставить копию на жестком диске\n"
+"Оставить копию и обновить интерфейс\n"
+"Спрашивать"
+
+#: ../data/ogmrip-pref.glade.h:11
+msgid "Select the output directory"
+msgstr "Выберите директорию назначения"
+
+#: ../data/ogmrip-pref.glade.h:12
+msgid "Select the temporary directory"
+msgstr "Выберите временную директорию"
+
+#: ../data/ogmrip-pref.glade.h:13
+msgid ""
+"Title\n"
+"Title - Language\n"
+"Title - Language - Video Codec\n"
+"Title - Language - Video Codec Audio Codec"
+msgstr ""
+"Заголовок\n"
+"Заголовок - Язык\n"
+"Заголовок - Язык - Видео кодек\n"
+"Заголовок - Язык - Видео кодек - Аудио кодек"
+
+#: ../data/ogmrip-pref.glade.h:17
+msgid "_Advanced"
+msgstr "_Дополнительные"
+
+#: ../data/ogmrip-pref.glade.h:18
+msgid "_After the encoding:"
+msgstr "После кодирования:"
+
+#: ../data/ogmrip-pref.glade.h:19
+msgid "_Audio:"
+msgstr "Звук:"
+
+#: ../data/ogmrip-pref.glade.h:20
+msgid "_Chapters:"
+msgstr "Главы:"
+
+#: ../data/ogmrip-pref.glade.h:21
+msgid "_Copy DVD on hard drive before encoding"
+msgstr "_Копировать DVD на жёсткий диск перед кодированием:"
+
+#: ../data/ogmrip-pref.glade.h:22
+msgid "_Create a log file"
+msgstr "_Создать файл протокола"
+
+#: ../data/ogmrip-pref.glade.h:23
+msgid "_File Name:"
+msgstr "Имя _файла:"
+
+#: ../data/ogmrip-pref.glade.h:25
+msgid "_Output Path:"
+msgstr "Путь назначения:"
+
+#: ../data/ogmrip-pref.glade.h:26
+msgid "_Subtitles:"
+msgstr "Субтитры:"
+
+#: ../data/ogmrip-pref.glade.h:27
+msgid "_Temporary Path:"
+msgstr "Временный путь:"
+
+#: ../data/ogmrip-pref.glade.h:28
+msgid "_Threads:"
+msgstr "_Потоки:"
+
+#: ../data/ogmrip-profile-editor.glade.h:1
+msgid "1 audio +"
+msgstr "1 аудио +"
+
+#: ../data/ogmrip-profile-editor.glade.h:2
+msgid ""
+"48000 Hz\n"
+"44100 Hz\n"
+"32000 Hz\n"
+"24000 Hz\n"
+"22050 Hz\n"
+"16000 Hz\n"
+"12000 Hz\n"
+"11025 Hz\n"
+"8000 Hz"
+msgstr ""
+"48000 Hz\n"
+"44100 Hz\n"
+"32000 Hz\n"
+"24000 Hz\n"
+"22050 Hz\n"
+"16000 Hz\n"
+"12000 Hz\n"
+"11025 Hz\n"
+"8000 Hz"
+
+#: ../data/ogmrip-profile-editor.glade.h:11
+msgid "<b>Codec</b>"
+msgstr "<b>Кодек</b>"
+
+#: ../data/ogmrip-profile-editor.glade.h:12
+msgid "<b>Container</b>"
+msgstr "<b>Контейнер</b>"
+
+#: ../data/ogmrip-profile-editor.glade.h:13
+msgid "<b>Encoding</b>"
+msgstr "<b>Кодирование</b>"
+
+#: ../data/ogmrip-profile-editor.glade.h:14
+msgid "<b>More Options</b>"
+msgstr ""
+
+#: ../data/ogmrip-profile-editor.glade.h:15
+msgid "<b>Options</b>"
+msgstr "<b>Параметры</b>"
+
+#: ../data/ogmrip-profile-editor.glade.h:16
+msgid "<b>Text Options</b>"
+msgstr "<b>Параметры текста</b>"
+
+#: ../data/ogmrip-profile-editor.glade.h:17
+msgid ""
+"Automatic\n"
+"XviD\n"
+"DivX 4\n"
+"Divx 5\n"
+"FFMpeg"
+msgstr ""
+"Автоматически\n"
+"XviD\n"
+"DivX 4\n"
+"Divx 5\n"
+"FFMpeg"
+
+#: ../data/ogmrip-profile-editor.glade.h:22
+msgid ""
+"Dramatically speeds up pass one using faster algorithms and disabling CPU-"
+"intensive options. This will probably reduce global PSNR a little bit "
+"(around 0.01dB) and change individual frame type and PSNR little bit more "
+"(up to 0.03dB)."
+msgstr ""
+"Резко ускоряет первый проход, используя более быстрые алгоритмы и отключая "
+"CPU-интенсивные опции. Это, вероятно, уменьшит общий PSNR немного (около "
+"0.01дБ) и изменит отдельные кадры и PSNR немного больше (до 0.03dB)."
+
+#: ../data/ogmrip-profile-editor.glade.h:23
+msgid "E_xpand image to maximum size"
+msgstr ""
+
+#: ../data/ogmrip-profile-editor.glade.h:24
+msgid "Ensure A/V _synchronisation"
+msgstr "Убедиться в аудио/видео синхронизации"
+
+#: ../data/ogmrip-profile-editor.glade.h:25
+msgid ""
+"Extreme\n"
+"High\n"
+"Normal"
+msgstr ""
+"Очень высокое\n"
+"Высокое\n"
+"Нормальное"
+
+#: ../data/ogmrip-profile-editor.glade.h:28
+msgid ""
+"Fixed size\n"
+"Constant bitrate\n"
+"Constant quantizer"
+msgstr ""
+"Фиксированный размер \n"
+"Постоянный битрейт \n"
+"Постоянный квантователь"
+
+#: ../data/ogmrip-profile-editor.glade.h:31
+msgid "Four_CC:"
+msgstr "Four_CC:"
+
+#: ../data/ogmrip-profile-editor.glade.h:32
+msgid ""
+"Line feed only (Unix, Mac)\n"
+"Carriage return + Line feed (Dos, Windows)\n"
+"Carriage return only (Other)"
+msgstr ""
+
+#: ../data/ogmrip-profile-editor.glade.h:35
+msgid "MB"
+msgstr "МБайт"
+
+#: ../data/ogmrip-profile-editor.glade.h:36
+msgid ""
+"MPEG-4 uses a half pixel precision for its motion search by default. The "
+"standard proposes a mode where encoders are allowed to use quarter pixel "
+"precision. This option usually results in a sharper image. Unfortunately it "
+"has a great impact on bitrate and sometimes the higher bitrate use will "
+"prevent it from giving a better image quality at a fixed bitrate. It's "
+"better to test with and without this option and see whether it is worth "
+"activating."
+msgstr ""
+
+#: ../data/ogmrip-profile-editor.glade.h:37
+msgid "M_aximum image size:"
+msgstr ""
+
+#: ../data/ogmrip-profile-editor.glade.h:38
+msgid "M_inimum image size:"
+msgstr ""
+
+#: ../data/ogmrip-profile-editor.glade.h:39
+msgid "Maximizes the volume without distorting the sound."
+msgstr "Максимизировать громкость без искажения звука"
+
+#: ../data/ogmrip-profile-editor.glade.h:40
+msgid ""
+"Mono\n"
+"Stereo\n"
+"Surround\n"
+"5.1"
+msgstr ""
+"Mono\n"
+"Stereo\n"
+"Surround\n"
+"5.1"
+
+#: ../data/ogmrip-profile-editor.glade.h:44
+msgid ""
+"No Scaling\n"
+"Fast Bilinear\n"
+"Bilinear\n"
+"Bicubic\n"
+"Experimental\n"
+"Nearest Neighbour\n"
+"Area\n"
+"Luma Bicubic Chroma Bilinear\n"
+"Gauss (best for downscaling)\n"
+"SincR\n"
+"Lanczos (best for upscaling)\n"
+"Bicubic Spline"
+msgstr ""
+
+#: ../data/ogmrip-profile-editor.glade.h:56 ../src/ogmrip-queue-dialog.c:683
+msgid "Profile"
+msgstr "Профиль"
+
+#: ../data/ogmrip-profile-editor.glade.h:57
+msgid "Reduce image _noise"
+msgstr "Уменьшить шум изображения"
+
+#: ../data/ogmrip-profile-editor.glade.h:58
+msgid "S_caler:"
+msgstr "Способ _масштабирования"
+
+#: ../data/ogmrip-profile-editor.glade.h:59
+msgid "Sample _Rate:"
+msgstr "Частота дискретизации:"
+
+#: ../data/ogmrip-profile-editor.glade.h:60
+msgid "Spell _Checking"
+msgstr "_Проверка правописания"
+
+#: ../data/ogmrip-profile-editor.glade.h:61
+msgid "T_rellis searched quantization"
+msgstr ""
+
+#: ../data/ogmrip-profile-editor.glade.h:62
+msgid "T_urbo"
+msgstr "Турбо"
+
+#: ../data/ogmrip-profile-editor.glade.h:63
+msgid "The audio quality from 0 (very low) to 10 (very high)"
+msgstr "Качество аудио от 0 (очень низкое) до 10 (очень высокое)"
+
+#: ../data/ogmrip-profile-editor.glade.h:64
+msgid "The maximum number of audio channels"
+msgstr "Максимальное число аудиоканалов"
+
+#: ../data/ogmrip-profile-editor.glade.h:65
+msgid ""
+"This filter aims to reduce image noise producing smooth images and making "
+"still images really still (This should enhance compressibility.)."
+msgstr ""
+"Этот фильтр направлен на снижение шума изображения, производство гладких "
+"изображений и делать неподвижные изображения действительно неподвижными (Это "
+"должно улучшить сжимаемость.)."
+
+#: ../data/ogmrip-profile-editor.glade.h:66
+msgid ""
+"Trellis quantization is a kind of adaptive quantization method that saves "
+"bits by modifying quantized coefficients to make them more compressible by "
+"the entropy encoder. Its impact on quality is good."
+msgstr ""
+
+#: ../data/ogmrip-profile-editor.glade.h:67
+msgid ""
+"UTF-8\n"
+"ISO-8859-1\n"
+"ASCII"
+msgstr ""
+"UTF-8\n"
+"ISO-8859-1\n"
+"ASCII"
+
+#: ../data/ogmrip-profile-editor.glade.h:70
+msgid "Use _quarter pel motion compensation"
+msgstr ""
+
+#: ../data/ogmrip-profile-editor.glade.h:71
+msgid "Use a deblocking filter"
+msgstr "Использовать деблокирующий фильтр"
+
+#: ../data/ogmrip-profile-editor.glade.h:72
+msgid "Use a deringing filter"
+msgstr ""
+
+#: ../data/ogmrip-profile-editor.glade.h:73
+msgid "_Audio"
+msgstr "_Аудио"
+
+#: ../data/ogmrip-profile-editor.glade.h:74
+msgid "_Bitrate:"
+msgstr "_Битрейт:"
+
+#: ../data/ogmrip-profile-editor.glade.h:75
+msgid "_Channels:"
+msgstr "_Каналы:"
+
+#: ../data/ogmrip-profile-editor.glade.h:76
+msgid "_Character Set:"
+msgstr "Набор символов:"
+
+#: ../data/ogmrip-profile-editor.glade.h:77
+msgid "_Codec:"
+msgstr "Кодек:"
+
+#: ../data/ogmrip-profile-editor.glade.h:78
+msgid "_Crop image"
+msgstr "К_адрировать изображение"
+
+#: ../data/ogmrip-profile-editor.glade.h:79 ../src/ogmrip-main.c:3100
+msgid "_Edit"
+msgstr "_Правка"
+
+#: ../data/ogmrip-profile-editor.glade.h:80
+msgid "_Forced subtitles only"
+msgstr ""
+
+#: ../data/ogmrip-profile-editor.glade.h:81
+msgid "_Format:"
+msgstr "_Формат:"
+
+#: ../data/ogmrip-profile-editor.glade.h:83
+msgid "_Method:"
+msgstr "_Метод:"
+
+#: ../data/ogmrip-profile-editor.glade.h:84
+msgid "_Newline:"
+msgstr "_Новая строка:"
+
+#: ../data/ogmrip-profile-editor.glade.h:85
+msgid "_Normalize"
+msgstr "Нормализовать"
+
+#: ../data/ogmrip-profile-editor.glade.h:86
+msgid "_Options"
+msgstr "_Настройки"
+
+#: ../data/ogmrip-profile-editor.glade.h:87
+msgid "_Passes:"
+msgstr "Проходы:"
+
+#: ../data/ogmrip-profile-editor.glade.h:88
+msgid "_Quality:"
+msgstr "_Качество:"
+
+#: ../data/ogmrip-profile-editor.glade.h:89
+msgid "_Quantizer:"
+msgstr "Квантователь:"
+
+#: ../data/ogmrip-profile-editor.glade.h:90
+msgid "_Size:"
+msgstr "_Размер:"
+
+#: ../data/ogmrip-profile-editor.glade.h:91
+msgid "_Subtitles"
+msgstr "_Субтитры"
+
+#: ../data/ogmrip-profile-editor.glade.h:92
+msgid "_Video"
+msgstr "_Видео"
+
+#: ../data/ogmrip-profile-editor.glade.h:93
+msgid "kbps"
+msgstr "кбит/с"
+
+#: ../data/ogmrip-profile-editor.glade.h:94
+msgid "video"
+msgstr "видео"
+
+#: ../data/ogmrip-profiles.glade.h:1 ../src/ogmrip-queue-dialog.c:577
+msgid "_Export"
+msgstr "_Экспорт"
+
+#: ../data/ogmrip-profiles.glade.h:2 ../src/ogmrip-queue-dialog.c:576
+msgid "_Import"
+msgstr "_Импорт"
+
+#: ../data/ogmrip-profiles.glade.h:3
+msgid "_Profiles:"
+msgstr "_Профили:"
+
+#: ../data/ogmrip-profiles.glade.h:4
+msgid "_Rename"
+msgstr "_Переименовать"
+
+#: ../data/ogmrip-progress.glade.h:1
+msgid "Estimated time left:"
+msgstr "Осталось примерно:"
+
+#: ../data/ogmrip-progress.glade.h:2 ../src/ogmrip-progress-dialog.c:393
+msgid "Progress"
+msgstr "Прогрес"
+
+#: ../data/ogmrip-progress.glade.h:3
+msgid "Unknown"
+msgstr "Неизвестно"
+
+#: ../data/ogmrip-progress.glade.h:4
+msgid "_Close the application if the encoding is successful"
+msgstr "Закрыть программу, если кодирование удачно"
+
+#: ../data/ogmrip-queue.glade.h:1
+msgid "Move encoding down"
+msgstr "Переместить ниже"
+
+#: ../data/ogmrip-queue.glade.h:2
+msgid "Move encoding to bottom"
+msgstr "Переместить вниз"
+
+#: ../data/ogmrip-queue.glade.h:3
+msgid "Move encoding to top"
+msgstr "Переместить наверх"
+
+#: ../data/ogmrip-queue.glade.h:4
+msgid "Move encoding up"
+msgstr "Переместить выше"
+
+#: ../data/ogmrip-spell.glade.h:1
+msgid "A_dd Word"
+msgstr "Добавить слово"
+
+#: ../data/ogmrip-spell.glade.h:2
+msgid "Ignore _All"
+msgstr "Игнорировать в_се"
+
+#: ../data/ogmrip-spell.glade.h:3
+msgid "Mispelled word:"
+msgstr "Неверно написанное слово:"
+
+#: ../data/ogmrip-spell.glade.h:4
+msgid "Replace _with:"
+msgstr "Заменить на:"
+
+#: ../data/ogmrip-spell.glade.h:5 ../src/ogmrip-spell-dialog.c:202
+msgid "Spell Checking"
+msgstr "Проверка правописания"
+
+#: ../data/ogmrip-spell.glade.h:6
+msgid "_Ignore"
+msgstr "_Игнорировать"
+
+#: ../data/ogmrip-spell.glade.h:7
+msgid "_Replace"
+msgstr "_Заменить"
+
+#: ../data/ogmrip-update.glade.h:1
+msgid ""
+"<b><big>Profile updates are available</big></b>\n"
+"Select the profiles you want to update"
+msgstr ""
+"<b><big>Доступны обновления профилей</big></b>\n"
+"Выберите профили которые хотите обновить"
+
+#: ../data/ogmrip-update.glade.h:3 ../src/ogmrip-main.c:3101
+msgid "Select _All"
+msgstr "Выделить Всё"
+
+#: ../data/ogmrip-update.glade.h:4 ../src/ogmrip-main.c:3102
+msgid "_Deselect All"
+msgstr "_Снять выделение"
+
+#: ../data/ogmrip-x264.glade.h:1
+msgid "<b>Analysis</b>"
+msgstr "<b>Анализ</b>"
+
+#: ../data/ogmrip-x264.glade.h:2
+msgid "<b>Frame type</b>"
+msgstr "Тип кадра"
+
+#: ../data/ogmrip-x264.glade.h:3 ../data/ogmrip-xvid.glade.h:16
+msgid "<b>Other</b>"
+msgstr "<b>Прочее</b>"
+
+#: ../data/ogmrip-x264.glade.h:4
+msgid "<b>Presets</b>"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:5
+msgid "<b>Rate control</b>"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:6
+msgid "Adaptive B-frame placement decision algorithm (b_adapt)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:7
+msgid "Adaptive spatial transform size (8x8dct)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:8
+msgid ""
+"Allows B-frames to be used as references for predicting other frames "
+"(b_pyramid)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:9
+msgid ""
+"Allows each 8x8 or 16x8 motion partition to independently select a reference "
+"frame (mixed_refs)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:10
+msgid "Analysis"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:11
+msgid "Averaging period for vbv_maxrate, in kbits (vbv_bufsize)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:12
+msgid ""
+"Baseline (no 8x8dct, no cabac, no weight_p, no cqm, no bframes)\n"
+"Main (no 8x8dct and no cqm)\n"
+"High (no restriction)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:15
+msgid ""
+"Diamond search, radius 1 (dia - fast)\n"
+"Hexagon search, radius 2 (hex)\n"
+"Uneven multi-hexagon search (umh - slow)\n"
+"Exhaustive search (esa - very slow)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:19
+msgid ""
+"Disabled\n"
+"Blind offset\n"
+"Smart analysis"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:22
+msgid ""
+"Enables rate-distortion optimization of macroblock types in B-frames (brdo)"
+msgstr ""
+"Разрешить оптимизацию типов макроблоков в B-кадрах по соотношению сигнал-"
+"шум  (brdo)"
+
+#: ../data/ogmrip-x264.glade.h:23
+msgid "Encoding"
+msgstr "Кодирование"
+
+#: ../data/ogmrip-x264.glade.h:24
+msgid ""
+"Flat\n"
+"JVM"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:26
+msgid "Fullpixel motion estimation algorithm (me)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:27
+msgid "Maximum GOP size (keyint)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:28
+msgid "Maximum local bitrate, in kbits/second (vbv_maxrate)"
+msgstr "Максимальный локальный битрейт, в кбит/секунду (vbv_maxrate)"
+
+#: ../data/ogmrip-x264.glade.h:29
+msgid "Maximum motion vector search range (merange)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:30
+msgid ""
+"Maximum number of consecutive B-frames between I- and P-frames (bframes)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:31
+msgid ""
+"None\n"
+"Spatial\n"
+"Temporal\n"
+"Auto"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:35
+msgid ""
+"None\n"
+"Strict\n"
+"Normal"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:38
+msgid "Number of frames for frametype lookahead (rc-lookahead)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:39
+msgid ""
+"Number of previous frames used as predictors in B- and  P-frames (frameref)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:40
+msgid "Prediction mode for 'direct' motion vectors (direct_pred)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:41
+msgid "Preset quantization matrices (cqm)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:42
+msgid "Profile of the output stream (profile)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:43
+msgid "Set the bitstream's level (level_idc)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:44
+msgid "Strength of rate-distortion psychovisual optimization (psy-rd)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:45
+msgid "Strength of trellis psychovisual optimization (psy-trellis)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:46
+msgid "Subpel refinement quality (subq)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:47
+msgid "Use access unit delimiters (aud)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:48
+msgid "Use context-adaptive binary arithmetic coding (cabac)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:49
+msgid "Use global header (global_header)"
+msgstr "Использовать глобальный заголовок (global_header)"
+
+#: ../data/ogmrip-x264.glade.h:50
+msgid "Use small macroblocks (partitions)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:51
+msgid "Use weighted prediction in B-frames (weight_b)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:52
+msgid "Weighted prediction for P-frames (weight_p)"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:1
+msgid ""
+"0 - Off\n"
+"1 - Mode decision\n"
+"2 - Limited search\n"
+"3 - Medium search\n"
+"4 - Wide search"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:6
+msgid ""
+"0 - Off\n"
+"1 - Very low\n"
+"2 - Low\n"
+"3 - Medium\n"
+"4 - High\n"
+"5 - Very high\n"
+"6 - Ultra high"
+msgstr ""
+"0 - Выключено\n"
+"1 - Очень низкая\n"
+"2 - Низкая\n"
+"3 - Средняя\n"
+"4 - Высокая\n"
+"5 - Очень высокая\n"
+"6 - Ultra high"
+
+#: ../data/ogmrip-xvid.glade.h:13
+msgid "<b>B-VOPs</b>"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:14
+msgid "<b>General</b>"
+msgstr "<b>Основные</b>"
+
+#: ../data/ogmrip-xvid.glade.h:15
+msgid "<b>Motion Precision</b>"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:17
+msgid "<b>Pixel aspect ratio</b>"
+msgstr "<b>Коэффициент пропорциональности пикселя</b>"
+
+#: ../data/ogmrip-xvid.glade.h:18
+msgid "<b>Restrictions</b>"
+msgstr "<b>Ограничения</b>"
+
+#: ../data/ogmrip-xvid.glade.h:19
+msgid "Adaptative quantization (b_adapt)"
+msgstr "Адаптивное квантование (b_adapt)"
+
+#: ../data/ogmrip-xvid.glade.h:20
+msgid "Allow vector candidates for B-frames (bvhq)"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:21
+msgid "Closed GOP (closed_gop)"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:22
+msgid "Enable  a  chroma  optimizer  prefilter (chroma_opt)"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:23
+msgid "Frame drop ratio (frame_drop_ratio):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:24
+msgid "Global motion compensation (gmc)"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:25
+msgid "Interlaced encoding (interlacing)"
+msgstr "Чересстрочное кодирование (interlacing)"
+
+#: ../data/ogmrip-xvid.glade.h:26
+msgid "Max B-frame quantizer (max_bquant):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:27
+msgid "Max I-frame quantizer (max_iquant):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:28
+msgid "Max P-frame quantizer (max_pquant):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:29
+msgid "Max consecutive B-VOPs (max_bframes):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:30
+msgid "Maximum I-frame interval (max_key_interval):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:31
+msgid "Min B-frame quantizer (min_bquant):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:32
+msgid "Min I-frame quantizer (min_iquant):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:33
+msgid "Min P-frame quantizer (min_pquant):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:34
+msgid "Misc"
+msgstr "Прочее"
+
+#: ../data/ogmrip-xvid.glade.h:35
+msgid "Motion"
+msgstr "Движение"
+
+#: ../data/ogmrip-xvid.glade.h:36
+msgid "Motion search precision (me_quality):"
+msgstr "Точность поиска движения (me_quality):"
+
+#: ../data/ogmrip-xvid.glade.h:37
+msgid ""
+"No restrictions\n"
+"Simple level 0\n"
+"Simple level 1\n"
+"Simple level 2\n"
+"Simple level 3\n"
+"Advanced simple level 0\n"
+"Advanced simple level 1\n"
+"Advanced simple level 2\n"
+"Advanced simple level 3\n"
+"Advanced simple level 4\n"
+"Advanced simple level 5\n"
+"DXN handheld\n"
+"DXN portable NTSC\n"
+"DXN portable PAL\n"
+"DXN home theater NTSC\n"
+"DXN home theater PAL \n"
+"DXN HDTV"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:54
+msgid ""
+"None\n"
+"PC content\n"
+"PAL standard 4:3 PAR  \n"
+"PAL standard 16:9 PAR \n"
+"NTSC standard 4:3 PAR \n"
+"NTSC standard 16:6 PAR\n"
+"Custom"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:61
+msgid "Packed bitstream (packed)"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:62
+msgid "Pixel aspect ratio (par):"
+msgstr "Соотношение сторон пикселя (par):"
+
+#: ../data/ogmrip-xvid.glade.h:63
+msgid "Profile (profile):"
+msgstr "Профиль (profile):"
+
+#: ../data/ogmrip-xvid.glade.h:64
+msgid "Quantization"
+msgstr "Квантование"
+
+#: ../data/ogmrip-xvid.glade.h:65
+msgid "Quantization type (quant_type):"
+msgstr "Тип квантования (quant_type):"
+
+#: ../data/ogmrip-xvid.glade.h:66
+msgid "Quantizer offset (bquant_offset):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:67
+msgid "Quantizer ratio (bquant_ratio):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:68
+msgid "Use chroma motion (chroma_me)"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:69
+msgid "VHQ mode (vhq):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:70
+msgid "Width x height:"
+msgstr "Ширина х высота:"
+
+#: ../data/ogmrip-xvid.glade.h:71
+msgid ""
+"h263\n"
+"mpeg"
+msgstr ""
+"h263\n"
+"mpeg"
+
+#: ../data/profiles.xml.in.h:1
+msgid ""
+"&lt;b&gt;DivX for Standalone Player&lt;/b&gt;&#xA;2-pass, 1x700MB (AVI + "
+"XviD + MP3)"
+msgstr ""
+"&lt;b&gt;DivX для Аппарантых проигрывателй&lt;/b&gt;&#xA;2 прохода, 1x700MB "
+"(AVI + XviD + MP3)"
+
+#: ../data/profiles.xml.in.h:2
+msgid "&lt;b&gt;PC, High Quality&lt;/b&gt;&#xA;Quantizer 2 (MKV + X264 + AAC)"
+msgstr ""
+"&lt;b&gt;PC, Высокое качество&lt;/b&gt;&#xA;Квантователь: 2 (MKV + X264 + "
+"AAC)"
+
+#: ../data/profiles.xml.in.h:3
+msgid ""
+"&lt;b&gt;PC, Low Quality&lt;/b&gt;&#xA;1-pass, 1x700MB (OGM + Lavc + Vorbis)"
+msgstr ""
+"&lt;b&gt;PC, Низкое качество&lt;/b&gt;&#xA;1 проход, 1x700MB (OGM + Lavc + "
+"Vorbis)"
+
+#: ../libogmdvd/ogmdvd-disc.c:113
+#, c-format
+msgid "No such file or directory"
+msgstr "Нет такого файла или каталога"
+
+#: ../libogmdvd/ogmdvd-disc.c:117
+#, c-format
+msgid "Permission denied to access device"
+msgstr "Нет прав на доступ к устройству"
+
+#: ../libogmdvd/ogmdvd-disc.c:123
+#, c-format
+msgid "Tray seems to be open"
+msgstr "Лоток DVD возможно открыт"
+
+#: ../libogmdvd/ogmdvd-disc.c:125
+#, c-format
+msgid "Device does not contain a valid DVD video"
+msgstr "Устройство не содержит корректный DVD"
+
+#: ../libogmdvd/ogmdvd-disc.c:128
+#, c-format
+msgid "Path does not contain a valid DVD structure"
+msgstr "Путь не содержит корректный DVD"
+
+#: ../libogmdvd/ogmdvd-disc.c:130
+#, c-format
+msgid "No such directory, block device or iso file"
+msgstr "Нет такой папки, устройства или iso файла"
+
+#: ../libogmdvd/ogmdvd-disc.c:629
+#, c-format
+msgid "Cannot open video manager"
+msgstr ""
+
+#: ../libogmdvd/ogmdvd-disc.c:692 ../libogmrip/ogmrip-encoding.c:3402
+#, c-format
+msgid "Device does not contain the expected DVD"
+msgstr "Устройство не содержит ожидаемый DVD"
+
+#: ../libogmdvd/ogmdvd-title.c:94
+#, c-format
+msgid "Cannot open video titleset"
+msgstr ""
+
+#: ../libogmdvd-gtk/ogmdvd-chapter-list.c:108
+#: ../libogmdvd-gtk/ogmdvd-chapter-list.c:246
+msgid "Chapter"
+msgstr "Глава"
+
+#: ../libogmdvd-gtk/ogmdvd-chapter-list.c:112
+msgid "Duration"
+msgstr "Продолжительность"
+
+#: ../libogmdvd-gtk/ogmdvd-chapter-list.c:116
+msgid "Label"
+msgstr "Метка"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-dialog.c:122
+msgid "Open DVD Disk"
+msgstr "Открыть DVD диск"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-dialog.c:146
+msgid "_Eject"
+msgstr "_Извлечь"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-dialog.c:177
+msgid "<b>Select _DVD Drive:</b>"
+msgstr "<b>Выберите DVD привод:</b>"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:220
+msgid "Select an ISO file"
+msgstr "Выбрать ISO образ"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:220
+msgid "Select a DVD structure"
+msgstr "Выбрать папку с DVD структурой"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:245
+msgid "ISO images"
+msgstr "ISO-образы"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:383
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:534
+msgid ""
+"<b>No DVD</b>\n"
+"No device"
+msgstr ""
+"<b>Нет DVD диска</b>\n"
+"Нет устройства"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:407
+msgid "Unknown Drive"
+msgstr "Неизвестный диск"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:543
+msgid "Select a DVD structure..."
+msgstr "Выбрать папку с DVD структурой..."
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:547
+msgid "Select an ISO file..."
+msgstr "Выбрать ISO образ ..."
+
+#: ../libogmdvd-gtk/ogmdvd-title-chooser-widget.c:234
+msgid "hours"
+msgstr "часов"
+
+#: ../libogmdvd-gtk/ogmdvd-title-chooser-widget.c:236
+msgid "minutes"
+msgstr "минут"
+
+#: ../libogmdvd-gtk/ogmdvd-title-chooser-widget.c:238
+msgid "seconds"
+msgstr "секунд"
+
+#: ../libogmdvd-gtk/ogmdvd-title-chooser-widget.c:240
+#: ../src/ogmrip-queue-dialog.c:679
+msgid "Title"
+msgstr "Глава"
+
+#: ../libogmrip/ogmrip-aac.c:183
+msgid "Advanced Audio Coding (AAC)"
+msgstr "Advanced Audio Coding (AAC)"
+
+#: ../libogmrip/ogmrip-aac.c:207
+#, c-format
+msgid "MPlayer and FAAC are missing"
+msgstr "MPlayer и FAAC не найдены"
+
+#: ../libogmrip/ogmrip-aac.c:209 ../libogmrip/ogmrip-mp3.c:235
+#: ../libogmrip/ogmrip-vorbis.c:207 ../libogmrip/ogmrip-wav.c:124
+#, c-format
+msgid "MPlayer is missing"
+msgstr "MPlayer не найден"
+
+#: ../libogmrip/ogmrip-aac.c:211
+#, c-format
+msgid "FAAC is missing"
+msgstr "FAAC не найден"
+
+#: ../libogmrip/ogmrip-acopy.c:157
+msgid "Copy (for AC3 or DTS)"
+msgstr "Копия (для AC3 или DTS)"
+
+#: ../libogmrip/ogmrip-avi.c:300
+msgid "Audio-Video Interlace (AVI)"
+msgstr "Audio-Video Interlace (AVI)"
+
+#: ../libogmrip/ogmrip-encoding.c:1788
+#, c-format
+msgid "Unknown error while extracting chapters"
+msgstr "Неизвестная ошибка при извлечении глав"
+
+#: ../libogmrip/ogmrip-encoding.c:1883
+#, c-format
+msgid "Unknown error while extracting subtitle stream"
+msgstr "Неизвестная ошибка по время извлечения потока субтитров"
+
+#: ../libogmrip/ogmrip-encoding.c:1999
+#, c-format
+msgid "Unknown error while extracting audio stream"
+msgstr "Неизвестная ошибка по время извлечения аудио потока"
+
+#: ../libogmrip/ogmrip-encoding.c:2243
+#, c-format
+msgid "Unknown error while extracting video stream"
+msgstr "Неизвестная ошибка во время извлечения видео потока"
+
+#: ../libogmrip/ogmrip-encoding.c:2281
+#, c-format
+msgid "Unknown error while merging"
+msgstr "Неизвестная ошибка при слиянии"
+
+#: ../libogmrip/ogmrip-encoding.c:3028
+#, c-format
+msgid "The container and the video codec are incompatible."
+msgstr "Контейнер и видео кодек не совместимы"
+
+#: ../libogmrip/ogmrip-encoding.c:3063
+#, c-format
+msgid "Your version of MPlayer does not support DTS streams"
+msgstr "Ваша версия MPlayer`а не поддерживает DTS потоки"
+
+#: ../libogmrip/ogmrip-encoding.c:3074
+#, c-format
+msgid "The container and the audio codec are incompatible."
+msgstr "Контейнер и аудио кодек не совместимы"
+
+#: ../libogmrip/ogmrip-encoding.c:3098
+#, c-format
+msgid "It is not possible to hardcode multiple subtitle streams"
+msgstr ""
+
+#: ../libogmrip/ogmrip-encoding.c:3109
+#, c-format
+msgid "The container and the subtitles codec are incompatible."
+msgstr "Контейнер и  кодек субтитров не совместимы"
+
+#: ../libogmrip/ogmrip-encoding.c:3122
+#, c-format
+msgid "The container and the audio file are incompatible."
+msgstr "Контейнер и аудио файл не совместимы"
+
+#: ../libogmrip/ogmrip-encoding.c:3135
+#, c-format
+msgid "The container and the subtitles file are incompatible."
+msgstr "Контейнер и файл субтитров не совместимы"
+
+#: ../libogmrip/ogmrip-encoding.c:3148
+#, c-format
+msgid "The selected container does not support multiple audio streams"
+msgstr "Выбранный контейнер не поддерживает множественные аудио потоки."
+
+#: ../libogmrip/ogmrip-encoding.c:3161
+#, c-format
+msgid "The selected container does not support multiple subtitles streams"
+msgstr "Выбраннй контейнер не поддерживает множественные потоки субтитров"
+
+#: ../libogmrip/ogmrip-encoding.c:3177
+#, c-format
+msgid "No container has been selected."
+msgstr "Контейнер ещё не был выбран."
+
+#: ../libogmrip/ogmrip-encoding.c:3243 ../libogmrip/ogmrip-encoding.c:3253
+#, c-format
+msgid "Failed to get mount point of '%s'"
+msgstr "Не получить получить точку монтирования '%s'"
+
+#: ../libogmrip/ogmrip-encoding.c:3266
+#, c-format
+msgid "Not enough space to store output and temporary files (%sMB needed)."
+msgstr ""
+"Не достаточно места для записи результата и временных файлов (%sMB нужно)."
+
+#: ../libogmrip/ogmrip-encoding.c:3279
+#, c-format
+msgid "Not enough space to store the temporary files (%sMB needed)."
+msgstr "Не достаточно места для записи временных файлов (%sMB нужно)."
+
+#: ../libogmrip/ogmrip-encoding.c:3291
+#, c-format
+msgid "Not enough space to store the output file (%sMB needed)."
+msgstr "Не достаточно места для записи результата (%sMB нужно)."
+
+#: ../libogmrip/ogmrip-encoding.c:3363 ../libogmrip/ogmrip-encoding.c:3372
+#: ../libogmrip/ogmrip-encoding.c:3389
+#, c-format
+msgid "The file %s does not seem to contain a valid encoding"
+msgstr "По-видимому, файл %s не содержит правильной кодировки"
+
+#: ../libogmrip/ogmrip-encoding.c:5823
+#, c-format
+msgid "A file named '%s' already exists."
+msgstr "Файл с именем '%s' уже существует."
+
+#: ../libogmrip/ogmrip-encoding.c:5997
+#, c-format
+msgid "Unknown error while copying the DVD on the hard drive"
+msgstr "Неизвестная ошибка при копировании DVD на жесткий диск"
+
+#: ../libogmrip/ogmrip-encoding.c:6047
+#, c-format
+msgid ""
+"Cannot perform a compressibility test when the video codec is not defined."
+msgstr "Невозможно произвести тест сжимаемости когда видео кодек не определён."
+
+#: ../libogmrip/ogmrip-encoding.c:6054
+#, c-format
+msgid ""
+"Cannot perform a compressibility test when cropping parameters are not "
+"defined."
+msgstr ""
+"Невозможно произвести тест сжимаемости когда параметры кадрирования не "
+"определены."
+
+#: ../libogmrip/ogmrip-encoding.c:6061
+#, c-format
+msgid ""
+"Cannot perform a compressibility test when scaling parameters are not "
+"defined."
+msgstr ""
+"Невозможно произвести тест сжимаемости когда параметры масштабирования не "
+"определены."
+
+#: ../libogmrip/ogmrip-encoding.c:6068
+#, c-format
+msgid ""
+"Cannot perform a compressibility test when encoding at constant quantizer."
+msgstr ""
+"Невозможно произвести тест сжимаемости при кодировании с постоянным "
+"коэффициентом квантования."
+
+#: ../libogmrip/ogmrip-file.c:512 ../libogmrip/ogmrip-file.c:773
+#: ../libogmrip/ogmrip-file.c:843 ../libogmrip/ogmrip-file.c:987
+#, c-format
+msgid "Unknown error while identifying '%s'"
+msgstr "Неизвесная ошибка при идентификации  '%s'"
+
+#: ../libogmrip/ogmrip-file.c:541 ../libogmrip/ogmrip-file.c:1026
+#, c-format
+msgid "Cannot identify file '%s': %s"
+msgstr "Невозможно идентифицировать '%s': %s"
+
+#: ../libogmrip/ogmrip-file.c:553 ../libogmrip/ogmrip-file.c:1038
+#, c-format
+msgid "Cannot get bitrate of file '%s'"
+msgstr "Невозможно установить битрейт файла '%s'"
+
+#: ../libogmrip/ogmrip-file.c:560
+#, c-format
+msgid "Cannot get rate of file '%s'"
+msgstr ""
+
+#: ../libogmrip/ogmrip-file.c:567 ../libogmrip/ogmrip-file.c:1045
+#, c-format
+msgid "Cannot get length of file '%s'"
+msgstr "Невозможно получить размер файла '%s'"
+
+#: ../libogmrip/ogmrip-file.c:574 ../libogmrip/ogmrip-file.c:793
+#: ../libogmrip/ogmrip-file.c:863 ../libogmrip/ogmrip-file.c:1052
+#, c-format
+msgid "Cannot get format of file '%s'"
+msgstr "Невозможно получить формат файла '%s'"
+
+#: ../libogmrip/ogmrip-file.c:581
+#, c-format
+msgid "Cannot get number of channels of file '%s'"
+msgstr "Невозможно получить колличество каналов в файле '%s'"
+
+#: ../libogmrip/ogmrip-file.c:588
+#, c-format
+msgid "File '%s' contains video tracks"
+msgstr "Файл '%s' содержит видео дороджки"
+
+#: ../libogmrip/ogmrip-file.c:596
+#, c-format
+msgid "Format of file '%s' is not supported"
+msgstr "Фаормат файла '%s' не поддерживается"
+
+#: ../libogmrip/ogmrip-file.c:607 ../libogmrip/ogmrip-file.c:805
+#: ../libogmrip/ogmrip-file.c:875 ../libogmrip/ogmrip-file.c:1091
+#, c-format
+msgid "Unknown error while opening '%s': %s"
+msgstr "Неизвестная ошибка при открытии '%s': %s"
+
+#: ../libogmrip/ogmrip-file.c:1059
+#, c-format
+msgid "Cannot get width of video file '%s'"
+msgstr "Немозожно получить ширина видео файла '%s'"
+
+#: ../libogmrip/ogmrip-file.c:1066
+#, c-format
+msgid "Cannot get height of video file '%s'"
+msgstr "Немозожно получить высоту видео файла '%s'"
+
+#: ../libogmrip/ogmrip-file.c:1073
+#, c-format
+msgid "Cannot get aspect ratio of video file '%s'"
+msgstr "Не удается получить пропорции видео-файла '%s'"
+
+#: ../libogmrip/ogmrip-file.c:1080
+#, c-format
+msgid "Cannot get frame rate of video file '%s'"
+msgstr "Невозможно получить частоту кадров видео файла '%s'"
+
+#: ../libogmrip/ogmrip-fs.c:103 ../libogmrip/ogmrip-fs.c:297
+#, c-format
+msgid "Failed to create directory '%s': %s"
+msgstr "Не удалось создать директорию '%s': %s"
+
+#: ../libogmrip/ogmrip-fs.c:160
+#, c-format
+msgid "Failed to unlink file '%s': %s"
+msgstr "Не удалось удалить файл '%s': %s"
+
+#: ../libogmrip/ogmrip-fs.c:174
+#, c-format
+msgid "Failed to remove directory '%s': %s"
+msgstr "Не удалось удалить директорию '%s': %s"
+
+#: ../libogmrip/ogmrip-fs.c:205 ../libogmrip/ogmrip-fs.c:407
+#, c-format
+msgid "Failed to create file '%s': %s"
+msgstr "Не удалось создать файл «%s»: %s"
+
+#: ../libogmrip/ogmrip-fs.c:249
+#, c-format
+msgid "Failed to create fifo '%s': %s"
+msgstr "Не удалось создать fifo '%s': %s"
+
+#: ../libogmrip/ogmrip-fs.c:349
+#, c-format
+msgid "Failed to link '%s': %s"
+msgstr "Не удалось слинковать '%s': %s"
+
+#: ../libogmrip/ogmrip-fs.c:385
+#, c-format
+msgid "Template '%s' doesn't end with XXXXXX"
+msgstr "Шаблон \"%s\" не заканчивается на XXXXXX"
+
+#: ../libogmrip/ogmrip-fs.c:396
+#, c-format
+msgid "Template '%s' invalid, should not contain a '/'"
+msgstr "Шаблон '%s' неверен: не должен содержать '/'"
+
+#: ../libogmrip/ogmrip-fs.c:465
+#, c-format
+msgid "Failed to stat the file system containing '%s': %s"
+msgstr ""
+"Не удалось получить информацию о файловой системе, содержащей  '%s': %s"
+
+#: ../libogmrip/ogmrip-fs.c:508
+#, c-format
+msgid "Failed to stat '%s': %s"
+msgstr "Не удалось получить информацию  '%s': %s"
+
+#: ../libogmrip/ogmrip-fs.c:515
+#, c-format
+msgid "Failed to change to directory '%s': %s"
+msgstr "Не удалось перейти в директорию  '%s': %s"
+
+#: ../libogmrip/ogmrip-fs.c:524
+#, c-format
+msgid "Failed to stat '..': %s"
+msgstr "Не удалось получить информацию '..': %s"
+
+#: ../libogmrip/ogmrip-fs.c:534
+#, c-format
+msgid "Failed to change to directory '..': %s"
+msgstr "Не удалось перейти в директорию '..': %s"
+
+#: ../libogmrip/ogmrip-hardsub.c:44
+msgid "Hardcoded subtitle"
+msgstr ""
+
+#: ../libogmrip/ogmrip-lavc-mpeg4.c:65
+msgid "Lavc Mpeg-4"
+msgstr "Lavc Mpeg-4"
+
+#: ../libogmrip/ogmrip-mkv.c:463
+msgid "Matroska Media (MKV)"
+msgstr "Matroska Media (MKV)"
+
+#: ../libogmrip/ogmrip-mkv.c:501 ../libogmrip/ogmrip-mkv.c:519
+#, c-format
+msgid "mkvmerge is missing"
+msgstr "mkvmerge не найден"
+
+#: ../libogmrip/ogmrip-mov.c:66
+#, c-format
+msgid "An MOV file must contain a video stream."
+msgstr "MOV-файл должен содержать видеопоток."
+
+#: ../libogmrip/ogmrip-mov.c:144
+msgid "QuickTime Media (MOV)"
+msgstr "QuickTime Media (MOV)"
+
+#: ../libogmrip/ogmrip-mov.c:179 ../libogmrip/ogmrip-srt.c:556
+#: ../libogmrip/ogmrip-vobsub.c:282 ../libogmrip/ogmrip-x264.c:921
+#: ../libogmrip/ogmrip-xvid.c:928
+#, c-format
+msgid "MEncoder is missing"
+msgstr "MEncoder не найден"
+
+#: ../libogmrip/ogmrip-mov.c:191
+#, c-format
+msgid "MEncoder is build without lavf support"
+msgstr "MEncoder собран без поддержки lavf"
+
+#: ../libogmrip/ogmrip-mp3.c:209
+msgid "MPEG-1 layer III (MP3)"
+msgstr "MPEG-1 layer III (MP3)"
+
+#: ../libogmrip/ogmrip-mp3.c:233
+#, c-format
+msgid "MPlayer and LAME are missing"
+msgstr "MPlayer и LAME не найдены"
+
+#: ../libogmrip/ogmrip-mp3.c:237
+#, c-format
+msgid "LAME is missing"
+msgstr "LAME is missing"
+
+#: ../libogmrip/ogmrip-mp4.c:654
+msgid "Mpeg-4 Media (MP4)"
+msgstr "Mpeg-4 Media (MP4)"
+
+#: ../libogmrip/ogmrip-mp4.c:688
+#, c-format
+msgid "MP4Box is missing"
+msgstr "MP4Box не найден"
+
+#: ../libogmrip/ogmrip-novideo.c:32
+msgid "No Video"
+msgstr "Нет видео потока"
+
+#: ../libogmrip/ogmrip-ogg.c:433
+msgid "Ogg Media (OGM)"
+msgstr "Ogg Media (OGM)"
+
+#: ../libogmrip/ogmrip-ogg.c:477
+#, c-format
+msgid "ogmmerge and ogmsplit are missing"
+msgstr "ogmmerge и ogmsplit не найдены"
+
+#: ../libogmrip/ogmrip-ogg.c:479
+#, c-format
+msgid "ogmmerge is missing"
+msgstr "ogmmerge не найден"
+
+#: ../libogmrip/ogmrip-ogg.c:481
+#, c-format
+msgid "ogmsplit is missing"
+msgstr "ogmsplit не найден"
+
+#: ../libogmrip/ogmrip-plugin.c:152
+#, c-format
+msgid "Plugin %s disabled"
+msgstr "Модуль %s отключен"
+
+#: ../libogmrip/ogmrip-plugin.c:154
+msgid "some requirements are not available"
+msgstr ""
+
+#: ../libogmrip/ogmrip-settings.c:1648 ../libogmrip/ogmrip-settings.c:1786
+#, c-format
+msgid "Failed to open '%s'"
+msgstr "Невозможно открыть '%s'"
+
+#: ../libogmrip/ogmrip-settings.c:1656 ../libogmrip/ogmrip-settings.c:1667
+#: ../libogmrip/ogmrip-settings.c:1680 ../libogmrip/ogmrip-settings.c:1697
+#: ../libogmrip/ogmrip-settings.c:1705 ../libogmrip/ogmrip-settings.c:1794
+#: ../libogmrip/ogmrip-settings.c:1805 ../libogmrip/ogmrip-settings.c:1818
+#: ../libogmrip/ogmrip-settings.c:1835 ../libogmrip/ogmrip-settings.c:1843
+#, c-format
+msgid "'%s' does not contain a valid profile"
+msgstr "'%s' не содержить корректный профиль"
+
+#: ../libogmrip/ogmrip-srt.c:540
+msgid "SRT text"
+msgstr "SRT текст"
+
+#: ../libogmrip/ogmrip-srt.c:593
+#, c-format
+msgid "GOCR, Ocrad and Tesseract are missing"
+msgstr "GOCR, Ocrad и Tesseract не найдены"
+
+#: ../libogmrip/ogmrip-theora.c:215
+msgid "Ogg Theora"
+msgstr "Ogg Theora"
+
+#: ../libogmrip/ogmrip-vobsub.c:270
+msgid "VobSub"
+msgstr "VobSub"
+
+#: ../libogmrip/ogmrip-vorbis.c:181
+msgid "Ogg Vorbis"
+msgstr "Ogg Vorbis"
+
+#: ../libogmrip/ogmrip-vorbis.c:205
+#, c-format
+msgid "MPlayer and OggEnc are missing"
+msgstr "MPlayer и OggEnc не найдены"
+
+#: ../libogmrip/ogmrip-vorbis.c:209
+#, c-format
+msgid "OggEnc is missing"
+msgstr "OggEnc не найден"
+
+#: ../libogmrip/ogmrip-wav.c:113
+msgid "Wave (uncompressed PCM)"
+msgstr "Wave (несжатый PCM)"
+
+#: ../libogmrip/ogmrip-x264.c:828
+msgid "X264"
+msgstr "X264"
+
+#: ../libogmrip/ogmrip-x264.c:933
+#, c-format
+msgid "MEncoder is build without X264 support"
+msgstr "MEncoder собран без поддержки X264"
+
+#: ../libogmrip/ogmrip-xvid.c:910
+msgid "XviD"
+msgstr "XviD"
+
+#: ../libogmrip/ogmrip-xvid.c:940
+#, c-format
+msgid "MEncoder is built without XviD support"
+msgstr "MEncoderсобран без поддержки XviD"
+
+#: ../libogmrip-gtk/ogmrip-chapter-list.c:109
+msgid "Extract?"
+msgstr "Извлекать?"
+
+#: ../libogmrip-gtk/ogmrip-chooser-list.c:104
+msgid "More options"
+msgstr "Дополнительные параметры"
+
+#: ../libogmrip-gtk/ogmrip-chooser-list.c:109
+msgid "Add a stream"
+msgstr "Добавить поток"
+
+#: ../libogmrip-gtk/ogmrip-chooser-list.c:118
+msgid "Remove the stream"
+msgstr "Удалить поток"
+
+#: ../libogmrip-gtk/ogmrip-helper.c:1096
+msgid "Please insert the DVD required to encode this title."
+msgstr "Пожалуйста вставьте DVD, необходимый для кодирования этой главы."
+
+#: ../libogmrip-gtk/ogmrip-lavc-options.c:128
+msgid "Lavc Options"
+msgstr "Lavc опции"
+
+#: ../libogmrip-gtk/ogmrip-x264-options.c:247
+msgid "X264 Options"
+msgstr "X264 опции"
+
+#: ../libogmrip-gtk/ogmrip-x264-options.c:299
+msgid "Transformed Exhaustive search (tesa - even slower)"
+msgstr ""
+
+#: ../libogmrip-gtk/ogmrip-xvid-options.c:171
+msgid "XviD Options"
+msgstr "Настройки XviD"
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:236
+msgid "Select an audio file"
+msgstr "Выберите аудио файл"
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:334
+msgid "Select a subtitles file"
+msgstr "Выберите файл с субтитрами"
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:430
+#: ../src/ogmrip-audio-options.c:156 ../src/ogmrip-subp-options.c:156
+msgid "_Language:"
+msgstr "_Язык:"
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:592
+msgid "No audio"
+msgstr "Без звука"
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:609
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:614
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:621
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:625
+msgid "Track"
+msgstr "Дорожка"
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:649
+msgid "No subtitle"
+msgstr "Без субтитров"
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:661
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:664
+msgid "Subtitle"
+msgstr "Субтитры"
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:714
+msgid "Other..."
+msgstr "Другой..."
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:866
+msgid "Unknown error while opening file"
+msgstr "Неизвесная ошибка при открыти файла"
+
+#: ../src/ogmrip-audio-options.c:115
+msgid "Audio Track Options"
+msgstr "Параметры аудио дорожки"
+
+#: ../src/ogmrip-audio-options.c:127 ../src/ogmrip-subp-options.c:127
+msgid "<b>Track</b>"
+msgstr ""
+
+#: ../src/ogmrip-audio-options.c:144 ../src/ogmrip-subp-options.c:144
+msgid "_Name:"
+msgstr ""
+
+#: ../src/ogmrip-audio-options.c:162 ../src/ogmrip-options-dialog.c:738
+#: ../src/ogmrip-subp-options.c:162
+msgid "None"
+msgstr "Нет"
+
+#: ../src/ogmrip-audio-options.c:168 ../src/ogmrip-subp-options.c:168
+msgid "Use _profile settings"
+msgstr "Использовать настройки профиля"
+
+#: ../src/ogmrip-crop-dialog.c:224
+#, c-format
+msgid "Frame %lu of %lu"
+msgstr "Кадр %lu из %lu"
+
+#: ../src/ogmrip-main.c:163
+msgid ""
+"Please, check http://ogmrip.sourceforge.net to see if this is a known issue."
+msgstr ""
+
+#: ../src/ogmrip-main.c:164
+msgid ""
+"You really should join the log file if you open a bug report or ask "
+"questions on the forum."
+msgstr ""
+
+#: ../src/ogmrip-main.c:168
+msgid "Please, choose some others."
+msgstr "Пожалуйста выберите что-нибуть другое"
+
+#: ../src/ogmrip-main.c:171
+msgid "Please, choose one audio stream only."
+msgstr "Пожалуйста, выбирете только один аудио поток"
+
+#: ../src/ogmrip-main.c:175
+msgid "Please, choose one subtitles stream only."
+msgstr "Пожалуйста, выберите только один поток субтитров."
+
+#: ../src/ogmrip-main.c:179
+msgid "This is an unexpected error and should not happen."
+msgstr "Это неожиданная ошибка, её не должно было происходить"
+
+#: ../src/ogmrip-main.c:180
+msgid "Please, fill a bug report at http://ogmrip.sourceforge.net."
+msgstr ""
+
+#: ../src/ogmrip-main.c:241
+msgid "Could not create dictionary"
+msgstr "Не удалось создать директорию"
+
+#: ../src/ogmrip-main.c:241
+msgid "Spell will not be checked."
+msgstr "Орфография не будет проверена"
+
+#: ../src/ogmrip-main.c:567
+msgid ""
+"Do you want to remove the copy of the DVD,\n"
+"keep it on the hard drive, or\n"
+"keep it and update the GUI ?"
+msgstr ""
+"Вы действительно хотите удалить копию DVD, \n"
+"сохранить его на жестком диске, или \n"
+"сохранить и обновить GUI?"
+
+#: ../src/ogmrip-main.c:588
+msgid "_Remove"
+msgstr "_Удалить"
+
+#: ../src/ogmrip-main.c:609
+msgid "_Keep"
+msgstr "_Оставить"
+
+#: ../src/ogmrip-main.c:630
+msgid "_Update"
+msgstr "Обновить"
+
+#: ../src/ogmrip-main.c:1016
+#, c-format
+msgid "Audio stream %d seems to be empty. It has not been merged."
+msgstr "Аудио потока  %d  по-видимому, пустой. Он не был объединен."
+
+#: ../src/ogmrip-main.c:1050
+#, c-format
+msgid "Subtitle stream %d seems to be empty. It has not been merged."
+msgstr "Поток субтитров %d по-видимому, пустой. Он не был объединен"
+
+#: ../src/ogmrip-main.c:1423 ../src/ogmrip-main.c:1631
+#, c-format
+msgid "Could not open the DVD"
+msgstr "Не удалось открыть DVD"
+
+#: ../src/ogmrip-main.c:1431
+msgid "No available profile"
+msgstr "Нет доступного профиля"
+
+#: ../src/ogmrip-main.c:1431
+msgid "You must create at least one profile before you can encode."
+msgstr "Вы должны создать хотя бы один профиль прежде чем кодировать"
+
+#: ../src/ogmrip-main.c:1519
+#, c-format
+msgid ""
+"A file named '%s' already exists.\n"
+"Do you want to replace it?"
+msgstr ""
+"Файл по имени '%s' уже сществует.\n"
+"Заменить?"
+
+#: ../src/ogmrip-main.c:1600 ../src/ogmrip-main.c:1636
+#: ../src/ogmrip-main.c:2102 ../src/ogmrip-profiles-dialog.c:613
+#, c-format
+msgid "Unknown error"
+msgstr "Неизвестная ошибка"
+
+#: ../src/ogmrip-main.c:1610
+msgid "The compressibility test completed successfully."
+msgstr "Тест на сжимаемость успешно завершён."
+
+#: ../src/ogmrip-main.c:1611
+msgid "The scaling parameters have been adjusted to optimize the quality."
+msgstr "Параметры масштабирования были отрегулированы для наилучшего качества."
+
+#: ../src/ogmrip-main.c:1636
+msgid "Could not read the DVD"
+msgstr "Не могу прочитать DVD"
+
+#: ../src/ogmrip-main.c:1813
+#, c-format
+msgid "Unknown error while exporting the chapters"
+msgstr "Неизвестная ошибка при экспорте глав"
+
+#: ../src/ogmrip-main.c:2182
+msgid "The DVD has been successfully encoded, but..."
+msgstr "DVD успешно закодирован, но ..."
+
+#: ../src/ogmrip-main.c:2297
+msgid "Are you sure you want to cancel the encoding process?"
+msgstr "Вы уверены, что хотите завершить процесс кодирования?"
+
+#: ../src/ogmrip-main.c:2441
+msgid "Can't play DVD title"
+msgstr ""
+
+#: ../src/ogmrip-main.c:2518
+msgid "Select a chapters file"
+msgstr "Выберите файл глав"
+
+#: ../src/ogmrip-main.c:2539
+#, c-format
+msgid "Could not open the chapters file '%s'"
+msgstr "Не удалось открыть файл глав '%s'"
+
+#: ../src/ogmrip-main.c:2554
+msgid "Select a file"
+msgstr "Выбрать файл"
+
+#: ../src/ogmrip-main.c:2669
+msgid "translator-credits"
+msgstr ""
+"Launchpad Contributions:\n"
+"  Andrey Filippov https://launchpad.net/~mail-for-fil\n"
+"  HsH https://launchpad.net/~hsh\n"
+"  Sergey \"Shnatsel\" Davidoff https://launchpad.net/~shnatsel\n"
+"  Voronin Viktor https://launchpad.net/~wizard-wcs\n"
+"  Zhomart https://launchpad.net/~amirkhanov-zhomart\n"
+"  Алексей Шиянов https://launchpad.net/~monado\n"
+"  Андрей Калинин https://launchpad.net/~prize2step"
+
+#: ../src/ogmrip-main.c:2686
+msgid "A DVD Encoder for GNOME"
+msgstr "Утилита кодирования DVD для GNOME"
+
+#: ../src/ogmrip-main.c:3094
+msgid "_File"
+msgstr "_Файл"
+
+#: ../src/ogmrip-main.c:3097
+msgid "_Import Chapters..."
+msgstr "_Импорт Глав"
+
+#: ../src/ogmrip-main.c:3097
+msgid "Import chapter information"
+msgstr "Импорт информации о главах"
+
+#: ../src/ogmrip-main.c:3098
+msgid "_Export Chapters..."
+msgstr "Экспортировать главы"
+
+#: ../src/ogmrip-main.c:3098
+msgid "Export chapter information"
+msgstr "Экспорт информации о главах"
+
+#: ../src/ogmrip-main.c:3099
+msgid "Exit OGMRip"
+msgstr "Закрыть OGMRip"
+
+#: ../src/ogmrip-main.c:3101
+msgid "Select all chapters"
+msgstr "Выбрать все главы"
+
+#: ../src/ogmrip-main.c:3102
+msgid "Deselect all chapters"
+msgstr "Снять выделение со всех глав"
+
+#: ../src/ogmrip-main.c:3103
+msgid "Pro_files"
+msgstr "Про_фили"
+
+#: ../src/ogmrip-main.c:3103
+msgid "Edit the profiles"
+msgstr "Редактировать профили"
+
+#: ../src/ogmrip-main.c:3104
+msgid "Edit the preferences"
+msgstr "Редактировать настройки"
+
+#: ../src/ogmrip-main.c:3105
+msgid "_Encodings"
+msgstr "_Очередь кодирования"
+
+#: ../src/ogmrip-main.c:3105
+msgid "Edit the encodings"
+msgstr ""
+
+#: ../src/ogmrip-main.c:3106
+msgid "_Help"
+msgstr "_Справка"
+
+#: ../src/ogmrip-main.c:3107
+msgid "_About"
+msgstr "_О программе"
+
+#: ../src/ogmrip-main.c:3107
+msgid "About OGMRip"
+msgstr "О OGMRip"
+
+#: ../src/ogmrip-options-dialog.c:497
+msgid "Detecting cropping parameters"
+msgstr "Определение параметров кадрирования"
+
+#: ../src/ogmrip-options-dialog.c:497
+msgid "Please wait"
+msgstr "Пожалуйста, ждите"
+
+#: ../src/ogmrip-options-dialog.c:738
+msgid "Extra Small"
+msgstr "Очень маленький"
+
+#: ../src/ogmrip-options-dialog.c:738
+msgid "Small"
+msgstr "Маленький"
+
+#: ../src/ogmrip-options-dialog.c:738
+msgid "Medium"
+msgstr "Средний"
+
+#: ../src/ogmrip-options-dialog.c:739
+msgid "Large"
+msgstr "Большой"
+
+#: ../src/ogmrip-options-dialog.c:739
+msgid "Extra Large"
+msgstr "Очень большой"
+
+#: ../src/ogmrip-options-dialog.c:739
+msgid "Full"
+msgstr "Полный"
+
+#: ../src/ogmrip-options-dialog.c:739
+msgid "User Defined"
+msgstr "Задано пользователем"
+
+#: ../src/ogmrip-options-dialog.c:762
+msgid "En_queue"
+msgstr "В очередь"
+
+#: ../src/ogmrip-pref-dialog.c:247
+msgid "No preferred audio language"
+msgstr "Нет предпочитаемого языка аудио"
+
+#: ../src/ogmrip-pref-dialog.c:253
+msgid "No preferred subtitle language"
+msgstr "Нет предпочитаемого языка субтитров"
+
+#: ../src/ogmrip-pref-dialog.c:259
+msgid "No chapters language"
+msgstr "Нет языка глав"
+
+#: ../src/ogmrip-profiles.c:120
+#, c-format
+msgid "The container '%s' is not available"
+msgstr "Контейнер '%s' не доступен"
+
+#: ../src/ogmrip-profiles.c:137
+#, c-format
+msgid "The video codec '%s' is not available"
+msgstr "Видео кодек '%s' не доступен"
+
+#: ../src/ogmrip-profiles.c:152
+#, c-format
+msgid "The audio codec '%s' is not available"
+msgstr "Аудио кодек  '%s' не доступен"
+
+#: ../src/ogmrip-profiles.c:166
+#, c-format
+msgid "The subtitles codec '%s' is not available"
+msgstr "Кодек субтитров  '%s' не доступен"
+
+#: ../src/ogmrip-profile-editor.c:635
+msgid "User"
+msgstr "Задано пользователем"
+
+#: ../src/ogmrip-profile-editor.c:731
+msgid "_Reset"
+msgstr "Сброс"
+
+#: ../src/ogmrip-profiles-dialog.c:200
+msgid "Rename profile"
+msgstr "Переименовать профиль"
+
+#: ../src/ogmrip-profiles-dialog.c:200
+msgid "New profile"
+msgstr "Новый профиль"
+
+#: ../src/ogmrip-profiles-dialog.c:216
+msgid "_Profile name:"
+msgstr "Имя _профиля:"
+
+#: ../src/ogmrip-profiles-dialog.c:346
+#, c-format
+msgid "Editing profile \"%s\""
+msgstr "Изменение профиля \"%s\""
+
+#: ../src/ogmrip-profiles-dialog.c:385
+msgid "Copy of"
+msgstr ""
+
+#: ../src/ogmrip-profiles-dialog.c:473 ../src/ogmrip-profiles-dialog.c:474
+msgid "Cannot remove profile"
+msgstr "Не могу удалить профиль"
+
+#: ../src/ogmrip-profiles-dialog.c:487 ../src/ogmrip-profiles-dialog.c:488
+msgid "Delete profile ?"
+msgstr "Удалить профиль?"
+
+#: ../src/ogmrip-profiles-dialog.c:562
+msgid "Export profile as"
+msgstr "Экспортировать профиль как"
+
+#: ../src/ogmrip-profiles-dialog.c:590
+msgid "Select profile to import"
+msgstr "Выберите профиль для импорта"
+
+#: ../src/ogmrip-profiles-dialog.c:611
+msgid "Cannot load profile"
+msgstr "Не могу заргузить профиль"
+
+#: ../src/ogmrip-profiles-dialog.c:671
+msgid "Edit Profiles"
+msgstr "Изменить профили"
+
+#: ../src/ogmrip-progress-dialog.c:128 ../src/ogmrip-progress-dialog.c:386
+msgid "Suspend"
+msgstr "Приостановить"
+
+#: ../src/ogmrip-progress-dialog.c:144 ../src/ogmrip-progress-dialog.c:382
+msgid "Resume"
+msgstr "Продолжить"
+
+#: ../src/ogmrip-progress-dialog.c:216
+msgid "Analyzing video stream"
+msgstr "Анализ видео потока"
+
+#: ../src/ogmrip-progress-dialog.c:219
+msgid "Extracting chapters information"
+msgstr "Извлечение информации о главах"
+
+#: ../src/ogmrip-progress-dialog.c:222
+msgid "Encoding video title"
+msgstr ""
+
+#: ../src/ogmrip-progress-dialog.c:226
+#, c-format
+msgid "Extracting audio stream %d"
+msgstr "Извлечение аудио потока %d"
+
+#: ../src/ogmrip-progress-dialog.c:232
+#, c-format
+msgid "Extracting subtitle stream %d"
+msgstr "Извлечение потока субтитров %d"
+
+#: ../src/ogmrip-progress-dialog.c:237
+msgid "Merging audio and video streams"
+msgstr "Слияние аудио и видео потоков"
+
+#: ../src/ogmrip-progress-dialog.c:240
+msgid "DVD backup"
+msgstr "Копирование DVD"
+
+#: ../src/ogmrip-progress-dialog.c:243
+msgid "Compressibility Test"
+msgstr "Тест сжимаемости"
+
+#: ../src/ogmrip-progress-dialog.c:282
+#, c-format
+msgid "%s: %02.0lf%% done"
+msgstr "%s: %02.0lf%% завершено"
+
+#: ../src/ogmrip-queue-dialog.c:450
+msgid "Load encoding"
+msgstr "Открыть очередь кодирования"
+
+#: ../src/ogmrip-queue-dialog.c:488
+#, c-format
+msgid "Cannot load encoding from '%s'"
+msgstr ""
+
+#: ../src/ogmrip-queue-dialog.c:514
+msgid "Save encoding"
+msgstr "Сохранить очередь кодирования"
+
+#: ../src/ogmrip-queue-dialog.c:612
+msgid "Encoding Queue"
+msgstr "Очередь кодирования"
+
+#: ../src/ogmrip-queue-dialog.c:670
+msgid "Run"
+msgstr "Запуск"
+
+#: ../src/ogmrip-queue-dialog.c:675
+msgid "Name"
+msgstr "Заголовок"
+
+#: ../src/ogmrip-queue-dialog.c:762
+msgid "This encoding will have the same output file name as another one."
+msgstr ""
+
+#: ../src/ogmrip-queue-dialog.c:763 ../src/ogmrip-queue-dialog.c:775
+msgid "Do you want to enqueue it anyway ?"
+msgstr "Вы всё равно хотите добавить его в очередь?"
+
+#: ../src/ogmrip-queue-dialog.c:774
+msgid ""
+"A file with the same name as the output file of the encoding already exists."
+msgstr "Файл с таким именем как и у конечного файла уже существует."
+
+#: ../src/ogmrip-subp-options.c:115
+msgid "Subtitles Options"
+msgstr "Настройки Субтитров"
+
+#: ../src/ogmrip-update-dialog.c:136
+msgid "Update profiles"
+msgstr "Обновить профили"
+
+#: ../data/ogmrip.desktop.in.h:1
+msgid "A DVD encoder"
+msgstr "DVD кодировщик"
+
+#: ../data/ogmrip.desktop.in.h:2
+msgid "DVD Encoder OGMRip"
+msgstr "DVD Кодировщик OGMRip"
+
+#~ msgid "Could not detect scaling parameters"
+#~ msgstr "Не удалось определить параметры масштабирования"
+
+#~ msgid "There is no video codec available"
+#~ msgstr "Нет доступного кодека"
+
+#~ msgid "Could not detect cropping parameters"
+#~ msgstr "Не могу определить параметры кадрирования"

@@ -1,0 +1,2405 @@
+# Norwegian Bokmal translation for ogmrip
+# Copyright (c) 2007 Rosetta Contributors and Canonical Ltd 2007
+# This file is distributed under the same license as the ogmrip package.
+# Kjetil Birkeland Moe <kjetilbi@stud.ntnu.no>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ogmrip\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-05-04 09:57+0200\n"
+"PO-Revision-Date: 2010-02-24 11:19+0000\n"
+"Last-Translator: Kjetil Birkeland Moe <kjetilbi@stud.ntnu.no>\n"
+"Language-Team: Norwegian Bokmal <nb@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Launchpad-Export-Date: 2010-05-04 07:44+0000\n"
+"X-Generator: Launchpad (build Unknown)\n"
+
+#: ../data/ogmrip-crop.glade.h:1 ../src/ogmrip-crop-dialog.c:262
+#: ../src/ogmrip-progress-dialog.c:246
+msgid "Cropping"
+msgstr "Kantkutting"
+
+#: ../data/ogmrip-crop.glade.h:2
+msgid "_Bottom"
+msgstr "_Nederst"
+
+#: ../data/ogmrip-crop.glade.h:3
+msgid "_Left"
+msgstr "_Venstre"
+
+#: ../data/ogmrip-crop.glade.h:4
+msgid "_Right"
+msgstr "_Høyre"
+
+#: ../data/ogmrip-crop.glade.h:5
+msgid "_Top"
+msgstr "_Øverst"
+
+#: ../data/ogmrip-lavc.glade.h:1
+msgid "Allow 4 motion vectors per macroblock (v4mv)"
+msgstr "Benytt 4 bevegelsesvektorer per makroblokk (v4mv)"
+
+#: ../data/ogmrip-lavc.glade.h:2
+msgid ""
+"Always use the maximum number of B-frames\n"
+"Avoid B-frames in high motion scenes\n"
+"Places B-frames more or less optimally to yield maximum quality"
+msgstr ""
+"Bruk alltid høyest mulig antall B-rammer\n"
+"Unngå B-rammer i høyintensitetsområder\n"
+"Bruk B-rammer mer eller mindre optimalt for høyest mulig kvalitet"
+
+#: ../data/ogmrip-lavc.glade.h:5
+msgid "Comparison function for _sub pel motion estimation (subcmp)"
+msgstr "Sammenligningsfunksjon for _sub pel bevegelsesberegning (subcmp)"
+
+#: ../data/ogmrip-lavc.glade.h:6
+msgid "Comparison function for motion estimation _pre pass (precmp)"
+msgstr "Sammenligningsfunksjon for bevegelsesberegning _pre pass (precmp)"
+
+#: ../data/ogmrip-lavc.glade.h:7
+msgid "Diamond type and size for motion estimation _pre-pass (predia)"
+msgstr ""
+"Diamanttype og -størrelse for bevegelsesgjenkjenning _pre-pass (predia)"
+
+#: ../data/ogmrip-lavc.glade.h:8
+msgid ""
+"Disabled\n"
+"Mpeg-4 reference decoder\n"
+"Libavcodec specific extensions\n"
+"Experimental  codecs and features"
+msgstr ""
+"Deaktivert\n"
+"Mpeg-4 reference decoder\n"
+"Libavcodec utvidelser\n"
+"Eksperimentelle kodeker og funksjoner"
+
+#: ../data/ogmrip-lavc.glade.h:12
+msgid ""
+"Disabled\n"
+"Only after I-frames\n"
+"Always"
+msgstr ""
+"Deaktivert\n"
+"Kun etter I-rammer\n"
+"Alltid"
+
+#: ../data/ogmrip-lavc.glade.h:15
+msgid ""
+"Disabled\n"
+"Only lower the absolute value of coefficients\n"
+"Only change coefficients before the last non-zero coefficient + 1\n"
+"Try all"
+msgstr ""
+"Deaktivert\n"
+"Velg kun nedre verdi for absoluttverdier av koeffisienter\n"
+"Endre koeffisienter kun før den siste koeffisienten +1 som ikke er lik null\n"
+"Forsøk alle"
+
+#: ../data/ogmrip-lavc.glade.h:19
+msgid "Intra DC _precision in bits (dc)"
+msgstr "Intra DC _nøyaktighet i bit (dc)"
+
+#: ../data/ogmrip-lavc.glade.h:20
+msgid "M_aximum bitrate in kbit/sec (vrc__maxrate)"
+msgstr "M_aksimal bitrate i kbit/sek (vrc__maxrate)"
+
+#: ../data/ogmrip-lavc.glade.h:21
+msgid "M_inimum bitrate in kbit/sec (vrc__minrate)"
+msgstr "M_inimum bitrate i kbit/sek (vrc__minrate)"
+
+#: ../data/ogmrip-lavc.glade.h:22
+msgid "Motion _Estimation"
+msgstr "Bevegelsesberegning"
+
+#: ../data/ogmrip-lavc.glade.h:23
+msgid "Motion _estimation pre-pass (preme)"
+msgstr "Bevegelsesberegning ved forhåndsgjennomkjøring (preme)"
+
+#: ../data/ogmrip-lavc.glade.h:24
+msgid "Quantizer _compression (vqcomp)"
+msgstr "Komprimering av omregningstall (vqcomp)"
+
+#: ../data/ogmrip-lavc.glade.h:25
+msgid "Strategy to choose between I/P/B-frames (vb__strategy)"
+msgstr "Plan for å velge mellom I/P/B-rammer (vb__strategy)"
+
+#: ../data/ogmrip-lavc.glade.h:26
+msgid "Try to encode each MB with MV=<0,0> and choose the better one"
+msgstr "Forsøk å kode hver MB med MV=<0,0> og deretter velge den beste"
+
+#: ../data/ogmrip-lavc.glade.h:27
+msgid ""
+"Use comparison function given by mbcmp\n"
+"Select the MB mode which needs the fewest bits\n"
+"Select the MB mode which has the best rate distortion"
+msgstr ""
+"Bruk sammenligningsfunksjon gitt av mbcmp\n"
+"Velg MB-modus som behøver færrest bits\n"
+"Velg MB-modus som har beste rate-distortion"
+
+#: ../data/ogmrip-lavc.glade.h:30
+msgid "_Amount of motion predictors from the previous frame (last__pred)"
+msgstr "_Mengde bevegelses-gjetning fra forrige ramme (last__pred)"
+
+#: ../data/ogmrip-lavc.glade.h:31
+msgid "_Buffer size in kbit (vrc__buf__size)"
+msgstr "_Bufferstørrelse i kbit (vrc__buf__size)"
+
+#: ../data/ogmrip-lavc.glade.h:32
+msgid "_Comparison function for full pel motion estimation (cmp)"
+msgstr "_Sammenligningsfunksjon for full piksel begevelsesberegning (cmp)"
+
+#: ../data/ogmrip-lavc.glade.h:33
+msgid "_Diamond type and size for motion estimation (dia)"
+msgstr "_Diamanttype og -form for bevegelsesberegning (dia)"
+
+#: ../data/ogmrip-lavc.glade.h:34 ../data/ogmrip-pref.glade.h:24
+#: ../data/ogmrip-profile-editor.glade.h:82
+msgid "_General"
+msgstr "_Generelt"
+
+#: ../data/ogmrip-lavc.glade.h:35
+msgid "_Macroblock decision algorithm (mbd)"
+msgstr "Algoritme for å bestemme makroblokk (mbd)"
+
+#: ../data/ogmrip-lavc.glade.h:36
+msgid "_Maximum interval between keyframes in frames (keyint)"
+msgstr "_Maksimalt intervall mellom referanserammer (keyint)"
+
+#: ../data/ogmrip-lavc.glade.h:37
+msgid "_Quantizer noise shaping (qns)"
+msgstr "Støyform for _omregningstall (qns)"
+
+#: ../data/ogmrip-lavc.glade.h:38
+msgid "_Rate Control"
+msgstr "Bitrate-kontroll"
+
+#: ../data/ogmrip-lavc.glade.h:39
+msgid "_Strict standard compliance (vstrict)"
+msgstr "_Strict standard compliance (vstrict)"
+
+#: ../data/ogmrip-main.glade.h:1
+msgid "<b>Duration:</b>"
+msgstr "<b>Varighet:</b>"
+
+#: ../data/ogmrip-main.glade.h:2
+msgid "<b>_Audio Tracks:</b>"
+msgstr "<b>_Lydspor:</b>"
+
+#: ../data/ogmrip-main.glade.h:3
+msgid "<b>_Subtitles:</b>"
+msgstr "<b>_Undertekster:</b>"
+
+#: ../data/ogmrip-main.glade.h:4
+msgid "<b>_Title:</b>"
+msgstr "<b>_Tittel:</b>"
+
+#: ../data/ogmrip-main.glade.h:5
+msgid "<b>_Video Stream:</b>"
+msgstr "<b>_Videospor:</b>"
+
+#: ../data/ogmrip-main.glade.h:6
+msgid "Angle:"
+msgstr "Vinkel:"
+
+#: ../data/ogmrip-main.glade.h:7 ../src/ogmrip-main.c:3096
+#: ../src/ogmrip-options-dialog.c:772
+msgid "E_xtract"
+msgstr "_Hent ut"
+
+#: ../data/ogmrip-main.glade.h:8 ../src/ogmrip-main.c:3096
+msgid "Extract selected streams"
+msgstr "Hent ut valgte spor"
+
+#: ../data/ogmrip-main.glade.h:9 ../src/ogmrip-main.c:3095
+msgid "Load a DVD disk, an ISO file, or a DVD structure"
+msgstr "Last en DVD, ISO-fil eller annen DVD-struktur"
+
+#: ../data/ogmrip-main.glade.h:10
+msgid "OGMRip"
+msgstr "OGMRip"
+
+#: ../data/ogmrip-main.glade.h:11
+msgid "Open a DVD structure"
+msgstr "Åpne DVD-struktur"
+
+#: ../data/ogmrip-main.glade.h:12
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-dialog.c:167
+#: ../src/ogmrip-main.c:3095
+msgid "_Load"
+msgstr "_Last inn"
+
+#: ../data/ogmrip-main.glade.h:13
+msgid "_Open"
+msgstr "_Åpne"
+
+#: ../data/ogmrip-main.glade.h:14
+msgid "_Relative mode"
+msgstr "_Relativ modus"
+
+#: ../data/ogmrip-options.glade.h:1
+msgid "Auto_detect"
+msgstr "Finn _automatisk"
+
+#: ../data/ogmrip-options.glade.h:2
+msgid "Automatic _cropping"
+msgstr "Automatisk kantbekjæring"
+
+#: ../data/ogmrip-options.glade.h:3
+msgid "Automatic _scaling"
+msgstr "Automatisk størrelsesskalering"
+
+#: ../data/ogmrip-options.glade.h:4
+msgid "Automatic c_ompressibility check"
+msgstr "Automatisk undersøkelse av komprimering"
+
+#: ../data/ogmrip-options.glade.h:5
+msgid "Compressibility Check"
+msgstr "Undersøk evne til komprimering"
+
+#: ../data/ogmrip-options.glade.h:6 ../src/ogmrip-options-dialog.c:751
+msgid "Options"
+msgstr "Valg"
+
+#: ../data/ogmrip-options.glade.h:7
+msgid ""
+"The scaling parameters can only be autodetected if a video bitrate and "
+"cropping parameters are set."
+msgstr ""
+"Skaleringsparametere kan finnes automatisk kun hvis videobitrate og "
+"kantkuttingsparametere er satt."
+
+#: ../data/ogmrip-options.glade.h:8
+msgid "_Cartoon"
+msgstr "_Tegnefilm"
+
+#: ../data/ogmrip-options.glade.h:9
+msgid "_Crop"
+msgstr "_Kutt kanter"
+
+#: ../data/ogmrip-options.glade.h:10
+msgid "_Deinterlace"
+msgstr "_Deinterlace"
+
+#: ../data/ogmrip-options.glade.h:11
+msgid "_Height:"
+msgstr "_Høyde:"
+
+#: ../data/ogmrip-options.glade.h:12
+msgid "_Profile:"
+msgstr "_Profil:"
+
+#: ../data/ogmrip-options.glade.h:13
+msgid "_Width:"
+msgstr "_Bredde:"
+
+#: ../data/ogmrip-pref.glade.h:1
+msgid "<b>DVD Copy</b>"
+msgstr "<b>DVD-kopi</b>"
+
+#: ../data/ogmrip-pref.glade.h:2
+msgid "<b>Misc</b>"
+msgstr "<b>Annet</b>"
+
+#: ../data/ogmrip-pref.glade.h:3
+msgid "<b>Pathes</b>"
+msgstr "<b>Patcher</b>"
+
+#: ../data/ogmrip-pref.glade.h:4
+msgid "<b>Preferred Languages</b>"
+msgstr "<b>Forvalgte språk</b>"
+
+#: ../data/ogmrip-pref.glade.h:5
+msgid "Do _not remove temporary files"
+msgstr "Ikke fjern _midlertidige filer"
+
+#: ../data/ogmrip-pref.glade.h:6 ../src/ogmrip-pref-dialog.c:218
+msgid "Preferences"
+msgstr "Brukervalg"
+
+#: ../data/ogmrip-pref.glade.h:7
+msgid ""
+"Remove the copy\n"
+"Keep the copy on the hard drive\n"
+"Keep the copy and update the GUI\n"
+"Ask the user"
+msgstr ""
+"Fjern kopien\n"
+"Behold kopien på harddisken\n"
+"Behold kopien og oppdater grensesnittet\n"
+"Spør bruker"
+
+#: ../data/ogmrip-pref.glade.h:11
+msgid "Select the output directory"
+msgstr "Velg lagringsmappe"
+
+#: ../data/ogmrip-pref.glade.h:12
+msgid "Select the temporary directory"
+msgstr "Velg mappe for midlertidige filer"
+
+#: ../data/ogmrip-pref.glade.h:13
+msgid ""
+"Title\n"
+"Title - Language\n"
+"Title - Language - Video Codec\n"
+"Title - Language - Video Codec Audio Codec"
+msgstr ""
+"Tittel\n"
+"Tittel - Språk\n"
+"Tittel - Språk - Videokoding\n"
+"Tittel - Språk - Videokoding Lydkoding"
+
+#: ../data/ogmrip-pref.glade.h:17
+msgid "_Advanced"
+msgstr "_Avansert"
+
+#: ../data/ogmrip-pref.glade.h:18
+msgid "_After the encoding:"
+msgstr "_Etter konvertering:"
+
+#: ../data/ogmrip-pref.glade.h:19
+msgid "_Audio:"
+msgstr "_Lyd:"
+
+#: ../data/ogmrip-pref.glade.h:20
+msgid "_Chapters:"
+msgstr "_Kapitler:"
+
+#: ../data/ogmrip-pref.glade.h:21
+msgid "_Copy DVD on hard drive before encoding"
+msgstr "_Kopier DVD'en til harddisken før konvertering"
+
+#: ../data/ogmrip-pref.glade.h:22
+msgid "_Create a log file"
+msgstr "_Opprett en loggfil"
+
+#: ../data/ogmrip-pref.glade.h:23
+msgid "_File Name:"
+msgstr "_Filnavn:"
+
+#: ../data/ogmrip-pref.glade.h:25
+msgid "_Output Path:"
+msgstr "_Lagringssti:"
+
+#: ../data/ogmrip-pref.glade.h:26
+msgid "_Subtitles:"
+msgstr "_Undertekster:"
+
+#: ../data/ogmrip-pref.glade.h:27
+msgid "_Temporary Path:"
+msgstr "_Midlertidige filer:"
+
+#: ../data/ogmrip-pref.glade.h:28
+msgid "_Threads:"
+msgstr "_Tråder:"
+
+#: ../data/ogmrip-profile-editor.glade.h:1
+msgid "1 audio +"
+msgstr "1 lyd +"
+
+#: ../data/ogmrip-profile-editor.glade.h:2
+msgid ""
+"48000 Hz\n"
+"44100 Hz\n"
+"32000 Hz\n"
+"24000 Hz\n"
+"22050 Hz\n"
+"16000 Hz\n"
+"12000 Hz\n"
+"11025 Hz\n"
+"8000 Hz"
+msgstr ""
+"48000 Hz\n"
+"44100 Hz\n"
+"32000 Hz\n"
+"24000 Hz\n"
+"22050 Hz\n"
+"16000 Hz\n"
+"12000 Hz\n"
+"11025 Hz\n"
+"8000 Hz"
+
+#: ../data/ogmrip-profile-editor.glade.h:11
+msgid "<b>Codec</b>"
+msgstr "<b>Format</b>"
+
+#: ../data/ogmrip-profile-editor.glade.h:12
+msgid "<b>Container</b>"
+msgstr "<b>Innkapsling</b>"
+
+#: ../data/ogmrip-profile-editor.glade.h:13
+msgid "<b>Encoding</b>"
+msgstr "<b>Format</b>"
+
+#: ../data/ogmrip-profile-editor.glade.h:14
+msgid "<b>More Options</b>"
+msgstr "<b>Flere alternativer</b>"
+
+#: ../data/ogmrip-profile-editor.glade.h:15
+msgid "<b>Options</b>"
+msgstr "<b>Valg</b>"
+
+#: ../data/ogmrip-profile-editor.glade.h:16
+msgid "<b>Text Options</b>"
+msgstr "<b>Alternativer for tekst</b>"
+
+#: ../data/ogmrip-profile-editor.glade.h:17
+msgid ""
+"Automatic\n"
+"XviD\n"
+"DivX 4\n"
+"Divx 5\n"
+"FFMpeg"
+msgstr ""
+"Automatisk\n"
+"XviD\n"
+"DivX 4\n"
+"Divx 5\n"
+"FFMpeg"
+
+#: ../data/ogmrip-profile-editor.glade.h:22
+msgid ""
+"Dramatically speeds up pass one using faster algorithms and disabling CPU-"
+"intensive options. This will probably reduce global PSNR a little bit "
+"(around 0.01dB) and change individual frame type and PSNR little bit more "
+"(up to 0.03dB)."
+msgstr ""
+"Gjør første gjennomkjøring drastisk raskere ved å bruke kjappe algoritmer og "
+"deaktiverer CPU-intensive valg. Dette vil sannsynligvis redusere global PSNR "
+"noe (omtrent 0.01dB) og endre individuelle rammetyper og PSNR noe mer (opp "
+"til 0.03dB)."
+
+#: ../data/ogmrip-profile-editor.glade.h:23
+msgid "E_xpand image to maximum size"
+msgstr "Øk bildet til maksimal størrelse"
+
+#: ../data/ogmrip-profile-editor.glade.h:24
+msgid "Ensure A/V _synchronisation"
+msgstr "Sikre at A/V er _synkronisert"
+
+#: ../data/ogmrip-profile-editor.glade.h:25
+msgid ""
+"Extreme\n"
+"High\n"
+"Normal"
+msgstr ""
+"Ekstrem\n"
+"Høy\n"
+"Normal"
+
+#: ../data/ogmrip-profile-editor.glade.h:28
+msgid ""
+"Fixed size\n"
+"Constant bitrate\n"
+"Constant quantizer"
+msgstr ""
+"Fast størrelse\n"
+"Konstant bitrate\n"
+"Konstant omformingstall"
+
+#: ../data/ogmrip-profile-editor.glade.h:31
+msgid "Four_CC:"
+msgstr "Four_CC:"
+
+#: ../data/ogmrip-profile-editor.glade.h:32
+msgid ""
+"Line feed only (Unix, Mac)\n"
+"Carriage return + Line feed (Dos, Windows)\n"
+"Carriage return only (Other)"
+msgstr ""
+"Kun linjematning (Unix, Mac)\n"
+"Linjeskift + linjemating (Dos, Windows)\n"
+"Kun linjeskift (Andre)"
+
+#: ../data/ogmrip-profile-editor.glade.h:35
+msgid "MB"
+msgstr "Mb"
+
+#: ../data/ogmrip-profile-editor.glade.h:36
+msgid ""
+"MPEG-4 uses a half pixel precision for its motion search by default. The "
+"standard proposes a mode where encoders are allowed to use quarter pixel "
+"precision. This option usually results in a sharper image. Unfortunately it "
+"has a great impact on bitrate and sometimes the higher bitrate use will "
+"prevent it from giving a better image quality at a fixed bitrate. It's "
+"better to test with and without this option and see whether it is worth "
+"activating."
+msgstr ""
+"MPEG-4 benytter en halv piksels nøyaktighet som standard for "
+"bevegelsesberegninger. Formatet tillater en modus hvor konverteringen kan "
+"bruke en kvart piksels nøyaktiget. Dette alternativet medfører vanligvis et "
+"skarpere bilde. Dessverre har dette et utslag på bitraten, og noen ganger "
+"fører denne økte bitraten til at bildekvaliteten synker ved bruk av fast "
+"bitrate. Det anbefales å forsøke med dette alternativet både aktivert og "
+"deaktiert og manuelt undersøke effekten av den."
+
+#: ../data/ogmrip-profile-editor.glade.h:37
+msgid "M_aximum image size:"
+msgstr "S_tørste bildestørrelse:"
+
+#: ../data/ogmrip-profile-editor.glade.h:38
+msgid "M_inimum image size:"
+msgstr "M_inste bildestørrelse:"
+
+#: ../data/ogmrip-profile-editor.glade.h:39
+msgid "Maximizes the volume without distorting the sound."
+msgstr "Maksimerer volumet uten å ødelegge lyden."
+
+#: ../data/ogmrip-profile-editor.glade.h:40
+msgid ""
+"Mono\n"
+"Stereo\n"
+"Surround\n"
+"5.1"
+msgstr ""
+"Mono\n"
+"Stereo\n"
+"Surround\n"
+"5.1"
+
+#: ../data/ogmrip-profile-editor.glade.h:44
+msgid ""
+"No Scaling\n"
+"Fast Bilinear\n"
+"Bilinear\n"
+"Bicubic\n"
+"Experimental\n"
+"Nearest Neighbour\n"
+"Area\n"
+"Luma Bicubic Chroma Bilinear\n"
+"Gauss (best for downscaling)\n"
+"SincR\n"
+"Lanczos (best for upscaling)\n"
+"Bicubic Spline"
+msgstr ""
+"Ingen skalering\n"
+"Hurtig Bilineær\n"
+"Bilineær\n"
+"Bikubisk\n"
+"Eksperimentell\n"
+"Nærmeste nabo\n"
+"Område\n"
+"Luma Bicubic Chroma Bilinear\n"
+"Gauss (egnet for nedskalering)\n"
+"SincR\n"
+"Lanczos (egnet for oppskalering)\n"
+"Bicubic Spline"
+
+#: ../data/ogmrip-profile-editor.glade.h:56 ../src/ogmrip-queue-dialog.c:683
+msgid "Profile"
+msgstr "Profil"
+
+#: ../data/ogmrip-profile-editor.glade.h:57
+msgid "Reduce image _noise"
+msgstr "Reduser bilde_støy"
+
+#: ../data/ogmrip-profile-editor.glade.h:58
+msgid "S_caler:"
+msgstr "S_kaleringsmetode:"
+
+#: ../data/ogmrip-profile-editor.glade.h:59
+msgid "Sample _Rate:"
+msgstr "Samplingsrate:"
+
+#: ../data/ogmrip-profile-editor.glade.h:60
+msgid "Spell _Checking"
+msgstr "Stave_kontroll"
+
+#: ../data/ogmrip-profile-editor.glade.h:61
+msgid "T_rellis searched quantization"
+msgstr "T_rellis gjennomsøket omregningstall"
+
+#: ../data/ogmrip-profile-editor.glade.h:62
+msgid "T_urbo"
+msgstr "T_urbo"
+
+#: ../data/ogmrip-profile-editor.glade.h:63
+msgid "The audio quality from 0 (very low) to 10 (very high)"
+msgstr "Lydkvalitet fra 0 (veldig lav) til 10 (veldig høy)"
+
+#: ../data/ogmrip-profile-editor.glade.h:64
+msgid "The maximum number of audio channels"
+msgstr "Maksimalt antall lydkanaler"
+
+#: ../data/ogmrip-profile-editor.glade.h:65
+msgid ""
+"This filter aims to reduce image noise producing smooth images and making "
+"still images really still (This should enhance compressibility.)."
+msgstr ""
+"Dette filteret sikter mot å redusere bildestøy, og gjør bilder klare og "
+"setter stillbilder helt i ro (som igjen forbedrer kompressibiliteten)."
+
+#: ../data/ogmrip-profile-editor.glade.h:66
+msgid ""
+"Trellis quantization is a kind of adaptive quantization method that saves "
+"bits by modifying quantized coefficients to make them more compressible by "
+"the entropy encoder. Its impact on quality is good."
+msgstr ""
+"Trellis omregningstall er en form for tilpassende omregningsmetode som "
+"sparer bits ved å modifisere omregnede koeffisienter ved å gjøre dem mer "
+"kompressibel for entropi-koderen. Den har en god påvirkning på kvaliteten."
+
+#: ../data/ogmrip-profile-editor.glade.h:67
+msgid ""
+"UTF-8\n"
+"ISO-8859-1\n"
+"ASCII"
+msgstr ""
+"UTF-8\n"
+"ISO-8859-1\n"
+"ASCII"
+
+#: ../data/ogmrip-profile-editor.glade.h:70
+msgid "Use _quarter pel motion compensation"
+msgstr "Bruk _kvartpiksel bevegelseskompensasjon"
+
+#: ../data/ogmrip-profile-editor.glade.h:71
+msgid "Use a deblocking filter"
+msgstr ""
+
+#: ../data/ogmrip-profile-editor.glade.h:72
+msgid "Use a deringing filter"
+msgstr ""
+
+#: ../data/ogmrip-profile-editor.glade.h:73
+msgid "_Audio"
+msgstr "_Lyd"
+
+#: ../data/ogmrip-profile-editor.glade.h:74
+msgid "_Bitrate:"
+msgstr "_Bitrate:"
+
+#: ../data/ogmrip-profile-editor.glade.h:75
+msgid "_Channels:"
+msgstr "_Kanaler:"
+
+#: ../data/ogmrip-profile-editor.glade.h:76
+msgid "_Character Set:"
+msgstr "_Tegnkoding:"
+
+#: ../data/ogmrip-profile-editor.glade.h:77
+msgid "_Codec:"
+msgstr "_Format:"
+
+#: ../data/ogmrip-profile-editor.glade.h:78
+msgid "_Crop image"
+msgstr "_Kutt kanter"
+
+#: ../data/ogmrip-profile-editor.glade.h:79 ../src/ogmrip-main.c:3100
+msgid "_Edit"
+msgstr "_Rediger"
+
+#: ../data/ogmrip-profile-editor.glade.h:80
+msgid "_Forced subtitles only"
+msgstr "Kun _tvungne undertekster"
+
+#: ../data/ogmrip-profile-editor.glade.h:81
+msgid "_Format:"
+msgstr "_Format:"
+
+#: ../data/ogmrip-profile-editor.glade.h:83
+msgid "_Method:"
+msgstr "_Metode:"
+
+#: ../data/ogmrip-profile-editor.glade.h:84
+msgid "_Newline:"
+msgstr "_Linjeskift:"
+
+#: ../data/ogmrip-profile-editor.glade.h:85
+msgid "_Normalize"
+msgstr "_Normaliser"
+
+#: ../data/ogmrip-profile-editor.glade.h:86
+msgid "_Options"
+msgstr "_Alternativer"
+
+#: ../data/ogmrip-profile-editor.glade.h:87
+msgid "_Passes:"
+msgstr "_Gjennomkjøringer:"
+
+#: ../data/ogmrip-profile-editor.glade.h:88
+msgid "_Quality:"
+msgstr "_Kvalitet:"
+
+#: ../data/ogmrip-profile-editor.glade.h:89
+msgid "_Quantizer:"
+msgstr "_Omformingstall:"
+
+#: ../data/ogmrip-profile-editor.glade.h:90
+msgid "_Size:"
+msgstr "_Størrelse:"
+
+#: ../data/ogmrip-profile-editor.glade.h:91
+msgid "_Subtitles"
+msgstr "_Undertekster"
+
+#: ../data/ogmrip-profile-editor.glade.h:92
+msgid "_Video"
+msgstr "_Video"
+
+#: ../data/ogmrip-profile-editor.glade.h:93
+msgid "kbps"
+msgstr "kbps"
+
+#: ../data/ogmrip-profile-editor.glade.h:94
+msgid "video"
+msgstr "video"
+
+#: ../data/ogmrip-profiles.glade.h:1 ../src/ogmrip-queue-dialog.c:577
+msgid "_Export"
+msgstr "_Eksporter"
+
+#: ../data/ogmrip-profiles.glade.h:2 ../src/ogmrip-queue-dialog.c:576
+msgid "_Import"
+msgstr "_Importer"
+
+#: ../data/ogmrip-profiles.glade.h:3
+msgid "_Profiles:"
+msgstr "_Profiler:"
+
+#: ../data/ogmrip-profiles.glade.h:4
+msgid "_Rename"
+msgstr "_Gi nytt navn"
+
+#: ../data/ogmrip-progress.glade.h:1
+msgid "Estimated time left:"
+msgstr "Antatt gjenstående tid:"
+
+#: ../data/ogmrip-progress.glade.h:2 ../src/ogmrip-progress-dialog.c:393
+msgid "Progress"
+msgstr "Fremdrift"
+
+#: ../data/ogmrip-progress.glade.h:3
+msgid "Unknown"
+msgstr "Ukjent"
+
+#: ../data/ogmrip-progress.glade.h:4
+msgid "_Close the application if the encoding is successful"
+msgstr "_Lukk programmet hvis konverteringen er vellykket"
+
+#: ../data/ogmrip-queue.glade.h:1
+msgid "Move encoding down"
+msgstr "Flytt konverteringen ned"
+
+#: ../data/ogmrip-queue.glade.h:2
+msgid "Move encoding to bottom"
+msgstr "Flytt konverteringen nederst"
+
+#: ../data/ogmrip-queue.glade.h:3
+msgid "Move encoding to top"
+msgstr "Flytt konverteringen øverst"
+
+#: ../data/ogmrip-queue.glade.h:4
+msgid "Move encoding up"
+msgstr "Flytt konverteringen opp"
+
+#: ../data/ogmrip-spell.glade.h:1
+msgid "A_dd Word"
+msgstr "Legg _til ord"
+
+#: ../data/ogmrip-spell.glade.h:2
+msgid "Ignore _All"
+msgstr "Ignorer _alle"
+
+#: ../data/ogmrip-spell.glade.h:3
+msgid "Mispelled word:"
+msgstr "Feilstavet ord:"
+
+#: ../data/ogmrip-spell.glade.h:4
+msgid "Replace _with:"
+msgstr "Erstatt _med:"
+
+#: ../data/ogmrip-spell.glade.h:5 ../src/ogmrip-spell-dialog.c:202
+msgid "Spell Checking"
+msgstr "Stavekontroll"
+
+#: ../data/ogmrip-spell.glade.h:6
+msgid "_Ignore"
+msgstr "_Ignorer"
+
+#: ../data/ogmrip-spell.glade.h:7
+msgid "_Replace"
+msgstr "E_rstatt"
+
+#: ../data/ogmrip-update.glade.h:1
+msgid ""
+"<b><big>Profile updates are available</big></b>\n"
+"Select the profiles you want to update"
+msgstr ""
+"<b><big>Nye profiloppdateringer</big></b>\n"
+"Velg profilene du ønsker å oppdatere"
+
+#: ../data/ogmrip-update.glade.h:3 ../src/ogmrip-main.c:3101
+msgid "Select _All"
+msgstr "Velg _alle"
+
+#: ../data/ogmrip-update.glade.h:4 ../src/ogmrip-main.c:3102
+msgid "_Deselect All"
+msgstr "_Velg bort alle"
+
+#: ../data/ogmrip-x264.glade.h:1
+msgid "<b>Analysis</b>"
+msgstr "<b>Analyse</b>"
+
+#: ../data/ogmrip-x264.glade.h:2
+msgid "<b>Frame type</b>"
+msgstr "<b>Rammetype</b>"
+
+#: ../data/ogmrip-x264.glade.h:3 ../data/ogmrip-xvid.glade.h:16
+msgid "<b>Other</b>"
+msgstr "<b>Annet</b>"
+
+#: ../data/ogmrip-x264.glade.h:4
+msgid "<b>Presets</b>"
+msgstr "<b>Forhåndsinstillinger</b>"
+
+#: ../data/ogmrip-x264.glade.h:5
+msgid "<b>Rate control</b>"
+msgstr "<b>Kontrollere rate</b>"
+
+#: ../data/ogmrip-x264.glade.h:6
+msgid "Adaptive B-frame placement decision algorithm (b_adapt)"
+msgstr "Algoritme for tilpassende plasseringbestemming av B-ramme (b_adapt)"
+
+#: ../data/ogmrip-x264.glade.h:7
+msgid "Adaptive spatial transform size (8x8dct)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:8
+msgid ""
+"Allows B-frames to be used as references for predicting other frames "
+"(b_pyramid)"
+msgstr ""
+"Benytter B-rammer som referanser for å forutsi andre rammer (b_pyramid)"
+
+#: ../data/ogmrip-x264.glade.h:9
+msgid ""
+"Allows each 8x8 or 16x8 motion partition to independently select a reference "
+"frame (mixed_refs)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:10
+msgid "Analysis"
+msgstr "Analyse"
+
+#: ../data/ogmrip-x264.glade.h:11
+msgid "Averaging period for vbv_maxrate, in kbits (vbv_bufsize)"
+msgstr "Midlingsperiode for vbv_maxrate, i kbits (vbv_bufsize)"
+
+#: ../data/ogmrip-x264.glade.h:12
+msgid ""
+"Baseline (no 8x8dct, no cabac, no weight_p, no cqm, no bframes)\n"
+"Main (no 8x8dct and no cqm)\n"
+"High (no restriction)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:15
+msgid ""
+"Diamond search, radius 1 (dia - fast)\n"
+"Hexagon search, radius 2 (hex)\n"
+"Uneven multi-hexagon search (umh - slow)\n"
+"Exhaustive search (esa - very slow)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:19
+msgid ""
+"Disabled\n"
+"Blind offset\n"
+"Smart analysis"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:22
+msgid ""
+"Enables rate-distortion optimization of macroblock types in B-frames (brdo)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:23
+msgid "Encoding"
+msgstr "Format"
+
+#: ../data/ogmrip-x264.glade.h:24
+msgid ""
+"Flat\n"
+"JVM"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:26
+msgid "Fullpixel motion estimation algorithm (me)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:27
+msgid "Maximum GOP size (keyint)"
+msgstr "Største GOP-størrelse (keyint)"
+
+#: ../data/ogmrip-x264.glade.h:28
+msgid "Maximum local bitrate, in kbits/second (vbv_maxrate)"
+msgstr "Maksimal lokal bitrate, i kbit/sekund (vbv_maxrate)"
+
+#: ../data/ogmrip-x264.glade.h:29
+msgid "Maximum motion vector search range (merange)"
+msgstr "Maksimal rekkevidde for søk etter bevegelsesvektorer (vbv_maxrate)"
+
+#: ../data/ogmrip-x264.glade.h:30
+msgid ""
+"Maximum number of consecutive B-frames between I- and P-frames (bframes)"
+msgstr ""
+"Maksimalt antall etterfølgende B-rammer mellom I- og P-rammer (bframes)"
+
+#: ../data/ogmrip-x264.glade.h:31
+msgid ""
+"None\n"
+"Spatial\n"
+"Temporal\n"
+"Auto"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:35
+msgid ""
+"None\n"
+"Strict\n"
+"Normal"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:38
+msgid "Number of frames for frametype lookahead (rc-lookahead)"
+msgstr "Antall rammer for rammetype-frempek (rc-lookahead)"
+
+#: ../data/ogmrip-x264.glade.h:39
+msgid ""
+"Number of previous frames used as predictors in B- and  P-frames (frameref)"
+msgstr ""
+"Antall tidligere rammer som skal brukes ved gjetting på B- og P-rammer "
+"(frameref)"
+
+#: ../data/ogmrip-x264.glade.h:40
+msgid "Prediction mode for 'direct' motion vectors (direct_pred)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:41
+msgid "Preset quantization matrices (cqm)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:42
+msgid "Profile of the output stream (profile)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:43
+msgid "Set the bitstream's level (level_idc)"
+msgstr "Sett bitstrømmens nivå (level_idc)"
+
+#: ../data/ogmrip-x264.glade.h:44
+msgid "Strength of rate-distortion psychovisual optimization (psy-rd)"
+msgstr "Styrken til rate-forandring for psykovisuell optimalisering (psy-rd)"
+
+#: ../data/ogmrip-x264.glade.h:45
+msgid "Strength of trellis psychovisual optimization (psy-trellis)"
+msgstr "Styrken til trellis psykovisuell optimalisering (psy-trellis)"
+
+#: ../data/ogmrip-x264.glade.h:46
+msgid "Subpel refinement quality (subq)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:47
+msgid "Use access unit delimiters (aud)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:48
+msgid "Use context-adaptive binary arithmetic coding (cabac)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:49
+msgid "Use global header (global_header)"
+msgstr "Bruk global topptekst (global_header)"
+
+#: ../data/ogmrip-x264.glade.h:50
+msgid "Use small macroblocks (partitions)"
+msgstr ""
+
+#: ../data/ogmrip-x264.glade.h:51
+msgid "Use weighted prediction in B-frames (weight_b)"
+msgstr "Benytt vektet antagelse for B-rammer (weight_b)"
+
+#: ../data/ogmrip-x264.glade.h:52
+msgid "Weighted prediction for P-frames (weight_p)"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:1
+msgid ""
+"0 - Off\n"
+"1 - Mode decision\n"
+"2 - Limited search\n"
+"3 - Medium search\n"
+"4 - Wide search"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:6
+msgid ""
+"0 - Off\n"
+"1 - Very low\n"
+"2 - Low\n"
+"3 - Medium\n"
+"4 - High\n"
+"5 - Very high\n"
+"6 - Ultra high"
+msgstr ""
+"0 - Av\n"
+"1 - Veldig lav\n"
+"2 - Lav\n"
+"3 - Middels\n"
+"4 - Høy\n"
+"5 - Meget høy\n"
+"6 - Ekstremt høy"
+
+#: ../data/ogmrip-xvid.glade.h:13
+msgid "<b>B-VOPs</b>"
+msgstr "<b>B-VOP'er</b>"
+
+#: ../data/ogmrip-xvid.glade.h:14
+msgid "<b>General</b>"
+msgstr "<b>Generelt</b>"
+
+#: ../data/ogmrip-xvid.glade.h:15
+msgid "<b>Motion Precision</b>"
+msgstr "<b>Nøyaktighet for bevegelse</b>"
+
+#: ../data/ogmrip-xvid.glade.h:17
+msgid "<b>Pixel aspect ratio</b>"
+msgstr "<b>Pikslers størrelsesforhold</b>"
+
+#: ../data/ogmrip-xvid.glade.h:18
+msgid "<b>Restrictions</b>"
+msgstr "<b>Begrensninger</b>"
+
+#: ../data/ogmrip-xvid.glade.h:19
+msgid "Adaptative quantization (b_adapt)"
+msgstr "Tilpassende omformingstall (b_adapt)"
+
+#: ../data/ogmrip-xvid.glade.h:20
+msgid "Allow vector candidates for B-frames (bvhq)"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:21
+msgid "Closed GOP (closed_gop)"
+msgstr "Lukket GOP (closed_gop)"
+
+#: ../data/ogmrip-xvid.glade.h:22
+msgid "Enable  a  chroma  optimizer  prefilter (chroma_opt)"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:23
+msgid "Frame drop ratio (frame_drop_ratio):"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:24
+msgid "Global motion compensation (gmc)"
+msgstr "Global bevegelseskompensasjon (gmc)"
+
+#: ../data/ogmrip-xvid.glade.h:25
+msgid "Interlaced encoding (interlacing)"
+msgstr "Koding med utjevning (interlacing)"
+
+#: ../data/ogmrip-xvid.glade.h:26
+msgid "Max B-frame quantizer (max_bquant):"
+msgstr "Maksimal B-ramme omregningstall (max_bquant):"
+
+#: ../data/ogmrip-xvid.glade.h:27
+msgid "Max I-frame quantizer (max_iquant):"
+msgstr "Maksimal beregningstall for I-ramme (max_iquant):"
+
+#: ../data/ogmrip-xvid.glade.h:28
+msgid "Max P-frame quantizer (max_pquant):"
+msgstr "Maksimal beregningstall for P-ramme (max_pquant):"
+
+#: ../data/ogmrip-xvid.glade.h:29
+msgid "Max consecutive B-VOPs (max_bframes):"
+msgstr "Maksimalt påfølgende B-VOP'er (max_bframes):"
+
+#: ../data/ogmrip-xvid.glade.h:30
+msgid "Maximum I-frame interval (max_key_interval):"
+msgstr "Maksimalt intervall for I-ramme (max_key_interval):"
+
+#: ../data/ogmrip-xvid.glade.h:31
+msgid "Min B-frame quantizer (min_bquant):"
+msgstr "Minimum omregningstall for B-ramme (min_bquant):"
+
+#: ../data/ogmrip-xvid.glade.h:32
+msgid "Min I-frame quantizer (min_iquant):"
+msgstr "Minimum omregningstall for I-ramme (min_iquant):"
+
+#: ../data/ogmrip-xvid.glade.h:33
+msgid "Min P-frame quantizer (min_pquant):"
+msgstr "Minimum omregningstall for P-ramme (min_pquant):"
+
+#: ../data/ogmrip-xvid.glade.h:34
+msgid "Misc"
+msgstr "Forskjellig"
+
+#: ../data/ogmrip-xvid.glade.h:35
+msgid "Motion"
+msgstr "Bevegelse"
+
+#: ../data/ogmrip-xvid.glade.h:36
+msgid "Motion search precision (me_quality):"
+msgstr "Nøyaktighet for bevegelsessøk (me_quality):"
+
+#: ../data/ogmrip-xvid.glade.h:37
+msgid ""
+"No restrictions\n"
+"Simple level 0\n"
+"Simple level 1\n"
+"Simple level 2\n"
+"Simple level 3\n"
+"Advanced simple level 0\n"
+"Advanced simple level 1\n"
+"Advanced simple level 2\n"
+"Advanced simple level 3\n"
+"Advanced simple level 4\n"
+"Advanced simple level 5\n"
+"DXN handheld\n"
+"DXN portable NTSC\n"
+"DXN portable PAL\n"
+"DXN home theater NTSC\n"
+"DXN home theater PAL \n"
+"DXN HDTV"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:54
+msgid ""
+"None\n"
+"PC content\n"
+"PAL standard 4:3 PAR  \n"
+"PAL standard 16:9 PAR \n"
+"NTSC standard 4:3 PAR \n"
+"NTSC standard 16:6 PAR\n"
+"Custom"
+msgstr ""
+"Ingen\n"
+"PC-innhold\n"
+"PAL standard 4:3 PAR  \n"
+"PAL standard 16:9 PAR \n"
+"NTSC standard 4:3 PAR \n"
+"NTSC standard 16:6 PAR\n"
+"Egendefinert"
+
+#: ../data/ogmrip-xvid.glade.h:61
+msgid "Packed bitstream (packed)"
+msgstr "Pakket bitstrøm (packed)"
+
+#: ../data/ogmrip-xvid.glade.h:62
+msgid "Pixel aspect ratio (par):"
+msgstr "Pikslers størrelsesforhold (par):"
+
+#: ../data/ogmrip-xvid.glade.h:63
+msgid "Profile (profile):"
+msgstr "Profil (profile):"
+
+#: ../data/ogmrip-xvid.glade.h:64
+msgid "Quantization"
+msgstr "Omformingstall"
+
+#: ../data/ogmrip-xvid.glade.h:65
+msgid "Quantization type (quant_type):"
+msgstr "Type omregningstall (quant_type):"
+
+#: ../data/ogmrip-xvid.glade.h:66
+msgid "Quantizer offset (bquant_offset):"
+msgstr "Avvik for omregningstall (bquant_offset):"
+
+#: ../data/ogmrip-xvid.glade.h:67
+msgid "Quantizer ratio (bquant_ratio):"
+msgstr "Omregningstall-forhold (bquant_ratio):"
+
+#: ../data/ogmrip-xvid.glade.h:68
+msgid "Use chroma motion (chroma_me)"
+msgstr ""
+
+#: ../data/ogmrip-xvid.glade.h:69
+msgid "VHQ mode (vhq):"
+msgstr "VHQ-modus (vhq):"
+
+#: ../data/ogmrip-xvid.glade.h:70
+msgid "Width x height:"
+msgstr "Bredde x høyde:"
+
+#: ../data/ogmrip-xvid.glade.h:71
+msgid ""
+"h263\n"
+"mpeg"
+msgstr ""
+"h263\n"
+"mpeg"
+
+#: ../data/profiles.xml.in.h:1
+msgid ""
+"&lt;b&gt;DivX for Standalone Player&lt;/b&gt;&#xA;2-pass, 1x700MB (AVI + "
+"XviD + MP3)"
+msgstr ""
+"&lt;b&gt;DivX for separat avspiller &lt;/b&gt;&#xA;2-gjennomkjøringer, "
+"1x700MB (AVI + XviD + MP3)"
+
+#: ../data/profiles.xml.in.h:2
+msgid "&lt;b&gt;PC, High Quality&lt;/b&gt;&#xA;Quantizer 2 (MKV + X264 + AAC)"
+msgstr ""
+"&lt;b&gt;PC, Høy Kvalitet&lt;/b&gt;&#xA;Omregningstall 2 (MKV + X264 + AAC)"
+
+#: ../data/profiles.xml.in.h:3
+msgid ""
+"&lt;b&gt;PC, Low Quality&lt;/b&gt;&#xA;1-pass, 1x700MB (OGM + Lavc + Vorbis)"
+msgstr ""
+"&lt;b&gt;PC, Lav kvalitet&lt;/b&gt;&#xA;1-pass, 1x700MB (OGM + Lavc + Vorbis)"
+
+#: ../libogmdvd/ogmdvd-disc.c:113
+#, c-format
+msgid "No such file or directory"
+msgstr "Fil eller mappe finnes ikke"
+
+#: ../libogmdvd/ogmdvd-disc.c:117
+#, c-format
+msgid "Permission denied to access device"
+msgstr "Ingen tilgang til enhet"
+
+#: ../libogmdvd/ogmdvd-disc.c:123
+#, c-format
+msgid "Tray seems to be open"
+msgstr "Skuff tyder på å være åpen"
+
+#: ../libogmdvd/ogmdvd-disc.c:125
+#, c-format
+msgid "Device does not contain a valid DVD video"
+msgstr "Enhet inneholder ikke en gyldig DVD-video"
+
+#: ../libogmdvd/ogmdvd-disc.c:128
+#, c-format
+msgid "Path does not contain a valid DVD structure"
+msgstr "Sti fører ikke til en gyldig DVD-struktur"
+
+#: ../libogmdvd/ogmdvd-disc.c:130
+#, c-format
+msgid "No such directory, block device or iso file"
+msgstr "Ingen slik fil, enhet eller isofil"
+
+#: ../libogmdvd/ogmdvd-disc.c:629
+#, c-format
+msgid "Cannot open video manager"
+msgstr "Kan ikke åpne videobehandler"
+
+#: ../libogmdvd/ogmdvd-disc.c:692 ../libogmrip/ogmrip-encoding.c:3402
+#, c-format
+msgid "Device does not contain the expected DVD"
+msgstr "Enhet inneholder ikke forventet DVD"
+
+#: ../libogmdvd/ogmdvd-title.c:94
+#, c-format
+msgid "Cannot open video titleset"
+msgstr "Kan ikke åpne oversikt over videotitler"
+
+#: ../libogmdvd-gtk/ogmdvd-chapter-list.c:108
+#: ../libogmdvd-gtk/ogmdvd-chapter-list.c:246
+msgid "Chapter"
+msgstr "Kapittel"
+
+#: ../libogmdvd-gtk/ogmdvd-chapter-list.c:112
+msgid "Duration"
+msgstr "Varighet"
+
+#: ../libogmdvd-gtk/ogmdvd-chapter-list.c:116
+msgid "Label"
+msgstr "Etikett"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-dialog.c:122
+msgid "Open DVD Disk"
+msgstr "Åpne DVD"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-dialog.c:146
+msgid "_Eject"
+msgstr "L_øs ut"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-dialog.c:177
+msgid "<b>Select _DVD Drive:</b>"
+msgstr "<b>Velg _DVD-stasjon:</b>"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:220
+msgid "Select an ISO file"
+msgstr "Velg en ISO-fil"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:220
+msgid "Select a DVD structure"
+msgstr "Velg en DVD-struktur"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:245
+msgid "ISO images"
+msgstr "ISO-bilde"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:383
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:534
+msgid ""
+"<b>No DVD</b>\n"
+"No device"
+msgstr ""
+"<b>Ingen DVD</b>\n"
+"Ingen enhet"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:407
+msgid "Unknown Drive"
+msgstr "Ukjent stasjon"
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:543
+msgid "Select a DVD structure..."
+msgstr "Velg en DVD-struktur..."
+
+#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:547
+msgid "Select an ISO file..."
+msgstr "Velg en ISO-fil..."
+
+#: ../libogmdvd-gtk/ogmdvd-title-chooser-widget.c:234
+msgid "hours"
+msgstr "timer"
+
+#: ../libogmdvd-gtk/ogmdvd-title-chooser-widget.c:236
+msgid "minutes"
+msgstr "minutter"
+
+#: ../libogmdvd-gtk/ogmdvd-title-chooser-widget.c:238
+msgid "seconds"
+msgstr "sekunder"
+
+#: ../libogmdvd-gtk/ogmdvd-title-chooser-widget.c:240
+#: ../src/ogmrip-queue-dialog.c:679
+msgid "Title"
+msgstr "Tittel"
+
+#: ../libogmrip/ogmrip-aac.c:183
+msgid "Advanced Audio Coding (AAC)"
+msgstr "Advanced Audio Coding (AAC)"
+
+#: ../libogmrip/ogmrip-aac.c:207
+#, c-format
+msgid "MPlayer and FAAC are missing"
+msgstr "MPlayer og FAAC mangler"
+
+#: ../libogmrip/ogmrip-aac.c:209 ../libogmrip/ogmrip-mp3.c:235
+#: ../libogmrip/ogmrip-vorbis.c:207 ../libogmrip/ogmrip-wav.c:124
+#, c-format
+msgid "MPlayer is missing"
+msgstr "MPlayer mangler"
+
+#: ../libogmrip/ogmrip-aac.c:211
+#, c-format
+msgid "FAAC is missing"
+msgstr "FAAC mangler"
+
+#: ../libogmrip/ogmrip-acopy.c:157
+msgid "Copy (for AC3 or DTS)"
+msgstr "Kopier (for AC3 eller DTS)"
+
+#: ../libogmrip/ogmrip-avi.c:300
+msgid "Audio-Video Interlace (AVI)"
+msgstr "Audio-Video Interlace (AVI)"
+
+#: ../libogmrip/ogmrip-encoding.c:1788
+#, c-format
+msgid "Unknown error while extracting chapters"
+msgstr "Ukjent feil ved uthenting av kapitler"
+
+#: ../libogmrip/ogmrip-encoding.c:1883
+#, c-format
+msgid "Unknown error while extracting subtitle stream"
+msgstr "Ukjent feil ved uthenting av undertekst"
+
+#: ../libogmrip/ogmrip-encoding.c:1999
+#, c-format
+msgid "Unknown error while extracting audio stream"
+msgstr "Ukjent feil ved uthenting av lydspor"
+
+#: ../libogmrip/ogmrip-encoding.c:2243
+#, c-format
+msgid "Unknown error while extracting video stream"
+msgstr "Ukjent feil ved uthenting av videospor"
+
+#: ../libogmrip/ogmrip-encoding.c:2281
+#, c-format
+msgid "Unknown error while merging"
+msgstr "Ukjent feil ved sammenslåing av video og lyd"
+
+#: ../libogmrip/ogmrip-encoding.c:3028
+#, c-format
+msgid "The container and the video codec are incompatible."
+msgstr "Medieinnkapsling og videokoding kan ikke brukes sammen."
+
+#: ../libogmrip/ogmrip-encoding.c:3063
+#, c-format
+msgid "Your version of MPlayer does not support DTS streams"
+msgstr "Din versjon av MPlayer støtter ikke DTS-spor"
+
+#: ../libogmrip/ogmrip-encoding.c:3074
+#, c-format
+msgid "The container and the audio codec are incompatible."
+msgstr "Medieinnkapsling og lydkoding kan ikke brukes sammen."
+
+#: ../libogmrip/ogmrip-encoding.c:3098
+#, c-format
+msgid "It is not possible to hardcode multiple subtitle streams"
+msgstr "Det er ikke mulig å prente flere undertekster samtidig"
+
+#: ../libogmrip/ogmrip-encoding.c:3109
+#, c-format
+msgid "The container and the subtitles codec are incompatible."
+msgstr "Medieinnkapsling og undertekster kan ikke brukes sammen"
+
+#: ../libogmrip/ogmrip-encoding.c:3122
+#, c-format
+msgid "The container and the audio file are incompatible."
+msgstr "Medieinnkapsling og lydfil kan ikke brukes sammen."
+
+#: ../libogmrip/ogmrip-encoding.c:3135
+#, c-format
+msgid "The container and the subtitles file are incompatible."
+msgstr "Medieinnkapsling og undertekstfil kan ikke brukes sammen."
+
+#: ../libogmrip/ogmrip-encoding.c:3148
+#, c-format
+msgid "The selected container does not support multiple audio streams"
+msgstr "Valgt medieinnkapsling støtter ikke flere lydspor samtidig"
+
+#: ../libogmrip/ogmrip-encoding.c:3161
+#, c-format
+msgid "The selected container does not support multiple subtitles streams"
+msgstr "Valgt medieinnkapsling støtter ikke flere undertekstspor samtidig"
+
+#: ../libogmrip/ogmrip-encoding.c:3177
+#, c-format
+msgid "No container has been selected."
+msgstr "Ingen medieinnkapsling valgt."
+
+#: ../libogmrip/ogmrip-encoding.c:3243 ../libogmrip/ogmrip-encoding.c:3253
+#, c-format
+msgid "Failed to get mount point of '%s'"
+msgstr "Fant ikke monteringspunkt for '%s'"
+
+#: ../libogmrip/ogmrip-encoding.c:3266
+#, c-format
+msgid "Not enough space to store output and temporary files (%sMB needed)."
+msgstr ""
+"Ikke nok diskplass for å lagre resultat eller midlertidige filer (%sMB "
+"behøves)."
+
+#: ../libogmrip/ogmrip-encoding.c:3279
+#, c-format
+msgid "Not enough space to store the temporary files (%sMB needed)."
+msgstr "Ikke nok diskplass til å lagre midlertidige filer (%sMB behøves)."
+
+#: ../libogmrip/ogmrip-encoding.c:3291
+#, c-format
+msgid "Not enough space to store the output file (%sMB needed)."
+msgstr "Ikke nok diskplass for å lagre resultatfil (%sMB behøves)."
+
+#: ../libogmrip/ogmrip-encoding.c:3363 ../libogmrip/ogmrip-encoding.c:3372
+#: ../libogmrip/ogmrip-encoding.c:3389
+#, c-format
+msgid "The file %s does not seem to contain a valid encoding"
+msgstr "Filen %s ser ikke ut til å inneholde gyldig koding"
+
+#: ../libogmrip/ogmrip-encoding.c:5823
+#, c-format
+msgid "A file named '%s' already exists."
+msgstr "En fil med navnet «%s» finnes allerede."
+
+#: ../libogmrip/ogmrip-encoding.c:5997
+#, c-format
+msgid "Unknown error while copying the DVD on the hard drive"
+msgstr "Ukjent feil ved kopiering av DVD til harddisk"
+
+#: ../libogmrip/ogmrip-encoding.c:6047
+#, c-format
+msgid ""
+"Cannot perform a compressibility test when the video codec is not defined."
+msgstr ""
+"Kan ikke gjennomføre kompressibilitetstest når videokoding ikke er angitt."
+
+#: ../libogmrip/ogmrip-encoding.c:6054
+#, c-format
+msgid ""
+"Cannot perform a compressibility test when cropping parameters are not "
+"defined."
+msgstr ""
+"Kan ikke gjennomføre kompressibilitetstest når beskjæringsparametre ikke er "
+"angitt."
+
+#: ../libogmrip/ogmrip-encoding.c:6061
+#, c-format
+msgid ""
+"Cannot perform a compressibility test when scaling parameters are not "
+"defined."
+msgstr ""
+"Kan ikke gjennomføre kompressibilitetstest når skaleringsparametre ikke er "
+"angitt."
+
+#: ../libogmrip/ogmrip-encoding.c:6068
+#, c-format
+msgid ""
+"Cannot perform a compressibility test when encoding at constant quantizer."
+msgstr ""
+"Kan ikke gjennomføre kompressibilitetstest når konvertering skjer ved "
+"konstant omregningstall."
+
+#: ../libogmrip/ogmrip-file.c:512 ../libogmrip/ogmrip-file.c:773
+#: ../libogmrip/ogmrip-file.c:843 ../libogmrip/ogmrip-file.c:987
+#, c-format
+msgid "Unknown error while identifying '%s'"
+msgstr "Ukjent feil ved gjenkjenning '%s'"
+
+#: ../libogmrip/ogmrip-file.c:541 ../libogmrip/ogmrip-file.c:1026
+#, c-format
+msgid "Cannot identify file '%s': %s"
+msgstr "Kan ikke gjenkjenne fil '%s': %s"
+
+#: ../libogmrip/ogmrip-file.c:553 ../libogmrip/ogmrip-file.c:1038
+#, c-format
+msgid "Cannot get bitrate of file '%s'"
+msgstr "Kan ikke lese bitrate fra fil '%s'"
+
+#: ../libogmrip/ogmrip-file.c:560
+#, c-format
+msgid "Cannot get rate of file '%s'"
+msgstr "Kan ikke hente filens datarate '%s'"
+
+#: ../libogmrip/ogmrip-file.c:567 ../libogmrip/ogmrip-file.c:1045
+#, c-format
+msgid "Cannot get length of file '%s'"
+msgstr "Kan ikke lese fil-lengde på '%s'"
+
+#: ../libogmrip/ogmrip-file.c:574 ../libogmrip/ogmrip-file.c:793
+#: ../libogmrip/ogmrip-file.c:863 ../libogmrip/ogmrip-file.c:1052
+#, c-format
+msgid "Cannot get format of file '%s'"
+msgstr "Kan ikke lese filformat for '%s'"
+
+#: ../libogmrip/ogmrip-file.c:581
+#, c-format
+msgid "Cannot get number of channels of file '%s'"
+msgstr "Kan ikke lese antall lydkanaler for filen '%s'"
+
+#: ../libogmrip/ogmrip-file.c:588
+#, c-format
+msgid "File '%s' contains video tracks"
+msgstr "Filen '%s' inneholder videospor"
+
+#: ../libogmrip/ogmrip-file.c:596
+#, c-format
+msgid "Format of file '%s' is not supported"
+msgstr "Filformatet '%s' støttes ikke"
+
+#: ../libogmrip/ogmrip-file.c:607 ../libogmrip/ogmrip-file.c:805
+#: ../libogmrip/ogmrip-file.c:875 ../libogmrip/ogmrip-file.c:1091
+#, c-format
+msgid "Unknown error while opening '%s': %s"
+msgstr "Ukjent feil ved åpning av '%s': %s"
+
+#: ../libogmrip/ogmrip-file.c:1059
+#, c-format
+msgid "Cannot get width of video file '%s'"
+msgstr "Kan ikke lese videobredde for fil '%s'"
+
+#: ../libogmrip/ogmrip-file.c:1066
+#, c-format
+msgid "Cannot get height of video file '%s'"
+msgstr "Kan ikke lese videohøyde for fil '%s'"
+
+#: ../libogmrip/ogmrip-file.c:1073
+#, c-format
+msgid "Cannot get aspect ratio of video file '%s'"
+msgstr "Kan ikke lese størrelsesforhold for videofilen '%s'"
+
+#: ../libogmrip/ogmrip-file.c:1080
+#, c-format
+msgid "Cannot get frame rate of video file '%s'"
+msgstr "Kan ikke hente rammerate for videofil '%s'"
+
+#: ../libogmrip/ogmrip-fs.c:103 ../libogmrip/ogmrip-fs.c:297
+#, c-format
+msgid "Failed to create directory '%s': %s"
+msgstr "Oppretting av mappe '%s' mislyktes: %s"
+
+#: ../libogmrip/ogmrip-fs.c:160
+#, c-format
+msgid "Failed to unlink file '%s': %s"
+msgstr "Kunne ikke avlinke fil '%s': %s"
+
+#: ../libogmrip/ogmrip-fs.c:174
+#, c-format
+msgid "Failed to remove directory '%s': %s"
+msgstr "Fjerning av mappe '%s' mislyktes: %s"
+
+#: ../libogmrip/ogmrip-fs.c:205 ../libogmrip/ogmrip-fs.c:407
+#, c-format
+msgid "Failed to create file '%s': %s"
+msgstr "Mislyktes oppretting av fil '%s': %s"
+
+#: ../libogmrip/ogmrip-fs.c:249
+#, c-format
+msgid "Failed to create fifo '%s': %s"
+msgstr "Mislyktes oppretting av fifo '%s': %s"
+
+#: ../libogmrip/ogmrip-fs.c:349
+#, c-format
+msgid "Failed to link '%s': %s"
+msgstr "Misyktes lenking av '%s': %s"
+
+#: ../libogmrip/ogmrip-fs.c:385
+#, c-format
+msgid "Template '%s' doesn't end with XXXXXX"
+msgstr "Mal '%s' slutter ikke med XXXXXX"
+
+#: ../libogmrip/ogmrip-fs.c:396
+#, c-format
+msgid "Template '%s' invalid, should not contain a '/'"
+msgstr "Mal '%s' er ugyldig, skal ikke inneholde '/'"
+
+#: ../libogmrip/ogmrip-fs.c:465
+#, c-format
+msgid "Failed to stat the file system containing '%s': %s"
+msgstr ""
+
+#: ../libogmrip/ogmrip-fs.c:508
+#, c-format
+msgid "Failed to stat '%s': %s"
+msgstr ""
+
+#: ../libogmrip/ogmrip-fs.c:515
+#, c-format
+msgid "Failed to change to directory '%s': %s"
+msgstr "Kunne ikke bytte mappe '%s': %s"
+
+#: ../libogmrip/ogmrip-fs.c:524
+#, c-format
+msgid "Failed to stat '..': %s"
+msgstr ""
+
+#: ../libogmrip/ogmrip-fs.c:534
+#, c-format
+msgid "Failed to change to directory '..': %s"
+msgstr "Mislyktes å bytte til mappe '..': %s"
+
+#: ../libogmrip/ogmrip-hardsub.c:44
+msgid "Hardcoded subtitle"
+msgstr "Prentet undertekst"
+
+#: ../libogmrip/ogmrip-lavc-mpeg4.c:65
+msgid "Lavc Mpeg-4"
+msgstr "Lavc Mpeg-4"
+
+#: ../libogmrip/ogmrip-mkv.c:463
+msgid "Matroska Media (MKV)"
+msgstr "Matroska Media (MKV)"
+
+#: ../libogmrip/ogmrip-mkv.c:501 ../libogmrip/ogmrip-mkv.c:519
+#, c-format
+msgid "mkvmerge is missing"
+msgstr "mkvmerge mangler"
+
+#: ../libogmrip/ogmrip-mov.c:66
+#, c-format
+msgid "An MOV file must contain a video stream."
+msgstr "En MOV-fil må inneholde et videospor."
+
+#: ../libogmrip/ogmrip-mov.c:144
+msgid "QuickTime Media (MOV)"
+msgstr "QuickTime (MOV)"
+
+#: ../libogmrip/ogmrip-mov.c:179 ../libogmrip/ogmrip-srt.c:556
+#: ../libogmrip/ogmrip-vobsub.c:282 ../libogmrip/ogmrip-x264.c:921
+#: ../libogmrip/ogmrip-xvid.c:928
+#, c-format
+msgid "MEncoder is missing"
+msgstr "MEncoder mangler"
+
+#: ../libogmrip/ogmrip-mov.c:191
+#, c-format
+msgid "MEncoder is build without lavf support"
+msgstr "MEncoder er kompilert uten støtte for lavf"
+
+#: ../libogmrip/ogmrip-mp3.c:209
+msgid "MPEG-1 layer III (MP3)"
+msgstr "MPEG-1 layer III (MP3)"
+
+#: ../libogmrip/ogmrip-mp3.c:233
+#, c-format
+msgid "MPlayer and LAME are missing"
+msgstr "MPlayer og LAME mangler"
+
+#: ../libogmrip/ogmrip-mp3.c:237
+#, c-format
+msgid "LAME is missing"
+msgstr "LAME mangler"
+
+#: ../libogmrip/ogmrip-mp4.c:654
+msgid "Mpeg-4 Media (MP4)"
+msgstr "Mpeg-4 Media (MP4)"
+
+#: ../libogmrip/ogmrip-mp4.c:688
+#, c-format
+msgid "MP4Box is missing"
+msgstr "MP4Box mangler"
+
+#: ../libogmrip/ogmrip-novideo.c:32
+msgid "No Video"
+msgstr "Ingen video"
+
+#: ../libogmrip/ogmrip-ogg.c:433
+msgid "Ogg Media (OGM)"
+msgstr "Ogg Media (OGM)"
+
+#: ../libogmrip/ogmrip-ogg.c:477
+#, c-format
+msgid "ogmmerge and ogmsplit are missing"
+msgstr "ogmmerge og ogmsplit mangler"
+
+#: ../libogmrip/ogmrip-ogg.c:479
+#, c-format
+msgid "ogmmerge is missing"
+msgstr "ogmmerge mangler"
+
+#: ../libogmrip/ogmrip-ogg.c:481
+#, c-format
+msgid "ogmsplit is missing"
+msgstr "ogmsplit mangler"
+
+#: ../libogmrip/ogmrip-plugin.c:152
+#, c-format
+msgid "Plugin %s disabled"
+msgstr "Utvidelse %s deaktivert"
+
+#: ../libogmrip/ogmrip-plugin.c:154
+msgid "some requirements are not available"
+msgstr "noen påkrevde elementer er ikke tilgjengelig"
+
+#: ../libogmrip/ogmrip-settings.c:1648 ../libogmrip/ogmrip-settings.c:1786
+#, c-format
+msgid "Failed to open '%s'"
+msgstr "Klarte ikke å åpne «%s»"
+
+#: ../libogmrip/ogmrip-settings.c:1656 ../libogmrip/ogmrip-settings.c:1667
+#: ../libogmrip/ogmrip-settings.c:1680 ../libogmrip/ogmrip-settings.c:1697
+#: ../libogmrip/ogmrip-settings.c:1705 ../libogmrip/ogmrip-settings.c:1794
+#: ../libogmrip/ogmrip-settings.c:1805 ../libogmrip/ogmrip-settings.c:1818
+#: ../libogmrip/ogmrip-settings.c:1835 ../libogmrip/ogmrip-settings.c:1843
+#, c-format
+msgid "'%s' does not contain a valid profile"
+msgstr "'%s' inneholder ikke en gyldig profil"
+
+#: ../libogmrip/ogmrip-srt.c:540
+msgid "SRT text"
+msgstr "SRT-tekst"
+
+#: ../libogmrip/ogmrip-srt.c:593
+#, c-format
+msgid "GOCR, Ocrad and Tesseract are missing"
+msgstr "GOCR, Ocrad og Tesseract mangler"
+
+#: ../libogmrip/ogmrip-theora.c:215
+msgid "Ogg Theora"
+msgstr "Ogg Theora"
+
+#: ../libogmrip/ogmrip-vobsub.c:270
+msgid "VobSub"
+msgstr "VobSub"
+
+#: ../libogmrip/ogmrip-vorbis.c:181
+msgid "Ogg Vorbis"
+msgstr "Ogg Vorbis"
+
+#: ../libogmrip/ogmrip-vorbis.c:205
+#, c-format
+msgid "MPlayer and OggEnc are missing"
+msgstr "MPlayer og OggEnc mangler"
+
+#: ../libogmrip/ogmrip-vorbis.c:209
+#, c-format
+msgid "OggEnc is missing"
+msgstr "OggEnc mangler"
+
+#: ../libogmrip/ogmrip-wav.c:113
+msgid "Wave (uncompressed PCM)"
+msgstr "Wave (ukomprimert PCM)"
+
+#: ../libogmrip/ogmrip-x264.c:828
+msgid "X264"
+msgstr "X264"
+
+#: ../libogmrip/ogmrip-x264.c:933
+#, c-format
+msgid "MEncoder is build without X264 support"
+msgstr "MEncoder er kompilert uten støtte for X264"
+
+#: ../libogmrip/ogmrip-xvid.c:910
+msgid "XviD"
+msgstr "XviD"
+
+#: ../libogmrip/ogmrip-xvid.c:940
+#, c-format
+msgid "MEncoder is built without XviD support"
+msgstr "MEncoder er kompilert uten støtte for Xvid"
+
+#: ../libogmrip-gtk/ogmrip-chapter-list.c:109
+msgid "Extract?"
+msgstr "Hente ut?"
+
+#: ../libogmrip-gtk/ogmrip-chooser-list.c:104
+msgid "More options"
+msgstr "Flere valg"
+
+#: ../libogmrip-gtk/ogmrip-chooser-list.c:109
+msgid "Add a stream"
+msgstr "Legg til et spor"
+
+#: ../libogmrip-gtk/ogmrip-chooser-list.c:118
+msgid "Remove the stream"
+msgstr "Fjern spor"
+
+#: ../libogmrip-gtk/ogmrip-helper.c:1096
+msgid "Please insert the DVD required to encode this title."
+msgstr ""
+"Vennligst sett inn DVD som behøves for å konvertere dette tittelsporet."
+
+#: ../libogmrip-gtk/ogmrip-lavc-options.c:128
+msgid "Lavc Options"
+msgstr "Alternativer for Lavc"
+
+#: ../libogmrip-gtk/ogmrip-x264-options.c:247
+msgid "X264 Options"
+msgstr "Alternativer for X264"
+
+#: ../libogmrip-gtk/ogmrip-x264-options.c:299
+msgid "Transformed Exhaustive search (tesa - even slower)"
+msgstr ""
+
+#: ../libogmrip-gtk/ogmrip-xvid-options.c:171
+msgid "XviD Options"
+msgstr "Alternativer for XviD"
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:236
+msgid "Select an audio file"
+msgstr "Velg en lydfil"
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:334
+msgid "Select a subtitles file"
+msgstr "Velg en undertekstfil"
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:430
+#: ../src/ogmrip-audio-options.c:156 ../src/ogmrip-subp-options.c:156
+msgid "_Language:"
+msgstr "_Språk:"
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:592
+msgid "No audio"
+msgstr "Ingen lyd"
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:609
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:614
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:621
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:625
+msgid "Track"
+msgstr "Spor"
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:649
+msgid "No subtitle"
+msgstr "Ingen undertekst"
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:661
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:664
+msgid "Subtitle"
+msgstr "Undertekst"
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:714
+msgid "Other..."
+msgstr "Annet..."
+
+#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:866
+msgid "Unknown error while opening file"
+msgstr "Ukjent feil ved åpning av fil"
+
+#: ../src/ogmrip-audio-options.c:115
+msgid "Audio Track Options"
+msgstr "Alternativer for lydspor"
+
+#: ../src/ogmrip-audio-options.c:127 ../src/ogmrip-subp-options.c:127
+msgid "<b>Track</b>"
+msgstr "<b>Spor</b>"
+
+#: ../src/ogmrip-audio-options.c:144 ../src/ogmrip-subp-options.c:144
+msgid "_Name:"
+msgstr "_Navn:"
+
+#: ../src/ogmrip-audio-options.c:162 ../src/ogmrip-options-dialog.c:738
+#: ../src/ogmrip-subp-options.c:162
+msgid "None"
+msgstr "Ingen"
+
+#: ../src/ogmrip-audio-options.c:168 ../src/ogmrip-subp-options.c:168
+msgid "Use _profile settings"
+msgstr "Bruk _profilinnstillinger"
+
+#: ../src/ogmrip-crop-dialog.c:224
+#, c-format
+msgid "Frame %lu of %lu"
+msgstr "Ramme %lu av %lu"
+
+#: ../src/ogmrip-main.c:163
+msgid ""
+"Please, check http://ogmrip.sourceforge.net to see if this is a known issue."
+msgstr ""
+"Se http://ogmrip.sourceforge.net for å undersøke om dette er et kjent "
+"problem."
+
+#: ../src/ogmrip-main.c:164
+msgid ""
+"You really should join the log file if you open a bug report or ask "
+"questions on the forum."
+msgstr ""
+"Du bør legge ved loggfilen hvis du skal sende inn en feilmelding eller "
+"stille spørsmål i forumet."
+
+#: ../src/ogmrip-main.c:168
+msgid "Please, choose some others."
+msgstr "Vennligst velg noen andre."
+
+#: ../src/ogmrip-main.c:171
+msgid "Please, choose one audio stream only."
+msgstr "Vennligst velg kun én lydoppføring."
+
+#: ../src/ogmrip-main.c:175
+msgid "Please, choose one subtitles stream only."
+msgstr "Vennligst velg kun én undertekst."
+
+#: ../src/ogmrip-main.c:179
+msgid "This is an unexpected error and should not happen."
+msgstr "En uventet feil oppsto og skulle ikke skjedd."
+
+#: ../src/ogmrip-main.c:180
+msgid "Please, fill a bug report at http://ogmrip.sourceforge.net."
+msgstr "Vennligst send inn en feilmelding på http://ogmrip.sourceforge.net."
+
+#: ../src/ogmrip-main.c:241
+msgid "Could not create dictionary"
+msgstr "Kunne ikke opprette oppslag"
+
+#: ../src/ogmrip-main.c:241
+msgid "Spell will not be checked."
+msgstr "Ingen stavekontroll."
+
+#: ../src/ogmrip-main.c:567
+msgid ""
+"Do you want to remove the copy of the DVD,\n"
+"keep it on the hard drive, or\n"
+"keep it and update the GUI ?"
+msgstr ""
+"Ønsker du å fjerne DVD-kopien,\n"
+"la den være på harddisk, eller\n"
+"la den være på harddisk og oppdatere GUI?"
+
+#: ../src/ogmrip-main.c:588
+msgid "_Remove"
+msgstr "Fje_rn"
+
+#: ../src/ogmrip-main.c:609
+msgid "_Keep"
+msgstr "_Behold"
+
+#: ../src/ogmrip-main.c:630
+msgid "_Update"
+msgstr "_Oppdater"
+
+#: ../src/ogmrip-main.c:1016
+#, c-format
+msgid "Audio stream %d seems to be empty. It has not been merged."
+msgstr "Lydspor %d synes å være tom. Den har ikke blitt sammenslått."
+
+#: ../src/ogmrip-main.c:1050
+#, c-format
+msgid "Subtitle stream %d seems to be empty. It has not been merged."
+msgstr "Undertekst %d synes å være tom. Den har ikke blitt sammenslått."
+
+#: ../src/ogmrip-main.c:1423 ../src/ogmrip-main.c:1631
+#, c-format
+msgid "Could not open the DVD"
+msgstr "Kunne ikke åpne DVD"
+
+#: ../src/ogmrip-main.c:1431
+msgid "No available profile"
+msgstr "Ingen tilgjengelig profil"
+
+#: ../src/ogmrip-main.c:1431
+msgid "You must create at least one profile before you can encode."
+msgstr "Du må opprette minst én profil før du kan konvertere."
+
+#: ../src/ogmrip-main.c:1519
+#, c-format
+msgid ""
+"A file named '%s' already exists.\n"
+"Do you want to replace it?"
+msgstr ""
+"Filen '%s' eksisterer allerede.\n"
+"Ønsker du å erstatte den?"
+
+#: ../src/ogmrip-main.c:1600 ../src/ogmrip-main.c:1636
+#: ../src/ogmrip-main.c:2102 ../src/ogmrip-profiles-dialog.c:613
+#, c-format
+msgid "Unknown error"
+msgstr "Ukjent feil"
+
+#: ../src/ogmrip-main.c:1610
+msgid "The compressibility test completed successfully."
+msgstr "Vellykket kompressibilitetstest."
+
+#: ../src/ogmrip-main.c:1611
+msgid "The scaling parameters have been adjusted to optimize the quality."
+msgstr "Skaleringsparametrene har blitt justert for å gi optimal kvalitet."
+
+#: ../src/ogmrip-main.c:1636
+msgid "Could not read the DVD"
+msgstr "Kunne ikke lese DVD"
+
+#: ../src/ogmrip-main.c:1813
+#, c-format
+msgid "Unknown error while exporting the chapters"
+msgstr "Ukjent feil ved eksportering av kapitler."
+
+#: ../src/ogmrip-main.c:2182
+msgid "The DVD has been successfully encoded, but..."
+msgstr "DVDen har blitt konvertert, men..."
+
+#: ../src/ogmrip-main.c:2297
+msgid "Are you sure you want to cancel the encoding process?"
+msgstr "Ønsker du virkelig å avbryte konverteringsprosessen?"
+
+#: ../src/ogmrip-main.c:2441
+msgid "Can't play DVD title"
+msgstr "Kan ikke spille DVD-tittel"
+
+#: ../src/ogmrip-main.c:2518
+msgid "Select a chapters file"
+msgstr "Velg en kapittelfil"
+
+#: ../src/ogmrip-main.c:2539
+#, c-format
+msgid "Could not open the chapters file '%s'"
+msgstr "Kunne ikke åpne kapittelfilen '%s'"
+
+#: ../src/ogmrip-main.c:2554
+msgid "Select a file"
+msgstr "Velg en fil"
+
+#: ../src/ogmrip-main.c:2669
+msgid "translator-credits"
+msgstr ""
+"Launchpad Contributions:\n"
+"  Håvar Nielsen https://launchpad.net/~havar\n"
+"  Kjetil Birkeland Moe https://launchpad.net/~kjetilbmoe"
+
+#: ../src/ogmrip-main.c:2686
+msgid "A DVD Encoder for GNOME"
+msgstr "Et DVD-konverteringsverktøy for GNOME"
+
+#: ../src/ogmrip-main.c:3094
+msgid "_File"
+msgstr "_Fil"
+
+#: ../src/ogmrip-main.c:3097
+msgid "_Import Chapters..."
+msgstr "_Importere kapitler..."
+
+#: ../src/ogmrip-main.c:3097
+msgid "Import chapter information"
+msgstr "Importere kapittelinformasjon"
+
+#: ../src/ogmrip-main.c:3098
+msgid "_Export Chapters..."
+msgstr "_Eksporter kapitler..."
+
+#: ../src/ogmrip-main.c:3098
+msgid "Export chapter information"
+msgstr "Eksportere kapittelinformasjon"
+
+#: ../src/ogmrip-main.c:3099
+msgid "Exit OGMRip"
+msgstr "Avslutt OGMRip"
+
+#: ../src/ogmrip-main.c:3101
+msgid "Select all chapters"
+msgstr "Velg alle kapitler"
+
+#: ../src/ogmrip-main.c:3102
+msgid "Deselect all chapters"
+msgstr "Fravelg alle kapitler"
+
+#: ../src/ogmrip-main.c:3103
+msgid "Pro_files"
+msgstr "Pro_filer"
+
+#: ../src/ogmrip-main.c:3103
+msgid "Edit the profiles"
+msgstr "Rediger profilene"
+
+#: ../src/ogmrip-main.c:3104
+msgid "Edit the preferences"
+msgstr "Endre innstillinger"
+
+#: ../src/ogmrip-main.c:3105
+msgid "_Encodings"
+msgstr "_Konverteringsjobber"
+
+#: ../src/ogmrip-main.c:3105
+msgid "Edit the encodings"
+msgstr "Endre konverteringsjobber"
+
+#: ../src/ogmrip-main.c:3106
+msgid "_Help"
+msgstr "_Hjelp"
+
+#: ../src/ogmrip-main.c:3107
+msgid "_About"
+msgstr "_Om"
+
+#: ../src/ogmrip-main.c:3107
+msgid "About OGMRip"
+msgstr "Om OGMRip"
+
+#: ../src/ogmrip-options-dialog.c:497
+msgid "Detecting cropping parameters"
+msgstr "Finner beskjæringsparametre"
+
+#: ../src/ogmrip-options-dialog.c:497
+msgid "Please wait"
+msgstr "Vennligst vent"
+
+#: ../src/ogmrip-options-dialog.c:738
+msgid "Extra Small"
+msgstr "Ekstra liten"
+
+#: ../src/ogmrip-options-dialog.c:738
+msgid "Small"
+msgstr "Liten"
+
+#: ../src/ogmrip-options-dialog.c:738
+msgid "Medium"
+msgstr "Middels"
+
+#: ../src/ogmrip-options-dialog.c:739
+msgid "Large"
+msgstr "Stor"
+
+#: ../src/ogmrip-options-dialog.c:739
+msgid "Extra Large"
+msgstr "Ekstra stor"
+
+#: ../src/ogmrip-options-dialog.c:739
+msgid "Full"
+msgstr "Hele"
+
+#: ../src/ogmrip-options-dialog.c:739
+msgid "User Defined"
+msgstr "Egendefinert"
+
+#: ../src/ogmrip-options-dialog.c:762
+msgid "En_queue"
+msgstr "Legg til i _kø"
+
+#: ../src/ogmrip-pref-dialog.c:247
+msgid "No preferred audio language"
+msgstr "Ikke noe forvalgt lydspråk"
+
+#: ../src/ogmrip-pref-dialog.c:253
+msgid "No preferred subtitle language"
+msgstr "Ikke noe forhåndsvalgt språk for undertekster"
+
+#: ../src/ogmrip-pref-dialog.c:259
+msgid "No chapters language"
+msgstr "Kapittelspråk ikke angitt"
+
+#: ../src/ogmrip-profiles.c:120
+#, c-format
+msgid "The container '%s' is not available"
+msgstr "Innkapsling '%s' er ikke tilgjengelig"
+
+#: ../src/ogmrip-profiles.c:137
+#, c-format
+msgid "The video codec '%s' is not available"
+msgstr "Videokodingen '%s' er ikke tilgjengelig"
+
+#: ../src/ogmrip-profiles.c:152
+#, c-format
+msgid "The audio codec '%s' is not available"
+msgstr "Lydkodingen '%s' er ikke tilgjengelig"
+
+#: ../src/ogmrip-profiles.c:166
+#, c-format
+msgid "The subtitles codec '%s' is not available"
+msgstr "Undertekstkodingen '%s' er ikke tilgjengelig"
+
+#: ../src/ogmrip-profile-editor.c:635
+msgid "User"
+msgstr "Bruker"
+
+#: ../src/ogmrip-profile-editor.c:731
+msgid "_Reset"
+msgstr "_Tilbakestill"
+
+#: ../src/ogmrip-profiles-dialog.c:200
+msgid "Rename profile"
+msgstr "Omdøp profil"
+
+#: ../src/ogmrip-profiles-dialog.c:200
+msgid "New profile"
+msgstr "Ny profil"
+
+#: ../src/ogmrip-profiles-dialog.c:216
+msgid "_Profile name:"
+msgstr "_Profilnavn:"
+
+#: ../src/ogmrip-profiles-dialog.c:346
+#, c-format
+msgid "Editing profile \"%s\""
+msgstr "Redigerer profil \"%s\""
+
+#: ../src/ogmrip-profiles-dialog.c:385
+msgid "Copy of"
+msgstr "Kopi av"
+
+#: ../src/ogmrip-profiles-dialog.c:473 ../src/ogmrip-profiles-dialog.c:474
+msgid "Cannot remove profile"
+msgstr "Kan ikke fjerne profil"
+
+#: ../src/ogmrip-profiles-dialog.c:487 ../src/ogmrip-profiles-dialog.c:488
+msgid "Delete profile ?"
+msgstr "Slette profil?"
+
+#: ../src/ogmrip-profiles-dialog.c:562
+msgid "Export profile as"
+msgstr "Eksporter profil som"
+
+#: ../src/ogmrip-profiles-dialog.c:590
+msgid "Select profile to import"
+msgstr "Velg pofil som skal importeres"
+
+#: ../src/ogmrip-profiles-dialog.c:611
+msgid "Cannot load profile"
+msgstr "Kan ikke laste profil"
+
+#: ../src/ogmrip-profiles-dialog.c:671
+msgid "Edit Profiles"
+msgstr "Rediger profiler"
+
+#: ../src/ogmrip-progress-dialog.c:128 ../src/ogmrip-progress-dialog.c:386
+msgid "Suspend"
+msgstr "Pause"
+
+#: ../src/ogmrip-progress-dialog.c:144 ../src/ogmrip-progress-dialog.c:382
+msgid "Resume"
+msgstr "Fortsett"
+
+#: ../src/ogmrip-progress-dialog.c:216
+msgid "Analyzing video stream"
+msgstr "Analyserer video"
+
+#: ../src/ogmrip-progress-dialog.c:219
+msgid "Extracting chapters information"
+msgstr "Henter ut informasjon om kapitler"
+
+#: ../src/ogmrip-progress-dialog.c:222
+msgid "Encoding video title"
+msgstr "Konverterer videospor"
+
+#: ../src/ogmrip-progress-dialog.c:226
+#, c-format
+msgid "Extracting audio stream %d"
+msgstr "Henter ut lydspor %d"
+
+#: ../src/ogmrip-progress-dialog.c:232
+#, c-format
+msgid "Extracting subtitle stream %d"
+msgstr "Henter ut undertekstspor %d"
+
+#: ../src/ogmrip-progress-dialog.c:237
+msgid "Merging audio and video streams"
+msgstr "Slår sammen lyd- og videospor"
+
+#: ../src/ogmrip-progress-dialog.c:240
+msgid "DVD backup"
+msgstr "Sikkerhetskopi av DVD"
+
+#: ../src/ogmrip-progress-dialog.c:243
+msgid "Compressibility Test"
+msgstr "Komprimerbarhetstest"
+
+#: ../src/ogmrip-progress-dialog.c:282
+#, c-format
+msgid "%s: %02.0lf%% done"
+msgstr "%s: %02.0lf%% fullført"
+
+#: ../src/ogmrip-queue-dialog.c:450
+msgid "Load encoding"
+msgstr "Last konvertering"
+
+#: ../src/ogmrip-queue-dialog.c:488
+#, c-format
+msgid "Cannot load encoding from '%s'"
+msgstr "Kan ikke laste koding fra '%s'"
+
+#: ../src/ogmrip-queue-dialog.c:514
+msgid "Save encoding"
+msgstr "Lagre konvertering"
+
+#: ../src/ogmrip-queue-dialog.c:612
+msgid "Encoding Queue"
+msgstr "Konverteringskø"
+
+#: ../src/ogmrip-queue-dialog.c:670
+msgid "Run"
+msgstr "Kjør"
+
+#: ../src/ogmrip-queue-dialog.c:675
+msgid "Name"
+msgstr "Navn"
+
+#: ../src/ogmrip-queue-dialog.c:762
+msgid "This encoding will have the same output file name as another one."
+msgstr "Denne kodingen vil ha samme resultatfilnavn som en annen."
+
+#: ../src/ogmrip-queue-dialog.c:763 ../src/ogmrip-queue-dialog.c:775
+msgid "Do you want to enqueue it anyway ?"
+msgstr "Ønsker du likevel å legge den i kø?"
+
+#: ../src/ogmrip-queue-dialog.c:774
+msgid ""
+"A file with the same name as the output file of the encoding already exists."
+msgstr ""
+"En fil med samme navn som resultatfilen av denne kodingen finnes allerede."
+
+#: ../src/ogmrip-subp-options.c:115
+msgid "Subtitles Options"
+msgstr "Alternativer for undertekster"
+
+#: ../src/ogmrip-update-dialog.c:136
+msgid "Update profiles"
+msgstr "Oppdater profiler"
+
+#: ../data/ogmrip.desktop.in.h:1
+msgid "A DVD encoder"
+msgstr "Konverteringsverktøy for DVD"
+
+#: ../data/ogmrip.desktop.in.h:2
+msgid "DVD Encoder OGMRip"
+msgstr "OGMRip DVD-konverterer"
+
+#~ msgid "Could not detect scaling parameters"
+#~ msgstr "Kunne ikke automatisk oppdage skaleringsparametre"
+
+#~ msgid "There is no video codec available"
+#~ msgstr "Det finnes ingen videokoding tilgjengelig"
+
+#~ msgid "Could not detect cropping parameters"
+#~ msgstr "Kunne ikke automatisk oppdage beskjæringsparametre"

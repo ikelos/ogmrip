@@ -1,0 +1,140 @@
+OGMRip
+======
+
+    OGMRip is an application and a set of libraries for ripping and encoding
+    DVD into AVI/OGM files.
+
+    OGMRip:
+
+        * transcodes from DVD or files
+        * outputs ogm, avi, matroska or mp4 files
+        * supports a lot of codecs (vorbis, mp3, pcm, ac3, dts, aac, xvid, lavc, x264, theora)
+        * determines video bitrate for a given filesize
+        * autodetects cropping parameters and scaling factors
+        * supports multiple audio and subtitles streams encoding
+        * extracts subtitles in srt or vobsub format
+        * uses maximum quality codec switches
+        * rips contiguous chapters
+        * supports external audio and subtitles files
+        * provides customisable encoding profiles
+        * is extensible through plugins
+
+        * features a HIG-compliant GNOME 2 user interface
+
+Requirements
+------------
+
+    glib        >= 2.16.0: http://www.gtk.org
+    dvdread     >= 0.9.4:  http://www.dtek.chalmers.se/groups/dvd
+    mplayer     >= 0.92:   http://www.mplayerhq.hu
+    mencoder    >= 0.92:   http://www.mplayerhq.hu
+    intltool    >= 0.35:   http://www.gnome.org
+    pkgconfig   >= 0.12:   http://www.freedesktop.org/software/pkgconfig
+    libxml2     >= 2.0:    http://www.xmlsoft.org
+    enca        >= 1.9:    http://trific.ath.cx/software/enca
+
+Optional
+--------
+
+    For the GUI:
+
+        gtk+     >= 2.12.0: http://www.gtk.org
+        gconf    >= 2.6.0:  http://www.gnome.org
+        libglade >= 2.5.0:  http://www.gnome.org
+
+    For DBus support:
+
+        dbus-glib >= 0.7.2: http://www.freedesktop.org/wiki/Software/DBusBindings
+
+    For notification support:
+        
+        libnotify >= 0.4.3:  http://www.galago-project.org
+
+    For Ogg Media support:
+
+        ogmtools >= 1.0: http://www.bunkus.org/videotools/ogmtools
+
+    For matroska support:
+
+        mkvtoolnix >= 0.9.5: http://www.bunkus.org/videotools/mkvtoolnix
+
+    For mp4 support:
+
+        gpac >= 0.4.2: http://gpac.sourceforge.net
+
+    For x264 suport:
+
+        mplayer must be built with x264 support
+
+    For theora support:
+
+        libtheora >= 1.0alpha5: http://www.theora.org
+
+    For dts support:
+
+        mplayer must be built with dts support
+
+    For mp3 support:
+
+        lame >= 3.96: http://lame.sourceforge.net
+
+    For aac support:
+
+        faac >= 1.24: http://www.audiocoding.com
+
+    For Ogg Vorbis support:
+
+        vorbistools >= 1.0: http://www.xiph.org/ogg/vorbis
+
+    For srt support:
+
+        gocr  >= 0.39:    http://jocr.sourceforge.net/
+      or
+        ocrad >= 0.15:    http://www.gnu.org/software/ocrad/ocrad.html
+      or
+        tesseract >= 2.0: http://code.google.com/p/tesseract-ocr
+        libtiff:          http://www.remotesensing.org/libtiff
+
+    For subtitles spell checking:
+
+        enchant >= 1.1: http://www.abisource.com/enchant/
+
+    For the documentation:
+
+        gtk-doc >= 1.0: http://www.gtk.org/gtk-doc
+        xsltproc      : http://www.xmlsoft.org
+
+Install
+-------
+
+    See the INSTALL file.
+
+Usage
+-----
+
+    $ ogmrip
+
+Notes
+-----
+
+    For FreeBSD users, libbacon relies on the Common Access Method user library. If you 
+    have an ATAPI drive, you've got to install the CAM XPT module (atapicam) otherwise
+    your drive will never be detected. 
+    See http://haribo.ath.cx/~olivier/ogmrip/ogmrip-freebsd.html
+
+License
+-------
+
+    OGMRip is distributed under the terms of the GNU Lesser General Public License.
+    See the COPYING file for more information.
+
+Thanks
+------
+    Arpi and the mplayer team for such a great piece of software.
+    Moritz Bunkus for ogmtools and mktoolnix. Do you plan to add support for theora ?
+    Mike Cheng and Mark Taylor for the best mp3 encoder ever.
+    Chris Phillips for lsdvd from which I have learned libdvdread's API.
+    Ross Burton, sound juicer was an inspiration for both the gui and the code.
+    Bastien Nocera for his bacon-cd-selection
+    The Xiph Foundation for vorbis and theora.
+

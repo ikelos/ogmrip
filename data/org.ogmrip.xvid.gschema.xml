@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<schemalist>
+  <schema id="org.ogmrip.xvid">
+    <key name="profile" type="u">
+      <range min="0" max="16"/>
+      <default>0</default>
+      <summary>Profile</summary>
+    </key>
+    <key name="quant-type" type="u">
+      <range min="0" max="1"/>
+      <default>0</default>
+      <summary>Quantizer</summary>
+    </key>
+    <key name="me-quality" type="u">
+      <range min="0" max="6"/>
+      <default>6</default>
+      <summary>Motion estimation quality</summary>
+    </key>
+    <key name="vhq" type="u">
+      <range min="0" max="4"/>
+      <default>1</default>
+      <summary>Vector high quality</summary>
+    </key>
+    <key name="bvhq" type="u">
+      <range min="0" max="1"/>
+      <default>1</default>
+      <summary>Vector high quality for B-frames</summary>
+    </key>
+    <key name="par" type="u">
+      <range min="0" max="6"/>
+      <default>0</default>
+      <summary>Pixel aspect ratio</summary>
+    </key>
+    <key name="min-iquant" type="u">
+      <range min="0" max="31"/>
+      <default>2</default>
+      <summary>Minimum I-frame quantizer</summary>
+    </key>
+    <key name="max-iquant" type="u">
+      <range min="0" max="31"/>
+      <default>31</default>
+      <summary>Maximum I-frame quantizer</summary>
+    </key>
+    <key name="min-pquant" type="u">
+      <range min="0" max="31"/>
+      <default>2</default>
+      <summary>Minimum P-frame quantizer</summary>
+    </key>
+    <key name="max-pquant" type="u">
+      <range min="0" max="31"/>
+      <default>31</default>
+      <summary>Maximum P-frame quantizer</summary>
+    </key>
+    <key name="min-bquant" type="u">
+      <range min="0" max="31"/>
+      <default>2</default>
+      <summary>Minimum B-frame quantizer</summary>
+    </key>
+    <key name="max-bquant" type="u">
+      <range min="0" max="31"/>
+      <default>31</default>
+      <summary>Maximum B-frame quantizer</summary>
+    </key>
+    <key name="max-key-interval" type="u">
+      <default>250</default>
+      <summary>Maximum interval between keyframes</summary>
+    </key>
+    <key name="frame-drop-ratio" type="u">
+      <range min="0" max="100"/>
+      <default>0</default>
+      <summary>Frame drop ratio</summary>
+    </key>
+    <key name="bquant-ratio" type="u">
+      <range min="0" max="1000"/>
+      <default>150</default>
+      <summary>Quantizer ratio between B- and non-B-frames</summary>
+    </key>
+    <key name="bquant-offset" type="i">
+      <range min="-1000" max="1000"/>
+      <default>100</default>
+      <summary>Quantizer offset between B- and non-B-frames</summary>
+    </key>
+    <key name="par-width" type="u">
+      <range min="1" max="255"/>
+      <default>1</default>
+      <summary>Width of the custom pixel aspect ratio</summary>
+    </key>
+    <key name="par-height" type="u">
+      <range min="1" max="255"/>
+      <default>1</default>
+      <summary>Height of the custom pixel aspect ratio</summary>
+    </key>
+    <key name="gmc" type="b">
+      <default>false</default>
+      <summary>Global motion compensation</summary>
+    </key>
+    <key name="interlacing" type="b">
+      <default>false</default>
+      <summary>Interlacing</summary>
+    </key>
+    <key name="chroma-me" type="b">
+      <default>true</default>
+      <summary>Chroma motion estimation</summary>
+    </key>
+    <key name="chroma-opt" type="b">
+      <default>true</default>
+      <summary>Chroma optimizer</summary>
+    </key>
+    <key name="packed" type="b">
+      <default>false</default>
+      <summary>Packed</summary>
+    </key>
+    <key name="closed-gop" type="b">
+      <default>true</default>
+      <summary>Close every group of pictures</summary>
+    </key>
+    <key name="trellis" type="b">
+      <default>true</default>
+      <summary>Trellis quantization</summary>
+    </key>
+    <key name="qpel" type="b">
+      <default>false</default>
+      <summary>Quarter pixel precision</summary>
+    </key>
+    <key name="grayscale" type="b">
+      <default>false</default>
+      <summary>Discard chroma planes</summary>
+    </key>
+    <key name="cartoon" type="b">
+      <default>false</default>
+      <summary>Encode anime/cartoon</summary>
+    </key>
+  </schema>
+</schemalist>

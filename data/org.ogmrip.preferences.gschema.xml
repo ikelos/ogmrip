@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<schemalist>
+  <schema id="org.ogmrip.preferences" path="/apps/ogmrip/preferences/">
+    <!-- General -->
+    <key name="chapters-language" type="u">
+      <default>0</default>
+      <summary>The chapter language</summary>
+    </key>
+    <key name="filename" type="u">
+      <default>3</default>
+      <summary>The filename pattern of the movie</summary>
+    </key>
+    <key name="output-directory" type="s">
+      <default>''</default>
+      <summary>The directory to save the extracted movie to</summary>
+    </key>
+    <key name="prefered-audio-language" type="u">
+      <default>0</default>
+      <summary>The preferred language of the audio tracks</summary>
+    </key>
+    <key name="prefered-subp-language" type="u">
+      <default>0</default>
+      <summary>The preferred language of the subtitles</summary>
+    </key>
+    <key name="profile" type="s">
+      <default>'default-ogm'</default>
+      <summary>The current profile</summary>
+    </key>
+    <!-- Advanced -->
+    <key name="auto-subp" type="b">
+      <default>true</default>
+      <summary>If a subtitle stream should be automatically hardcoded</summary>
+    </key>
+    <key name="after-encoding" type="u">
+      <default>0</default>
+      <summary>What to do after the encoding</summary>
+    </key>
+    <key name="copy-dvd" type="b">
+      <default>true</default>
+      <summary>If copy DVD on hard drive before encoding</summary>
+    </key>
+    <key name="create-log-file" type="b">
+      <default>false</default>
+      <summary>If a log file must be created</summary>
+    </key>
+    <key name="keep-temporary-files" type="b">
+      <default>false</default>
+      <summary>If the temporary files must be kept</summary>
+    </key>
+    <key name="temporary-directory" type="s">
+      <default>''</default>
+      <summary>The directory to save the temporary files to</summary>
+    </key>
+    <key name="threads" type="u">
+      <default>1</default>
+      <summary>The maximum number of threads</summary>
+    </key>
+    <!-- Profiles -->
+    <key name="profiles" type="as">
+      <default>[]</default>
+      <summary>The list of all available profiles</summary>
+    </key>
+  </schema>
+</schemalist>

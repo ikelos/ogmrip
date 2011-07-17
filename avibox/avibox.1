@@ -1,0 +1,41 @@
+.TH AVIBOX 1 "May 6, 2009" Linux "User Manuals"
+.SH NAME
+avibox \- merge multimedia files into an AVI file
+.SH SYNOPSIS
+avibox [global options] -o <output> -i <input> [local options] <file>
+.SH DESCRIPTION
+.B avibox
+takes the input from several media files and joins their streams (all of them
+or just a selection) into an AVI file.
+
+The options are as follows:
+.TP
+.B -h, --help
+Display usage and quit.
+.TP
+.B -v, --verbose
+Increase verbosity level.
+.TP
+.B -f, --fourcc " fourcc
+Forces the FourCC to the specified value.
+.TP
+.BI "-o, --output " output
+Specifies the name of the output file.
+.TP
+.BI "-s, --split " size
+Splits the output file after a given size.
+.TP
+.BI "-i, --input " input
+Specifies the input AVI file.
+.TP
+.B "-n, --noaudio
+Removes all audio streams from the input file
+.SH FILE TYPES
+.TP
+AVI as the video and audio source (only MP3 and AC3 audio tracks at the moment)
+.TP
+AC3 audio files
+.TP
+MP3 audio files
+.SH AUTHORS
+Manual page by Olivier Rolland

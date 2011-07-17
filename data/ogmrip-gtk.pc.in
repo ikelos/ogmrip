@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: ogmrip-gtk
+Description: ogmrip-gtk is a collection of widgets for OGMRip.
+Requires: ogmdvd-gtk ogmrip gconf-2.0 libglade-2.0
+Version: @VERSION@
+Libs: -L${libdir} -logmrip-gtk
+Cflags: -I${includedir}/ogmrip
+

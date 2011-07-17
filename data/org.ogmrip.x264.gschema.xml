@@ -1,0 +1,128 @@
+<?xml version="1.0"?>
+<schemalist>
+  <schema id="org.ogmrip.x264">
+    <key name="dct8x8" type="b">
+      <default>true</default>
+      <summary>8x8 dct</summary>
+    </key>
+    <key name="aud" type="b">
+      <default>false</default>
+      <summary>Access unit delimiters</summary>
+    </key>
+    <key name="b-adapt" type="u">
+      <range min="0" max="2"/>
+      <default>1</default>
+      <summary>Adaptative B-frames</summary>
+    </key>
+    <key name="b-pyramid" type="u">
+      <range min="0" max="2"/>
+      <default>2</default>
+      <summary>Adaptative B-frames</summary>
+    </key>
+    <key name="brdo" type="b">
+      <default>false</default>
+      <summary>Brdo</summary>
+    </key>
+    <key name="cabac" type="b">
+      <default>true</default>
+      <summary>Use context-adaptive binary arithmetic coding</summary>
+    </key>
+    <key name="cqm" type="u">
+      <range min="0" max="1"/>
+      <default>0</default>
+      <summary>Custom quantization matrix</summary>
+    </key>
+    <key name="direct" type="u">
+      <range min="0" max="3"/>
+      <default>3</default>
+      <summary>Type of motion prediction used for direct macroblocks in B-frames</summary>
+    </key>
+    <key name="framref" type="u">
+      <range min="1" max="16"/>
+      <default>3</default>
+      <summary>Number of previous frames used as predictors in B- and  P-frames</summary>
+    </key>
+    <key name="global-header" type="b">
+      <default>false</default>
+      <summary>Causes SPS and PPS to appear only once, at the beginning of the bitstream</summary>
+    </key>
+    <key name="keyint" type="u">
+      <default>250</default>
+      <summary>Maximum interval between IDR-frames</summary>
+    </key>
+    <key name="level-idc" type="u">
+      <range min="0" max="51"/>
+      <default>51</default>
+      <summary>Bitstream's level</summary>
+    </key>
+    <key name="me" type="u">
+      <range min="0" max="5"/>
+      <default>2</default>
+      <summary>Motion estimation</summary>
+    </key>
+    <key name="merange" type="u">
+      <!-- <range min="4"/> -->
+      <default>16</default>
+      <summary>Motion estimation range</summary>
+    </key>
+    <key name="mixed-refs" type="b">
+      <default>true</default>
+      <summary>Mixed reference frames</summary>
+    </key>
+    <key name="partitions" type="as">
+      <choices>
+        <choice value="i4x4"/>
+        <choice value="p4x4"/>
+        <choice value="b8x8"/>
+        <choice value="i8x8"/>
+        <choice value="p8x8"/>
+        <choice value="all"/>
+        <choice value="none"/>
+      </choices>
+      <default>['p8x8','b8x8','i8x8','i4x4']</default>
+      <summary>Optional macroblock types</summary>
+    </key>
+    <key name="psy-rd" type="d">
+      <range min="0" max="10"/>
+      <default>1</default>
+      <summary>Psy optimization strength</summary>
+    </key>
+    <key name="psy-trellis" type="d">
+      <range min="0" max="10"/>
+      <default>0.15</default>
+      <summary>Psy optimiation trellis</summary>
+    </key>
+    <key name="rc-lookahead" type="u">
+      <range min="0" max="250"/>
+      <default>40</default>
+      <summary>MBtree lookahead distance</summary>
+    </key>
+    <key name="subq" type="u">
+      <range min="0" max="10"/>
+      <default>7</default>
+      <summary>Subpel refinement quality</summary>
+    </key>
+    <key name="trellis" type="u">
+      <range min="0" max="2"/>
+      <default>1</default>
+      <summary>Rate-distortion optimal quantization</summary>
+    </key>
+    <key name="vbv-bufsize" type="u">
+      <default>0</default>
+      <summary>Video buffering verifier buffer size</summary>
+    </key>
+    <key name="vbv-maxrate" type="u">
+      <default>0</default>
+      <summary>Maximum processing rate</summary>
+    </key>
+    <key name="weight-b" type="b">
+      <default>true</default>
+      <summary>Weighted B-frames prediction mode</summary>
+    </key>
+    <key name="weight-p" type="u">
+      <range min="0" max="2"/>
+      <default>2</default>
+      <summary>Weighted P-frame prediction mode</summary>
+    </key>
+  </schema>
+</schemalist>

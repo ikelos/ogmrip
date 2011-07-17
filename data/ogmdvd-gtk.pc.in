@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: ogmdvd-gtk
+Description: ogmdvd-gtk is a collection of widgets to display DVD informations.
+Requires: gtk+-2.0 ogmdvd
+Version: @VERSION@
+Libs: -L${libdir} -logmdvd-gtk -logmdvd -ldvdread
+Cflags: -I${includedir}/ogmdvd
+

@@ -1,0 +1,16 @@
+<profile name="default-mkv" version="1.0">
+  <key name="name">'&lt;b&gt;PC, High Quality&lt;/b&gt;&#xA;Quantizer 2 (MKV + X264 + AAC)'</key>
+  <section name="general">
+    <key name="encoding-method">2</key>
+    <key name="container">'mkv'</key>
+  </section>
+  <section name="video">
+    <key name="codec">'x264'</key>
+  </section>
+  <section name="audio">
+    <key name="codec">'aac'</key>
+  </section>
+  <section name="subp">
+    <key name="codec">'srt'</key>
+  </section>
+</profile>

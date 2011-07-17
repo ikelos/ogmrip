@@ -1,0 +1,110 @@
+<?xml version="1.0"?>
+<schemalist>
+  <schema id="org.ogmrip.lavc">
+    <key name="header" type="u">
+      <range min="0" max="3"/>
+      <default>0</default>
+      <summary>Header</summary>
+    </key>
+    <key name="cmp" type="u">
+      <range min="0" max="2000"/>
+      <default>0</default>
+      <summary>Header</summary>
+    </key>
+    <key name="precmp" type="u">
+      <range min="0" max="2000"/>
+      <default>0</default>
+      <summary>Header</summary>
+    </key>
+    <key name="subcmp" type="u">
+      <range min="0" max="2000"/>
+      <default>0</default>
+      <summary>Header</summary>
+    </key>
+    <key name="dia" type="i">
+      <range min="-99" max="6"/>
+      <default>1</default>
+      <summary>Header</summary>
+    </key>
+    <key name="predia" type="i">
+      <range min="-99" max="6"/>
+      <default>1</default>
+      <summary>Header</summary>
+    </key>
+    <key name="keyint" type="u">
+      <default>250</default>
+      <summary>Header</summary>
+    </key>
+    <key name="buf-size" type="u">
+      <default>0</default>
+      <summary>Header</summary>
+    </key>
+    <key name="min-rate" type="u">
+      <default>0</default>
+      <summary>Header</summary>
+    </key>
+    <key name="max-rate" type="u">
+      <default>0</default>
+      <summary>Header</summary>
+    </key>
+    <key name="strict" type="u">
+      <range min="0" max="3"/>
+      <default>2</default>
+      <summary>Header</summary>
+    </key>
+    <key name="dc" type="u">
+      <default>8</default>
+      <summary>Header</summary>
+    </key>
+    <key name="mbd" type="u">
+      <range min="0" max="2"/>
+      <default>0</default>
+      <summary>Header</summary>
+    </key>
+    <key name="qns" type="u">
+      <range min="0" max="3"/>
+      <default>0</default>
+      <summary>Header</summary>
+    </key>
+    <key name="vb-strategy" type="u">
+      <range min="0" max="2"/>
+      <default>0</default>
+      <summary>Header</summary>
+    </key>
+    <key name="last-pred" type="u">
+      <range min="0" max="99"/>
+      <default>0</default>
+      <summary>Header</summary>
+    </key>
+    <key name="preme" type="u">
+      <range min="0" max="2"/>
+      <default>1</default>
+      <summary>Header</summary>
+    </key>
+    <key name="vqcomp" type="d">
+      <range min="0" max="1"/>
+      <default>0.5</default>
+      <summary>Header</summary>
+    </key>
+    <key name="mv0" type="b">
+      <default>false</default>
+      <summary>Header</summary>
+    </key>
+    <key name="grayscale" type="b">
+      <default>false</default>
+      <summary>Header</summary>
+    </key>
+    <key name="qpel" type="b">
+      <default>false</default>
+      <summary>Header</summary>
+    </key>
+    <key name="trellis" type="b">
+      <default>true</default>
+      <summary>Header</summary>
+    </key>
+    <key name="v4mv" type="b">
+      <default>true</default>
+      <summary>Header</summary>
+    </key>
+  </schema>
+</schemalist>
