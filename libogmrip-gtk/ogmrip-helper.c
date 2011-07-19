@@ -147,7 +147,11 @@ gtk_window_set_icon_from_stock (GtkWindow *window, const gchar *stock_id)
   g_return_if_fail (GTK_IS_WINDOW (window));
   g_return_if_fail (stock_id && *stock_id);
   
+#if GTK_CHECK_VERSION(3,0,0)
+  pixbuf = gtk_widget_render_icon_pixbuf (GTK_WIDGET (window), stock_id, GTK_ICON_SIZE_DIALOG);
+#else
   pixbuf = gtk_widget_render_icon (GTK_WIDGET (window), stock_id, GTK_ICON_SIZE_DIALOG, NULL);
+#endif
   gtk_window_set_icon (window, pixbuf);
   g_object_unref (pixbuf);
 }

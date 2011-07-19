@@ -72,7 +72,7 @@ ogmrip_profiles_dialog_run_profile_dialog (GtkWindow *parent, const gchar *old_n
   gchar *new_name = NULL;
 
   dialog = gtk_dialog_new_with_buttons (old_name ? _("Rename profile") : _("New profile"), NULL,
-      GTK_DIALOG_MODAL | GTK_DIALOG_NO_SEPARATOR, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
+      GTK_DIALOG_MODAL, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
       GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, NULL);
 
   gtk_dialog_set_response_sensitive (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT, FALSE);
