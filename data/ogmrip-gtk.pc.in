@@ -5,7 +5,7 @@ includedir=@includedir@
 
 Name: ogmrip-gtk
 Description: ogmrip-gtk is a collection of widgets for OGMRip.
-Requires: ogmdvd-gtk ogmrip gconf-2.0 libglade-2.0
+Requires: ogmdvd-gtk ogmrip
 Version: @VERSION@
 Libs: -L${libdir} -logmrip-gtk
 Cflags: -I${includedir}/ogmrip
