@@ -167,29 +167,6 @@ ogmrip_profiles_dialog_new_button_clicked (OGMRipProfilesDialog *dialog)
   }
 }
 
-static gchar *
-get_profile_title (const gchar *name)
-{
-  gchar *str1, *str2;
-  gint i;
-
-  for (i = 0; name[i] != '\0'; i++)
-    if (name[i] == '\n' || name[i] == '\r')
-      break;
-
-  str1 = g_strndup (name, i);
-
-  if (!pango_parse_markup (str1, -1, 0, NULL, &str2, NULL, NULL))
-    str2 = g_strdup (name);
-
-  g_free (str1);
-
-  str1 = g_strdup_printf (_("Editing profile \"%s\""), str2);
-  g_free (str2);
-
-  return str1;
-}
-
 static void
 ogmrip_profiles_dialog_copy_button_clicked (OGMRipProfilesDialog *dialog)
 {
@@ -211,20 +188,12 @@ ogmrip_profiles_dialog_edit_button_clicked (OGMRipProfilesDialog *parent)
   {
     OGMRipProfile *profile;
     GtkWidget *dialog;
-    gchar *name, *title;
 
     profile = ogmrip_profile_store_get_profile (GTK_LIST_STORE (model), &iter);
 
     dialog = ogmrip_profile_editor_dialog_new (profile);
     gtk_window_set_parent (GTK_WINDOW (dialog), GTK_WINDOW (parent));
     gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), FALSE);
-
-    name = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_NAME);
-    title = get_profile_title (name);
-    g_free (name);
-
-    gtk_window_set_title (GTK_WINDOW (dialog), title);
-    g_free (title);
 
     gtk_dialog_run (GTK_DIALOG (dialog));
 

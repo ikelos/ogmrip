@@ -757,13 +757,51 @@ ogmrip_profile_editor_dialog_get_property (GObject *gobject, guint property_id, 
   }
 }
 
+static gchar *
+get_profile_title (const gchar *name)
+{
+  gchar *str1, *str2;
+  gint i;
+
+  for (i = 0; name[i] != '\0'; i++)
+    if (name[i] == '\n' || name[i] == '\r')
+      break;
+
+  str1 = g_strndup (name, i);
+
+  if (!pango_parse_markup (str1, -1, 0, NULL, &str2, NULL, NULL))
+    str2 = g_strdup (name);
+
+  g_free (str1);
+
+  str1 = g_strdup_printf (_("Editing profile \"%s\""), str2);
+  g_free (str2);
+
+  return str1;
+}
+
+static void
+ogmrip_profile_editor_set_profile (OGMRipProfileEditorDialog *dialog, OGMRipProfile *profile)
+{
+  gchar *name, *title;
+
+  dialog->priv->profile = g_object_ref (profile);
+
+  name = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_NAME);
+  title = get_profile_title (name);
+  g_free (name);
+
+  gtk_window_set_title (GTK_WINDOW (dialog), title);
+  g_free (title);
+}
+
 static void
 ogmrip_profile_editor_dialog_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
 {
   switch (property_id)
   {
     case PROP_PROFILE:
-      OGMRIP_PROFILE_EDITOR_DIALOG (gobject)->priv->profile = g_value_dup_object (value);
+      ogmrip_profile_editor_set_profile (OGMRIP_PROFILE_EDITOR_DIALOG (gobject), g_value_get_object (value));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
