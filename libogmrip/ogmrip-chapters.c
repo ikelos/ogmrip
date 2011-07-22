@@ -104,10 +104,9 @@ static gint
 ogmrip_chapters_run (OGMJobSpawn *spawn)
 {
   GIOChannel *channel;
-  OGMDvdTitle *title;
+  OGMDvdStream *stream;
 
   const gchar *output;
-  guint numerator, denominator;
   guint start_chapter, end_chapter;
   gdouble seconds, length;
   gint i;
@@ -119,15 +118,14 @@ ogmrip_chapters_run (OGMJobSpawn *spawn)
 
   ogmrip_codec_get_chapters (OGMRIP_CODEC (spawn), &start_chapter, &end_chapter);
 
-  title = ogmrip_codec_get_input (OGMRIP_CODEC (spawn));
-  ogmdvd_title_get_framerate (title, &numerator, &denominator);
+  stream = ogmrip_codec_get_input (OGMRIP_CODEC (spawn));
 
   for (i = start_chapter, seconds = length = 0.0; i <= end_chapter; i++)
   {
     length += seconds;
 
     if (i < end_chapter)
-      seconds = ogmdvd_title_get_chapters_length (title, i, i, NULL);
+      seconds = ogmdvd_title_get_chapters_length (ogmdvd_stream_get_title (stream), i, i, NULL);
 
     ogmrip_chapters_save (OGMRIP_CHAPTERS (spawn), 
         channel, i - start_chapter + 1, OGMRIP_CHAPTERS (spawn)->priv->labels[i], length * 1000);

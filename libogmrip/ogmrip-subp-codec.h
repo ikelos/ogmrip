@@ -48,9 +48,6 @@ struct _OGMRipSubpCodecClass
 
 GType              ogmrip_subp_codec_get_type            (void);
 
-void               ogmrip_subp_codec_set_dvd_subp_stream (OGMRipSubpCodec  *subp, 
-                                                          OGMDvdSubpStream *stream);
-OGMDvdSubpStream * ogmrip_subp_codec_get_dvd_subp_stream (OGMRipSubpCodec  *subp);
 void               ogmrip_subp_codec_set_forced_only     (OGMRipSubpCodec  *subp,
                                                           gboolean         forced_only);
 gboolean           ogmrip_subp_codec_get_forced_only     (OGMRipSubpCodec  *subp);

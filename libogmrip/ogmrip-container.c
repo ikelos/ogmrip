@@ -101,31 +101,31 @@ ogmrip_container_class_init (OGMRipContainerClass *klass)
 
   g_object_class_install_property (gobject_class, PROP_OUTPUT, 
         g_param_spec_string ("output", "Output property", "Set output file", 
-           NULL, G_PARAM_READWRITE));
+           NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_LABEL, 
         g_param_spec_string ("label", "Label property", "Set label", 
-           NULL, G_PARAM_READWRITE));
+           NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_FOURCC, 
         g_param_spec_string ("fourcc", "FourCC property", "Set fourcc", 
-           NULL, G_PARAM_READWRITE));
+           NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_TSIZE, 
         g_param_spec_uint ("target-size", "Target size property", "Set target size", 
-           0, G_MAXUINT, 0, G_PARAM_READWRITE));
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_TNUMBER, 
         g_param_spec_uint ("target-number", "Target number property", "Set target number", 
-           0, G_MAXUINT, 1, G_PARAM_READWRITE));
+           0, G_MAXUINT, 1, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_OVERHEAD, 
         g_param_spec_uint ("overhead", "Overhead property", "Get overhead", 
-           0, G_MAXUINT, 6, G_PARAM_READABLE));
+           0, G_MAXUINT, 6, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_START_DELAY, 
         g_param_spec_uint ("start-delay", "Start delay property", "Set start delay", 
-           0, G_MAXINT, 0, G_PARAM_READWRITE));
+           0, G_MAXINT, 0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipContainerPriv));
 }
@@ -204,7 +204,7 @@ ogmrip_container_set_property (GObject *gobject, guint property_id, const GValue
   switch (property_id) 
   {
     case PROP_OUTPUT:
-      ogmrip_container_set_output (container, g_value_get_string (value));
+      container->priv->output = g_value_dup_string (value);
       break;
     case PROP_LABEL: 
       ogmrip_container_set_label (container, g_value_get_string (value));
@@ -238,13 +238,13 @@ ogmrip_container_get_property (GObject *gobject, guint property_id, GValue *valu
   switch (property_id) 
   {
     case PROP_OUTPUT:
-      g_value_set_static_string (value, container->priv->output);
+      g_value_set_string (value, container->priv->output);
       break;
     case PROP_LABEL:
-      g_value_set_static_string (value, container->priv->label);
+      g_value_set_string (value, container->priv->label);
       break;
     case PROP_FOURCC:
-      g_value_set_static_string (value, container->priv->fourcc);
+      g_value_set_string (value, container->priv->fourcc);
       break;
     case PROP_TSIZE:
       g_value_set_uint (value, container->priv->tsize);
@@ -331,23 +331,6 @@ ogmrip_container_get_output (OGMRipContainer *container)
   g_return_val_if_fail (OGMRIP_IS_CONTAINER (container), NULL);
 
   return container->priv->output;
-}
-
-/**
- * ogmrip_container_set_output:
- * @container: an #OGMRipContainer
- * @output: the name of the output file
- *
- * Sets the name of the output file.
- */
-void
-ogmrip_container_set_output (OGMRipContainer *container, const gchar *output)
-{
-  g_return_if_fail (OGMRIP_IS_CONTAINER (container));
-  g_return_if_fail (output && *output);
-
-  g_free (container->priv->output);
-  container->priv->output = g_strdup (output);
 }
 
 /**
@@ -1096,6 +1079,7 @@ ogmrip_container_get_split (OGMRipContainer *container, guint *number, guint *si
 static gint64
 ogmrip_container_get_video_overhead (OGMRipContainer *container)
 {
+  OGMDvdStream *stream;
   gdouble framerate, length, video_frames;
   guint num, denom;
   gint overhead;
@@ -1103,7 +1087,8 @@ ogmrip_container_get_video_overhead (OGMRipContainer *container)
   if (!container->priv->video)
     return 0;
 
-  ogmrip_codec_get_framerate (OGMRIP_CODEC (container->priv->video), &num, &denom);
+  stream = ogmrip_codec_get_input (OGMRIP_CODEC (container->priv->video));
+  ogmdvd_video_stream_get_framerate (OGMDVD_VIDEO_STREAM (stream), &num, &denom);
   framerate = num / (gdouble) denom;
 
   length = ogmrip_codec_get_length (OGMRIP_CODEC (container->priv->video), NULL);

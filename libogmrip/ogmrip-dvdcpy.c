@@ -48,7 +48,7 @@ ogmrip_dvdcpy_watch (OGMJobExec *exec, const gchar *buffer, OGMRipVideoCodec *vi
 static gchar **
 ogmrip_dvdcpy_command (OGMRipDvdCpy *dvdcpy, const gchar *input, const gchar *output)
 {
-  OGMDvdTitle *title;
+  OGMDvdStream *stream;
   GPtrArray *argv;
 
   const gchar *device;
@@ -58,10 +58,8 @@ ogmrip_dvdcpy_command (OGMRipDvdCpy *dvdcpy, const gchar *input, const gchar *ou
 
   if (!output)
     output = ogmrip_codec_get_output (OGMRIP_CODEC (dvdcpy));
-  g_return_val_if_fail (output != NULL, NULL);
 
-  title = ogmrip_codec_get_input (OGMRIP_CODEC (dvdcpy));
-  g_return_val_if_fail (title != NULL, NULL);
+  stream = ogmrip_codec_get_input (OGMRIP_CODEC (dvdcpy));
 
   argv = g_ptr_array_new ();
   g_ptr_array_add (argv, g_strdup ("dvdcpy"));
@@ -71,11 +69,11 @@ ogmrip_dvdcpy_command (OGMRipDvdCpy *dvdcpy, const gchar *input, const gchar *ou
   g_ptr_array_add (argv, g_strdup (output));
   g_ptr_array_add (argv, g_strdup ("-m"));
 
-  vid = ogmdvd_title_get_nr (title);
+  vid = ogmdvd_title_get_nr (ogmdvd_stream_get_title (stream));
   g_ptr_array_add (argv, g_strdup ("-t"));
   g_ptr_array_add (argv, g_strdup_printf ("%d", vid + 1));
 
-  device = ogmdvd_disc_get_device (ogmdvd_title_get_disc (title));
+  device = ogmdvd_disc_get_device (ogmdvd_title_get_disc (ogmdvd_stream_get_title (stream)));
   g_ptr_array_add (argv, g_strdup (device));
 
   g_ptr_array_add (argv, NULL);

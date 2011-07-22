@@ -51,9 +51,6 @@ struct _OGMRipAudioCodecClass
 
 GType               ogmrip_audio_codec_get_type              (void);
 
-void                ogmrip_audio_codec_set_dvd_audio_stream  (OGMRipAudioCodec    *audio, 
-                                                              OGMDvdAudioStream   *stream);
-OGMDvdAudioStream * ogmrip_audio_codec_get_dvd_audio_stream  (OGMRipAudioCodec    *audio);
 void                ogmrip_audio_codec_set_fast              (OGMRipAudioCodec    *audio,
                                                               gboolean            fast);
 gboolean            ogmrip_audio_codec_get_fast              (OGMRipAudioCodec    *audio);

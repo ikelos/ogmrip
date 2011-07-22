@@ -331,11 +331,6 @@ ogmrip_video_codec_crop_command (OGMRipVideoCodec *video, gdouble start, gulong 
   const gchar *device;
   gint vid;
 
-  g_return_val_if_fail (OGMRIP_IS_VIDEO_CODEC (video), NULL);
-
-  title = ogmrip_codec_get_input (OGMRIP_CODEC (video));
-  g_return_val_if_fail (title != NULL, NULL);
-
   argv = g_ptr_array_new ();
 
   if (MPLAYER_CHECK_VERSION (1,0,0,8))
@@ -397,6 +392,8 @@ ogmrip_video_codec_crop_command (OGMRipVideoCodec *video, gdouble start, gulong 
   g_ptr_array_add (argv, g_strdup ("-frames"));
   g_ptr_array_add (argv, g_strdup_printf ("%lu", nframes));
 
+  title = ogmdvd_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video)));
+
   device = ogmdvd_disc_get_device (ogmdvd_title_get_disc (title));
   g_ptr_array_add (argv, g_strdup ("-dvd-device"));
   g_ptr_array_add (argv, g_strdup (device));
@@ -424,11 +421,6 @@ ogmrip_video_codec_analyze_command (OGMRipVideoCodec *video, gulong nframes)
 
   const gchar *device;
   gint vid;
-
-  g_return_val_if_fail (OGMRIP_IS_VIDEO_CODEC (video), NULL);
-
-  title = ogmrip_codec_get_input (OGMRIP_CODEC (video));
-  g_return_val_if_fail (title != NULL, NULL);
 
   argv = g_ptr_array_new ();
 
@@ -461,6 +453,8 @@ ogmrip_video_codec_analyze_command (OGMRipVideoCodec *video, gulong nframes)
 
   g_ptr_array_add (argv, g_strdup ("-frames"));
   g_ptr_array_add (argv, g_strdup_printf ("%lu", nframes));
+
+  title = ogmdvd_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video)));
 
   device = ogmdvd_disc_get_device (ogmdvd_title_get_disc (title));
   g_ptr_array_add (argv, g_strdup ("-dvd-device"));
@@ -499,47 +493,47 @@ ogmrip_video_codec_class_init (OGMRipVideoCodecClass *klass)
 
   g_object_class_install_property (gobject_class, PROP_ANGLE, 
         g_param_spec_uint ("angle", "Angle property", "Set angle", 
-           1, G_MAXUINT, 1, G_PARAM_READWRITE));
+           1, G_MAXUINT, 1, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_BITRATE, 
         g_param_spec_uint ("bitrate", "Bitrate property", "Set bitrate", 
-           4000, 24000000, 800000, G_PARAM_READWRITE));
+           4000, 24000000, 800000, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_QUANTIZER, 
         g_param_spec_double ("quantizer", "Quantizer property", "Set quantizer", 
-           -1.0, 31.0, -1.0, G_PARAM_READWRITE));
+           -1.0, 31.0, -1.0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_BPP, 
         g_param_spec_double ("bpp", "Bits per pixel property", "Set bits per pixel", 
-           0.0, 1.0, 0.25, G_PARAM_READWRITE));
+           0.0, 1.0, 0.25, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_PASSES, 
         g_param_spec_uint ("passes", "Passes property", "Set the number of passes", 
-           1, G_MAXUINT, 1, G_PARAM_READWRITE));
+           1, G_MAXUINT, 1, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_THREADS, 
         g_param_spec_uint ("threads", "Threads property", "Set the number of threads", 
-           0, G_MAXUINT, 0, G_PARAM_READWRITE));
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_TURBO, 
         g_param_spec_boolean ("turbo", "Turbo property", "Set turbo", 
-           FALSE, G_PARAM_READWRITE));
+           FALSE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_DENOISE, 
         g_param_spec_boolean ("denoise", "Denoise property", "Set denoise", 
-           FALSE, G_PARAM_READWRITE));
+           FALSE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_BFRAMES, 
         g_param_spec_uint ("bframes", "B frames property", "Set b-frames", 
-           0, 4, 2, G_PARAM_READWRITE));
+           0, 4, 2, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_DEBLOCK, 
         g_param_spec_boolean ("deblock", "Deblock property", "Set deblock", 
-           TRUE, G_PARAM_READWRITE));
+           TRUE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_DERING, 
         g_param_spec_boolean ("dering", "Dering property", "Set dering", 
-           TRUE, G_PARAM_READWRITE));
+           TRUE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipVideoCodecPriv));
 }
@@ -795,7 +789,7 @@ ogmrip_video_codec_set_angle (OGMRipVideoCodec *video, guint angle)
 
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
 
-  title = ogmrip_codec_get_input (OGMRIP_CODEC (video));
+  title = ogmdvd_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video)));
 
   g_return_if_fail (angle > 0 && angle <= ogmdvd_title_get_n_angles (title));
 
@@ -1268,17 +1262,14 @@ ogmrip_video_codec_get_start_delay (OGMRipVideoCodec *video)
 void
 ogmrip_video_codec_get_raw_size (OGMRipVideoCodec *video, guint *width, guint *height)
 {
-  OGMDvdTitle *title;
+  OGMDvdStream *stream;
 
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
   g_return_if_fail (width != NULL);
   g_return_if_fail (height != NULL);
 
-  title = ogmrip_codec_get_input (OGMRIP_CODEC (video));
-
-  g_return_if_fail (title != NULL);
-
-  ogmdvd_title_get_size (title, width, height);
+  stream = ogmrip_codec_get_input (OGMRIP_CODEC (video));
+  ogmdvd_video_stream_get_resolution (OGMDVD_VIDEO_STREAM (stream), width, height);
 }
 
 /**
@@ -1531,10 +1522,11 @@ ogmrip_video_codec_get_aspect_ratio (OGMRipVideoCodec *video, guint *num, guint 
 
   if (!video->priv->aspect_num || !video->priv->aspect_denom)
   {
-    OGMDvdTitle *title;
+    OGMDvdStream *stream;
 
-    title = ogmrip_codec_get_input (OGMRIP_CODEC (video));
-    ogmdvd_title_get_aspect_ratio (title, &video->priv->aspect_num, &video->priv->aspect_denom);
+    stream = ogmrip_codec_get_input (OGMRIP_CODEC (video));
+    ogmdvd_video_stream_get_aspect_ratio (OGMDVD_VIDEO_STREAM (stream),
+        &video->priv->aspect_num, &video->priv->aspect_denom);
   }
 
   if (num)
@@ -1570,7 +1562,7 @@ ogmrip_video_codec_set_aspect_ratio (OGMRipVideoCodec *video, guint num, guint d
 void
 ogmrip_video_codec_autoscale (OGMRipVideoCodec *video)
 {
-  OGMDvdTitle *title;
+  OGMDvdStream *stream;
   guint anumerator, adenominator;
   guint rnumerator, rdenominator;
   guint scale_width, scale_height;
@@ -1580,16 +1572,14 @@ ogmrip_video_codec_autoscale (OGMRipVideoCodec *video)
 
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
 
-  title = ogmrip_codec_get_input (OGMRIP_CODEC (video));
-  g_return_if_fail (title != NULL);
-
   ogmrip_video_codec_get_raw_size (video, &raw_width, &raw_height);
   ogmrip_video_codec_get_aspect_ratio (video, &anumerator, &adenominator);
 
   crop_width = video->priv->crop_width > 0 ? video->priv->crop_width : raw_width;
   crop_height = video->priv->crop_height > 0 ? video->priv->crop_height : raw_height;
 
-  ogmdvd_title_get_framerate (title, &rnumerator, &rdenominator);
+  stream = ogmrip_codec_get_input (OGMRIP_CODEC (video));
+  ogmdvd_video_stream_get_framerate (OGMDVD_VIDEO_STREAM (stream), &rnumerator, &rdenominator);
 
   ratio = crop_width / (gdouble) crop_height * raw_height / raw_width * anumerator / adenominator;
 
@@ -1630,13 +1620,9 @@ ogmrip_video_codec_autoscale (OGMRipVideoCodec *video)
 void
 ogmrip_video_codec_autobitrate (OGMRipVideoCodec *video, guint64 nonvideo_size, guint64 overhead_size, guint64 total_size)
 {
-  OGMDvdTitle *title;
   gdouble video_size, length;
 
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
-
-  title = ogmrip_codec_get_input (OGMRIP_CODEC (video));
-  g_return_if_fail (title != NULL);
 
   video_size = total_size - nonvideo_size - overhead_size;
   length = ogmrip_codec_get_length (OGMRIP_CODEC (video), NULL);

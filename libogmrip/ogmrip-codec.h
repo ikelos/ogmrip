@@ -52,54 +52,33 @@ struct _OGMRipCodecClass
                         OGMRipProfile *profile);
 };
 
-GType         ogmrip_codec_get_type            (void);
+GType          ogmrip_codec_get_type           (void);
+OGMDvdStream * ogmrip_codec_get_input          (OGMRipCodec   *codec);
 G_CONST_RETURN
-gchar *       ogmrip_codec_get_output          (OGMRipCodec   *codec);
-void          ogmrip_codec_set_output          (OGMRipCodec   *codec,
+gchar *        ogmrip_codec_get_output         (OGMRipCodec   *codec);
+void           ogmrip_codec_set_output         (OGMRipCodec   *codec,
                                                 const gchar   *output);
-OGMDvdTitle * ogmrip_codec_get_input           (OGMRipCodec   *codec);
-void          ogmrip_codec_set_input           (OGMRipCodec   *codec,
-                                                OGMDvdTitle   *title);
-
-void          ogmrip_codec_set_profile         (OGMRipCodec   *codec,
+void           ogmrip_codec_set_profile        (OGMRipCodec   *codec,
                                                 OGMRipProfile *profile);
-
-gdouble       ogmrip_codec_get_length          (OGMRipCodec   *codec,
+gdouble        ogmrip_codec_get_length         (OGMRipCodec   *codec,
                                                 OGMDvdTime    *length);
-
-void          ogmrip_codec_set_telecine        (OGMRipCodec   *codec,
+void           ogmrip_codec_set_telecine       (OGMRipCodec   *codec,
                                                 gboolean      telecine);
-gboolean      ogmrip_codec_get_telecine        (OGMRipCodec   *codec);
-void          ogmrip_codec_set_progressive     (OGMRipCodec   *codec,
+gboolean       ogmrip_codec_get_telecine       (OGMRipCodec   *codec);
+void           ogmrip_codec_set_progressive    (OGMRipCodec   *codec,
                                                 gboolean      progressive);
-gboolean      ogmrip_codec_get_progressive     (OGMRipCodec   *codec);
-
-void          ogmrip_codec_set_chapters        (OGMRipCodec   *codec,
-                                                guint         start,
-                                                gint          end);
-void          ogmrip_codec_get_chapters        (OGMRipCodec   *codec,
+gboolean       ogmrip_codec_get_progressive    (OGMRipCodec   *codec);
+void           ogmrip_codec_get_chapters       (OGMRipCodec   *codec,
                                                 guint         *start,
                                                 guint         *end);
-void          ogmrip_codec_set_framerate       (OGMRipCodec   *codec,
-                                                guint         numerator,
-                                                guint         denominator);
-void          ogmrip_codec_get_framerate       (OGMRipCodec   *codec,
-                                                guint         *numerator,
-                                                guint         *denominator);
-void          ogmrip_codec_set_framestep       (OGMRipCodec   *codec,
-                                                guint         framestep);
-gint          ogmrip_codec_get_framestep       (OGMRipCodec   *codec);
-
-void          ogmrip_codec_set_unlink_on_unref (OGMRipCodec   *codec,
-                                                gboolean      do_unlink);
-gboolean      ogmrip_codec_get_unlink_on_unref (OGMRipCodec   *codec);
-
-void          ogmrip_codec_set_play_length     (OGMRipCodec   *codec,
+void           ogmrip_codec_set_chapters       (OGMRipCodec   *codec,
+                                                guint         start,
+                                                gint          end);
+gdouble        ogmrip_codec_get_play_length    (OGMRipCodec   *codec);
+void           ogmrip_codec_set_play_length    (OGMRipCodec   *codec,
                                                 gdouble       length);
-gdouble       ogmrip_codec_get_play_length     (OGMRipCodec   *codec);
-
-gdouble       ogmrip_codec_get_start           (OGMRipCodec   *codec);
-void          ogmrip_codec_set_start           (OGMRipCodec   *codec,
+gdouble        ogmrip_codec_get_start_position (OGMRipCodec   *codec);
+void           ogmrip_codec_set_start_position (OGMRipCodec   *codec,
                                                 gdouble       start);
 
 G_END_DECLS

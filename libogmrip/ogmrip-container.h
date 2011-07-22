@@ -94,8 +94,6 @@ void               ogmrip_container_set_profile          (OGMRipContainer       
 
 G_CONST_RETURN
 gchar *            ogmrip_container_get_output           (OGMRipContainer          *container);
-void               ogmrip_container_set_output           (OGMRipContainer          *container,
-                                                          const gchar              *output);
 G_CONST_RETURN
 gchar *            ogmrip_container_get_label            (OGMRipContainer          *container);
 void               ogmrip_container_set_label            (OGMRipContainer          *container,

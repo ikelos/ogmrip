@@ -34,12 +34,9 @@
 struct _OGMRipCodecPriv
 {
   OGMDvdTitle *title;
+  OGMDvdStream *input;
   OGMDvdTime time_;
   gchar *output;
-
-  guint framerate_numerator;
-  guint framerate_denominator;
-  guint framestep;
 
   gboolean telecine;
   gboolean progressive;
@@ -63,7 +60,6 @@ enum
   PROP_LENGTH,
   PROP_START_CHAPTER,
   PROP_END_CHAPTER,
-  PROP_FRAMESTEP,
   PROP_PROGRESSIVE,
   PROP_TELECINE
 };
@@ -79,6 +75,24 @@ static void ogmrip_codec_get_property (GObject      *gobject,
                                        GValue       *value,
                                        GParamSpec   *pspec);
 static gint ogmrip_codec_run          (OGMJobSpawn  *spawn);
+
+static void
+ogmrip_codec_set_input (OGMRipCodec *codec, OGMDvdStream *input)
+{
+  g_return_if_fail (OGMRIP_IS_CODEC (codec));
+  g_return_if_fail (input != NULL);
+
+  ogmdvd_stream_ref (input);
+
+  if (codec->priv->input)
+    ogmdvd_stream_unref (codec->priv->input);
+
+  codec->priv->title = ogmdvd_stream_get_title (input);
+
+  codec->priv->dirty = TRUE;
+  codec->priv->start_chap = 0;
+  codec->priv->end_chap = -1;
+}
 
 G_DEFINE_ABSTRACT_TYPE (OGMRipCodec, ogmrip_codec, OGMJOB_TYPE_BIN)
 
@@ -99,27 +113,23 @@ ogmrip_codec_class_init (OGMRipCodecClass *klass)
 
   g_object_class_install_property (gobject_class, PROP_INPUT, 
         g_param_spec_pointer ("input", "Input property", "Set input title", 
-           G_PARAM_READWRITE));
+           G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_OUTPUT, 
         g_param_spec_string ("output", "Output property", "Set output file", 
-           NULL, G_PARAM_READWRITE));
+           NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_LENGTH, 
         g_param_spec_double ("length", "Length property", "Get length", 
-           0.0, G_MAXDOUBLE, 0.0, G_PARAM_READABLE));
+           0.0, G_MAXDOUBLE, 0.0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_START_CHAPTER, 
         g_param_spec_int ("start-chapter", "Start chapter property", "Set start chapter", 
-           0, G_MAXINT, 0, G_PARAM_READWRITE));
+           0, G_MAXINT, 0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_END_CHAPTER, 
         g_param_spec_int ("end-chapter", "End chapter property", "Set end chapter", 
-           -1, G_MAXINT, -1, G_PARAM_READWRITE));
-
-  g_object_class_install_property (gobject_class, PROP_FRAMESTEP, 
-        g_param_spec_uint ("framestep", "Framestep property", "Set framestep", 
-           0, G_MAXUINT, 1, G_PARAM_READWRITE));
+           -1, G_MAXINT, -1, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_PROGRESSIVE, 
         g_param_spec_boolean ("progressive", "Progressive property", "Set progressive", 
@@ -136,9 +146,8 @@ static void
 ogmrip_codec_init (OGMRipCodec *codec)
 {
   codec->priv = OGMRIP_CODEC_GET_PRIVATE (codec);
-  codec->priv->framestep = 1;
-  codec->priv->end_chap = -1;
 
+  codec->priv->end_chap = -1;
   codec->priv->play_length = -1.0;
   codec->priv->start_second = -1.0;
 }
@@ -150,9 +159,11 @@ ogmrip_codec_dispose (GObject *gobject)
 
   codec = OGMRIP_CODEC (gobject);
 
-  if (codec->priv->title)
-    ogmdvd_title_unref (codec->priv->title);
-  codec->priv->title = NULL;
+  if (codec->priv->input)
+  {
+    ogmdvd_stream_unref (codec->priv->input);
+    codec->priv->input = NULL;
+  }
 
   G_OBJECT_CLASS (ogmrip_codec_parent_class)->dispose (gobject);
 }
@@ -197,9 +208,6 @@ ogmrip_codec_set_property (GObject *gobject, guint property_id, const GValue *va
     case PROP_END_CHAPTER: 
       ogmrip_codec_set_chapters (codec, codec->priv->start_chap, g_value_get_int (value));
       break;
-    case PROP_FRAMESTEP: 
-      ogmrip_codec_set_framestep (codec, g_value_get_uint (value));
-      break;
     case PROP_PROGRESSIVE: 
       ogmrip_codec_set_progressive (codec, g_value_get_boolean (value));
       break;
@@ -222,10 +230,10 @@ ogmrip_codec_get_property (GObject *gobject, guint property_id, GValue *value, G
   switch (property_id) 
   {
     case PROP_INPUT:
-      g_value_set_pointer (value, codec->priv->title);
+      g_value_set_pointer (value, codec->priv->input);
       break;
     case PROP_OUTPUT:
-      g_value_set_static_string (value, codec->priv->output);
+      g_value_set_string (value, codec->priv->output);
       break;
     case PROP_LENGTH: 
       g_value_set_double (value, ogmrip_codec_get_length (codec, NULL));
@@ -235,9 +243,6 @@ ogmrip_codec_get_property (GObject *gobject, guint property_id, GValue *value, G
       break;
     case PROP_END_CHAPTER: 
       g_value_set_int (value, codec->priv->end_chap);
-      break;
-    case PROP_FRAMESTEP: 
-      g_value_set_uint (value, codec->priv->framestep);
       break;
     case PROP_PROGRESSIVE: 
       g_value_set_boolean (value, codec->priv->progressive);
@@ -254,30 +259,12 @@ ogmrip_codec_get_property (GObject *gobject, guint property_id, GValue *value, G
 static gint
 ogmrip_codec_run (OGMJobSpawn *spawn)
 {
-  OGMDvdTitle *title;
-
-  title = OGMRIP_CODEC (spawn)->priv->title;
+  OGMDvdTitle *title = OGMRIP_CODEC (spawn)->priv->title;
 
   g_return_val_if_fail (title != NULL, OGMJOB_RESULT_ERROR);
   g_return_val_if_fail (ogmdvd_title_is_open (title), OGMJOB_RESULT_ERROR);
 
   return OGMJOB_SPAWN_CLASS (ogmrip_codec_parent_class)->run (spawn);
-}
-
-/**
- * ogmrip_codec_set_output:
- * @codec: an #OGMRipCodec
- * @output: the name of the output file
- *
- * Sets the name of the output file.
- */
-void
-ogmrip_codec_set_output (OGMRipCodec *codec, const gchar *output)
-{
-  g_return_if_fail (OGMRIP_IS_CODEC (codec));
-
-  g_free (codec->priv->output);
-  codec->priv->output = g_strdup (output);
 }
 
 /**
@@ -297,32 +284,19 @@ ogmrip_codec_get_output (OGMRipCodec *codec)
 }
 
 /**
- * ogmrip_codec_set_input:
+ * ogmrip_codec_set_output:
  * @codec: an #OGMRipCodec
- * @title: an #OGMDvdTitle
+ * @output: the name of the output file
  *
- * Sets the input DVD title.
+ * Sets the name of the output file.
  */
 void
-ogmrip_codec_set_input (OGMRipCodec *codec, OGMDvdTitle *title)
+ogmrip_codec_set_output (OGMRipCodec *codec, const gchar *output)
 {
   g_return_if_fail (OGMRIP_IS_CODEC (codec));
-  g_return_if_fail (title != NULL);
 
-  ogmdvd_title_ref (title);
-
-  if (codec->priv->title)
-    ogmdvd_title_unref (codec->priv->title);
-
-  ogmdvd_title_get_framerate (title, 
-      &codec->priv->framerate_numerator, 
-      &codec->priv->framerate_denominator);
-
-  codec->priv->title = title;
-  codec->priv->dirty = TRUE;
-
-  codec->priv->start_chap = 0;
-  codec->priv->end_chap = -1;
+  g_free (codec->priv->output);
+  codec->priv->output = g_strdup (output);
 }
 
 /**
@@ -333,12 +307,12 @@ ogmrip_codec_set_input (OGMRipCodec *codec, OGMDvdTitle *title)
  *
  * Returns: an #OGMDvdTitle, or NULL
  */
-OGMDvdTitle *
+OGMDvdStream *
 ogmrip_codec_get_input (OGMRipCodec *codec)
 {
   g_return_val_if_fail (OGMRIP_IS_CODEC (codec), NULL);
 
-  return codec->priv->title;
+  return codec->priv->input;
 }
 
 /**
@@ -511,23 +485,21 @@ ogmrip_codec_get_length (OGMRipCodec *codec, OGMDvdTime *length)
 
   if (codec->priv->dirty)
   {
+    guint num, denom;
+
+    ogmdvd_video_stream_get_framerate (ogmdvd_title_get_video_stream (codec->priv->title), &num, &denom);
+
     if (codec->priv->play_length > 0.0)
     {
       codec->priv->length = codec->priv->play_length;
-      ogmrip_codec_sec_to_time (codec->priv->play_length,
-          codec->priv->framerate_numerator / (gdouble) codec->priv->framerate_denominator, &codec->priv->time_);
+      ogmrip_codec_sec_to_time (codec->priv->play_length, num / (gdouble) denom, &codec->priv->time_);
     }
     else if (codec->priv->start_chap == 0 && codec->priv->end_chap == -1)
       codec->priv->length = ogmdvd_title_get_length (codec->priv->title, &codec->priv->time_);
     else
       codec->priv->length = ogmdvd_title_get_chapters_length (codec->priv->title, 
             codec->priv->start_chap, codec->priv->end_chap, &codec->priv->time_);
-/*
-    ogmdvd_title_get_framerate (codec->priv->title, &numerator, &denominator);
-    if (numerator != codec->priv->framerate_numerator || denominator != codec->priv->framerate_denominator)
-      codec->priv->length *= ((denominator * codec->priv->framerate_numerator) / 
-          (gdouble) (numerator * codec->priv->framerate_denominator));
-*/
+
     codec->priv->dirty = FALSE;
   }
 
@@ -535,75 +507,6 @@ ogmrip_codec_get_length (OGMRipCodec *codec, OGMDvdTime *length)
     *length = codec->priv->time_;
 
   return codec->priv->length;
-}
-
-/**
- * ogmrip_codec_set_framerate:
- * @codec: an #OGMRipCodec
- * @numerator: the framerate numerator
- * @denominator: the framerate denominator
- *
- * Sets a frames per second (fps) value for the output file, which can be
- * different from that of the source material.
- */
-void
-ogmrip_codec_set_framerate (OGMRipCodec *codec, guint numerator, guint denominator)
-{
-  g_return_if_fail (OGMRIP_IS_CODEC (codec));
-  g_return_if_fail (numerator > 0 && denominator > 0);
-
-  codec->priv->framerate_numerator = numerator;
-  codec->priv->framerate_denominator = denominator;
-}
-
-/**
- * ogmrip_codec_get_framerate:
- * @codec: an #OGMRipCodec
- * @numerator: a pointer to store the framerate numerator
- * @denominator: a pointer to store the framerate denominator
- *
- * Gets the framerate of the output file in the form of a fraction.
- */
-void
-ogmrip_codec_get_framerate (OGMRipCodec *codec, guint *numerator, guint *denominator)
-{
-  g_return_if_fail (OGMRIP_IS_CODEC (codec));
-  g_return_if_fail (denominator != NULL);
-  g_return_if_fail (numerator != NULL);
-
-  *numerator = codec->priv->framerate_numerator;
-  *denominator = codec->priv->framerate_denominator;
-}
-
-/**
- * ogmrip_codec_set_framestep:
- * @codec: an #OGMRipCodec
- * @framestep: the framestep
- *
- * Skips @framestep frames after every frame.
- */
-void
-ogmrip_codec_set_framestep (OGMRipCodec *codec, guint framestep)
-{
-  g_return_if_fail (OGMRIP_IS_CODEC (codec));
-
-  codec->priv->framestep = MAX (framestep, 1);
-}
-
-/**
- * ogmrip_codec_get_framestep:
- * @codec: an #OGMRipCodec
- *
- * Gets the number of frames to skip after every frame.
- *
- * Returns: the framestep, or -1
- */
-gint
-ogmrip_codec_get_framestep (OGMRipCodec *codec)
-{
-  g_return_val_if_fail (OGMRIP_IS_CODEC (codec), -1);
-
-  return codec->priv->framestep;
 }
 
 /**
@@ -677,14 +580,14 @@ ogmrip_codec_get_play_length (OGMRipCodec *codec)
 }
 
 /**
- * ogmrip_codec_set_start:
+ * ogmrip_codec_set_start_position:
  * @codec: an #OGMRipCodec
  * @start: the position to seek in seconds
  *
  * Seeks to the given time position.
  */
 void
-ogmrip_codec_set_start (OGMRipCodec *codec, gdouble start)
+ogmrip_codec_set_start_position (OGMRipCodec *codec, gdouble start)
 {
   g_return_if_fail (OGMRIP_IS_CODEC (codec));
   g_return_if_fail (start >= 0.0);
@@ -696,7 +599,7 @@ ogmrip_codec_set_start (OGMRipCodec *codec, gdouble start)
 }
 
 /**
- * ogmrip_codec_get_start:
+ * ogmrip_codec_get_start_position:
  * @codec: an #OGMRipCodec
  *
  * Gets the position to seek in seconds.
@@ -704,7 +607,7 @@ ogmrip_codec_set_start (OGMRipCodec *codec, gdouble start)
  * Returns: the position, or -1.0
  */
 gdouble
-ogmrip_codec_get_start (OGMRipCodec *codec)
+ogmrip_codec_get_start_position (OGMRipCodec *codec)
 {
   g_return_val_if_fail (OGMRIP_IS_CODEC (codec), -1);
 

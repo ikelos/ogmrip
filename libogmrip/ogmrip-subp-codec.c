@@ -42,13 +42,11 @@ struct _OGMRipSubpCodecPriv
 enum 
 {
   PROP_0,
-  PROP_STREAM,
   PROP_FORCED_ONLY,
   PROP_CHARSET,
   PROP_NEWLINE
 };
 
-static void ogmrip_subp_codec_dispose      (GObject      *gobject);
 static void ogmrip_subp_codec_finalize     (GObject      *gobject);
 static void ogmrip_subp_codec_set_property (GObject      *gobject,
                                             guint        property_id,
@@ -68,26 +66,21 @@ ogmrip_subp_codec_class_init (OGMRipSubpCodecClass *klass)
 
   gobject_class = G_OBJECT_CLASS (klass);
 
-  gobject_class->dispose = ogmrip_subp_codec_dispose;
   gobject_class->finalize = ogmrip_subp_codec_finalize;
   gobject_class->set_property = ogmrip_subp_codec_set_property;
   gobject_class->get_property = ogmrip_subp_codec_get_property;
 
-  g_object_class_install_property (gobject_class, PROP_STREAM, 
-        g_param_spec_pointer ("stream", "Sub stream property", "Set subp stream", 
-           G_PARAM_READWRITE));
-
   g_object_class_install_property (gobject_class, PROP_FORCED_ONLY, 
         g_param_spec_boolean ("forced-only", "Forced only property", "Set forced only", 
-           FALSE, G_PARAM_READWRITE));
+           FALSE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_CHARSET,
       g_param_spec_uint ("charset", "Charset property", "Set charset",
-        0, OGMRIP_CHARSET_ASCII, 0, G_PARAM_READWRITE));
+        0, OGMRIP_CHARSET_ASCII, 0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_NEWLINE,
       g_param_spec_uint ("newline", "Newline property", "Set newline",
-        0, OGMRIP_NEWLINE_CR_LF, 0, G_PARAM_READWRITE));
+        0, OGMRIP_NEWLINE_CR_LF, 0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipSubpCodecPriv));
 }
@@ -96,21 +89,6 @@ static void
 ogmrip_subp_codec_init (OGMRipSubpCodec *subp)
 {
   subp->priv = OGMRIP_SUBP_GET_PRIVATE (subp);
-}
-
-static void
-ogmrip_subp_codec_dispose (GObject *gobject)
-{
-  OGMRipSubpCodec *subp;
-
-  subp = OGMRIP_SUBP_CODEC (gobject);
-  if (subp->priv->stream)
-  {
-    ogmdvd_stream_unref (OGMDVD_STREAM (subp->priv->stream));
-    subp->priv->stream = NULL;
-  }
-
-  G_OBJECT_CLASS (ogmrip_subp_codec_parent_class)->dispose (gobject);
 }
 
 static void
@@ -137,9 +115,6 @@ ogmrip_subp_codec_set_property (GObject *gobject, guint property_id, const GValu
 
   switch (property_id) 
   {
-    case PROP_STREAM:
-      ogmrip_subp_codec_set_dvd_subp_stream (subp, g_value_get_pointer (value));
-      break;
     case PROP_FORCED_ONLY: 
       subp->priv->forced_only = g_value_get_boolean (value);
       break;
@@ -164,9 +139,6 @@ ogmrip_subp_codec_get_property (GObject *gobject, guint property_id, GValue *val
 
   switch (property_id) 
   {
-    case PROP_STREAM:
-      g_value_set_pointer (value, subp->priv->stream);
-      break;
     case PROP_FORCED_ONLY: 
       g_value_set_boolean (value, subp->priv->forced_only);
       break;
@@ -180,48 +152,6 @@ ogmrip_subp_codec_get_property (GObject *gobject, guint property_id, GValue *val
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
   }
-}
-
-/**
- * ogmrip_subp_codec_set_dvd_subp_stream:
- * @subp: an #OGMRipSubpCodec
- * @stream: an #OGMDvdSubpStream
- *
- * Sets the subtitle stream to encode.
- */
-void
-ogmrip_subp_codec_set_dvd_subp_stream (OGMRipSubpCodec *subp, OGMDvdSubpStream *stream)
-{
-  g_return_if_fail (OGMRIP_IS_SUBP_CODEC (subp));
-  g_return_if_fail (stream != NULL);
-
-  if (subp->priv->stream != stream)
-  {
-    ogmdvd_stream_ref (OGMDVD_STREAM (stream));
-
-    if (subp->priv->stream)
-      ogmdvd_stream_unref (OGMDVD_STREAM (subp->priv->stream));
-    subp->priv->stream = stream;
-
-    ogmrip_codec_set_input (OGMRIP_CODEC (subp), 
-        ogmdvd_stream_get_title (OGMDVD_STREAM (stream)));
-  }
-}
-
-/**
- * ogmrip_subp_codec_get_dvd_subp_stream:
- * @subp: an #OGMRipSubpCodec
- *
- * Gets the subtitle stream to encode.
- *
- * Returns: an #OGMDvdSubpStream, or NULL
- */
-OGMDvdSubpStream *
-ogmrip_subp_codec_get_dvd_subp_stream (OGMRipSubpCodec *subp)
-{
-  g_return_val_if_fail (OGMRIP_IS_SUBP_CODEC (subp), NULL);
-
-  return subp->priv->stream;
 }
 
 /**
