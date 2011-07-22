@@ -37,13 +37,8 @@ struct _OGMDvdTitleChooserIface
 {
   GTypeInterface base_iface;
 
-  /*
-   * Methods
-   */
-
-  void          (* set_disc)   (OGMDvdTitleChooser *chooser,
-                                OGMDvdDisc         *disc);
-  OGMDvdDisc *  (* get_disc)   (OGMDvdTitleChooser *chooser);
+  void          (* set_active) (OGMDvdTitleChooser *chooser,
+                                OGMDvdTitle        *title);
   OGMDvdTitle * (* get_active) (OGMDvdTitleChooser *chooser);
 };
 
@@ -53,6 +48,8 @@ GType         ogmdvd_title_chooser_get_type   (void) G_GNUC_CONST;
 void          ogmdvd_title_chooser_set_disc   (OGMDvdTitleChooser *chooser,
                                                OGMDvdDisc         *disc);
 OGMDvdDisc *  ogmdvd_title_chooser_get_disc   (OGMDvdTitleChooser *chooser);
+void          ogmdvd_title_chooser_set_active (OGMDvdTitleChooser *chooser,
+                                               OGMDvdTitle        *title);
 OGMDvdTitle * ogmdvd_title_chooser_get_active (OGMDvdTitleChooser *chooser);
 
 G_END_DECLS

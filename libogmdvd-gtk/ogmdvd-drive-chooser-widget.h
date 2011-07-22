@@ -44,8 +44,8 @@ struct _OGMDvdDriveChooserWidgetClass
   GtkComboBoxClass parent_class;
 };
 
-GType               ogmdvd_drive_chooser_widget_get_type  (void);
-GtkWidget *         ogmdvd_drive_chooser_widget_new       (void);
+GType       ogmdvd_drive_chooser_widget_get_type (void);
+GtkWidget * ogmdvd_drive_chooser_widget_new      (void);
 
 G_END_DECLS
 

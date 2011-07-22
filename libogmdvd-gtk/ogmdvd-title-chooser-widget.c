@@ -37,8 +37,7 @@
 enum
 {
   PROP_0,
-  PROP_DISC,
-  PROP_TITLE
+  PROP_DISC
 };
 
 enum
@@ -51,12 +50,7 @@ enum
 struct _OGMDvdTitleChooserWidgetPriv
 {
   OGMDvdDisc *disc;
-  OGMDvdTitle *title;
 };
-
-/*
- * GObject funcs
- */
 
 static void ogmdvd_title_chooser_init                (OGMDvdTitleChooserIface  *iface);
 static void ogmdvd_title_chooser_widget_dispose      (GObject                  *object);
@@ -69,14 +63,116 @@ static void ogmdvd_title_chooser_widget_set_property (GObject                  *
                                                       const GValue             *value,
                                                       GParamSpec               *pspec);
 
-/*
- * OGMDvdTitleChooser funcs
- */
 
-static void          ogmdvd_title_chooser_widget_set_disc   (OGMDvdTitleChooser *chooser,
-                                                             OGMDvdDisc         *disc);
-static OGMDvdDisc *  ogmdvd_title_chooser_widget_get_disc   (OGMDvdTitleChooser *chooser);
-static OGMDvdTitle * ogmdvd_title_chooser_widget_get_active (OGMDvdTitleChooser *chooser);
+static void
+ogmdvd_title_chooser_widget_set_disc (OGMDvdTitleChooserWidget *chooser, OGMDvdDisc *disc)
+{
+  GtkTreeModel *model;
+  GtkTreeIter iter;
+
+  OGMDvdTitle *title;
+  OGMDvdTime time_;
+
+  gint vid, nvid, format, aspect;
+  glong length, longest;
+  gchar *str, *str_time;
+
+  if (disc)
+    ogmdvd_disc_ref (disc);
+  if (chooser->priv->disc)
+    ogmdvd_disc_unref (chooser->priv->disc);
+  chooser->priv->disc = disc;
+
+  model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
+  gtk_list_store_clear (GTK_LIST_STORE (model));
+
+  if (!disc)
+    gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), -1);
+  else
+  {
+    OGMDvdVideoStream *stream;
+
+    nvid = ogmdvd_disc_get_n_titles (disc);
+    for (vid = 0, longest = 0; vid < nvid; vid++)
+    {
+      title = ogmdvd_disc_get_nth_title (disc, vid);
+      if (title)
+      {
+        stream = ogmdvd_title_get_video_stream (title);
+
+        format = ogmdvd_video_stream_get_display_format (stream);
+        aspect = ogmdvd_video_stream_get_display_aspect (stream);
+        length = ogmdvd_title_get_length (title, &time_);
+
+        if (time_.hour > 0)
+          str_time = g_strdup_printf ("%02d:%02d %s", time_.hour, time_.min, _("hours"));
+        else if (time_.min > 0)
+          str_time = g_strdup_printf ("%02d:%02d %s", time_.min, time_.sec, _("minutes"));
+        else
+          str_time = g_strdup_printf ("%02d %s", time_.sec, _("seconds"));
+
+        str = g_strdup_printf ("%s %02d (%s, %s, %s)", _("Title"), vid + 1, str_time,
+            ogmdvd_get_video_format_label (format), 
+            ogmdvd_get_display_aspect_label (aspect)); 
+        g_free (str_time);
+
+        gtk_list_store_append (GTK_LIST_STORE (model), &iter);
+        gtk_list_store_set (GTK_LIST_STORE (model), &iter, TEXT_COLUMN, str, NR_COLUMN, vid, -1);
+        g_free (str);
+
+        if (length > longest)
+        {
+          longest = length;
+          gtk_combo_box_set_active_iter (GTK_COMBO_BOX (chooser), &iter);
+        }
+      }
+    }
+  }
+}
+
+static OGMDvdTitle *
+ogmdvd_title_chooser_widget_get_active (OGMDvdTitleChooser *chooser)
+{
+  OGMDvdTitleChooserWidget *widget = OGMDVD_TITLE_CHOOSER_WIDGET (chooser);
+  GtkTreeModel *model;
+  GtkTreeIter iter;
+  gint nr;
+
+  if (!widget->priv->disc)
+    return NULL;
+
+  if (!gtk_combo_box_get_active_iter (GTK_COMBO_BOX (widget), &iter))
+    return NULL;
+
+  model = gtk_combo_box_get_model (GTK_COMBO_BOX (widget));
+  gtk_tree_model_get (model, &iter, NR_COLUMN, &nr, -1);
+
+  return ogmdvd_disc_get_nth_title (widget->priv->disc, nr);
+}
+
+static void
+ogmdvd_title_chooser_widget_set_active (OGMDvdTitleChooser *chooser, OGMDvdTitle *title)
+{
+  OGMDvdTitleChooserWidget *widget = OGMDVD_TITLE_CHOOSER_WIDGET (chooser);
+  GtkTreeModel *model;
+  GtkTreeIter iter;
+  gint nr1, nr2;
+
+  nr1 = ogmdvd_title_get_nr (title);
+
+  model = gtk_combo_box_get_model (GTK_COMBO_BOX (widget));
+  if (gtk_tree_model_get_iter_first (model, &iter))
+  {
+    do
+    {
+      gtk_tree_model_get (model, &iter, NR_COLUMN, &nr2, -1);
+    }
+    while (nr1 != nr2 && gtk_tree_model_iter_next (model, &iter));
+
+    if (nr2 == nr1)
+      gtk_combo_box_set_active_iter (GTK_COMBO_BOX (widget), &iter);
+  }
+}
 
 G_DEFINE_TYPE_WITH_CODE (OGMDvdTitleChooserWidget, ogmdvd_title_chooser_widget, GTK_TYPE_COMBO_BOX,
     G_IMPLEMENT_INTERFACE (OGMDVD_TYPE_TITLE_CHOOSER, ogmdvd_title_chooser_init))
@@ -92,7 +188,6 @@ ogmdvd_title_chooser_widget_class_init (OGMDvdTitleChooserWidgetClass *klass)
   object_class->set_property = ogmdvd_title_chooser_widget_set_property;
 
   g_object_class_override_property (object_class, PROP_DISC, "disc");
-  g_object_class_override_property (object_class, PROP_TITLE, "title");
 
   g_type_class_add_private (klass, sizeof (OGMDvdTitleChooserWidgetPriv));
 }
@@ -100,9 +195,8 @@ ogmdvd_title_chooser_widget_class_init (OGMDvdTitleChooserWidgetClass *klass)
 static void
 ogmdvd_title_chooser_init (OGMDvdTitleChooserIface *iface)
 {
-  iface->set_disc = ogmdvd_title_chooser_widget_set_disc;
-  iface->get_disc = ogmdvd_title_chooser_widget_get_disc;
   iface->get_active = ogmdvd_title_chooser_widget_get_active;
+  iface->set_active = ogmdvd_title_chooser_widget_set_active;
 }
 
 static void
@@ -130,12 +224,10 @@ ogmdvd_title_chooser_widget_dispose (GObject *object)
   chooser = OGMDVD_TITLE_CHOOSER_WIDGET (object);
 
   if (chooser->priv->disc)
+  {
     ogmdvd_disc_unref (chooser->priv->disc);
-  chooser->priv->disc = NULL;
-
-  if (chooser->priv->title)
-    ogmdvd_title_unref (chooser->priv->title);
-  chooser->priv->title = NULL;
+    chooser->priv->disc = NULL;
+  }
 
   (*G_OBJECT_CLASS (ogmdvd_title_chooser_widget_parent_class)->dispose) (object);
 }
@@ -143,17 +235,13 @@ ogmdvd_title_chooser_widget_dispose (GObject *object)
 static void
 ogmdvd_title_chooser_widget_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
 {
-  OGMDvdTitleChooser *chooser;
-
-  chooser = OGMDVD_TITLE_CHOOSER (gobject);
+  OGMDvdTitleChooserWidget *chooser = OGMDVD_TITLE_CHOOSER_WIDGET (gobject);
 
   switch (property_id) 
   {
     case PROP_DISC:
-      g_value_set_pointer (value, ogmdvd_title_chooser_widget_get_disc (chooser));
+      g_value_set_pointer (value, chooser->priv->disc);
       break;
-    case PROP_TITLE:
-      g_value_set_pointer (value, ogmdvd_title_chooser_widget_get_active (chooser));
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
@@ -163,9 +251,7 @@ ogmdvd_title_chooser_widget_get_property (GObject *gobject, guint property_id, G
 static void
 ogmdvd_title_chooser_widget_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
 {
-  OGMDvdTitleChooser *chooser;
-
-  chooser = OGMDVD_TITLE_CHOOSER (gobject);
+  OGMDvdTitleChooserWidget *chooser = OGMDVD_TITLE_CHOOSER_WIDGET (gobject);
 
   switch (property_id) 
   {
@@ -176,130 +262,6 @@ ogmdvd_title_chooser_widget_set_property (GObject *gobject, guint property_id, c
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
   }
-}
-
-/*
- * OGMDvdTitleChooser funcs
- */
-
-static void
-ogmdvd_title_chooser_widget_set_disc (OGMDvdTitleChooser *chooser, OGMDvdDisc *disc)
-{
-  OGMDvdTitleChooserWidget *widget;
-
-  g_return_if_fail (OGMDVD_IS_TITLE_CHOOSER_WIDGET (chooser));
-
-  widget = OGMDVD_TITLE_CHOOSER_WIDGET (chooser);
-
-  if (widget->priv->disc != disc)
-  {
-    GtkTreeModel *model;
-    GtkTreeIter iter;
-
-    OGMDvdTitle *title;
-    OGMDvdTime time_;
-
-    gint vid, nvid, format, aspect;
-    glong length, longest;
-    gchar *str, *str_time;
-
-    if (widget->priv->title)
-      ogmdvd_title_unref (widget->priv->title);
-    widget->priv->title = NULL;
-
-    if (disc)
-      ogmdvd_disc_ref (disc);
-    if (widget->priv->disc)
-      ogmdvd_disc_unref (widget->priv->disc);
-    widget->priv->disc = disc;
-
-    model = gtk_combo_box_get_model (GTK_COMBO_BOX (widget));
-    gtk_list_store_clear (GTK_LIST_STORE (model));
-
-    if (!disc)
-      gtk_combo_box_set_active (GTK_COMBO_BOX (widget), -1);
-    else
-    {
-      nvid = ogmdvd_disc_get_n_titles (disc);
-      for (vid = 0, longest = 0; vid < nvid; vid++)
-      {
-        title = ogmdvd_disc_get_nth_title (disc, vid);
-        if (title)
-        {
-          format = ogmdvd_title_get_video_format (title);
-          aspect = ogmdvd_title_get_display_aspect (title);
-          length = ogmdvd_title_get_length (title, &time_);
-
-          if (time_.hour > 0)
-            str_time = g_strdup_printf ("%02d:%02d %s", time_.hour, time_.min, _("hours"));
-          else if (time_.min > 0)
-            str_time = g_strdup_printf ("%02d:%02d %s", time_.min, time_.sec, _("minutes"));
-          else
-            str_time = g_strdup_printf ("%02d %s", time_.sec, _("seconds"));
-
-          str = g_strdup_printf ("%s %02d (%s, %s, %s)", _("Title"), vid + 1, str_time,
-              ogmdvd_get_video_format_label (format), 
-              ogmdvd_get_display_aspect_label (aspect)); 
-          g_free (str_time);
-
-          gtk_list_store_append (GTK_LIST_STORE (model), &iter);
-          gtk_list_store_set (GTK_LIST_STORE (model), &iter, TEXT_COLUMN, str, NR_COLUMN, vid, -1);
-          g_free (str);
-
-          ogmdvd_title_unref (title);
-
-          if (length > longest)
-          {
-            longest = length;
-            gtk_combo_box_set_active_iter (GTK_COMBO_BOX (widget), &iter);
-          }
-        }
-      }
-    }
-  }
-}
-
-static OGMDvdDisc *
-ogmdvd_title_chooser_widget_get_disc (OGMDvdTitleChooser *chooser)
-{
-  g_return_val_if_fail (OGMDVD_IS_TITLE_CHOOSER_WIDGET (chooser), NULL);
-
-  return OGMDVD_TITLE_CHOOSER_WIDGET (chooser)->priv->disc;
-}
-
-static OGMDvdTitle *
-ogmdvd_title_chooser_widget_get_active (OGMDvdTitleChooser *chooser)
-{
-  OGMDvdTitleChooserWidget *widget;
-  GtkTreeModel *model;
-  GtkTreeIter iter;
-  gint nr;
-
-  g_return_val_if_fail (OGMDVD_IS_TITLE_CHOOSER_WIDGET (chooser), NULL);
-
-  widget = OGMDVD_TITLE_CHOOSER_WIDGET (chooser);
-
-  if (!widget->priv->disc)
-    return NULL;
-
-  if (!gtk_combo_box_get_active_iter (GTK_COMBO_BOX (widget), &iter))
-    return NULL;
-
-  model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
-  gtk_tree_model_get (model, &iter, NR_COLUMN, &nr, -1);
-
-  if (!widget->priv->title)
-    widget->priv->title = ogmdvd_disc_get_nth_title (widget->priv->disc, nr);
-  else
-  {
-    if (ogmdvd_title_get_nr (widget->priv->title) != nr)
-    {
-      ogmdvd_title_unref (widget->priv->title);
-      widget->priv->title = ogmdvd_disc_get_nth_title (widget->priv->disc, nr);
-    }
-  }
-
-  return widget->priv->title;
 }
 
 /**

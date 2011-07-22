@@ -46,8 +46,8 @@ struct _OGMDvdDriveChooserDialogClass
   void (* eject) (OGMDvdDriveChooserDialog *dialog);
 };
 
-GType               ogmdvd_drive_chooser_dialog_get_type  (void);
-GtkWidget *         ogmdvd_drive_chooser_dialog_new       (void);
+GType       ogmdvd_drive_chooser_dialog_get_type (void);
+GtkWidget * ogmdvd_drive_chooser_dialog_new      (void);
 
 G_END_DECLS
 

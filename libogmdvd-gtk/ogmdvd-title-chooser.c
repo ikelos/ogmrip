@@ -55,11 +55,7 @@ ogmdvd_title_chooser_class_init (gpointer g_iface)
 {
   g_object_interface_install_property (g_iface,
       g_param_spec_pointer ("disc", "Disc property", "The DVD disc",
-        G_PARAM_READWRITE));
-
-  g_object_interface_install_property (g_iface,
-      g_param_spec_pointer ("title", "Title property", "The active DVD title",
-        G_PARAM_READABLE));
+        G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 }
 
 /**
@@ -74,7 +70,7 @@ ogmdvd_title_chooser_set_disc (OGMDvdTitleChooser *chooser, OGMDvdDisc *disc)
 {
   g_return_if_fail (OGMDVD_IS_TITLE_CHOOSER (chooser));
 
-  OGMDVD_TITLE_CHOOSER_GET_IFACE (chooser)->set_disc (chooser, disc);
+  g_object_set (chooser, "disc", disc, NULL);
 }
 
 /**
@@ -88,9 +84,28 @@ ogmdvd_title_chooser_set_disc (OGMDvdTitleChooser *chooser, OGMDvdDisc *disc)
 OGMDvdDisc *
 ogmdvd_title_chooser_get_disc (OGMDvdTitleChooser *chooser)
 {
+  OGMDvdDisc *disc;
+
   g_return_val_if_fail (OGMDVD_IS_TITLE_CHOOSER (chooser), NULL);
 
-  return OGMDVD_TITLE_CHOOSER_GET_IFACE (chooser)->get_disc (chooser);
+  g_object_get (chooser, "disc", &disc, NULL);
+
+  return disc;
+}
+
+/**
+ * ogmdvd_title_chooser_set_active:
+ * @chooser: An #OGMDvdTitleChooser
+ * @title: An #OGMDvdTitle
+ *
+ * Sets the active #OGMDvdTitle.
+ */
+void
+ogmdvd_title_chooser_set_active (OGMDvdTitleChooser *chooser, OGMDvdTitle *title)
+{
+  g_return_if_fail (OGMDVD_IS_TITLE_CHOOSER (chooser));
+
+  OGMDVD_TITLE_CHOOSER_GET_IFACE (chooser)->set_active (chooser, title);
 }
 
 /**

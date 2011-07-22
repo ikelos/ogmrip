@@ -62,7 +62,6 @@ struct _OGMDvdDriveChooserWidgetPriv
  */
 
 static void    ogmdvd_drive_chooser_init              (OGMDvdDriveChooserIface  *iface);
-static void    ogmdvd_drive_chooser_widget_dispose    (GObject                  *object);
 static void    ogmdvd_drive_chooser_widget_changed    (GtkComboBox              *combo_box);
 static gchar * ogmdvd_drive_chooser_widget_get_device (OGMDvdDriveChooser       *chooser,
                                                        OGMDvdDeviceType         *type);
@@ -82,11 +81,7 @@ G_DEFINE_TYPE_WITH_CODE (OGMDvdDriveChooserWidget, ogmdvd_drive_chooser_widget, 
 static void
 ogmdvd_drive_chooser_widget_class_init (OGMDvdDriveChooserWidgetClass *klass)
 {
-  GObjectClass *object_class;
   GtkComboBoxClass *combo_box_class;
-
-  object_class = (GObjectClass *) klass;
-  object_class->dispose = ogmdvd_drive_chooser_widget_dispose;
 
   combo_box_class = (GtkComboBoxClass *) klass;
   combo_box_class->changed = ogmdvd_drive_chooser_widget_changed;
@@ -120,19 +115,6 @@ ogmdvd_drive_chooser_widget_init (OGMDvdDriveChooserWidget *chooser)
   gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (chooser), cell, "markup", TEXT_COLUMN, NULL);
 
   ogmdvd_drive_chooser_widget_fill (chooser);
-}
-
-static void
-ogmdvd_drive_chooser_widget_dispose (GObject *object)
-{
-  OGMDvdDriveChooserWidget *chooser;
-
-  g_return_if_fail (object != NULL);
-  g_return_if_fail (OGMDVD_IS_DRIVE_CHOOSER_WIDGET (object));
-
-  chooser = OGMDVD_DRIVE_CHOOSER_WIDGET (object);
-
-  (*G_OBJECT_CLASS (ogmdvd_drive_chooser_widget_parent_class)->dispose) (object);
 }
 
 static void

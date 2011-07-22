@@ -79,7 +79,7 @@ ogmdvd_chapter_list_class_init (OGMDvdChapterListClass *klass)
 
   g_object_class_install_property (object_class, PROP_TITLE, 
         g_param_spec_pointer ("title", "Title property", "The DVD title",
-          G_PARAM_READWRITE));
+          G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMDvdChapterListPriv));
 }
@@ -99,10 +99,16 @@ ogmdvd_chapter_list_label_edited (OGMDvdChapterList *list, gchar *path, gchar *t
 static void
 ogmdvd_chapter_list_init (OGMDvdChapterList *list)
 {
+  GtkListStore *store;
   GtkCellRenderer *renderer;
   GtkTreeViewColumn *column;
 
   list->priv = OGMDVD_CHAPTER_LIST_GET_PRIVATE (list);
+
+  store = gtk_list_store_new (COL_LAST, 
+      G_TYPE_UINT, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_DOUBLE);
+  gtk_tree_view_set_model (GTK_TREE_VIEW (list), GTK_TREE_MODEL (store));
+  g_object_unref (store);
 
   renderer = gtk_cell_renderer_text_new ();
   column = gtk_tree_view_column_new_with_attributes (_("Chapter"), renderer, "text", COL_CHAPTER, NULL);
@@ -124,13 +130,13 @@ ogmdvd_chapter_list_init (OGMDvdChapterList *list)
 static void
 ogmdvd_chapter_list_dispose (GObject *object)
 {
-  OGMDvdChapterList *list;
-
-  list = OGMDVD_CHAPTER_LIST (object);
+  OGMDvdChapterList *list = OGMDVD_CHAPTER_LIST (object);
 
   if (list->priv->title)
+  {
     ogmdvd_title_unref (list->priv->title);
-  list->priv->title = NULL;
+    list->priv->title = NULL;
+  }
 
   (*G_OBJECT_CLASS (ogmdvd_chapter_list_parent_class)->dispose) (object);
 }
@@ -173,38 +179,23 @@ ogmdvd_chapter_list_set_property (GObject *gobject, guint property_id, const GVa
 GtkWidget *
 ogmdvd_chapter_list_new (void)
 {
-  OGMDvdChapterList *list;
-  GtkListStore *store;
-
-  list = g_object_new (OGMDVD_TYPE_CHAPTER_LIST, NULL);
-
-  store = gtk_list_store_new (COL_LAST, 
-      G_TYPE_UINT, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_DOUBLE);
-  gtk_tree_view_set_model (GTK_TREE_VIEW (list), GTK_TREE_MODEL (store));
-  g_object_unref (store);
-
-  return GTK_WIDGET (list);
+  return g_object_new (OGMDVD_TYPE_CHAPTER_LIST, NULL);
 }
 
 /**
- * ogmdvd_chapter_list_clear:
+ * ogmdvd_chapter_list_get_title:
  * @list: An #OGMDvdChapterList
  *
- * Removes all entries of the #OGMDvdChapterList.
+ * Returns the #OGMDvdTitle which was passed to ogmdvd_chapter_list_set_title().
+ *
+ * Returns: An #OGMDvdTitle
  */
-void
-ogmdvd_chapter_list_clear (OGMDvdChapterList *list)
+OGMDvdTitle *
+ogmdvd_chapter_list_get_title (OGMDvdChapterList *list)
 {
-  GtkTreeModel *model;
+  g_return_val_if_fail (OGMDVD_IS_CHAPTER_LIST (list), NULL);
 
-  g_return_if_fail (OGMDVD_IS_CHAPTER_LIST (list));
-
-  model = gtk_tree_view_get_model (GTK_TREE_VIEW (list));
-  gtk_list_store_clear (GTK_LIST_STORE (model));
-
-  if (list->priv->title)
-    ogmdvd_title_unref (list->priv->title);
-  list->priv->title = NULL;
+  return list->priv->title;
 }
 
 /**
@@ -217,27 +208,27 @@ ogmdvd_chapter_list_clear (OGMDvdChapterList *list)
 void
 ogmdvd_chapter_list_set_title (OGMDvdChapterList *list, OGMDvdTitle *title)
 {
+  GtkTreeModel *model;
+  GtkTreeIter iter;
+  OGMDvdTime time_;
+
+  gint chap, nchap;
+  gdouble seconds;
+  gchar *str;
+
   g_return_if_fail (OGMDVD_IS_CHAPTER_LIST (list));
-  g_return_if_fail (title != NULL);
 
-  if (list->priv->title != title)
-  {
-    GtkTreeModel *model;
-    GtkTreeIter iter;
-    OGMDvdTime time_;
-
-    gint chap, nchap;
-    gdouble seconds;
-    gchar *str;
-
+  if (title)
     ogmdvd_title_ref (title);
-    if (list->priv->title)
-      ogmdvd_title_unref (list->priv->title);
-    list->priv->title = title;
+  if (list->priv->title)
+    ogmdvd_title_unref (list->priv->title);
+  list->priv->title = title;
 
-    model = gtk_tree_view_get_model (GTK_TREE_VIEW (list));
-    gtk_list_store_clear (GTK_LIST_STORE (model));
+  model = gtk_tree_view_get_model (GTK_TREE_VIEW (list));
+  gtk_list_store_clear (GTK_LIST_STORE (model));
 
+  if (title)
+  {
     nchap = ogmdvd_title_get_n_chapters (title);
     for (chap = 0; chap < nchap; chap++)
     {
@@ -255,6 +246,8 @@ ogmdvd_chapter_list_set_title (OGMDvdChapterList *list, OGMDvdTitle *title)
       }
     }
   }
+
+  g_object_notify (G_OBJECT (list), "title");
 }
 
 /**
@@ -305,21 +298,5 @@ ogmdvd_chapter_list_set_label (OGMDvdChapterList *list, guint chapter, const gch
 
   if (gtk_tree_model_iter_nth_child (model, &iter, NULL, chapter))
     gtk_list_store_set (GTK_LIST_STORE (model), &iter, COL_LABEL, label, -1);
-}
-
-/**
- * ogmdvd_chapter_list_get_title:
- * @list: An #OGMDvdChapterList
- *
- * Returns the #OGMDvdTitle which was passed to ogmdvd_chapter_list_set_title().
- *
- * Returns: An #OGMDvdTitle
- */
-OGMDvdTitle *
-ogmdvd_chapter_list_get_title (OGMDvdChapterList *list)
-{
-  g_return_val_if_fail (OGMDVD_IS_CHAPTER_LIST (list), NULL);
-
-  return list->priv->title;
 }
 

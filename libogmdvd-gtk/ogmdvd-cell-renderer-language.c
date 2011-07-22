@@ -35,16 +35,15 @@ struct _OGMDvdCellRendererLanguagePriv
   gchar *default_text;
 };
 
-static void ogmdvd_cell_renderer_language_finalize      (GObject                    *object);
-static void ogmdvd_cell_renderer_language_get_property  (GObject                    *object,
-                                                         guint                       param_id,
-                                                         GValue                     *value,
-                                                         GParamSpec                 *pspec);
-
-static void ogmdvd_cell_renderer_language_set_property  (GObject                    *object,
-                                                         guint                       param_id,
-                                                         const GValue               *value,
-                                                         GParamSpec                 *pspec);
+static void ogmdvd_cell_renderer_language_finalize     (GObject      *object);
+static void ogmdvd_cell_renderer_language_get_property (GObject      *object,
+                                                        guint        param_id,
+                                                        GValue       *value,
+                                                        GParamSpec   *pspec);
+static void ogmdvd_cell_renderer_language_set_property (GObject      *object,
+                                                        guint        param_id,
+                                                        const GValue *value,
+                                                        GParamSpec   *pspec);
 
 enum
 {
