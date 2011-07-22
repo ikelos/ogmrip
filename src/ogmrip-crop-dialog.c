@@ -324,9 +324,11 @@ ogmrip_crop_dialog_new (OGMDvdTitle *title, guint left, guint top, guint right, 
     ogmdvd_title_unref (dialog->priv->title);
   dialog->priv->title = title;
 
-  ogmdvd_title_get_size (title, &dialog->priv->raw_width, &dialog->priv->raw_height);
+  ogmdvd_video_stream_get_resolution (ogmdvd_title_get_video_stream (title),
+      &dialog->priv->raw_width, &dialog->priv->raw_height);
+  ogmdvd_video_stream_get_framerate (ogmdvd_title_get_video_stream (title),
+      &dialog->priv->rate_numerator, &dialog->priv->rate_denominator);
 
-  ogmdvd_title_get_framerate (title, &dialog->priv->rate_numerator, &dialog->priv->rate_denominator);
   framerate = dialog->priv->rate_numerator / (gdouble) dialog->priv->rate_denominator;
   dialog->priv->length = ogmdvd_title_get_length (title, NULL) * framerate;
 

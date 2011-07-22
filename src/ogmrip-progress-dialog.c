@@ -183,8 +183,7 @@ ogmrip_progress_dialog_set_label (OGMRipProgressDialog *dialog, const gchar *lab
 static void
 ogmrip_progress_dialog_run (OGMRipProgressDialog *dialog, OGMJobSpawn *spawn, OGMRipTaskType type)
 {
-  OGMDvdAudioStream *audio;
-  OGMDvdSubpStream *subp;
+  OGMDvdStream *stream;
   GTimeVal tv;
 
   gchar *message;
@@ -204,14 +203,14 @@ ogmrip_progress_dialog_run (OGMRipProgressDialog *dialog, OGMJobSpawn *spawn, OG
       ogmrip_progress_dialog_set_label (dialog, _("Encoding video title"));
       break;
     case OGMRIP_TASK_AUDIO:
-      audio = ogmrip_audio_codec_get_dvd_audio_stream (OGMRIP_AUDIO_CODEC (spawn));
-      message = g_strdup_printf (_("Extracting audio stream %d"), ogmdvd_stream_get_nr (OGMDVD_STREAM (audio)) + 1);
+      stream = ogmrip_codec_get_input (OGMRIP_CODEC (spawn));
+      message = g_strdup_printf (_("Extracting audio stream %d"), ogmdvd_stream_get_nr (stream) + 1);
       ogmrip_progress_dialog_set_label (dialog, message);
       g_free (message);
       break;
     case OGMRIP_TASK_SUBP:
-      subp = ogmrip_subp_codec_get_dvd_subp_stream (OGMRIP_SUBP_CODEC (spawn));
-      message = g_strdup_printf (_("Extracting subtitle stream %d"), ogmdvd_stream_get_nr (OGMDVD_STREAM (subp)) + 1);
+      stream = ogmrip_codec_get_input (OGMRIP_CODEC (spawn));
+      message = g_strdup_printf (_("Extracting subtitle stream %d"), ogmdvd_stream_get_nr (stream) + 1);
       ogmrip_progress_dialog_set_label (dialog, message);
       g_free (message);
       break;

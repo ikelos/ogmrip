@@ -39,13 +39,7 @@ struct _OGMRipProfilesDialogPriv
   GtkTreeSelection *selection;
   GtkTreeModel *model;
 };
-/*
-enum
-{
-  COL_NAME,
-  COL_PROFILE
-};
-*/
+
 extern GSettings *settings;
 
 static void
