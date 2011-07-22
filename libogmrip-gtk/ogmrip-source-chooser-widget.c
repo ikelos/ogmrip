@@ -36,8 +36,8 @@
 #define OGMRIP_AUDIO_CHOOSER_WIDGET_GET_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_AUDIO_CHOOSER_WIDGET, OGMRipSourceChooserWidgetPriv))
 
-#define OGMRIP_SUBTITLE_CHOOSER_WIDGET_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_SUBTITLE_CHOOSER_WIDGET, OGMRipSourceChooserWidgetPriv))
+#define OGMRIP_SUBP_CHOOSER_WIDGET_GET_PRIVATE(o) \
+  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_SUBP_CHOOSER_WIDGET, OGMRipSourceChooserWidgetPriv))
 
 enum
 {
@@ -84,17 +84,17 @@ static void ogmrip_audio_chooser_widget_set_property    (GObject      *gobject,
                                                          const GValue *value,
                                                          GParamSpec   *pspec);
 static void ogmrip_audio_chooser_widget_changed         (GtkComboBox  *combo);
-static void ogmrip_subtitle_chooser_widget_dispose      (GObject      *gobject);
-static void ogmrip_subtitle_chooser_widget_finalize     (GObject      *gobject);
-static void ogmrip_subtitle_chooser_widget_get_property (GObject      *gobject,
+static void ogmrip_subp_chooser_widget_dispose      (GObject      *gobject);
+static void ogmrip_subp_chooser_widget_finalize     (GObject      *gobject);
+static void ogmrip_subp_chooser_widget_get_property (GObject      *gobject,
                                                          guint        property_id,
                                                          GValue       *value,
                                                          GParamSpec   *pspec);
-static void ogmrip_subtitle_chooser_widget_set_property (GObject      *gobject,
+static void ogmrip_subp_chooser_widget_set_property (GObject      *gobject,
                                                          guint        property_id,
                                                          const GValue *value,
                                                          GParamSpec   *pspec);
-static void ogmrip_subtitle_chooser_widget_changed      (GtkComboBox  *combo);
+static void ogmrip_subp_chooser_widget_changed      (GtkComboBox  *combo);
 
 /*
  * OGMRipSourceChooser funcs
@@ -116,8 +116,8 @@ static void           ogmrip_source_chooser_widget_select_language (OGMRipSource
 static void     ogmrip_audio_chooser_widget_init             (OGMRipSourceChooserWidget      *chooser);
 static void     ogmrip_audio_chooser_widget_class_init       (OGMRipSourceChooserWidgetClass *klass);
 
-static void     ogmrip_subtitle_chooser_widget_init          (OGMRipSourceChooserWidget      *chooser);
-static void     ogmrip_subtitle_chooser_widget_class_init    (OGMRipSourceChooserWidgetClass *klass);
+static void     ogmrip_subp_chooser_widget_init          (OGMRipSourceChooserWidget      *chooser);
+static void     ogmrip_subp_chooser_widget_class_init    (OGMRipSourceChooserWidgetClass *klass);
 
 static void     ogmrip_source_chooser_widget_construct       (OGMRipSourceChooserWidget      *chooser);
 static void     ogmrip_source_chooser_widget_dispose         (OGMRipSourceChooserWidget      *chooser);
@@ -148,7 +148,7 @@ extern const gchar *ogmdvd_languages[][3];
 extern const guint  ogmdvd_nlanguages;
 
 static gpointer ogmrip_audio_chooser_widget_parent_class = NULL;
-static gpointer ogmrip_subtitle_chooser_widget_parent_class = NULL;
+static gpointer ogmrip_subp_chooser_widget_parent_class = NULL;
 
 static GtkWidget *
 ogmrip_source_chooser_construct_file_chooser_dialog (gboolean audio)
@@ -180,7 +180,7 @@ ogmrip_source_chooser_construct_file_chooser_dialog (gboolean audio)
   }
   else
   {
-    gtk_window_set_title (GTK_WINDOW (dialog), _("Select a subtitles file"));
+    gtk_window_set_title (GTK_WINDOW (dialog), _("Select a subps file"));
 
     gtk_file_filter_add_mime_type (filter, "text/*");
   }
@@ -367,18 +367,18 @@ ogmrip_audio_chooser_widget_changed (GtkComboBox *combo)
 }
 
 static void
-ogmrip_subtitle_chooser_widget_class_intern_init (gpointer klass)
+ogmrip_subp_chooser_widget_class_intern_init (gpointer klass)
 {
-  ogmrip_subtitle_chooser_widget_parent_class = g_type_class_peek_parent (klass);
-  ogmrip_subtitle_chooser_widget_class_init ((OGMRipSourceChooserWidgetClass*) klass);
+  ogmrip_subp_chooser_widget_parent_class = g_type_class_peek_parent (klass);
+  ogmrip_subp_chooser_widget_class_init ((OGMRipSourceChooserWidgetClass*) klass);
 }
 
 GType
-ogmrip_subtitle_chooser_widget_get_type (void)
+ogmrip_subp_chooser_widget_get_type (void)
 {
-  static GType subtitle_chooser_widget_type = 0;
+  static GType subp_chooser_widget_type = 0;
 
-  if (!subtitle_chooser_widget_type)
+  if (!subp_chooser_widget_type)
   {
     const GInterfaceInfo g_implement_interface_info =
     {
@@ -387,35 +387,35 @@ ogmrip_subtitle_chooser_widget_get_type (void)
       NULL
     };
 
-    subtitle_chooser_widget_type = g_type_register_static_simple (GTK_TYPE_COMBO_BOX,
-        "OGMRipSubtitleChooserWidget",
+    subp_chooser_widget_type = g_type_register_static_simple (GTK_TYPE_COMBO_BOX,
+        "OGMRipSubpChooserWidget",
         sizeof (OGMRipSourceChooserWidgetClass),
-        (GClassInitFunc) ogmrip_subtitle_chooser_widget_class_intern_init,
+        (GClassInitFunc) ogmrip_subp_chooser_widget_class_intern_init,
         sizeof (OGMRipSourceChooserWidget),
-        (GInstanceInitFunc)ogmrip_subtitle_chooser_widget_init,
+        (GInstanceInitFunc)ogmrip_subp_chooser_widget_init,
         (GTypeFlags) 0);
 
-    g_type_add_interface_static (subtitle_chooser_widget_type,
+    g_type_add_interface_static (subp_chooser_widget_type,
         OGMRIP_TYPE_SOURCE_CHOOSER, &g_implement_interface_info);
   }
 
-  return subtitle_chooser_widget_type;
+  return subp_chooser_widget_type;
 }
 
 static void
-ogmrip_subtitle_chooser_widget_class_init (OGMRipSourceChooserWidgetClass *klass)
+ogmrip_subp_chooser_widget_class_init (OGMRipSourceChooserWidgetClass *klass)
 {
   GObjectClass *object_class;
   GtkComboBoxClass *combo_box_class;
 
   object_class = (GObjectClass *) klass;
-  object_class->dispose = ogmrip_subtitle_chooser_widget_dispose;
-  object_class->finalize = ogmrip_subtitle_chooser_widget_finalize;
-  object_class->get_property = ogmrip_subtitle_chooser_widget_get_property;
-  object_class->set_property = ogmrip_subtitle_chooser_widget_set_property;
+  object_class->dispose = ogmrip_subp_chooser_widget_dispose;
+  object_class->finalize = ogmrip_subp_chooser_widget_finalize;
+  object_class->get_property = ogmrip_subp_chooser_widget_get_property;
+  object_class->set_property = ogmrip_subp_chooser_widget_set_property;
 
   combo_box_class = (GtkComboBoxClass *) klass;
-  combo_box_class->changed = ogmrip_subtitle_chooser_widget_changed;
+  combo_box_class->changed = ogmrip_subp_chooser_widget_changed;
 
   g_object_class_override_property (object_class, PROP_TITLE, "title");
   g_object_class_override_property (object_class, PROP_SOURCE, "source");
@@ -424,43 +424,43 @@ ogmrip_subtitle_chooser_widget_class_init (OGMRipSourceChooserWidgetClass *klass
 }
 
 static void
-ogmrip_subtitle_chooser_widget_init (OGMRipSourceChooserWidget *chooser)
+ogmrip_subp_chooser_widget_init (OGMRipSourceChooserWidget *chooser)
 {
-  chooser->priv = OGMRIP_SUBTITLE_CHOOSER_WIDGET_GET_PRIVATE (chooser);
+  chooser->priv = OGMRIP_SUBP_CHOOSER_WIDGET_GET_PRIVATE (chooser);
 
   ogmrip_source_chooser_widget_construct (chooser);
 }
 
 static void
-ogmrip_subtitle_chooser_widget_dispose (GObject *gobject)
+ogmrip_subp_chooser_widget_dispose (GObject *gobject)
 {
-  ogmrip_source_chooser_widget_dispose (OGMRIP_SUBTITLE_CHOOSER_WIDGET (gobject));
+  ogmrip_source_chooser_widget_dispose (OGMRIP_SUBP_CHOOSER_WIDGET (gobject));
 
-  (*G_OBJECT_CLASS (ogmrip_subtitle_chooser_widget_parent_class)->dispose) (gobject);
+  (*G_OBJECT_CLASS (ogmrip_subp_chooser_widget_parent_class)->dispose) (gobject);
 }
 
 static void
-ogmrip_subtitle_chooser_widget_finalize (GObject *gobject)
+ogmrip_subp_chooser_widget_finalize (GObject *gobject)
 {
-  ogmrip_source_chooser_widget_finalize (OGMRIP_SUBTITLE_CHOOSER_WIDGET (gobject));
+  ogmrip_source_chooser_widget_finalize (OGMRIP_SUBP_CHOOSER_WIDGET (gobject));
 
-  (*G_OBJECT_CLASS (ogmrip_subtitle_chooser_widget_parent_class)->finalize) (gobject);
+  (*G_OBJECT_CLASS (ogmrip_subp_chooser_widget_parent_class)->finalize) (gobject);
 }
 
 static void
-ogmrip_subtitle_chooser_widget_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
+ogmrip_subp_chooser_widget_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
 {
   ogmrip_source_chooser_widget_get_property (OGMRIP_SOURCE_CHOOSER (gobject), property_id, value, pspec);
 }
 
 static void
-ogmrip_subtitle_chooser_widget_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
+ogmrip_subp_chooser_widget_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
 {
   ogmrip_source_chooser_widget_set_property (OGMRIP_SOURCE_CHOOSER (gobject), property_id, value, pspec);
 }
 
 static void
-ogmrip_subtitle_chooser_widget_changed (GtkComboBox *combo)
+ogmrip_subp_chooser_widget_changed (GtkComboBox *combo)
 {
   GtkTreeIter iter;
 
@@ -470,7 +470,7 @@ ogmrip_subtitle_chooser_widget_changed (GtkComboBox *combo)
     GtkTreeModel *model;
     gint type;
 
-    chooser = OGMRIP_SUBTITLE_CHOOSER_WIDGET (combo);
+    chooser = OGMRIP_SUBP_CHOOSER_WIDGET (combo);
 
     model = gtk_combo_box_get_model (GTK_COMBO_BOX (combo));
     gtk_tree_model_get (model, &iter, TYPE_COLUMN, &type, -1);
@@ -651,7 +651,7 @@ ogmrip_source_chooser_widget_add_subp_streams (OGMRipSourceChooserWidget *choose
 
   gtk_list_store_append (GTK_LIST_STORE (model), &iter);
   gtk_list_store_set (GTK_LIST_STORE (model), &iter,
-      TEXT_COLUMN, _("No subtitle"), TYPE_COLUMN, OGMRIP_SOURCE_NONE, LANG_COLUMN, -1, SOURCE_COLUMN, NULL, -1);
+      TEXT_COLUMN, _("No subp"), TYPE_COLUMN, OGMRIP_SOURCE_NONE, LANG_COLUMN, -1, SOURCE_COLUMN, NULL, -1);
 
   nsid = ogmdvd_title_get_n_subp_streams (title);
   for (sid = 0; sid < nsid; sid++)
@@ -686,7 +686,7 @@ ogmrip_source_chooser_widget_set_title (OGMRipSourceChooser *chooser, OGMDvdTitl
   if (OGMRIP_IS_AUDIO_CHOOSER_WIDGET (chooser))
     source_chooser = OGMRIP_AUDIO_CHOOSER_WIDGET (chooser);
   else
-    source_chooser = OGMRIP_SUBTITLE_CHOOSER_WIDGET (chooser);
+    source_chooser = OGMRIP_SUBP_CHOOSER_WIDGET (chooser);
 
   if (source_chooser->priv->title != title)
   {
@@ -890,7 +890,7 @@ ogmrip_source_chooser_widget_get_title (OGMRipSourceChooser *chooser)
   if (OGMRIP_IS_AUDIO_CHOOSER_WIDGET (chooser))
     return OGMRIP_AUDIO_CHOOSER_WIDGET (chooser)->priv->title;
   else
-    return OGMRIP_SUBTITLE_CHOOSER_WIDGET (chooser)->priv->title;
+    return OGMRIP_SUBP_CHOOSER_WIDGET (chooser)->priv->title;
 }
 
 static OGMRipSource *
@@ -960,15 +960,15 @@ ogmrip_audio_chooser_widget_new (void)
 }
 
 /**
- * ogmrip_subtitle_chooser_widget_new:
+ * ogmrip_subp_chooser_widget_new:
  *
- * Creates a new #OGMRipSourceChooserWidget for subtitles streams.
+ * Creates a new #OGMRipSourceChooserWidget for subps streams.
  *
  * Returns: The new #OGMRipSourceChooserWidget
  */
 GtkWidget *
-ogmrip_subtitle_chooser_widget_new (void)
+ogmrip_subp_chooser_widget_new (void)
 {
-  return g_object_new (OGMRIP_TYPE_SUBTITLE_CHOOSER_WIDGET, NULL);
+  return g_object_new (OGMRIP_TYPE_SUBP_CHOOSER_WIDGET, NULL);
 }
 

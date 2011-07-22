@@ -1124,7 +1124,7 @@ ogmrip_profile_store_add (GtkListStore *store, GtkTreeIter *iter, OGMRipProfile 
   gtk_list_store_set (store, iter, COL_PROFILE_NAME, name, COL_PROFILE_OBJECT, profile, -1);
   g_free (name);
 
-  g_signal_connect_swapped (profile, "changed::" OGMRIP_PROFILE_NAME,
+  g_signal_connect_swapped_while_alive (profile, "changed::" OGMRIP_PROFILE_NAME,
       G_CALLBACK (ogmrip_profile_store_name_setting_changed), store);
 }
 

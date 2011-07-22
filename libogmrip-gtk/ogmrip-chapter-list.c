@@ -159,6 +159,8 @@ ogmrip_chapter_list_select_all (OGMRipChapterList *list)
     }
     while (gtk_tree_model_iter_next (model, &iter));
   }
+
+  g_signal_emit (G_OBJECT (list), signals[SELECTION_CHANGED], 0);
 }
 
 /**
@@ -184,6 +186,8 @@ ogmrip_chapter_list_deselect_all (OGMRipChapterList *list)
     }
     while (gtk_tree_model_iter_next (model, &iter));
   }
+
+  g_signal_emit (G_OBJECT (list), signals[SELECTION_CHANGED], 0);
 }
 
 /**

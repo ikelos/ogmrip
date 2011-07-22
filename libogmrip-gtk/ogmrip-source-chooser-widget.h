@@ -23,17 +23,17 @@
 
 G_BEGIN_DECLS
 
-#define OGMRIP_TYPE_AUDIO_CHOOSER_WIDGET               (ogmrip_audio_chooser_widget_get_type ())
-#define OGMRIP_AUDIO_CHOOSER_WIDGET(obj)               (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_AUDIO_CHOOSER_WIDGET, OGMRipSourceChooserWidget))
-#define OGMRIP_AUDIO_CHOOSER_WIDGET_CLASS(klass)       (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_AUDIO_CHOOSER_WIDGET, OGMRipSourceChooserWidgetClass))
-#define OGMRIP_IS_AUDIO_CHOOSER_WIDGET(obj)            (G_TYPE_CHECK_INSTANCE_TYPE (obj, OGMRIP_TYPE_AUDIO_CHOOSER_WIDGET))
-#define OGMRIP_IS_AUDIO_CHOOSER_WIDGET_CLASS(klass)    (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_AUDIO_CHOOSER_WIDGET))
+#define OGMRIP_TYPE_AUDIO_CHOOSER_WIDGET            (ogmrip_audio_chooser_widget_get_type ())
+#define OGMRIP_AUDIO_CHOOSER_WIDGET(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_AUDIO_CHOOSER_WIDGET, OGMRipSourceChooserWidget))
+#define OGMRIP_AUDIO_CHOOSER_WIDGET_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_AUDIO_CHOOSER_WIDGET, OGMRipSourceChooserWidgetClass))
+#define OGMRIP_IS_AUDIO_CHOOSER_WIDGET(obj)         (G_TYPE_CHECK_INSTANCE_TYPE (obj, OGMRIP_TYPE_AUDIO_CHOOSER_WIDGET))
+#define OGMRIP_IS_AUDIO_CHOOSER_WIDGET_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_AUDIO_CHOOSER_WIDGET))
 
-#define OGMRIP_TYPE_SUBTITLE_CHOOSER_WIDGET            (ogmrip_subtitle_chooser_widget_get_type ())
-#define OGMRIP_SUBTITLE_CHOOSER_WIDGET(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_SUBTITLE_CHOOSER_WIDGET, OGMRipSourceChooserWidget))
-#define OGMRIP_SUBTITLE_CHOOSER_WIDGET_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_SUBTITLE_CHOOSER_WIDGET, OGMRipSourceChooserWidgetClass))
-#define OGMRIP_IS_SUBTITLE_CHOOSER_WIDGET(obj)         (G_TYPE_CHECK_INSTANCE_TYPE (obj, OGMRIP_TYPE_SUBTITLE_CHOOSER_WIDGET))
-#define OGMRIP_IS_SUBTITLE_CHOOSER_WIDGET_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_SUBTITLE_CHOOSER_WIDGET))
+#define OGMRIP_TYPE_SUBP_CHOOSER_WIDGET             (ogmrip_subp_chooser_widget_get_type ())
+#define OGMRIP_SUBP_CHOOSER_WIDGET(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_SUBP_CHOOSER_WIDGET, OGMRipSourceChooserWidget))
+#define OGMRIP_SUBP_CHOOSER_WIDGET_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_SUBP_CHOOSER_WIDGET, OGMRipSourceChooserWidgetClass))
+#define OGMRIP_IS_SUBP_CHOOSER_WIDGET(obj)          (G_TYPE_CHECK_INSTANCE_TYPE (obj, OGMRIP_TYPE_SUBP_CHOOSER_WIDGET))
+#define OGMRIP_IS_SUBP_CHOOSER_WIDGET_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_SUBP_CHOOSER_WIDGET))
 
 typedef struct _OGMRipSourceChooserWidget      OGMRipSourceChooserWidget;
 typedef struct _OGMRipSourceChooserWidgetClass OGMRipSourceChooserWidgetClass;
@@ -50,11 +50,11 @@ struct _OGMRipSourceChooserWidgetClass
   GtkComboBoxClass parent_class;
 };
 
-GType       ogmrip_audio_chooser_widget_get_type    (void);
-GtkWidget * ogmrip_audio_chooser_widget_new         (void);
+GType       ogmrip_audio_chooser_widget_get_type (void);
+GtkWidget * ogmrip_audio_chooser_widget_new      (void);
 
-GType       ogmrip_subtitle_chooser_widget_get_type (void);
-GtkWidget * ogmrip_subtitle_chooser_widget_new      (void);
+GType       ogmrip_subp_chooser_widget_get_type  (void);
+GtkWidget * ogmrip_subp_chooser_widget_new       (void);
 
 G_END_DECLS
 

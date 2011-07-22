@@ -56,7 +56,6 @@ typedef struct
   GtkWidget *dialog;
 } OGMRipChooserListItem;
 
-static void ogmrip_chooser_list_dispose         (GObject      *gobject);
 static void ogmrip_chooser_list_show            (GtkWidget    *widget);
 static void ogmrip_chooser_list_add_internal    (GtkContainer *container,
                                                  GtkWidget    *widget);
@@ -166,7 +165,6 @@ ogmrip_chooser_list_class_init (OGMRipChooserListClass *klass)
   widget_class = GTK_WIDGET_CLASS (klass);
   container_class = GTK_CONTAINER_CLASS (klass);
 
-  gobject_class->dispose = ogmrip_chooser_list_dispose;
   widget_class->show = ogmrip_chooser_list_show;
   container_class->add = ogmrip_chooser_list_add_internal;
   container_class->remove = ogmrip_chooser_list_remove_internal;
@@ -224,20 +222,6 @@ ogmrip_chooser_list_more_clicked (OGMRipChooserList *list, GtkWidget *button)
   item = g_object_get_data (G_OBJECT (parent), "__ogmrip_chooser_list_item__");
   if (item)
     g_signal_emit (G_OBJECT (list), signals[MORE_CLICKED], 0, item->chooser);
-}
-
-static void
-ogmrip_chooser_list_dispose (GObject *gobject)
-{
-  OGMRipChooserList *list;
-  
-  list = OGMRIP_CHOOSER_LIST (gobject);
-/*
-  if (list->priv->client)
-    g_object_unref (list->priv->client);
-  list->priv->client = NULL;
-*/
-  G_OBJECT_CLASS (ogmrip_chooser_list_parent_class)->dispose (gobject);
 }
 
 static void
