@@ -608,7 +608,7 @@ ogmrip_queue_dialog_init (OGMRipQueueDialog *dialog)
   area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
 
   widget = gtk_builder_get_widget (builder, OGMRIP_GLADE_ROOT);
-  gtk_container_add (GTK_CONTAINER (area), widget);
+  gtk_box_pack_start (GTK_BOX (area), widget, TRUE, TRUE, 0);
   gtk_widget_show (widget);
 
   dialog->priv->treeview = gtk_builder_get_widget (builder, "treeview");
