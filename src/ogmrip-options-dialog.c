@@ -21,7 +21,7 @@
 #endif
 
 #include "ogmrip-options-dialog.h"
-#include "ogmrip-profiles-dialog.h"
+#include "ogmrip-profile-editor.h"
 #include "ogmrip-crop-dialog.h"
 
 #include "ogmrip-settings.h"
@@ -60,6 +60,8 @@ struct _OGMRipOptionsDialogPriv
 {
   OGMRipOptionsDialogAction action;
 
+  GtkWidget *profile_combo;
+
   GtkWidget *crop_check;
   GtkWidget *crop_box;
 
@@ -68,6 +70,7 @@ struct _OGMRipOptionsDialogPriv
   GtkWidget *crop_right_label;
   GtkWidget *crop_bottom_label;
 
+  GtkWidget *scale_combo;
   GtkWidget *scale_check;
   GtkWidget *scale_box;
 
@@ -78,6 +81,9 @@ struct _OGMRipOptionsDialogPriv
   GtkWidget *test_box;
 
   GtkWidget *deint_check;
+
+  GtkWidget *autoscale_button;
+  GtkWidget *autocrop_button;
 
   OGMRipEncoding *encoding;
 };
@@ -92,48 +98,137 @@ static void ogmrip_options_dialog_set_property (GObject      *gobject,
                                                 const GValue *value,
                                                 GParamSpec   *pspec);
 static void ogmrip_options_dialog_dispose      (GObject      *gobject);
+static void ogmrip_options_dialog_response     (GtkDialog    *dialog,
+                                                gint         response_id);
+
+static const guint m[] = { 0, 1, 1, 1, 3, 5, 1 };
+static const guint d[] = { 0, 8, 4, 2, 4, 6, 1 };
 
 static void
-ogmrip_options_dialog_get_crop_info (OGMRipOptionsDialog *dialog, guint *x, guint *y, guint *w, guint *h, gdouble *r)
+scale_to_size (guint cw, guint ch, gdouble r, guint s, guint *sw, guint *sh)
 {
-  gint left, top, right, bottom;
+  *sw = cw * m[s] / d[s];
+  *sw += *sw % 2;
 
-  left   = gtk_label_get_int (GTK_LABEL (dialog->priv->crop_left_label));
-  top    = gtk_label_get_int (GTK_LABEL (dialog->priv->crop_top_label));
-  right  = gtk_label_get_int (GTK_LABEL (dialog->priv->crop_right_label));
-  bottom = gtk_label_get_int (GTK_LABEL (dialog->priv->crop_bottom_label));
-
-  *x = left;
-  *y = top;
-
-  /*
-   * TODO encoding is always defined
-   */
-
-  *w = 0;
-  *h = 0;
-  *r = 1.0;
-
-  if (dialog->priv->encoding)
-  {
-    OGMDvdTitle *title;
-    guint n, d;
-
-    title = ogmrip_encoding_get_title (dialog->priv->encoding);
-    ogmdvd_title_get_aspect_ratio (title, &n, &d);
-    ogmdvd_title_get_size (title, w, h);
-
-    *r = *h / (gdouble) *w * n / (gdouble) d;
-  }
-
-  *w -= left + right;
-  *h -= top + bottom;
-
-  *r *= *w / (gdouble) *h;
+  *sw = 16 * ROUND (*sw / 16.);
+  *sh = 16 * ROUND (*sw / r / 16.);
 }
 
 static void
-ogmrip_options_dialog_profile_combo_changed (OGMRipOptionsDialog *dialog, GtkComboBox *chooser)
+crop_to_size (guint rw, guint rh, guint l, guint t, guint r, guint b, guint *cw, guint *ch)
+{
+  *cw = rw;
+  if (*cw > l + r)
+    *cw -= l + r;
+
+  *ch = rh;
+  if (*ch > t + b)
+    *ch -= t + b;
+}
+
+static gdouble
+get_ratio (guint rw, guint rh, guint cw, guint ch, guint n, guint d)
+{
+  if (!rw || !rh)
+    return 1.0;
+
+  return cw / (gdouble) ch * rh / (gdouble) rw * n / (gdouble) d;
+}
+
+static void
+ogmrip_options_dialog_get_crop (OGMRipOptionsDialog *dialog, guint *l, guint *t, guint *r, guint *b)
+{
+  *l = gtk_label_get_int (GTK_LABEL (dialog->priv->crop_left_label));
+  *t = gtk_label_get_int (GTK_LABEL (dialog->priv->crop_top_label));
+  *r = gtk_label_get_int (GTK_LABEL (dialog->priv->crop_right_label));
+  *b = gtk_label_get_int (GTK_LABEL (dialog->priv->crop_bottom_label));
+}
+
+static gdouble
+ogmrip_options_dialog_get_crop_size (OGMRipOptionsDialog *dialog, guint *x, guint *y, guint *w, guint *h)
+{
+  OGMDvdTitle *title;
+  guint r, b, n, d, rw, rh;
+
+  ogmrip_options_dialog_get_crop (dialog, x, y, &r, &b);
+
+  title = ogmrip_encoding_get_title (dialog->priv->encoding);
+
+  ogmdvd_video_stream_get_resolution (ogmdvd_title_get_video_stream (title), &rw, &rh);
+  crop_to_size (rw, rh, *x, *y, r, b, w, h);
+
+  ogmdvd_video_stream_get_aspect_ratio (ogmdvd_title_get_video_stream (title), &n, &d);
+
+  return get_ratio (rw, rh, *w, *h, n, d);
+}
+
+static void
+ogmrip_options_dialog_set_crop (OGMRipOptionsDialog *dialog, guint l, guint t, guint r, guint b)
+{
+  gtk_label_set_int (GTK_LABEL (dialog->priv->crop_left_label), l);
+  gtk_label_set_int (GTK_LABEL (dialog->priv->crop_top_label), t);
+  gtk_label_set_int (GTK_LABEL (dialog->priv->crop_right_label), r);
+  gtk_label_set_int (GTK_LABEL (dialog->priv->crop_bottom_label), b);
+}
+
+static void
+ogmrip_options_dialog_get_scale (OGMRipOptionsDialog *dialog, guint *w, guint *h)
+{
+  *w = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (dialog->priv->scale_width_spin));
+  *h = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (dialog->priv->scale_height_spin));
+}
+
+static void
+ogmrip_options_dialog_set_scale (OGMRipOptionsDialog *dialog, guint w, guint h)
+{
+  gtk_spin_button_set_value (GTK_SPIN_BUTTON (dialog->priv->scale_width_spin), w);
+  gtk_spin_button_set_value (GTK_SPIN_BUTTON (dialog->priv->scale_height_spin), h);
+}
+
+static void
+ogmrip_options_dialog_update_scale_combo (OGMRipOptionsDialog *dialog)
+{
+  GtkTreeModel *model;
+  GtkTreeIter iter;
+
+  gchar *str;
+  guint x, y, rw, rh, cw, ch, sw, sh, i;
+  gdouble f;
+
+  f = ogmrip_options_dialog_get_crop_size (dialog, &x, &y, &cw, &ch);
+
+  gtk_spin_button_set_range (GTK_SPIN_BUTTON (dialog->priv->scale_width_spin), 0, cw);
+  gtk_spin_button_set_range (GTK_SPIN_BUTTON (dialog->priv->scale_height_spin), 0, ch);
+
+  model = gtk_combo_box_get_model (GTK_COMBO_BOX (dialog->priv->scale_combo));
+
+  for (i = OGMRIP_SCALE_NONE; i < OGMRIP_SCALE_USER; i++)
+  {
+    if (gtk_tree_model_iter_nth_child (model, &iter, NULL, i))
+    {
+      if (i == OGMRIP_SCALE_NONE)
+      {
+        OGMDvdTitle *title;
+
+        title = ogmrip_encoding_get_title (dialog->priv->encoding);
+        ogmdvd_video_stream_get_resolution (ogmdvd_title_get_video_stream (title), &rw, &rh);
+
+        str = g_strdup_printf ("%u x %u", rw, rh);
+      }
+      else
+      {
+        scale_to_size (cw, ch, f, i, &sh, &sw);
+        str = g_strdup_printf ("%u x %u", sw, sh);
+      }
+
+      gtk_list_store_set (GTK_LIST_STORE (model), &iter, 1, str, -1);
+      g_free (str);
+    }
+  }
+}
+
+static void
+ogmrip_options_dialog_profile_combo_changed (OGMRipOptionsDialog *dialog)
 {
   OGMRipProfile *profile;
 
@@ -142,7 +237,7 @@ ogmrip_options_dialog_profile_combo_changed (OGMRipOptionsDialog *dialog, GtkCom
   OGMRipScalerType scaler = 0;
   gboolean sensitive, can_crop = FALSE;
 
-  profile = ogmrip_profile_chooser_get_active (chooser);
+  profile = ogmrip_profile_chooser_get_active (GTK_COMBO_BOX (dialog->priv->profile_combo));
   if (profile)
   {
     GSettings *settings;
@@ -202,62 +297,211 @@ ogmrip_options_dialog_check_toggled (GtkToggleButton *check, GtkWidget *box)
 }
 
 static void
-ogmrip_options_dialog_crop_changed (OGMRipOptionsDialog *dialog)
+ogmrip_options_dialog_scale_combo_changed (OGMRipOptionsDialog *dialog)
 {
-  guint x, y, w, h, i;
-//  gboolean active;
-  gdouble r;
+  GtkTreeIter iter;
 
-  ogmrip_options_dialog_get_crop_info (dialog, &x, &y, &w, &h, &r);
-
-  gtk_spin_button_set_range (GTK_SPIN_BUTTON (dialog->priv->scale_width_spin), 0, w);
-  gtk_spin_button_set_range (GTK_SPIN_BUTTON (dialog->priv->scale_height_spin), 0, h);
-
-//  active = gtk_combo_box_get_active (GTK_COMBO_BOX (dialog->priv->scale_combo));
-
-  for (i = 1; i < OGMRIP_SCALE_USER; i++)
+  if (gtk_combo_box_get_active_iter (GTK_COMBO_BOX (dialog->priv->scale_combo), &iter))
   {
-/*
-    if (gtk_tree_model_iter_nth_child (GTK_TREE_MODEL (dialog->priv->scale_store), &iter, NULL, i))
+    GtkTreeModel *model;
+    guint w, h;
+    gchar *str;
+
+    model = gtk_combo_box_get_model (GTK_COMBO_BOX (dialog->priv->scale_combo));
+    gtk_tree_model_get (model, &iter, 1, &str, -1);
+
+    if (str && sscanf (str, "%u x %u", &w, &h) == 2)
     {
-      scale_width = crop_width;
-      scale_height = crop_height;
-
-      ogmrip_options_dialog_scale (i, aspect, &scale_width, &scale_height);
-
-      snprintf (text, 16, "%u x %u", scale_width, scale_height);
-      gtk_list_store_set (dialog->priv->scale_store, &iter, 1, text, -1);
-
-      if (active == i)
-        ogmrip_options_dialog_set_scale_internal (dialog, -1, scale_width, scale_height);
+      gtk_spin_button_set_value (GTK_SPIN_BUTTON (dialog->priv->scale_width_spin), w);
+      gtk_spin_button_set_value (GTK_SPIN_BUTTON (dialog->priv->scale_height_spin), h);
     }
-*/
+
+    g_free (str);
   }
 }
 
 static void
-ogmrip_options_dialog_edit_profiles_button_clicked (OGMRipOptionsDialog *dialog)
+ogmrip_options_dialog_edit_profiles_button_clicked (OGMRipOptionsDialog *parent)
 {
+  OGMRipProfile *profile;
+
+  profile = ogmrip_profile_chooser_get_active (GTK_COMBO_BOX (parent->priv->profile_combo));
+  if (profile)
+  {
+    GtkWidget *dialog;
+
+    dialog = ogmrip_profile_editor_dialog_new (profile);
+    gtk_window_set_parent (GTK_WINDOW (dialog), GTK_WINDOW (parent));
+    gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), FALSE);
+
+    gtk_dialog_run (GTK_DIALOG (dialog));
+
+    gtk_widget_destroy (dialog);
+  }
 }
 
 static void
-ogmrip_options_dialog_crop_button_clicked (OGMRipOptionsDialog *options)
+ogmrip_options_dialog_crop_button_clicked (OGMRipOptionsDialog *parent)
 {
+  OGMDvdTitle *title;
+  GtkWidget *dialog;
+
+  /*
+   * TODO make a helper function ?
+   */
+
+  title = ogmrip_encoding_get_title (parent->priv->encoding);
+  if (!ogmdvd_title_open (title, NULL))
+  {
+    OGMDvdDisc *disc;
+    gint response;
+
+    disc = ogmdvd_title_get_disc (title);
+
+    dialog = ogmrip_load_dvd_dialog_new (GTK_WINDOW (parent), disc, ogmdvd_disc_get_label (disc), TRUE);
+    response = gtk_dialog_run (GTK_DIALOG (dialog));
+    gtk_widget_destroy (dialog);
+
+    if (response == GTK_RESPONSE_ACCEPT)
+      ogmdvd_title_open (title, NULL);
+  }
+
+  if (ogmdvd_title_is_open (title))
+  {
+    guint l, t, r, b;
+
+    ogmrip_options_dialog_get_crop (parent, &l, &t, &r, &b);
+
+    dialog = ogmrip_crop_dialog_new (title, l, t, r, b);
+    ogmrip_crop_dialog_set_deinterlacer (OGMRIP_CROP_DIALOG (dialog),
+        gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (parent->priv->deint_check)));
+
+    if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_OK)
+    {
+      ogmrip_crop_dialog_get_crop (OGMRIP_CROP_DIALOG (dialog), &l, &t, &r, &b);
+
+      ogmrip_options_dialog_set_crop (parent, l, t, r, b);
+      ogmrip_options_dialog_update_scale_combo (parent);
+
+      gtk_widget_set_sensitive (parent->priv->autocrop_button, TRUE);
+    }
+    gtk_widget_destroy (dialog);
+
+    ogmdvd_title_close (title);
+  }
 }
 
 static void
-ogmrip_options_dialog_autocrop_button_clicked (OGMRipOptionsDialog *options)
+ogmrip_options_dialog_autocrop_button_clicked (OGMRipOptionsDialog *parent)
 {
+  OGMRipProfile *profile;
+  OGMDvdTitle *title;
+  GtkWidget *dialog;
+  GType codec;
+
+  title = ogmrip_encoding_get_title (parent->priv->encoding);
+  profile = ogmrip_encoding_get_profile (parent->priv->encoding);
+  codec = ogmrip_profile_get_video_codec_type (profile, NULL);
+
+  if (!ogmdvd_title_open (title, NULL))
+  {
+    OGMDvdDisc *disc;
+    gint response;
+
+    disc = ogmdvd_title_get_disc (title);
+
+    dialog = ogmrip_load_dvd_dialog_new (GTK_WINDOW (parent), disc, ogmdvd_disc_get_label (disc), TRUE);
+    response = gtk_dialog_run (GTK_DIALOG (dialog));
+    gtk_widget_destroy (dialog);
+
+    if (response == GTK_RESPONSE_ACCEPT)
+      ogmdvd_title_open (title, NULL);
+  }
+
+  if (ogmdvd_title_is_open (title))
+  {
+    OGMJobSpawn *spawn;
+
+    guint x, y, w, h;
+
+    dialog = gtk_message_dialog_new_with_markup (GTK_WINDOW (parent), GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+        GTK_MESSAGE_INFO, GTK_BUTTONS_NONE, "<b>%s</b>\n\n%s", _("Detecting cropping parameters"), _("Please wait"));
+    gtk_widget_show (dialog);
+
+    spawn = g_object_new (codec, "input", title, NULL);
+
+    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (parent->priv->deint_check)))
+      ogmrip_video_codec_set_deinterlacer (OGMRIP_VIDEO_CODEC (spawn), OGMRIP_DEINT_YADIF);
+    else
+      ogmrip_video_codec_set_deinterlacer (OGMRIP_VIDEO_CODEC (spawn), OGMRIP_DEINT_NONE);
+
+    ogmrip_video_codec_autocrop (OGMRIP_VIDEO_CODEC (spawn), 0);
+    ogmrip_video_codec_get_crop_size (OGMRIP_VIDEO_CODEC (spawn), &x, &y, &w, &h);
+    g_object_unref (spawn);
+
+    gtk_widget_destroy (dialog);
+
+    if (!w || !h)
+      ogmdvd_video_stream_get_resolution (ogmdvd_title_get_video_stream (title), &w, &h);
+
+    ogmrip_options_dialog_set_crop (parent, x, y, w, h);
+    ogmrip_options_dialog_update_scale_combo (parent);
+
+    gtk_widget_set_sensitive (parent->priv->autocrop_button, FALSE);
+
+    ogmdvd_title_close (title);
+  }
 }
 
 static void
 ogmrip_options_dialog_autoscale_button_clicked (OGMRipOptionsDialog *dialog)
 {
+  OGMRipProfile *profile;
+  OGMDvdTitle *title;
+  OGMJobSpawn *spawn;
+
+  GType codec;
+  guint x, y, w, h;
+
+  title = ogmrip_encoding_get_title (dialog->priv->encoding);
+  profile = ogmrip_encoding_get_profile (dialog->priv->encoding);
+  codec = ogmrip_profile_get_video_codec_type (profile, NULL);
+
+  ogmrip_options_dialog_get_crop_size (dialog, &x, &y, &w, &h);
+
+  spawn = g_object_new (codec, "input", title, NULL);
+  ogmrip_video_codec_set_crop_size (OGMRIP_VIDEO_CODEC (spawn), x, y, w, h);
+  ogmrip_video_codec_autoscale (OGMRIP_VIDEO_CODEC (spawn));
+  ogmrip_video_codec_get_scale_size (OGMRIP_VIDEO_CODEC (spawn), &w, &h);
+  g_object_unref (spawn);
+
+  ogmrip_options_dialog_set_scale (dialog, w, h);
+
+  gtk_widget_set_sensitive (dialog->priv->autoscale_button, FALSE);
 }
 
 static void
 ogmrip_options_dialog_test_button_clicked (OGMRipOptionsDialog *dialog)
 {
+  /*
+   * TODO
+   */
+}
+
+static gboolean
+ogmrip_options_dialog_set_edit_button_sensitivity (GBinding *binding, const GValue *source_value, GValue *target_value, gpointer data)
+{
+  g_value_set_boolean (target_value, g_value_get_int (source_value) != -1);
+
+  return TRUE;
+}
+
+static gboolean
+ogmrip_options_dialog_set_scale_box_sensitivity (GBinding *binding, const GValue *source_value, GValue *target_value, gpointer data)
+{
+  g_value_set_boolean (target_value, g_value_get_int (source_value) == OGMRIP_SCALE_USER);
+
+  return TRUE;
 }
 
 G_DEFINE_TYPE (OGMRipOptionsDialog, ogmrip_options_dialog, GTK_TYPE_DIALOG)
@@ -265,12 +509,17 @@ G_DEFINE_TYPE (OGMRipOptionsDialog, ogmrip_options_dialog, GTK_TYPE_DIALOG)
 static void
 ogmrip_options_dialog_class_init (OGMRipOptionsDialogClass *klass)
 {
-  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
+  GObjectClass *gobject_class;
+  GtkDialogClass *dialog_class;
 
+  gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->constructed = ogmrip_options_dialog_constructed;
   gobject_class->get_property = ogmrip_options_dialog_get_property;
   gobject_class->set_property = ogmrip_options_dialog_set_property;
   gobject_class->dispose = ogmrip_options_dialog_dispose;
+
+  dialog_class = GTK_DIALOG_CLASS (klass);
+  dialog_class->response = ogmrip_options_dialog_response;
 
   g_object_class_install_property (G_OBJECT_CLASS (klass), PROP_ACTION,
       g_param_spec_uint ("action", "action", "action",
@@ -299,7 +548,7 @@ ogmrip_options_dialog_constructed (GObject *gobject)
   OGMRipOptionsDialog *dialog = OGMRIP_OPTIONS_DIALOG (gobject);
 
   GtkBuilder *builder;
-  GtkWidget *misc, *widget, *combo;
+  GtkWidget *misc, *widget;
   guint i;
 
   GtkTreeIter iter;
@@ -308,13 +557,13 @@ ogmrip_options_dialog_constructed (GObject *gobject)
 
   gchar *size[] = { N_("None"), N_("Extra Small"), N_("Small"), N_("Medium"), 
     N_("Large"), N_("Extra Large"), N_("Full"), N_("User Defined") };
-/*
+
   if (!dialog->priv->encoding)
   {
     g_critical ("No encoding has been specified");
     return;
   }
-*/
+
   builder = gtk_builder_new ();
   if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))
   {
@@ -358,9 +607,9 @@ ogmrip_options_dialog_constructed (GObject *gobject)
   gtk_container_add (GTK_CONTAINER (misc), widget);
   gtk_widget_show (widget);
 
-  combo = gtk_builder_get_widget (builder, "profile-combo");
-  ogmrip_profile_chooser_construct (GTK_COMBO_BOX (combo));
-  g_signal_connect_swapped (combo, "changed",
+  dialog->priv->profile_combo = gtk_builder_get_widget (builder, "profile-combo");
+  ogmrip_profile_chooser_construct (GTK_COMBO_BOX (dialog->priv->profile_combo));
+  g_signal_connect_swapped (dialog->priv->profile_combo, "changed",
       G_CALLBACK (ogmrip_options_dialog_profile_combo_changed), dialog);
 /*
   if (dialog->priv->action == OGMRIP_OPTIONS_DIALOG_CREATE)
@@ -371,6 +620,9 @@ ogmrip_options_dialog_constructed (GObject *gobject)
         NULL);
 */
   widget = gtk_builder_get_widget (builder, "edit-button");
+  g_object_bind_property_full (dialog->priv->profile_combo, "active",
+      widget, "sensitive", G_BINDING_SYNC_CREATE,
+      ogmrip_options_dialog_set_edit_button_sensitivity, NULL, NULL, NULL);
   g_signal_connect_swapped (widget, "clicked",
       G_CALLBACK (ogmrip_options_dialog_edit_profiles_button_clicked), dialog);
 
@@ -382,17 +634,17 @@ ogmrip_options_dialog_constructed (GObject *gobject)
   g_signal_connect (dialog->priv->crop_check, "toggled",
       G_CALLBACK (ogmrip_options_dialog_check_toggled), dialog->priv->crop_box);
 
-  widget = gtk_builder_get_widget (builder, "crop-left-label");
-  widget = gtk_builder_get_widget (builder, "crop-right-label");
-  widget = gtk_builder_get_widget (builder, "crop-top-label");
-  widget = gtk_builder_get_widget (builder, "crop-bottom-label");
+  dialog->priv->crop_left_label = gtk_builder_get_widget (builder, "crop-left-label");
+  dialog->priv->crop_right_label = gtk_builder_get_widget (builder, "crop-right-label");
+  dialog->priv->crop_top_label = gtk_builder_get_widget (builder, "crop-top-label");
+  dialog->priv->crop_bottom_label = gtk_builder_get_widget (builder, "crop-bottom-label");
 
   widget = gtk_builder_get_widget (builder, "crop-button");
   g_signal_connect_swapped (widget, "clicked", 
       G_CALLBACK (ogmrip_options_dialog_crop_button_clicked), dialog);
 
-  widget = gtk_builder_get_widget (builder, "autocrop-button");
-  g_signal_connect_swapped (widget, "clicked", 
+  dialog->priv->autocrop_button = gtk_builder_get_widget (builder, "autocrop-button");
+  g_signal_connect_swapped (dialog->priv->autocrop_button, "clicked", 
       G_CALLBACK (ogmrip_options_dialog_autocrop_button_clicked), dialog);
 
   dialog->priv->scale_check = gtk_builder_get_widget (builder, "scale-check");
@@ -403,17 +655,16 @@ ogmrip_options_dialog_constructed (GObject *gobject)
   g_signal_connect (dialog->priv->scale_check, "toggled",
       G_CALLBACK (ogmrip_options_dialog_check_toggled), dialog->priv->scale_box);
 
-  widget = gtk_builder_get_widget (builder, "autoscale-button");
-  g_signal_connect_swapped (widget, "clicked", 
+  dialog->priv->autoscale_button = gtk_builder_get_widget (builder, "autoscale-button");
+  g_signal_connect_swapped (dialog->priv->autoscale_button, "clicked", 
       G_CALLBACK (ogmrip_options_dialog_autoscale_button_clicked), dialog);
 
-  widget = gtk_builder_get_widget (builder, "scale-user-hbox");
-  dialog->priv->scale_width_spin = gtk_builder_get_widget (builder, "scale-width-spin");
-  dialog->priv->scale_height_spin = gtk_builder_get_widget (builder, "scale-height-spin");
+  dialog->priv->scale_combo = gtk_builder_get_widget (builder, "scale-combo");
+  g_signal_connect_swapped (dialog->priv->scale_combo, "changed",
+      G_CALLBACK (ogmrip_options_dialog_scale_combo_changed), dialog);
 
   store = gtk_list_store_new (2, G_TYPE_STRING, G_TYPE_STRING);
-
-  widget = gtk_builder_get_widget (builder, "scale-combo");
+  gtk_combo_box_set_model (GTK_COMBO_BOX (dialog->priv->scale_combo), GTK_TREE_MODEL (store));
 
   for (i = 0; i < G_N_ELEMENTS (size); i++)
   {
@@ -423,15 +674,23 @@ ogmrip_options_dialog_constructed (GObject *gobject)
 
   renderer = gtk_cell_renderer_text_new ();
   g_object_set (renderer, "xalign", 0.0, NULL);
-  gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (widget), renderer, TRUE);
-  gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (widget), renderer, "text", 0, NULL);
+  gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (dialog->priv->scale_combo), renderer, TRUE);
+  gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (dialog->priv->scale_combo), renderer, "text", 0, NULL);
 
   renderer = gtk_cell_renderer_text_new ();
   g_object_set (renderer, "xalign", 1.0, "xpad", 4, NULL);
-  gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (widget), renderer, TRUE);
-  gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (widget), renderer, "text", 1, NULL);
+  gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (dialog->priv->scale_combo), renderer, TRUE);
+  gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (dialog->priv->scale_combo), renderer, "text", 1, NULL);
 
-  gtk_combo_box_set_model (GTK_COMBO_BOX (widget), GTK_TREE_MODEL (store));
+  gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->scale_combo), 0);
+
+  widget = gtk_builder_get_widget (builder, "scale-user-hbox");
+  g_object_bind_property_full (dialog->priv->scale_combo, "active",
+      widget, "sensitive", G_BINDING_SYNC_CREATE,
+      ogmrip_options_dialog_set_scale_box_sensitivity, NULL, NULL, NULL);
+
+  dialog->priv->scale_width_spin = gtk_builder_get_widget (builder, "scale-width-spin");
+  dialog->priv->scale_height_spin = gtk_builder_get_widget (builder, "scale-height-spin");
 
   dialog->priv->test_check = gtk_builder_get_widget (builder, "test-check");
   dialog->priv->test_box = gtk_builder_get_widget (builder,"test-box");
@@ -441,24 +700,20 @@ ogmrip_options_dialog_constructed (GObject *gobject)
   g_signal_connect (dialog->priv->test_check, "toggled",
       G_CALLBACK (ogmrip_options_dialog_check_toggled), dialog->priv->test_box);
 
-  /*
-   * TODO bind test to encoding
-   */
-
   widget = gtk_builder_get_widget (builder, "test-button");
   g_signal_connect_swapped (widget, "clicked",
       G_CALLBACK (ogmrip_options_dialog_test_button_clicked), dialog);
 
   dialog->priv->deint_check = gtk_builder_get_widget (builder, "deint-check");
-  /*
-   * TODO bind deinterlacer to encoding
-   */
 
   g_object_unref (builder);
 
-  ogmrip_options_dialog_profile_combo_changed (dialog, GTK_COMBO_BOX (combo));
+  /*
+   * TODO use values from encoding
+   */
 
-  ogmrip_options_dialog_crop_changed (dialog);
+  ogmrip_options_dialog_profile_combo_changed (dialog);
+  ogmrip_options_dialog_update_scale_combo (dialog);
 }
 
 static void
@@ -511,6 +766,79 @@ ogmrip_options_dialog_dispose (GObject *gobject)
   }
 
   G_OBJECT_CLASS (ogmrip_options_dialog_parent_class)->dispose (gobject);
+}
+
+static void
+ogmrip_options_dialog_response (GtkDialog *dialog, gint response_id)
+{
+  OGMRipOptionsDialog *options = OGMRIP_OPTIONS_DIALOG (dialog);
+
+  if (options->priv->encoding)
+  {
+    OGMRipProfile *profile;
+    gboolean can_crop;
+
+    profile = ogmrip_profile_chooser_get_active (GTK_COMBO_BOX (options->priv->profile_combo));
+    ogmrip_encoding_set_profile (options->priv->encoding, profile);
+
+    can_crop = gtk_widget_get_sensitive (options->priv->crop_check);
+    ogmrip_encoding_set_can_crop (options->priv->encoding, can_crop);
+
+    if (can_crop)
+    {
+      if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (options->priv->crop_check)))
+        ogmrip_encoding_set_crop (options->priv->encoding, OGMRIP_OPTIONS_AUTOMATIC, 0, 0, 0, 0);
+      else
+      {
+        guint l, t, r, b;
+
+        ogmrip_options_dialog_get_crop (options, &l, &t, &r, &b);
+        if (!l && !t && !r && !b)
+          ogmrip_encoding_set_crop (options->priv->encoding, OGMRIP_OPTIONS_NONE, 0, 0, 0, 0);
+        else
+        {
+          guint x, y, w, h;
+
+          ogmrip_options_dialog_get_crop_size (options, &x, &y, &w, &h);
+          ogmrip_encoding_set_crop (options->priv->encoding, OGMRIP_OPTIONS_MANUAL, x, y, w, h);
+        }
+      }
+    }
+
+    if (!gtk_widget_get_sensitive (options->priv->scale_check))
+      ogmrip_encoding_set_can_scale (options->priv->encoding, FALSE);
+    else
+    {
+      if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (options->priv->scale_check)))
+        ogmrip_encoding_set_scale (options->priv->encoding, OGMRIP_OPTIONS_AUTOMATIC, 0, 0);
+      else
+      {
+        guint active;
+
+        active = gtk_combo_box_get_active (GTK_COMBO_BOX (options->priv->scale_combo));
+        if (active == OGMRIP_SCALE_NONE)
+          ogmrip_encoding_set_scale (options->priv->encoding, OGMRIP_OPTIONS_NONE, 0, 0);
+        else
+        {
+          guint w, h;
+
+          ogmrip_options_dialog_get_scale (options, &w, &h);
+          ogmrip_encoding_set_scale (options->priv->encoding, OGMRIP_OPTIONS_MANUAL, w, h);
+        }
+      }
+    }
+
+    ogmrip_encoding_set_test (options->priv->encoding,
+        gtk_widget_get_sensitive (options->priv->test_check) &&
+        gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (options->priv->test_check)));
+
+
+    if (gtk_widget_get_sensitive (options->priv->deint_check) &&
+        gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (options->priv->deint_check)))
+      ogmrip_encoding_set_deinterlacer (options->priv->encoding, OGMRIP_DEINT_YADIF);
+    else
+      ogmrip_encoding_set_deinterlacer (options->priv->encoding, OGMRIP_DEINT_NONE);
+  }
 }
 
 GtkWidget *
