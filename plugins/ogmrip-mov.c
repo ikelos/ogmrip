@@ -58,8 +58,6 @@ ogmrip_mov_command (OGMRipContainer *mov, GError **error)
   OGMRipVideoCodec *video;
   const gchar *output, *filename;
 
-  g_return_val_if_fail (OGMRIP_IS_MOV (mov), NULL);
-
   video = ogmrip_container_get_video (mov);
   if (!video)
   {

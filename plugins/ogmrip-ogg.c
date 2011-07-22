@@ -99,7 +99,12 @@ ogmrip_ogg_get_sync (OGMRipContainer *container)
       denom = 1001;
     }
     else
-      ogmrip_codec_get_framerate (OGMRIP_CODEC (video), &num, &denom);
+    {
+      OGMDvdStream *stream;
+
+      stream = ogmrip_codec_get_input (OGMRIP_CODEC (video));
+      ogmdvd_video_stream_get_framerate (OGMDVD_VIDEO_STREAM (stream), &num, &denom);
+    }
 
     buf = g_new0 (gchar, G_ASCII_DTOSTR_BUF_SIZE);
     g_ascii_formatd (buf, G_ASCII_DTOSTR_BUF_SIZE, "%.0f", (start_delay * denom * 1000) / (gdouble) num);
@@ -248,8 +253,6 @@ ogmrip_ogg_merge_command (OGMRipContainer *ogg, const gchar *output)
   OGMRipVideoCodec *video;
   const gchar *label, *fourcc, *filename;
 
-  g_return_val_if_fail (OGMRIP_IS_OGG (ogg), NULL);
-
   if (!output)
     output = ogmrip_container_get_output (ogg);
   g_return_val_if_fail (output != NULL, NULL);
@@ -309,14 +312,8 @@ ogmrip_ogg_split_command (OGMRipContainer *ogg, const gchar *input)
   const gchar *output;
   guint tsize;
 
-  g_return_val_if_fail (OGMRIP_IS_CONTAINER (ogg), NULL);
-  g_return_val_if_fail (input && *input, NULL);
-
   output = ogmrip_container_get_output (ogg);
-  g_return_val_if_fail (output && *output, NULL);
-
   ogmrip_container_get_split (OGMRIP_CONTAINER (ogg), NULL, &tsize);
-  g_return_val_if_fail (tsize > 0, NULL);
 
   argv = g_ptr_array_new ();
   g_ptr_array_add (argv, g_strdup ("ogmsplit"));

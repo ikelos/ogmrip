@@ -233,9 +233,15 @@ ogmrip_mp4_get_output_fps (OGMRipCodec *codec)
     output_rate_denominator = 1001;
   }
   else
-    ogmrip_codec_get_framerate (codec, &output_rate_numerator, &output_rate_denominator);
+  {
+    OGMDvdStream *stream;
 
-  return output_rate_numerator / (gdouble) (output_rate_denominator * ogmrip_codec_get_framestep (codec));
+    stream = ogmrip_codec_get_input (codec);
+    ogmdvd_video_stream_get_framerate (OGMDVD_VIDEO_STREAM (stream),
+        &output_rate_numerator, &output_rate_denominator);
+  }
+
+  return output_rate_numerator / (gdouble) output_rate_denominator;
 }
 
 static gchar **

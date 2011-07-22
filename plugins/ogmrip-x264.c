@@ -244,15 +244,7 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   gint quality, bitrate, vid, threads, bframes;
   gboolean cartoon;
 
-  g_return_val_if_fail (OGMRIP_IS_VIDEO_CODEC (video), NULL);
-
   output = ogmrip_codec_get_output (OGMRIP_CODEC (video));
-  g_return_val_if_fail (output != NULL, NULL);
-
-  title = ogmrip_codec_get_input (OGMRIP_CODEC (video));
-  g_return_val_if_fail (title != NULL, NULL);
-
-  g_return_val_if_fail (pass == 1 || log_file != NULL, NULL);
 
   cartoon = FALSE;
 
@@ -396,6 +388,7 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   g_ptr_array_add (argv, g_strdup ("-x264encopts"));
   g_ptr_array_add (argv, g_string_free (options, FALSE));
 
+  title = ogmdvd_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video)));
   vid = ogmdvd_title_get_nr (title);
 
   if (MPLAYER_CHECK_VERSION (1,0,0,1))

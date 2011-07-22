@@ -125,9 +125,6 @@ ogmrip_subp2pgm_command (OGMRipSubpCodec *subp, const gchar *input)
 {
   GPtrArray *argv;
 
-  g_return_val_if_fail (OGMRIP_IS_SUBP_CODEC (subp), NULL);
-  g_return_val_if_fail (input != NULL, NULL);
-
   argv = g_ptr_array_new ();
 
   if (use_tesseract)
@@ -150,9 +147,6 @@ static gchar **
 ogmrip_gocr_command (OGMRipSubpCodec *subp, const gchar *input)
 {
   GPtrArray *argv;
-
-  g_return_val_if_fail (OGMRIP_IS_SUBP_CODEC (subp), NULL);
-  g_return_val_if_fail (input != NULL, NULL);
 
   argv = g_ptr_array_new ();
   g_ptr_array_add (argv, g_strdup ("gocr"));
@@ -190,9 +184,6 @@ ogmrip_ocrad_command (OGMRipSubpCodec *subp, const gchar *input)
 {
   GPtrArray *argv;
 
-  g_return_val_if_fail (OGMRIP_IS_SUBP_CODEC (subp), NULL);
-  g_return_val_if_fail (input != NULL, NULL);
-
   argv = g_ptr_array_new ();
   g_ptr_array_add (argv, g_strdup ("ocrad"));
   g_ptr_array_add (argv, g_strdup ("-v"));
@@ -225,8 +216,6 @@ ogmrip_tesseract_command (OGMRipSubpCodec *subp, const gchar *input, gboolean la
 {
   GPtrArray *argv;
 
-  g_return_val_if_fail (input != NULL, NULL);
-
   argv = g_ptr_array_new ();
   g_ptr_array_add (argv, g_strdup ("tesseract"));
   g_ptr_array_add (argv, g_strdup (input));
@@ -234,11 +223,11 @@ ogmrip_tesseract_command (OGMRipSubpCodec *subp, const gchar *input, gboolean la
 
   if (lang && OGMRIP_SRT (subp)->is_valid_lang)
   {
-    OGMDvdSubpStream *stream;
+    OGMDvdStream *stream;
     const gchar *language;
 
-    stream = ogmrip_subp_codec_get_dvd_subp_stream (subp);
-    language = ogmdvd_get_language_iso639_2 (ogmdvd_subp_stream_get_language (stream));
+    stream = ogmrip_codec_get_input (OGMRIP_CODEC (subp));
+    language = ogmdvd_get_language_iso639_2 (ogmdvd_subp_stream_get_language (OGMDVD_SUBP_STREAM (stream)));
 
     if (g_str_equal (language, "und"))
       OGMRIP_SRT (subp)->is_valid_lang = FALSE;
@@ -264,12 +253,8 @@ ogmrip_srt_command (OGMRipSubpCodec *subp, const gchar *input, const gchar *outp
 {
   GPtrArray *argv;
 
-  g_return_val_if_fail (OGMRIP_IS_SUBP_CODEC (subp), NULL);
-  g_return_val_if_fail (input != NULL, NULL);
-
   if (!output)
     output = ogmrip_codec_get_output (OGMRIP_CODEC (subp));
-  g_return_val_if_fail (output != NULL, NULL);
 
   argv = g_ptr_array_new ();
   g_ptr_array_add (argv, g_strdup ("subptools"));

@@ -54,21 +54,17 @@ struct _OGMRipAudioCopyClass
 static gint ogmrip_audio_copy_run (OGMJobSpawn *spawn);
 static gint ogmrip_audio_copy_get_samples_per_frame (OGMRipAudioCodec *audio);
 
-gchar **
+static gchar **
 ogmrip_audio_copy_command (OGMRipAudioCodec *audio, const gchar *input, const gchar *output)
 {
   OGMDvdTitle *title;
   GPtrArray *argv;
   gint vid;
 
-  g_return_val_if_fail (OGMRIP_IS_AUDIO_CODEC (audio), NULL);
-
   if (!output)
     output = ogmrip_codec_get_output (OGMRIP_CODEC (audio));
-  g_return_val_if_fail (output != NULL, NULL);
 
-  title = ogmrip_codec_get_input (OGMRIP_CODEC (audio));
-  g_return_val_if_fail (title != NULL, NULL);
+  title = ogmdvd_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (audio)));
 
   argv = ogmrip_mencoder_audio_command (audio, output);
 

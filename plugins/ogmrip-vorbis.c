@@ -63,12 +63,8 @@ ogmrip_vorbis_command (OGMRipAudioCodec *audio, gboolean header, const gchar *in
   GPtrArray *argv;
   gint quality;
 
-  g_return_val_if_fail (OGMRIP_IS_AUDIO_CODEC (audio), NULL);
-  g_return_val_if_fail (input != NULL, NULL);
-
   if (!output)
     output = ogmrip_codec_get_output (OGMRIP_CODEC (audio));
-  g_return_val_if_fail (output != NULL, NULL);
 
   quality = ogmrip_audio_codec_get_quality (audio);
 

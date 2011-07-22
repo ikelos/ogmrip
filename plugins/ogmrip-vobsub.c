@@ -96,6 +96,7 @@ ogmrip_vobsub_finalize (GObject *gobject)
   output = ogmrip_codec_get_output (OGMRIP_CODEC (gobject));
   if (output)
   {
+/*
     if (ogmrip_codec_get_unlink_on_unref (OGMRIP_CODEC (gobject)))
     {
       gchar *filename;
@@ -110,6 +111,7 @@ ogmrip_vobsub_finalize (GObject *gobject)
         g_unlink (filename);
       g_free (filename);
     }
+*/
   }
 
   G_OBJECT_CLASS (ogmrip_vobsub_parent_class)->finalize (gobject);

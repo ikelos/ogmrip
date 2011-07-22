@@ -95,7 +95,12 @@ ogmrip_matroska_get_sync (OGMRipContainer *container)
       denom = 1001;
     }
     else
-      ogmrip_codec_get_framerate (OGMRIP_CODEC (video), &num, &denom);
+    {
+      OGMDvdStream *stream;
+
+      stream = ogmrip_codec_get_input (OGMRIP_CODEC (video));
+      ogmdvd_video_stream_get_framerate (OGMDVD_VIDEO_STREAM (stream), &num, &denom);
+    }
 
     buf = g_new0 (gchar, G_ASCII_DTOSTR_BUF_SIZE);
     g_ascii_formatd (buf, G_ASCII_DTOSTR_BUF_SIZE, "%.0f", (start_delay * denom * 1000) / (gdouble) num);
@@ -329,8 +334,6 @@ ogmrip_matroska_command (OGMRipContainer *matroska)
   OGMRipVideoCodec *video;
   const gchar *output, *label, *filename, *fourcc;
   guint tsize, tnumber;
-
-  g_return_val_if_fail (OGMRIP_IS_MATROSKA (matroska), NULL);
 
   argv = g_ptr_array_new ();
   g_ptr_array_add (argv, g_strdup (PROGRAM));

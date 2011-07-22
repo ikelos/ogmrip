@@ -101,8 +101,6 @@ ogmrip_avi_command (OGMRipContainer *avi, GError **error)
   const gchar *output, *filename, *fourcc;
   guint tsize, tnumber;
 
-  g_return_val_if_fail (OGMRIP_IS_AVI (avi), NULL);
-
   argv = g_ptr_array_new ();
   g_ptr_array_add (argv, g_strdup ("avibox"));
 
@@ -163,9 +161,6 @@ ogmrip_copy_command (OGMRipContainer *container, const gchar *input, const gchar
   GPtrArray *argv;
   const gchar *filename;
   gchar *output;
-
-  g_return_val_if_fail (OGMRIP_IS_CONTAINER (container), NULL);
-  g_return_val_if_fail (input != NULL, NULL);
 
   filename = ogmrip_container_get_output (container);
   output = ogmrip_fs_set_extension (filename, ext);
