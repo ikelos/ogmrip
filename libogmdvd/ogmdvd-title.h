@@ -42,22 +42,11 @@ gdouble             ogmdvd_title_get_chapters_length  (OGMDvdTitle  *title,
                                                        guint        start,
                                                        gint         end,
                                                        OGMDvdTime   *length);
-void                ogmdvd_title_get_framerate        (OGMDvdTitle  *title,
-                                                       guint        *numerator,
-                                                       guint        *denominator);
-void                ogmdvd_title_get_size             (OGMDvdTitle  *title,
-                                                       guint        *width,
-                                                       guint        *height);
-gint                ogmdvd_title_get_video_format     (OGMDvdTitle  *title);
-gint                ogmdvd_title_get_display_aspect   (OGMDvdTitle  *title);
-gint                ogmdvd_title_get_display_format   (OGMDvdTitle  *title);
-void                ogmdvd_title_get_aspect_ratio     (OGMDvdTitle  *title,
-                                                       guint        *numerator,
-                                                       guint        *denominator);
 G_CONST_RETURN
 guint *             ogmdvd_title_get_palette          (OGMDvdTitle  *title);
 gint                ogmdvd_title_get_n_angles         (OGMDvdTitle  *title);
 gint                ogmdvd_title_get_n_chapters       (OGMDvdTitle  *title);
+OGMDvdVideoStream * ogmdvd_title_get_video_stream     (OGMDvdTitle  *title);
 gint                ogmdvd_title_get_n_audio_streams  (OGMDvdTitle  *title);
 OGMDvdAudioStream * ogmdvd_title_get_nth_audio_stream (OGMDvdTitle  *title,
                                                        guint        nr);

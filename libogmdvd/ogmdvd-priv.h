@@ -64,6 +64,8 @@ struct _OGMDvdTitle
 
   guint8 nr_of_angles;
 
+  OGMDvdVideoStream *video_stream;
+
   guint8 nr_of_audio_streams;
   GSList *audio_streams;
 
@@ -76,11 +78,6 @@ struct _OGMDvdTitle
   guint64 vts_size;
 
   uint32_t palette[16];
-
-  guint video_format : 2;
-  guint picture_size : 2;
-  guint display_aspect_ratio : 2;
-  guint permitted_df : 2;
 
   dvd_time_t playback_time;
 
@@ -112,6 +109,20 @@ struct _OGMDvdStream
   OGMDvdTitle *title;
   guint16 id;
   guint nr;
+};
+
+/**
+ * OGMDvdVideoStream:
+ *
+ * An opaque structure representing a DVD video stream
+ */
+struct _OGMDvdVideoStream
+{
+  OGMDvdStream stream;
+  guint video_format : 2;
+  guint picture_size : 2;
+  guint display_aspect_ratio : 2;
+  guint permitted_df : 2;
 };
 
 /**

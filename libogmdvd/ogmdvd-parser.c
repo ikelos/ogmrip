@@ -29,6 +29,7 @@
 #include "ogmdvd-parser.h"
 #include "ogmdvd-contrib.h"
 #include "ogmdvd-title.h"
+#include "ogmdvd-video.h"
 #include "ogmdvd-priv.h"
 
 #include <string.h>
@@ -327,6 +328,7 @@ OGMDvdParser *
 ogmdvd_parser_new (OGMDvdTitle *title)
 {
   OGMDvdParser *parser;
+  OGMDvdVideoStream *video;
 
   parser = g_new0 (OGMDvdParser, 1);
   parser->ref = 1;
@@ -335,7 +337,8 @@ ogmdvd_parser_new (OGMDvdTitle *title)
   parser->mpeg2 = mpeg2_init ();
   parser->info = mpeg2_info (parser->mpeg2);
 */
-  ogmdvd_title_get_size (title, &parser->width, &parser->height);
+  video = ogmdvd_title_get_video_stream (title);
+  ogmdvd_video_stream_get_resolution (video, &parser->width, &parser->height);
 
   parser->naudio_streams = ogmdvd_title_get_n_audio_streams (title);
   parser->bitrates = g_new0 (int, parser->naudio_streams);

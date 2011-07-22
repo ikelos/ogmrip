@@ -302,6 +302,26 @@ dvd_reader_get_vts_size (dvd_reader_t *reader, guint vts)
   return fullsize;
 }
 
+static OGMDvdVideoStream *
+ogmdvd_video_stream_new (OGMDvdTitle *title, ifo_handle_t *vts_file)
+{
+  OGMDvdVideoStream *stream;
+  video_attr_t *attr;
+
+  stream = g_new0 (OGMDvdVideoStream, 1);
+  stream->stream.title = title;
+  stream->stream.id = 1;
+  stream->stream.nr = 1;
+
+  attr = &vts_file->vtsi_mat->vts_video_attr;
+  stream->video_format = attr->video_format;
+  stream->picture_size = attr->picture_size;
+  stream->display_aspect_ratio = attr->display_aspect_ratio;
+  stream->permitted_df = attr->permitted_df;
+
+  return stream;
+}
+
 static OGMDvdStream *
 ogmdvd_audio_stream_new (OGMDvdTitle *title, ifo_handle_t *vts_file, guint nr, guint real_nr)
 {
@@ -340,9 +360,9 @@ ogmdvd_subp_stream_new (OGMDvdTitle *title, ifo_handle_t *vts_file, guint nr, gu
   stream->lang_code = attr->lang_code;
 
   stream->stream.id = nr;
-  if (title->display_aspect_ratio == 0) /* 4:3 */
+  if (title->video_stream->display_aspect_ratio == 0) /* 4:3 */
     stream->stream.id = vts_file->vts_pgcit->pgci_srp[title->ttn - 1].pgc->subp_control[real_nr] >> 24 & 31;
-  else if (title->display_aspect_ratio == 3) /* 16:9 */
+  else if (title->video_stream->display_aspect_ratio == 3) /* 16:9 */
     stream->stream.id = vts_file->vts_pgcit->pgci_srp[title->ttn - 1].pgc->subp_control[real_nr] >> 8 & 31;
 
   return (OGMDvdStream *) stream;
@@ -409,13 +429,9 @@ ogmdvd_title_new (OGMDvdDisc *disc, dvd_reader_t *reader, ifo_handle_t *vmg_file
   title->nr_of_chapters = vts_file->vts_ptt_srpt->title[title->ttn - 1].nr_of_ptts;
   title->nr_of_angles = vmg_file->tt_srpt->title[nr].nr_of_angles;
   title->title_set_nr = vmg_file->tt_srpt->title[nr].title_set_nr;
-
-  title->video_format = vts_file->vtsi_mat->vts_video_attr.video_format;
-  title->picture_size = vts_file->vtsi_mat->vts_video_attr.picture_size;
-  title->display_aspect_ratio = vts_file->vtsi_mat->vts_video_attr.display_aspect_ratio;
-  title->permitted_df = vts_file->vtsi_mat->vts_video_attr.permitted_df;
-
   title->vts_size = dvd_reader_get_vts_size (reader, title->title_set_nr);
+
+  title->video_stream = ogmdvd_video_stream_new (title, vts_file);
 
   for (i = 0; i < vts_file->vtsi_mat->nr_of_vts_audio_streams; i++)
   {
@@ -878,20 +894,16 @@ ogmdvd_title_find_by_nr (OGMDvdTitle *title, guint nr)
 OGMDvdTitle *
 ogmdvd_disc_get_nth_title (OGMDvdDisc *disc, guint nr)
 {
-  OGMDvdTitle *title = NULL;
   GSList *link;
 
   g_return_val_if_fail (disc != NULL, NULL);
   g_return_val_if_fail (nr >= 0 && nr < disc->ntitles, NULL);
 
   link = g_slist_find_custom (disc->titles, GUINT_TO_POINTER (nr), (GCompareFunc) ogmdvd_title_find_by_nr);
-  if (link)
-  {
-    title = link->data;
-    ogmdvd_title_ref (title);
-  }
+  if (!link)
+    return NULL;
 
-  return title;
+  return link->data;
 }
 
 /**

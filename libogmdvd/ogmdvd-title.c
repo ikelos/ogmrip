@@ -269,167 +269,6 @@ ogmdvd_title_get_chapters_length (OGMDvdTitle *title, guint start, gint end, OGM
 }
 
 /**
- * ogmdvd_title_get_framerate:
- * @title: An #OGMDvdTitle
- * @numerator: A pointer to set the framerate numerator, or NULL
- * @denominator: A pointer to set the framerate denominator, or NULL
- 
- * Gets the framerate of the DVD title in the form of a fraction.
- */
-void
-ogmdvd_title_get_framerate (OGMDvdTitle *title, guint *numerator, guint *denominator)
-{
-  g_return_if_fail (title != NULL);
-  g_return_if_fail (numerator != NULL);
-  g_return_if_fail (denominator != NULL);
-
-  switch ((title->playback_time.frame_u & 0xc0) >> 6)
-  {
-    case 1:
-      *numerator = 25;
-      *denominator = 1;
-      break;
-    case 3:
-      *numerator = 30000;
-      *denominator = 1001;
-      break;
-    default:
-      g_assert_not_reached ();
-      break;
-  }
-}
-
-/**
- * ogmdvd_title_get_size:
- * @title: An #OGMDvdTitle
- * @width: A pointer to set the width of the picture, or NULL
- * @height: A pointer to set the height of the picture, or NULL
- 
- * Gets the size of the picture.
- */
-void
-ogmdvd_title_get_size (OGMDvdTitle *title, guint *width, guint *height)
-{
-  g_return_if_fail (title != NULL);
-  g_return_if_fail (width != NULL);
-  g_return_if_fail (height != NULL);
-
-  *width = 0;
-  *height = 480;
-  if (title->video_format != 0)
-    *height = 576;
-
-  switch (title->picture_size)
-  {
-    case 0:
-      *width = 720;
-      break;
-    case 1:
-      *width = 704;
-      break;
-    case 2:
-      *width = 352;
-      break;
-    case 3:
-      *width = 352;
-      *width /= 2;
-      break;
-    default:
-      g_assert_not_reached ();
-      break;
-  }
-}
-
-/**
- * ogmdvd_title_get_aspect_ratio:
- * @title: An #OGMDvdTitle
- * @numerator: A pointer to set the aspect ratio numerator, or NULL
- * @denominator: A pointer to set the aspect ratio denominator, or NULL
- 
- * Gets the aspect ratio of the DVD title in the form of a fraction.
- */
-void
-ogmdvd_title_get_aspect_ratio  (OGMDvdTitle *title, guint *numerator, guint *denominator)
-{
-  g_return_if_fail (title != NULL);
-  g_return_if_fail (numerator != NULL);
-  g_return_if_fail (denominator != NULL);
-
-  switch (title->display_aspect_ratio)
-  {
-    case 0:
-      *numerator = 4;
-      *denominator = 3;
-      break;
-    case 1:
-    case 3:
-      *numerator = 16;
-      *denominator = 9;
-      break;
-    default:
-      g_assert_not_reached ();
-      break;
-  }
-}
-
-/**
- * ogmdvd_title_get_video_format:
- * @title: An #OGMDvdTitle
- *
- * Returns the video format of the movie.
- *
- * Returns: #OGMDvdVideoFormat, or -1
- */
-gint
-ogmdvd_title_get_video_format (OGMDvdTitle *title)
-{
-  g_return_val_if_fail (title != NULL, -1);
-
-  return title->video_format;
-}
-
-/**
- * ogmdvd_title_get_display_aspect:
- * @title: An #OGMDvdTitle
- *
- * Returns the display aspect of the movie.
- *
- * Returns: #OGMDvdDisplayAspect, or -1
- */
-gint
-ogmdvd_title_get_display_aspect (OGMDvdTitle *title)
-{
-  g_return_val_if_fail (title != NULL, -1);
-
-  switch (title->display_aspect_ratio)
-  {
-    case 0:
-      return OGMDVD_DISPLAY_ASPECT_4_3;
-    case 1:
-    case 3:
-      return OGMDVD_DISPLAY_ASPECT_16_9;
-    default:
-      return -1;
-  }
-}
-
-/**
- * ogmdvd_title_get_display_format:
- * @title: An #OGMDvdTitle
- *
- * Returns the display format of the movie.
- *
- * Returns: #OGMDvdDisplayFormat, or -1
- */
-gint
-ogmdvd_title_get_display_format (OGMDvdTitle *title)
-{
-  g_return_val_if_fail (title != NULL, -1);
-
-  return title->permitted_df;
-}
-
-/**
  * ogmdvd_title_get_palette:
  * @title: An #OGMDvdTitle
  *
@@ -478,6 +317,22 @@ ogmdvd_title_get_n_chapters (OGMDvdTitle *title)
 }
 
 /**
+ * ogmdvd_title_get_video_stream:
+ * @title: An #OGMDvdTitle
+ *
+ * Returns the video stream.
+ *
+ * Returns: The #OGMDvdVideoStream, or NULL
+ */
+OGMDvdVideoStream *
+ogmdvd_title_get_video_stream (OGMDvdTitle *title)
+{
+  g_return_val_if_fail (title != NULL, NULL);
+
+  return title->video_stream;
+}
+
+/**
  * ogmdvd_title_get_n_audio_streams:
  * @title: An #OGMDvdTitle
  *
@@ -511,20 +366,16 @@ ogmdvd_stream_find_by_nr (OGMDvdStream *stream, guint nr)
 OGMDvdAudioStream *
 ogmdvd_title_get_nth_audio_stream (OGMDvdTitle *title, guint nr)
 {
-  OGMDvdAudioStream *audio = NULL;
   GSList *link;
 
   g_return_val_if_fail (title != NULL, NULL);
   g_return_val_if_fail (nr < title->nr_of_audio_streams, NULL);
 
   link = g_slist_find_custom (title->audio_streams, GUINT_TO_POINTER (nr), (GCompareFunc) ogmdvd_stream_find_by_nr);
-  if (link)
-  {
-    audio = link->data;
-    ogmdvd_stream_ref (&audio->stream);
-  }
+  if (!link)
+    return NULL;
 
-  return audio;
+  return link->data;
 }
 
 /**
@@ -558,20 +409,16 @@ ogmdvd_title_get_audio_streams (OGMDvdTitle *title)
 OGMDvdAudioStream *
 ogmdvd_title_find_audio_stream (OGMDvdTitle *title, GCompareFunc func, gpointer data)
 {
-  OGMDvdAudioStream *audio = NULL;
   GSList *link;
 
   g_return_val_if_fail (title != NULL, NULL);
   g_return_val_if_fail (func != NULL, NULL);
 
   link = g_slist_find_custom (title->audio_streams, data, func);
-  if (link)
-  {
-    audio = link->data;
-    ogmdvd_stream_ref (&audio->stream);
-  };
+  if (!link)
+    return NULL;
 
-  return audio;
+  return link->data;
 }
 
 /**
@@ -602,20 +449,16 @@ ogmdvd_title_get_n_subp_streams (OGMDvdTitle *title)
 OGMDvdSubpStream *
 ogmdvd_title_get_nth_subp_stream (OGMDvdTitle *title, guint nr)
 {
-  OGMDvdSubpStream *subp = NULL;
   GSList *link;
 
   g_return_val_if_fail (title != NULL, NULL);
   g_return_val_if_fail (nr < title->nr_of_subp_streams, NULL);
 
   link = g_slist_find_custom (title->subp_streams, GUINT_TO_POINTER (nr), (GCompareFunc) ogmdvd_stream_find_by_nr);
-  if (link)
-  {
-    subp = link->data;
-    ogmdvd_stream_ref (&subp->stream);
-  }
+  if (!link)
+    return NULL;
 
-  return subp;
+  return link->data;
 }
 
 /**
@@ -649,20 +492,16 @@ ogmdvd_title_get_subp_streams (OGMDvdTitle *title)
 OGMDvdSubpStream *
 ogmdvd_title_find_subp_stream (OGMDvdTitle *title, GCompareFunc func, gpointer data)
 {
-  OGMDvdSubpStream *subp = NULL;
   GSList *link;
 
   g_return_val_if_fail (title != NULL, NULL);
   g_return_val_if_fail (func != NULL, NULL);
 
   link = g_slist_find_custom (title->subp_streams, data, func);
-  if (link)
-  {
-    subp = link->data;
-    ogmdvd_stream_ref (&subp->stream);
-  };
+  if (!link)
+    return NULL;
 
-  return subp;
+  return link->data;
 }
 
 /**

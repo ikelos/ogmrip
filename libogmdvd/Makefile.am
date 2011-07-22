@@ -2,20 +2,21 @@ lib_LTLIBRARIES = \
   libogmdvd.la
 
 libogmdvd_la_SOURCES = \
-  ogmdvd-audio.c   \
-  ogmdvd-contrib.c \
-  ogmdvd-device.c  \
-  ogmdvd-disc.c    \
-  ogmdvd-drive.c   \
-  ogmdvd-labels.c  \
-  ogmdvd-monitor.c \
-  ogmdvd-parser.c  \
-  ogmdvd-priv.c    \
-  ogmdvd-reader.c  \
-  ogmdvd-stream.c  \
-  ogmdvd-subp.c    \
-  ogmdvd-title.c   \
-  ogmdvd-transport.c
+  ogmdvd-audio.c     \
+  ogmdvd-contrib.c   \
+  ogmdvd-device.c    \
+  ogmdvd-disc.c      \
+  ogmdvd-drive.c     \
+  ogmdvd-labels.c    \
+  ogmdvd-monitor.c   \
+  ogmdvd-parser.c    \
+  ogmdvd-priv.c      \
+  ogmdvd-reader.c    \
+  ogmdvd-stream.c    \
+  ogmdvd-subp.c      \
+  ogmdvd-title.c     \
+  ogmdvd-transport.c \
+  ogmdvd-video.c
 
 libogmdvd_la_HEADERS = \
   ogmdvd-audio.h   \
@@ -30,6 +31,7 @@ libogmdvd_la_HEADERS = \
   ogmdvd-subp.h    \
   ogmdvd-title.h   \
   ogmdvd-types.h   \
+  ogmdvd-video.h   \
   ogmdvd.h
 
 libogmdvd_la_LDFLAGS = \

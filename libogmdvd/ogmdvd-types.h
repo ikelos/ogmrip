@@ -34,6 +34,7 @@ typedef struct
 #define OGMDVD_DISC(disc)          ((OGMDvdDisc *) (disc))
 #define OGMDVD_TITLE(title)        ((OGMDvdTitle *) (title))
 #define OGMDVD_STREAM(stream)      ((OGMDvdStream *) (stream))
+#define OGMDVD_VIDEO_STREAM(video) ((OGMDvdVideoStream *) (video))
 #define OGMDVD_AUDIO_STREAM(audio) ((OGMDvdAudioStream *) (audio))
 #define OGMDVD_SUBP_STREAM(subp)   ((OGMDvdSubpStream *) (subp))
 #define OGMDVD_READER(reader)      ((OGMDvdReader *) (reader))
@@ -42,6 +43,7 @@ typedef struct
 typedef struct _OGMDvdDisc        OGMDvdDisc;
 typedef struct _OGMDvdTitle       OGMDvdTitle;
 typedef struct _OGMDvdStream      OGMDvdStream;
+typedef struct _OGMDvdVideoStream OGMDvdVideoStream;
 typedef struct _OGMDvdAudioStream OGMDvdAudioStream;
 typedef struct _OGMDvdSubpStream  OGMDvdSubpStream;
 typedef struct _OGMDvdReader      OGMDvdReader;

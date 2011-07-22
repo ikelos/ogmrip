@@ -31,6 +31,7 @@
 #include <ogmdvd-subp.h>
 #include <ogmdvd-title.h>
 #include <ogmdvd-types.h>
+#include <ogmdvd-video.h>
 
 #endif /* __OGMDVD_H__ */
 
