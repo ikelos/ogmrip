@@ -189,6 +189,6 @@ ogmdvd_video_stream_get_display_format (OGMDvdVideoStream *stream)
 {
   g_return_val_if_fail (stream != NULL, -1);
 
-  return stream->permitted_df;
+  return stream->video_format;
 }
 
