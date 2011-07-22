@@ -73,7 +73,6 @@ void
 ogmrip_source_chooser_set_title (OGMRipSourceChooser *chooser, OGMDvdTitle *title)
 {
   g_return_if_fail (OGMRIP_IS_SOURCE_CHOOSER (chooser));
-  g_return_if_fail (title != NULL);
 
   if (OGMRIP_SOURCE_CHOOSER_GET_IFACE (chooser)->set_title)
     OGMRIP_SOURCE_CHOOSER_GET_IFACE (chooser)->set_title (chooser, title);

@@ -602,6 +602,8 @@ ogmrip_source_chooser_widget_add_audio_streams (OGMRipSourceChooserWidget *choos
     astream = ogmdvd_title_get_nth_audio_stream (title, aid);
     if (astream)
     {
+      ogmdvd_stream_ref (OGMDVD_STREAM (astream));
+
       bitrate = ogmdvd_audio_stream_get_bitrate (astream);
       channels = ogmdvd_audio_stream_get_channels (astream);
       content = ogmdvd_audio_stream_get_content (astream);
@@ -659,6 +661,8 @@ ogmrip_source_chooser_widget_add_subp_streams (OGMRipSourceChooserWidget *choose
     sstream = ogmdvd_title_get_nth_subp_stream (title, sid);
     if (sstream)
     {
+      ogmdvd_stream_ref (OGMDVD_STREAM (sstream));
+
       lang = ogmdvd_subp_stream_get_language (sstream);
       content = ogmdvd_subp_stream_get_content (sstream);
 
@@ -690,36 +694,37 @@ ogmrip_source_chooser_widget_set_title (OGMRipSourceChooser *chooser, OGMDvdTitl
 
   if (source_chooser->priv->title != title)
   {
-    GtkTreeModel *model;
-    GtkTreeIter iter;
-
-    ogmdvd_title_ref (title);
+    if (title)
+      ogmdvd_title_ref (title);
     if (source_chooser->priv->title)
       ogmdvd_title_unref (source_chooser->priv->title);
     source_chooser->priv->title = title;
 
     ogmrip_source_chooser_widget_clear (source_chooser);
 
-    model = gtk_combo_box_get_model (GTK_COMBO_BOX (source_chooser));
-
-    if (OGMRIP_IS_AUDIO_CHOOSER_WIDGET (source_chooser))
-      ogmrip_source_chooser_widget_add_audio_streams (source_chooser, model, title);
-    else
-      ogmrip_source_chooser_widget_add_subp_streams (source_chooser, model, title);
-
-    if (gtk_tree_model_iter_n_children (model, NULL) > 0 )
+    if (title)
     {
+      GtkTreeModel *model;
+      GtkTreeIter iter;
+
+      model = gtk_combo_box_get_model (GTK_COMBO_BOX (source_chooser));
+
+      if (OGMRIP_IS_AUDIO_CHOOSER_WIDGET (source_chooser))
+        ogmrip_source_chooser_widget_add_audio_streams (source_chooser, model, title);
+      else
+        ogmrip_source_chooser_widget_add_subp_streams (source_chooser, model, title);
+
+      if (gtk_tree_model_iter_n_children (model, NULL) > 0 )
+      {
+        gtk_list_store_append (GTK_LIST_STORE (model), &iter);
+        gtk_list_store_set (GTK_LIST_STORE (model), &iter,
+            TEXT_COLUMN, NULL, TYPE_COLUMN, ROW_TYPE_OTHER_SEP, LANG_COLUMN, -1, SOURCE_COLUMN, NULL, -1);
+      }
+
       gtk_list_store_append (GTK_LIST_STORE (model), &iter);
       gtk_list_store_set (GTK_LIST_STORE (model), &iter,
-          TEXT_COLUMN, NULL, TYPE_COLUMN, ROW_TYPE_OTHER_SEP, LANG_COLUMN, -1, SOURCE_COLUMN, NULL, -1);
+          TEXT_COLUMN, _("Other..."), TYPE_COLUMN, ROW_TYPE_OTHER, LANG_COLUMN, -1, SOURCE_COLUMN, NULL, -1);
     }
-
-    gtk_list_store_append (GTK_LIST_STORE (model), &iter);
-    gtk_list_store_set (GTK_LIST_STORE (model), &iter,
-        TEXT_COLUMN, _("Other..."), TYPE_COLUMN, ROW_TYPE_OTHER, LANG_COLUMN, -1, SOURCE_COLUMN, NULL, -1);
-
-    gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), 0);
-    gtk_widget_set_sensitive (GTK_WIDGET (chooser), TRUE);
   }
 }
 
