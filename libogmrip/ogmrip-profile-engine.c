@@ -17,6 +17,8 @@
  */
 
 #include "ogmrip-profile-engine.h"
+#include "ogmrip-profile-keys.h"
+#include "ogmrip-plugin.h"
 
 #include <string.h>
 
@@ -162,6 +164,43 @@ ogmrip_profile_engine_get (OGMRipProfileEngine *engine, const gchar *name)
   return g_hash_table_lookup (engine->priv->profiles, name);
 }
 
+static gboolean
+ogmrip_profile_engine_check (OGMRipProfileEngine *engine, OGMRipProfile *profile)
+{
+  GType container, codec;
+  gchar *str;
+
+  ogmrip_profile_get (profile, OGMRIP_PROFILE_GENERAL, OGMRIP_PROFILE_CONTAINER, "s", &str);
+  container = ogmrip_plugin_get_container_by_name (str);
+  g_free (str);
+
+  if (container == G_TYPE_NONE)
+    return FALSE;
+
+  ogmrip_profile_get (profile, OGMRIP_PROFILE_VIDEO, OGMRIP_PROFILE_CODEC, "s", &str);
+  codec = ogmrip_plugin_get_video_codec_by_name (str);
+  g_free (str);
+
+  if (codec == G_TYPE_NONE || !ogmrip_plugin_can_contain_video (container, codec))
+    return FALSE;
+
+  ogmrip_profile_get (profile, OGMRIP_PROFILE_AUDIO, OGMRIP_PROFILE_CODEC, "s", &str);
+  codec = ogmrip_plugin_get_audio_codec_by_name (str);
+  g_free (str);
+
+  if (codec != G_TYPE_NONE && !ogmrip_plugin_can_contain_audio (container, codec))
+    return FALSE;
+
+  ogmrip_profile_get (profile, OGMRIP_PROFILE_SUBP, OGMRIP_PROFILE_CODEC, "s", &str);
+  codec = ogmrip_plugin_get_subp_codec_by_name (str);
+  g_free (str);
+
+  if (codec != G_TYPE_NONE && !ogmrip_plugin_can_contain_subp (container, codec))
+    return FALSE;
+
+  return TRUE;
+}
+
 void
 ogmrip_profile_engine_add (OGMRipProfileEngine *engine, OGMRipProfile *profile)
 {
@@ -170,8 +209,17 @@ ogmrip_profile_engine_add (OGMRipProfileEngine *engine, OGMRipProfile *profile)
   g_return_if_fail (OGMRIP_IS_PROFILE_ENGINE (engine));
   g_return_if_fail (OGMRIP_IS_PROFILE (profile));
 
-  g_object_get (profile, "name", &name, NULL);
-  g_hash_table_insert (engine->priv->profiles, name, g_object_ref (profile));
+  /*
+   * TODO Check if profile is already there
+   */
+
+  if (ogmrip_profile_engine_check (engine, profile))
+  {
+    g_object_get (profile, "name", &name, NULL);
+    g_hash_table_insert (engine->priv->profiles, name, g_object_ref (profile));
+  }
+
+  g_object_notify (G_OBJECT (engine), "profiles");
 }
 
 void
@@ -185,6 +233,8 @@ ogmrip_profile_engine_remove (OGMRipProfileEngine *engine, OGMRipProfile *profil
   g_object_get (profile, "name", &name, NULL);
   g_hash_table_remove (engine->priv->profiles, name);
   g_free (name);
+
+  g_object_notify (G_OBJECT (engine), "profiles");
 }
 
 GSList *
