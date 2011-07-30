@@ -30,6 +30,11 @@ void     ogmdvd_video_stream_get_framerate      (OGMDvdVideoStream *stream,
 void     ogmdvd_video_stream_get_resolution     (OGMDvdVideoStream *stream,
                                                  guint             *width,
                                                  guint             *height);
+void     ogmdvd_video_stream_get_crop_size      (OGMDvdVideoStream *stream,
+                                                 guint             *x,
+                                                 guint             *y,
+                                                 guint             *width,
+                                                 guint             *height);
 gint     ogmdvd_video_stream_get_display_format (OGMDvdVideoStream *stream);
 gint     ogmdvd_video_stream_get_display_aspect (OGMDvdVideoStream *stream);
 void     ogmdvd_video_stream_get_aspect_ratio   (OGMDvdVideoStream *stream,

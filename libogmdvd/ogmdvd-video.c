@@ -103,6 +103,24 @@ ogmdvd_video_stream_get_resolution (OGMDvdVideoStream *stream, guint *width, gui
   }
 }
 
+void
+ogmdvd_video_stream_get_crop_size (OGMDvdVideoStream *stream, guint *x, guint *y, guint *width, guint *height)
+{
+  g_return_if_fail (stream != NULL);
+
+  if (x)
+    *x = stream->crop_x;
+
+  if (y)
+    *y = stream->crop_y;
+
+  if (width)
+    *width = stream->crop_w;
+
+  if (height)
+    *height = stream->crop_h;
+}
+
 /**
  * ogmdvd_video_stream_get_aspect_ratio:
  * @stream: An #OGMDvdVideoStream

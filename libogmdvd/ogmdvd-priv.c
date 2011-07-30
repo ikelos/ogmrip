@@ -53,3 +53,92 @@ ogmdvd_msec_to_time (gulong msec, OGMDvdTime *dtime)
   dtime->frames = msec % 1000;
 }
 
+typedef struct
+{
+  gint val;
+  gint ref;
+} UInfo;
+
+static gint
+g_ulist_compare (UInfo *info, gint val)
+{
+  return info->val - val;
+}
+
+static gint
+g_ulist_min (UInfo *info1, UInfo *info2)
+{
+  return info2->val - info1->val;
+}
+
+static gint
+g_ulist_max (UInfo *info1, UInfo *info2)
+{
+  return info1->val - info2->val;
+}
+
+static GSList *
+g_ulist_add (GSList *ulist, GCompareFunc func, gint val)
+{
+  GSList *ulink;
+  UInfo *info;
+
+  ulink = g_slist_find_custom (ulist, GINT_TO_POINTER (val), (GCompareFunc) g_ulist_compare);
+  if (ulink)
+  {
+    info = ulink->data;
+    info->ref ++;
+  }
+  else
+  {
+    info = g_new0 (UInfo, 1);
+    info->val = val;
+    info->ref = 1;
+
+    ulist = g_slist_insert_sorted (ulist, info, func);
+  }
+
+  return ulist;
+}
+
+GSList *
+g_ulist_add_min (GSList *ulist, gint val)
+{
+  return g_ulist_add (ulist, (GCompareFunc) g_ulist_min, val);
+}
+
+GSList *
+g_ulist_add_max (GSList *ulist, gint val)
+{
+  return g_ulist_add (ulist, (GCompareFunc) g_ulist_max, val);
+}
+
+gint
+g_ulist_get_most_frequent (GSList *ulist)
+{
+  GSList *ulink;
+  UInfo *info, *umax;
+
+  if (!ulist)
+    return 0;
+
+  umax = ulist->data;
+
+  for (ulink = ulist; ulink; ulink = ulink->next)
+  {
+    info = ulink->data;
+
+    if (info->ref > umax->ref)
+      umax = info;
+  }
+
+  return umax->val;
+}
+
+void
+g_ulist_free (GSList *ulist)
+{
+  g_slist_foreach (ulist, (GFunc) g_free, NULL);
+  g_slist_free (ulist);
+}
+

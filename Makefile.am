@@ -1,6 +1,6 @@
 SUBDIRS = \
-  libogmdvd \
   libogmjob \
+  libogmdvd \
   libogmrip \
   avibox \
   dvdcpy

@@ -31,11 +31,13 @@ gboolean            ogmdvd_title_open                 (OGMDvdTitle  *title,
 void                ogmdvd_title_close                (OGMDvdTitle  *title);
 gboolean            ogmdvd_title_is_open              (OGMDvdTitle  *title);
 
-gboolean            ogmdvd_title_analyze              (OGMDvdTitle  *title);
 OGMDvdDisc *        ogmdvd_title_get_disc             (OGMDvdTitle  *title);
 gint64              ogmdvd_title_get_vts_size         (OGMDvdTitle  *title);
 gint                ogmdvd_title_get_nr               (OGMDvdTitle  *title);
 gint                ogmdvd_title_get_ts_nr            (OGMDvdTitle  *title);
+gboolean            ogmdvd_title_get_progressive      (OGMDvdTitle  *title);
+gboolean            ogmdvd_title_get_telecine         (OGMDvdTitle  *title);
+gboolean            ogmdvd_title_get_interlaced       (OGMDvdTitle  *title);
 gdouble             ogmdvd_title_get_length           (OGMDvdTitle  *title,
                                                        OGMDvdTime   *length);
 gdouble             ogmdvd_title_get_chapters_length  (OGMDvdTitle  *title, 
@@ -60,6 +62,7 @@ GSList *            ogmdvd_title_get_subp_streams     (OGMDvdTitle  *title);
 OGMDvdSubpStream  * ogmdvd_title_find_subp_stream     (OGMDvdTitle  *title,
                                                        GCompareFunc func,
                                                        gpointer     data);
+gboolean            ogmdvd_title_analyze              (OGMDvdTitle  *title);
 
 G_END_DECLS
 

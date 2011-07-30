@@ -89,14 +89,20 @@ struct _OGMDvdTitle
   guint8 title_set_nr;
   ifo_handle_t *vts_file;
 
-  gint *bitrates;
+  gboolean analyzed;
+  gboolean interlaced;
+  gboolean progressive;
+  gboolean telecine;
 
+  gint *bitrates;
+/*
   OGMDvdReader *reader;
   OGMDvdParser *parser;
 
   gint block_len;
   guchar *buffer;
   guchar *ptr;
+*/
 };
 
 /**
@@ -123,6 +129,11 @@ struct _OGMDvdVideoStream
   guint picture_size : 2;
   guint display_aspect_ratio : 2;
   guint permitted_df : 2;
+
+  guint crop_x;
+  guint crop_y;
+  guint crop_w;
+  guint crop_h;
 };
 
 /**
@@ -218,6 +229,13 @@ struct _OGMDvdParser
 gulong  ogmdvd_time_to_msec (dvd_time_t *dtime);
 void    ogmdvd_msec_to_time (gulong     msec,
                              OGMDvdTime *dtime);
+
+GSList * g_ulist_add_min           (GSList *ulist,
+                                    gint   val);
+GSList * g_ulist_add_max           (GSList *ulist,
+                                    gint   val);
+gint     g_ulist_get_most_frequent (GSList *ulist);
+void     g_ulist_free              (GSList *ulist);
 
 G_END_DECLS
 

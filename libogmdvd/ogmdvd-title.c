@@ -31,10 +31,14 @@
 #include "ogmdvd-enums.h"
 #include "ogmdvd-title.h"
 #include "ogmdvd-stream.h"
+#include "ogmdvd-video.h"
 #include "ogmdvd-priv.h"
 
 #include "ogmdvd-reader.h"
 #include "ogmdvd-parser.h"
+
+#include <stdio.h>
+#include <ogmjob.h>
 
 #include <glib/gi18n-lib.h>
 
@@ -184,6 +188,30 @@ ogmdvd_title_get_ts_nr (OGMDvdTitle *title)
   g_return_val_if_fail (title != NULL, -1);
 
   return title->title_set_nr;
+}
+
+gboolean
+ogmdvd_title_get_progressive (OGMDvdTitle *title)
+{
+  g_return_val_if_fail (title != NULL, FALSE);
+
+  return title->progressive;
+}
+
+gboolean
+ogmdvd_title_get_telecine (OGMDvdTitle *title)
+{
+  g_return_val_if_fail (title != NULL, FALSE);
+
+  return title->telecine;
+}
+
+gboolean
+ogmdvd_title_get_interlaced (OGMDvdTitle *title)
+{
+  g_return_val_if_fail (title != NULL, FALSE);
+
+  return title->interlaced;
 }
 
 /**
@@ -514,6 +542,7 @@ ogmdvd_title_find_subp_stream (OGMDvdTitle *title, GCompareFunc func, gpointer d
  *
  * Returns: FALSE if the analysis is complete, TRUE otherwise
  */
+/*
 gboolean
 ogmdvd_title_analyze (OGMDvdTitle *title)
 {
@@ -548,7 +577,7 @@ ogmdvd_title_analyze (OGMDvdTitle *title)
     title->block_len = ogmdvd_reader_get_block (title->reader, 1024, title->buffer);
     if (title->block_len <= 0)
     {
-      /* ERROR */
+      /?* ERROR *?/
     }
     title->ptr = title->buffer;
   }
@@ -576,6 +605,343 @@ ogmdvd_title_analyze (OGMDvdTitle *title)
 
     return FALSE;
   }
+
+  return TRUE;
+}
+*/
+enum
+{
+  SECTION_UNKNOWN,
+  SECTION_24000_1001,
+  SECTION_30000_1001
+};
+
+typedef struct
+{
+  gchar *cur_affinity;
+  gchar* prev_affinity;
+  guint naffinities;
+  guint cur_duration;
+  guint prev_duration;
+  guint npatterns;
+  guint cur_section;
+  guint nsections;
+  guint nframes;
+  guint frames;
+} OGMDvdAnalyze;
+
+static gchar **
+ogmdvd_title_analyze_command (OGMDvdTitle *title, gulong nframes)
+{
+  GPtrArray *argv;
+
+  const gchar *device;
+  gint vid;
+
+  argv = g_ptr_array_new ();
+
+  g_ptr_array_add (argv, g_strdup ("mplayer"));
+  g_ptr_array_add (argv, g_strdup ("-nolirc"));
+  g_ptr_array_add (argv, g_strdup ("-nosound"));
+  g_ptr_array_add (argv, g_strdup ("-nocache"));
+  g_ptr_array_add (argv, g_strdup ("-nosub"));
+
+  g_ptr_array_add (argv, g_strdup ("-noconfig"));
+  g_ptr_array_add (argv, g_strdup ("all"));
+
+  g_ptr_array_add (argv, g_strdup ("-v"));
+  g_ptr_array_add (argv, g_strdup ("-benchmark"));
+
+  g_ptr_array_add (argv, g_strdup ("-vo"));
+  g_ptr_array_add (argv, g_strdup ("null"));
+
+  g_ptr_array_add (argv, g_strdup ("-vf"));
+  g_ptr_array_add (argv, g_strdup ("pullup"));
+
+  g_ptr_array_add (argv, g_strdup ("-frames"));
+  g_ptr_array_add (argv, g_strdup_printf ("%lu", nframes));
+
+  device = ogmdvd_disc_get_device (ogmdvd_title_get_disc (title));
+  g_ptr_array_add (argv, g_strdup ("-dvd-device"));
+  g_ptr_array_add (argv, g_strdup (device));
+
+  vid = ogmdvd_title_get_nr (title);
+  g_ptr_array_add (argv, g_strdup_printf ("dvd://%d", vid + 1));
+
+  g_ptr_array_add (argv, NULL);
+
+  return (gchar **) g_ptr_array_free (argv, FALSE);
+}
+
+static gdouble
+ogmdvd_title_analyze_watch (OGMJobExec *exec, const gchar *buffer, OGMDvdAnalyze *info)
+{
+  if (g_str_has_prefix (buffer, "V: "))
+  {
+    info->frames ++;
+
+    if (info->frames == info->nframes)
+      return 1.0;
+
+    return info->frames / (gdouble) info->nframes;
+  }
+  else
+  {
+    if (g_str_has_prefix (buffer, "demux_mpg: 24000/1001"))
+    {
+      info->cur_section = SECTION_24000_1001;
+      info->nsections ++;
+    }
+    else if (g_str_has_prefix (buffer, "demux_mpg: 30000/1001"))
+    {
+      info->cur_section = SECTION_30000_1001;
+      info->nsections ++;
+    }
+
+    if (info->cur_section == SECTION_30000_1001)
+    {
+      if (g_str_has_prefix (buffer, "affinity: "))
+      {
+        g_free (info->prev_affinity);
+        info->prev_affinity = g_strdup (info->cur_affinity);
+
+        g_free (info->cur_affinity);
+        info->cur_affinity = g_strdup (buffer + 10);
+      }
+      else if (g_str_has_prefix (buffer, "duration: "))
+      {
+        info->prev_duration = info->cur_duration;
+        sscanf (buffer, "duration: %u", &info->cur_duration);
+
+        if (info->prev_duration == 3 && info->cur_duration == 2)
+        {
+          info->npatterns ++;
+
+          if (strncmp (info->prev_affinity, ".0+.1.+2", 8) == 0 && strncmp (info->cur_affinity, ".0++1", 5) == 0)
+            info->naffinities ++;
+        }
+      }
+    }
+  }
+
+  return -1.0;
+}
+
+typedef struct
+{
+  GSList *x;
+  GSList *y;
+  GSList *w;
+  GSList *h;
+  guint nframes;
+  guint frames;
+} OGMDvdCrop;
+
+static gchar **
+ogmdvd_title_crop_command (OGMDvdTitle *title, gdouble start, gulong nframes)
+{
+  GPtrArray *argv;
+
+  GString *filter;
+  const gchar *device;
+  gint vid;
+
+  argv = g_ptr_array_new ();
+
+  g_ptr_array_add (argv, g_strdup ("mplayer"));
+  g_ptr_array_add (argv, g_strdup ("-nolirc"));
+  g_ptr_array_add (argv, g_strdup ("-nosound"));
+  g_ptr_array_add (argv, g_strdup ("-nocache"));
+  g_ptr_array_add (argv, g_strdup ("-nosub"));
+
+  g_ptr_array_add (argv, g_strdup ("-noconfig"));
+  g_ptr_array_add (argv, g_strdup ("all"));
+
+  g_ptr_array_add (argv, g_strdup ("-vo"));
+  g_ptr_array_add (argv, g_strdup ("null"));
+
+  g_ptr_array_add (argv, g_strdup ("-speed"));
+  g_ptr_array_add (argv, g_strdup ("100"));
+
+  filter = g_string_new (NULL);
+
+  if (ogmdvd_title_get_interlaced (title))
+    g_string_append (filter, "yadif=0");
+
+  if (filter->len > 0)
+    g_string_append_c (filter, ',');
+  g_string_append (filter, "cropdetect");
+
+  g_ptr_array_add (argv, g_strdup ("-vf"));
+  g_ptr_array_add (argv, g_string_free (filter, FALSE));
+
+  g_ptr_array_add (argv, g_strdup ("-ss"));
+  g_ptr_array_add (argv, g_strdup_printf ("%.0lf", start));
+
+  g_ptr_array_add (argv, g_strdup ("-frames"));
+  g_ptr_array_add (argv, g_strdup_printf ("%lu", nframes));
+
+  device = ogmdvd_disc_get_device (ogmdvd_title_get_disc (title));
+  g_ptr_array_add (argv, g_strdup ("-dvd-device"));
+  g_ptr_array_add (argv, g_strdup (device));
+
+  vid = ogmdvd_title_get_nr (title);
+  g_ptr_array_add (argv, g_strdup_printf ("dvd://%d", vid + 1));
+
+  g_ptr_array_add (argv, NULL);
+
+  return (gchar **) g_ptr_array_free (argv, FALSE);
+}
+
+static gdouble
+ogmdvd_title_crop_watch (OGMJobExec *exec, const gchar *buffer, OGMDvdCrop *info)
+{
+  gchar *str;
+
+  static guint frame = 0;
+
+  str = strstr (buffer, "-vf crop=");
+  if (str)
+  {
+    gint x, y, w, h;
+
+    if (sscanf (str, "-vf crop=%d:%d:%d:%d", &w, &h, &x, &y) == 4)
+    {
+      if (w > 0)
+        info->w = g_ulist_add_min (info->w, w);
+      if (h > 0)
+        info->h = g_ulist_add_min (info->h, h);
+      if (x > 0)
+        info->x = g_ulist_add_max (info->x, x);
+      if (y > 0)
+        info->y = g_ulist_add_max (info->y, y);
+    }
+
+    frame ++;
+    if (frame == info->nframes - 2)
+    {
+      frame = 0;
+      return 1.0;
+    }
+
+    return frame / (gdouble) (info->nframes - 2);
+  }
+  else
+  {
+    gdouble d;
+
+    if (sscanf (buffer, "V: %lf", &d))
+    {
+      info->frames ++;
+
+      if (info->frames >= 100)
+        ogmjob_spawn_cancel (OGMJOB_SPAWN (exec));
+    }
+  }
+
+  return -1.0;
+}
+
+gboolean
+ogmdvd_title_analyze (OGMDvdTitle *title)
+{
+  OGMJobSpawn *spawn;
+  OGMDvdAnalyze analyze;
+  OGMDvdCrop crop;
+
+  gdouble length, start, step;
+  gchar **argv;
+
+  g_return_val_if_fail (title != NULL, FALSE);
+
+  if (title->analyzed)
+    return TRUE;
+
+  memset (&analyze, 0, sizeof (OGMDvdAnalyze));
+  analyze.nframes = 500;
+
+  argv = ogmdvd_title_analyze_command (title, analyze.nframes);
+
+  spawn = ogmjob_exec_newv (argv);
+  ogmjob_exec_add_watch_full (OGMJOB_EXEC (spawn),
+      (OGMJobWatch) ogmdvd_title_analyze_watch, &analyze, TRUE, FALSE, FALSE);
+
+  ogmjob_spawn_run (spawn, NULL);
+  g_object_unref (spawn);
+
+  if (analyze.nsections > 0)
+  {
+    /*
+     * Progressive
+     */
+    if (analyze.cur_section == SECTION_24000_1001 && analyze.nsections == 1)
+    {
+      title->progressive = TRUE;
+      title->telecine = FALSE;
+      title->interlaced = FALSE;
+    }
+    else if (analyze.nsections > 1)
+    {
+      title->progressive = TRUE;
+      if (analyze.npatterns > 0 && analyze.naffinities > 0)
+      {
+        /*
+         * Mixed progressive and telecine
+         */
+        title->telecine = TRUE;
+        title->interlaced = FALSE;
+      }
+      else
+      {
+        /*
+         * Mixed progressive and interlaced
+         */
+        title->telecine = FALSE;
+        title->interlaced = TRUE;
+      }
+    }
+  }
+  else
+  {
+    title->telecine = FALSE;
+    title->progressive = FALSE;
+    title->interlaced = FALSE;
+  }
+
+  g_free (analyze.prev_affinity);
+  g_free (analyze.cur_affinity);
+
+  memset (&crop, 0, sizeof (OGMDvdCrop));
+  crop.nframes = 12;
+
+  length = ogmdvd_title_get_length (title, NULL);
+  step = length / 5.;
+
+  for (start = step; start < length; start += step)
+  {
+    argv = ogmdvd_title_crop_command (title, start, crop.nframes);
+
+    spawn = ogmjob_exec_newv (argv);
+    ogmjob_exec_add_watch_full (OGMJOB_EXEC (spawn),
+        (OGMJobWatch) ogmdvd_title_crop_watch, &crop, TRUE, FALSE, FALSE);
+
+    ogmjob_spawn_run (spawn, NULL);
+    g_object_unref (spawn);
+  }
+
+  title->video_stream->crop_x = g_ulist_get_most_frequent (crop.x);
+  g_ulist_free (crop.x);
+
+  title->video_stream->crop_y = g_ulist_get_most_frequent (crop.y);
+  g_ulist_free (crop.y);
+
+  title->video_stream->crop_w = g_ulist_get_most_frequent (crop.w);
+  g_ulist_free (crop.w);
+
+  title->video_stream->crop_h = g_ulist_get_most_frequent (crop.h);
+  g_ulist_free (crop.h);
+
+  title->analyzed = TRUE;
 
   return TRUE;
 }

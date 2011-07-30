@@ -37,6 +37,9 @@ libogmdvd_la_HEADERS = \
 libogmdvd_la_LDFLAGS = \
   -version-info $(OGMDVD_LT_VERSION)
 
+libogmdvd_la_LIBADD = \
+  $(top_builddir)/libogmjob/libogmjob.la
+
 libogmdvd_ladir = \
   $(includedir)/ogmdvd
 
@@ -46,3 +49,5 @@ EXTRA_DIST = \
   ogmdvd-transport.h \
   ogmdvd-priv.h
 
+INCLUDES = \
+  -I$(top_srcdir)/libogmjob

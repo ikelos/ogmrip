@@ -155,9 +155,7 @@ ogmrip_codec_init (OGMRipCodec *codec)
 static void
 ogmrip_codec_dispose (GObject *gobject)
 {
-  OGMRipCodec *codec;
-
-  codec = OGMRIP_CODEC (gobject);
+  OGMRipCodec *codec = OGMRIP_CODEC (gobject);
 
   if (codec->priv->input)
   {
@@ -171,9 +169,7 @@ ogmrip_codec_dispose (GObject *gobject)
 static void
 ogmrip_codec_finalize (GObject *gobject)
 {
-  OGMRipCodec *codec;
-
-  codec = OGMRIP_CODEC (gobject);
+  OGMRipCodec *codec = OGMRIP_CODEC (gobject);
 
   if (codec->priv->output)
   {
@@ -275,7 +271,7 @@ ogmrip_codec_run (OGMJobSpawn *spawn)
  *
  * Returns: the filename, or NULL
  */
-G_CONST_RETURN gchar *
+const gchar *
 ogmrip_codec_get_output (OGMRipCodec *codec)
 {
   g_return_val_if_fail (OGMRIP_IS_CODEC (codec), NULL);

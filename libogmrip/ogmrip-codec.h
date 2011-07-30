@@ -54,8 +54,7 @@ struct _OGMRipCodecClass
 
 GType          ogmrip_codec_get_type           (void);
 OGMDvdStream * ogmrip_codec_get_input          (OGMRipCodec   *codec);
-G_CONST_RETURN
-gchar *        ogmrip_codec_get_output         (OGMRipCodec   *codec);
+const gchar *  ogmrip_codec_get_output         (OGMRipCodec   *codec);
 void           ogmrip_codec_set_output         (OGMRipCodec   *codec,
                                                 const gchar   *output);
 void           ogmrip_codec_set_profile        (OGMRipCodec   *codec,
