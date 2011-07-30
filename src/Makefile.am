@@ -7,30 +7,24 @@ ogmrip_SOURCES = \
   ogmrip-main.c             \
   ogmrip-options-dialog.c   \
   ogmrip-pref-dialog.c      \
-  ogmrip-profile-editor.c   \
   ogmrip-profiles.c         \
   ogmrip-profiles-dialog.c  \
   ogmrip-progress-dialog.c  \
   ogmrip-queue-dialog.c     \
   ogmrip-spell-dialog.c     \
-  ogmrip-update-dialog.c    \
-  ogmrip-audio-options.c    \
-  ogmrip-subp-options.c
+  ogmrip-update-dialog.c
 
 EXTRA_DIST = \
   ogmrip-crop-dialog.h      \
   ogmrip-settings.h         \
   ogmrip-options-dialog.h   \
   ogmrip-pref-dialog.h      \
-  ogmrip-profile-editor.h   \
   ogmrip-profiles.h         \
   ogmrip-profiles-dialog.h  \
   ogmrip-progress-dialog.h  \
   ogmrip-queue-dialog.h     \
   ogmrip-spell-dialog.h     \
-  ogmrip-update-dialog.h    \
-  ogmrip-audio-options.h    \
-  ogmrip-subp-options.h
+  ogmrip-update-dialog.h
 
 ogmrip_LDADD = \
   $(top_builddir)/libogmdvd/libogmdvd.la         \

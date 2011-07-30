@@ -16,10 +16,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef __OGMRIP_AUDIO_OPTIONS_H__
-#define __OGMRIP_AUDIO_OPTIONS_H__
+#ifndef __OGMRIP_AUDIO_OPTIONS_DIALOG_H__
+#define __OGMRIP_AUDIO_OPTIONS_DIALOG_H__
 
-#include <ogmrip-gtk.h>
+#include <ogmrip-audio-options.h>
 
 G_BEGIN_DECLS
 
@@ -45,15 +45,10 @@ struct _OGMRipAudioOptionsDialogClass
   GtkDialogClass parent_class;
 };
 
-GType       ogmrip_audio_options_dialog_get_type    (void);
-GtkWidget * ogmrip_audio_options_dialog_new         (void);
-
-void        ogmrip_audio_options_dialog_set_options (OGMRipAudioOptionsDialog *dialog,
-                                                     OGMRipAudioOptions       *options);
-void        ogmrip_audio_options_dialog_get_options (OGMRipAudioOptionsDialog *dialog,
-                                                     OGMRipAudioOptions       *options);
+GType       ogmrip_audio_options_dialog_get_type (void);
+GtkWidget * ogmrip_audio_options_dialog_new      (void);
 
 G_END_DECLS
 
-#endif /* __OGMRIP_AUDIO_OPTIONS_H__ */
+#endif /* __OGMRIP_AUDIO_OPTIONS_DIALOG_H__ */
 

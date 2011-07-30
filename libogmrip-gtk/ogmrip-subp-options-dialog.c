@@ -16,7 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "ogmrip-subp-options.h"
+#include "ogmrip-subp-options-dialog.h"
+#include "ogmrip-helper.h"
 
 #include <glib/gi18n.h>
 
@@ -38,6 +39,28 @@ struct _OGMRipSubpOptionsDialogPriv
   GtkWidget *label_entry;
 };
 
+enum
+{
+  PROP_0,
+  PROP_CHARSET,
+  PROP_CODEC,
+  PROP_FORCED_ONLY,
+  PROP_LABEL,
+  PROP_LANGUAGE,
+  PROP_NEWLINE,
+  PROP_SPELL_CHECK
+};
+
+static void ogmrip_subp_options_init (OGMRipSubpOptionsInterface *iface);
+static void ogmrip_subp_options_dialog_get_property (GObject     *gobject,
+                                                     guint        prop_id,
+                                                     GValue       *value,
+                                                     GParamSpec   *pspec);
+static void ogmrip_subp_options_dialog_set_property (GObject      *gobject,
+                                                     guint        prop_id,
+                                                     const GValue *value,
+                                                     GParamSpec   *pspec);
+
 static void
 ogmrip_subp_options_dialog_codec_changed (GtkWidget *combo, GtkWidget *table)
 {
@@ -52,12 +75,141 @@ ogmrip_subp_options_dialog_codec_changed (GtkWidget *combo, GtkWidget *table)
     gtk_widget_set_sensitive (table, ogmrip_plugin_get_subp_codec_text (codec));
 }
 
-G_DEFINE_TYPE (OGMRipSubpOptionsDialog, ogmrip_subp_options_dialog, GTK_TYPE_DIALOG)
+static OGMRipCharset
+ogmrip_subp_options_dialog_get_charset (OGMRipSubpOptionsDialog *dialog)
+{
+  return gtk_combo_box_get_active (GTK_COMBO_BOX (dialog->priv->charset_combo));
+}
+
+static void
+ogmrip_subp_options_dialog_set_charset (OGMRipSubpOptionsDialog *dialog, OGMRipCharset charset)
+{
+  gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->charset_combo), charset);
+}
+
+static GType
+ogmrip_subp_options_dialog_get_codec (OGMRipSubpOptionsDialog *dialog)
+{
+  return ogmrip_codec_chooser_get_active_type (GTK_COMBO_BOX (dialog->priv->codec_combo));
+}
+
+static void
+ogmrip_subp_options_dialog_set_codec (OGMRipSubpOptionsDialog *dialog, GType codec)
+{
+  const gchar *name;
+
+  name = ogmrip_plugin_get_subp_codec_name (codec);
+  ogmrip_codec_chooser_set_active (GTK_COMBO_BOX (dialog->priv->codec_combo), name);
+}
+
+static gboolean
+ogmrip_subp_options_dialog_get_forced_only (OGMRipSubpOptionsDialog *dialog)
+{
+  return gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (dialog->priv->forced_subs_check));
+}
+
+static void
+ogmrip_subp_options_dialog_set_forced_only (OGMRipSubpOptionsDialog *dialog, gboolean forced_only)
+{
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->forced_subs_check), forced_only);
+}
+
+static const gchar *
+ogmrip_subp_options_dialog_get_label (OGMRipSubpOptionsDialog *dialog)
+{
+  return gtk_entry_get_text (GTK_ENTRY (dialog->priv->label_entry));
+}
+
+static void
+ogmrip_subp_options_dialog_set_label (OGMRipSubpOptionsDialog *dialog, const gchar *label)
+{
+  gtk_entry_set_text (GTK_ENTRY (dialog->priv->label_entry), label ? label : "");
+}
+
+static gint
+ogmrip_subp_options_dialog_get_language (OGMRipSubpOptionsDialog *dialog)
+{
+  return ogmrip_language_chooser_get_active (GTK_COMBO_BOX (dialog->priv->language_combo));
+}
+
+static void
+ogmrip_subp_options_dialog_set_language (OGMRipSubpOptionsDialog *dialog, gint lang)
+{
+  ogmrip_language_chooser_set_active (GTK_COMBO_BOX (dialog->priv->language_combo), lang);
+}
+
+static OGMRipNewline
+ogmrip_subp_options_dialog_get_newline (OGMRipSubpOptionsDialog *dialog)
+{
+  return gtk_combo_box_get_active (GTK_COMBO_BOX (dialog->priv->newline_combo));
+}
+
+static void
+ogmrip_subp_options_dialog_set_newline (OGMRipSubpOptionsDialog *dialog, OGMRipNewline newline)
+{
+  gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->newline_combo), newline);
+}
+
+static gboolean
+ogmrip_subp_options_dialog_get_spell_check (OGMRipSubpOptionsDialog *dialog)
+{
+  return gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (dialog->priv->spell_check));
+}
+
+static void
+ogmrip_subp_options_dialog_set_spell_check (OGMRipSubpOptionsDialog *dialog, gboolean spell_check)
+{
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->spell_check), spell_check);
+}
+/*
+void
+ogmrip_subp_options_dialog_set_options (OGMRipSubpOptionsDialog *dialog, OGMRipSubpCodec *codec)
+{
+  g_return_if_fail (OGMRIP_IS_SUBP_OPTIONS_DIALOG (dialog));
+  g_return_if_fail (OGMRIP_IS_SUBP_CODEC (codec));
+
+  gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->newline_combo), ogmrip_subp_codec_get_newline (codec));
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->forced_subs_check), ogmrip_subp_codec_get_forced_only (codec));
+}
+
+void
+ogmrip_subp_options_dialog_get_options (OGMRipSubpOptionsDialog *dialog, OGMRipSubpCodec *codec)
+{
+  g_return_if_fail (OGMRIP_IS_SUBP_OPTIONS_DIALOG (dialog));
+  g_return_if_fail (OGMRIP_IS_SUBP_CODEC (codec));
+
+  ogmrip_subp_codec_set_newline (codec,
+      gtk_combo_box_get_active (GTK_COMBO_BOX (dialog->priv->newline_combo)));
+  ogmrip_subp_codec_set_forced_only (codec,
+      gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (dialog->priv->forced_subs_check)));
+}
+*/
+G_DEFINE_TYPE_WITH_CODE (OGMRipSubpOptionsDialog, ogmrip_subp_options_dialog, GTK_TYPE_DIALOG,
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_SUBP_OPTIONS, ogmrip_subp_options_init))
 
 static void
 ogmrip_subp_options_dialog_class_init (OGMRipSubpOptionsDialogClass *klass)
 {
+  GObjectClass *object_class;
+
+  object_class = G_OBJECT_CLASS (klass);
+  object_class->get_property = ogmrip_subp_options_dialog_get_property;
+  object_class->set_property = ogmrip_subp_options_dialog_set_property;
+
+  g_object_class_override_property (object_class, PROP_CHARSET, "character-set");
+  g_object_class_override_property (object_class, PROP_CODEC, "codec");
+  g_object_class_override_property (object_class, PROP_FORCED_ONLY, "forced-only");
+  g_object_class_override_property (object_class, PROP_LABEL, "label");
+  g_object_class_override_property (object_class, PROP_LANGUAGE, "language");
+  g_object_class_override_property (object_class, PROP_NEWLINE, "language");
+  g_object_class_override_property (object_class, PROP_SPELL_CHECK, "spell-check");
+
   g_type_class_add_private (klass, sizeof (OGMRipSubpOptionsDialogPriv));
+}
+
+static void
+ogmrip_subp_options_init (OGMRipSubpOptionsInterface *iface)
+{
 }
 
 static void
@@ -176,75 +328,76 @@ ogmrip_subp_options_dialog_init (OGMRipSubpOptionsDialog *dialog)
   g_object_unref (builder);
 }
 
+static void
+ogmrip_subp_options_dialog_get_property (GObject *gobject, guint prop_id, GValue *value, GParamSpec *pspec)
+{
+  OGMRipSubpOptionsDialog *dialog = OGMRIP_SUBP_OPTIONS_DIALOG (gobject);
+
+  switch (prop_id) 
+  {
+    case PROP_CHARSET:
+      g_value_set_uint (value, ogmrip_subp_options_dialog_get_charset (dialog));
+      break;
+    case PROP_CODEC:
+      g_value_set_gtype (value, ogmrip_subp_options_dialog_get_codec (dialog));
+      break;
+    case PROP_FORCED_ONLY:
+      g_value_set_boolean (value, ogmrip_subp_options_dialog_get_forced_only (dialog));
+      break;
+    case PROP_LABEL:
+      g_value_set_string (value, ogmrip_subp_options_dialog_get_label (dialog));
+      break;
+    case PROP_LANGUAGE:
+      g_value_set_uint (value, ogmrip_subp_options_dialog_get_language (dialog));
+      break;
+    case PROP_NEWLINE:
+      g_value_set_uint (value, ogmrip_subp_options_dialog_get_newline (dialog));
+      break;
+    case PROP_SPELL_CHECK:
+      g_value_set_boolean (value, ogmrip_subp_options_dialog_get_spell_check (dialog));
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
+      break;
+  }
+}
+
+static void
+ogmrip_subp_options_dialog_set_property (GObject *gobject, guint prop_id, const GValue *value, GParamSpec *pspec)
+{
+  OGMRipSubpOptionsDialog *dialog = OGMRIP_SUBP_OPTIONS_DIALOG (gobject);
+
+  switch (prop_id) 
+  {
+    case PROP_CHARSET:
+      ogmrip_subp_options_dialog_set_charset (dialog, g_value_get_uint (value));
+      break;
+    case PROP_CODEC:
+      ogmrip_subp_options_dialog_set_codec (dialog, g_value_get_gtype (value));
+      break;
+    case PROP_FORCED_ONLY:
+      ogmrip_subp_options_dialog_set_forced_only (dialog, g_value_get_boolean (value));
+      break;
+    case PROP_LABEL:
+      ogmrip_subp_options_dialog_set_label (dialog, g_value_get_string (value));
+      break;
+    case PROP_LANGUAGE:
+      ogmrip_subp_options_dialog_set_language (dialog, g_value_get_uint (value));
+      break;
+    case PROP_NEWLINE:
+      ogmrip_subp_options_dialog_set_newline (dialog, g_value_get_uint (value));
+      break;
+    case PROP_SPELL_CHECK:
+      ogmrip_subp_options_dialog_set_spell_check (dialog, g_value_get_boolean (value));
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
+      break;
+  }
+}
+
 GtkWidget *
 ogmrip_subp_options_dialog_new (void)
 {
   return g_object_new (OGMRIP_TYPE_SUBP_OPTIONS_DIALOG, NULL);
 }
-static void
-ogmrip_subp_options_dialog_set_label (OGMRipSubpOptionsDialog *dialog, const gchar *label)
-{
-  g_return_if_fail (OGMRIP_IS_SUBP_OPTIONS_DIALOG (dialog));
-
-  gtk_entry_set_text (GTK_ENTRY (dialog->priv->label_entry), label ? label : "");
-}
-
-static gchar *
-ogmrip_subp_options_dialog_get_label (OGMRipSubpOptionsDialog *dialog)
-{
-  const gchar *label;
-
-  g_return_val_if_fail (OGMRIP_IS_SUBP_OPTIONS_DIALOG (dialog), NULL);
-
-  label = gtk_entry_get_text (GTK_ENTRY (dialog->priv->label_entry));
-  if (!label || strlen (label) == 0)
-    return NULL;
-
-  return g_strdup (label);
-}
-
-void
-ogmrip_subp_options_dialog_set_options (OGMRipSubpOptionsDialog *dialog, OGMRipSubpOptions *options)
-{
-  const gchar *name = NULL;
-
-  g_return_if_fail (OGMRIP_IS_SUBP_OPTIONS_DIALOG (dialog));
-
-  if (options->codec != G_TYPE_NONE)
-    name = ogmrip_plugin_get_subp_codec_name (options->codec);
-  ogmrip_codec_chooser_set_active (GTK_COMBO_BOX (dialog->priv->codec_combo), name);
-
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->default_button), options->defaults);
-
-  gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->charset_combo), options->charset);
-  gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->newline_combo), options->newline);
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->spell_check), options->spell);
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->forced_subs_check), options->forced_subs);
-
-  ogmrip_language_chooser_set_active (GTK_COMBO_BOX (dialog->priv->language_combo), options->language);
-  ogmrip_subp_options_dialog_set_label (dialog, options->label);
-}
-
-void
-ogmrip_subp_options_dialog_get_options (OGMRipSubpOptionsDialog *dialog, OGMRipSubpOptions *options)
-{
-  g_return_if_fail (OGMRIP_IS_SUBP_OPTIONS_DIALOG (dialog));
-  g_return_if_fail (options != NULL);
-
-  options->defaults = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (dialog->priv->default_button));
-  if (!options->defaults)
-  {
-    options->codec = ogmrip_codec_chooser_get_active_type (GTK_COMBO_BOX (dialog->priv->codec_combo));
-    options->charset = gtk_combo_box_get_active (GTK_COMBO_BOX (dialog->priv->charset_combo));
-    options->newline = gtk_combo_box_get_active (GTK_COMBO_BOX (dialog->priv->newline_combo));
-    options->spell = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (dialog->priv->spell_check));
-    options->forced_subs = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (dialog->priv->forced_subs_check));
-  }
-
-  options->language = ogmrip_language_chooser_get_active (GTK_COMBO_BOX (dialog->priv->language_combo));
-
-  if (options->label)
-    g_free (options->label);
-  options->label = ogmrip_subp_options_dialog_get_label (dialog);
-}
-

@@ -16,7 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "ogmrip-audio-options.h"
+#include "ogmrip-audio-options-dialog.h"
+#include "ogmrip-helper.h"
 
 #include <glib/gi18n.h>
 
@@ -38,6 +39,28 @@ struct _OGMRipAudioOptionsDialogPriv
   GtkWidget *label_entry;
 };
 
+enum
+{
+  PROP_0,
+  PROP_CHANNELS,
+  PROP_CODEC,
+  PROP_LABEL,
+  PROP_LANGUAGE,
+  PROP_NORMALIZE,
+  PROP_QUALITY,
+  PROP_SAMPLE_RATE
+};
+
+static void ogmrip_audio_options_init (OGMRipAudioOptionsInterface *iface);
+static void ogmrip_audio_options_dialog_get_property  (GObject     *gobject,
+                                                      guint        prop_id,
+                                                      GValue       *value,
+                                                      GParamSpec   *pspec);
+static void ogmrip_audio_options_dialog_set_property (GObject      *gobject,
+                                                      guint        prop_id,
+                                                      const GValue *value,
+                                                      GParamSpec   *pspec);
+
 static void
 ogmrip_audio_options_dialog_codec_changed (GtkWidget *combo, GtkWidget *table)
 {
@@ -52,12 +75,119 @@ ogmrip_audio_options_dialog_codec_changed (GtkWidget *combo, GtkWidget *table)
     gtk_widget_set_sensitive (table, ogmrip_plugin_get_audio_codec_format (codec) != OGMRIP_FORMAT_COPY);
 }
 
-G_DEFINE_TYPE (OGMRipAudioOptionsDialog, ogmrip_audio_options_dialog, GTK_TYPE_DIALOG)
+static gint
+ogmrip_audio_options_dialog_get_channels (OGMRipAudioOptionsDialog *dialog)
+{
+  return gtk_combo_box_get_active (GTK_COMBO_BOX (dialog->priv->channels_combo));
+}
+
+static void
+ogmrip_audio_options_dialog_set_channels (OGMRipAudioOptionsDialog *dialog, OGMDvdAudioChannels channels)
+{
+  gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->channels_combo), channels);
+}
+
+static GType
+ogmrip_audio_options_dialog_get_codec (OGMRipAudioOptionsDialog *dialog)
+{
+  return ogmrip_codec_chooser_get_active_type (GTK_COMBO_BOX (dialog->priv->codec_combo));
+}
+
+static void
+ogmrip_audio_options_dialog_set_codec (OGMRipAudioOptionsDialog *dialog, GType codec)
+{
+  const gchar *name;
+
+  name = ogmrip_plugin_get_audio_codec_name (codec);
+  ogmrip_codec_chooser_set_active (GTK_COMBO_BOX (dialog->priv->codec_combo), name);
+}
+
+static const  gchar *
+ogmrip_audio_options_dialog_get_label (OGMRipAudioOptionsDialog *dialog)
+{
+  return gtk_entry_get_text (GTK_ENTRY (dialog->priv->label_entry));
+}
+
+static void
+ogmrip_audio_options_dialog_set_label (OGMRipAudioOptionsDialog *dialog, const gchar *label)
+{
+  gtk_entry_set_text (GTK_ENTRY (dialog->priv->label_entry), label ? label : "");
+}
+
+static gint
+ogmrip_audio_options_dialog_get_language (OGMRipAudioOptionsDialog *dialog)
+{
+  return ogmrip_language_chooser_get_active (GTK_COMBO_BOX (dialog->priv->language_combo));
+}
+
+static void
+ogmrip_audio_options_dialog_set_language (OGMRipAudioOptionsDialog *dialog, guint lang)
+{
+  ogmrip_language_chooser_set_active (GTK_COMBO_BOX (dialog->priv->language_combo), lang);
+}
+
+static gboolean
+ogmrip_audio_options_dialog_get_normalize (OGMRipAudioOptionsDialog *dialog)
+{
+  return gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (dialog->priv->normalize_check));
+}
+
+static void
+ogmrip_audio_options_dialog_set_normalize (OGMRipAudioOptionsDialog *dialog, gboolean normalize)
+{
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->normalize_check), normalize);
+}
+
+static gint
+ogmrip_audio_options_dialog_get_quality (OGMRipAudioOptionsDialog *dialog)
+{
+  return gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (dialog->priv->quality_spin));
+}
+
+static void
+ogmrip_audio_options_dialog_set_quality (OGMRipAudioOptionsDialog *dialog, guint quality)
+{
+  gtk_spin_button_set_value (GTK_SPIN_BUTTON (dialog->priv->quality_spin), quality);
+}
+
+static gint
+ogmrip_audio_options_dialog_get_sample_rate (OGMRipAudioOptionsDialog *dialog)
+{
+  return gtk_combo_box_get_active (GTK_COMBO_BOX (dialog->priv->srate_combo));
+}
+
+static void
+ogmrip_audio_options_dialog_set_sample_rate (OGMRipAudioOptionsDialog *dialog, guint srate)
+{
+  gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->srate_combo), srate);
+}
+
+G_DEFINE_TYPE_WITH_CODE (OGMRipAudioOptionsDialog, ogmrip_audio_options_dialog, GTK_TYPE_DIALOG,
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_AUDIO_OPTIONS, ogmrip_audio_options_init))
 
 static void
 ogmrip_audio_options_dialog_class_init (OGMRipAudioOptionsDialogClass *klass)
 {
+  GObjectClass *object_class;
+
+  object_class = G_OBJECT_CLASS (klass);
+  object_class->get_property = ogmrip_audio_options_dialog_get_property;
+  object_class->set_property = ogmrip_audio_options_dialog_set_property;
+
+  g_object_class_override_property (object_class, PROP_CHANNELS, "channels");
+  g_object_class_override_property (object_class, PROP_CODEC, "codec");
+  g_object_class_override_property (object_class, PROP_LABEL, "label");
+  g_object_class_override_property (object_class, PROP_LANGUAGE, "language");
+  g_object_class_override_property (object_class, PROP_NORMALIZE, "normalize");
+  g_object_class_override_property (object_class, PROP_QUALITY, "quality");
+  g_object_class_override_property (object_class, PROP_SAMPLE_RATE, "sample-rate");
+
   g_type_class_add_private (klass, sizeof (OGMRipAudioOptionsDialogPriv));
+}
+
+static void
+ogmrip_audio_options_init (OGMRipAudioOptionsInterface *iface)
+{
 }
 
 static void
@@ -176,76 +306,77 @@ ogmrip_audio_options_dialog_init (OGMRipAudioOptionsDialog *dialog)
   g_object_unref (builder);
 }
 
+static void
+ogmrip_audio_options_dialog_get_property (GObject *gobject, guint prop_id, GValue *value, GParamSpec *pspec)
+{
+  OGMRipAudioOptionsDialog *dialog = OGMRIP_AUDIO_OPTIONS_DIALOG (gobject);
+
+  switch (prop_id) 
+  {
+    case PROP_CHANNELS:
+      g_value_set_uint (value, ogmrip_audio_options_dialog_get_channels (dialog));
+      break;
+    case PROP_CODEC:
+      g_value_set_gtype (value, ogmrip_audio_options_dialog_get_codec (dialog));
+      break;
+    case PROP_LABEL:
+      g_value_set_string (value, ogmrip_audio_options_dialog_get_label (dialog));
+      break;
+    case PROP_LANGUAGE:
+      g_value_set_uint (value, ogmrip_audio_options_dialog_get_language (dialog));
+      break;
+    case PROP_NORMALIZE:
+      g_value_set_boolean (value, ogmrip_audio_options_dialog_get_normalize (dialog));
+      break;
+    case PROP_QUALITY:
+      g_value_set_uint (value, ogmrip_audio_options_dialog_get_quality (dialog));
+      break;
+    case PROP_SAMPLE_RATE:
+      g_value_set_uint (value, ogmrip_audio_options_dialog_get_sample_rate (dialog));
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
+      break;
+  }
+}
+
+static void
+ogmrip_audio_options_dialog_set_property (GObject *gobject, guint prop_id, const GValue *value, GParamSpec *pspec)
+{
+  OGMRipAudioOptionsDialog *dialog = OGMRIP_AUDIO_OPTIONS_DIALOG (gobject);
+
+  switch (prop_id) 
+  {
+    case PROP_CHANNELS:
+      ogmrip_audio_options_dialog_set_channels (dialog, g_value_get_uint (value));
+      break;
+    case PROP_CODEC:
+      ogmrip_audio_options_dialog_set_codec (dialog, g_value_get_gtype (value));
+      break;
+    case PROP_LABEL:
+      ogmrip_audio_options_dialog_set_label (dialog, g_value_get_string (value));
+      break;
+    case PROP_LANGUAGE:
+      ogmrip_audio_options_dialog_set_language (dialog, g_value_get_uint (value));
+      break;
+    case PROP_NORMALIZE:
+      ogmrip_audio_options_dialog_set_normalize (dialog, g_value_get_boolean (value));
+      break;
+    case PROP_QUALITY:
+      ogmrip_audio_options_dialog_set_quality (dialog, g_value_get_uint (value));
+      break;
+    case PROP_SAMPLE_RATE:
+      ogmrip_audio_options_dialog_set_sample_rate (dialog, g_value_get_uint (value));
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
+      break;
+  }
+}
+
 GtkWidget *
 ogmrip_audio_options_dialog_new (void)
 {
   return g_object_new (OGMRIP_TYPE_AUDIO_OPTIONS_DIALOG, NULL);
-}
-
-static void
-ogmrip_audio_options_dialog_set_label (OGMRipAudioOptionsDialog *dialog, const gchar *label)
-{
-  g_return_if_fail (OGMRIP_IS_AUDIO_OPTIONS_DIALOG (dialog));
-
-  gtk_entry_set_text (GTK_ENTRY (dialog->priv->label_entry), label ? label : "");
-}
-
-static gchar *
-ogmrip_audio_options_dialog_get_label (OGMRipAudioOptionsDialog *dialog)
-{
-  const gchar *label;
-
-  g_return_val_if_fail (OGMRIP_IS_AUDIO_OPTIONS_DIALOG (dialog), NULL);
-
-  label = gtk_entry_get_text (GTK_ENTRY (dialog->priv->label_entry));
-  if (!label || strlen (label) == 0)
-    return NULL;
-
-  return g_strdup (label);
-}
-
-void
-ogmrip_audio_options_dialog_set_options (OGMRipAudioOptionsDialog *dialog, OGMRipAudioOptions *options)
-{
-  const gchar *name = NULL;
-
-  g_return_if_fail (OGMRIP_IS_AUDIO_OPTIONS_DIALOG (dialog));
-
-  if (options->codec != G_TYPE_NONE)
-    name = ogmrip_plugin_get_audio_codec_name (options->codec);
-  ogmrip_codec_chooser_set_active (GTK_COMBO_BOX (dialog->priv->codec_combo), name);
-
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->default_button), options->defaults);
-
-  gtk_spin_button_set_value (GTK_SPIN_BUTTON (dialog->priv->quality_spin), options->quality);
-  gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->srate_combo), options->srate);
-  gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->channels_combo), options->channels);
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->normalize_check), options->normalize);
-
-  ogmrip_language_chooser_set_active (GTK_COMBO_BOX (dialog->priv->language_combo), options->language);
-  ogmrip_audio_options_dialog_set_label (dialog, options->label);
-}
-
-void
-ogmrip_audio_options_dialog_get_options (OGMRipAudioOptionsDialog *dialog, OGMRipAudioOptions *options)
-{
-  g_return_if_fail (OGMRIP_IS_AUDIO_OPTIONS_DIALOG (dialog));
-  g_return_if_fail (options != NULL);
-
-  options->defaults = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (dialog->priv->default_button));
-  if (!options->defaults)
-  {
-    options->codec = ogmrip_codec_chooser_get_active_type (GTK_COMBO_BOX (dialog->priv->codec_combo));
-    options->quality = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (dialog->priv->quality_spin));
-    options->srate = gtk_combo_box_get_active (GTK_COMBO_BOX (dialog->priv->srate_combo));
-    options->channels = gtk_combo_box_get_active (GTK_COMBO_BOX (dialog->priv->channels_combo));
-    options->normalize = gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (dialog->priv->normalize_check));
-  }
-
-  options->language = ogmrip_language_chooser_get_active (GTK_COMBO_BOX (dialog->priv->language_combo));
-
-  if (options->label)
-    g_free (options->label);
-  options->label = ogmrip_audio_options_dialog_get_label (dialog);
 }
 

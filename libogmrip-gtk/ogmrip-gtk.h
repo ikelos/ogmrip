@@ -25,6 +25,7 @@
 #include <ogmrip-source-chooser-widget.h>
 #include <ogmrip-chooser-list.h>
 #include <ogmrip-chapter-list.h>
+#include <ogmrip-profile-editor.h>
 
 #endif /* __OGMRIP_GTK_H__ */
 

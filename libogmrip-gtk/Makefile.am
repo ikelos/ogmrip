@@ -2,23 +2,33 @@ lib_LTLIBRARIES = \
   libogmrip-gtk.la
 
 libogmrip_gtk_la_SOURCES =       \
+  ogmrip-audio-options.c         \
+  ogmrip-audio-options-dialog.c  \
   ogmrip-chapter-list.c          \
   ogmrip-chooser-list.c          \
   ogmrip-helper.c                \
   ogmrip-options-plugin.c        \
+  ogmrip-profile-editor.c        \
   ogmrip-source-chooser.c        \
-  ogmrip-source-chooser-widget.c
+  ogmrip-source-chooser-widget.c \
+  ogmrip-subp-options.c          \
+  ogmrip-subp-options-dialog.c
 
 libogmrip_gtk_ladir = \
   $(includedir)/ogmrip
 
 libogmrip_gtk_la_HEADERS =       \
+  ogmrip-audio-options.h         \
+  ogmrip-audio-options-dialog.h  \
   ogmrip-chapter-list.h          \
   ogmrip-chooser-list.h          \
   ogmrip-helper.h                \
   ogmrip-options-plugin.h        \
+  ogmrip-profile-editor.h        \
   ogmrip-source-chooser.h        \
   ogmrip-source-chooser-widget.h \
+  ogmrip-subp-options.c          \
+  ogmrip-subp-options-dialog.c   \
   ogmrip-gtk.h
 
 libogmrip_gtk_la_LDFLAGS = \
@@ -29,10 +39,6 @@ libogmrip_gtk_la_LIBADD = \
   $(top_builddir)/libogmdvd-gtk/libogmdvd-gtk.la  \
   $(top_builddir)/libogmjob/libogmjob.la \
   $(top_builddir)/libogmrip/libogmrip.la
-
-#
-# Misc
-#
 
 INCLUDES = \
   -I$(top_srcdir)/libogmdvd      \

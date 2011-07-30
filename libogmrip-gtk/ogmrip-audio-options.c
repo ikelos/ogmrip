@@ -1,0 +1,201 @@
+/* OGMRip - A wrapper library around libdvdread
+ * Copyright (C) 2004-2010 Olivier Rolland <billl@users.sourceforge.net>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include "ogmrip-audio-options.h"
+#include "ogmrip-audio-codec.h"
+
+G_DEFINE_INTERFACE (OGMRipAudioOptions, ogmrip_audio_options, G_TYPE_OBJECT);
+
+static void
+ogmrip_audio_options_default_init (OGMRipAudioOptionsInterface *iface)
+{
+  g_object_interface_install_property (iface,
+      g_param_spec_uint ("channels", "Channels property", "Set channels",
+        OGMDVD_AUDIO_CHANNELS_MONO, OGMDVD_AUDIO_CHANNELS_5_1, OGMDVD_AUDIO_CHANNELS_STEREO,
+        G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+
+  g_object_interface_install_property (iface,
+      g_param_spec_gtype ("codec", "Codec property", "Set codec",
+        OGMRIP_TYPE_AUDIO_CODEC, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+
+  g_object_interface_install_property (iface,
+      g_param_spec_string ("label", "Label property", "Set label",
+        NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+
+  g_object_interface_install_property (iface,
+      g_param_spec_uint ("language", "Language property", "Set language",
+        0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+
+  g_object_interface_install_property (iface,
+      g_param_spec_boolean ("normalize", "Normalize property", "Set normalize",
+        TRUE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+
+  g_object_interface_install_property (iface,
+      g_param_spec_uint ("quality", "Quality property", "Set quality",
+        0, 10, 3, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+
+  g_object_interface_install_property (iface,
+      g_param_spec_uint ("sample-rate", "Sample rate property", "Set sample rate",
+        0, G_MAXUINT, 48000, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+}
+
+guint
+ogmrip_audio_options_get_channels (OGMRipAudioOptions *options)
+{
+  guint channels;
+
+  g_return_val_if_fail (OGMRIP_IS_AUDIO_OPTIONS (options), -1);
+
+  g_object_get (options, "channels", &channels, NULL);
+
+  return channels;
+}
+
+void
+ogmrip_audio_options_set_channels (OGMRipAudioOptions *options, OGMDvdAudioChannels channels)
+{
+  g_return_if_fail (OGMRIP_IS_AUDIO_OPTIONS (options));
+
+  g_object_set (options, "channels", channels, NULL);
+}
+
+GType
+ogmrip_audio_options_get_codec (OGMRipAudioOptions *options)
+{
+  GType codec;
+
+  g_return_val_if_fail (OGMRIP_IS_AUDIO_OPTIONS (options), G_TYPE_NONE);
+
+  g_object_get (options, "codec", &codec, NULL);
+
+  return codec;
+}
+
+void
+ogmrip_audio_options_set_codec (OGMRipAudioOptions *options, GType codec)
+{
+  g_return_if_fail (OGMRIP_IS_AUDIO_OPTIONS (options));
+  g_return_if_fail (g_type_is_a (codec, OGMRIP_TYPE_AUDIO_CODEC));
+
+  g_object_set (options, "codec", codec, NULL);
+}
+
+gchar *
+ogmrip_audio_options_get_label (OGMRipAudioOptions *options)
+{
+  gchar *label;
+
+  g_return_val_if_fail (OGMRIP_IS_AUDIO_OPTIONS (options), NULL);
+
+  g_object_get (options, "label", &label, NULL);
+
+  return label;
+}
+
+void
+ogmrip_audio_options_set_label (OGMRipAudioOptions *options, const gchar *label)
+{
+  g_return_if_fail (OGMRIP_IS_AUDIO_OPTIONS (options));
+
+  g_object_set (options, "label", label, NULL);
+}
+
+guint
+ogmrip_audio_options_get_language (OGMRipAudioOptions *options)
+{
+  guint lang;
+
+  g_return_val_if_fail (OGMRIP_IS_AUDIO_OPTIONS (options), -1);
+
+  g_object_get (options, "language", &lang, NULL);
+
+  return lang;
+}
+
+void
+ogmrip_audio_options_set_language (OGMRipAudioOptions *options, guint lang)
+{
+  g_return_if_fail (OGMRIP_IS_AUDIO_OPTIONS (options));
+
+  g_object_set (options, "language", lang, NULL);
+}
+
+gboolean
+ogmrip_audio_options_get_normalize (OGMRipAudioOptions *options)
+{
+  gboolean normalize;
+
+  g_return_val_if_fail (OGMRIP_IS_AUDIO_OPTIONS (options), FALSE);
+
+  g_object_get (options, "normalize", &normalize, NULL);
+
+  return normalize;
+}
+
+void
+ogmrip_audio_options_set_normalize (OGMRipAudioOptions *options, gboolean normalize)
+{
+  g_return_if_fail (OGMRIP_IS_AUDIO_OPTIONS (options));
+
+  g_object_set (options, "normalize", normalize, NULL);
+}
+
+guint
+ogmrip_audio_options_get_quality (OGMRipAudioOptions *options)
+{
+  guint quality;
+
+  g_return_val_if_fail (OGMRIP_IS_AUDIO_OPTIONS (options), -1);
+
+  g_object_get (options, "quality", &quality, NULL);
+
+  return quality;
+}
+
+void
+ogmrip_audio_options_set_quality (OGMRipAudioOptions *options, guint quality)
+{
+  g_return_if_fail (OGMRIP_IS_AUDIO_OPTIONS (options));
+
+  g_object_set (options, "quality", quality, NULL);
+}
+
+guint
+ogmrip_audio_options_get_sample_rate (OGMRipAudioOptions *options)
+{
+  guint srate;
+
+  g_return_val_if_fail (OGMRIP_IS_AUDIO_OPTIONS (options), -1);
+
+  g_object_get (options, "sample-rate", &srate, NULL);
+
+  return srate;
+}
+
+void
+ogmrip_audio_options_set_sample_rate (OGMRipAudioOptions *options, guint srate)
+{
+  g_return_if_fail (OGMRIP_IS_AUDIO_OPTIONS (options));
+
+  g_object_set (options, "sample-rate", srate, NULL);
+}
+
