@@ -23,16 +23,16 @@
 
 G_BEGIN_DECLS
 
-G_CONST_RETURN gchar * ogmdvd_get_video_format_label       (gint format);
-G_CONST_RETURN gchar * ogmdvd_get_display_aspect_label     (gint aspect);
-G_CONST_RETURN gchar * ogmdvd_get_audio_format_label       (gint format);
-G_CONST_RETURN gchar * ogmdvd_get_audio_channels_label     (gint channels);
-G_CONST_RETURN gchar * ogmdvd_get_audio_quantization_label (gint quantization);
-G_CONST_RETURN gchar * ogmdvd_get_audio_content_label      (gint content);
-G_CONST_RETURN gchar * ogmdvd_get_subp_content_label       (gint content);
-G_CONST_RETURN gchar * ogmdvd_get_language_label           (gint code);
-G_CONST_RETURN gchar * ogmdvd_get_language_iso639_1        (gint code);
-G_CONST_RETURN gchar * ogmdvd_get_language_iso639_2        (gint code);
+const gchar * ogmdvd_get_video_format_label       (gint format);
+const gchar * ogmdvd_get_display_aspect_label     (gint aspect);
+const gchar * ogmdvd_get_audio_format_label       (gint format);
+const gchar * ogmdvd_get_audio_channels_label     (gint channels);
+const gchar * ogmdvd_get_audio_quantization_label (gint quantization);
+const gchar * ogmdvd_get_audio_content_label      (gint content);
+const gchar * ogmdvd_get_subp_content_label       (gint content);
+const gchar * ogmdvd_get_language_label           (gint code);
+const gchar * ogmdvd_get_language_iso639_1        (gint code);
+const gchar * ogmdvd_get_language_iso639_2        (gint code);
 
 G_END_DECLS
 

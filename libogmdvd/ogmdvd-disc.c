@@ -134,7 +134,7 @@ dvd_open_reader (const gchar *device, GError **error)
   return reader;
 }
 
-static G_CONST_RETURN gchar *
+static const gchar *
 dvd_reader_get_id (dvd_reader_t *reader)
 {
   static gchar str[33];
@@ -804,7 +804,7 @@ ogmdvd_disc_unref (OGMDvdDisc *disc)
  *
  * Returns: The label of the DVD, or NULL
  */
-G_CONST_RETURN gchar *
+const gchar *
 ogmdvd_disc_get_label (OGMDvdDisc *disc)
 {
   g_return_val_if_fail (disc != NULL, NULL);
@@ -820,7 +820,7 @@ ogmdvd_disc_get_label (OGMDvdDisc *disc)
  *
  * Returns: The identifier, or NULL
  */
-G_CONST_RETURN gchar *
+const gchar *
 ogmdvd_disc_get_id (OGMDvdDisc *disc)
 {
   g_return_val_if_fail (disc != NULL, NULL);
@@ -836,7 +836,7 @@ ogmdvd_disc_get_id (OGMDvdDisc *disc)
  *
  * Returns: The device of the DVD.
  */
-G_CONST_RETURN gchar *
+const gchar *
 ogmdvd_disc_get_device (OGMDvdDisc *disc)
 {
   g_return_val_if_fail (disc != NULL, NULL);

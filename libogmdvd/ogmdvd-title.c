@@ -276,7 +276,7 @@ ogmdvd_title_get_chapters_length (OGMDvdTitle *title, guint start, gint end, OGM
  *
  * Returns: a constant array of 16 integers, or NULL
  */
-G_CONST_RETURN guint *
+const guint *
 ogmdvd_title_get_palette (OGMDvdTitle *title)
 {
   g_return_val_if_fail (title != NULL, NULL);

@@ -248,7 +248,7 @@ const guint ogmdvd_nlanguages = G_N_ELEMENTS (ogmdvd_languages) - 1;
  *
  * Returns: A constant string, or NULL
  */
-G_CONST_RETURN gchar *
+const gchar *
 ogmdvd_get_video_format_label (gint format)
 {
   static const gchar *video_format[] = 
@@ -272,7 +272,7 @@ ogmdvd_get_video_format_label (gint format)
  *
  * Returns: A constant string, or NULL
  */
-G_CONST_RETURN gchar *
+const gchar *
 ogmdvd_get_display_aspect_label (gint aspect)
 {
   static gchar *display_aspect[] =
@@ -296,7 +296,7 @@ ogmdvd_get_display_aspect_label (gint aspect)
  *
  * Returns: A constant string, or NULL
  */
-G_CONST_RETURN gchar *
+const gchar *
 ogmdvd_get_audio_format_label (gint format)
 {
   static gchar *audio_format[] =
@@ -324,7 +324,7 @@ ogmdvd_get_audio_format_label (gint format)
  *
  * Returns: A constant string, or NULL
  */
-G_CONST_RETURN gchar *
+const gchar *
 ogmdvd_get_audio_channels_label (gint channels)
 {
   static gchar *audio_channels[] =
@@ -352,7 +352,7 @@ ogmdvd_get_audio_channels_label (gint channels)
  *
  * Returns: A constant string, or NULL
  */
-G_CONST_RETURN gchar *
+const gchar *
 ogmdvd_get_audio_quantization_label (gint quantization)
 {
   static gchar *audio_quantization[] = 
@@ -376,7 +376,7 @@ ogmdvd_get_audio_quantization_label (gint quantization)
  *
  * Returns: A constant string, or NULL
  */
-G_CONST_RETURN gchar *
+const gchar *
 ogmdvd_get_audio_content_label (gint content)
 {
   static gchar *audio_content[] = 
@@ -401,7 +401,7 @@ ogmdvd_get_audio_content_label (gint content)
  *
  * Returns: A constant string, or NULL
  */
-G_CONST_RETURN gchar *
+const gchar *
 ogmdvd_get_subp_content_label (gint content)
 {
   static gchar *subp_content[] = 
@@ -437,7 +437,7 @@ ogmdvd_get_subp_content_label (gint content)
  *
  * Returns: A constant string, or NULL
  */
-G_CONST_RETURN gchar *
+const gchar *
 ogmdvd_get_language_label (gint code)
 {
   const gchar *lang;
@@ -460,7 +460,7 @@ ogmdvd_get_language_label (gint code)
  *
  * Returns: A constant string, or NULL
  */
-G_CONST_RETURN gchar *
+const gchar *
 ogmdvd_get_language_iso639_1 (gint code)
 {
   static gchar lang[3];
@@ -489,7 +489,7 @@ ogmdvd_get_language_iso639_1 (gint code)
  *
  * Returns: A constant string, or NULL
  */
-G_CONST_RETURN gchar *
+const gchar *
 ogmdvd_get_language_iso639_2 (gint code)
 {
   const gchar *lang;

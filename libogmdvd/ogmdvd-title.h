@@ -42,8 +42,7 @@ gdouble             ogmdvd_title_get_chapters_length  (OGMDvdTitle  *title,
                                                        guint        start,
                                                        gint         end,
                                                        OGMDvdTime   *length);
-G_CONST_RETURN
-guint *             ogmdvd_title_get_palette          (OGMDvdTitle  *title);
+const guint *       ogmdvd_title_get_palette          (OGMDvdTitle  *title);
 gint                ogmdvd_title_get_n_angles         (OGMDvdTitle  *title);
 gint                ogmdvd_title_get_n_chapters       (OGMDvdTitle  *title);
 OGMDvdVideoStream * ogmdvd_title_get_video_stream     (OGMDvdTitle  *title);

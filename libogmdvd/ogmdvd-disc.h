@@ -67,12 +67,9 @@ gboolean      ogmdvd_disc_is_open       (OGMDvdDisc  *disc);
 
 void          ogmdvd_disc_ref           (OGMDvdDisc  *disc);
 void          ogmdvd_disc_unref         (OGMDvdDisc  *disc);
-G_CONST_RETURN
-gchar *       ogmdvd_disc_get_label     (OGMDvdDisc  *disc);
-G_CONST_RETURN
-gchar *       ogmdvd_disc_get_id        (OGMDvdDisc  *disc);
-G_CONST_RETURN
-gchar *       ogmdvd_disc_get_device    (OGMDvdDisc  *disc);
+const gchar * ogmdvd_disc_get_label     (OGMDvdDisc  *disc);
+const gchar * ogmdvd_disc_get_id        (OGMDvdDisc  *disc);
+const gchar * ogmdvd_disc_get_device    (OGMDvdDisc  *disc);
 gint64        ogmdvd_disc_get_vmg_size  (OGMDvdDisc  *disc);
 gint          ogmdvd_disc_get_n_titles  (OGMDvdDisc  *disc);
 OGMDvdTitle * ogmdvd_disc_get_nth_title (OGMDvdDisc  *disc,
