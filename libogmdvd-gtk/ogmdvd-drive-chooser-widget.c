@@ -57,23 +57,14 @@ struct _OGMDvdDriveChooserWidgetPriv
   GtkTreeRowReference *last_row;
 };
 
-/*
- * Virtual functions
- */
-
-static void    ogmdvd_drive_chooser_init              (OGMDvdDriveChooserIface  *iface);
-static void    ogmdvd_drive_chooser_widget_changed    (GtkComboBox              *combo_box);
-static gchar * ogmdvd_drive_chooser_widget_get_device (OGMDvdDriveChooser       *chooser,
-                                                       OGMDvdDeviceType         *type);
-
-/*
- * Internal functions
- */
-
-static void     ogmdvd_drive_chooser_widget_fill     (OGMDvdDriveChooserWidget *chooser);
-static gboolean ogmdvd_drive_chooser_widget_sep_func (GtkTreeModel             *model,
-                                                      GtkTreeIter              *iter,
-                                                      gpointer                 data);
+static void     ogmdvd_drive_chooser_init              (OGMDvdDriveChooserInterface *iface);
+static void     ogmdvd_drive_chooser_widget_changed    (GtkComboBox                 *combo_box);
+static gchar *  ogmdvd_drive_chooser_widget_get_device (OGMDvdDriveChooser          *chooser,
+                                                        OGMDvdDeviceType            *type);
+static void     ogmdvd_drive_chooser_widget_fill       (OGMDvdDriveChooserWidget    *chooser);
+static gboolean ogmdvd_drive_chooser_widget_sep_func   (GtkTreeModel                *model,
+                                                        GtkTreeIter                 *iter,
+                                                        gpointer                    data);
 
 G_DEFINE_TYPE_WITH_CODE (OGMDvdDriveChooserWidget, ogmdvd_drive_chooser_widget, GTK_TYPE_COMBO_BOX,
     G_IMPLEMENT_INTERFACE (OGMDVD_TYPE_DRIVE_CHOOSER, ogmdvd_drive_chooser_init))
@@ -90,7 +81,7 @@ ogmdvd_drive_chooser_widget_class_init (OGMDvdDriveChooserWidgetClass *klass)
 }
 
 static void
-ogmdvd_drive_chooser_init (OGMDvdDriveChooserIface  *iface)
+ogmdvd_drive_chooser_init (OGMDvdDriveChooserInterface  *iface)
 {
   iface->get_device = ogmdvd_drive_chooser_widget_get_device;
 }

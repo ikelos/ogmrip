@@ -36,12 +36,12 @@ typedef enum
 #define OGMDVD_TYPE_DRIVE_CHOOSER            (ogmdvd_drive_chooser_get_type ())
 #define OGMDVD_DRIVE_CHOOSER(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMDVD_TYPE_DRIVE_CHOOSER, OGMDvdDriveChooser))
 #define OGMDVD_IS_DRIVE_CHOOSER(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), OGMDVD_TYPE_DRIVE_CHOOSER))
-#define OGMDVD_DRIVE_CHOOSER_GET_IFACE(inst) (G_TYPE_INSTANCE_GET_INTERFACE ((inst), OGMDVD_TYPE_DRIVE_CHOOSER, OGMDvdDriveChooserIface))
+#define OGMDVD_DRIVE_CHOOSER_GET_IFACE(inst) (G_TYPE_INSTANCE_GET_INTERFACE ((inst), OGMDVD_TYPE_DRIVE_CHOOSER, OGMDvdDriveChooserInterface))
 
-typedef struct _OGMDvdDriveChooser      OGMDvdDriveChooser;
-typedef struct _OGMDvdDriveChooserIface OGMDvdDriveChooserIface;
+typedef struct _OGMDvdDriveChooser          OGMDvdDriveChooser;
+typedef struct _OGMDvdDriveChooserInterface OGMDvdDriveChooserInterface;
 
-struct _OGMDvdDriveChooserIface
+struct _OGMDvdDriveChooserInterface
 {
   GTypeInterface base_iface;
 

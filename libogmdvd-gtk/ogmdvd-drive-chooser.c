@@ -31,31 +31,12 @@
 #include "ogmdvd-drive-chooser.h"
 #include "ogmdvd-marshal.h"
 
-static void ogmdvd_drive_chooser_class_init (gpointer g_iface);
-
-GType
-ogmdvd_drive_chooser_get_type (void)
-{
-  static GType drive_chooser_type = 0;
-
-  if (!drive_chooser_type)
-  {
-    drive_chooser_type = g_type_register_static_simple (G_TYPE_INTERFACE,
-        "OGMDvdDriveChooser",
-        sizeof (OGMDvdDriveChooserIface),
-        (GClassInitFunc) ogmdvd_drive_chooser_class_init,
-        0, NULL, 0);
-
-    g_type_interface_add_prerequisite (drive_chooser_type, GTK_TYPE_WIDGET);
-  }
-
-  return drive_chooser_type;
-}
+G_DEFINE_INTERFACE (OGMDvdDriveChooser, ogmdvd_drive_chooser, GTK_TYPE_WIDGET);
 
 static void
-ogmdvd_drive_chooser_class_init (gpointer g_iface)
+ogmdvd_drive_chooser_default_init (OGMDvdDriveChooserInterface *iface)
 {
-  GType iface_type = G_TYPE_FROM_INTERFACE (g_iface);
+  GType iface_type = G_TYPE_FROM_INTERFACE (iface);
 
   /**
    * OGMDvdDriveChooser::device-changed:
@@ -66,7 +47,7 @@ ogmdvd_drive_chooser_class_init (gpointer g_iface)
    */
   g_signal_new ("device-changed", iface_type,
       G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
-      G_STRUCT_OFFSET (OGMDvdDriveChooserIface, device_changed), NULL, NULL,
+      G_STRUCT_OFFSET (OGMDvdDriveChooserInterface, device_changed), NULL, NULL,
       ogmdvd_cclosure_marshal_VOID__STRING_UINT, G_TYPE_NONE, 2, G_TYPE_STRING, G_TYPE_UINT);
 }
 

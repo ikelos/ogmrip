@@ -54,24 +54,15 @@ struct _OGMDvdDriveChooserDialogPriv
  * GObject vfuncs
  */
 
-static void ogmdvd_drive_chooser_init (OGMDvdDriveChooserIface  *iface);
+static void ogmdvd_drive_chooser_init (OGMDvdDriveChooserInterface *iface);
 
-/*
- * OGMDvdDriveChooser vfuncs
- */
-
-static gchar * ogmdvd_drive_chooser_dialog_get_device (OGMDvdDriveChooser *chooser,
-                                                       OGMDvdDeviceType   *type);
-
-/*
- * Internal fucntions
- */
-
-static void ogmdvd_drive_chooser_dialog_eject_clicked  (GtkDialog                *dialog);
-static void ogmdvd_drive_chooser_dialog_device_changed (OGMDvdDriveChooserDialog *dialog,
-                                                        const gchar              *device,
-                                                        OGMDvdDeviceType         type,
-                                                        GtkWidget                *chooser);
+static gchar * ogmdvd_drive_chooser_dialog_get_device     (OGMDvdDriveChooser       *chooser,
+                                                           OGMDvdDeviceType         *type);
+static void    ogmdvd_drive_chooser_dialog_eject_clicked  (GtkDialog                *dialog);
+static void    ogmdvd_drive_chooser_dialog_device_changed (OGMDvdDriveChooserDialog *dialog,
+                                                           const gchar              *device,
+                                                           OGMDvdDeviceType         type,
+                                                           GtkWidget                *chooser);
 
 static int signals[LAST_SIGNAL] = { 0 };
 
@@ -100,7 +91,7 @@ ogmdvd_drive_chooser_dialog_class_init (OGMDvdDriveChooserDialogClass *klass)
 }
 
 static void
-ogmdvd_drive_chooser_init (OGMDvdDriveChooserIface  *iface)
+ogmdvd_drive_chooser_init (OGMDvdDriveChooserInterface *iface)
 {
   iface->get_device = ogmdvd_drive_chooser_dialog_get_device;
 }

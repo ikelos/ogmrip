@@ -29,31 +29,12 @@
 
 #include "ogmdvd-title-chooser.h"
 
-static void ogmdvd_title_chooser_class_init (gpointer g_iface);
-
-GType
-ogmdvd_title_chooser_get_type (void)
-{
-  static GType title_chooser_type = 0;
-
-  if (!title_chooser_type)
-  {
-    title_chooser_type = g_type_register_static_simple (G_TYPE_INTERFACE,
-        "OGMDvdTitleChooser",
-        sizeof (OGMDvdTitleChooserIface),
-        (GClassInitFunc) ogmdvd_title_chooser_class_init,
-        0, NULL, 0);
-
-    g_type_interface_add_prerequisite (title_chooser_type, GTK_TYPE_WIDGET);
-  }
-
-  return title_chooser_type;
-}
+G_DEFINE_INTERFACE (OGMDvdTitleChooser, ogmdvd_title_chooser, GTK_TYPE_WIDGET);
 
 static void
-ogmdvd_title_chooser_class_init (gpointer g_iface)
+ogmdvd_title_chooser_default_init (OGMDvdTitleChooserInterface *iface)
 {
-  g_object_interface_install_property (g_iface,
+  g_object_interface_install_property (iface,
       g_param_spec_pointer ("disc", "Disc property", "The DVD disc",
         G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 }

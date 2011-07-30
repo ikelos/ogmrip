@@ -52,16 +52,16 @@ struct _OGMDvdTitleChooserWidgetPriv
   OGMDvdDisc *disc;
 };
 
-static void ogmdvd_title_chooser_init                (OGMDvdTitleChooserIface  *iface);
-static void ogmdvd_title_chooser_widget_dispose      (GObject                  *object);
-static void ogmdvd_title_chooser_widget_get_property (GObject                  *gobject,
-                                                      guint                    property_id,
-                                                      GValue                   *value,
-                                                      GParamSpec               *pspec);
-static void ogmdvd_title_chooser_widget_set_property (GObject                  *gobject,
-                                                      guint                    property_id,
-                                                      const GValue             *value,
-                                                      GParamSpec               *pspec);
+static void ogmdvd_title_chooser_init                (OGMDvdTitleChooserInterface *iface);
+static void ogmdvd_title_chooser_widget_dispose      (GObject                     *object);
+static void ogmdvd_title_chooser_widget_get_property (GObject                     *gobject,
+                                                      guint                       property_id,
+                                                      GValue                      *value,
+                                                      GParamSpec                  *pspec);
+static void ogmdvd_title_chooser_widget_set_property (GObject                     *gobject,
+                                                      guint                       property_id,
+                                                      const GValue                *value,
+                                                      GParamSpec                  *pspec);
 
 
 static void
@@ -193,7 +193,7 @@ ogmdvd_title_chooser_widget_class_init (OGMDvdTitleChooserWidgetClass *klass)
 }
 
 static void
-ogmdvd_title_chooser_init (OGMDvdTitleChooserIface *iface)
+ogmdvd_title_chooser_init (OGMDvdTitleChooserInterface *iface)
 {
   iface->get_active = ogmdvd_title_chooser_widget_get_active;
   iface->set_active = ogmdvd_title_chooser_widget_set_active;

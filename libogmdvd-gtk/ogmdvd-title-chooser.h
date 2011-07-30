@@ -28,12 +28,12 @@ G_BEGIN_DECLS
 #define OGMDVD_TYPE_TITLE_CHOOSER            (ogmdvd_title_chooser_get_type ())
 #define OGMDVD_TITLE_CHOOSER(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMDVD_TYPE_TITLE_CHOOSER, OGMDvdTitleChooser))
 #define OGMDVD_IS_TITLE_CHOOSER(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), OGMDVD_TYPE_TITLE_CHOOSER))
-#define OGMDVD_TITLE_CHOOSER_GET_IFACE(inst) (G_TYPE_INSTANCE_GET_INTERFACE ((inst), OGMDVD_TYPE_TITLE_CHOOSER, OGMDvdTitleChooserIface))
+#define OGMDVD_TITLE_CHOOSER_GET_IFACE(inst) (G_TYPE_INSTANCE_GET_INTERFACE ((inst), OGMDVD_TYPE_TITLE_CHOOSER, OGMDvdTitleChooserInterface))
 
-typedef struct _OGMDvdTitleChooser      OGMDvdTitleChooser;
-typedef struct _OGMDvdTitleChooserIface OGMDvdTitleChooserIface;
+typedef struct _OGMDvdTitleChooser          OGMDvdTitleChooser;
+typedef struct _OGMDvdTitleChooserInterface OGMDvdTitleChooserInterface;
 
-struct _OGMDvdTitleChooserIface
+struct _OGMDvdTitleChooserInterface
 {
   GTypeInterface base_iface;
 
