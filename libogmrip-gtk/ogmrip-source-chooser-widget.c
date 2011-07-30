@@ -42,8 +42,7 @@
 enum
 {
   PROP_0,
-  PROP_TITLE,
-  PROP_SOURCE
+  PROP_TITLE
 };
 
 enum
@@ -84,17 +83,17 @@ static void ogmrip_audio_chooser_widget_set_property    (GObject      *gobject,
                                                          const GValue *value,
                                                          GParamSpec   *pspec);
 static void ogmrip_audio_chooser_widget_changed         (GtkComboBox  *combo);
-static void ogmrip_subp_chooser_widget_dispose      (GObject      *gobject);
-static void ogmrip_subp_chooser_widget_finalize     (GObject      *gobject);
-static void ogmrip_subp_chooser_widget_get_property (GObject      *gobject,
+static void ogmrip_subp_chooser_widget_dispose          (GObject      *gobject);
+static void ogmrip_subp_chooser_widget_finalize         (GObject      *gobject);
+static void ogmrip_subp_chooser_widget_get_property     (GObject      *gobject,
                                                          guint        property_id,
                                                          GValue       *value,
                                                          GParamSpec   *pspec);
-static void ogmrip_subp_chooser_widget_set_property (GObject      *gobject,
+static void ogmrip_subp_chooser_widget_set_property     (GObject      *gobject,
                                                          guint        property_id,
                                                          const GValue *value,
                                                          GParamSpec   *pspec);
-static void ogmrip_subp_chooser_widget_changed      (GtkComboBox  *combo);
+static void ogmrip_subp_chooser_widget_changed          (GtkComboBox  *combo);
 
 /*
  * OGMRipSourceChooser funcs
@@ -116,8 +115,8 @@ static void           ogmrip_source_chooser_widget_select_language (OGMRipSource
 static void     ogmrip_audio_chooser_widget_init             (OGMRipSourceChooserWidget      *chooser);
 static void     ogmrip_audio_chooser_widget_class_init       (OGMRipSourceChooserWidgetClass *klass);
 
-static void     ogmrip_subp_chooser_widget_init          (OGMRipSourceChooserWidget      *chooser);
-static void     ogmrip_subp_chooser_widget_class_init    (OGMRipSourceChooserWidgetClass *klass);
+static void     ogmrip_subp_chooser_widget_init              (OGMRipSourceChooserWidget      *chooser);
+static void     ogmrip_subp_chooser_widget_class_init        (OGMRipSourceChooserWidgetClass *klass);
 
 static void     ogmrip_source_chooser_widget_construct       (OGMRipSourceChooserWidget      *chooser);
 static void     ogmrip_source_chooser_widget_dispose         (OGMRipSourceChooserWidget      *chooser);
@@ -285,7 +284,6 @@ ogmrip_audio_chooser_widget_class_init (OGMRipSourceChooserWidgetClass *klass)
   combo_box_class->changed = ogmrip_audio_chooser_widget_changed;
 
   g_object_class_override_property (object_class, PROP_TITLE, "title");
-  g_object_class_override_property (object_class, PROP_SOURCE, "source");
 
   g_type_class_add_private (klass, sizeof (OGMRipSourceChooserWidgetPriv));
 }
@@ -418,7 +416,6 @@ ogmrip_subp_chooser_widget_class_init (OGMRipSourceChooserWidgetClass *klass)
   combo_box_class->changed = ogmrip_subp_chooser_widget_changed;
 
   g_object_class_override_property (object_class, PROP_TITLE, "title");
-  g_object_class_override_property (object_class, PROP_SOURCE, "source");
 
   g_type_class_add_private (klass, sizeof (OGMRipSourceChooserWidgetPriv));
 }
@@ -502,8 +499,6 @@ ogmrip_subp_chooser_widget_changed (GtkComboBox *combo)
 static void
 ogmrip_source_chooser_init (OGMRipSourceChooserIface *iface)
 {
-  iface->set_title = ogmrip_source_chooser_widget_set_title;
-  iface->get_title = ogmrip_source_chooser_widget_get_title;
   iface->get_active = ogmrip_source_chooser_widget_get_active;
   iface->select_language = ogmrip_source_chooser_widget_select_language;
 }
@@ -552,8 +547,6 @@ ogmrip_source_chooser_widget_get_property (OGMRipSourceChooser *chooser, guint p
     case PROP_TITLE:
       g_value_set_pointer (value, ogmrip_source_chooser_widget_get_title (chooser));
       break;
-    case PROP_SOURCE:
-      g_value_set_pointer (value, ogmrip_source_chooser_widget_get_active (chooser, NULL));
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (chooser, property_id, pspec);
       break;

@@ -56,10 +56,6 @@ ogmrip_source_chooser_class_init (gpointer g_iface)
   g_object_interface_install_property (g_iface,
       g_param_spec_pointer ("title", "Title property", "The DVD title",
         G_PARAM_READWRITE));
-
-  g_object_interface_install_property (g_iface,
-      g_param_spec_pointer ("source", "Source property", "The active source",
-        G_PARAM_READWRITE));
 }
 
 /**
@@ -74,8 +70,7 @@ ogmrip_source_chooser_set_title (OGMRipSourceChooser *chooser, OGMDvdTitle *titl
 {
   g_return_if_fail (OGMRIP_IS_SOURCE_CHOOSER (chooser));
 
-  if (OGMRIP_SOURCE_CHOOSER_GET_IFACE (chooser)->set_title)
-    OGMRIP_SOURCE_CHOOSER_GET_IFACE (chooser)->set_title (chooser, title);
+  g_object_set (chooser, "title", title, NULL);
 }
 
 /**
@@ -89,12 +84,13 @@ ogmrip_source_chooser_set_title (OGMRipSourceChooser *chooser, OGMDvdTitle *titl
 OGMDvdTitle *
 ogmrip_source_chooser_get_title (OGMRipSourceChooser *chooser)
 {
+  OGMDvdTitle *title;
+
   g_return_val_if_fail (OGMRIP_IS_SOURCE_CHOOSER (chooser), NULL);
 
-  if (OGMRIP_SOURCE_CHOOSER_GET_IFACE (chooser)->get_title)
-    return OGMRIP_SOURCE_CHOOSER_GET_IFACE (chooser)->get_title (chooser);
+  g_object_get (chooser, "title", &title, NULL);
 
-  return NULL;
+  return title;
 }
 
 /**

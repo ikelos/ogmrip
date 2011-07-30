@@ -61,10 +61,6 @@ struct _OGMRipSourceChooserIface
 {
   GTypeInterface base_iface;
 
-  void           (* set_title)       (OGMRipSourceChooser *chooser,
-                                      OGMDvdTitle         *title);
-  OGMDvdTitle *  (* get_title)       (OGMRipSourceChooser *chooser);
-
   OGMRipSource * (* get_active)      (OGMRipSourceChooser *chooser,
                                       OGMRipSourceType    *type);
   void           (* select_language) (OGMRipSourceChooser *chooser,

@@ -22,8 +22,6 @@
 
 #include "ogmrip-profile-editor.h"
 
-#include "ogmrip-settings.h"
-
 #include <glib/gi18n.h>
 
 #define OGMRIP_GLADE_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-profile-editor.glade"
