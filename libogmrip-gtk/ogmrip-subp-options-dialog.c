@@ -161,29 +161,7 @@ ogmrip_subp_options_dialog_set_spell_check (OGMRipSubpOptionsDialog *dialog, gbo
 {
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->spell_check), spell_check);
 }
-/*
-void
-ogmrip_subp_options_dialog_set_options (OGMRipSubpOptionsDialog *dialog, OGMRipSubpCodec *codec)
-{
-  g_return_if_fail (OGMRIP_IS_SUBP_OPTIONS_DIALOG (dialog));
-  g_return_if_fail (OGMRIP_IS_SUBP_CODEC (codec));
 
-  gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->newline_combo), ogmrip_subp_codec_get_newline (codec));
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->forced_subs_check), ogmrip_subp_codec_get_forced_only (codec));
-}
-
-void
-ogmrip_subp_options_dialog_get_options (OGMRipSubpOptionsDialog *dialog, OGMRipSubpCodec *codec)
-{
-  g_return_if_fail (OGMRIP_IS_SUBP_OPTIONS_DIALOG (dialog));
-  g_return_if_fail (OGMRIP_IS_SUBP_CODEC (codec));
-
-  ogmrip_subp_codec_set_newline (codec,
-      gtk_combo_box_get_active (GTK_COMBO_BOX (dialog->priv->newline_combo)));
-  ogmrip_subp_codec_set_forced_only (codec,
-      gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (dialog->priv->forced_subs_check)));
-}
-*/
 G_DEFINE_TYPE_WITH_CODE (OGMRipSubpOptionsDialog, ogmrip_subp_options_dialog, GTK_TYPE_DIALOG,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_SUBP_OPTIONS, ogmrip_subp_options_init))
 
