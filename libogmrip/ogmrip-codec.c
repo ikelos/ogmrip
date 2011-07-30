@@ -38,8 +38,6 @@ struct _OGMRipCodecPriv
   OGMDvdTime time_;
   gchar *output;
 
-  gboolean telecine;
-  gboolean progressive;
   gboolean do_unlink;
   gboolean dirty;
 
@@ -59,11 +57,10 @@ enum
   PROP_OUTPUT,
   PROP_LENGTH,
   PROP_START_CHAPTER,
-  PROP_END_CHAPTER,
-  PROP_PROGRESSIVE,
-  PROP_TELECINE
+  PROP_END_CHAPTER
 };
 
+static void ogmrip_codec_constructed  (GObject      *gobject);
 static void ogmrip_codec_dispose      (GObject      *gobject);
 static void ogmrip_codec_finalize     (GObject      *gobject);
 static void ogmrip_codec_set_property (GObject      *gobject,
@@ -103,6 +100,7 @@ ogmrip_codec_class_init (OGMRipCodecClass *klass)
   OGMJobSpawnClass *spawn_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->constructed = ogmrip_codec_constructed;
   gobject_class->dispose = ogmrip_codec_dispose;
   gobject_class->finalize = ogmrip_codec_finalize;
   gobject_class->set_property = ogmrip_codec_set_property;
@@ -131,14 +129,6 @@ ogmrip_codec_class_init (OGMRipCodecClass *klass)
         g_param_spec_int ("end-chapter", "End chapter property", "Set end chapter", 
            -1, G_MAXINT, -1, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
-  g_object_class_install_property (gobject_class, PROP_PROGRESSIVE, 
-        g_param_spec_boolean ("progressive", "Progressive property", "Set progressive", 
-           FALSE, G_PARAM_READWRITE));
-
-  g_object_class_install_property (gobject_class, PROP_TELECINE, 
-        g_param_spec_boolean ("telecine", "Telecine property", "Set telecine", 
-           FALSE, G_PARAM_READWRITE));
-
   g_type_class_add_private (klass, sizeof (OGMRipCodecPriv));
 }
 
@@ -150,6 +140,17 @@ ogmrip_codec_init (OGMRipCodec *codec)
   codec->priv->end_chap = -1;
   codec->priv->play_length = -1.0;
   codec->priv->start_second = -1.0;
+}
+
+static void
+ogmrip_codec_constructed (GObject *gobject)
+{
+  OGMRipCodec *codec = OGMRIP_CODEC (gobject);
+
+  if (!codec->priv->output)
+    codec->priv->output = g_strdup ("/dev/null");
+
+  G_OBJECT_CLASS (ogmrip_codec_parent_class)->constructed (gobject);
 }
 
 static void
@@ -204,12 +205,6 @@ ogmrip_codec_set_property (GObject *gobject, guint property_id, const GValue *va
     case PROP_END_CHAPTER: 
       ogmrip_codec_set_chapters (codec, codec->priv->start_chap, g_value_get_int (value));
       break;
-    case PROP_PROGRESSIVE: 
-      ogmrip_codec_set_progressive (codec, g_value_get_boolean (value));
-      break;
-    case PROP_TELECINE: 
-      ogmrip_codec_set_telecine (codec, g_value_get_boolean (value));
-      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
@@ -239,12 +234,6 @@ ogmrip_codec_get_property (GObject *gobject, guint property_id, GValue *value, G
       break;
     case PROP_END_CHAPTER: 
       g_value_set_int (value, codec->priv->end_chap);
-      break;
-    case PROP_PROGRESSIVE: 
-      g_value_set_boolean (value, codec->priv->progressive);
-      break;
-    case PROP_TELECINE: 
-      g_value_set_boolean (value, codec->priv->telecine);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -293,6 +282,8 @@ ogmrip_codec_set_output (OGMRipCodec *codec, const gchar *output)
 
   g_free (codec->priv->output);
   codec->priv->output = g_strdup (output);
+
+  g_object_notify (G_OBJECT (codec), "output");
 }
 
 /**
@@ -309,88 +300,6 @@ ogmrip_codec_get_input (OGMRipCodec *codec)
   g_return_val_if_fail (OGMRIP_IS_CODEC (codec), NULL);
 
   return codec->priv->input;
-}
-
-/**
- * ogmrip_codec_set_profile:
- * @codec: An #OGMRipCodec
- * @profile: An #OGMRipProfile
- *
- * Sets codec specific options from the specified profile.
- */
-void
-ogmrip_codec_set_profile (OGMRipCodec *codec, OGMRipProfile *profile)
-{
-  OGMRipCodecClass *klass;
-
-  g_return_if_fail (OGMRIP_IS_CODEC (codec));
-  g_return_if_fail (G_IS_SETTINGS (profile));
-
-  klass = OGMRIP_CODEC_GET_CLASS (codec);
-  if (klass->set_profile)
-    (* klass->set_profile) (codec, profile);
-}
-
-/**
- * ogmrip_codec_set_progressive:
- * @codec: an #OGMRipCodec
- * @progressive: %TRUE to inverse progressive
- *
- * Sets whether an inverse progressive filter will be applied
- */
-void
-ogmrip_codec_set_progressive (OGMRipCodec *codec, gboolean progressive)
-{
-  g_return_if_fail (OGMRIP_IS_CODEC (codec));
-
-  codec->priv->progressive = progressive;
-}
-
-/**
- * ogmrip_codec_get_progressive:
- * @codec: an #OGMRipCodec
- *
- * Gets whether an inverse progressive filter will be applied
- *
- * Returns: %TRUE if inverse progressive
- */
-gboolean
-ogmrip_codec_get_progressive (OGMRipCodec *codec)
-{
-  g_return_val_if_fail (OGMRIP_IS_CODEC (codec), FALSE);
-
-  return codec->priv->progressive;
-}
-
-/**
- * ogmrip_codec_set_telecine:
- * @codec: an #OGMRipCodec
- * @telecine: %TRUE to inverse telecine
- *
- * Sets whether an inverse telecine filter will be applied
- */
-void
-ogmrip_codec_set_telecine (OGMRipCodec *codec, gboolean telecine)
-{
-  g_return_if_fail (OGMRIP_IS_CODEC (codec));
-
-  codec->priv->telecine = telecine;
-}
-
-/**
- * ogmrip_codec_get_telecine:
- * @codec: an #OGMRipCodec
- *
- * Gets whether an inverse telecine filter will be applied
- *
- * Returns: %TRUE if inverse telecine
- */
-gboolean
-ogmrip_codec_get_telecine (OGMRipCodec *codec)
-{
-  g_return_val_if_fail (OGMRIP_IS_CODEC (codec), FALSE);
-
-  return codec->priv->telecine;
 }
 
 /**
@@ -503,39 +412,6 @@ ogmrip_codec_get_length (OGMRipCodec *codec, OGMDvdTime *length)
     *length = codec->priv->time_;
 
   return codec->priv->length;
-}
-
-/**
- * ogmrip_codec_set_unlink_on_unref:
- * @codec: an #OGMRipCodec
- * @do_unlink: %TRUE to unlink the output file
- *
- * Whether to unlink the output file on the final unref of the #OGMRipCodec
- * data structure.
- */
-void
-ogmrip_codec_set_unlink_on_unref (OGMRipCodec *codec, gboolean do_unlink)
-{
-  g_return_if_fail (OGMRIP_IS_CODEC (codec));
-
-  codec->priv->do_unlink = do_unlink;
-}
-
-/**
- * ogmrip_codec_get_unlink_on_unref:
- * @codec: an #OGMRipCodec
- *
- * Returns whether the output file will be unlinked on the final unref of
- * @codec.
- *
- * Returns: a boolean
- */
-gboolean
-ogmrip_codec_get_unlink_on_unref (OGMRipCodec *codec)
-{
-  g_return_val_if_fail (OGMRIP_IS_CODEC (codec), FALSE);
-
-  return codec->priv->do_unlink;
 }
 
 /**

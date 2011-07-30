@@ -43,7 +43,7 @@ struct _OGMRipEncodingManagerPriv
 };
 
 static void ogmrip_encoding_manager_dispose (GObject *gobject);
-
+/*
 static gint
 ogmrip_encoding_encoding_compare_title_set (OGMRipEncoding *encoding1, OGMRipEncoding *encoding2)
 {
@@ -77,7 +77,7 @@ ogmrip_encoding_encoding_compare_title_set (OGMRipEncoding *encoding1, OGMRipEnc
 
   return strcmp (id1, id2);
 }
-
+*/
 G_DEFINE_TYPE (OGMRipEncodingManager, ogmrip_encoding_manager, G_TYPE_OBJECT)
 
 static void
@@ -113,7 +113,7 @@ ogmrip_encoding_manager_dispose (GObject *gobject)
 
   (*G_OBJECT_CLASS (ogmrip_encoding_manager_parent_class)->dispose) (gobject);
 }
-
+/*
 static gboolean
 ogmrip_encoding_manager_check_cleanup (OGMRipEncodingManager *manager, OGMRipEncoding *encoding)
 {
@@ -132,7 +132,7 @@ ogmrip_encoding_manager_check_cleanup (OGMRipEncodingManager *manager, OGMRipEnc
 
   return FALSE;
 }
-
+*/
 /**
  * ogmrip_encoding_manager_new:
  *
@@ -158,14 +158,15 @@ ogmrip_encoding_manager_new (void)
 gint
 ogmrip_encoding_manager_run (OGMRipEncodingManager *manager, GError **error)
 {
+/*
   OGMRipEncoding *encoding = NULL;
   GList *link;
-
+*/
   gint result = OGMJOB_RESULT_ERROR;
 
   g_return_val_if_fail (manager != NULL, FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-
+/*
   for (link = manager->priv->encodings; link; link = link->next)
   {
     encoding = link->data;
@@ -178,7 +179,7 @@ ogmrip_encoding_manager_run (OGMRipEncodingManager *manager, GError **error)
 
   while (manager->priv->extract_link)
   {
-    /* backup as many titles as possible */
+    /?* backup as many titles as possible *?/
     while (manager->priv->backup_link)
     {
       encoding = manager->priv->backup_link->data;
@@ -187,10 +188,10 @@ ogmrip_encoding_manager_run (OGMRipEncodingManager *manager, GError **error)
       {
         result = ogmrip_encoding_backup (encoding, error);
 
-        /* stop backuping when there is not enough disk space */
+        /?* stop backuping when there is not enough disk space *?/
         if (result == OGMJOB_RESULT_ERROR && g_error_matches (*error, OGMRIP_ENCODING_ERROR, OGMRIP_ENCODING_ERROR_SIZE))
         {
-          /* at least one title has been backuped */
+          /?* at least one title has been backuped *?/
           if (manager->priv->backup_link != manager->priv->extract_link)
           {
             g_clear_error (error);
@@ -207,12 +208,12 @@ ogmrip_encoding_manager_run (OGMRipEncodingManager *manager, GError **error)
 
     encoding = manager->priv->extract_link->data;
 
-    /* extract the title */
+    /?* extract the title *?/
     result = ogmrip_encoding_extract (encoding, error);
     if (result != OGMJOB_RESULT_SUCCESS)
       goto cleanup;
 
-    /* cleanup the copy if it's not needed anymore */
+    /?* cleanup the copy if it's not needed anymore *?/
     if (ogmrip_encoding_manager_check_cleanup (manager, encoding))
       ogmrip_encoding_cleanup (encoding);
 
@@ -222,7 +223,7 @@ ogmrip_encoding_manager_run (OGMRipEncodingManager *manager, GError **error)
 cleanup:
   if (encoding && result != OGMJOB_RESULT_SUCCESS)
     ogmrip_encoding_cleanup (encoding);
- 
+*/ 
   return result;
 }
 
@@ -264,6 +265,7 @@ ogmrip_encoding_manager_add (OGMRipEncodingManager *manager, OGMRipEncoding *enc
     manager->priv->encodings = item;
   else
   {
+/*
     GList *list, *link;
 
     list = manager->priv->backup_link ? manager->priv->backup_link : manager->priv->extract_link ? manager->priv->extract_link : manager->priv->encodings;
@@ -284,6 +286,7 @@ ogmrip_encoding_manager_add (OGMRipEncodingManager *manager, OGMRipEncoding *enc
     if (link->next)
       link->next->prev = item;
     link->next = item;
+*/
   }
 }
 
@@ -319,9 +322,10 @@ ogmrip_encoding_manager_remove (OGMRipEncodingManager *manager, OGMRipEncoding *
   {
     if (link != manager->priv->extract_link && link != manager->priv->backup_link)
     {
+/*
       if (backup_found && !extract_found)
         ogmrip_encoding_cleanup (OGMRIP_ENCODING (link->data));
-
+*/
       if (link == manager->priv->encodings)
         manager->priv->encodings = link->next;
 

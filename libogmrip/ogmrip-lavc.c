@@ -95,19 +95,17 @@ struct _OGMRipLavcPriv
   guint strict;
 };
 
-static void ogmrip_lavc_get_property (GObject           *gobject,
-                                      guint             property_id,
-                                      GValue            *value,
-                                      GParamSpec        *pspec);
-static void ogmrip_lavc_set_property (GObject           *gobject,
-                                      guint             property_id,
-                                      const GValue      *value,
-                                      GParamSpec        *pspec);
-static gint ogmrip_lavc_run          (OGMJobSpawn       *spawn);
-static void ogmrip_lavc_set_quality  (OGMRipVideoCodec  *video,
-                                      OGMRipQualityType quality);
-static void ogmrip_lavc_set_profile  (OGMRipCodec       *codec,
-                                      OGMRipProfile     *profile);
+static void ogmrip_lavc_get_property (GObject      *gobject,
+                                      guint        property_id,
+                                      GValue       *value,
+                                      GParamSpec   *pspec);
+static void ogmrip_lavc_set_property (GObject      *gobject,
+                                      guint        property_id,
+                                      const GValue *value,
+                                      GParamSpec   *pspec);
+static void ogmrip_lavc_notify       (GObject      *object,
+                                      GParamSpec   *pspec);
+static gint ogmrip_lavc_run          (OGMJobSpawn  *spawn);
 
 static const gchar * const properties[] =
 {
@@ -147,7 +145,7 @@ ogmrip_lavc_get_quantizer (OGMRipVideoCodec *video)
   return CLAMP (quantizer, 2, 31);
 }
 
-static G_CONST_RETURN gchar *
+static const gchar *
 ogmrip_lavc_get_codec (OGMRipLavc *lavc)
 {
   OGMRipLavcClass *klass;
@@ -235,9 +233,9 @@ ogmrip_lavc_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
 
   if (lavc->priv->header != 0)
     g_string_append_printf (options, ":vglobal=%d", lavc->priv->header);
-
+/*
   g_string_append_printf (options, ":vmax_b_frames=%d", ogmrip_video_codec_get_max_b_frames (video));
-
+*/
   bitrate = ogmrip_video_codec_get_bitrate (video);
   if (bitrate > 0)
     g_string_append_printf (options, ":vbitrate=%u", bitrate);
@@ -289,21 +287,14 @@ ogmrip_lavc_class_init (OGMRipLavcClass *klass)
 {
   GObjectClass *gobject_class;
   OGMJobSpawnClass *spawn_class;
-  OGMRipVideoCodecClass *video_class;
-  OGMRipCodecClass *codec_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->get_property = ogmrip_lavc_get_property;
   gobject_class->set_property = ogmrip_lavc_set_property;
+  gobject_class->notify = ogmrip_lavc_notify;
 
   spawn_class = OGMJOB_SPAWN_CLASS (klass);
   spawn_class->run = ogmrip_lavc_run;
-
-  video_class = OGMRIP_VIDEO_CODEC_CLASS (klass);
-  video_class->set_quality = ogmrip_lavc_set_quality;
-
-  codec_class = OGMRIP_CODEC_CLASS (klass);
-  codec_class->set_profile = ogmrip_lavc_set_profile;
 
   g_object_class_install_property (gobject_class, PROP_HEADER,
       g_param_spec_uint (OGMRIP_LAVC_PROP_HEADER,
@@ -576,6 +567,60 @@ ogmrip_lavc_set_property (GObject *gobject, guint property_id, const GValue *val
   }
 }
 
+static void
+ogmrip_lavc_set_quality (OGMRipLavc *lavc, OGMRipQualityType quality)
+{
+  ogmrip_lavc_init (lavc);
+
+  switch (quality)
+  {
+    case OGMRIP_QUALITY_EXTREME:
+      // ogmrip_video_codec_set_max_b_frames (video, 2);
+      lavc->priv->mbd = 2;
+      lavc->priv->vb_strategy = 1;
+      lavc->priv->last_pred = 3;
+      lavc->priv->preme = 2;
+      lavc->priv->qns = 2;
+      lavc->priv->vqcomp = 0.5;
+      lavc->priv->mv0 = TRUE;
+      break;
+    case OGMRIP_QUALITY_HIGH:
+      // ogmrip_video_codec_set_max_b_frames (video, 2);
+      lavc->priv->mbd = 2;
+      lavc->priv->vb_strategy = 1;
+      lavc->priv->last_pred = 2;
+      lavc->priv->preme = 1;
+      lavc->priv->qns = 0;
+      lavc->priv->vqcomp = 0.6;
+      lavc->priv->mv0 = FALSE;
+      break;
+    case OGMRIP_QUALITY_NORMAL:
+      // ogmrip_video_codec_set_max_b_frames (video, 0);
+      lavc->priv->mbd = 2;
+      lavc->priv->vb_strategy = 0;
+      lavc->priv->last_pred = 0;
+      lavc->priv->preme = 1;
+      lavc->priv->qns = 0;
+      lavc->priv->vqcomp = 0.5;
+      lavc->priv->mv0 = FALSE;
+      break;
+    case OGMRIP_QUALITY_USER:
+      break;
+  }
+}
+
+static void
+ogmrip_lavc_notify (GObject *object, GParamSpec *pspec)
+{
+  if (g_str_equal (pspec->name, "quality"))
+  {
+    OGMRipQualityType quality;
+
+    g_object_get (object, "quality", &quality, NULL);
+    ogmrip_lavc_set_quality (OGMRIP_LAVC (object), quality);
+  }
+}
+
 static gint
 ogmrip_lavc_run (OGMJobSpawn *spawn)
 {
@@ -613,72 +658,6 @@ ogmrip_lavc_run (OGMJobSpawn *spawn)
   g_free (log_file);
 
   return result;
-}
-
-static void
-ogmrip_lavc_set_quality (OGMRipVideoCodec *video, OGMRipQualityType quality)
-{
-  OGMRipLavc *lavc = OGMRIP_LAVC (video);
-
-  ogmrip_lavc_init (lavc);
-
-  switch (quality)
-  {
-    case OGMRIP_QUALITY_EXTREME:
-      ogmrip_video_codec_set_max_b_frames (video, 2);
-      lavc->priv->mbd = 2;
-      lavc->priv->vb_strategy = 1;
-      lavc->priv->last_pred = 3;
-      lavc->priv->preme = 2;
-      lavc->priv->qns = 2;
-      lavc->priv->vqcomp = 0.5;
-      lavc->priv->mv0 = TRUE;
-      break;
-    case OGMRIP_QUALITY_HIGH:
-      ogmrip_video_codec_set_max_b_frames (video, 2);
-      lavc->priv->mbd = 2;
-      lavc->priv->vb_strategy = 1;
-      lavc->priv->last_pred = 2;
-      lavc->priv->preme = 1;
-      lavc->priv->qns = 0;
-      lavc->priv->vqcomp = 0.6;
-      lavc->priv->mv0 = FALSE;
-      break;
-    case OGMRIP_QUALITY_NORMAL:
-      ogmrip_video_codec_set_max_b_frames (video, 0);
-      lavc->priv->mbd = 2;
-      lavc->priv->vb_strategy = 0;
-      lavc->priv->last_pred = 0;
-      lavc->priv->preme = 1;
-      lavc->priv->qns = 0;
-      lavc->priv->vqcomp = 0.5;
-      lavc->priv->mv0 = FALSE;
-      break;
-    case OGMRIP_QUALITY_USER:
-      break;
-  }
-}
-
-static void
-ogmrip_lavc_set_profile (OGMRipCodec *codec, OGMRipProfile *profile)
-{
-/*
-  OGMRipSettings *settings;
-
-  settings = ogmrip_settings_get_default ();
-  if (settings)
-  {
-    gchar *key;
-    guint i;
-
-    for (i = 0; properties[i]; i++)
-    {
-      key = ogmrip_settings_build_section (settings, OGMRIP_LAVC_SECTION, properties[i], NULL);
-      ogmrip_settings_set_property_from_key (settings, G_OBJECT (codec), properties[i], section, key);
-      g_free (key);
-    }
-  }
-*/
 }
 
 /**

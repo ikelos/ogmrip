@@ -167,6 +167,8 @@ ogmrip_subp_codec_set_forced_only (OGMRipSubpCodec *subp, gboolean forced_only)
   g_return_if_fail (OGMRIP_IS_SUBP_CODEC (subp));
 
   subp->priv->forced_only = forced_only;
+
+  g_object_notify (G_OBJECT (subp), "forced-only");
 }
 
 /**
@@ -198,6 +200,8 @@ ogmrip_subp_codec_set_charset (OGMRipSubpCodec *subp, OGMRipCharset charset)
   g_return_if_fail (OGMRIP_IS_SUBP_CODEC (subp));
 
   subp->priv->charset = charset;
+
+  g_object_notify (G_OBJECT (subp), "charset");
 }
 
 /**
@@ -229,6 +233,8 @@ ogmrip_subp_codec_set_newline (OGMRipSubpCodec *subp, OGMRipNewline newline)
   g_return_if_fail (OGMRIP_IS_SUBP_CODEC (subp));
 
   subp->priv->newline = newline;
+
+  g_object_notify (G_OBJECT (subp), "newline");
 }
 
 /**

@@ -46,10 +46,6 @@ struct _OGMRipCodec
 struct _OGMRipCodecClass
 {
   OGMJobBinClass parent_class;
-
-  /* vtable */
-  void (* set_profile) (OGMRipCodec   *codec,
-                        OGMRipProfile *profile);
 };
 
 GType          ogmrip_codec_get_type           (void);
@@ -57,16 +53,8 @@ OGMDvdStream * ogmrip_codec_get_input          (OGMRipCodec   *codec);
 const gchar *  ogmrip_codec_get_output         (OGMRipCodec   *codec);
 void           ogmrip_codec_set_output         (OGMRipCodec   *codec,
                                                 const gchar   *output);
-void           ogmrip_codec_set_profile        (OGMRipCodec   *codec,
-                                                OGMRipProfile *profile);
 gdouble        ogmrip_codec_get_length         (OGMRipCodec   *codec,
                                                 OGMDvdTime    *length);
-void           ogmrip_codec_set_telecine       (OGMRipCodec   *codec,
-                                                gboolean      telecine);
-gboolean       ogmrip_codec_get_telecine       (OGMRipCodec   *codec);
-void           ogmrip_codec_set_progressive    (OGMRipCodec   *codec,
-                                                gboolean      progressive);
-gboolean       ogmrip_codec_get_progressive    (OGMRipCodec   *codec);
 void           ogmrip_codec_get_chapters       (OGMRipCodec   *codec,
                                                 guint         *start,
                                                 guint         *end);

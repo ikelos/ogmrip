@@ -367,7 +367,7 @@ ogmrip_plugin_find_codec_by_type (GSList *list, GType type)
   return NULL;
 }
 
-static G_CONST_RETURN gchar *
+static const gchar *
 ogmrip_plugin_get_codec_name (GSList *list, GType type)
 {
   OGMRipPlugin *plugin;
@@ -542,7 +542,7 @@ ogmrip_plugin_get_container_index (GType container)
  *
  * Returns: The name of the container, or NULL 
  */
-G_CONST_RETURN gchar *
+const gchar *
 ogmrip_plugin_get_container_name (GType container)
 {
   OGMRipContainerPlugin *plugin;
@@ -740,7 +740,7 @@ ogmrip_plugin_get_video_codec_index (GType codec)
  *
  * Returns: The name of the video codec, or NULL 
  */
-G_CONST_RETURN gchar *
+const gchar *
 ogmrip_plugin_get_video_codec_name (GType codec)
 {
   g_return_val_if_fail (g_type_is_a (codec, OGMRIP_TYPE_VIDEO_CODEC), NULL);
@@ -926,7 +926,7 @@ ogmrip_plugin_get_audio_codec_index (GType codec)
  *
  * Returns: The name of the audio codec, or NULL 
  */
-G_CONST_RETURN gchar *
+const gchar *
 ogmrip_plugin_get_audio_codec_name (GType codec)
 {
   g_return_val_if_fail (g_type_is_a (codec, OGMRIP_TYPE_AUDIO_CODEC), NULL);
@@ -1070,7 +1070,7 @@ ogmrip_plugin_get_subp_codec_index (GType codec)
  *
  * Returns: The name of the subtitle codec, or NULL 
  */
-G_CONST_RETURN gchar *
+const gchar *
 ogmrip_plugin_get_subp_codec_name (GType codec)
 {
   g_return_val_if_fail (g_type_is_a (codec, OGMRIP_TYPE_SUBP_CODEC), NULL);

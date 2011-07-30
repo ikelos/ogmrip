@@ -88,7 +88,7 @@ ogmrip_mplayer_get_output_fps (OGMRipCodec *codec, OGMDvdTitle *title)
   stream = ogmdvd_title_get_video_stream (title);
   ogmdvd_video_stream_get_framerate (stream, &num1, &denom1);
 
-  if (ogmrip_codec_get_telecine (codec) || ogmrip_codec_get_progressive (codec))
+  if (ogmdvd_title_get_telecine (title) || ogmdvd_title_get_progressive (title))
   {
     num2 = 24000;
     denom2 = 1001;
@@ -196,17 +196,20 @@ ogmrip_mplayer_set_deint (OGMRipVideoCodec *video, GPtrArray *argv, GString *opt
 }
 
 static gint
-ogmrip_mplayer_audio_file_get_demuxer (OGMRipAudioFile *audio)
+ogmrip_mplayer_audio_file_get_demuxer (OGMRipFormatType format)
 {
-  gint demuxer = OGMRIP_AUDIO_DEMUXER_AUTO;
+  gint demuxer;
 
-  switch (ogmrip_file_get_format (OGMRIP_FILE (audio)))
+  switch (format)
   {
     case OGMRIP_FORMAT_AC3:
       demuxer = OGMRIP_AUDIO_DEMUXER_AC3;
       break;
     case OGMRIP_FORMAT_DTS:
       demuxer = OGMRIP_AUDIO_DEMUXER_DTS;
+      break;
+    default:
+      demuxer = OGMRIP_AUDIO_DEMUXER_AUTO;
       break;
   }
 
@@ -666,7 +669,7 @@ ogmrip_mencoder_video_command (OGMRipVideoCodec *video, const gchar *output, gui
       g_string_append (pp, "dr");
     }
 
-    if (ogmrip_codec_get_telecine (OGMRIP_CODEC (video)))
+    if (ogmdvd_title_get_telecine (ogmdvd_stream_get_title (stream)))
     {
       if (options->len > 0)
         g_string_append_c (options, ',');
@@ -697,7 +700,8 @@ ogmrip_mencoder_video_command (OGMRipVideoCodec *video, const gchar *output, gui
         g_string_append_c (options, ',');
       g_string_append_printf (options, "scale=%u:%u", scale_width, scale_height);
 
-      if (ogmrip_video_codec_is_interlaced (video) > 0 && ogmrip_video_codec_get_deinterlacer (video) == OGMRIP_DEINT_NONE)
+      if (ogmdvd_title_get_interlaced (ogmdvd_stream_get_title (stream)) &&
+          ogmrip_video_codec_get_deinterlacer (video) == OGMRIP_DEINT_NONE)
         g_string_append (options, ":1");
     }
 
@@ -896,7 +900,7 @@ ogmrip_mplayer_video_command (OGMRipVideoCodec *video, const gchar *output)
       g_string_append (pp, "dr");
     }
 
-    if (ogmrip_codec_get_telecine (OGMRIP_CODEC (video)))
+    if (ogmdvd_title_get_telecine (ogmdvd_stream_get_title (stream)))
     {
       if (options->len > 0)
         g_string_append_c (options, ',');
@@ -927,7 +931,8 @@ ogmrip_mplayer_video_command (OGMRipVideoCodec *video, const gchar *output)
         g_string_append_c (options, ',');
       g_string_append_printf (options, "scale=%u:%u", scale_width, scale_height);
 
-      if (ogmrip_video_codec_is_interlaced (video) > 0 && ogmrip_video_codec_get_deinterlacer (video) == OGMRIP_DEINT_NONE)
+      if (ogmdvd_title_get_interlaced (ogmdvd_stream_get_title (stream)) &&
+          ogmrip_video_codec_get_deinterlacer (video) == OGMRIP_DEINT_NONE)
         g_string_append (options, ":1");
     }
 
@@ -1180,52 +1185,41 @@ ogmrip_mencoder_container_append_audio_file (OGMRipContainer *container,
 }
 
 static void
-ogmrip_mencoder_container_foreach_audio (OGMRipContainer *container, 
-    OGMRipCodec *codec, guint demuxer, gint language, GPtrArray *argv)
+ogmrip_mencoder_container_foreach_file (OGMRipContainer *container,
+    const gchar *filename, OGMRipFormatType format, const gchar *name, guint lang, GPtrArray *argv)
 {
-  ogmrip_mencoder_container_append_audio_file (container,
-      ogmrip_codec_get_output (codec), demuxer,
-      ogmrip_plugin_get_audio_codec_format (G_OBJECT_TYPE (codec)), language, argv);
-}
-
-static void
-ogmrip_mencoder_container_foreach_file (OGMRipContainer *container, OGMRipFile *file, GPtrArray *argv)
-{
-  gchar *filename;
-
-  filename = ogmrip_file_get_filename (file);
-  if (filename)
+  /*
+   * TODO check audio format
+   */
+/*
+  if (ogmrip_file_get_type (file) == OGMRIP_FILE_TYPE_AUDIO)
   {
-    if (ogmrip_file_get_type (file) == OGMRIP_FILE_TYPE_AUDIO)
+*/
+    gint demuxer;
+
+    demuxer = ogmrip_mplayer_audio_file_get_demuxer (format);
+
+    if (format == OGMRIP_FORMAT_AAC && !g_str_has_suffix (filename, ".aac"))
     {
-      gint demuxer, format;
+      gchar *s1, *s2;
 
-      format = ogmrip_file_get_format (file);
-      if (format == OGMRIP_FORMAT_AAC && !g_str_has_suffix (filename, ".aac"))
-      {
-        gchar *s1, *s2;
+      s1 = g_path_get_basename (filename);
+      s2 = g_build_filename (g_get_tmp_dir (), s1, NULL);
+      g_free (s1);
 
-        s1 = g_path_get_basename (filename);
-        s2 = g_build_filename (g_get_tmp_dir (), s1, NULL);
-        g_free (s1);
+      s1 = g_strconcat (s2, ".aac", NULL);
+      g_free (s2);
 
-        s1 = g_strconcat (s2, ".aac", NULL);
-        g_free (s2);
+      if (symlink (filename, s1) < 0)
+        ogmrip_mencoder_container_append_audio_file (container, filename, demuxer, format, lang, argv);
+      else
+        ogmrip_mencoder_container_append_audio_file (container, s1, demuxer, format, lang, argv);
 
-        if (symlink (filename, s1) < 0)
-          g_free (s1);
-        else
-        {
-          g_free (filename);
-          filename = s1;
-        }
-      }
-
-      demuxer = ogmrip_mplayer_audio_file_get_demuxer (OGMRIP_AUDIO_FILE (file));
-      ogmrip_mencoder_container_append_audio_file (container, filename, demuxer, format, -1, argv);
+      g_free (s1);
     }
+/*
   }
-  g_free (filename);
+*/
 }
 
 /**
@@ -1281,10 +1275,8 @@ ogmrip_mencoder_container_command (OGMRipContainer *container)
     }
   }
 
-  ogmrip_container_foreach_audio (container, 
-      (OGMRipContainerCodecFunc) ogmrip_mencoder_container_foreach_audio, argv);
   ogmrip_container_foreach_file (container, 
-      (OGMRipContainerFileFunc) ogmrip_mencoder_container_foreach_file, argv);
+      (OGMRipContainerFunc) ogmrip_mencoder_container_foreach_file, argv);
 
   return argv;
 }

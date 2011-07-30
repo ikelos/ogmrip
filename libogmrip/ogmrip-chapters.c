@@ -203,7 +203,7 @@ ogmrip_chapters_set_label (OGMRipChapters *chapters, guint n, const gchar *label
  *
  * Returns: The label
  */
-G_CONST_RETURN gchar *
+const gchar *
 ogmrip_chapters_get_label (OGMRipChapters *chapters, guint n)
 {
   g_return_val_if_fail (OGMRIP_IS_CHAPTERS (chapters), NULL);

@@ -51,7 +51,7 @@ static gchar *ogmrip_tmp_dir = NULL;
  * 
  * Returns: The temporaty directory
  */
-G_CONST_RETURN gchar *
+const gchar *
 ogmrip_fs_get_tmp_dir (void)
 {
   if (!ogmrip_tmp_dir)
@@ -618,7 +618,7 @@ ogmrip_fs_rename (const gchar *old_name, const gchar *new_name, GError **error)
  * 
  * Returns: The extension, or NULL
  */
-G_CONST_RETURN gchar *
+const gchar *
 ogmrip_fs_get_extension (const gchar *filename)
 {
   gchar *dot;

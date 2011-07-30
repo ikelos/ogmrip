@@ -38,9 +38,6 @@
 #define ROUND(x) ((gint) ((x) + 0.5) != (gint) (x) ? ((gint) ((x) + 0.5)) : ((gint) (x)))
 #define FLOOR(x) ((gint) (x))
 
-#define CROP_FRAMES    100
-#define ANALYZE_FRAMES 500
-
 struct _OGMRipVideoCodecPriv
 {
   gdouble bpp;
@@ -61,7 +58,6 @@ struct _OGMRipVideoCodecPriv
   guint min_height;
   guint aspect_num;
   guint aspect_denom;
-  guint max_b_frames;
   gboolean denoise;
   gboolean deblock;
   gboolean dering;
@@ -74,47 +70,7 @@ struct _OGMRipVideoCodecPriv
   OGMRipScalerType scaler;
   OGMRipDeintType deint;
 
-  OGMJobSpawn *child;
-  gboolean child_canceled;
   gboolean forced_subs;
-  gint interlaced;
-};
-
-typedef struct
-{
-  gint val;
-  gint ref;
-} UInfo;
-
-typedef struct
-{
-  guint nframes;
-  guint frames;
-  GSList *x;
-  GSList *y;
-  GSList *w;
-  GSList *h;
-} OGMRipCrop;
-
-typedef struct
-{
-  gchar *cur_affinity;
-  gchar* prev_affinity;
-  guint naffinities;
-  guint cur_duration;
-  guint prev_duration;
-  guint npatterns;
-  guint cur_section;
-  guint nsections;
-  guint nframes;
-  guint frames;
-} OGMRipAnalyze;
-
-enum
-{
-  SECTION_UNKNOWN,
-  SECTION_24000_1001,
-  SECTION_30000_1001
 };
 
 enum 
@@ -128,9 +84,11 @@ enum
   PROP_THREADS,
   PROP_TURBO,
   PROP_DENOISE,
-  PROP_BFRAMES,
   PROP_DEBLOCK,
-  PROP_DERING
+  PROP_DERING,
+  PROP_SCALER,
+  PROP_DEINT,
+  PROP_QUALITY
 };
 
 static void ogmrip_video_codec_dispose      (GObject      *gobject);
@@ -142,338 +100,6 @@ static void ogmrip_video_codec_get_property (GObject      *gobject,
                                              guint        property_id,
                                              GValue       *value,
                                              GParamSpec   *pspec);
-static void ogmrip_video_codec_cancel       (OGMJobSpawn  *spawn);
-
-static const gchar *deinterlacer[] = { "lb", "li", "ci", "md", "fd", "l5", "kerndeint", "yadif=0" };
-
-static gint
-g_ulist_compare (UInfo *info, gint val)
-{
-  return info->val - val;
-}
-
-static gint
-g_ulist_min (UInfo *info1, UInfo *info2)
-{
-  return info2->val - info1->val;
-}
-
-static gint
-g_ulist_max (UInfo *info1, UInfo *info2)
-{
-  return info1->val - info2->val;
-}
-
-static GSList *
-g_ulist_add (GSList *ulist, GCompareFunc func, gint val)
-{
-  GSList *ulink;
-  UInfo *info;
-
-  ulink = g_slist_find_custom (ulist, GINT_TO_POINTER (val), (GCompareFunc) g_ulist_compare);
-  if (ulink)
-  {
-    info = ulink->data;
-    info->ref ++;
-  }
-  else
-  {
-    info = g_new0 (UInfo, 1);
-    info->val = val;
-    info->ref = 1;
-
-    ulist = g_slist_insert_sorted (ulist, info, func);
-  }
-
-  return ulist;
-}
-
-static gint
-g_ulist_get_most_frequent (GSList *ulist)
-{
-  GSList *ulink;
-  UInfo *info, *umax;
-
-  if (!ulist)
-    return 0;
-
-  umax = ulist->data;
-
-  for (ulink = ulist; ulink; ulink = ulink->next)
-  {
-    info = ulink->data;
-
-    if (info->ref > umax->ref)
-      umax = info;
-  }
-
-  return umax->val;
-}
-
-static void
-g_ulist_free (GSList *ulist)
-{
-  g_slist_foreach (ulist, (GFunc) g_free, NULL);
-  g_slist_free (ulist);
-}
-
-static gdouble
-ogmrip_video_codec_crop_watch (OGMJobExec *exec, const gchar *buffer, OGMRipCrop *info)
-{
-  gchar *str;
-
-  static guint frame = 0;
-
-  str = strstr (buffer, "-vf crop=");
-  if (str)
-  {
-    gint x, y, w, h;
-
-    if (sscanf (str, "-vf crop=%d:%d:%d:%d", &w, &h, &x, &y) == 4)
-    {
-      if (w > 0)
-        info->w = g_ulist_add (info->w, (GCompareFunc) g_ulist_min, w);
-      if (h > 0)
-        info->h = g_ulist_add (info->h, (GCompareFunc) g_ulist_min, h);
-      if (x > 0)
-        info->x = g_ulist_add (info->x, (GCompareFunc) g_ulist_max, x);
-      if (y > 0)
-        info->y = g_ulist_add (info->y, (GCompareFunc) g_ulist_max, y);
-    }
-
-    frame ++;
-    if (frame == info->nframes - 2)
-    {
-      frame = 0;
-      return 1.0;
-    }
-
-    return frame / (gdouble) (info->nframes - 2);
-  }
-  else
-  {
-    gdouble d;
-
-    if (sscanf (buffer, "V: %lf", &d))
-    {
-      info->frames ++;
-
-      if (info->frames >= CROP_FRAMES)
-        ogmjob_spawn_cancel (OGMJOB_SPAWN (exec));
-    }
-  }
-
-  return -1.0;
-}
-
-static gdouble
-ogmrip_video_codec_analyze_watch (OGMJobExec *exec, const gchar *buffer, OGMRipAnalyze *info)
-{
-  if (g_str_has_prefix (buffer, "V: "))
-  {
-    info->frames ++;
-
-    if (info->frames == info->nframes)
-      return 1.0;
-
-    return info->frames / (gdouble) info->nframes;
-  }
-  else
-  {
-    if (g_str_has_prefix (buffer, "demux_mpg: 24000/1001"))
-    {
-      info->cur_section = SECTION_24000_1001;
-      info->nsections ++;
-    }
-    else if (g_str_has_prefix (buffer, "demux_mpg: 30000/1001"))
-    {
-      info->cur_section = SECTION_30000_1001;
-      info->nsections ++;
-    }
-
-    if (info->cur_section == SECTION_30000_1001)
-    {
-      if (g_str_has_prefix (buffer, "affinity: "))
-      {
-        g_free (info->prev_affinity);
-        info->prev_affinity = g_strdup (info->cur_affinity);
-
-        g_free (info->cur_affinity);
-        info->cur_affinity = g_strdup (buffer + 10);
-      }
-      else if (g_str_has_prefix (buffer, "duration: "))
-      {
-        info->prev_duration = info->cur_duration;
-        sscanf (buffer, "duration: %u", &info->cur_duration);
-
-        if (info->prev_duration == 3 && info->cur_duration == 2)
-        {
-          info->npatterns ++;
-
-          if (strncmp (info->prev_affinity, ".0+.1.+2", 8) == 0 && strncmp (info->cur_affinity, ".0++1", 5) == 0)
-            info->naffinities ++;
-        }
-      }
-    }
-  }
-
-  return -1.0;
-}
-
-static gchar **
-ogmrip_video_codec_crop_command (OGMRipVideoCodec *video, gdouble start, gulong nframes)
-{
-  OGMDvdTitle *title;
-  OGMRipDeintType deint;
-  GPtrArray *argv;
-
-  GString *filter;
-  const gchar *device;
-  gint vid;
-
-  argv = g_ptr_array_new ();
-
-  if (MPLAYER_CHECK_VERSION (1,0,0,8))
-  {
-    g_ptr_array_add (argv, g_strdup ("mplayer"));
-    g_ptr_array_add (argv, g_strdup ("-nolirc"));
-    g_ptr_array_add (argv, g_strdup ("-vo"));
-    g_ptr_array_add (argv, g_strdup ("null"));
-  }
-  else
-  {
-    g_ptr_array_add (argv, g_strdup ("mencoder"));
-    g_ptr_array_add (argv, g_strdup ("-ovc"));
-    g_ptr_array_add (argv, g_strdup ("lavc"));
-    g_ptr_array_add (argv, g_strdup ("-o"));
-    g_ptr_array_add (argv, g_strdup ("/dev/null"));
-  }
-
-  g_ptr_array_add (argv, g_strdup ("-nosound"));
-  g_ptr_array_add (argv, g_strdup ("-nocache"));
-
-  if (ogmrip_check_mplayer_nosub ())
-    g_ptr_array_add (argv, g_strdup ("-nosub"));
-
-  if (MPLAYER_CHECK_VERSION (1,0,3,0))
-  {
-    g_ptr_array_add (argv, g_strdup ("-noconfig"));
-    g_ptr_array_add (argv, g_strdup ("all"));
-  }
-
-  g_ptr_array_add (argv, g_strdup ("-speed"));
-  g_ptr_array_add (argv, g_strdup ("100"));
-
-  g_ptr_array_add (argv, g_strdup ("-dvdangle"));
-  g_ptr_array_add (argv, g_strdup_printf ("%d",
-        ogmrip_video_codec_get_angle (video)));
-
-  filter = g_string_new (NULL);
-
-  deint = ogmrip_video_codec_get_deinterlacer (video);
-  if (deint != OGMRIP_DEINT_NONE)
-  {
-    if (deint == OGMRIP_DEINT_KERNEL || OGMRIP_DEINT_YADIF)
-      g_string_append (filter, deinterlacer[deint - 1]);
-    else
-      g_string_append_printf (filter, "pp=%s", deinterlacer[deint - 1]);
-  }
-
-  if (filter->len > 0)
-    g_string_append_c (filter, ',');
-  g_string_append (filter, "cropdetect");
-
-  g_ptr_array_add (argv, g_strdup ("-vf"));
-  g_ptr_array_add (argv, g_string_free (filter, FALSE));
-
-  g_ptr_array_add (argv, g_strdup ("-ss"));
-  g_ptr_array_add (argv, g_strdup_printf ("%.0lf", start));
-
-  g_ptr_array_add (argv, g_strdup ("-frames"));
-  g_ptr_array_add (argv, g_strdup_printf ("%lu", nframes));
-
-  title = ogmdvd_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video)));
-
-  device = ogmdvd_disc_get_device (ogmdvd_title_get_disc (title));
-  g_ptr_array_add (argv, g_strdup ("-dvd-device"));
-  g_ptr_array_add (argv, g_strdup (device));
-
-  vid = ogmdvd_title_get_nr (title);
-
-  if (MPLAYER_CHECK_VERSION (1,0,0,1))
-    g_ptr_array_add (argv, g_strdup_printf ("dvd://%d", vid + 1));
-  else
-  {
-    g_ptr_array_add (argv, g_strdup ("-dvd"));
-    g_ptr_array_add (argv, g_strdup_printf ("%d", vid + 1));
-  }
-
-  g_ptr_array_add (argv, NULL);
-
-  return (gchar **) g_ptr_array_free (argv, FALSE);
-}
-
-static gchar **
-ogmrip_video_codec_analyze_command (OGMRipVideoCodec *video, gulong nframes)
-{
-  OGMDvdTitle *title;
-  GPtrArray *argv;
-
-  const gchar *device;
-  gint vid;
-
-  argv = g_ptr_array_new ();
-
-  g_ptr_array_add (argv, g_strdup ("mplayer"));
-  g_ptr_array_add (argv, g_strdup ("-nolirc"));
-  g_ptr_array_add (argv, g_strdup ("-nosound"));
-  g_ptr_array_add (argv, g_strdup ("-nocache"));
-
-  if (ogmrip_check_mplayer_nosub ())
-    g_ptr_array_add (argv, g_strdup ("-nosub"));
-
-  if (MPLAYER_CHECK_VERSION (1,0,3,0))
-  {
-    g_ptr_array_add (argv, g_strdup ("-noconfig"));
-    g_ptr_array_add (argv, g_strdup ("all"));
-  }
-
-  g_ptr_array_add (argv, g_strdup ("-v"));
-  g_ptr_array_add (argv, g_strdup ("-benchmark"));
-
-  g_ptr_array_add (argv, g_strdup ("-vo"));
-  g_ptr_array_add (argv, g_strdup ("null"));
-
-  g_ptr_array_add (argv, g_strdup ("-vf"));
-  g_ptr_array_add (argv, g_strdup ("pullup"));
-
-  g_ptr_array_add (argv, g_strdup ("-dvdangle"));
-  g_ptr_array_add (argv, g_strdup_printf ("%d",
-        ogmrip_video_codec_get_angle (video)));
-
-  g_ptr_array_add (argv, g_strdup ("-frames"));
-  g_ptr_array_add (argv, g_strdup_printf ("%lu", nframes));
-
-  title = ogmdvd_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video)));
-
-  device = ogmdvd_disc_get_device (ogmdvd_title_get_disc (title));
-  g_ptr_array_add (argv, g_strdup ("-dvd-device"));
-  g_ptr_array_add (argv, g_strdup (device));
-
-  vid = ogmdvd_title_get_nr (title);
-
-  if (MPLAYER_CHECK_VERSION (1,0,0,1))
-    g_ptr_array_add (argv, g_strdup_printf ("dvd://%d", vid + 1));
-  else
-  {
-    g_ptr_array_add (argv, g_strdup ("-dvd"));
-    g_ptr_array_add (argv, g_strdup_printf ("%d", vid + 1));
-  }
-
-  g_ptr_array_add (argv, NULL);
-
-  return (gchar **) g_ptr_array_free (argv, FALSE);
-}
 
 G_DEFINE_ABSTRACT_TYPE (OGMRipVideoCodec, ogmrip_video_codec, OGMRIP_TYPE_CODEC)
 
@@ -481,15 +107,11 @@ static void
 ogmrip_video_codec_class_init (OGMRipVideoCodecClass *klass)
 {
   GObjectClass *gobject_class;
-  OGMJobSpawnClass *spawn_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->dispose = ogmrip_video_codec_dispose;
   gobject_class->set_property = ogmrip_video_codec_set_property;
   gobject_class->get_property = ogmrip_video_codec_get_property;
-
-  spawn_class = OGMJOB_SPAWN_CLASS (klass);
-  spawn_class->cancel = ogmrip_video_codec_cancel;
 
   g_object_class_install_property (gobject_class, PROP_ANGLE, 
         g_param_spec_uint ("angle", "Angle property", "Set angle", 
@@ -515,6 +137,21 @@ ogmrip_video_codec_class_init (OGMRipVideoCodecClass *klass)
         g_param_spec_uint ("threads", "Threads property", "Set the number of threads", 
            0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
+  g_object_class_install_property (gobject_class, PROP_SCALER, 
+        g_param_spec_uint ("scaler", "Scaler property", "Set the scaler", 
+           OGMRIP_SCALER_NONE, OGMRIP_SCALER_BICUBIC_SPLINE, OGMRIP_SCALER_GAUSS,
+           G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_DEINT, 
+        g_param_spec_uint ("deinterlacer", "Deinterlacer property", "Set the deinterlacer", 
+           OGMRIP_DEINT_NONE, OGMRIP_DEINT_YADIF, OGMRIP_DEINT_NONE,
+           G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_QUALITY, 
+        g_param_spec_uint ("quality", "Quality property", "Set the quality", 
+           OGMRIP_QUALITY_EXTREME, OGMRIP_QUALITY_USER, OGMRIP_QUALITY_NORMAL,
+           G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_property (gobject_class, PROP_TURBO, 
         g_param_spec_boolean ("turbo", "Turbo property", "Set turbo", 
            FALSE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
@@ -522,10 +159,6 @@ ogmrip_video_codec_class_init (OGMRipVideoCodecClass *klass)
   g_object_class_install_property (gobject_class, PROP_DENOISE, 
         g_param_spec_boolean ("denoise", "Denoise property", "Set denoise", 
            FALSE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_BFRAMES, 
-        g_param_spec_uint ("bframes", "B frames property", "Set b-frames", 
-           0, 4, 2, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_DEBLOCK, 
         g_param_spec_boolean ("deblock", "Deblock property", "Set deblock", 
@@ -543,15 +176,14 @@ ogmrip_video_codec_init (OGMRipVideoCodec *video)
 {
   video->priv = OGMRIP_VIDEO_GET_PRIVATE (video);
   video->priv->scaler = OGMRIP_SCALER_GAUSS;
+  video->priv->quality = OGMRIP_QUALITY_NORMAL;
   video->priv->astream = NULL;
   video->priv->bitrate = 800000;
   video->priv->quantizer = -1.0;
   video->priv->turbo = FALSE;
-  video->priv->max_b_frames = 2;
   video->priv->angle = 1;
   video->priv->bpp = 0.25;
   video->priv->passes = 1;
-  video->priv->interlaced = -1;
 }
 
 static void
@@ -605,14 +237,17 @@ ogmrip_video_codec_set_property (GObject *gobject, guint property_id, const GVal
     case PROP_DENOISE:
       ogmrip_video_codec_set_denoise (video, g_value_get_boolean (value));
       break;
-    case PROP_BFRAMES:
-      ogmrip_video_codec_set_max_b_frames (video, g_value_get_uint (value));
-      break;
     case PROP_DEBLOCK:
       ogmrip_video_codec_set_deblock (video, g_value_get_boolean (value));
       break;
     case PROP_DERING:
       ogmrip_video_codec_set_dering (video, g_value_get_boolean (value));
+      break;
+    case PROP_SCALER:
+      ogmrip_video_codec_set_scaler (video, g_value_get_uint (value));
+      break;
+    case PROP_DEINT:
+      ogmrip_video_codec_set_deinterlacer (video, g_value_get_uint (value));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -653,14 +288,17 @@ ogmrip_video_codec_get_property (GObject *gobject, guint property_id, GValue *va
     case PROP_DENOISE:
       g_value_set_boolean (value, video->priv->denoise);
       break;
-    case PROP_BFRAMES:
-      g_value_set_uint (value, video->priv->max_b_frames);
-      break;
     case PROP_DEBLOCK:
       g_value_set_boolean (value, video->priv->deblock);
       break;
     case PROP_DERING:
       g_value_set_boolean (value, video->priv->dering);
+      break;
+    case PROP_SCALER:
+      g_value_set_uint (value, video->priv->scaler);
+      break;
+    case PROP_DEINT:
+      g_value_set_uint (value, video->priv->deint);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -715,22 +353,6 @@ ogmrip_video_codec_autosize (OGMRipVideoCodec *video)
       video->priv->scale_height = scale_height;
     }
   }
-}
-
-static void
-ogmrip_video_codec_cancel (OGMJobSpawn *spawn)
-{
-  OGMRipVideoCodec *video;
-
-  video = OGMRIP_VIDEO_CODEC (spawn);
-
-  if (video->priv->child)
-  {
-    ogmjob_spawn_cancel (video->priv->child);
-    video->priv->child_canceled = TRUE;
-  }
-
-  OGMJOB_SPAWN_CLASS (ogmrip_video_codec_parent_class)->cancel (spawn);
 }
 
 /**
@@ -794,6 +416,8 @@ ogmrip_video_codec_set_angle (OGMRipVideoCodec *video, guint angle)
   g_return_if_fail (angle > 0 && angle <= ogmdvd_title_get_n_angles (title));
 
   video->priv->angle = angle;
+
+  g_object_notify (G_OBJECT (video), "angle");
 }
 
 /**
@@ -827,6 +451,9 @@ ogmrip_video_codec_set_bitrate (OGMRipVideoCodec *video, guint bitrate)
 
   video->priv->bitrate = CLAMP (bitrate, 4000, 24000000);
   video->priv->quantizer = -1.0;
+
+  g_object_notify (G_OBJECT (video), "bitrate");
+  g_object_notify (G_OBJECT (video), "quantizer");
 }
 
 /**
@@ -860,6 +487,9 @@ ogmrip_video_codec_set_quantizer (OGMRipVideoCodec *video, gdouble quantizer)
 
   video->priv->quantizer = CLAMP (quantizer, 0, 31);
   video->priv->bitrate = -1;
+
+  g_object_notify (G_OBJECT (video), "quantizer");
+  g_object_notify (G_OBJECT (video), "bitrate");
 }
 
 /**
@@ -892,6 +522,8 @@ ogmrip_video_codec_set_bits_per_pixel (OGMRipVideoCodec *video, gdouble bpp)
   g_return_if_fail (bpp > 0.0 && bpp <= 1.0);
 
   video->priv->bpp = bpp;
+
+  g_object_notify (G_OBJECT (video), "bpp");
 }
 
 /**
@@ -923,6 +555,8 @@ ogmrip_video_codec_set_passes (OGMRipVideoCodec *video, guint pass)
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
 
   video->priv->passes = MAX (pass, 1);
+
+  g_object_notify (G_OBJECT (video), "passes");
 }
 
 /**
@@ -954,6 +588,8 @@ ogmrip_video_codec_set_threads (OGMRipVideoCodec *video, guint threads)
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
 
   video->priv->threads = MAX (threads, 0);
+
+  g_object_notify (G_OBJECT (video), "threads");
 }
 
 /**
@@ -985,6 +621,8 @@ ogmrip_video_codec_set_scaler (OGMRipVideoCodec *video, OGMRipScalerType scaler)
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
 
   video->priv->scaler = scaler;
+
+  g_object_notify (G_OBJECT (video), "scaler");
 }
 
 /**
@@ -1015,8 +653,9 @@ ogmrip_video_codec_set_deinterlacer (OGMRipVideoCodec *video, OGMRipDeintType de
 {
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
 
-  if (video->priv->interlaced != 0)
-    video->priv->deint = deint;
+  video->priv->deint = deint;
+
+  g_object_notify (G_OBJECT (video), "deinterlacer");
 }
 
 /**
@@ -1048,6 +687,8 @@ ogmrip_video_codec_set_turbo (OGMRipVideoCodec *video, gboolean turbo)
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
 
   video->priv->turbo = turbo;
+
+  g_object_notify (G_OBJECT (video), "turbo");
 }
 
 /**
@@ -1079,6 +720,8 @@ ogmrip_video_codec_set_denoise (OGMRipVideoCodec *video, gboolean denoise)
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
 
   video->priv->denoise = denoise;
+
+  g_object_notify (G_OBJECT (video), "denoise");
 }
 
 /**
@@ -1098,37 +741,6 @@ ogmrip_video_codec_get_denoise (OGMRipVideoCodec *video)
 }
 
 /**
- * ogmrip_video_codec_set_max_b_frames:
- * @video: an #OGMRipVideoCodec
- * @max_b_frames: the maximum number of B-frames
- *
- * Sets the maximum number of B-frames to put between I/P-frames.
- */
-void
-ogmrip_video_codec_set_max_b_frames (OGMRipVideoCodec *video, guint max_b_frames)
-{
-  g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
-
-  video->priv->max_b_frames = MIN (max_b_frames, 4);
-}
-
-/**
- * ogmrip_video_codec_get_max_b_frames:
- * @video: an #OGMRipVideoCodec
- *
- * Gets the maximum number of B-frames to put between I/P-frames.
- *
- * Returns: the maximum number of B-frames, or -1
- */
-gint
-ogmrip_video_codec_get_max_b_frames (OGMRipVideoCodec *video)
-{
-  g_return_val_if_fail (OGMRIP_IS_VIDEO_CODEC (video), -1);
-
-  return video->priv->max_b_frames;
-}
-
-/**
  * ogmrip_video_codec_set_quality:
  * @video: an #OGMRipVideoCodec
  * @quality: the #OGMRipQualityType
@@ -1138,16 +750,11 @@ ogmrip_video_codec_get_max_b_frames (OGMRipVideoCodec *video)
 void
 ogmrip_video_codec_set_quality (OGMRipVideoCodec *video, OGMRipQualityType quality)
 {
-  OGMRipVideoCodecClass *klass;
-
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
 
   video->priv->quality = CLAMP (quality, OGMRIP_QUALITY_EXTREME, OGMRIP_QUALITY_USER);
 
-  klass = OGMRIP_VIDEO_CODEC_GET_CLASS (video);
-
-  if (klass->set_quality)
-    (* klass->set_quality) (video, video->priv->quality);
+  g_object_notify (G_OBJECT (video), "quality");
 }
 
 /**
@@ -1179,6 +786,8 @@ ogmrip_video_codec_set_deblock (OGMRipVideoCodec *video, gboolean deblock)
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
 
   video->priv->deblock = deblock;
+
+  g_object_notify (G_OBJECT (video), "deblock");
 }
 
 /**
@@ -1210,6 +819,8 @@ ogmrip_video_codec_set_dering (OGMRipVideoCodec *video, gboolean dering)
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
 
   video->priv->dering = dering;
+
+  g_object_notify (G_OBJECT (video), "dering");
 }
 
 /**
@@ -1239,16 +850,13 @@ ogmrip_video_codec_get_dering (OGMRipVideoCodec *video)
 gint
 ogmrip_video_codec_get_start_delay (OGMRipVideoCodec *video)
 {
-  OGMRipVideoCodecClass *klass;
+  gint delay;
 
   g_return_val_if_fail (OGMRIP_IS_VIDEO_CODEC (video), -1);
 
-  klass = OGMRIP_VIDEO_CODEC_GET_CLASS (video);
+  g_object_get (video, "start-delay", &delay, NULL);
 
-  if (klass->get_start_delay)
-    return (* klass->get_start_delay) (video);
-
-  return 0;
+  return delay;
 }
 
 /**
@@ -1630,179 +1238,6 @@ ogmrip_video_codec_autobitrate (OGMRipVideoCodec *video, guint64 nonvideo_size, 
   ogmrip_video_codec_set_bitrate (video, (video_size * 8.) / length);
 }
 
-static void
-ogmrip_video_codec_child_progress (OGMJobSpawn *spawn, gdouble fraction, OGMRipVideoCodec *video)
-{
-  g_signal_emit_by_name (video, "progress", fraction);
-}
-
-/**
- * ogmrip_video_codec_autocrop:
- * @video: an #OGMRipVideoCodec
- * @nframes: the number of frames
- *
- * Autodetects the cropping parameters.
- *
- * Returns: %FALSE, on error or cancel
- */
-gboolean
-ogmrip_video_codec_autocrop (OGMRipVideoCodec *video, guint nframes)
-{
-  OGMJobSpawn *child;
-  OGMRipCrop crop;
-
-  gdouble length, start, step;
-  gint x, y, w, h;
-  gchar **argv;
-
-  g_return_val_if_fail (OGMRIP_IS_VIDEO_CODEC (video), FALSE);
-
-  memset (&crop, 0, sizeof (OGMRipCrop));
-
-  if (!nframes)
-  {
-    if (MPLAYER_CHECK_VERSION (1,0,0,8))
-      crop.nframes = 12;
-    else
-      crop.nframes = 30;
-  }
-  else
-    crop.nframes = nframes + 5;
-
-  video->priv->child = ogmjob_queue_new ();
-
-  g_signal_connect (video->priv->child, "progress",
-      G_CALLBACK (ogmrip_video_codec_child_progress), video);
-
-  length = ogmrip_codec_get_length (OGMRIP_CODEC (video), NULL);
-  step = length / 5.;
-
-  for (start = step; start < length; start += step)
-  {
-    argv = ogmrip_video_codec_crop_command (video, start, crop.nframes);
-
-    child = ogmjob_exec_newv (argv);
-    ogmjob_container_add (OGMJOB_CONTAINER (video->priv->child), child);
-    g_object_unref (child);
-
-    ogmjob_exec_add_watch_full (OGMJOB_EXEC (child),
-        (OGMJobWatch) ogmrip_video_codec_crop_watch, &crop, TRUE, FALSE, FALSE);
-  }
-
-  video->priv->child_canceled = FALSE;
-
-  ogmjob_spawn_run (video->priv->child, NULL);
-  g_object_unref (video->priv->child);
-  video->priv->child = NULL;
-
-  if (video->priv->child_canceled)
-    return FALSE;
-
-  w = g_ulist_get_most_frequent (crop.w);
-  g_ulist_free (crop.w);
-
-  h = g_ulist_get_most_frequent (crop.h);
-  g_ulist_free (crop.h);
-
-  x = g_ulist_get_most_frequent (crop.x);
-  g_ulist_free (crop.x);
-
-  y = g_ulist_get_most_frequent (crop.y);
-  g_ulist_free (crop.y);
-
-  ogmrip_video_codec_set_crop_size (video, x, y, w, h);
-
-  return TRUE;
-}
-
-/**
- * ogmrip_video_codec_analyze:
- * @video: an #OGMRipVideoCodec
- * @nframes: the number of frames
- *
- * Analyze the video stream to detect if the video is progressive,
- * interlaced and/or telecine.
- *
- * Returns: %FALSE, on error or cancel
- */
-gboolean
-ogmrip_video_codec_analyze (OGMRipVideoCodec *video, guint nframes)
-{
-  OGMRipAnalyze analyze;
-  gchar **argv;
-
-  g_return_val_if_fail (OGMRIP_IS_VIDEO_CODEC (video), FALSE);
-
-  if (!nframes)
-    nframes = ANALYZE_FRAMES;
-
-  memset (&analyze, 0, sizeof (OGMRipAnalyze));
-  analyze.nframes = nframes;
-
-  argv = ogmrip_video_codec_analyze_command (video, analyze.nframes);
-
-  video->priv->child = ogmjob_exec_newv (argv);
-
-  g_signal_connect (video->priv->child, "progress",
-      G_CALLBACK (ogmrip_video_codec_child_progress), video);
-
-  ogmjob_exec_add_watch_full (OGMJOB_EXEC (video->priv->child),
-      (OGMJobWatch) ogmrip_video_codec_analyze_watch, &analyze, TRUE, FALSE, FALSE);
-
-  video->priv->child_canceled = FALSE;
-
-  ogmjob_spawn_run (video->priv->child, NULL);
-  g_object_unref (video->priv->child);
-  video->priv->child = NULL;
-
-  if (video->priv->child_canceled)
-    return FALSE;
-
-  if (analyze.nsections > 0)
-  {
-    /*
-     * Progressive
-     */
-    if (analyze.cur_section == SECTION_24000_1001 && analyze.nsections == 1)
-    {
-      ogmrip_codec_set_progressive (OGMRIP_CODEC (video), TRUE);
-      ogmrip_codec_set_telecine (OGMRIP_CODEC (video), FALSE);
-      ogmrip_video_codec_set_deinterlacer (video, OGMRIP_DEINT_NONE);
-    }
-    else if (analyze.nsections > 1)
-    {
-      ogmrip_codec_set_progressive (OGMRIP_CODEC (video), TRUE);
-      if (analyze.npatterns > 0 && analyze.naffinities > 0)
-      {
-        /*
-         * Mixed progressive and telecine
-         */
-        ogmrip_codec_set_telecine (OGMRIP_CODEC (video), TRUE);
-        ogmrip_video_codec_set_deinterlacer (video, OGMRIP_DEINT_NONE);
-      }
-      else
-      {
-        /*
-         * Mixed progressive and interlaced
-         */
-        ogmrip_codec_set_telecine (OGMRIP_CODEC (video), FALSE);
-        ogmrip_video_codec_set_deinterlacer (video, OGMRIP_DEINT_YADIF);
-      }
-    }
-  }
-  else
-  {
-    ogmrip_codec_set_telecine (OGMRIP_CODEC (video), FALSE);
-    ogmrip_codec_set_progressive (OGMRIP_CODEC (video), FALSE);
-    ogmrip_video_codec_set_deinterlacer (video, OGMRIP_DEINT_NONE);
-  }
-
-  g_free (analyze.prev_affinity);
-  g_free (analyze.cur_affinity);
-
-  return TRUE;
-}
-
 /**
  * ogmrip_video_codec_get_hard_subp:
  * @video: an #OGMRipVideoCodec
@@ -1848,20 +1283,3 @@ ogmrip_video_codec_set_hard_subp (OGMRipVideoCodec *video, OGMDvdSubpStream *str
     video->priv->forced_subs = forced;
   }
 }
-
-/**
- * ogmrip_video_codec_is_interlaced:
- * @video: an #OGMRipVideoCodec
- *
- * Gets whether the video stream is interlaced.
- *
- * Returns: 1 if the video interlaced, 0 if it isn't, -1 otherwise.
- */
-gint
-ogmrip_video_codec_is_interlaced (OGMRipVideoCodec  *video)
-{
-  g_return_val_if_fail (OGMRIP_IS_VIDEO_CODEC (video), -1);
-
-  return video->priv->interlaced;
-}
-

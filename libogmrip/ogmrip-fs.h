@@ -30,51 +30,49 @@ G_BEGIN_DECLS
 #define g_chdir chdir
 #endif
 
-G_CONST_RETURN
-gchar *  ogmrip_fs_get_tmp_dir      (void);
-void     ogmrip_fs_set_tmp_dir      (const gchar  *dir);
+const gchar * ogmrip_fs_get_tmp_dir      (void);
+void          ogmrip_fs_set_tmp_dir      (const gchar  *dir);
 
-gboolean ogmrip_fs_mkdir            (const gchar  *path,
-                                     mode_t       mode,
-                                     GError       **error);
-gboolean ogmrip_fs_rmdir            (const gchar  *path,
-                                     gboolean     recursive,
-                                     GError       **error);
+gboolean      ogmrip_fs_mkdir            (const gchar  *path,
+                                          mode_t       mode,
+                                          GError       **error);
+gboolean      ogmrip_fs_rmdir            (const gchar  *path,
+                                          gboolean     recursive,
+                                          GError       **error);
 
-gchar *  ogmrip_fs_mktemp           (const gchar  *tmpl,
-                                     GError       **error);
-gchar *  ogmrip_fs_mkftemp          (const gchar  *tmpl,
-                                     GError       **error);
-gchar *  ogmrip_fs_mkdtemp          (const gchar  *tmpl,
-                                     GError       **error);
-gchar *  ogmrip_fs_lntemp           (const gchar  *oldpath,
-                                     const gchar  *newtmpl,
-                                     gboolean     symln,
-                                     GError       **error);
+gchar *       ogmrip_fs_mktemp           (const gchar  *tmpl,
+                                          GError       **error);
+gchar *       ogmrip_fs_mkftemp          (const gchar  *tmpl,
+                                          GError       **error);
+gchar *       ogmrip_fs_mkdtemp          (const gchar  *tmpl,
+                                          GError       **error);
+gchar *       ogmrip_fs_lntemp           (const gchar  *oldpath,
+                                          const gchar  *newtmpl,
+                                          gboolean     symln,
+                                          GError       **error);
 
-gint     ogmrip_fs_open_tmp         (const gchar  *tmpl,
-                                     gchar        **name_used,
-                                     GError       **error);
+gint          ogmrip_fs_open_tmp         (const gchar  *tmpl,
+                                          gchar        **name_used,
+                                          GError       **error);
 
-gint64   ogmrip_fs_get_left_space   (const gchar  *filename,
-                                     GError       **error);
-gchar *  ogmrip_fs_get_mount_point  (const gchar  *filename,
-                                     GError       **error);
+gint64        ogmrip_fs_get_left_space   (const gchar  *filename,
+                                          GError       **error);
+gchar *       ogmrip_fs_get_mount_point  (const gchar  *filename,
+                                          GError       **error);
 
 
-void     ogmrip_fs_unref            (gchar        *filename,
-                                     gboolean     do_unlink);
+void          ogmrip_fs_unref            (gchar        *filename,
+                                          gboolean     do_unlink);
 
-gboolean ogmrip_fs_rename           (const gchar  *old_name,
-                                     const gchar  *new_name,
-                                     GError       **error);
+gboolean      ogmrip_fs_rename           (const gchar  *old_name,
+                                          const gchar  *new_name,
+                                          GError       **error);
 
-gchar *  ogmrip_fs_get_full_path    (const gchar  *filename);
+gchar *       ogmrip_fs_get_full_path    (const gchar  *filename);
 
-G_CONST_RETURN
-gchar *  ogmrip_fs_get_extension    (const gchar  *filename);
-gchar *  ogmrip_fs_set_extension    (const gchar  *filename,
-                                     const gchar  *extension);
+const gchar * ogmrip_fs_get_extension    (const gchar  *filename);
+gchar *       ogmrip_fs_set_extension    (const gchar  *filename,
+                                          const gchar  *extension);
 
 G_END_DECLS
 

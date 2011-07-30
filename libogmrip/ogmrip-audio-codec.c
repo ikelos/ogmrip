@@ -50,6 +50,7 @@ enum
   PROP_QUALITY,
   PROP_NORMALIZE,
   PROP_CHANNELS,
+  PROP_SRATE,
   PROP_SPF,
   PROP_FAST
 };
@@ -89,9 +90,13 @@ ogmrip_audio_codec_class_init (OGMRipAudioCodecClass *klass)
         g_param_spec_uint ("channels", "Channels property", "Set channels", 
            0, 10, OGMDVD_AUDIO_CHANNELS_STEREO, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
+  g_object_class_install_property (gobject_class, PROP_SRATE, 
+        g_param_spec_uint ("sample-rate", "Sample rate property", "Set sample rate", 
+           0, G_MAXUINT, 48000, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_property (gobject_class, PROP_SPF, 
         g_param_spec_uint ("samples-per-frame", "Samples per frame property", "Set samples per frame", 
-           0, G_MAXUINT, 512, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+           0, G_MAXUINT, DEFAULT_SPF, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_FAST, 
         g_param_spec_boolean ("fast", "Fast property", "Set fast", 
@@ -143,6 +148,9 @@ ogmrip_audio_codec_set_property (GObject *gobject, guint property_id, const GVal
     case PROP_CHANNELS: 
       ogmrip_audio_codec_set_channels (audio, g_value_get_uint (value));
       break;
+    case PROP_SRATE:
+      ogmrip_audio_codec_set_sample_rate (audio, g_value_get_uint (value));
+      break;
     case PROP_FAST: 
       audio->priv->fast = g_value_get_boolean (value);
       break;
@@ -156,7 +164,6 @@ static void
 ogmrip_audio_codec_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
 {
   OGMRipAudioCodec *audio;
-  gint spf;
 
   audio = OGMRIP_AUDIO_CODEC (gobject);
 
@@ -171,9 +178,11 @@ ogmrip_audio_codec_get_property (GObject *gobject, guint property_id, GValue *va
     case PROP_CHANNELS:
       g_value_set_uint (value, audio->priv->channels);
       break;
+    case PROP_SRATE:
+      g_value_set_uint (value, audio->priv->srate);
+      break;
     case PROP_SPF:
-      spf = ogmrip_audio_codec_get_samples_per_frame (audio);
-      g_value_set_uint (value, spf > 0 ? spf : DEFAULT_SPF);
+      g_value_set_uint (value, DEFAULT_SPF);
       break;
     case PROP_FAST:
       g_value_set_boolean (value, audio->priv->fast);
@@ -197,6 +206,8 @@ ogmrip_audio_codec_set_fast (OGMRipAudioCodec *audio, gboolean fast)
   g_return_if_fail (OGMRIP_IS_AUDIO_CODEC (audio));
 
   audio->priv->fast = fast;
+
+  g_object_notify (G_OBJECT (audio), "fast");
 }
 
 /**
@@ -228,6 +239,8 @@ ogmrip_audio_codec_set_quality (OGMRipAudioCodec *audio, guint quality)
   g_return_if_fail (OGMRIP_IS_AUDIO_CODEC (audio));
 
   audio->priv->quality = MIN (quality, 10);
+
+  g_object_notify (G_OBJECT (audio), "quality");
 }
 
 /**
@@ -259,6 +272,8 @@ ogmrip_audio_codec_set_normalize (OGMRipAudioCodec *audio, gboolean normalize)
   g_return_if_fail (OGMRIP_IS_AUDIO_CODEC (audio));
 
   audio->priv->normalize = normalize;
+
+  g_object_notify (G_OBJECT (audio), "normalize");
 }
 
 /**
@@ -295,6 +310,8 @@ ogmrip_audio_codec_set_channels (OGMRipAudioCodec *audio, OGMDvdAudioChannels ch
   stream = ogmrip_codec_get_input (OGMRIP_CODEC (audio));
   max_channels = ogmdvd_audio_stream_get_channels (OGMDVD_AUDIO_STREAM (stream));
   audio->priv->channels = MIN (channels, max_channels);
+
+  g_object_notify (G_OBJECT (audio), "channels");
 }
 
 /**
@@ -324,15 +341,13 @@ ogmrip_audio_codec_get_channels (OGMRipAudioCodec *audio)
 gint
 ogmrip_audio_codec_get_samples_per_frame (OGMRipAudioCodec *audio)
 {
-  OGMRipAudioCodecClass *klass;
+  gint spf;
 
   g_return_val_if_fail (OGMRIP_IS_AUDIO_CODEC (audio), -1);
 
-  klass = OGMRIP_AUDIO_CODEC_GET_CLASS (audio);
-  if (klass->get_samples_per_frame)
-    return (* klass->get_samples_per_frame) (audio);
+  g_object_get (audio, "samples-per-frame", &spf, NULL);
 
-  return DEFAULT_SPF;
+  return spf;
 }
 
 /**
@@ -340,7 +355,7 @@ ogmrip_audio_codec_get_samples_per_frame (OGMRipAudioCodec *audio)
  * @audio: an #OGMRipAudioCodec
  * @srate: the sample rate
  *
- * Sets the output sample rate to be used.
+ * Sets the output sample rate in Hz.
  */
 void
 ogmrip_audio_codec_set_sample_rate (OGMRipAudioCodec *audio, guint srate)
@@ -348,13 +363,15 @@ ogmrip_audio_codec_set_sample_rate (OGMRipAudioCodec *audio, guint srate)
   g_return_if_fail (OGMRIP_IS_AUDIO_CODEC (audio));
 
   audio->priv->srate = srate;
+
+  g_object_notify (G_OBJECT (audio), "sample-rate");
 }
 
 /**
  * ogmrip_audio_codec_get_sample_rate:
  * @audio: an #OGMRipAudioCodec
  *
- * Gets the output sample rate.
+ * Gets the output sample rate in Hz.
  *
  * Returns: the sample rate
  */
@@ -396,7 +413,7 @@ ogmrip_audio_codec_set_label (OGMRipAudioCodec *audio, const gchar *label)
  *
  * Returns: the track name
  */
-G_CONST_RETURN gchar *
+const gchar *
 ogmrip_audio_codec_get_label (OGMRipAudioCodec *audio)
 {
   g_return_val_if_fail (OGMRIP_IS_AUDIO_CODEC (audio), NULL);

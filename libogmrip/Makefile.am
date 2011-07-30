@@ -20,11 +20,10 @@ libogmrip_la_SOURCES =      \
   ogmrip-hardsub.c          \
   ogmrip-marshal.c          \
   ogmrip-novideo.c          \
-  ogmrip-options.c          \
   ogmrip-player.c           \
   ogmrip-plugin.c           \
   ogmrip-profile.c          \
-	ogmrip-profile-engine.c   \
+  ogmrip-profile-engine.c   \
   ogmrip-subp-codec.c       \
   ogmrip-version.c          \
   ogmrip-video-codec.c
@@ -46,12 +45,11 @@ libogmrip_la_HEADERS =      \
   ogmrip-hardsub.h          \
   ogmrip-marshal.h          \
   ogmrip-novideo.h          \
-  ogmrip-options.h          \
   ogmrip-player.h           \
   ogmrip-plugin.h           \
   ogmrip-profile.h          \
-	ogmrip-profile-engine.h   \
-	ogmrip-profile-keys.h     \
+  ogmrip-profile-engine.h   \
+  ogmrip-profile-keys.h     \
   ogmrip-subp-codec.h       \
   ogmrip-version.h          \
   ogmrip-video-codec.h      \

@@ -46,21 +46,20 @@ struct _OGMRipSubpCodecClass
   OGMRipCodecClass parent_class;
 };
 
-GType              ogmrip_subp_codec_get_type            (void);
+GType         ogmrip_subp_codec_get_type        (void);
 
-void               ogmrip_subp_codec_set_forced_only     (OGMRipSubpCodec  *subp,
-                                                          gboolean         forced_only);
-gboolean           ogmrip_subp_codec_get_forced_only     (OGMRipSubpCodec  *subp);
-void               ogmrip_subp_codec_set_charset         (OGMRipSubpCodec  *subp,
-                                                          OGMRipCharset    charset);
-gint               ogmrip_subp_codec_get_charset         (OGMRipSubpCodec  *subp);
-void               ogmrip_subp_codec_set_newline         (OGMRipSubpCodec  *subp,
-                                                          OGMRipNewline    newline);
-gint               ogmrip_subp_codec_get_newline         (OGMRipSubpCodec  *subp);
-void               ogmrip_subp_codec_set_label           (OGMRipSubpCodec  *subp,
-                                                          const gchar      *label);
-G_CONST_RETURN
-gchar *            ogmrip_subp_codec_get_label           (OGMRipSubpCodec  *subp);
+gboolean      ogmrip_subp_codec_get_forced_only (OGMRipSubpCodec  *subp);
+void          ogmrip_subp_codec_set_forced_only (OGMRipSubpCodec  *subp,
+                                                 gboolean         forced_only);
+gint          ogmrip_subp_codec_get_charset     (OGMRipSubpCodec  *subp);
+void          ogmrip_subp_codec_set_charset     (OGMRipSubpCodec  *subp,
+                                                 OGMRipCharset    charset);
+const gchar * ogmrip_subp_codec_get_label       (OGMRipSubpCodec  *codec);
+void          ogmrip_subp_codec_set_label       (OGMRipSubpCodec  *codec,
+                                                 const gchar      *label);
+gint          ogmrip_subp_codec_get_newline     (OGMRipSubpCodec  *subp);
+void          ogmrip_subp_codec_set_newline     (OGMRipSubpCodec  *subp,
+                                                 OGMRipNewline    newline);
 
 G_END_DECLS
 

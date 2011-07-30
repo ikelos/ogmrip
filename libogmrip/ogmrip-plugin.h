@@ -187,78 +187,74 @@ GQuark   ogmrip_plugin_error_quark (void);
  * Container functions
  */
 
-gint      ogmrip_plugin_get_n_containers        (void);
-void      ogmrip_plugin_foreach_container       (OGMRipPluginFunc    func,
-                                                 gpointer             data);
-GType     ogmrip_plugin_find_container          (OGMRipPluginCmpFunc func,
-                                                 gconstpointer        data);
+gint          ogmrip_plugin_get_n_containers        (void);
+void          ogmrip_plugin_foreach_container       (OGMRipPluginFunc    func,
+                                                     gpointer             data);
+GType         ogmrip_plugin_find_container          (OGMRipPluginCmpFunc func,
+                                                     gconstpointer        data);
 
-GType     ogmrip_plugin_get_nth_container       (guint n);
-GType     ogmrip_plugin_get_container_by_name   (const gchar *name);
-gint      ogmrip_plugin_get_container_index     (GType container);
-G_CONST_RETURN
-gchar *   ogmrip_plugin_get_container_name      (GType container);
-gboolean  ogmrip_plugin_get_container_bframes   (GType container);
-gint      ogmrip_plugin_get_container_max_audio (GType container);
-gint      ogmrip_plugin_get_container_max_subp  (GType container);
-GModule * ogmrip_plugin_get_container_module    (GType container);
+GType         ogmrip_plugin_get_nth_container       (guint n);
+GType         ogmrip_plugin_get_container_by_name   (const gchar *name);
+gint          ogmrip_plugin_get_container_index     (GType container);
+const gchar * ogmrip_plugin_get_container_name      (GType container);
+gboolean      ogmrip_plugin_get_container_bframes   (GType container);
+gint          ogmrip_plugin_get_container_max_audio (GType container);
+gint          ogmrip_plugin_get_container_max_subp  (GType container);
+GModule *     ogmrip_plugin_get_container_module    (GType container);
 
 /*
  * Video codec functions
  */
 
-gint      ogmrip_plugin_get_n_video_codecs      (void);
-void      ogmrip_plugin_foreach_video_codec     (OGMRipPluginFunc    func,
-                                                 gpointer             data);
-GType     ogmrip_plugin_find_video_codec        (OGMRipPluginCmpFunc func,
-                                                 gconstpointer        data);
+gint          ogmrip_plugin_get_n_video_codecs      (void);
+void          ogmrip_plugin_foreach_video_codec     (OGMRipPluginFunc    func,
+                                                     gpointer             data);
+GType         ogmrip_plugin_find_video_codec        (OGMRipPluginCmpFunc func,
+                                                     gconstpointer        data);
 
-GType     ogmrip_plugin_get_nth_video_codec     (guint n);
-GType     ogmrip_plugin_get_video_codec_by_name (const gchar *name);
-gint      ogmrip_plugin_get_video_codec_index   (GType codec);
-G_CONST_RETURN
-gchar *   ogmrip_plugin_get_video_codec_name    (GType codec);
-gint      ogmrip_plugin_get_video_codec_format  (GType codec);
-gint      ogmrip_plugin_get_video_codec_passes  (GType codec);
-gint      ogmrip_plugin_get_video_codec_threads (GType codec);
-GModule * ogmrip_plugin_get_video_codec_module  (GType codec);
+GType         ogmrip_plugin_get_nth_video_codec     (guint n);
+GType         ogmrip_plugin_get_video_codec_by_name (const gchar *name);
+gint          ogmrip_plugin_get_video_codec_index   (GType codec);
+const gchar * ogmrip_plugin_get_video_codec_name    (GType codec);
+gint          ogmrip_plugin_get_video_codec_format  (GType codec);
+gint          ogmrip_plugin_get_video_codec_passes  (GType codec);
+gint          ogmrip_plugin_get_video_codec_threads (GType codec);
+GModule *     ogmrip_plugin_get_video_codec_module  (GType codec);
 
 /*
  * Audio codec functions
  */
 
-gint     ogmrip_plugin_get_n_audio_codecs      (void);
-void     ogmrip_plugin_foreach_audio_codec     (OGMRipPluginFunc    func,
-                                                gpointer             data);
-GType    ogmrip_plugin_find_audio_codec        (OGMRipPluginCmpFunc func,
-                                                gconstpointer        data);
+gint          ogmrip_plugin_get_n_audio_codecs      (void);
+void          ogmrip_plugin_foreach_audio_codec     (OGMRipPluginFunc    func,
+                                                     gpointer             data);
+GType         ogmrip_plugin_find_audio_codec        (OGMRipPluginCmpFunc func,
+                                                     gconstpointer        data);
 
-GType     ogmrip_plugin_get_nth_audio_codec     (guint n);
-GType     ogmrip_plugin_get_audio_codec_by_name (const gchar *name);
-gint      ogmrip_plugin_get_audio_codec_index   (GType codec);
-G_CONST_RETURN
-gchar *   ogmrip_plugin_get_audio_codec_name    (GType codec);
-gint      ogmrip_plugin_get_audio_codec_format  (GType codec);
-GModule * ogmrip_plugin_get_audio_codec_module  (GType codec);
+GType         ogmrip_plugin_get_nth_audio_codec     (guint n);
+GType         ogmrip_plugin_get_audio_codec_by_name (const gchar *name);
+gint          ogmrip_plugin_get_audio_codec_index   (GType codec);
+const gchar * ogmrip_plugin_get_audio_codec_name    (GType codec);
+gint          ogmrip_plugin_get_audio_codec_format  (GType codec);
+GModule *     ogmrip_plugin_get_audio_codec_module  (GType codec);
 
 /*
  * Subp codec functions
  */
 
-gint     ogmrip_plugin_get_n_subp_codecs      (void);
-void     ogmrip_plugin_foreach_subp_codec     (OGMRipPluginFunc    func,
-                                               gpointer             data);
-GType    ogmrip_plugin_find_subp_codec        (OGMRipPluginCmpFunc func,
-                                               gconstpointer        data);
+gint          ogmrip_plugin_get_n_subp_codecs      (void);
+void          ogmrip_plugin_foreach_subp_codec     (OGMRipPluginFunc    func,
+                                                    gpointer             data);
+GType         ogmrip_plugin_find_subp_codec        (OGMRipPluginCmpFunc func,
+                                                    gconstpointer        data);
 
-GType     ogmrip_plugin_get_nth_subp_codec     (guint n);
-GType     ogmrip_plugin_get_subp_codec_by_name (const gchar *name);
-gint      ogmrip_plugin_get_subp_codec_index   (GType codec);
-G_CONST_RETURN
-gchar *   ogmrip_plugin_get_subp_codec_name    (GType codec);
-gint      ogmrip_plugin_get_subp_codec_format  (GType codec);
-gboolean  ogmrip_plugin_get_subp_codec_text    (GType codec);
-GModule * ogmrip_plugin_get_subp_codec_module  (GType codec);
+GType         ogmrip_plugin_get_nth_subp_codec     (guint n);
+GType         ogmrip_plugin_get_subp_codec_by_name (const gchar *name);
+gint          ogmrip_plugin_get_subp_codec_index   (GType codec);
+const gchar * ogmrip_plugin_get_subp_codec_name    (GType codec);
+gint          ogmrip_plugin_get_subp_codec_format  (GType codec);
+gboolean      ogmrip_plugin_get_subp_codec_text    (GType codec);
+GModule *     ogmrip_plugin_get_subp_codec_module  (GType codec);
 
 /*
  * Compatibility functions

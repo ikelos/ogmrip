@@ -49,117 +49,98 @@ struct _OGMRipVideoCodecClass
   /* signals */
   void (* pass) (OGMRipVideoCodec *video,
                  guint       pass);
-  
-  /* vtable */
-  gint (* get_start_delay) (OGMRipVideoCodec  *video);
-  void (* set_quality)     (OGMRipVideoCodec  *video,
-                            OGMRipQualityType quality);
 };
 
-GType     ogmrip_video_codec_get_type             (void);
+GType               ogmrip_video_codec_get_type           (void);
 
-void      ogmrip_video_codec_set_angle            (OGMRipVideoCodec  *video,
-                                                   guint             angle);
-gint      ogmrip_video_codec_get_angle            (OGMRipVideoCodec  *video);
-void      ogmrip_video_codec_set_bitrate          (OGMRipVideoCodec  *video,
-                                                   guint             bitrate);
-gint      ogmrip_video_codec_get_bitrate          (OGMRipVideoCodec  *video);
-void      ogmrip_video_codec_set_quantizer        (OGMRipVideoCodec  *video,
-                                                   gdouble           quantizer);
-gdouble   ogmrip_video_codec_get_quantizer        (OGMRipVideoCodec  *video);
-void      ogmrip_video_codec_set_bits_per_pixel   (OGMRipVideoCodec  *video,
-                                                   gdouble           bpp);
-gdouble   ogmrip_video_codec_get_bits_per_pixel   (OGMRipVideoCodec  *video);
-void      ogmrip_video_codec_set_passes           (OGMRipVideoCodec  *video,
-                                                   guint             pass);
-gint      ogmrip_video_codec_get_passes           (OGMRipVideoCodec  *video);
-void      ogmrip_video_codec_set_threads          (OGMRipVideoCodec  *video,
-                                                   guint             threads);
-gint      ogmrip_video_codec_get_threads          (OGMRipVideoCodec  *video);
-void      ogmrip_video_codec_set_scaler           (OGMRipVideoCodec  *video,
-                                                   OGMRipScalerType  scaler);
-gint      ogmrip_video_codec_get_scaler           (OGMRipVideoCodec  *video);
-void      ogmrip_video_codec_set_deinterlacer     (OGMRipVideoCodec  *video,
-                                                   OGMRipDeintType   deint);
-gint      ogmrip_video_codec_get_deinterlacer     (OGMRipVideoCodec  *video);
-void      ogmrip_video_codec_set_turbo            (OGMRipVideoCodec  *video,
-                                                   gboolean          turbo);
-gboolean  ogmrip_video_codec_get_turbo            (OGMRipVideoCodec  *video);
-void      ogmrip_video_codec_set_denoise          (OGMRipVideoCodec  *video,
-                                                   gboolean          denoise);
-gboolean  ogmrip_video_codec_get_denoise          (OGMRipVideoCodec  *video);
-void      ogmrip_video_codec_set_max_b_frames     (OGMRipVideoCodec  *video,
-                                                   guint             max_b_frames);
-gint      ogmrip_video_codec_get_max_b_frames     (OGMRipVideoCodec  *video);
-void      ogmrip_video_codec_set_quality          (OGMRipVideoCodec  *video,
-                                                   OGMRipQualityType quality);
-gint      ogmrip_video_codec_get_quality          (OGMRipVideoCodec  *video);
-void      ogmrip_video_codec_set_deblock          (OGMRipVideoCodec  *video,
-                                                   gboolean          deblock);
-gboolean  ogmrip_video_codec_get_deblock          (OGMRipVideoCodec  *video);
-void      ogmrip_video_codec_set_dering           (OGMRipVideoCodec  *video,
-                                                   gboolean          dering);
-gboolean  ogmrip_video_codec_get_dering           (OGMRipVideoCodec  *video);
-gint      ogmrip_video_codec_get_start_delay      (OGMRipVideoCodec  *video);
-void      ogmrip_video_codec_get_raw_size         (OGMRipVideoCodec  *video,
-                                                   guint             *width,
-                                                   guint             *height);
-gboolean  ogmrip_video_codec_get_crop_size        (OGMRipVideoCodec  *video,
-                                                   guint             *x,
-                                                   guint             *y,
-                                                   guint             *width,
-                                                   guint             *height);
-void      ogmrip_video_codec_set_crop_size        (OGMRipVideoCodec  *video,
-                                                   guint             x,
-                                                   guint             y,
-                                                   guint             width,
-                                                   guint             height);
-gboolean  ogmrip_video_codec_get_scale_size       (OGMRipVideoCodec  *video,
-                                                   guint             *width,
-                                                   guint             *height);
-void      ogmrip_video_codec_set_scale_size       (OGMRipVideoCodec  *video,
-                                                   guint             width,
-                                                   guint             height);
-gboolean  ogmrip_video_codec_get_max_size         (OGMRipVideoCodec  *video,
-                                                   guint             *width,
-                                                   guint             *height,
-                                                   gboolean          *expand);
-void      ogmrip_video_codec_set_max_size         (OGMRipVideoCodec  *video,
-                                                   guint             width,
-                                                   guint             height,
-                                                   gboolean          expand);
-gboolean  ogmrip_video_codec_get_min_size         (OGMRipVideoCodec  *video,
-                                                   guint             *width,
-                                                   guint             *height);
-void      ogmrip_video_codec_set_min_size         (OGMRipVideoCodec  *video,
-                                                   guint             width,
-                                                   guint             height);
-void      ogmrip_video_codec_get_aspect_ratio     (OGMRipVideoCodec  *video,
-                                                   guint             *num,
-                                                   guint             *denom);
-void      ogmrip_video_codec_set_aspect_ratio     (OGMRipVideoCodec  *video,
-                                                   guint             num,
-                                                   guint             denom);
-gboolean  ogmrip_video_codec_analyze              (OGMRipVideoCodec  *video,
-                                                   guint             nframes);
-gboolean  ogmrip_video_codec_autocrop             (OGMRipVideoCodec  *video,
-                                                   guint             nframes);
-void      ogmrip_video_codec_autoscale            (OGMRipVideoCodec  *video);
-void      ogmrip_video_codec_autobitrate          (OGMRipVideoCodec  *video, 
-                                                   guint64           nonvideo_size,
-                                                   guint64           overhead_size,
-                                                   guint64           total_size);
-gint      ogmrip_video_codec_is_interlaced        (OGMRipVideoCodec  *video);
+void                ogmrip_video_codec_set_angle          (OGMRipVideoCodec  *video,
+                                                           guint             angle);
+gint                ogmrip_video_codec_get_angle          (OGMRipVideoCodec  *video);
+void                ogmrip_video_codec_set_bitrate        (OGMRipVideoCodec  *video,
+                                                           guint             bitrate);
+gint                ogmrip_video_codec_get_bitrate        (OGMRipVideoCodec  *video);
+void                ogmrip_video_codec_set_quantizer      (OGMRipVideoCodec  *video,
+                                                           gdouble           quantizer);
+gdouble             ogmrip_video_codec_get_quantizer      (OGMRipVideoCodec  *video);
+void                ogmrip_video_codec_set_bits_per_pixel (OGMRipVideoCodec  *video,
+                                                           gdouble           bpp);
+gdouble             ogmrip_video_codec_get_bits_per_pixel (OGMRipVideoCodec  *video);
+void                ogmrip_video_codec_set_passes         (OGMRipVideoCodec  *video,
+                                                           guint             pass);
+gint                ogmrip_video_codec_get_passes         (OGMRipVideoCodec  *video);
+void                ogmrip_video_codec_set_threads        (OGMRipVideoCodec  *video,
+                                                           guint             threads);
+gint                ogmrip_video_codec_get_threads        (OGMRipVideoCodec  *video);
+void                ogmrip_video_codec_set_scaler         (OGMRipVideoCodec  *video,
+                                                           OGMRipScalerType  scaler);
+gint                ogmrip_video_codec_get_scaler         (OGMRipVideoCodec  *video);
+void                ogmrip_video_codec_set_deinterlacer   (OGMRipVideoCodec  *video,
+                                                           OGMRipDeintType   deint);
+gint                ogmrip_video_codec_get_deinterlacer   (OGMRipVideoCodec  *video);
+void                ogmrip_video_codec_set_turbo          (OGMRipVideoCodec  *video,
+                                                           gboolean          turbo);
+gboolean            ogmrip_video_codec_get_turbo          (OGMRipVideoCodec  *video);
+void                ogmrip_video_codec_set_denoise        (OGMRipVideoCodec  *video,
+                                                           gboolean          denoise);
+gboolean            ogmrip_video_codec_get_denoise        (OGMRipVideoCodec  *video);
+void                ogmrip_video_codec_set_quality        (OGMRipVideoCodec  *video,
+                                                           OGMRipQualityType quality);
+gint                ogmrip_video_codec_get_quality        (OGMRipVideoCodec  *video);
+void                ogmrip_video_codec_set_deblock        (OGMRipVideoCodec  *video,
+                                                           gboolean          deblock);
+gboolean            ogmrip_video_codec_get_deblock        (OGMRipVideoCodec  *video);
+void                ogmrip_video_codec_set_dering         (OGMRipVideoCodec  *video,
+                                                           gboolean          dering);
+gboolean            ogmrip_video_codec_get_dering         (OGMRipVideoCodec  *video);
+gint                ogmrip_video_codec_get_start_delay    (OGMRipVideoCodec  *video);
+void                ogmrip_video_codec_get_raw_size       (OGMRipVideoCodec  *video,
+                                                           guint             *width,
+                                                           guint             *height);
+gboolean            ogmrip_video_codec_get_crop_size      (OGMRipVideoCodec  *video,
+                                                           guint             *x,
+                                                           guint             *y,
+                                                           guint             *width,
+                                                           guint             *height);
+void                ogmrip_video_codec_set_crop_size      (OGMRipVideoCodec  *video,
+                                                           guint             x,
+                                                           guint             y,
+                                                           guint             width,
+                                                           guint             height);
+gboolean            ogmrip_video_codec_get_scale_size     (OGMRipVideoCodec  *video,
+                                                           guint             *width,
+                                                           guint             *height);
+void                ogmrip_video_codec_set_scale_size     (OGMRipVideoCodec  *video,
+                                                           guint             width,
+                                                           guint             height);
+gboolean            ogmrip_video_codec_get_max_size       (OGMRipVideoCodec  *video,
+                                                           guint             *width,
+                                                           guint             *height,
+                                                           gboolean          *expand);
+void                ogmrip_video_codec_set_max_size       (OGMRipVideoCodec  *video,
+                                                           guint             width,
+                                                           guint             height,
+                                                           gboolean          expand);
+gboolean            ogmrip_video_codec_get_min_size       (OGMRipVideoCodec  *video,
+                                                           guint             *width,
+                                                           guint             *height);
+void                ogmrip_video_codec_set_min_size       (OGMRipVideoCodec  *video,
+                                                           guint             width,
+                                                           guint             height);
+void                ogmrip_video_codec_get_aspect_ratio   (OGMRipVideoCodec  *video,
+                                                           guint             *num,
+                                                           guint             *denom);
+void                ogmrip_video_codec_set_aspect_ratio   (OGMRipVideoCodec  *video,
+                                                           guint             num,
+                                                           guint             denom);
+OGMDvdAudioStream * ogmrip_video_codec_get_ensure_sync    (OGMRipVideoCodec  *video);
+void                ogmrip_video_codec_set_ensure_sync    (OGMRipVideoCodec  *video,
+                                                           OGMDvdAudioStream *stream);
 
-OGMDvdAudioStream * ogmrip_video_codec_get_ensure_sync (OGMRipVideoCodec  *video);
-void                ogmrip_video_codec_set_ensure_sync (OGMRipVideoCodec  *video,
-                                                        OGMDvdAudioStream *stream);
-
-OGMDvdSubpStream *  ogmrip_video_codec_get_hard_subp   (OGMRipVideoCodec  *video,
-                                                        gboolean          *forced);
-void                ogmrip_video_codec_set_hard_subp   (OGMRipVideoCodec  *video,
-                                                        OGMDvdSubpStream  *stream,
-                                                        gboolean          forced);
+OGMDvdSubpStream *  ogmrip_video_codec_get_hard_subp      (OGMRipVideoCodec  *video,
+                                                           gboolean          *forced);
+void                ogmrip_video_codec_set_hard_subp      (OGMRipVideoCodec  *video,
+                                                           OGMDvdSubpStream  *stream,
+                                                           gboolean          forced);
 
 G_END_DECLS
 

@@ -70,7 +70,7 @@ struct _OGMRipLavcClass
   OGMRipVideoCodecClass parent_class;
 
   /* vtable */
-  G_CONST_RETURN gchar * (* get_codec) (void);
+  const gchar * (* get_codec) (void);
 };
 
 /**

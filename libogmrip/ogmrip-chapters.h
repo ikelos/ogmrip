@@ -48,8 +48,7 @@ struct _OGMRipChaptersClass
 GType         ogmrip_chapters_get_type  (void);
 OGMJobSpawn * ogmrip_chapters_new       (OGMDvdTitle    *title,
                                          const gchar    *output);
-G_CONST_RETURN 
-gchar *       ogmrip_chapters_get_label (OGMRipChapters *chapters, 
+const gchar * ogmrip_chapters_get_label (OGMRipChapters *chapters, 
                                          guint          n);
 void          ogmrip_chapters_set_label (OGMRipChapters *chapters, 
                                          guint          n, 

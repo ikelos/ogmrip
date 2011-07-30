@@ -44,9 +44,6 @@ struct _OGMRipAudioCodec
 struct _OGMRipAudioCodecClass
 {
   OGMRipCodecClass parent_class;
-
-  /* vtable */
-  gint (* get_samples_per_frame) (OGMRipAudioCodec *audio);
 };
 
 GType               ogmrip_audio_codec_get_type              (void);
@@ -68,8 +65,7 @@ void                ogmrip_audio_codec_set_sample_rate       (OGMRipAudioCodec  
 gint                ogmrip_audio_codec_get_sample_rate       (OGMRipAudioCodec    *audio);
 void                ogmrip_audio_codec_set_label             (OGMRipAudioCodec    *audio,
                                                               const gchar         *label);
-G_CONST_RETURN
-gchar *             ogmrip_audio_codec_get_label             (OGMRipAudioCodec    *audio);
+const gchar *       ogmrip_audio_codec_get_label             (OGMRipAudioCodec    *audio);
 gint                ogmrip_audio_codec_get_samples_per_frame (OGMRipAudioCodec    *audio);
 
 G_END_DECLS
