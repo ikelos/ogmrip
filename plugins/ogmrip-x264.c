@@ -284,7 +284,8 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   if (x264_have_lookahead)
     g_string_append_printf (options, ":rc_lookahead=%u", x264->rc_lookahead);
 
-  bframes = ogmrip_video_codec_get_max_b_frames (video);
+  bframes = 0;
+  // bframes = ogmrip_video_codec_get_max_b_frames (video);
   g_string_append_printf (options, ":bframes=%d", cartoon ? bframes + 2 : bframes);
 
   if (pass != passes)
@@ -799,9 +800,10 @@ ogmrip_x264_run (OGMJobSpawn *spawn)
 static gint
 ogmrip_x264_get_start_delay (OGMRipVideoCodec *video)
 {
+/*
   if (ogmrip_video_codec_get_max_b_frames (video) > 0)
     return 2;
-  
+*/
   return 1;
 }
 
@@ -810,7 +812,7 @@ ogmrip_x264_set_default_values (OGMRipX264 *x264)
 {
   ogmrip_x264_init (x264);
 
-  ogmrip_video_codec_set_max_b_frames (OGMRIP_VIDEO_CODEC (x264), OGMRIP_X264_DEFAULT_B_FRAMES);
+  // ogmrip_video_codec_set_max_b_frames (OGMRIP_VIDEO_CODEC (x264), OGMRIP_X264_DEFAULT_B_FRAMES);
 }
 
 static void
@@ -832,7 +834,7 @@ ogmrip_x264_set_quality (OGMRipVideoCodec *video, OGMRipQualityType quality)
       x264->merange = 24;
       x264->rc_lookahead = 60;
       x264->subq = 10;
-      ogmrip_video_codec_set_max_b_frames (OGMRIP_VIDEO_CODEC (x264), 8);
+      // ogmrip_video_codec_set_max_b_frames (OGMRIP_VIDEO_CODEC (x264), 8);
       break;
     case OGMRIP_QUALITY_HIGH:
       x264->b_adapt = 2;

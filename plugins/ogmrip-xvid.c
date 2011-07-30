@@ -225,7 +225,8 @@ ogmrip_xvid_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   g_ptr_array_add (argv, g_strdup ("xvid"));
 
   quality = ogmrip_video_codec_get_quality (video);
-  bframes = ogmrip_video_codec_get_max_b_frames (video);
+  // bframes = ogmrip_video_codec_get_max_b_frames (video);
+  bframes = 0;
 
   options = g_string_new (NULL);
 
@@ -816,7 +817,7 @@ ogmrip_xvid_set_default_values (OGMRipXvid *xvid)
 {
   ogmrip_xvid_init (xvid);
 
-  ogmrip_video_codec_set_max_b_frames (OGMRIP_VIDEO_CODEC (xvid), OGMRIP_XVID_DEFAULT_BFRAMES);
+  // ogmrip_video_codec_set_max_b_frames (OGMRIP_VIDEO_CODEC (xvid), OGMRIP_XVID_DEFAULT_BFRAMES);
 }
 
 static void
