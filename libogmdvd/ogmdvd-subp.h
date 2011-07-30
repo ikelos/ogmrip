@@ -23,8 +23,9 @@
 
 G_BEGIN_DECLS
 
-gint ogmdvd_subp_stream_get_language (OGMDvdSubpStream *subp);
-gint ogmdvd_subp_stream_get_content  (OGMDvdSubpStream *subp);
+gint          ogmdvd_subp_stream_get_content  (OGMDvdSubpStream *subp);
+gint          ogmdvd_subp_stream_get_language (OGMDvdSubpStream *subp);
+const gchar * ogmdvd_subp_stream_get_name     (OGMDvdSubpStream *subp);
 
 G_END_DECLS
 

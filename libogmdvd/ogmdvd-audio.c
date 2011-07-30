@@ -133,3 +133,27 @@ ogmdvd_audio_stream_get_bitrate (OGMDvdAudioStream *audio)
   return 0;
 }
 
+/**
+ * ogmdvd_audio_stream_get_name:
+ * @audio: An #OGMDvdAudioStream
+ *
+ * Returns the name of the audio stream.
+ *
+ * Returns: the name, or NULL
+ */
+const gchar *
+ogmdvd_audio_stream_get_name (OGMDvdAudioStream *audio)
+{
+  g_return_val_if_fail (audio != NULL, NULL);
+
+  return NULL;
+}
+
+gint
+ogmdvd_audio_stream_get_sample_rate (OGMDvdAudioStream *audio)
+{
+  g_return_val_if_fail (audio != NULL, -1);
+
+  return 48000;
+}
+

@@ -23,12 +23,14 @@
 
 G_BEGIN_DECLS
 
-gint ogmdvd_audio_stream_get_format       (OGMDvdAudioStream *audio);
-gint ogmdvd_audio_stream_get_channels     (OGMDvdAudioStream *audio);
-gint ogmdvd_audio_stream_get_language     (OGMDvdAudioStream *audio);
-gint ogmdvd_audio_stream_get_quantization (OGMDvdAudioStream *audio);
-gint ogmdvd_audio_stream_get_content      (OGMDvdAudioStream *audio);
-gint ogmdvd_audio_stream_get_bitrate      (OGMDvdAudioStream *audio);
+gint          ogmdvd_audio_stream_get_bitrate      (OGMDvdAudioStream *audio);
+gint          ogmdvd_audio_stream_get_channels     (OGMDvdAudioStream *audio);
+gint          ogmdvd_audio_stream_get_content      (OGMDvdAudioStream *audio);
+gint          ogmdvd_audio_stream_get_format       (OGMDvdAudioStream *audio);
+const gchar * ogmdvd_audio_stream_get_name         (OGMDvdAudioStream *audio);
+gint          ogmdvd_audio_stream_get_language     (OGMDvdAudioStream *audio);
+gint          ogmdvd_audio_stream_get_quantization (OGMDvdAudioStream *audio);
+gint          ogmdvd_audio_stream_get_sample_rate  (OGMDvdAudioStream *audio);
 
 G_END_DECLS
 
