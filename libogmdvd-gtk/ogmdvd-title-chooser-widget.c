@@ -29,7 +29,7 @@
 
 #include "ogmdvd-title-chooser-widget.h"
 
-#include <glib/gi18n.h>
+#include <glib/gi18n-lib.h>
 
 #define OGMDVD_TITLE_CHOOSER_WIDGET_GET_PRIVATE(o) \
     (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMDVD_TYPE_TITLE_CHOOSER_WIDGET, OGMDvdTitleChooserWidgetPriv))

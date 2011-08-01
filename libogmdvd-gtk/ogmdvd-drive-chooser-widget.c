@@ -30,7 +30,7 @@
 #include "ogmdvd-drive-chooser-widget.h"
 
 #include <ogmdvd.h>
-#include <glib/gi18n.h>
+#include <glib/gi18n-lib.h>
 
 #define OGMDVD_DRIVE_CHOOSER_WIDGET_GET_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMDVD_TYPE_DRIVE_CHOOSER_WIDGET, OGMDvdDriveChooserWidgetPriv))
