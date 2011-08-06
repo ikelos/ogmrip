@@ -146,6 +146,7 @@ GtkWidget * ogmrip_load_dvd_dialog_new (GtkWindow   *parent,
  * Languages
  */
 
+GtkWidget * ogmrip_language_chooser_new             (void);
 void        ogmrip_language_chooser_construct       (GtkComboBox *chooser);
 guint       ogmrip_language_chooser_get_active      (GtkComboBox *chooser);
 void        ogmrip_language_chooser_set_active      (GtkComboBox *chooser,

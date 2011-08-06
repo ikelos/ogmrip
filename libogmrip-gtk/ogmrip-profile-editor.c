@@ -21,8 +21,10 @@
 #endif
 
 #include "ogmrip-profile-editor.h"
+#include "ogmrip-options-plugin.h"
+#include "ogmrip-helper.h"
 
-#include <glib/gi18n.h>
+#include <glib/gi18n-lib.h>
 
 #define OGMRIP_GLADE_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-profile-editor.glade"
 #define OGMRIP_GLADE_ROOT "root"

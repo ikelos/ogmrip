@@ -52,12 +52,12 @@ typedef union
 #define OGMRIP_TYPE_SOURCE_CHOOSER            (ogmrip_source_chooser_get_type ())
 #define OGMRIP_SOURCE_CHOOSER(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_SOURCE_CHOOSER, OGMRipSourceChooser))
 #define OGMRIP_IS_SOURCE_CHOOSER(obj)         (G_TYPE_CHECK_INSTANCE_TYPE (obj, OGMRIP_TYPE_SOURCE_CHOOSER))
-#define OGMRIP_SOURCE_CHOOSER_GET_IFACE(inst) (G_TYPE_INSTANCE_GET_INTERFACE ((inst), OGMRIP_TYPE_SOURCE_CHOOSER, OGMRipSourceChooserIface))
+#define OGMRIP_SOURCE_CHOOSER_GET_IFACE(inst) (G_TYPE_INSTANCE_GET_INTERFACE ((inst), OGMRIP_TYPE_SOURCE_CHOOSER, OGMRipSourceChooserInterface))
 
-typedef struct _OGMRipSourceChooser      OGMRipSourceChooser;
-typedef struct _OGMRipSourceChooserIface OGMRipSourceChooserIface;
+typedef struct _OGMRipSourceChooser          OGMRipSourceChooser;
+typedef struct _OGMRipSourceChooserInterface OGMRipSourceChooserInterface;
 
-struct _OGMRipSourceChooserIface
+struct _OGMRipSourceChooserInterface
 {
   GTypeInterface base_iface;
 
@@ -67,17 +67,14 @@ struct _OGMRipSourceChooserIface
                                       gint                language);
 };
 
-GType               ogmrip_source_chooser_get_type        (void);
-
-void                ogmrip_source_chooser_set_title       (OGMRipSourceChooser *chooser,
-                                                           OGMDvdTitle         *title);
-OGMDvdTitle *       ogmrip_source_chooser_get_title       (OGMRipSourceChooser *chooser);
-
-OGMRipSource *      ogmrip_source_chooser_get_active      (OGMRipSourceChooser *chooser,
-                                                           OGMRipSourceType    *type);
-
-void                ogmrip_source_chooser_select_language (OGMRipSourceChooser *chooser,
-                                                           gint                language);
+GType          ogmrip_source_chooser_get_type        (void);
+void           ogmrip_source_chooser_set_title       (OGMRipSourceChooser *chooser,
+                                                      OGMDvdTitle         *title);
+OGMDvdTitle *  ogmrip_source_chooser_get_title       (OGMRipSourceChooser *chooser);
+OGMRipSource * ogmrip_source_chooser_get_active      (OGMRipSourceChooser *chooser,
+                                                      OGMRipSourceType    *type);
+void           ogmrip_source_chooser_select_language (OGMRipSourceChooser *chooser,
+                                                      gint                language);
 
 G_END_DECLS
 

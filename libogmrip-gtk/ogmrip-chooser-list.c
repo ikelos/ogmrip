@@ -16,16 +16,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 /**
  * SECTION:ogmrip-chooser-list
  * @title: OGMRipChooserList
  * @include: ogmrip-chooser-list.h
  * @short_description: A widget that displays a list of source choosers
  */
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include "ogmrip-chooser-list.h"
 #include "ogmrip-helper.h"

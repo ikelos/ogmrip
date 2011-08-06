@@ -16,10 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 /**
  * SECTION:ogmrip-helper
  * @title: Helper
@@ -27,11 +23,15 @@
  * @short_description: A list of helper functions
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "ogmrip-helper.h"
 #include "ogmrip-plugin.h"
 #include "ogmrip-container.h"
 
-#include <glib/gi18n.h>
+#include <glib/gi18n-lib.h>
 
 #include <stdlib.h>
 #include <locale.h>
@@ -924,6 +924,26 @@ ogmrip_get_user_profiles_dir (void)
     dir = g_build_filename (g_get_home_dir (), ".ogmrip", "profiles", NULL);
 
   return dir;
+}
+
+GtkWidget *
+ogmrip_language_chooser_new (void)
+{
+  GtkWidget *chooser;
+  GtkListStore *store;
+  GtkCellRenderer *cell;
+
+  chooser = gtk_combo_box_new ();
+
+  store = gtk_list_store_new (2, G_TYPE_STRING, G_TYPE_UINT);
+  gtk_combo_box_set_model (GTK_COMBO_BOX (chooser), GTK_TREE_MODEL (store));
+  g_object_unref (store);
+
+  cell = gtk_cell_renderer_text_new ();
+  gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (chooser), cell, TRUE);
+  gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (chooser), cell, "text", 0, NULL);
+
+  return chooser;
 }
 
 /**

@@ -19,7 +19,8 @@
 #ifndef __OGMRIP_PROFILE_EDITOR_H__
 #define __OGMRIP_PROFILE_EDITOR_H__
 
-#include <ogmrip-gtk.h>
+#include <ogmrip.h>
+#include <gtk/gtk.h>
 
 G_BEGIN_DECLS
 

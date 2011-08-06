@@ -23,17 +23,11 @@
 
 G_BEGIN_DECLS
 
-#define OGMRIP_TYPE_AUDIO_CHOOSER_WIDGET            (ogmrip_audio_chooser_widget_get_type ())
-#define OGMRIP_AUDIO_CHOOSER_WIDGET(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_AUDIO_CHOOSER_WIDGET, OGMRipSourceChooserWidget))
-#define OGMRIP_AUDIO_CHOOSER_WIDGET_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_AUDIO_CHOOSER_WIDGET, OGMRipSourceChooserWidgetClass))
-#define OGMRIP_IS_AUDIO_CHOOSER_WIDGET(obj)         (G_TYPE_CHECK_INSTANCE_TYPE (obj, OGMRIP_TYPE_AUDIO_CHOOSER_WIDGET))
-#define OGMRIP_IS_AUDIO_CHOOSER_WIDGET_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_AUDIO_CHOOSER_WIDGET))
-
-#define OGMRIP_TYPE_SUBP_CHOOSER_WIDGET             (ogmrip_subp_chooser_widget_get_type ())
-#define OGMRIP_SUBP_CHOOSER_WIDGET(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_SUBP_CHOOSER_WIDGET, OGMRipSourceChooserWidget))
-#define OGMRIP_SUBP_CHOOSER_WIDGET_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_SUBP_CHOOSER_WIDGET, OGMRipSourceChooserWidgetClass))
-#define OGMRIP_IS_SUBP_CHOOSER_WIDGET(obj)          (G_TYPE_CHECK_INSTANCE_TYPE (obj, OGMRIP_TYPE_SUBP_CHOOSER_WIDGET))
-#define OGMRIP_IS_SUBP_CHOOSER_WIDGET_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_SUBP_CHOOSER_WIDGET))
+#define OGMRIP_TYPE_SOURCE_CHOOSER_WIDGET            (ogmrip_source_chooser_widget_get_type ())
+#define OGMRIP_SOURCE_CHOOSER_WIDGET(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_SOURCE_CHOOSER_WIDGET, OGMRipSourceChooserWidget))
+#define OGMRIP_SOURCE_CHOOSER_WIDGET_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_SOURCE_CHOOSER_WIDGET, OGMRipSourceChooserWidgetClass))
+#define OGMRIP_IS_SOURCE_CHOOSER_WIDGET(obj)         (G_TYPE_CHECK_INSTANCE_TYPE (obj, OGMRIP_TYPE_SOURCE_CHOOSER_WIDGET))
+#define OGMRIP_IS_SOURCE_CHOOSER_WIDGET_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_SOURCE_CHOOSER_WIDGET))
 
 typedef struct _OGMRipSourceChooserWidget      OGMRipSourceChooserWidget;
 typedef struct _OGMRipSourceChooserWidgetClass OGMRipSourceChooserWidgetClass;
@@ -41,20 +35,19 @@ typedef struct _OGMRipSourceChooserWidgetPriv  OGMRipSourceChooserWidgetPriv;
 
 struct _OGMRipSourceChooserWidget
 {
-  GtkComboBox parent_instance;
+  GtkHBox parent_instance;
+
   OGMRipSourceChooserWidgetPriv *priv;
 };
 
 struct _OGMRipSourceChooserWidgetClass
 {
-  GtkComboBoxClass parent_class;
+  GtkHBoxClass parent_class;
 };
 
-GType       ogmrip_audio_chooser_widget_get_type (void);
-GtkWidget * ogmrip_audio_chooser_widget_new      (void);
-
-GType       ogmrip_subp_chooser_widget_get_type  (void);
-GtkWidget * ogmrip_subp_chooser_widget_new       (void);
+GType ogmrip_source_chooser_widget_get_type (void);
+void  ogmrip_source_chooser_widget_add_stream (OGMRipSourceChooserWidget *chooser,
+                                               OGMDvdStream              *stream);
 
 G_END_DECLS
 

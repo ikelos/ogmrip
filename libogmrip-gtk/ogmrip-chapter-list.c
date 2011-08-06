@@ -16,16 +16,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 /**
  * SECTION:ogmrip-chapter-list
  * @title: OGMRipChapterList
  * @include: ogmrip-chapter-list.h
  * @short_description: A widget that lists the chapters of a DVD title
  */
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 #include "ogmrip-chapter-list.h"
 #include "ogmrip-helper.h"

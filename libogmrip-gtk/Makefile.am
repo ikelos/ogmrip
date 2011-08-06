@@ -1,34 +1,46 @@
 lib_LTLIBRARIES = \
   libogmrip-gtk.la
 
-libogmrip_gtk_la_SOURCES =       \
-  ogmrip-audio-options.c         \
-  ogmrip-audio-options-dialog.c  \
-  ogmrip-chapter-list.c          \
-  ogmrip-chooser-list.c          \
-  ogmrip-helper.c                \
-  ogmrip-options-plugin.c        \
-  ogmrip-profile-editor.c        \
-  ogmrip-source-chooser.c        \
-  ogmrip-source-chooser-widget.c \
-  ogmrip-subp-options.c          \
+libogmrip_gtk_la_SOURCES =           \
+  ogmrip-audio-chooser-widget.c      \
+  ogmrip-audio-file-chooser-dialog.c \
+  ogmrip-audio-options.c             \
+  ogmrip-audio-options-dialog.c      \
+  ogmrip-chapter-list.c              \
+  ogmrip-chooser-list.c              \
+  ogmrip-file-chooser-dialog.c       \
+  ogmrip-helper.c                    \
+  ogmrip-list-item.c                 \
+  ogmrip-options-plugin.c            \
+  ogmrip-profile-editor.c            \
+  ogmrip-source-chooser.c            \
+  ogmrip-source-chooser-widget.c     \
+  ogmrip-subp-chooser-widget.c       \
+  ogmrip-subp-file-chooser-dialog.c  \
+  ogmrip-subp-options.c              \
   ogmrip-subp-options-dialog.c
 
 libogmrip_gtk_ladir = \
   $(includedir)/ogmrip
 
-libogmrip_gtk_la_HEADERS =       \
-  ogmrip-audio-options.h         \
-  ogmrip-audio-options-dialog.h  \
-  ogmrip-chapter-list.h          \
-  ogmrip-chooser-list.h          \
-  ogmrip-helper.h                \
-  ogmrip-options-plugin.h        \
-  ogmrip-profile-editor.h        \
-  ogmrip-source-chooser.h        \
-  ogmrip-source-chooser-widget.h \
-  ogmrip-subp-options.c          \
-  ogmrip-subp-options-dialog.c   \
+libogmrip_gtk_la_HEADERS =           \
+  ogmrip-audio-chooser-widget.h      \
+  ogmrip-audio-file-chooser-dialog.h \
+  ogmrip-audio-options.h             \
+  ogmrip-audio-options-dialog.h      \
+  ogmrip-chapter-list.h              \
+  ogmrip-chooser-list.h              \
+  ogmrip-file-chooser-dialog.h       \
+  ogmrip-helper.h                    \
+  ogmrip-list-item.h                 \
+  ogmrip-options-plugin.h            \
+  ogmrip-profile-editor.h            \
+  ogmrip-source-chooser.h            \
+  ogmrip-source-chooser-widget.h     \
+  ogmrip-subp-chooser-widget.h       \
+  ogmrip-subp-file-chooser-dialog.h  \
+  ogmrip-subp-options.c              \
+  ogmrip-subp-options-dialog.c       \
   ogmrip-gtk.h
 
 libogmrip_gtk_la_LDFLAGS = \

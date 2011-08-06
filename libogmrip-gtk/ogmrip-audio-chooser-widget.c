@@ -1,4 +1,4 @@
-/* OGMDvd - A wrapper library around libripread
+/* OGMRip - A wrapper library around libdvdread
  * Copyright (C) 2004-2010 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -16,20 +16,25 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef __OGMRIP_GTK_H__
-#define __OGMRIP_GTK_H__
+#include "ogmrip-audio-chooser-widget.h"
+#include "ogmrip-audio-file-chooser-dialog.h"
 
-#include <ogmrip.h>
-#include <ogmrip-audio-chooser-widget.h>
-#include <ogmrip-audio-file-chooser-dialog.h>
-#include <ogmrip-chapter-list.h>
-#include <ogmrip-chooser-list.h>
-#include <ogmrip-helper.h>
-#include <ogmrip-list-item.h>
-#include <ogmrip-options-plugin.h>
-#include <ogmrip-profile-editor.h>
-#include <ogmrip-subp-chooser-widget.h>
-#include <ogmrip-subp-file-chooser-dialog.h>
+G_DEFINE_TYPE (OGMRipAudioChooserWidget, ogmrip_audio_chooser_widget, OGMRIP_TYPE_SOURCE_CHOOSER_WIDGET);
 
-#endif /* __OGMRIP_GTK_H__ */
+static void
+ogmrip_audio_chooser_widget_class_init (OGMRipAudioChooserWidgetClass *klass)
+{
+}
+
+static void
+ogmrip_audio_chooser_widget_init (OGMRipAudioChooserWidget *chooser)
+{
+}
+
+GtkWidget *
+ogmrip_audio_chooser_widget_new (void)
+{
+  return g_object_new (OGMRIP_TYPE_AUDIO_CHOOSER_WIDGET,
+      "dialog", ogmrip_audio_file_chooser_dialog_new (), NULL);
+}
 

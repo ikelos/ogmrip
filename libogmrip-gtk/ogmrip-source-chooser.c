@@ -16,10 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 /**
  * SECTION:ogmrip-source-chooser
  * @title: OGMRipSourceChooser
@@ -29,31 +25,12 @@
 
 #include "ogmrip-source-chooser.h"
 
-static void ogmrip_source_chooser_class_init (gpointer g_iface);
-
-GType
-ogmrip_source_chooser_get_type (void)
-{
-  static GType source_chooser_type = 0;
-
-  if (!source_chooser_type)
-  {
-    source_chooser_type = g_type_register_static_simple (G_TYPE_INTERFACE,
-        "OGMRipSourceChooser",
-        sizeof (OGMRipSourceChooserIface),
-        (GClassInitFunc) ogmrip_source_chooser_class_init,
-        0, NULL, 0);
-
-    g_type_interface_add_prerequisite (source_chooser_type, GTK_TYPE_WIDGET);
-  }
-
-  return source_chooser_type;
-}
+G_DEFINE_INTERFACE (OGMRipSourceChooser, ogmrip_source_chooser, GTK_TYPE_WIDGET);
 
 static void
-ogmrip_source_chooser_class_init (gpointer g_iface)
+ogmrip_source_chooser_default_init (OGMRipSourceChooserInterface *iface)
 {
-  g_object_interface_install_property (g_iface,
+  g_object_interface_install_property (iface,
       g_param_spec_pointer ("title", "Title property", "The DVD title",
         G_PARAM_READWRITE));
 }
