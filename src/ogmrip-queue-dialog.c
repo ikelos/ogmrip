@@ -98,6 +98,7 @@ ogmrip_queue_dialog_find_encoding (OGMRipQueueDialog *dialog, OGMRipEncoding *en
 static void
 ogmrip_queue_dialog_update (OGMRipQueueDialog *dialog, OGMRipEncoding *encoding, GtkTreeIter *iter)
 {
+/*
   gboolean has_prev = FALSE, has_next = FALSE, can_remove = FALSE;
 
   can_remove = !OGMRIP_ENCODING_IS_RUNNING (encoding);
@@ -122,6 +123,7 @@ ogmrip_queue_dialog_update (OGMRipQueueDialog *dialog, OGMRipEncoding *encoding,
   gtk_widget_set_sensitive (dialog->priv->bottom_button, has_next);
 
   gtk_action_set_sensitive (dialog->priv->remove_action, can_remove);
+*/
 }
 
 static void
@@ -149,7 +151,7 @@ ogmrip_queue_dialog_encoding_completed (OGMRipQueueDialog *dialog, OGMJobResultT
     ogmrip_queue_dialog_update (dialog, encoding, &iter);
   }
 }
-
+/*
 static void
 ogmrip_queue_dialog_encoding_task_completed (OGMRipQueueDialog *dialog, OGMRipEncodingTask *task, OGMRipEncoding *encoding)
 {
@@ -159,7 +161,7 @@ ogmrip_queue_dialog_encoding_task_completed (OGMRipQueueDialog *dialog, OGMRipEn
       ogmrip_queue_dialog_find_encoding (dialog, encoding, &iter))
     gtk_list_store_set (dialog->priv->store, &iter, COL_STRIKE, TRUE, -1);
 }
-
+*/
 static void
 ogmrip_queue_dialog_remove_iter (OGMRipQueueDialog *dialog, GtkTreeIter *iter, OGMRipEncoding *encoding)
 {
@@ -179,7 +181,7 @@ ogmrip_queue_dialog_remove_iter (OGMRipQueueDialog *dialog, GtkTreeIter *iter, O
 
   g_signal_handlers_disconnect_by_func (encoding, ogmrip_queue_dialog_encoding_run, dialog);
   g_signal_handlers_disconnect_by_func (encoding, ogmrip_queue_dialog_encoding_completed, dialog);
-  g_signal_handlers_disconnect_by_func (encoding, ogmrip_queue_dialog_encoding_task_completed, dialog);
+  // g_signal_handlers_disconnect_by_func (encoding, ogmrip_queue_dialog_encoding_task_completed, dialog);
 
   g_signal_emit (dialog, signals[REMOVE], 0, encoding);
 }
@@ -217,23 +219,19 @@ ogmrip_queue_dialog_list_row_activated (OGMRipQueueDialog *parent, GtkTreePath *
 
     gtk_tree_model_get (GTK_TREE_MODEL (parent->priv->store), &iter,
         COL_ENCODING, &encoding, -1);
-
+/*
     if (!OGMRIP_ENCODING_IS_EXTRACTED (encoding))
     {
       GtkWidget *dialog;
-/*
+
       GType container;
       GSList *sections, *section;
       gint n_audio, n_subp;
       gchar *name;
-*/
+
       dialog = ogmrip_options_dialog_new (encoding, OGMRIP_OPTIONS_DIALOG_EDIT);
       gtk_window_set_parent (GTK_WINDOW (dialog), GTK_WINDOW (parent));
 
-      /*
-       * TODO ajout des profils compatibles
-       */
-/*
       n_audio = ogmrip_encoding_get_n_audio_streams (encoding);
       n_subp = ogmrip_encoding_get_n_subp_streams (encoding);
 
@@ -260,10 +258,11 @@ ogmrip_queue_dialog_list_row_activated (OGMRipQueueDialog *parent, GtkTreePath *
       g_slist_free (sections);
 
       g_signal_connect_swapped (dialog, "profile-changed", G_CALLBACK (ogmrip_queue_dialog_profile_changed), parent);
-*/
+
       gtk_dialog_run (GTK_DIALOG (dialog));
       gtk_widget_destroy (dialog);
     }
+*/
   }
 }
 
@@ -374,10 +373,10 @@ ogmrip_queue_dialog_clear_action_activated (OGMRipQueueDialog *dialog)
   while (gtk_tree_model_get_iter_first (GTK_TREE_MODEL (dialog->priv->store), &iter))
   {
     gtk_tree_model_get (GTK_TREE_MODEL (dialog->priv->store), &iter, COL_ENCODING, &encoding, -1);
-
+/*
     if (!OGMRIP_ENCODING_IS_EXTRACTED (encoding))
       break;
-
+*/
     ogmrip_queue_dialog_remove_iter (dialog, &iter, encoding);
   }
 }
@@ -390,7 +389,7 @@ ogmrip_queue_dialog_remove_action_activated (OGMRipQueueDialog *dialog)
   if (gtk_tree_selection_get_selected (dialog->priv->selection, NULL, &iter))
     ogmrip_queue_dialog_remove_iter (dialog, &iter, NULL);
 }
-
+/*
 static void
 ogmrip_queue_dialog_import_action_activated (OGMRipQueueDialog *parent)
 {
@@ -486,8 +485,7 @@ ogmrip_queue_dialog_export_action_activated (OGMRipQueueDialog *parent)
     }
   }
 }
-
-
+*/
 G_DEFINE_TYPE (OGMRipQueueDialog, ogmrip_queue_dialog, GTK_TYPE_DIALOG)
 
 static void
@@ -595,14 +593,18 @@ ogmrip_queue_dialog_init (OGMRipQueueDialog *dialog)
       G_CALLBACK (ogmrip_queue_dialog_remove_action_activated), dialog);
 
   dialog->priv->import_action = gtk_action_group_get_action (action_group, "Import");
+/*
   g_signal_connect_swapped (dialog->priv->import_action, "activate",
       G_CALLBACK (ogmrip_queue_dialog_import_action_activated), dialog);
+*/
   gtk_action_set_visible (dialog->priv->import_action, FALSE);
 
   dialog->priv->export_action = gtk_action_group_get_action (action_group, "Export");
   gtk_action_set_sensitive (dialog->priv->export_action, FALSE);
+/*
   g_signal_connect_swapped (dialog->priv->export_action, "activate",
       G_CALLBACK (ogmrip_queue_dialog_export_action_activated), dialog);
+*/
   gtk_action_set_visible (dialog->priv->export_action, FALSE);
 
   area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
@@ -692,8 +694,11 @@ ogmrip_queue_dialog_new (void)
 static gboolean
 ogmrip_queue_dialog_check_filename (OGMRipEncoding *encoding1, OGMRipEncoding *encoding2)
 {
+/*
   return g_str_equal (ogmrip_encoding_get_filename (encoding1),
       ogmrip_encoding_get_filename (encoding2)) != TRUE;
+*/
+  return TRUE;
 }
 
 void
@@ -708,10 +713,11 @@ ogmrip_queue_dialog_add_encoding (OGMRipQueueDialog *dialog, OGMRipEncoding *enc
     gtk_tree_selection_select_iter (dialog->priv->selection, &iter);
   else
   {
+/*
     OGMDvdTitle *title;
     OGMRipProfile *profile;
     gchar *name;
-
+*/
     if (!ogmrip_queue_dialog_foreach_encoding (dialog,
           (OGMRipEncodingFunc) ogmrip_queue_dialog_check_filename, encoding))
     {
@@ -724,7 +730,7 @@ ogmrip_queue_dialog_add_encoding (OGMRipQueueDialog *dialog, OGMRipEncoding *enc
             _("Do you want to enqueue it anyway ?")) != GTK_RESPONSE_YES)
         return;
     }
-
+/*
     if (g_file_test (ogmrip_encoding_get_filename (encoding), G_FILE_TEST_EXISTS))
     {
       GtkWindow *transient;
@@ -751,14 +757,15 @@ ogmrip_queue_dialog_add_encoding (OGMRipQueueDialog *dialog, OGMRipEncoding *enc
         -1);
 
     g_free (name);
-
+*/
     g_signal_connect_swapped (encoding, "run",
         G_CALLBACK (ogmrip_queue_dialog_encoding_run), dialog);
     g_signal_connect_swapped (encoding, "complete",
         G_CALLBACK (ogmrip_queue_dialog_encoding_completed), dialog);
+/*
     g_signal_connect_swapped (encoding, "task::complete",
         G_CALLBACK (ogmrip_queue_dialog_encoding_task_completed), dialog);
-
+*/
     gtk_tree_selection_select_iter (dialog->priv->selection, &iter);
 
     gtk_dialog_set_response_sensitive (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT, TRUE);
@@ -770,13 +777,15 @@ ogmrip_queue_dialog_add_encoding (OGMRipQueueDialog *dialog, OGMRipEncoding *enc
 void
 ogmrip_queue_dialog_remove_encoding (OGMRipQueueDialog *dialog, OGMRipEncoding *encoding)
 {
+/*
   GtkTreeIter iter;
-
+*/
   g_return_if_fail (OGMRIP_IS_QUEUE_DIALOG (dialog));
   g_return_if_fail (encoding != NULL);
-
+/*
   if (ogmrip_queue_dialog_find_encoding (dialog, encoding, &iter) && !OGMRIP_ENCODING_IS_RUNNING (encoding))
     ogmrip_queue_dialog_remove_iter (dialog, &iter, NULL);
+*/
 }
 
 gboolean

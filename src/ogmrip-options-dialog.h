@@ -23,12 +23,6 @@
 
 G_BEGIN_DECLS
 
-typedef enum
-{
-  OGMRIP_OPTIONS_DIALOG_CREATE,
-  OGMRIP_OPTIONS_DIALOG_EDIT
-} OGMRipOptionsDialogAction;
-
 enum
 {
   OGMRIP_RESPONSE_EXTRACT,
@@ -58,10 +52,19 @@ struct _OGMRipOptionsDialogClass
   GtkDialogClass parent_class;
 };
 
-GType       ogmrip_options_dialog_get_type (void);
+GType       ogmrip_options_dialog_get_type         (void);
 
-GtkWidget * ogmrip_options_dialog_new      (OGMRipEncoding            *encoding,
-                                            OGMRipOptionsDialogAction action);
+GtkWidget * ogmrip_options_dialog_new              (OGMRipEncoding      *encoding,
+                                                    OGMDvdTitle         *title);
+void        ogmrip_options_dialog_get_scale_size   (OGMRipOptionsDialog *dialog,
+                                                    guint               *width,
+                                                    guint               *height);
+void        ogmrip_options_dialog_get_crop_size    (OGMRipOptionsDialog *dialog,
+                                                    guint               *x,
+                                                    guint               *y,
+                                                    guint               *width,
+                                                    guint               *height);
+gint        ogmrip_options_dialog_get_deinterlacer (OGMRipOptionsDialog *dialog);
 
 G_END_DECLS
 

@@ -22,6 +22,8 @@
 
 #include "ogmrip-crop-dialog.h"
 
+#include <ogmjob.h>
+
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 

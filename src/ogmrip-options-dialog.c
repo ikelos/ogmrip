@@ -21,7 +21,6 @@
 #endif
 
 #include "ogmrip-options-dialog.h"
-#include "ogmrip-profile-editor.h"
 #include "ogmrip-crop-dialog.h"
 
 #include "ogmrip-settings.h"
@@ -39,8 +38,8 @@
 enum
 {
   PROP_0,
-  PROP_ACTION,
-  PROP_ENCODING
+  PROP_ENCODING,
+  PROP_TITLE
 };
 
 enum
@@ -58,8 +57,6 @@ enum
 
 struct _OGMRipOptionsDialogPriv
 {
-  OGMRipOptionsDialogAction action;
-
   GtkWidget *profile_combo;
 
   GtkWidget *crop_check;
@@ -86,6 +83,7 @@ struct _OGMRipOptionsDialogPriv
   GtkWidget *autocrop_button;
 
   OGMRipEncoding *encoding;
+  OGMDvdTitle *title;
 };
 
 static void ogmrip_options_dialog_constructed  (GObject      *gobject);
@@ -145,19 +143,16 @@ ogmrip_options_dialog_get_crop (OGMRipOptionsDialog *dialog, guint *l, guint *t,
 }
 
 static gdouble
-ogmrip_options_dialog_get_crop_size (OGMRipOptionsDialog *dialog, guint *x, guint *y, guint *w, guint *h)
+ogmrip_options_dialog_get_crop_full (OGMRipOptionsDialog *dialog, guint *x, guint *y, guint *w, guint *h)
 {
-  OGMDvdTitle *title;
   guint r, b, n, d, rw, rh;
 
   ogmrip_options_dialog_get_crop (dialog, x, y, &r, &b);
 
-  title = ogmrip_encoding_get_title (dialog->priv->encoding);
-
-  ogmdvd_video_stream_get_resolution (ogmdvd_title_get_video_stream (title), &rw, &rh);
+  ogmdvd_video_stream_get_resolution (ogmdvd_title_get_video_stream (dialog->priv->title), &rw, &rh);
   crop_to_size (rw, rh, *x, *y, r, b, w, h);
 
-  ogmdvd_video_stream_get_aspect_ratio (ogmdvd_title_get_video_stream (title), &n, &d);
+  ogmdvd_video_stream_get_aspect_ratio (ogmdvd_title_get_video_stream (dialog->priv->title), &n, &d);
 
   return get_ratio (rw, rh, *w, *h, n, d);
 }
@@ -169,13 +164,6 @@ ogmrip_options_dialog_set_crop (OGMRipOptionsDialog *dialog, guint l, guint t, g
   gtk_label_set_int (GTK_LABEL (dialog->priv->crop_top_label), t);
   gtk_label_set_int (GTK_LABEL (dialog->priv->crop_right_label), r);
   gtk_label_set_int (GTK_LABEL (dialog->priv->crop_bottom_label), b);
-}
-
-static void
-ogmrip_options_dialog_get_scale (OGMRipOptionsDialog *dialog, guint *w, guint *h)
-{
-  *w = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (dialog->priv->scale_width_spin));
-  *h = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (dialog->priv->scale_height_spin));
 }
 
 static void
@@ -195,7 +183,7 @@ ogmrip_options_dialog_update_scale_combo (OGMRipOptionsDialog *dialog)
   guint x, y, rw, rh, cw, ch, sw, sh, i;
   gdouble f;
 
-  f = ogmrip_options_dialog_get_crop_size (dialog, &x, &y, &cw, &ch);
+  f = ogmrip_options_dialog_get_crop_full (dialog, &x, &y, &cw, &ch);
 
   gtk_spin_button_set_range (GTK_SPIN_BUTTON (dialog->priv->scale_width_spin), 0, cw);
   gtk_spin_button_set_range (GTK_SPIN_BUTTON (dialog->priv->scale_height_spin), 0, ch);
@@ -208,10 +196,7 @@ ogmrip_options_dialog_update_scale_combo (OGMRipOptionsDialog *dialog)
     {
       if (i == OGMRIP_SCALE_NONE)
       {
-        OGMDvdTitle *title;
-
-        title = ogmrip_encoding_get_title (dialog->priv->encoding);
-        ogmdvd_video_stream_get_resolution (ogmdvd_title_get_video_stream (title), &rw, &rh);
+        ogmdvd_video_stream_get_resolution (ogmdvd_title_get_video_stream (dialog->priv->title), &rw, &rh);
 
         str = g_strdup_printf ("%u x %u", rw, rh);
       }
@@ -256,7 +241,7 @@ ogmrip_options_dialog_profile_combo_changed (OGMRipOptionsDialog *dialog)
     g_settings_get (settings, OGMRIP_PROFILE_ENCODING_METHOD, "u", &method);
   }
 
-  sensitive = gtk_widget_get_sensitive (dialog->priv->crop_check);
+  sensitive = gtk_widget_is_sensitive (dialog->priv->crop_check);
   gtk_widget_set_sensitive (dialog->priv->crop_check,
       video_codec != G_TYPE_NONE && can_crop);
 
@@ -266,7 +251,7 @@ ogmrip_options_dialog_profile_combo_changed (OGMRipOptionsDialog *dialog)
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->crop_check),
         !gtk_widget_get_visible (dialog->priv->crop_box));
 
-  sensitive = gtk_widget_get_sensitive (dialog->priv->scale_check);
+  sensitive = gtk_widget_is_sensitive (dialog->priv->scale_check);
   gtk_widget_set_sensitive (dialog->priv->scale_check,
       video_codec != G_TYPE_NONE && scaler != OGMRIP_SCALER_NONE);
 
@@ -276,7 +261,7 @@ ogmrip_options_dialog_profile_combo_changed (OGMRipOptionsDialog *dialog)
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->scale_check),
         !gtk_widget_get_visible (dialog->priv->scale_box));
 
-  sensitive = gtk_widget_get_sensitive (dialog->priv->test_check);
+  sensitive = gtk_widget_is_sensitive (dialog->priv->test_check);
   gtk_widget_set_sensitive (dialog->priv->test_check,
       video_codec != G_TYPE_NONE && scaler != OGMRIP_SCALER_NONE && method != OGMRIP_ENCODING_QUANTIZER);
 
@@ -292,7 +277,7 @@ ogmrip_options_dialog_profile_combo_changed (OGMRipOptionsDialog *dialog)
 static void
 ogmrip_options_dialog_check_toggled (GtkToggleButton *check, GtkWidget *box)
 {
-  if (gtk_widget_get_sensitive (GTK_WIDGET (check)))
+  if (gtk_widget_is_sensitive (GTK_WIDGET (check)))
     gtk_widget_set_visible (box, !gtk_toggle_button_get_active (check));
 }
 
@@ -343,36 +328,34 @@ ogmrip_options_dialog_edit_profiles_button_clicked (OGMRipOptionsDialog *parent)
 static void
 ogmrip_options_dialog_crop_button_clicked (OGMRipOptionsDialog *parent)
 {
-  OGMDvdTitle *title;
   GtkWidget *dialog;
 
   /*
    * TODO make a helper function ?
    */
 
-  title = ogmrip_encoding_get_title (parent->priv->encoding);
-  if (!ogmdvd_title_open (title, NULL))
+  if (!ogmdvd_title_open (parent->priv->title, NULL))
   {
     OGMDvdDisc *disc;
     gint response;
 
-    disc = ogmdvd_title_get_disc (title);
+    disc = ogmdvd_title_get_disc (parent->priv->title);
 
     dialog = ogmrip_load_dvd_dialog_new (GTK_WINDOW (parent), disc, ogmdvd_disc_get_label (disc), TRUE);
     response = gtk_dialog_run (GTK_DIALOG (dialog));
     gtk_widget_destroy (dialog);
 
     if (response == GTK_RESPONSE_ACCEPT)
-      ogmdvd_title_open (title, NULL);
+      ogmdvd_title_open (parent->priv->title, NULL);
   }
 
-  if (ogmdvd_title_is_open (title))
+  if (ogmdvd_title_is_open (parent->priv->title))
   {
     guint l, t, r, b;
 
     ogmrip_options_dialog_get_crop (parent, &l, &t, &r, &b);
 
-    dialog = ogmrip_crop_dialog_new (title, l, t, r, b);
+    dialog = ogmrip_crop_dialog_new (parent->priv->title, l, t, r, b);
     ogmrip_crop_dialog_set_deinterlacer (OGMRIP_CROP_DIALOG (dialog),
         gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (parent->priv->deint_check)));
 
@@ -387,93 +370,56 @@ ogmrip_options_dialog_crop_button_clicked (OGMRipOptionsDialog *parent)
     }
     gtk_widget_destroy (dialog);
 
-    ogmdvd_title_close (title);
+    ogmdvd_title_close (parent->priv->title);
   }
 }
 
 static void
 ogmrip_options_dialog_autocrop_button_clicked (OGMRipOptionsDialog *parent)
 {
-  OGMRipProfile *profile;
-  OGMDvdTitle *title;
-  GtkWidget *dialog;
-  GType codec;
+  OGMDvdVideoStream *stream;
+  guint x, y, w, h;
 
-  title = ogmrip_encoding_get_title (parent->priv->encoding);
-  profile = ogmrip_encoding_get_profile (parent->priv->encoding);
-  codec = ogmrip_profile_get_video_codec_type (profile, NULL);
+  /*
+   * TODO The title must have been analyzed
+   */
 
-  if (!ogmdvd_title_open (title, NULL))
-  {
-    OGMDvdDisc *disc;
-    gint response;
+  stream = ogmdvd_title_get_video_stream (parent->priv->title);
+  ogmdvd_video_stream_get_crop_size (stream, &x, &y, &w, &h);
 
-    disc = ogmdvd_title_get_disc (title);
+  if (!w || !h)
+    ogmdvd_video_stream_get_resolution (ogmdvd_title_get_video_stream (parent->priv->title), &w, &h);
 
-    dialog = ogmrip_load_dvd_dialog_new (GTK_WINDOW (parent), disc, ogmdvd_disc_get_label (disc), TRUE);
-    response = gtk_dialog_run (GTK_DIALOG (dialog));
-    gtk_widget_destroy (dialog);
+  ogmrip_options_dialog_set_crop (parent, x, y, w, h);
+  ogmrip_options_dialog_update_scale_combo (parent);
 
-    if (response == GTK_RESPONSE_ACCEPT)
-      ogmdvd_title_open (title, NULL);
-  }
-
-  if (ogmdvd_title_is_open (title))
-  {
-    OGMJobSpawn *spawn;
-
-    guint x, y, w, h;
-
-    dialog = gtk_message_dialog_new_with_markup (GTK_WINDOW (parent), GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-        GTK_MESSAGE_INFO, GTK_BUTTONS_NONE, "<b>%s</b>\n\n%s", _("Detecting cropping parameters"), _("Please wait"));
-    gtk_widget_show (dialog);
-
-    spawn = g_object_new (codec, "input", title, NULL);
-
-    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (parent->priv->deint_check)))
-      ogmrip_video_codec_set_deinterlacer (OGMRIP_VIDEO_CODEC (spawn), OGMRIP_DEINT_YADIF);
-    else
-      ogmrip_video_codec_set_deinterlacer (OGMRIP_VIDEO_CODEC (spawn), OGMRIP_DEINT_NONE);
-
-    ogmrip_video_codec_autocrop (OGMRIP_VIDEO_CODEC (spawn), 0);
-    ogmrip_video_codec_get_crop_size (OGMRIP_VIDEO_CODEC (spawn), &x, &y, &w, &h);
-    g_object_unref (spawn);
-
-    gtk_widget_destroy (dialog);
-
-    if (!w || !h)
-      ogmdvd_video_stream_get_resolution (ogmdvd_title_get_video_stream (title), &w, &h);
-
-    ogmrip_options_dialog_set_crop (parent, x, y, w, h);
-    ogmrip_options_dialog_update_scale_combo (parent);
-
-    gtk_widget_set_sensitive (parent->priv->autocrop_button, FALSE);
-
-    ogmdvd_title_close (title);
-  }
+  gtk_widget_set_sensitive (parent->priv->autocrop_button, FALSE);
 }
 
 static void
 ogmrip_options_dialog_autoscale_button_clicked (OGMRipOptionsDialog *dialog)
 {
   OGMRipProfile *profile;
-  OGMDvdTitle *title;
+  OGMRipEncoding *encoding;
   OGMJobSpawn *spawn;
 
   GType codec;
   guint x, y, w, h;
 
-  title = ogmrip_encoding_get_title (dialog->priv->encoding);
-  profile = ogmrip_encoding_get_profile (dialog->priv->encoding);
+  profile = ogmrip_profile_chooser_get_active (GTK_COMBO_BOX (dialog->priv->profile_combo));
   codec = ogmrip_profile_get_video_codec_type (profile, NULL);
 
-  ogmrip_options_dialog_get_crop_size (dialog, &x, &y, &w, &h);
+  encoding = ogmrip_encoding_new ();
 
-  spawn = g_object_new (codec, "input", title, NULL);
-  ogmrip_video_codec_set_crop_size (OGMRIP_VIDEO_CODEC (spawn), x, y, w, h);
-  ogmrip_video_codec_autoscale (OGMRIP_VIDEO_CODEC (spawn));
-  ogmrip_video_codec_get_scale_size (OGMRIP_VIDEO_CODEC (spawn), &w, &h);
+  spawn = g_object_new (codec, "input", ogmdvd_title_get_video_stream (dialog->priv->title), NULL);
+  ogmrip_encoding_set_video_codec (encoding, OGMRIP_VIDEO_CODEC (spawn));
   g_object_unref (spawn);
+
+  ogmrip_options_dialog_get_crop_full (dialog, &x, &y, &w, &h);
+  ogmrip_video_codec_set_crop_size (OGMRIP_VIDEO_CODEC (spawn), x, y, w, h);
+
+  ogmrip_encoding_autoscale (encoding, 0.25, &w, &h);
+  g_object_unref (encoding);
 
   ogmrip_options_dialog_set_scale (dialog, w, h);
 
@@ -521,13 +467,13 @@ ogmrip_options_dialog_class_init (OGMRipOptionsDialogClass *klass)
   dialog_class = GTK_DIALOG_CLASS (klass);
   dialog_class->response = ogmrip_options_dialog_response;
 
-  g_object_class_install_property (G_OBJECT_CLASS (klass), PROP_ACTION,
-      g_param_spec_uint ("action", "action", "action",
-        OGMRIP_OPTIONS_DIALOG_CREATE, OGMRIP_OPTIONS_DIALOG_EDIT, OGMRIP_OPTIONS_DIALOG_CREATE,
-        G_PARAM_STATIC_STRINGS | G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
   g_object_class_install_property (G_OBJECT_CLASS (klass), PROP_ENCODING,
       g_param_spec_object ("encoding", "encoding", "encoding",
         OGMRIP_TYPE_ENCODING, G_PARAM_STATIC_STRINGS | G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
+
+  g_object_class_install_property (G_OBJECT_CLASS (klass), PROP_TITLE,
+      g_param_spec_pointer ("title", "title", "title",
+        G_PARAM_STATIC_STRINGS | G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
 
   g_type_class_add_private (klass, sizeof (OGMRipOptionsDialogPriv));
 }
@@ -536,8 +482,6 @@ static void
 ogmrip_options_dialog_init (OGMRipOptionsDialog *dialog)
 {
   dialog->priv = OGMRIP_OPTIONS_DIALOG_GET_PRIVATE (dialog);
-
-  dialog->priv->action = OGMRIP_OPTIONS_DIALOG_CREATE;
 }
 
 static void
@@ -573,10 +517,9 @@ ogmrip_options_dialog_constructed (GObject *gobject)
 
   gtk_window_set_title (GTK_WINDOW (dialog), _("Options"));
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
-  gtk_dialog_set_default_response (GTK_DIALOG (dialog), OGMRIP_RESPONSE_EXTRACT);
   gtk_window_set_icon_from_stock (GTK_WINDOW (dialog), GTK_STOCK_PROPERTIES);
 
-  if (dialog->priv->action == OGMRIP_OPTIONS_DIALOG_EDIT)
+  if (ogmrip_encoding_get_profile (dialog->priv->encoding))
     gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE);
   else
   {
@@ -599,6 +542,8 @@ ogmrip_options_dialog_constructed (GObject *gobject)
 
     image = gtk_image_new_from_stock (GTK_STOCK_CONVERT, GTK_ICON_SIZE_BUTTON);
     gtk_button_set_image (GTK_BUTTON (widget), image);
+
+    gtk_dialog_set_default_response (GTK_DIALOG (dialog), OGMRIP_RESPONSE_EXTRACT);
   }
 
   misc = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
@@ -723,11 +668,11 @@ ogmrip_options_dialog_get_property (GObject *gobject, guint property_id, GValue 
 
   switch (property_id)
   {
-    case PROP_ACTION:
-      g_value_set_uint (value, dialog->priv->action);
-      break;
     case PROP_ENCODING:
       g_value_set_object (value, dialog->priv->encoding);
+      break;
+    case PROP_TITLE:
+      g_value_set_pointer (value, dialog->priv->title);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -742,11 +687,13 @@ ogmrip_options_dialog_set_property (GObject *gobject, guint property_id, const G
 
   switch (property_id)
   {
-    case PROP_ACTION:
-      dialog->priv->action = g_value_get_uint (value);
-      break;
     case PROP_ENCODING:
       dialog->priv->encoding = g_value_dup_object (value);
+      break;
+    case PROP_TITLE:
+      dialog->priv->title = g_value_get_pointer (value);
+      if (dialog->priv->title)
+        ogmdvd_title_ref (dialog->priv->title);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -772,78 +719,92 @@ static void
 ogmrip_options_dialog_response (GtkDialog *dialog, gint response_id)
 {
   OGMRipOptionsDialog *options = OGMRIP_OPTIONS_DIALOG (dialog);
+  OGMRipProfile *profile;
 
-  if (options->priv->encoding)
+  if (response_id != OGMRIP_RESPONSE_EXTRACT && response_id != OGMRIP_RESPONSE_EXTRACT && response_id != GTK_RESPONSE_CLOSE)
+    return;
+
+  if (response_id == GTK_RESPONSE_CLOSE)
+    profile = ogmrip_encoding_get_profile (options->priv->encoding);
+  else
   {
-    OGMRipProfile *profile;
-    gboolean can_crop;
-
     profile = ogmrip_profile_chooser_get_active (GTK_COMBO_BOX (options->priv->profile_combo));
     ogmrip_encoding_set_profile (options->priv->encoding, profile);
-
-    can_crop = gtk_widget_get_sensitive (options->priv->crop_check);
-    ogmrip_encoding_set_can_crop (options->priv->encoding, can_crop);
-
-    if (can_crop)
-    {
-      if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (options->priv->crop_check)))
-        ogmrip_encoding_set_crop (options->priv->encoding, OGMRIP_OPTIONS_AUTOMATIC, 0, 0, 0, 0);
-      else
-      {
-        guint l, t, r, b;
-
-        ogmrip_options_dialog_get_crop (options, &l, &t, &r, &b);
-        if (!l && !t && !r && !b)
-          ogmrip_encoding_set_crop (options->priv->encoding, OGMRIP_OPTIONS_NONE, 0, 0, 0, 0);
-        else
-        {
-          guint x, y, w, h;
-
-          ogmrip_options_dialog_get_crop_size (options, &x, &y, &w, &h);
-          ogmrip_encoding_set_crop (options->priv->encoding, OGMRIP_OPTIONS_MANUAL, x, y, w, h);
-        }
-      }
-    }
-
-    if (!gtk_widget_get_sensitive (options->priv->scale_check))
-      ogmrip_encoding_set_can_scale (options->priv->encoding, FALSE);
-    else
-    {
-      if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (options->priv->scale_check)))
-        ogmrip_encoding_set_scale (options->priv->encoding, OGMRIP_OPTIONS_AUTOMATIC, 0, 0);
-      else
-      {
-        guint active;
-
-        active = gtk_combo_box_get_active (GTK_COMBO_BOX (options->priv->scale_combo));
-        if (active == OGMRIP_SCALE_NONE)
-          ogmrip_encoding_set_scale (options->priv->encoding, OGMRIP_OPTIONS_NONE, 0, 0);
-        else
-        {
-          guint w, h;
-
-          ogmrip_options_dialog_get_scale (options, &w, &h);
-          ogmrip_encoding_set_scale (options->priv->encoding, OGMRIP_OPTIONS_MANUAL, w, h);
-        }
-      }
-    }
-
-    ogmrip_encoding_set_test (options->priv->encoding,
-        gtk_widget_get_sensitive (options->priv->test_check) &&
-        gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (options->priv->test_check)));
-
-
-    if (gtk_widget_get_sensitive (options->priv->deint_check) &&
-        gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (options->priv->deint_check)))
-      ogmrip_encoding_set_deinterlacer (options->priv->encoding, OGMRIP_DEINT_YADIF);
-    else
-      ogmrip_encoding_set_deinterlacer (options->priv->encoding, OGMRIP_DEINT_NONE);
   }
+
+  if (!gtk_widget_is_sensitive (options->priv->crop_check))
+    ogmrip_encoding_set_autocrop (options->priv->encoding, FALSE);
+  else
+  {
+    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (options->priv->crop_check)))
+      ogmrip_encoding_set_autocrop (options->priv->encoding, TRUE);
+    else
+      ogmrip_encoding_set_autocrop (options->priv->encoding, FALSE);
+  }
+
+  if (!gtk_widget_is_sensitive (options->priv->scale_check))
+    ogmrip_encoding_set_autoscale (options->priv->encoding, FALSE);
+  else
+  {
+    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (options->priv->scale_check)))
+      ogmrip_encoding_set_autoscale (options->priv->encoding, TRUE);
+    else
+      ogmrip_encoding_set_autoscale (options->priv->encoding, FALSE);
+  }
+
+  ogmrip_encoding_set_test (options->priv->encoding,
+      gtk_widget_is_sensitive (options->priv->test_check) &&
+      gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (options->priv->test_check)));
 }
 
 GtkWidget *
-ogmrip_options_dialog_new (OGMRipEncoding *encoding, OGMRipOptionsDialogAction action)
+ogmrip_options_dialog_new (OGMRipEncoding *encoding, OGMDvdTitle *title)
 {
-  return g_object_new (OGMRIP_TYPE_OPTIONS_DIALOG, "encoding", encoding, "action", action, NULL);
+  return g_object_new (OGMRIP_TYPE_OPTIONS_DIALOG, "encoding", encoding, "title", title, NULL);
+}
+
+void
+ogmrip_options_dialog_get_scale_size (OGMRipOptionsDialog *dialog, guint *width, guint *height)
+{
+  guint active;
+
+  g_return_if_fail (OGMRIP_IS_OPTIONS_DIALOG (dialog));
+  g_return_if_fail (width != NULL && height != NULL);
+
+  active = gtk_combo_box_get_active (GTK_COMBO_BOX (dialog->priv->scale_combo));
+  if (active == OGMRIP_SCALE_NONE)
+    *width = *height = 0;
+  else
+  {
+    *width = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (dialog->priv->scale_width_spin));
+    *height = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (dialog->priv->scale_height_spin));
+  }
+}
+
+void
+ogmrip_options_dialog_get_crop_size (OGMRipOptionsDialog *dialog, guint *x, guint *y, guint *width, guint *height)
+{
+  guint l, t, r, b;
+
+  g_return_if_fail (OGMRIP_IS_OPTIONS_DIALOG (dialog));
+  g_return_if_fail (x != NULL && y != NULL && width != NULL && height != NULL);
+
+  ogmrip_options_dialog_get_crop (dialog, &l, &t, &r, &b);
+  if (!l && !t && !r && !b)
+    *x = *y = *width = *height = 0;
+  else
+    ogmrip_options_dialog_get_crop_full (dialog, x, y, width, height);
+}
+
+gint
+ogmrip_options_dialog_get_deinterlacer (OGMRipOptionsDialog *dialog)
+{
+  g_return_val_if_fail (OGMRIP_IS_OPTIONS_DIALOG (dialog), -1);
+
+  if (gtk_widget_is_sensitive (dialog->priv->deint_check) &&
+      gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (dialog->priv->deint_check)))
+    return OGMRIP_DEINT_YADIF;
+
+  return OGMRIP_DEINT_NONE;
 }
 

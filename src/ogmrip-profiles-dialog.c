@@ -21,8 +21,6 @@
 #endif
 
 #include "ogmrip-profiles-dialog.h"
-#include "ogmrip-profile-editor.h"
-
 #include "ogmrip-settings.h"
 
 #include <glib/gi18n.h>

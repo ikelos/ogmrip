@@ -155,7 +155,7 @@ ogmrip_progress_dialog_status_icon_popup_menu (OGMRipProgressDialog *dialog, gui
 }
 
 #endif /* HAVE_LIBNOTIFY_SUPPORT */
-
+/*
 static void
 ogmrip_progress_dialog_set_label (OGMRipProgressDialog *dialog, const gchar *label)
 {
@@ -177,9 +177,9 @@ ogmrip_progress_dialog_set_label (OGMRipProgressDialog *dialog, const gchar *lab
   }
 #endif
 }
-
+*/
 #define SAMPLE_LENGTH  10.0
-
+/*
 static void
 ogmrip_progress_dialog_run (OGMRipProgressDialog *dialog, OGMJobSpawn *spawn, OGMRipTaskType type)
 {
@@ -265,7 +265,7 @@ ogmrip_progress_dialog_progress (OGMRipProgressDialog *dialog, gdouble fraction)
     gtk_status_icon_set_tooltip_text (dialog->priv->status_icon, str);
     g_free (str);
   }
-#endif /* HAVE_LIBNOTIFY_SUPPORT */
+#endif
 
   parent = gtk_window_get_transient_for (GTK_WINDOW (dialog));
   if (parent)
@@ -317,7 +317,7 @@ ogmrip_progress_dialog_task_event (OGMRipProgressDialog *dialog, OGMRipEncodingT
       break;
   }
 }
-
+*/
 G_DEFINE_TYPE (OGMRipProgressDialog, ogmrip_progress_dialog, GTK_TYPE_DIALOG)
 
 static void
@@ -426,8 +426,10 @@ ogmrip_progress_dialog_dispose (GObject *gobject)
 
   if (dialog->priv->encoding)
   {
+/*
     g_signal_handlers_disconnect_by_func (dialog->priv->encoding,
         ogmrip_progress_dialog_task_event, dialog);
+*/
     g_object_unref (dialog->priv->encoding);
     dialog->priv->encoding = NULL;
   }
@@ -458,7 +460,7 @@ ogmrip_progress_dialog_new (void)
 {
   return g_object_new (OGMRIP_TYPE_PROGRESS_DIALOG, NULL);
 }
-
+/*
 static void
 ogmrip_progress_dialog_set_title (OGMRipProgressDialog *dialog, const gchar *title)
 {
@@ -478,9 +480,9 @@ ogmrip_progress_dialog_set_title (OGMRipProgressDialog *dialog, const gchar *tit
 #ifdef HAVE_LIBNOTIFY_SUPPORT
   notify_notification_update (dialog->priv->notification, title, "Dummy",
       OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_ICON_FILE);
-#endif /* HAVE_LIBNOTIFY_SUPPORT */
+#endif
 }
-
+*/
 void
 ogmrip_progress_dialog_set_encoding (OGMRipProgressDialog *dialog, OGMRipEncoding *encoding)
 {
@@ -493,19 +495,19 @@ ogmrip_progress_dialog_set_encoding (OGMRipProgressDialog *dialog, OGMRipEncodin
 
     if (dialog->priv->encoding)
     {
+/*
       g_signal_handlers_disconnect_by_func (dialog->priv->encoding,
           ogmrip_progress_dialog_task_event, dialog);
-
+*/
       g_object_unref (dialog->priv->encoding);
     }
 
     dialog->priv->encoding = encoding;
-
+/*
     g_signal_connect_swapped (encoding, "task",
         G_CALLBACK (ogmrip_progress_dialog_task_event), dialog);
-
-    ogmrip_progress_dialog_set_title (dialog, ogmrip_encoding_get_label (encoding));
-
+*/
+    // ogmrip_progress_dialog_set_title (dialog, ogmrip_encoding_get_label (encoding));
   }
 }
 
