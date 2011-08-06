@@ -6,7 +6,6 @@ BUILT_SOURCES = \
   ogmdvd-marshal.h
 
 libogmdvd_gtk_la_SOURCES =        \
-  ogmdvd-cell-renderer-language.c \
   ogmdvd-chapter-list.c           \
   ogmdvd-drive-chooser.c          \
   ogmdvd-drive-chooser-widget.c   \
@@ -19,7 +18,6 @@ libogmdvd_gtk_ladir = \
   $(includedir)/ogmdvd
 
 libogmdvd_gtk_la_HEADERS =        \
-  ogmdvd-cell-renderer-language.h \
   ogmdvd-chapter-list.h           \
   ogmdvd-drive-chooser.h          \
   ogmdvd-drive-chooser-widget.h   \

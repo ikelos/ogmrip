@@ -19,7 +19,6 @@
 #ifndef __OGMDVD_GTK_H__
 #define __OGMDVD_GTK_H__
 
-#include <ogmdvd-cell-renderer-language.h>
 #include <ogmdvd-chapter-list.h>
 #include <ogmdvd-drive-chooser-widget.h>
 #include <ogmdvd-drive-chooser-dialog.h>
