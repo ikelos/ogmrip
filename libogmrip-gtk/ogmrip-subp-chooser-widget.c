@@ -153,6 +153,8 @@ ogmrip_subp_chooser_widget_init (OGMRipSubpChooserWidget *widget)
 
   dialog = ogmrip_subp_file_chooser_dialog_new ();
 
+  gtk_box_set_spacing (GTK_BOX (widget), 6);
+
   widget->priv->chooser = ogmrip_source_chooser_widget_new_with_dialog (OGMRIP_FILE_CHOOSER_DIALOG (dialog));
   gtk_box_pack_start (GTK_BOX (widget), widget->priv->chooser, TRUE, TRUE, 0);
   gtk_widget_show (widget->priv->chooser);
