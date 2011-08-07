@@ -167,28 +167,10 @@ ogmdvd_drive_chooser_widget_add_device (GtkComboBox *combo_box, const gchar *dev
   }
 }
 
-static GtkWidget *
-gtk_widget_get_transient_window (GtkWidget *widget)
-{
-  GtkWidget *parent;
-
-  parent = gtk_widget_get_parent (widget);
-  while (parent)
-  {
-    widget = parent;
-    parent = gtk_widget_get_parent (widget);
-  }
-
-  if (!GTK_IS_WINDOW (widget))
-    return NULL;
-
-  return widget;
-}
-
 static gchar *
 ogmdvd_drive_chooser_widget_select_file (GtkComboBox *combo_box, gboolean file)
 {
-  GtkWidget *dialog, *parent;
+  GtkWidget *dialog, *toplevel;
   GdkPixbuf *pixbuf;
 
   gchar *device = NULL;
@@ -197,10 +179,10 @@ ogmdvd_drive_chooser_widget_select_file (GtkComboBox *combo_box, gboolean file)
       NULL, file ? GTK_FILE_CHOOSER_ACTION_OPEN : GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
       GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_OK, NULL);
 
-  parent = gtk_widget_get_transient_window (GTK_WIDGET (combo_box));
-  if (parent)
+  toplevel = gtk_widget_get_toplevel (GTK_WIDGET (combo_box));
+  if (gtk_widget_is_toplevel (toplevel) && GTK_IS_WINDOW (toplevel))
   {
-    gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (parent));
+    gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (toplevel));
     gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_CENTER_ON_PARENT);
     gtk_window_set_gravity (GTK_WINDOW (dialog), GDK_GRAVITY_CENTER);
     gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
