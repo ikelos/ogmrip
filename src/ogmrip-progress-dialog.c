@@ -70,6 +70,7 @@ struct _OGMRipProgressDialogPriv
 static void ogmrip_progress_dialog_dispose  (GObject   *gobject);
 
 #ifdef HAVE_LIBNOTIFY_SUPPORT
+/*
 static gboolean
 ogmrip_progress_dialog_get_visibility (OGMRipProgressDialog *dialog)
 {
@@ -87,7 +88,7 @@ ogmrip_progress_dialog_get_visibility (OGMRipProgressDialog *dialog)
 
   return TRUE;
 }
-
+*/
 static gboolean
 ogmrip_progress_dialog_state_changed (OGMRipProgressDialog *dialog, GdkEventWindowState *event)
 {
