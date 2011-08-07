@@ -23,7 +23,6 @@ SUBDIRS += \
 endif
 
 SUBDIRS += \
-  plugins \
   data \
   po
 
