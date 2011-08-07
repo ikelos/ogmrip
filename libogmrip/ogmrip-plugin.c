@@ -307,13 +307,14 @@ ogmrip_plugin_get_type_by_name (GSList *list, const gchar *name)
   OGMRipPlugin *plugin;
   GSList *link;
 
-  g_return_val_if_fail (name != NULL, G_TYPE_NONE);
-
-  for (link = list; link; link = link->next)
+  if (name)
   {
-    plugin = link->data;
-    if (g_str_equal (plugin->name, name))
-      return plugin->type;
+    for (link = list; link; link = link->next)
+    {
+      plugin = link->data;
+      if (g_str_equal (plugin->name, name))
+        return plugin->type;
+    }
   }
 
   return G_TYPE_NONE;
