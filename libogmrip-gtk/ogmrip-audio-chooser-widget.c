@@ -165,6 +165,8 @@ ogmrip_audio_chooser_widget_init (OGMRipAudioChooserWidget *widget)
       G_CALLBACK (ogmrip_audio_chooser_widget_button_clicked), widget);
 
   widget->priv->dialog = ogmrip_audio_options_dialog_new ();
+  g_signal_connect (widget->priv->dialog, "delete-event",
+      G_CALLBACK (gtk_widget_hide_on_delete), NULL);
 }
 
 static void

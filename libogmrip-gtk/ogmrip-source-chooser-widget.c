@@ -70,6 +70,7 @@ struct _OGMRipSourceChooserWidgetPriv
 };
 
 static void ogmrip_source_chooser_init (OGMRipSourceChooserInterface   *iface);
+static void ogmrip_source_chooser_widget_constructed  (GObject      *gobject);
 static void ogmrip_source_chooser_widget_dispose      (GObject      *gobject);
 static void ogmrip_source_chooser_widget_finalize     (GObject      *gobject);
 static void ogmrip_source_chooser_widget_get_property (GObject      *gobject,
@@ -290,7 +291,6 @@ ogmrip_source_chooser_widget_changed (GtkComboBox *combo)
         else
           gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), -1);
       }
-      gtk_widget_destroy (chooser->priv->dialog);
     }
     else
     {
@@ -312,6 +312,7 @@ ogmrip_source_chooser_widget_class_init (OGMRipSourceChooserWidgetClass *klass)
   GtkComboBoxClass *combo_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->constructed = ogmrip_source_chooser_widget_constructed;
   gobject_class->dispose = ogmrip_source_chooser_widget_dispose;
   gobject_class->finalize = ogmrip_source_chooser_widget_finalize;
   gobject_class->get_property = ogmrip_source_chooser_widget_get_property;
@@ -352,6 +353,18 @@ ogmrip_source_chooser_widget_init (OGMRipSourceChooserWidget *chooser)
   gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (chooser), cell, "text", TEXT_COLUMN, NULL);
 
   ogmrip_source_chooser_widget_clear (chooser);
+}
+
+static void
+ogmrip_source_chooser_widget_constructed (GObject *gobject)
+{
+  OGMRipSourceChooserWidget *chooser = OGMRIP_SOURCE_CHOOSER_WIDGET (gobject);
+
+  if (chooser->priv->dialog)
+    g_signal_connect (chooser->priv->dialog, "delete-event",
+        G_CALLBACK (gtk_widget_hide_on_delete), NULL);
+
+  G_OBJECT_CLASS (ogmrip_source_chooser_widget_parent_class)->constructed (gobject);
 }
 
 static void

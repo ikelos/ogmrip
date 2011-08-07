@@ -165,6 +165,8 @@ ogmrip_subp_chooser_widget_init (OGMRipSubpChooserWidget *widget)
       G_CALLBACK (ogmrip_subp_chooser_widget_button_clicked), widget);
 
   widget->priv->dialog = ogmrip_subp_options_dialog_new ();
+  g_signal_connect (widget->priv->dialog, "delete-event",
+      G_CALLBACK (gtk_widget_hide_on_delete), NULL);
 }
 
 static void
