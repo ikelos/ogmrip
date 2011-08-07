@@ -144,12 +144,13 @@ ogmrip_main_add_audio_chooser (OGMRipData *data)
     g_settings_get (settings, OGMRIP_SETTINGS_PREF_AUDIO, "u", &lang);
     ogmrip_source_chooser_select_language (OGMRIP_SOURCE_CHOOSER (chooser), lang);
 
-    if (gtk_combo_box_get_active (GTK_COMBO_BOX (chooser)) < 0)
+    if (!ogmrip_source_chooser_get_active (OGMRIP_SOURCE_CHOOSER (chooser), NULL))
     {
       if (ogmdvd_title_get_n_audio_streams (title) > 0)
-        gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), 1);
+        ogmrip_source_chooser_set_active (OGMRIP_SOURCE_CHOOSER (chooser),
+            (OGMRipSource *) ogmdvd_title_get_nth_audio_stream (title, 0));
       else
-        gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), 0);
+        ogmrip_source_chooser_set_active (OGMRIP_SOURCE_CHOOSER (chooser), NULL);
     }
   }
 }
@@ -181,6 +182,15 @@ ogmrip_main_add_subp_chooser (OGMRipData *data)
 
     g_settings_get (settings, OGMRIP_SETTINGS_PREF_SUBP, "u", &lang);
     ogmrip_source_chooser_select_language (OGMRIP_SOURCE_CHOOSER (chooser), lang);
+
+    if (!ogmrip_source_chooser_get_active (OGMRIP_SOURCE_CHOOSER (chooser), NULL))
+    {
+      if (ogmdvd_title_get_n_subp_streams (title) > 0)
+        ogmrip_source_chooser_set_active (OGMRIP_SOURCE_CHOOSER (chooser),
+            (OGMRipSource *) ogmdvd_title_get_nth_subp_stream (title, 0));
+      else
+        ogmrip_source_chooser_set_active (OGMRIP_SOURCE_CHOOSER (chooser), NULL);
+    }
 
     if (gtk_combo_box_get_active (GTK_COMBO_BOX (chooser)) < 0)
       gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), 0);

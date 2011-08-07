@@ -91,6 +91,22 @@ ogmrip_source_chooser_get_active (OGMRipSourceChooser *chooser, OGMRipSourceType
 }
 
 /**
+ * ogmrip_source_chooser_set_active:
+ * @chooser: An #OGMRipSourceChooser
+ * @source: An #OGMRipSource
+ *
+ * Set the current active source.
+ */
+void
+ogmrip_source_chooser_set_active (OGMRipSourceChooser *chooser, OGMRipSource *source)
+{
+  g_return_if_fail (OGMRIP_IS_SOURCE_CHOOSER (chooser));
+
+  if (OGMRIP_SOURCE_CHOOSER_GET_IFACE (chooser)->set_active)
+    OGMRIP_SOURCE_CHOOSER_GET_IFACE (chooser)->set_active (chooser, source);
+}
+
+/**
  * ogmrip_source_chooser_select_language:
  * @chooser: An #OGMRipSourceChooser
  * @language: The language to select

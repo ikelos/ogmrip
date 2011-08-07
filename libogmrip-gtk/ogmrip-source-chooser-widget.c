@@ -473,6 +473,36 @@ ogmrip_source_chooser_widget_get_active (OGMRipSourceChooser *chooser, OGMRipSou
 }
 
 static void
+ogmrip_source_chooser_widget_set_active (OGMRipSourceChooser *chooser, OGMRipSource *source)
+{
+  if (!source)
+    gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), 0);
+  else
+  {
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+
+    model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
+
+    if (gtk_tree_model_get_iter_first (model, &iter))
+    {
+      OGMRipSource *asource;
+
+      do
+      {
+        gtk_tree_model_get (model, &iter, SOURCE_COLUMN, &asource, -1);
+        if (source == asource)
+        {
+          gtk_combo_box_set_active_iter (GTK_COMBO_BOX (chooser), &iter);
+          break;
+        }
+      }
+      while (gtk_tree_model_iter_next (model, &iter));
+    }
+  }
+}
+
+static void
 ogmrip_source_chooser_widget_select_language (OGMRipSourceChooser *chooser, gint language)
 {
   GtkTreeModel *model;
@@ -502,6 +532,7 @@ static void
 ogmrip_source_chooser_init (OGMRipSourceChooserInterface *iface)
 {
   iface->get_active = ogmrip_source_chooser_widget_get_active;
+  iface->set_active = ogmrip_source_chooser_widget_set_active;
   iface->select_language = ogmrip_source_chooser_widget_select_language;
 }
 

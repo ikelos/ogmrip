@@ -63,6 +63,8 @@ struct _OGMRipSourceChooserInterface
 
   OGMRipSource * (* get_active)      (OGMRipSourceChooser *chooser,
                                       OGMRipSourceType    *type);
+  void           (* set_active)      (OGMRipSourceChooser *chooser,
+                                      OGMRipSource        *source);
   void           (* select_language) (OGMRipSourceChooser *chooser,
                                       gint                language);
 };
@@ -73,6 +75,8 @@ void           ogmrip_source_chooser_set_title       (OGMRipSourceChooser *choos
 OGMDvdTitle *  ogmrip_source_chooser_get_title       (OGMRipSourceChooser *chooser);
 OGMRipSource * ogmrip_source_chooser_get_active      (OGMRipSourceChooser *chooser,
                                                       OGMRipSourceType    *type);
+void           ogmrip_source_chooser_set_active      (OGMRipSourceChooser *chooser,
+                                                      OGMRipSource        *source);
 void           ogmrip_source_chooser_select_language (OGMRipSourceChooser *chooser,
                                                       gint                language);
 

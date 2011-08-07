@@ -62,6 +62,14 @@ ogmrip_subp_chooser_widget_get_active (OGMRipSourceChooser *chooser, OGMRipSourc
 }
 
 static void
+ogmrip_subp_chooser_widget_set_active (OGMRipSourceChooser *chooser, OGMRipSource *source)
+{
+  OGMRipSubpChooserWidget *widget = OGMRIP_SUBP_CHOOSER_WIDGET (chooser);
+
+  ogmrip_source_chooser_set_active (OGMRIP_SOURCE_CHOOSER (widget->priv->chooser), source);
+}
+
+static void
 ogmrip_subp_chooser_widget_select_language (OGMRipSourceChooser *chooser, gint language)
 {
   OGMRipSubpChooserWidget *widget = OGMRIP_SUBP_CHOOSER_WIDGET (chooser);
@@ -173,6 +181,7 @@ static void
 ogmrip_source_chooser_init (OGMRipSourceChooserInterface *iface)
 {
   iface->get_active = ogmrip_subp_chooser_widget_get_active;
+  iface->set_active = ogmrip_subp_chooser_widget_set_active;
   iface->select_language = ogmrip_subp_chooser_widget_select_language;
 }
 

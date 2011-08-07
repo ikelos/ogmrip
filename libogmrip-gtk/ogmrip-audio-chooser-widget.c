@@ -62,6 +62,14 @@ ogmrip_audio_chooser_widget_get_active (OGMRipSourceChooser *chooser, OGMRipSour
 }
 
 static void
+ogmrip_audio_chooser_widget_set_active (OGMRipSourceChooser *chooser, OGMRipSource *source)
+{
+  OGMRipAudioChooserWidget *widget = OGMRIP_AUDIO_CHOOSER_WIDGET (chooser);
+
+  ogmrip_source_chooser_set_active (OGMRIP_SOURCE_CHOOSER (widget->priv->chooser), source);
+}
+
+static void
 ogmrip_audio_chooser_widget_select_language (OGMRipSourceChooser *chooser, gint language)
 {
   OGMRipAudioChooserWidget *widget = OGMRIP_AUDIO_CHOOSER_WIDGET (chooser);
@@ -173,6 +181,7 @@ static void
 ogmrip_source_chooser_init (OGMRipSourceChooserInterface *iface)
 {
   iface->get_active = ogmrip_audio_chooser_widget_get_active;
+  iface->set_active = ogmrip_audio_chooser_widget_set_active;
   iface->select_language = ogmrip_audio_chooser_widget_select_language;
 }
 
