@@ -45,8 +45,11 @@ struct _OGMRipSubpOptionsDialogClass
   GtkDialogClass parent_class;
 };
 
-GType       ogmrip_subp_options_dialog_get_type (void);
-GtkWidget * ogmrip_subp_options_dialog_new      (void);
+GType       ogmrip_subp_options_dialog_get_type         (void);
+GtkWidget * ogmrip_subp_options_dialog_new              (void);
+gboolean    ogmrip_subp_options_dialog_get_use_defaults (OGMRipSubpOptionsDialog *dialog);
+void        ogmrip_subp_options_dialog_set_use_defaults (OGMRipSubpOptionsDialog *dialog,
+                                                          gboolean               use_defaults);
 
 G_END_DECLS
 

@@ -117,6 +117,77 @@ ogmrip_main_load (OGMRipData *data, const gchar *path)
 }
 
 /*
+ * Adds an audio chooser
+ */
+static void
+ogmrip_main_add_audio_chooser (OGMRipData *data)
+{
+  GtkWidget *chooser;
+  OGMDvdTitle *title;
+
+  chooser = ogmrip_audio_chooser_widget_new ();
+  gtk_container_add (GTK_CONTAINER (data->audio_list), chooser);
+  gtk_widget_show (chooser);
+
+  g_signal_connect_swapped (chooser, "add-clicked",
+      G_CALLBACK (ogmrip_main_add_audio_chooser), data);
+  g_signal_connect_swapped (chooser, "remove-clicked",
+      G_CALLBACK (gtk_container_remove), data->audio_list);
+
+  title = ogmdvd_title_chooser_get_active (OGMDVD_TITLE_CHOOSER (data->title_chooser));
+  ogmrip_source_chooser_set_title (OGMRIP_SOURCE_CHOOSER (chooser), title);
+
+  if (title)
+  {
+    gint lang;
+
+    g_settings_get (settings, OGMRIP_SETTINGS_PREF_AUDIO, "u", &lang);
+    ogmrip_source_chooser_select_language (OGMRIP_SOURCE_CHOOSER (chooser), lang);
+
+    if (gtk_combo_box_get_active (GTK_COMBO_BOX (chooser)) < 0)
+    {
+      if (ogmdvd_title_get_n_audio_streams (title) > 0)
+        gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), 1);
+      else
+        gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), 0);
+    }
+  }
+}
+
+/*
+ * Adds a subp chooser
+ */
+static void
+ogmrip_main_add_subp_chooser (OGMRipData *data)
+{
+  GtkWidget *chooser;
+  OGMDvdTitle *title;
+
+  chooser = ogmrip_subp_chooser_widget_new ();
+  gtk_container_add (GTK_CONTAINER (data->subp_list), chooser);
+  gtk_widget_show (chooser);
+
+  g_signal_connect_swapped (chooser, "add-clicked",
+      G_CALLBACK (ogmrip_main_add_subp_chooser), data);
+  g_signal_connect_swapped (chooser, "remove-clicked",
+      G_CALLBACK (gtk_container_remove), data->subp_list);
+
+  title = ogmdvd_title_chooser_get_active (OGMDVD_TITLE_CHOOSER (data->title_chooser));
+  ogmrip_source_chooser_set_title (OGMRIP_SOURCE_CHOOSER (chooser), title);
+
+  if (title)
+  {
+    gint lang;
+
+    g_settings_get (settings, OGMRIP_SETTINGS_PREF_SUBP, "u", &lang);
+    ogmrip_source_chooser_select_language (OGMRIP_SOURCE_CHOOSER (chooser), lang);
+
+    if (gtk_combo_box_get_active (GTK_COMBO_BOX (chooser)) < 0)
+      gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), 0);
+  }
+}
+
+/*
  * Add audio streams and files to the encoding
  */
 /*
@@ -331,7 +402,7 @@ ogmrip_main_create_video_codec (OGMRipData *data, OGMRipProfile *profile, OGMDvd
 static void
 ogmrip_main_extract_activated (OGMRipData *data)
 {
-  GtkWidget *dialog, *chooser;
+  GtkWidget *dialog;
 
   OGMDvdTitle *title;
   OGMRipEncoding *encoding;
@@ -340,7 +411,8 @@ ogmrip_main_extract_activated (OGMRipData *data)
   OGMRipCodec *codec;
 
   guint start_chap;
-  gint i, n, end_chap, response;
+  gint end_chap, response;
+  GList *list, *link;
 
   title = ogmdvd_title_chooser_get_active (OGMDVD_TITLE_CHOOSER (data->title_chooser));
 
@@ -383,19 +455,18 @@ ogmrip_main_extract_activated (OGMRipData *data)
     ogmrip_video_codec_set_scale_size (OGMRIP_VIDEO_CODEC (codec), w, h);
   }
 
-  n = ogmrip_chooser_list_length (OGMRIP_CHOOSER_LIST (data->audio_list));
-  for (i = 0; i < n; i ++)
+  list = gtk_container_get_children (GTK_CONTAINER (data->audio_list));
+  for (link = list; link; link = link->next)
   {
-    chooser = ogmrip_chooser_list_nth (OGMRIP_CHOOSER_LIST (data->audio_list), i);
     /*
      * TODO add audio streams and files
      */
   }
+  g_list_free (list);
 
-  n = ogmrip_chooser_list_length (OGMRIP_CHOOSER_LIST (data->subp_list));
-  for (i = 0; i < n; i ++)
+  list = gtk_container_get_children (GTK_CONTAINER (data->subp_list));
+  for (link = list; link; link = link->next)
   {
-    chooser = ogmrip_chooser_list_nth (OGMRIP_CHOOSER_LIST (data->subp_list), i);
     /*
      * TODO add subp streams and files
      */
@@ -609,23 +680,16 @@ static void
 ogmrip_main_title_chooser_changed (OGMRipData *data)
 {
   OGMDvdTitle *title;
-  GtkWidget *chooser;
   gint angles;
 
   title = ogmdvd_title_chooser_get_active (OGMDVD_TITLE_CHOOSER (data->title_chooser));
   gtk_widget_set_sensitive (data->title_chooser, title != NULL);
 
-  ogmrip_chooser_list_clear (OGMRIP_CHOOSER_LIST (data->audio_list));
+  gtk_container_clear (GTK_CONTAINER (data->audio_list));
+  ogmrip_main_add_audio_chooser (data);
 
-  chooser = ogmrip_audio_chooser_widget_new ();
-  gtk_container_add (GTK_CONTAINER (data->audio_list), chooser);
-  gtk_widget_show (chooser);
-
-  ogmrip_chooser_list_clear (OGMRIP_CHOOSER_LIST (data->subp_list));
-
-  chooser = ogmrip_subp_chooser_widget_new ();
-  gtk_container_add (GTK_CONTAINER (data->subp_list), chooser);
-  gtk_widget_show (chooser);
+  gtk_container_clear (GTK_CONTAINER (data->subp_list));
+  ogmrip_main_add_subp_chooser (data);
 
   ogmdvd_chapter_list_set_title (OGMDVD_CHAPTER_LIST (data->chapter_list), title);
   ogmrip_chapter_list_select_all (OGMRIP_CHAPTER_LIST (data->chapter_list));
@@ -667,79 +731,6 @@ ogmrip_main_chapter_selection_changed (OGMRipData *data)
 
   gtk_action_set_sensitive (data->extract_action, sensitive); 
   gtk_widget_set_sensitive (data->relative_check, sensitive && (start_chap > 0 || end_chap != -1));
-}
-
-/*
- * When an audio chooser is added
- */
-static void
-ogmrip_main_audio_chooser_added (OGMRipData *data, OGMRipSourceChooser *chooser)
-{
-  OGMDvdTitle *title;
-
-  title = ogmdvd_title_chooser_get_active (OGMDVD_TITLE_CHOOSER (data->title_chooser));
-  ogmrip_source_chooser_set_title (OGMRIP_SOURCE_CHOOSER (chooser), title);
-
-  if (title)
-  {
-    gint lang;
-
-    g_settings_get (settings, OGMRIP_SETTINGS_PREF_AUDIO, "u", &lang);
-    ogmrip_source_chooser_select_language (OGMRIP_SOURCE_CHOOSER (chooser), lang);
-
-    if (gtk_combo_box_get_active (GTK_COMBO_BOX (chooser)) < 0)
-    {
-      if (ogmdvd_title_get_n_audio_streams (title) > 0)
-        gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), 1);
-      else
-        gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), 0);
-    }
-  }
-}
-
-/*
- * When the more button of an audio chooser is clicked
- */
-static void
-ogmrip_main_audio_chooser_more_clicked (OGMRipData *data, OGMRipSourceChooser *chooser)
-{
-  /*
-   * TODO audio chooser more clicked
-   */
-}
-
-/*
- * When a subp chooser is added
- */
-static void
-ogmrip_main_subp_chooser_added (OGMRipData *data, OGMRipSourceChooser *chooser)
-{
-  OGMDvdTitle *title;
-
-  title = ogmdvd_title_chooser_get_active (OGMDVD_TITLE_CHOOSER (data->title_chooser));
-  ogmrip_source_chooser_set_title (OGMRIP_SOURCE_CHOOSER (chooser), title);
-
-  if (title)
-  {
-    gint lang;
-
-    g_settings_get (settings, OGMRIP_SETTINGS_PREF_SUBP, "u", &lang);
-    ogmrip_source_chooser_select_language (OGMRIP_SOURCE_CHOOSER (chooser), lang);
-
-    if (gtk_combo_box_get_active (GTK_COMBO_BOX (chooser)) < 0)
-      gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), 0);
-  }
-}
-
-/*
- * When the more button of a subp chooser is clicked
- */
-static void
-ogmrip_main_subp_chooser_more_clicked (OGMRipData *data, OGMRipSourceChooser *chooser)
-{
-  /*
-   * TODO subp chooser more clicked
-   */
 }
 
 /*
@@ -1005,29 +996,19 @@ ogmrip_main_new (void)
 
   widget = gtk_builder_get_widget (builder, "table");
 
-  data->audio_list = ogmrip_chooser_list_new (OGMRIP_TYPE_AUDIO_CHOOSER_WIDGET);
+  data->audio_list = gtk_vbox_new (TRUE, 6);
   gtk_table_attach (GTK_TABLE (widget), data->audio_list, 1, 3, 2, 3, GTK_EXPAND | GTK_FILL, 0, 0, 0);
   gtk_widget_show (data->audio_list);
 
   g_object_bind_property (data->title_chooser, "sensitive",
       data->audio_list, "sensitive", G_BINDING_SYNC_CREATE);
 
-  g_signal_connect_swapped (data->audio_list, "add",
-      G_CALLBACK (ogmrip_main_audio_chooser_added), data);
-  g_signal_connect_swapped (data->audio_list, "more-clicked",
-      G_CALLBACK (ogmrip_main_audio_chooser_more_clicked), data);
-
-  data->subp_list = ogmrip_chooser_list_new (OGMRIP_TYPE_SUBP_CHOOSER_WIDGET);
+  data->subp_list = gtk_vbox_new (TRUE, 6);
   gtk_table_attach (GTK_TABLE (widget), data->subp_list, 1, 3, 3, 4, GTK_EXPAND | GTK_FILL, 0, 0, 0);
   gtk_widget_show (data->subp_list);
 
   g_object_bind_property (data->title_chooser, "sensitive",
       data->subp_list, "sensitive", G_BINDING_SYNC_CREATE);
-
-  g_signal_connect_swapped (data->subp_list, "add",
-      G_CALLBACK (ogmrip_main_subp_chooser_added), data);
-  g_signal_connect_swapped (data->audio_list, "more-clicked",
-      G_CALLBACK (ogmrip_main_subp_chooser_more_clicked), data);
 
   data->length_label = gtk_builder_get_widget (builder, "length-label");
 

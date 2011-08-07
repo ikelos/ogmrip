@@ -7,7 +7,6 @@ libogmrip_gtk_la_SOURCES =           \
   ogmrip-audio-options.c             \
   ogmrip-audio-options-dialog.c      \
   ogmrip-chapter-list.c              \
-  ogmrip-chooser-list.c              \
   ogmrip-file-chooser-dialog.c       \
   ogmrip-helper.c                    \
   ogmrip-list-item.c                 \
@@ -29,7 +28,6 @@ libogmrip_gtk_la_HEADERS =           \
   ogmrip-audio-options.h             \
   ogmrip-audio-options-dialog.h      \
   ogmrip-chapter-list.h              \
-  ogmrip-chooser-list.h              \
   ogmrip-file-chooser-dialog.h       \
   ogmrip-helper.h                    \
   ogmrip-list-item.h                 \
@@ -39,8 +37,8 @@ libogmrip_gtk_la_HEADERS =           \
   ogmrip-source-chooser-widget.h     \
   ogmrip-subp-chooser-widget.h       \
   ogmrip-subp-file-chooser-dialog.h  \
-  ogmrip-subp-options.c              \
-  ogmrip-subp-options-dialog.c       \
+  ogmrip-subp-options.h              \
+  ogmrip-subp-options-dialog.h       \
   ogmrip-gtk.h
 
 libogmrip_gtk_la_LDFLAGS = \

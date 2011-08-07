@@ -19,6 +19,8 @@
 #ifndef __OGMRIP_SUBP_CHOOSER_WIDGET_H__
 #define __OGMRIP_SUBP_CHOOSER_WIDGET_H__
 
+#include <ogmrip-list-item.h>
+#include <ogmrip-subp-options.h>
 #include <ogmrip-source-chooser-widget.h>
 
 G_BEGIN_DECLS
@@ -31,19 +33,23 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipSubpChooserWidget      OGMRipSubpChooserWidget;
 typedef struct _OGMRipSubpChooserWidgetClass OGMRipSubpChooserWidgetClass;
+typedef struct _OGMRipSubpChooserWidgetPriv  OGMRipSubpChooserWidgetPriv;
 
 struct _OGMRipSubpChooserWidget
 {
-  OGMRipSourceChooserWidget parent_instance;
+  OGMRipListItem parent_instance;
+
+  OGMRipSubpChooserWidgetPriv *priv;
 };
 
 struct _OGMRipSubpChooserWidgetClass
 {
-  OGMRipSourceChooserWidgetClass parent_class;
+  OGMRipListItemClass parent_class;
 };
 
-GType       ogmrip_subp_chooser_widget_get_type (void);
-GtkWidget * ogmrip_subp_chooser_widget_new      (void);
+GType               ogmrip_subp_chooser_widget_get_type    (void);
+GtkWidget *         ogmrip_subp_chooser_widget_new         (void);
+OGMRipSubpOptions * ogmrip_subp_chooser_widget_get_options (OGMRipSubpChooserWidget *chooser);
 
 G_END_DECLS
 

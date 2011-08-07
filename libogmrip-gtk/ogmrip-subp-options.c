@@ -26,7 +26,7 @@ ogmrip_subp_options_default_init (OGMRipSubpOptionsInterface *iface)
 {
   g_object_interface_install_property (iface,
       g_param_spec_uint ("character-set", "Character set property", "Set character set",
-        OGMRIP_CHARSET_UTF8, OGMRIP_CHARSET_ISO8859_1, OGMRIP_CHARSET_ASCII,
+        OGMRIP_CHARSET_UTF8, OGMRIP_CHARSET_ASCII, OGMRIP_CHARSET_UTF8,
         G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_interface_install_property (iface,

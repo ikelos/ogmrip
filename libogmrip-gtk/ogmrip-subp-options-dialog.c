@@ -26,7 +26,7 @@
 #include <glib/gi18n-lib.h>
 
 #define OGMRIP_GLADE_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-profile-editor.glade"
-#define OGMRIP_GLADE_ROOT "subtitles-page"
+#define OGMRIP_GLADE_ROOT "subp-page"
 
 #define OGMRIP_SUBP_OPTIONS_DIALOG_GET_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_SUBP_OPTIONS_DIALOG, OGMRipSubpOptionsDialogPriv))
@@ -34,7 +34,7 @@
 struct _OGMRipSubpOptionsDialogPriv
 {
   GtkWidget *codec_combo;
-  GtkWidget *default_button;
+  GtkWidget *default_check;
   GtkWidget *charset_combo;
   GtkWidget *newline_combo;
   GtkWidget *spell_check;
@@ -183,7 +183,7 @@ ogmrip_subp_options_dialog_class_init (OGMRipSubpOptionsDialogClass *klass)
   g_object_class_override_property (object_class, PROP_FORCED_ONLY, "forced-only");
   g_object_class_override_property (object_class, PROP_LABEL, "label");
   g_object_class_override_property (object_class, PROP_LANGUAGE, "language");
-  g_object_class_override_property (object_class, PROP_NEWLINE, "language");
+  g_object_class_override_property (object_class, PROP_NEWLINE, "newline-style");
   g_object_class_override_property (object_class, PROP_SPELL_CHECK, "spell-check");
 
   g_type_class_add_private (klass, sizeof (OGMRipSubpOptionsDialogPriv));
@@ -269,22 +269,24 @@ ogmrip_subp_options_dialog_init (OGMRipSubpOptionsDialog *dialog)
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
   gtk_widget_show (label);
 
-  dialog->priv->language_combo = gtk_combo_box_new ();
+  dialog->priv->language_combo = ogmrip_language_chooser_new ();
   ogmrip_language_chooser_construct (GTK_COMBO_BOX (dialog->priv->language_combo));
   gtk_table_attach (GTK_TABLE (table), dialog->priv->language_combo, 1, 2, 1, 2, GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0);
   gtk_widget_show (dialog->priv->language_combo);
 
   gtk_label_set_mnemonic_widget (GTK_LABEL (label), dialog->priv->language_combo);
 
-  dialog->priv->default_button = gtk_check_button_new_with_mnemonic (_("Use _profile settings"));
-  gtk_table_attach (GTK_TABLE (table), dialog->priv->default_button, 0, 2, 2, 3, GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0);
-  gtk_widget_show (dialog->priv->default_button);
+  dialog->priv->default_check = gtk_check_button_new_with_mnemonic (_("Use _profile settings"));
+  gtk_table_attach (GTK_TABLE (table), dialog->priv->default_check, 0, 2, 2, 3, GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0);
+  gtk_widget_show (dialog->priv->default_check);
 
   root = gtk_builder_get_widget (builder, OGMRIP_GLADE_ROOT);
-  gtk_box_pack_start (GTK_BOX (vbox), root, TRUE, TRUE, 0);
+  gtk_widget_reparent (root, vbox);
   gtk_widget_show (root);
 
-  g_object_bind_property (dialog->priv->default_button, "active", root, "visible", G_BINDING_INVERT_BOOLEAN);
+  gtk_box_set_child_packing (GTK_BOX (vbox), root, TRUE, TRUE, 0, GTK_PACK_START);
+
+  g_object_bind_property (dialog->priv->default_check, "active", root, "visible", G_BINDING_INVERT_BOOLEAN);
 
   dialog->priv->codec_combo = gtk_builder_get_widget (builder, "subp-codec-combo");
   ogmrip_subp_codec_chooser_construct (GTK_COMBO_BOX (dialog->priv->codec_combo));
@@ -383,3 +385,20 @@ ogmrip_subp_options_dialog_new (void)
 {
   return g_object_new (OGMRIP_TYPE_SUBP_OPTIONS_DIALOG, NULL);
 }
+
+gboolean
+ogmrip_subp_options_dialog_get_use_defaults (OGMRipSubpOptionsDialog *dialog)
+{
+  g_return_val_if_fail (OGMRIP_IS_SUBP_OPTIONS_DIALOG (dialog), FALSE);
+
+  return gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (dialog->priv->default_check));
+}
+
+void
+ogmrip_subp_options_dialog_set_use_defaults (OGMRipSubpOptionsDialog *dialog, gboolean use_defaults)
+{
+  g_return_if_fail (OGMRIP_IS_SUBP_OPTIONS_DIALOG (dialog));
+
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->default_check), use_defaults);
+}
+

@@ -95,6 +95,7 @@ gboolean    gtk_tree_model_iter_prev        (GtkTreeModel     *tree_model,
 void        gtk_label_set_int               (GtkLabel         *label,
                                              gint             value);
 gint        gtk_label_get_int               (GtkLabel         *label);
+void        gtk_container_clear             (GtkContainer     *container);
 GtkWidget * gtk_box_get_nth_child           (GtkBox           *box,
                                              gint             n);
 void        gtk_table_append                (GtkTable         *table,

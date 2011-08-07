@@ -19,6 +19,8 @@
 #ifndef __OGMRIP_AUDIO_CHOOSER_WIDGET_H__
 #define __OGMRIP_AUDIO_CHOOSER_WIDGET_H__
 
+#include <ogmrip-list-item.h>
+#include <ogmrip-audio-options.h>
 #include <ogmrip-source-chooser-widget.h>
 
 G_BEGIN_DECLS
@@ -31,19 +33,23 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipAudioChooserWidget      OGMRipAudioChooserWidget;
 typedef struct _OGMRipAudioChooserWidgetClass OGMRipAudioChooserWidgetClass;
+typedef struct _OGMRipAudioChooserWidgetPriv  OGMRipAudioChooserWidgetPriv;
 
 struct _OGMRipAudioChooserWidget
 {
-  OGMRipSourceChooserWidget parent_instance;
+  OGMRipListItem parent_instance;
+
+  OGMRipAudioChooserWidgetPriv *priv;
 };
 
 struct _OGMRipAudioChooserWidgetClass
 {
-  OGMRipSourceChooserWidgetClass parent_class;
+  OGMRipListItemClass parent_class;
 };
 
-GType       ogmrip_audio_chooser_widget_get_type (void);
-GtkWidget * ogmrip_audio_chooser_widget_new      (void);
+GType                ogmrip_audio_chooser_widget_get_type    (void);
+GtkWidget *          ogmrip_audio_chooser_widget_new         (void);
+OGMRipAudioOptions * ogmrip_audio_chooser_widget_get_options (OGMRipAudioChooserWidget *chooser);
 
 G_END_DECLS
 

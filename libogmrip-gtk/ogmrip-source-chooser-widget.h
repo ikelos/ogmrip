@@ -20,6 +20,7 @@
 #define __OGMRIP_SOURCE_CHOOSER_WIDGET_H__
 
 #include <ogmrip-source-chooser.h>
+#include <ogmrip-file-chooser-dialog.h>
 
 G_BEGIN_DECLS
 
@@ -35,19 +36,23 @@ typedef struct _OGMRipSourceChooserWidgetPriv  OGMRipSourceChooserWidgetPriv;
 
 struct _OGMRipSourceChooserWidget
 {
-  GtkHBox parent_instance;
+  GtkComboBox parent_instance;
 
   OGMRipSourceChooserWidgetPriv *priv;
 };
 
 struct _OGMRipSourceChooserWidgetClass
 {
-  GtkHBoxClass parent_class;
+  GtkComboBoxClass parent_class;
 };
 
-GType ogmrip_source_chooser_widget_get_type (void);
-void  ogmrip_source_chooser_widget_add_stream (OGMRipSourceChooserWidget *chooser,
-                                               OGMDvdStream              *stream);
+GType       ogmrip_source_chooser_widget_get_type         (void);
+GtkWidget * ogmrip_source_chooser_widget_new              (void);
+GtkWidget * ogmrip_source_chooser_widget_new_with_dialog  (OGMRipFileChooserDialog   *dialog);
+void        ogmrip_source_chooser_widget_add_audio_stream (OGMRipSourceChooserWidget *chooser,
+                                                           OGMDvdAudioStream         *stream);
+void        ogmrip_source_chooser_widget_add_subp_stream  (OGMRipSourceChooserWidget *chooser,
+                                                           OGMDvdSubpStream          *stream);
 
 G_END_DECLS
 

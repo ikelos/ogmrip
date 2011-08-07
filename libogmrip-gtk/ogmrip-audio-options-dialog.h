@@ -45,8 +45,11 @@ struct _OGMRipAudioOptionsDialogClass
   GtkDialogClass parent_class;
 };
 
-GType       ogmrip_audio_options_dialog_get_type (void);
-GtkWidget * ogmrip_audio_options_dialog_new      (void);
+GType       ogmrip_audio_options_dialog_get_type         (void);
+GtkWidget * ogmrip_audio_options_dialog_new              (void);
+gboolean    ogmrip_audio_options_dialog_get_use_defaults (OGMRipAudioOptionsDialog *dialog);
+void        ogmrip_audio_options_dialog_set_use_defaults (OGMRipAudioOptionsDialog *dialog,
+                                                          gboolean                 use_defaults);
 
 G_END_DECLS
 
