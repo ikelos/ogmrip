@@ -279,6 +279,7 @@ ogmrip_source_chooser_widget_changed (GtkComboBox *combo)
             g_error_free (error);
         }
       }
+      gtk_widget_hide (chooser->priv->dialog);
 
       if (select_prev)
       {

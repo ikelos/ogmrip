@@ -307,6 +307,7 @@ ogmrip_subp_options_dialog_init (OGMRipSubpOptionsDialog *dialog)
   g_signal_connect (dialog->priv->codec_combo, "changed",
       G_CALLBACK (ogmrip_subp_options_dialog_codec_changed), table);
 
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->default_check), TRUE);
   gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->codec_combo), 0);
 
   g_object_unref (builder);

@@ -119,6 +119,7 @@ ogmrip_audio_chooser_widget_button_clicked (OGMRipAudioChooserWidget *widget)
      gtk_window_set_transient_for (GTK_WINDOW (widget->priv->dialog), GTK_WINDOW (toplevel));
 
    gtk_dialog_run (GTK_DIALOG (widget->priv->dialog));
+   gtk_widget_hide (widget->priv->dialog);
 }
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipAudioChooserWidget, ogmrip_audio_chooser_widget, OGMRIP_TYPE_LIST_ITEM,
@@ -151,6 +152,8 @@ ogmrip_audio_chooser_widget_init (OGMRipAudioChooserWidget *widget)
   widget->priv = OGMRIP_AUDIO_CHOOSER_WIDGET_GET_PRIVATE (widget);
 
   dialog = ogmrip_audio_file_chooser_dialog_new ();
+
+  gtk_box_set_spacing (GTK_BOX (widget), 6);
 
   widget->priv->chooser = ogmrip_source_chooser_widget_new_with_dialog (OGMRIP_FILE_CHOOSER_DIALOG (dialog));
   gtk_box_pack_start (GTK_BOX (widget), widget->priv->chooser, TRUE, TRUE, 0);

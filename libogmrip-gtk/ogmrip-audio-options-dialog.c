@@ -157,13 +157,36 @@ ogmrip_audio_options_dialog_set_quality (OGMRipAudioOptionsDialog *dialog, guint
 static gint
 ogmrip_audio_options_dialog_get_sample_rate (OGMRipAudioOptionsDialog *dialog)
 {
-  return gtk_combo_box_get_active (GTK_COMBO_BOX (dialog->priv->srate_combo));
+  static const gint sample_rate[] =
+  { 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000 };
+  gint i;
+
+  i = gtk_combo_box_get_active (GTK_COMBO_BOX (dialog->priv->srate_combo));
+
+  return sample_rate[i];
 }
 
 static void
 ogmrip_audio_options_dialog_set_sample_rate (OGMRipAudioOptionsDialog *dialog, guint srate)
 {
-  gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->srate_combo), srate);
+  if (srate >= 48000)
+    gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->srate_combo), 0);
+  else if (srate >= 44100)
+    gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->srate_combo), 1);
+  else if (srate >= 32000)
+    gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->srate_combo), 2);
+  else if (srate >= 24000)
+    gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->srate_combo), 3);
+  else if (srate >= 22050)
+    gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->srate_combo), 4);
+  else if (srate >= 16000)
+    gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->srate_combo), 5);
+  else if (srate >= 12000)
+    gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->srate_combo), 6);
+  else if (srate >= 11025)
+    gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->srate_combo), 7);
+  else
+    gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->srate_combo), 8);
 }
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipAudioOptionsDialog, ogmrip_audio_options_dialog, GTK_TYPE_DIALOG,
@@ -307,6 +330,7 @@ ogmrip_audio_options_dialog_init (OGMRipAudioOptionsDialog *dialog)
   g_signal_connect (dialog->priv->codec_combo, "changed",
       G_CALLBACK (ogmrip_audio_options_dialog_codec_changed), table);
 
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->default_check), TRUE);
   gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->codec_combo), 0);
 
   g_object_unref (builder);

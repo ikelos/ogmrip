@@ -119,6 +119,7 @@ ogmrip_subp_chooser_widget_button_clicked (OGMRipSubpChooserWidget *widget)
      gtk_window_set_transient_for (GTK_WINDOW (widget->priv->dialog), GTK_WINDOW (toplevel));
 
    gtk_dialog_run (GTK_DIALOG (widget->priv->dialog));
+   gtk_widget_hide (widget->priv->dialog);
 }
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipSubpChooserWidget, ogmrip_subp_chooser_widget, OGMRIP_TYPE_LIST_ITEM,
