@@ -40,6 +40,7 @@ struct _OGMRipAudioCodecPriv
   gboolean normalize;
 
   gchar *label;
+  guint language;
 
   OGMDvdAudioChannels channels;
 };
@@ -52,7 +53,9 @@ enum
   PROP_CHANNELS,
   PROP_SRATE,
   PROP_SPF,
-  PROP_FAST
+  PROP_FAST,
+  PROP_LABEL,
+  PROP_LANGUAGE
 };
 
 static void ogmrip_audio_codec_finalize     (GObject      *gobject);
@@ -101,6 +104,14 @@ ogmrip_audio_codec_class_init (OGMRipAudioCodecClass *klass)
   g_object_class_install_property (gobject_class, PROP_FAST, 
         g_param_spec_boolean ("fast", "Fast property", "Set fast", 
            FALSE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_LABEL, 
+        g_param_spec_string ("label", "Label property", "Set label", 
+           NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_LANGUAGE, 
+        g_param_spec_uint ("language", "Language property", "Set language", 
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipAudioCodecPriv));
 }
@@ -154,6 +165,13 @@ ogmrip_audio_codec_set_property (GObject *gobject, guint property_id, const GVal
     case PROP_FAST: 
       audio->priv->fast = g_value_get_boolean (value);
       break;
+    case PROP_LABEL: 
+      g_free (audio->priv->label);
+      audio->priv->label = g_value_dup_string (value);
+      break;
+    case PROP_LANGUAGE: 
+      audio->priv->language = g_value_get_uint (value);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
@@ -186,6 +204,12 @@ ogmrip_audio_codec_get_property (GObject *gobject, guint property_id, GValue *va
       break;
     case PROP_FAST:
       g_value_set_boolean (value, audio->priv->fast);
+      break;
+    case PROP_LABEL:
+      g_value_set_string (value, audio->priv->label);
+      break;
+    case PROP_LANGUAGE:
+      g_value_set_uint (value, audio->priv->language);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -403,6 +427,8 @@ ogmrip_audio_codec_set_label (OGMRipAudioCodec *audio, const gchar *label)
 
   if (label)
     audio->priv->label = g_strdup (label);
+
+  g_object_notify (G_OBJECT (audio), "label");
 }
 
 /**
@@ -419,5 +445,38 @@ ogmrip_audio_codec_get_label (OGMRipAudioCodec *audio)
   g_return_val_if_fail (OGMRIP_IS_AUDIO_CODEC (audio), NULL);
 
   return audio->priv->label;
+}
+
+/**
+ * ogmrip_audio_codec_set_language:
+ * @audio: an #OGMRipAudioCodec
+ * @language: the language
+ *
+ * Sets the language of the track.
+ */
+void
+ogmrip_audio_codec_set_language (OGMRipAudioCodec *audio, guint language)
+{
+  g_return_if_fail (OGMRIP_IS_AUDIO_CODEC (audio));
+
+  audio->priv->language = language;
+
+  g_object_notify (G_OBJECT (audio), "language");
+}
+
+/**
+ * ogmrip_audio_codec_get_language:
+ * @audio: an #OGMRipAudioCodec
+ *
+ * Gets the language of the track.
+ *
+ * Returns: the language
+ */
+gint
+ogmrip_audio_codec_get_language (OGMRipAudioCodec *audio)
+{
+  g_return_val_if_fail (OGMRIP_IS_AUDIO_CODEC (audio), -1);
+
+  return audio->priv->language;
 }
 
