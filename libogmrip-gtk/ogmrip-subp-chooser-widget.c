@@ -51,7 +51,11 @@ static void ogmrip_subp_chooser_widget_set_property (GObject         *gobject,
                                                      guint           property_id,
                                                      const GValue    *value,
                                                      GParamSpec      *pspec);
+#if GTK_CHECK_VERSION(3,0,0)
+static void ogmrip_subp_chooser_widget_destroy      (GtkWidget       *widget);
+#else
 static void ogmrip_subp_chooser_widget_destroy      (GtkObject       *object);
+#endif
 
 static OGMRipSource *
 ogmrip_subp_chooser_widget_get_active (OGMRipSourceChooser *chooser, OGMRipSourceType *type)
@@ -80,10 +84,19 @@ ogmrip_subp_chooser_widget_select_language (OGMRipSourceChooser *chooser, gint l
 static void
 ogmrip_subp_chooser_widget_combo_changed (OGMRipSubpChooserWidget *widget)
 {
+  OGMRipSource *source;
   OGMRipSourceType type;
 
-  ogmrip_source_chooser_get_active (OGMRIP_SOURCE_CHOOSER (widget->priv->chooser), &type);
-  gtk_widget_set_sensitive (widget->priv->button, type == OGMRIP_SOURCE_STREAM);
+  source = ogmrip_source_chooser_get_active (OGMRIP_SOURCE_CHOOSER (widget->priv->chooser), &type);
+  gtk_widget_set_sensitive (widget->priv->button, source != NULL && type == OGMRIP_SOURCE_STREAM);
+
+  if (source != NULL && type == OGMRIP_SOURCE_STREAM)
+  {
+    ogmrip_subp_options_dialog_set_label (OGMRIP_SUBP_OPTIONS_DIALOG (widget->priv->dialog),
+        ogmdvd_subp_stream_get_name (OGMDVD_SUBP_STREAM (source)));
+    ogmrip_subp_options_dialog_set_language (OGMRIP_SUBP_OPTIONS_DIALOG (widget->priv->dialog),
+        ogmdvd_subp_stream_get_language (OGMDVD_SUBP_STREAM (source)));
+  }
 }
 
 static void
@@ -129,14 +142,23 @@ static void
 ogmrip_subp_chooser_widget_class_init (OGMRipSubpChooserWidgetClass *klass)
 {
   GObjectClass *gobject_class;
+#if GTK_CHECK_VERSION(3,0,0)
+  GtkWidgetClass *widget_class;
+#else
   GtkObjectClass *object_class;
+#endif
 
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->get_property = ogmrip_subp_chooser_widget_get_property;
   gobject_class->set_property = ogmrip_subp_chooser_widget_set_property;
 
+#if GTK_CHECK_VERSION(3,0,0)
+  widget_class = GTK_WIDGET_CLASS (klass);
+  widget_class->destroy = ogmrip_subp_chooser_widget_destroy;
+#else
   object_class = GTK_OBJECT_CLASS (klass);
   object_class->destroy = ogmrip_subp_chooser_widget_destroy;
+#endif
 
   g_object_class_override_property (gobject_class, PROP_TITLE, "title");
 
@@ -221,19 +243,35 @@ ogmrip_subp_chooser_widget_set_property (GObject *gobject, guint property_id, co
   }
 }
 
+#if GTK_CHECK_VERSION(3,0,0)
+static void
+ogmrip_subp_chooser_widget_destroy (GtkWidget *widget)
+{
+  OGMRipSubpChooserWidget *chooser = OGMRIP_SUBP_CHOOSER_WIDGET (widget);
+
+  if (chooser->priv->dialog)
+  {
+    gtk_widget_destroy (chooser->priv->dialog);
+    chooser->priv->dialog = NULL;
+  }
+
+  GTK_WIDGET_CLASS (ogmrip_subp_chooser_widget_parent_class)->destroy (widget);
+}
+#else
 static void
 ogmrip_subp_chooser_widget_destroy (GtkObject *object)
 {
-  OGMRipSubpChooserWidget *widget = OGMRIP_SUBP_CHOOSER_WIDGET (object);
+  OGMRipSubpChooserWidget *chooser = OGMRIP_SUBP_CHOOSER_WIDGET (object);
 
-  if (widget->priv->dialog)
+  if (chooser->priv->dialog)
   {
-    gtk_widget_destroy (OGMRIP_SUBP_CHOOSER_WIDGET (object)->priv->dialog);
-    widget->priv->dialog = NULL;
+    gtk_widget_destroy (chooser->priv->dialog);
+    chooser->priv->dialog = NULL;
   }
 
   GTK_OBJECT_CLASS (ogmrip_subp_chooser_widget_parent_class)->destroy (object);
 }
+#endif
 
 GtkWidget *
 ogmrip_subp_chooser_widget_new (void)

@@ -38,14 +38,6 @@ ogmrip_subp_options_default_init (OGMRipSubpOptionsInterface *iface)
         FALSE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_interface_install_property (iface,
-      g_param_spec_string ("label", "Label property", "Set label",
-        NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
-
-  g_object_interface_install_property (iface,
-      g_param_spec_uint ("language", "Language property", "Set language",
-        0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
-
-  g_object_interface_install_property (iface,
       g_param_spec_uint ("newline-style", "Newline style property", "Set newline style",
         OGMRIP_NEWLINE_LF, OGMRIP_NEWLINE_CR, OGMRIP_NEWLINE_LF,
         G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
@@ -114,46 +106,6 @@ ogmrip_subp_options_set_forced_only (OGMRipSubpOptions *options, gboolean forced
   g_return_if_fail (OGMRIP_IS_SUBP_OPTIONS (options));
 
   g_object_set (options, "forced-only", forced_only, NULL);
-}
-
-gchar *
-ogmrip_subp_options_get_label (OGMRipSubpOptions *options)
-{
-  gchar *label;
-
-  g_return_val_if_fail (OGMRIP_IS_SUBP_OPTIONS (options), NULL);
-
-  g_object_get (options, "label", &label, NULL);
-
-  return label;
-}
-
-void
-ogmrip_subp_options_set_label (OGMRipSubpOptions *options, const gchar *label)
-{
-  g_return_if_fail (OGMRIP_IS_SUBP_OPTIONS (options));
-
-  g_object_set (options, "label", label, NULL);
-}
-
-guint
-ogmrip_subp_options_get_language (OGMRipSubpOptions *options)
-{
-  guint lang;
-
-  g_return_val_if_fail (OGMRIP_IS_SUBP_OPTIONS (options), 0);
-
-  g_object_get (options, "language", &lang, NULL);
-
-  return lang;
-}
-
-void
-ogmrip_subp_options_set_language (OGMRipSubpOptions *options, guint lang)
-{
-  g_return_if_fail (OGMRIP_IS_SUBP_OPTIONS (options));
-
-  g_object_set (options, "language", lang, NULL);
 }
 
 OGMRipNewline

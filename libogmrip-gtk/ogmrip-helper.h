@@ -77,6 +77,12 @@ gulong g_signal_connect_data_while_alive (gpointer       instance,
                                           GConnectFlags  connect_flags);
 
 /*
+ * Gio
+ */
+
+guint g_settings_get_uint (GSettings   *settings,
+                           const gchar *key);
+/*
  * Gtk+
  */
 

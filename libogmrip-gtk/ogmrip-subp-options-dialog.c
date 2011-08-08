@@ -118,30 +118,6 @@ ogmrip_subp_options_dialog_set_forced_only (OGMRipSubpOptionsDialog *dialog, gbo
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->forced_subs_check), forced_only);
 }
 
-static const gchar *
-ogmrip_subp_options_dialog_get_label (OGMRipSubpOptionsDialog *dialog)
-{
-  return gtk_entry_get_text (GTK_ENTRY (dialog->priv->label_entry));
-}
-
-static void
-ogmrip_subp_options_dialog_set_label (OGMRipSubpOptionsDialog *dialog, const gchar *label)
-{
-  gtk_entry_set_text (GTK_ENTRY (dialog->priv->label_entry), label ? label : "");
-}
-
-static gint
-ogmrip_subp_options_dialog_get_language (OGMRipSubpOptionsDialog *dialog)
-{
-  return ogmrip_language_chooser_get_active (GTK_COMBO_BOX (dialog->priv->lang_chooser));
-}
-
-static void
-ogmrip_subp_options_dialog_set_language (OGMRipSubpOptionsDialog *dialog, gint lang)
-{
-  ogmrip_language_chooser_set_active (GTK_COMBO_BOX (dialog->priv->lang_chooser), lang);
-}
-
 static OGMRipNewline
 ogmrip_subp_options_dialog_get_newline (OGMRipSubpOptionsDialog *dialog)
 {
@@ -172,19 +148,25 @@ G_DEFINE_TYPE_WITH_CODE (OGMRipSubpOptionsDialog, ogmrip_subp_options_dialog, GT
 static void
 ogmrip_subp_options_dialog_class_init (OGMRipSubpOptionsDialogClass *klass)
 {
-  GObjectClass *object_class;
+  GObjectClass *gobject_class;
 
-  object_class = G_OBJECT_CLASS (klass);
-  object_class->get_property = ogmrip_subp_options_dialog_get_property;
-  object_class->set_property = ogmrip_subp_options_dialog_set_property;
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->get_property = ogmrip_subp_options_dialog_get_property;
+  gobject_class->set_property = ogmrip_subp_options_dialog_set_property;
 
-  g_object_class_override_property (object_class, PROP_CHARSET, "character-set");
-  g_object_class_override_property (object_class, PROP_CODEC, "codec");
-  g_object_class_override_property (object_class, PROP_FORCED_ONLY, "forced-only");
-  g_object_class_override_property (object_class, PROP_LABEL, "label");
-  g_object_class_override_property (object_class, PROP_LANGUAGE, "language");
-  g_object_class_override_property (object_class, PROP_NEWLINE, "newline-style");
-  g_object_class_override_property (object_class, PROP_SPELL_CHECK, "spell-check");
+  g_object_class_override_property (gobject_class, PROP_CHARSET, "character-set");
+  g_object_class_override_property (gobject_class, PROP_CODEC, "codec");
+  g_object_class_override_property (gobject_class, PROP_FORCED_ONLY, "forced-only");
+  g_object_class_override_property (gobject_class, PROP_NEWLINE, "newline-style");
+  g_object_class_override_property (gobject_class, PROP_SPELL_CHECK, "spell-check");
+
+  g_object_class_install_property (gobject_class, PROP_LABEL,
+      g_param_spec_string ("label", "Label property", "Set label",
+        NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_LANGUAGE,
+      g_param_spec_uint ("language", "Language property", "Set language",
+        0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipSubpOptionsDialogPriv));
 }
@@ -410,5 +392,29 @@ ogmrip_subp_options_dialog_set_use_defaults (OGMRipSubpOptionsDialog *dialog, gb
   g_return_if_fail (OGMRIP_IS_SUBP_OPTIONS_DIALOG (dialog));
 
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->default_check), use_defaults);
+}
+
+const gchar *
+ogmrip_subp_options_dialog_get_label (OGMRipSubpOptionsDialog *dialog)
+{
+  return gtk_entry_get_text (GTK_ENTRY (dialog->priv->label_entry));
+}
+
+void
+ogmrip_subp_options_dialog_set_label (OGMRipSubpOptionsDialog *dialog, const gchar *label)
+{
+  gtk_entry_set_text (GTK_ENTRY (dialog->priv->label_entry), label ? label : "");
+}
+
+gint
+ogmrip_subp_options_dialog_get_language (OGMRipSubpOptionsDialog *dialog)
+{
+  return ogmrip_language_chooser_get_active (GTK_COMBO_BOX (dialog->priv->lang_chooser));
+}
+
+void
+ogmrip_subp_options_dialog_set_language (OGMRipSubpOptionsDialog *dialog, gint lang)
+{
+  ogmrip_language_chooser_set_active (GTK_COMBO_BOX (dialog->priv->lang_chooser), lang);
 }
 

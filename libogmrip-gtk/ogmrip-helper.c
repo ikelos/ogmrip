@@ -108,6 +108,19 @@ g_signal_connect_data_while_alive (gpointer instance, const gchar *detailed_sign
   return info->handler;
 }
 
+guint
+g_settings_get_uint (GSettings *settings, const gchar *key)
+{
+  guint val;
+
+  g_return_val_if_fail (G_IS_SETTINGS (settings), 0);
+  g_return_val_if_fail (key != NULL, 0);
+
+  g_settings_get (settings, key, "u", &val);
+
+  return val;
+}
+
 /**
  * gtk_window_set_parent:
  * @window: A #GtkWindow

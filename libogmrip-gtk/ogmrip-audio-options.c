@@ -34,14 +34,6 @@ ogmrip_audio_options_default_init (OGMRipAudioOptionsInterface *iface)
         OGMRIP_TYPE_AUDIO_CODEC, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_interface_install_property (iface,
-      g_param_spec_string ("label", "Label property", "Set label",
-        NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
-
-  g_object_interface_install_property (iface,
-      g_param_spec_uint ("language", "Language property", "Set language",
-        0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
-
-  g_object_interface_install_property (iface,
       g_param_spec_boolean ("normalize", "Normalize property", "Set normalize",
         TRUE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
@@ -93,46 +85,6 @@ ogmrip_audio_options_set_codec (OGMRipAudioOptions *options, GType codec)
   g_return_if_fail (g_type_is_a (codec, OGMRIP_TYPE_AUDIO_CODEC));
 
   g_object_set (options, "codec", codec, NULL);
-}
-
-gchar *
-ogmrip_audio_options_get_label (OGMRipAudioOptions *options)
-{
-  gchar *label;
-
-  g_return_val_if_fail (OGMRIP_IS_AUDIO_OPTIONS (options), NULL);
-
-  g_object_get (options, "label", &label, NULL);
-
-  return label;
-}
-
-void
-ogmrip_audio_options_set_label (OGMRipAudioOptions *options, const gchar *label)
-{
-  g_return_if_fail (OGMRIP_IS_AUDIO_OPTIONS (options));
-
-  g_object_set (options, "label", label, NULL);
-}
-
-guint
-ogmrip_audio_options_get_language (OGMRipAudioOptions *options)
-{
-  guint lang;
-
-  g_return_val_if_fail (OGMRIP_IS_AUDIO_OPTIONS (options), -1);
-
-  g_object_get (options, "language", &lang, NULL);
-
-  return lang;
-}
-
-void
-ogmrip_audio_options_set_language (OGMRipAudioOptions *options, guint lang)
-{
-  g_return_if_fail (OGMRIP_IS_AUDIO_OPTIONS (options));
-
-  g_object_set (options, "language", lang, NULL);
 }
 
 gboolean

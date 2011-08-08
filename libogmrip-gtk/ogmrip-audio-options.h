@@ -44,12 +44,6 @@ void     ogmrip_audio_options_set_channels    (OGMRipAudioOptions  *options,
 GType    ogmrip_audio_options_get_codec       (OGMRipAudioOptions  *options);
 void     ogmrip_audio_options_set_codec       (OGMRipAudioOptions  *options,
                                                GType               codec);
-gchar *  ogmrip_audio_options_get_label       (OGMRipAudioOptions  *options);
-void     ogmrip_audio_options_set_label       (OGMRipAudioOptions  *options,
-                                               const gchar         *label);
-guint    ogmrip_audio_options_get_language    (OGMRipAudioOptions  *options);
-void     ogmrip_audio_options_set_language    (OGMRipAudioOptions  *options,
-                                               guint               lang);
 gboolean ogmrip_audio_options_get_normalize   (OGMRipAudioOptions  *options);
 void     ogmrip_audio_options_set_normalize   (OGMRipAudioOptions  *options,
                                                gboolean            normalize);

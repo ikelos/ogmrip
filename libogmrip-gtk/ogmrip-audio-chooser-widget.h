@@ -47,9 +47,11 @@ struct _OGMRipAudioChooserWidgetClass
   OGMRipListItemClass parent_class;
 };
 
-GType                ogmrip_audio_chooser_widget_get_type    (void);
-GtkWidget *          ogmrip_audio_chooser_widget_new         (void);
-OGMRipAudioOptions * ogmrip_audio_chooser_widget_get_options (OGMRipAudioChooserWidget *chooser);
+GType                ogmrip_audio_chooser_widget_get_type     (void);
+GtkWidget *          ogmrip_audio_chooser_widget_new          (void);
+OGMRipAudioOptions * ogmrip_audio_chooser_widget_get_options  (OGMRipAudioChooserWidget *chooser);
+const gchar *        ogmrip_audio_chooser_widget_get_label    (OGMRipAudioChooserWidget *chooser);
+gint                 ogmrip_audio_chooser_widget_get_language (OGMRipAudioChooserWidget *chooser);
 
 G_END_DECLS
 

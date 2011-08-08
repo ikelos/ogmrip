@@ -44,12 +44,6 @@ void          ogmrip_subp_options_set_character_set (OGMRipSubpOptions *options,
 GType         ogmrip_subp_options_get_codec         (OGMRipSubpOptions *dialog);
 void          ogmrip_subp_options_set_codec         (OGMRipSubpOptions *dialog,
                                                      GType             type);
-gchar *       ogmrip_subp_options_get_label         (OGMRipSubpOptions *dialog);
-void          ogmrip_subp_options_set_label         (OGMRipSubpOptions *dialog,
-                                                     const gchar       *label);
-guint         ogmrip_subp_options_get_language      (OGMRipSubpOptions *dialog);
-void          ogmrip_subp_options_set_language      (OGMRipSubpOptions *dialog,
-                                                     guint             lang);
 OGMRipNewline ogmrip_subp_options_get_newline_style (OGMRipSubpOptions *options);
 void          ogmrip_subp_options_set_newline_stype (OGMRipSubpOptions *options,
                                                      OGMRipNewline     newline);

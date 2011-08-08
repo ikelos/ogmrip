@@ -106,30 +106,6 @@ ogmrip_audio_options_dialog_set_codec (OGMRipAudioOptionsDialog *dialog, GType c
   ogmrip_codec_chooser_set_active (GTK_COMBO_BOX (dialog->priv->codec_combo), name);
 }
 
-static const  gchar *
-ogmrip_audio_options_dialog_get_label (OGMRipAudioOptionsDialog *dialog)
-{
-  return gtk_entry_get_text (GTK_ENTRY (dialog->priv->label_entry));
-}
-
-static void
-ogmrip_audio_options_dialog_set_label (OGMRipAudioOptionsDialog *dialog, const gchar *label)
-{
-  gtk_entry_set_text (GTK_ENTRY (dialog->priv->label_entry), label ? label : "");
-}
-
-static gint
-ogmrip_audio_options_dialog_get_language (OGMRipAudioOptionsDialog *dialog)
-{
-  return ogmrip_language_chooser_get_active (GTK_COMBO_BOX (dialog->priv->lang_chooser));
-}
-
-static void
-ogmrip_audio_options_dialog_set_language (OGMRipAudioOptionsDialog *dialog, guint lang)
-{
-  ogmrip_language_chooser_set_active (GTK_COMBO_BOX (dialog->priv->lang_chooser), lang);
-}
-
 static gboolean
 ogmrip_audio_options_dialog_get_normalize (OGMRipAudioOptionsDialog *dialog)
 {
@@ -195,19 +171,25 @@ G_DEFINE_TYPE_WITH_CODE (OGMRipAudioOptionsDialog, ogmrip_audio_options_dialog, 
 static void
 ogmrip_audio_options_dialog_class_init (OGMRipAudioOptionsDialogClass *klass)
 {
-  GObjectClass *object_class;
+  GObjectClass *gobject_class;
 
-  object_class = G_OBJECT_CLASS (klass);
-  object_class->get_property = ogmrip_audio_options_dialog_get_property;
-  object_class->set_property = ogmrip_audio_options_dialog_set_property;
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->get_property = ogmrip_audio_options_dialog_get_property;
+  gobject_class->set_property = ogmrip_audio_options_dialog_set_property;
 
-  g_object_class_override_property (object_class, PROP_CHANNELS, "channels");
-  g_object_class_override_property (object_class, PROP_CODEC, "codec");
-  g_object_class_override_property (object_class, PROP_LABEL, "label");
-  g_object_class_override_property (object_class, PROP_LANGUAGE, "language");
-  g_object_class_override_property (object_class, PROP_NORMALIZE, "normalize");
-  g_object_class_override_property (object_class, PROP_QUALITY, "quality");
-  g_object_class_override_property (object_class, PROP_SAMPLE_RATE, "sample-rate");
+  g_object_class_override_property (gobject_class, PROP_CHANNELS, "channels");
+  g_object_class_override_property (gobject_class, PROP_CODEC, "codec");
+  g_object_class_override_property (gobject_class, PROP_NORMALIZE, "normalize");
+  g_object_class_override_property (gobject_class, PROP_QUALITY, "quality");
+  g_object_class_override_property (gobject_class, PROP_SAMPLE_RATE, "sample-rate");
+
+  g_object_class_install_property (gobject_class, PROP_LABEL,
+      g_param_spec_string ("label", "Label property", "Set label",
+        NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_LANGUAGE,
+      g_param_spec_uint ("language", "Language property", "Set language",
+        0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipAudioOptionsDialogPriv));
 }
@@ -417,6 +399,30 @@ GtkWidget *
 ogmrip_audio_options_dialog_new (void)
 {
   return g_object_new (OGMRIP_TYPE_AUDIO_OPTIONS_DIALOG, NULL);
+}
+
+const  gchar *
+ogmrip_audio_options_dialog_get_label (OGMRipAudioOptionsDialog *dialog)
+{
+  return gtk_entry_get_text (GTK_ENTRY (dialog->priv->label_entry));
+}
+
+void
+ogmrip_audio_options_dialog_set_label (OGMRipAudioOptionsDialog *dialog, const gchar *label)
+{
+  gtk_entry_set_text (GTK_ENTRY (dialog->priv->label_entry), label ? label : "");
+}
+
+gint
+ogmrip_audio_options_dialog_get_language (OGMRipAudioOptionsDialog *dialog)
+{
+  return ogmrip_language_chooser_get_active (GTK_COMBO_BOX (dialog->priv->lang_chooser));
+}
+
+void
+ogmrip_audio_options_dialog_set_language (OGMRipAudioOptionsDialog *dialog, guint lang)
+{
+  ogmrip_language_chooser_set_active (GTK_COMBO_BOX (dialog->priv->lang_chooser), lang);
 }
 
 gboolean

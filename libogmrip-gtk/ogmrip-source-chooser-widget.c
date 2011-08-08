@@ -66,6 +66,7 @@ struct _OGMRipSourceChooserWidgetPriv
   GtkWidget *dialog;
   GtkWidget *options;
 
+  GtkListStore *store;
   GtkTreePath *prev_path;
 };
 
@@ -81,7 +82,11 @@ static void ogmrip_source_chooser_widget_set_property (GObject      *gobject,
                                                        guint        property_id,
                                                        const GValue *value,
                                                        GParamSpec   *pspec);
+#if GTK_CHECK_VERSION(3,0,0)
+static void ogmrip_source_chooser_widget_destroy      (GtkWidget    *widget);
+#else
 static void ogmrip_source_chooser_widget_destroy      (GtkObject    *object);
+#endif
 static void ogmrip_source_chooser_widget_changed      (GtkComboBox  *combo);
 
 static gboolean
@@ -98,35 +103,33 @@ static void
 ogmrip_source_chooser_widget_clear (OGMRipSourceChooserWidget *chooser)
 { 
   OGMRipSource *source;
-  GtkTreeModel *model;
   GtkTreeIter iter;
   gint type;
 
-  model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
-  if (gtk_tree_model_get_iter_first (model, &iter))
+  if (gtk_tree_model_get_iter_first (GTK_TREE_MODEL (chooser->priv->store), &iter))
   {
     do
     {
-      gtk_tree_model_get (model, &iter, TYPE_COLUMN, &type, SOURCE_COLUMN, &source, -1);
+      gtk_tree_model_get (GTK_TREE_MODEL (chooser->priv->store), &iter, TYPE_COLUMN, &type, SOURCE_COLUMN, &source, -1);
 
       if (type == OGMRIP_SOURCE_FILE)
         ogmrip_file_unref (OGMRIP_FILE (source)); 
       else if (type == OGMRIP_SOURCE_STREAM)
         ogmdvd_stream_unref (OGMDVD_STREAM (source));
     }
-    while (gtk_list_store_remove (GTK_LIST_STORE (model), &iter));
+    while (gtk_list_store_remove (chooser->priv->store, &iter));
   }
 
-  gtk_list_store_append (GTK_LIST_STORE (model), &iter);
-  gtk_list_store_set (GTK_LIST_STORE (model), &iter,
+  gtk_list_store_append (chooser->priv->store, &iter);
+  gtk_list_store_set (chooser->priv->store, &iter,
       TEXT_COLUMN, _("No stream"), TYPE_COLUMN, OGMRIP_SOURCE_NONE, LANG_COLUMN, -1, SOURCE_COLUMN, NULL, -1);
 
-  gtk_list_store_append (GTK_LIST_STORE (model), &iter);
-  gtk_list_store_set (GTK_LIST_STORE (model), &iter,
+  gtk_list_store_append (chooser->priv->store, &iter);
+  gtk_list_store_set (chooser->priv->store, &iter,
       TEXT_COLUMN, NULL, TYPE_COLUMN, ROW_TYPE_OTHER_SEP, LANG_COLUMN, -1, SOURCE_COLUMN, NULL, -1);
 
-  gtk_list_store_append (GTK_LIST_STORE (model), &iter);
-  gtk_list_store_set (GTK_LIST_STORE (model), &iter,
+  gtk_list_store_append (chooser->priv->store, &iter);
+  gtk_list_store_set (chooser->priv->store, &iter,
       TEXT_COLUMN, _("Other..."), TYPE_COLUMN, ROW_TYPE_OTHER, LANG_COLUMN, -1, SOURCE_COLUMN, NULL, -1);
 
 }
@@ -149,60 +152,57 @@ ogmrip_source_chooser_widget_set_title (OGMRipSourceChooserWidget *chooser, OGMD
 static gboolean
 ogmrip_source_chooser_widget_get_stream_iter (OGMRipSourceChooserWidget *chooser, GtkTreeIter *iter)
 {
-  GtkTreeModel *model;
   GtkTreeIter sibling;
   gint type;
 
-  model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
-  if (!gtk_tree_model_get_iter_first (model, &sibling))
+  if (!gtk_tree_model_get_iter_first (GTK_TREE_MODEL (chooser->priv->store), &sibling))
     return FALSE;
 
   do
   {
-    gtk_tree_model_get (model, &sibling, TYPE_COLUMN, &type, -1);
+    gtk_tree_model_get (GTK_TREE_MODEL (chooser->priv->store), &sibling, TYPE_COLUMN, &type, -1);
     if (type != OGMRIP_SOURCE_STREAM && type != OGMRIP_SOURCE_NONE)
       break;
   }
-  while (gtk_tree_model_iter_next (model, &sibling));
+  while (gtk_tree_model_iter_next (GTK_TREE_MODEL (chooser->priv->store), &sibling));
 
-  gtk_list_store_insert_before (GTK_LIST_STORE (model), iter, &sibling);
+  gtk_list_store_insert_before (chooser->priv->store, iter, &sibling);
 
   return TRUE;
 }
 
 static gboolean
-ogmrip_source_chooser_widget_get_file_iter (OGMRipSourceChooserWidget *chooser, GtkTreeModel **model, GtkTreeIter *iter)
+ogmrip_source_chooser_widget_get_file_iter (OGMRipSourceChooserWidget *chooser, GtkTreeIter *iter)
 {
   gint type, pos = 0;
 
-  *model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
-  if (!gtk_tree_model_get_iter_first (*model, iter))
+  if (!gtk_tree_model_get_iter_first (GTK_TREE_MODEL (chooser->priv->store), iter))
     return FALSE;
 
   do
   {
-    gtk_tree_model_get (*model, iter, TYPE_COLUMN, &type, -1);
+    gtk_tree_model_get (GTK_TREE_MODEL (chooser->priv->store), iter, TYPE_COLUMN, &type, -1);
     if (type != OGMRIP_SOURCE_STREAM && type != OGMRIP_SOURCE_NONE)
       break;
     pos ++;
   }
-  while (gtk_tree_model_iter_next (*model, iter));
+  while (gtk_tree_model_iter_next (GTK_TREE_MODEL (chooser->priv->store), iter));
 
   if (type != ROW_TYPE_FILE_SEP)
   {
-    gtk_list_store_insert (GTK_LIST_STORE (*model), iter, pos);
-    gtk_list_store_set (GTK_LIST_STORE (*model), iter,
+    gtk_list_store_insert (chooser->priv->store, iter, pos);
+    gtk_list_store_set (chooser->priv->store, iter,
         TEXT_COLUMN, NULL, TYPE_COLUMN, ROW_TYPE_FILE_SEP, LANG_COLUMN, -1, SOURCE_COLUMN, NULL, -1);
     pos ++;
   }
   else
   {
-    gtk_tree_model_iter_next (*model, iter);
-    gtk_tree_model_get (*model, iter, TYPE_COLUMN, &type, -1);
+    gtk_tree_model_iter_next (GTK_TREE_MODEL (chooser->priv->store), iter);
+    gtk_tree_model_get (GTK_TREE_MODEL (chooser->priv->store), iter, TYPE_COLUMN, &type, -1);
   }
 
   if (type != OGMRIP_SOURCE_FILE)
-    gtk_list_store_insert (GTK_LIST_STORE (*model), iter, pos);
+    gtk_list_store_insert (chooser->priv->store, iter, pos);
 
   return TRUE;
 }
@@ -210,15 +210,14 @@ ogmrip_source_chooser_widget_get_file_iter (OGMRipSourceChooserWidget *chooser, 
 static void
 ogmrip_source_chooser_widget_set_file (OGMRipSourceChooserWidget *chooser, OGMRipFile *file)
 {
-  GtkTreeModel *model;
   GtkTreeIter iter;
 
-  if (ogmrip_source_chooser_widget_get_file_iter (chooser, &model, &iter))
+  if (ogmrip_source_chooser_widget_get_file_iter (chooser, &iter))
   {
     OGMRipFile *old_file;
     gchar *filename, *basename;
 
-    gtk_tree_model_get (model, &iter, SOURCE_COLUMN, &old_file, -1);
+    gtk_tree_model_get (GTK_TREE_MODEL (chooser->priv->store), &iter, SOURCE_COLUMN, &old_file, -1);
     if (old_file)
       ogmrip_file_unref (old_file);
 
@@ -226,7 +225,7 @@ ogmrip_source_chooser_widget_set_file (OGMRipSourceChooserWidget *chooser, OGMRi
     basename = g_path_get_basename (filename);
     g_free (filename);
 
-    gtk_list_store_set (GTK_LIST_STORE (model), &iter, TEXT_COLUMN, basename,
+    gtk_list_store_set (chooser->priv->store, &iter, TEXT_COLUMN, basename,
         TYPE_COLUMN, OGMRIP_SOURCE_FILE, LANG_COLUMN, ogmrip_file_get_language (file), SOURCE_COLUMN, file, -1);
     g_free (basename);
   }
@@ -242,11 +241,9 @@ ogmrip_source_chooser_widget_changed (GtkComboBox *combo)
 
   if (gtk_combo_box_get_active_iter (GTK_COMBO_BOX (chooser), &iter))
   {
-    GtkTreeModel *model;
     gint type;
 
-    model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
-    gtk_tree_model_get (model, &iter, TYPE_COLUMN, &type, -1);
+    gtk_tree_model_get (GTK_TREE_MODEL (chooser->priv->store), &iter, TYPE_COLUMN, &type, -1);
 
     if (type == ROW_TYPE_OTHER && chooser->priv->dialog)
     {
@@ -283,11 +280,10 @@ ogmrip_source_chooser_widget_changed (GtkComboBox *combo)
 
       if (select_prev)
       {
-        GtkTreeModel *model;
         GtkTreeIter iter;
 
-        model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
-        if (chooser->priv->prev_path && gtk_tree_model_get_iter (model, &iter, chooser->priv->prev_path))
+        if (chooser->priv->prev_path &&
+            gtk_tree_model_get_iter (GTK_TREE_MODEL (chooser->priv->store), &iter, chooser->priv->prev_path))
           gtk_combo_box_set_active_iter (GTK_COMBO_BOX (chooser), &iter);
         else
           gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), -1);
@@ -297,7 +293,7 @@ ogmrip_source_chooser_widget_changed (GtkComboBox *combo)
     {
       if (chooser->priv->prev_path)
         gtk_tree_path_free (chooser->priv->prev_path);
-      chooser->priv->prev_path = gtk_tree_model_get_path (model, &iter);
+      chooser->priv->prev_path = gtk_tree_model_get_path (GTK_TREE_MODEL (chooser->priv->store), &iter);
     }
   }
 }
@@ -309,7 +305,11 @@ static void
 ogmrip_source_chooser_widget_class_init (OGMRipSourceChooserWidgetClass *klass)
 {
   GObjectClass *gobject_class;
+#if GTK_CHECK_VERSION(3,0,0)
+  GtkWidgetClass *widget_class;
+#else
   GtkObjectClass *object_class;
+#endif
   GtkComboBoxClass *combo_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
@@ -319,8 +319,13 @@ ogmrip_source_chooser_widget_class_init (OGMRipSourceChooserWidgetClass *klass)
   gobject_class->get_property = ogmrip_source_chooser_widget_get_property;
   gobject_class->set_property = ogmrip_source_chooser_widget_set_property;
 
+#if GTK_CHECK_VERSION(3,0,0)
+  widget_class = GTK_WIDGET_CLASS (klass);
+  widget_class->destroy = ogmrip_source_chooser_widget_destroy;
+#else
   object_class = GTK_OBJECT_CLASS (klass);
   object_class->destroy = ogmrip_source_chooser_widget_destroy;
+#endif
 
   combo_class = GTK_COMBO_BOX_CLASS (klass);
   combo_class->changed = ogmrip_source_chooser_widget_changed;
@@ -338,13 +343,11 @@ static void
 ogmrip_source_chooser_widget_init (OGMRipSourceChooserWidget *chooser)
 {
   GtkCellRenderer *cell;
-  GtkListStore *store;
 
   chooser->priv = OGMRIP_SOURCE_CHOOSER_WIDGET_GET_PRIVATE (chooser);
 
-  store = gtk_list_store_new (NUM_COLUMNS, G_TYPE_STRING, G_TYPE_INT, G_TYPE_INT, G_TYPE_POINTER);
-  gtk_combo_box_set_model (GTK_COMBO_BOX (chooser), GTK_TREE_MODEL (store));
-  g_object_unref (store);
+  chooser->priv->store = gtk_list_store_new (NUM_COLUMNS, G_TYPE_STRING, G_TYPE_INT, G_TYPE_INT, G_TYPE_POINTER);
+  gtk_combo_box_set_model (GTK_COMBO_BOX (chooser), GTK_TREE_MODEL (chooser->priv->store));
 
   gtk_combo_box_set_row_separator_func (GTK_COMBO_BOX (chooser),
       ogmrip_source_chooser_widget_sep_func, NULL, NULL);
@@ -373,11 +376,18 @@ ogmrip_source_chooser_widget_dispose (GObject *gobject)
 {
   OGMRipSourceChooserWidget *chooser = OGMRIP_SOURCE_CHOOSER_WIDGET (gobject);
 
-  ogmrip_source_chooser_widget_clear (chooser);
+  if (chooser->priv->store)
+  {
+    ogmrip_source_chooser_widget_clear (chooser);
+    g_object_unref (chooser->priv->store);
+    chooser->priv->store = NULL;
+  }
 
   if (chooser->priv->title)
+  {
     ogmdvd_title_unref (chooser->priv->title);
-  chooser->priv->title = NULL;
+    chooser->priv->title = NULL;
+  }
 
   G_OBJECT_CLASS (ogmrip_source_chooser_widget_parent_class)->dispose (gobject);
 }
@@ -432,6 +442,21 @@ ogmrip_source_chooser_widget_set_property (GObject *gobject, guint property_id, 
   }
 }
 
+#if GTK_CHECK_VERSION(3,0,0)
+static void
+ogmrip_source_chooser_widget_destroy (GtkWidget *widget)
+{
+  OGMRipSourceChooserWidget *chooser = OGMRIP_SOURCE_CHOOSER_WIDGET (widget);
+
+  if (chooser->priv->dialog)
+  {
+    gtk_widget_destroy (chooser->priv->dialog);
+    chooser->priv->dialog = NULL;
+  }
+
+  GTK_WIDGET_CLASS (ogmrip_source_chooser_widget_parent_class)->destroy (widget);
+}
+#else
 static void
 ogmrip_source_chooser_widget_destroy (GtkObject *object)
 {
@@ -445,6 +470,7 @@ ogmrip_source_chooser_widget_destroy (GtkObject *object)
 
   GTK_OBJECT_CLASS (ogmrip_source_chooser_widget_parent_class)->destroy (object);
 }
+#endif
 
 static OGMRipSource *
 ogmrip_source_chooser_widget_get_active (OGMRipSourceChooser *chooser, OGMRipSourceType *type)
@@ -553,16 +579,13 @@ void
 ogmrip_source_chooser_widget_add_audio_stream (OGMRipSourceChooserWidget *chooser, OGMDvdAudioStream *stream)
 {
   GtkTreeIter iter;
-  GtkTreeModel *model;
 
   g_return_if_fail (OGMRIP_IS_SOURCE_CHOOSER_WIDGET (chooser));
 
-  model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
-
   if (!stream)
   {
-    gtk_tree_model_get_iter_first (model, &iter);
-    gtk_list_store_set (GTK_LIST_STORE (model), &iter,
+    gtk_tree_model_get_iter_first (GTK_TREE_MODEL (chooser->priv->store), &iter);
+    gtk_list_store_set (chooser->priv->store, &iter,
         TEXT_COLUMN, _("No audio"), TYPE_COLUMN, OGMRIP_SOURCE_NONE, LANG_COLUMN, -1, SOURCE_COLUMN, NULL, -1);
   }
   else
@@ -604,7 +627,7 @@ ogmrip_source_chooser_widget_add_audio_stream (OGMRipSourceChooserWidget *choose
     }
 
     ogmrip_source_chooser_widget_get_stream_iter (chooser, &iter);
-    gtk_list_store_set (GTK_LIST_STORE (model), &iter,
+    gtk_list_store_set (chooser->priv->store, &iter,
         TEXT_COLUMN, str, TYPE_COLUMN, OGMRIP_SOURCE_STREAM, LANG_COLUMN, lang, SOURCE_COLUMN, stream, -1);
 
     g_free (str);
@@ -615,16 +638,13 @@ void
 ogmrip_source_chooser_widget_add_subp_stream (OGMRipSourceChooserWidget *chooser, OGMDvdSubpStream *stream)
 {
   GtkTreeIter iter;
-  GtkTreeModel *model;
 
   g_return_if_fail (OGMRIP_IS_SOURCE_CHOOSER_WIDGET (chooser));
 
-  model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
-
   if (!stream)
   {
-    gtk_tree_model_get_iter_first (model, &iter);
-    gtk_list_store_set (GTK_LIST_STORE (model), &iter,
+    gtk_tree_model_get_iter_first (GTK_TREE_MODEL (chooser->priv->store), &iter);
+    gtk_list_store_set (chooser->priv->store, &iter,
         TEXT_COLUMN, _("No subp"), TYPE_COLUMN, OGMRIP_SOURCE_NONE, LANG_COLUMN, -1, SOURCE_COLUMN, NULL, -1);
   }
   else
@@ -646,7 +666,7 @@ ogmrip_source_chooser_widget_add_subp_stream (OGMRipSourceChooserWidget *chooser
           ogmdvd_get_language_label (lang));
 
     ogmrip_source_chooser_widget_get_stream_iter (chooser, &iter);
-    gtk_list_store_set (GTK_LIST_STORE (model), &iter,
+    gtk_list_store_set (chooser->priv->store, &iter,
         TEXT_COLUMN, str, TYPE_COLUMN, OGMRIP_SOURCE_STREAM, LANG_COLUMN, lang, SOURCE_COLUMN, stream, -1);
 
     g_free (str);

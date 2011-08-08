@@ -45,11 +45,17 @@ struct _OGMRipAudioOptionsDialogClass
   GtkDialogClass parent_class;
 };
 
-GType       ogmrip_audio_options_dialog_get_type         (void);
-GtkWidget * ogmrip_audio_options_dialog_new              (void);
-gboolean    ogmrip_audio_options_dialog_get_use_defaults (OGMRipAudioOptionsDialog *dialog);
-void        ogmrip_audio_options_dialog_set_use_defaults (OGMRipAudioOptionsDialog *dialog,
-                                                          gboolean                 use_defaults);
+GType          ogmrip_audio_options_dialog_get_type         (void);
+GtkWidget *    ogmrip_audio_options_dialog_new              (void);
+const  gchar * ogmrip_audio_options_dialog_get_label        (OGMRipAudioOptionsDialog *dialog);
+void           ogmrip_audio_options_dialog_set_label        (OGMRipAudioOptionsDialog *dialog,
+                                                             const gchar *label);
+gint           ogmrip_audio_options_dialog_get_language     (OGMRipAudioOptionsDialog *dialog);
+void           ogmrip_audio_options_dialog_set_language     (OGMRipAudioOptionsDialog *dialog,
+                                                             guint                    lang);
+gboolean       ogmrip_audio_options_dialog_get_use_defaults (OGMRipAudioOptionsDialog *dialog);
+void           ogmrip_audio_options_dialog_set_use_defaults (OGMRipAudioOptionsDialog *dialog,
+                                                             gboolean                 use_defaults);
 
 G_END_DECLS
 

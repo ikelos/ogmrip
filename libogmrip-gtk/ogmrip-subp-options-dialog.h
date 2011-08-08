@@ -45,11 +45,17 @@ struct _OGMRipSubpOptionsDialogClass
   GtkDialogClass parent_class;
 };
 
-GType       ogmrip_subp_options_dialog_get_type         (void);
-GtkWidget * ogmrip_subp_options_dialog_new              (void);
-gboolean    ogmrip_subp_options_dialog_get_use_defaults (OGMRipSubpOptionsDialog *dialog);
-void        ogmrip_subp_options_dialog_set_use_defaults (OGMRipSubpOptionsDialog *dialog,
-                                                          gboolean               use_defaults);
+GType         ogmrip_subp_options_dialog_get_type         (void);
+GtkWidget *   ogmrip_subp_options_dialog_new              (void);
+const gchar * ogmrip_subp_options_dialog_get_label        (OGMRipSubpOptionsDialog *dialog);
+void          ogmrip_subp_options_dialog_set_label        (OGMRipSubpOptionsDialog *dialog,
+                                                           const gchar             *label);
+gint          ogmrip_subp_options_dialog_get_language     (OGMRipSubpOptionsDialog *dialog);
+void          ogmrip_subp_options_dialog_set_language     (OGMRipSubpOptionsDialog *dialog,
+                                                           gint                    lang);
+gboolean      ogmrip_subp_options_dialog_get_use_defaults (OGMRipSubpOptionsDialog *dialog);
+void          ogmrip_subp_options_dialog_set_use_defaults (OGMRipSubpOptionsDialog *dialog,
+                                                           gboolean                use_defaults);
 
 G_END_DECLS
 
