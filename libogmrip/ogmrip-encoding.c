@@ -28,7 +28,11 @@
 #endif
 
 #include "ogmrip-encoding.h"
+#include "ogmrip-profile-keys.h"
+#include "ogmrip-hardsub.h"
+#include "ogmrip-marshal.h"
 #include "ogmrip-plugin.h"
+#include "ogmrip-fs.h"
 
 #include <glib/gstdio.h>
 
@@ -43,12 +47,17 @@
 
 struct _OGMRipEncodingPriv
 {
+  OGMDvdTitle *title;
+
   OGMRipProfile *profile;
+  gchar *log_file;
 
   OGMRipContainer  *container;
   OGMRipVideoCodec *video_codec;
-  GSList *audio_codecs;
-  GSList *subp_codecs;
+  GList *audio_codecs;
+  GList *subp_codecs;
+  GList *chapters;
+  GList *files;
 
   gboolean relative;
   gboolean autocrop;
@@ -63,11 +72,21 @@ enum
   PROP_AUTOCROP,
   PROP_AUTOSCALE,
   PROP_CONTAINER,
+  PROP_LOG_FILE,
   PROP_PROFILE,
   PROP_RELATIVE,
   PROP_SUBP_CODECS,
   PROP_TEST,
+  PROP_TITLE,
   PROP_VIDEO_CODEC
+};
+
+enum
+{
+  RUN,
+  PROGRESS,
+  COMPLETE,
+  LAST_SIGNAL
 };
 
 static void   ogmrip_encoding_constructed   (GObject      *gobject);
@@ -82,6 +101,8 @@ static void   ogmrip_encoding_get_property  (GObject      *gobject,
                                              GValue       *value,
                                              GParamSpec   *pspec);
 
+guint signals[LAST_SIGNAL] = { 0 };
+
 G_DEFINE_TYPE (OGMRipEncoding, ogmrip_encoding, G_TYPE_OBJECT)
 
 static void
@@ -95,6 +116,21 @@ ogmrip_encoding_class_init (OGMRipEncodingClass *klass)
   gobject_class->finalize = ogmrip_encoding_finalize;
   gobject_class->get_property = ogmrip_encoding_get_property;
   gobject_class->set_property = ogmrip_encoding_set_property;
+
+  signals[RUN] = g_signal_new ("run", G_TYPE_FROM_CLASS (klass),
+      G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+      G_STRUCT_OFFSET (OGMRipEncodingClass, run), NULL, NULL,
+      g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, OGMJOB_TYPE_SPAWN);
+
+  signals[PROGRESS] = g_signal_new ("progress", G_TYPE_FROM_CLASS (klass),
+      G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+      G_STRUCT_OFFSET (OGMRipEncodingClass, progress), NULL, NULL,
+      ogmrip_cclosure_marshal_VOID__OBJECT_DOUBLE, G_TYPE_NONE, 2, OGMJOB_TYPE_SPAWN, G_TYPE_DOUBLE);
+
+  signals[COMPLETE] = g_signal_new ("complete", G_TYPE_FROM_CLASS (klass),
+      G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+      G_STRUCT_OFFSET (OGMRipEncodingClass, complete), NULL, NULL,
+      ogmrip_cclosure_marshal_VOID__OBJECT_UINT, G_TYPE_NONE, 2, OGMJOB_TYPE_SPAWN, G_TYPE_UINT);
 /*
   g_object_class_install_property (gobject_class, PROP_AUDIO_CODECS, 
         g_param_spec_boxed ("audio-codecs", "Audio codecs property", "Set audio codecs", 
@@ -112,6 +148,10 @@ ogmrip_encoding_class_init (OGMRipEncodingClass *klass)
         g_param_spec_object ("container", "Container property", "Set the container", 
            OGMRIP_TYPE_CONTAINER, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
+  g_object_class_install_property (gobject_class, PROP_LOG_FILE, 
+        g_param_spec_string ("log-file", "Log file property", "Set the log file", 
+           NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_property (gobject_class, PROP_PROFILE, 
         g_param_spec_object ("profile", "Profile property", "Set the profile", 
            OGMRIP_TYPE_PROFILE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
@@ -127,6 +167,10 @@ ogmrip_encoding_class_init (OGMRipEncodingClass *klass)
   g_object_class_install_property (gobject_class, PROP_TEST, 
         g_param_spec_boolean ("test", "Test property", "Set test", 
            TRUE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_TITLE, 
+        g_param_spec_pointer ("title", "Title property", "Set title", 
+           G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_VIDEO_CODEC, 
         g_param_spec_object ("video-codec", "Video codec property", "Set video codec", 
@@ -186,16 +230,29 @@ ogmrip_encoding_dispose (GObject *gobject)
 
   if (encoding->priv->audio_codecs)
   {
-    g_slist_foreach (encoding->priv->audio_codecs, (GFunc) g_object_unref, NULL);
-    g_slist_free (encoding->priv->audio_codecs);
+    g_list_foreach (encoding->priv->audio_codecs, (GFunc) g_object_unref, NULL);
+    g_list_free (encoding->priv->audio_codecs);
     encoding->priv->audio_codecs = NULL;
   }
 
   if (encoding->priv->subp_codecs)
   {
-    g_slist_foreach (encoding->priv->subp_codecs, (GFunc) g_object_unref, NULL);
-    g_slist_free (encoding->priv->subp_codecs);
+    g_list_foreach (encoding->priv->subp_codecs, (GFunc) g_object_unref, NULL);
+    g_list_free (encoding->priv->subp_codecs);
     encoding->priv->subp_codecs = NULL;
+  }
+
+  if (encoding->priv->chapters)
+  {
+    g_list_foreach (encoding->priv->chapters, (GFunc) g_object_unref, NULL);
+    g_list_free (encoding->priv->chapters);
+    encoding->priv->chapters = NULL;
+  }
+
+  if (encoding->priv->title)
+  {
+    ogmdvd_title_unref (encoding->priv->title);
+    encoding->priv->title = NULL;
   }
 
   (*G_OBJECT_CLASS (ogmrip_encoding_parent_class)->dispose) (gobject);
@@ -204,6 +261,8 @@ ogmrip_encoding_dispose (GObject *gobject)
 static void
 ogmrip_encoding_finalize (GObject *gobject)
 {
+  g_free (OGMRIP_ENCODING (gobject)->priv->log_file);
+
   (*G_OBJECT_CLASS (ogmrip_encoding_parent_class)->finalize) (gobject);
 }
 
@@ -228,6 +287,9 @@ ogmrip_encoding_set_property (GObject *gobject, guint property_id, const GValue 
     case PROP_CONTAINER:
       ogmrip_encoding_set_container (encoding, g_value_get_object (value));
       break;
+    case PROP_LOG_FILE:
+      ogmrip_encoding_set_log_file (encoding, g_value_get_string (value));
+      break;
     case PROP_PROFILE:
       ogmrip_encoding_set_profile (encoding, g_value_get_object (value));
       break;
@@ -241,6 +303,11 @@ ogmrip_encoding_set_property (GObject *gobject, guint property_id, const GValue 
 */
     case PROP_TEST:
       encoding->priv->test = g_value_get_boolean (value);
+      break;
+    case PROP_TITLE:
+      encoding->priv->title = g_value_get_pointer (value);
+      if (encoding->priv->title)
+        ogmdvd_title_ref (encoding->priv->title);
       break;
     case PROP_VIDEO_CODEC:
       ogmrip_encoding_set_video_codec (encoding, g_value_get_object (value));
@@ -272,6 +339,9 @@ ogmrip_encoding_get_property (GObject *gobject, guint property_id, GValue *value
     case PROP_CONTAINER:
       g_value_set_object (value, encoding->priv->container);
       break;
+    case PROP_LOG_FILE:
+      g_value_set_string (value, encoding->priv->log_file);
+      break;
     case PROP_PROFILE:
       g_value_set_object (value, encoding->priv->profile);
       break;
@@ -286,6 +356,9 @@ ogmrip_encoding_get_property (GObject *gobject, guint property_id, GValue *value
     case PROP_TEST:
       g_value_set_boolean (value, encoding->priv->test);
       break;
+    case PROP_TITLE:
+      g_value_set_pointer (value, encoding->priv->title);
+      break;
     case PROP_VIDEO_CODEC:
       g_value_set_object (value, encoding->priv->video_codec);
       break;
@@ -299,13 +372,14 @@ ogmrip_encoding_get_property (GObject *gobject, guint property_id, GValue *value
  * ogmrip_encoding_new:
  *
  * Creates a new #OGMRipEncoding.
+ * @title: An #OGMDvdTitle
  *
  * Returns: The newly created #OGMRipEncoding, or NULL
  */
 OGMRipEncoding *
-ogmrip_encoding_new (void)
+ogmrip_encoding_new (OGMDvdTitle *title)
 {
-  return g_object_new (OGMRIP_TYPE_ENCODING, NULL);
+  return g_object_new (OGMRIP_TYPE_ENCODING, "title", title, NULL);
 }
 
 void
@@ -314,9 +388,35 @@ ogmrip_encoding_add_audio_codec (OGMRipEncoding *encoding, OGMRipAudioCodec *cod
   g_return_if_fail (OGMRIP_IS_ENCODING (encoding));
   g_return_if_fail (OGMRIP_IS_AUDIO_CODEC (codec));
 
-  encoding->priv->audio_codecs = g_slist_append (encoding->priv->audio_codecs, g_object_ref (codec));
+  encoding->priv->audio_codecs = g_list_append (encoding->priv->audio_codecs, g_object_ref (codec));
 
   // g_object_notify (G_OBJECT (encoding), "audio-codecs");
+}
+
+OGMRipCodec *
+ogmrip_encoding_get_nth_audio_codec (OGMRipEncoding *encoding, gint n)
+{
+  GList *link;
+
+  g_return_val_if_fail (OGMRIP_IS_ENCODING (encoding), NULL);
+
+  if (n < 0)
+    link = g_list_last (encoding->priv->audio_codecs);
+  else
+    link = g_list_nth (encoding->priv->audio_codecs, n);
+
+  if (link)
+    return link->data;
+
+  return NULL;
+}
+
+GList *
+ogmrip_encoding_get_audio_codecs (OGMRipEncoding *encoding)
+{
+  g_return_val_if_fail (OGMRIP_IS_ENCODING (encoding), NULL);
+
+  return g_list_copy (encoding->priv->audio_codecs);
 }
 
 void
@@ -325,9 +425,61 @@ ogmrip_encoding_add_subp_codec (OGMRipEncoding *encoding, OGMRipSubpCodec *codec
   g_return_if_fail (OGMRIP_IS_ENCODING (encoding));
   g_return_if_fail (OGMRIP_IS_SUBP_CODEC (codec));
 
-  encoding->priv->subp_codecs = g_slist_append (encoding->priv->subp_codecs, g_object_ref (codec));
+  encoding->priv->subp_codecs = g_list_append (encoding->priv->subp_codecs, g_object_ref (codec));
 
   // g_object_notify (G_OBJECT (encoding), "subp-codecs");
+}
+
+OGMRipCodec *
+ogmrip_encoding_get_nth_subp_codec (OGMRipEncoding *encoding, gint n)
+{
+  GList *link;
+
+  g_return_val_if_fail (OGMRIP_IS_ENCODING (encoding), NULL);
+
+  if (n < 0)
+    link = g_list_last (encoding->priv->subp_codecs);
+  else
+    link = g_list_nth (encoding->priv->subp_codecs, n);
+
+  if (link)
+    return link->data;
+
+  return NULL;
+}
+
+GList *
+ogmrip_encoding_get_subp_codecs (OGMRipEncoding *encoding)
+{
+  g_return_val_if_fail (OGMRIP_IS_ENCODING (encoding), NULL);
+
+  return g_list_copy (encoding->priv->subp_codecs);
+}
+
+void
+ogmrip_encoding_add_chapters (OGMRipEncoding *encoding, OGMRipChapters *chapters)
+{
+  g_return_if_fail (OGMRIP_IS_ENCODING (encoding));
+  g_return_if_fail (OGMRIP_IS_CHAPTERS (chapters));
+
+  encoding->priv->chapters = g_list_append (encoding->priv->chapters, g_object_ref (chapters));
+}
+
+GList *
+ogmrip_encoding_get_chapters (OGMRipEncoding *encoding)
+{
+  g_return_val_if_fail (OGMRIP_IS_ENCODING (encoding), NULL);
+
+  return g_list_copy (encoding->priv->chapters);
+}
+
+void
+ogmrip_encoding_add_file (OGMRipEncoding *encoding, OGMRipFile *file)
+{
+  g_return_if_fail (OGMRIP_IS_ENCODING (encoding));
+  g_return_if_fail (file != NULL);
+
+  encoding->priv->files = g_list_append (encoding->priv->files, ogmrip_file_ref (file));
 }
 
 gboolean
@@ -388,6 +540,31 @@ ogmrip_encoding_set_container (OGMRipEncoding *encoding, OGMRipContainer *contai
   g_object_notify (G_OBJECT (encoding), "container");
 }
 
+const gchar *
+ogmrip_encoding_get_log_file (OGMRipEncoding *encoding)
+{
+  g_return_val_if_fail (OGMRIP_IS_ENCODING (encoding), NULL);
+
+  return encoding->priv->log_file;
+}
+
+void
+ogmrip_encoding_set_log_file (OGMRipEncoding *encoding, const gchar *filename)
+{
+  g_return_if_fail (OGMRIP_IS_ENCODING (encoding));
+
+  if (encoding->priv->log_file)
+  {
+    g_free (encoding->priv->log_file);
+    encoding->priv->log_file = NULL;
+  }
+  
+  if (filename)
+    filename = g_strdup (filename);
+
+  g_object_notify (G_OBJECT (encoding), "log-file");
+}
+
 OGMRipProfile *
 ogmrip_encoding_get_profile (OGMRipEncoding *encoding)
 {
@@ -428,12 +605,20 @@ ogmrip_encoding_set_test (OGMRipEncoding *encoding, gboolean test)
   g_object_notify (G_OBJECT (encoding), "test");
 }
 
-OGMRipVideoCodec *
+OGMDvdTitle *
+ogmrip_encoding_get_title (OGMRipEncoding *encoding)
+{
+  g_return_val_if_fail (OGMRIP_IS_ENCODING (encoding), NULL);
+
+  return encoding->priv->title;
+}
+
+OGMRipCodec *
 ogmrip_encoding_get_video_codec (OGMRipEncoding *encoding)
 {
   g_return_val_if_fail (OGMRIP_IS_ENCODING (encoding), NULL);
 
-  return encoding->priv->video_codec;
+  return OGMRIP_CODEC (encoding->priv->video_codec);
 }
 
 void
@@ -523,7 +708,7 @@ ogmrip_encoding_get_file_size (OGMRipCodec *codec)
 static gint64
 ogmrip_encoding_get_nonvideo_size (OGMRipEncoding *encoding)
 {
-  GSList *link;
+  GList *link;
   gint64 nonvideo = 0;
 
   for (link = encoding->priv->audio_codecs; link; link = link->next)
@@ -531,13 +716,13 @@ ogmrip_encoding_get_nonvideo_size (OGMRipEncoding *encoding)
 
   for (link = encoding->priv->subp_codecs; link; link = link->next)
     nonvideo += ogmrip_encoding_get_file_size (link->data);
-/*
+
   for (link = encoding->priv->chapters; link; link = link->next)
     nonvideo += ogmrip_encoding_get_file_size (link->data);
 
   for (link = encoding->priv->files; link; link = link->next)
     nonvideo += ogmrip_file_get_size (link->data);
-*/
+
   return nonvideo;
 }
 
@@ -602,7 +787,7 @@ ogmrip_encoding_get_subp_overhead (OGMRipEncoding *encoding, OGMRipSubpCodec *co
 {
   return 0;
 }
-/*
+
 static gint64
 ogmrip_encoding_get_file_overhead (OGMRipEncoding *encoding, OGMRipFile *file)
 {
@@ -626,11 +811,11 @@ ogmrip_encoding_get_file_overhead (OGMRipEncoding *encoding, OGMRipFile *file)
 
   return (gint64) (audio_frames * overhead);
 }
-*/
+
 static gint64
 ogmrip_encoding_get_overhead_size (OGMRipEncoding *encoding)
 {
-  GSList *link;
+  GList *link;
   gint64 overhead = 0;
 
   overhead = ogmrip_encoding_get_video_overhead (encoding);
@@ -640,10 +825,10 @@ ogmrip_encoding_get_overhead_size (OGMRipEncoding *encoding)
 
   for (link = encoding->priv->subp_codecs; link; link = link->next)
     overhead += ogmrip_encoding_get_subp_overhead (encoding, link->data);
-/*
+
   for (link = encoding->priv->files; link; link = link->next)
     overhead += ogmrip_encoding_get_file_overhead (encoding, link->data);
-*/
+
   return overhead;
 }
 
@@ -709,5 +894,237 @@ ogmrip_encoding_autoscale (OGMRipEncoding *encoding, gdouble bpp, guint *width, 
   }
 
   *width = MIN (*width, rw);
+}
+
+static gint
+get_audio_stream_format (OGMRipCodec *codec)
+{
+  OGMDvdStream *stream;
+  gint format;
+
+  stream = ogmrip_codec_get_input (codec);
+  format = ogmdvd_audio_stream_get_format (OGMDVD_AUDIO_STREAM (stream));
+  
+  if (format == OGMDVD_AUDIO_FORMAT_AC3)
+    return OGMRIP_FORMAT_AC3;
+/*
+  if (format == OGMDVD_AUDIO_FORMAT_MPEG1)
+    return;
+
+  if (format == OGMDVD_AUDIO_FORMAT_MPEG2EXT)
+    return;
+*/
+  if (format == OGMDVD_AUDIO_FORMAT_LPCM)
+    return OGMRIP_FORMAT_LPCM;
+/*
+  if (format == OGMDVD_AUDIO_FORMAT_SDDS)
+    return;
+*/
+  if (format == OGMDVD_AUDIO_FORMAT_DTS)
+    return OGMRIP_FORMAT_DTS;
+
+  return -1;
+}
+
+static gint
+ogmrip_encoding_run_codec (OGMRipEncoding *encoding, OGMRipCodec *codec, GError **error)
+{
+  const gchar *label = NULL;
+  gint result, format = -1, lang = -1;
+  gchar *output;
+
+  output = ogmrip_fs_mktemp ("ogmrip.XXXXXX", error);
+  if (!output)
+    return OGMJOB_RESULT_ERROR;
+
+  ogmrip_codec_set_output (codec, output);
+  g_free (output);
+
+  g_signal_emit (encoding, signals[RUN], 0, codec);
+  result = ogmjob_spawn_run (OGMJOB_SPAWN (codec), error);
+  g_signal_emit (encoding, signals[COMPLETE], 0, codec, result);
+
+  if (result != OGMJOB_RESULT_SUCCESS)
+    return result;
+
+  if (OGMRIP_IS_VIDEO_CODEC (codec))
+  {
+    format = ogmrip_plugin_get_video_codec_format (G_OBJECT_TYPE (codec));
+    if (format == OGMRIP_FORMAT_COPY)
+      format = OGMRIP_FORMAT_MPEG2;
+  }
+  else if (OGMRIP_IS_AUDIO_CODEC (codec))
+  {
+    format = ogmrip_plugin_get_audio_codec_format (G_OBJECT_TYPE (codec));
+    if (format == OGMRIP_FORMAT_COPY)
+      format = get_audio_stream_format (codec);
+    label = ogmrip_audio_codec_get_label (OGMRIP_AUDIO_CODEC (codec));
+    lang = ogmrip_audio_codec_get_language (OGMRIP_AUDIO_CODEC (codec));
+  }
+  else if (OGMRIP_IS_SUBP_CODEC (codec))
+  {
+    format = ogmrip_plugin_get_subp_codec_format (G_OBJECT_TYPE (codec));
+    if (format == OGMRIP_FORMAT_COPY)
+      format = OGMRIP_FORMAT_VOBSUB;
+    label = ogmrip_subp_codec_get_label (OGMRIP_SUBP_CODEC (codec));
+    lang = ogmrip_subp_codec_get_language (OGMRIP_SUBP_CODEC (codec));
+  }
+  else if (OGMRIP_IS_CHAPTERS (codec))
+    lang = ogmrip_chapters_get_language (OGMRIP_CHAPTERS (codec));
+
+  ogmrip_container_add_file (encoding->priv->container, output, format, label, lang);
+
+  return OGMJOB_RESULT_SUCCESS;
+}
+
+static gint
+ogmrip_encoding_merge (OGMRipEncoding *encoding, GError **error)
+{
+  gint result;
+
+  g_signal_emit (encoding, signals[RUN], 0, encoding->priv->container);
+  result = ogmjob_spawn_run (OGMJOB_SPAWN (encoding->priv->container), error);
+  g_signal_emit (encoding, signals[COMPLETE], 0, encoding->priv->container, result);
+
+  return result;
+}
+
+gint
+ogmrip_encoding_encode (OGMRipEncoding *encoding, GError **error)
+{
+  gint result = OGMJOB_RESULT_ERROR;
+  GSettings *settings;
+  GList *list, *link;
+
+  g_return_val_if_fail (OGMRIP_IS_ENCODING (encoding), OGMJOB_RESULT_ERROR);
+  g_return_val_if_fail (error == NULL || *error == NULL, OGMJOB_RESULT_ERROR);
+  g_return_val_if_fail (ogmdvd_title_is_open (encoding->priv->title), OGMJOB_RESULT_ERROR);
+
+  /*
+   * TODO check space
+   */
+
+  g_signal_emit (encoding, signals[RUN], 0, NULL);
+
+  settings = ogmrip_profile_get_child (encoding->priv->profile, OGMRIP_PROFILE_GENERAL);
+
+  if (encoding->priv->video_codec)
+  {
+    OGMDvdStream *stream;
+
+    stream = ogmrip_codec_get_input (OGMRIP_CODEC (encoding->priv->video_codec));
+    if (!ogmdvd_title_analyze (ogmdvd_stream_get_title (stream), NULL, NULL, error))
+      goto encode_cleanup;
+  }
+
+  /*
+   * Clear the container
+   */
+  list = ogmrip_container_get_files (encoding->priv->container);
+  for (link = list; link; link = link->next)
+  {
+    ogmrip_container_remove_file (encoding->priv->container, link->data);
+    g_free (link->data);
+  }
+  g_list_free (list);
+
+  /*
+   * Extract all chapters
+   */
+  for (link = encoding->priv->chapters; link; link = link->next)
+  {
+    result = ogmrip_encoding_run_codec (encoding, link->data, error);
+    if (result != OGMJOB_RESULT_SUCCESS)
+      goto encode_cleanup;
+  }
+
+  /*
+   * Extract all subtitles except harsubed ones
+   */
+  for (link = encoding->priv->subp_codecs; link; link = link->next)
+  {
+    if (G_OBJECT_TYPE (link->data) != OGMRIP_TYPE_HARDSUB)
+    {
+      result = ogmrip_encoding_run_codec (encoding, link->data, error);
+      if (result != OGMJOB_RESULT_SUCCESS)
+        goto encode_cleanup;
+    }
+  }
+
+  /*
+   * Encode all audio tracks
+   */
+  for (link = encoding->priv->audio_codecs; link; link = link->next)
+  {
+    result = ogmrip_encoding_run_codec (encoding, link->data, error);
+    if (result != OGMJOB_RESULT_SUCCESS)
+      goto encode_cleanup;
+  }
+
+  if (encoding->priv->video_codec)
+  {
+    OGMRipEncodingMethod method;
+
+    /*
+     * Compute bitrate if encoding by size
+     */
+    g_settings_get (settings, OGMRIP_PROFILE_ENCODING_METHOD, "u", &method);
+    if (method == OGMRIP_ENCODING_SIZE)
+      ogmrip_video_codec_set_bitrate (encoding->priv->video_codec,
+          ogmrip_encoding_autobitrate (encoding));
+
+    /*
+     * Get cropping parameters
+     */
+    if (encoding->priv->autocrop &&
+        g_settings_get_boolean (settings, OGMRIP_PROFILE_CAN_CROP))
+    {
+      OGMDvdStream *stream;
+      guint x, y, w, h;
+
+      stream = ogmrip_codec_get_input (OGMRIP_CODEC (encoding->priv->video_codec));
+      ogmdvd_video_stream_get_crop_size (OGMDVD_VIDEO_STREAM (stream), &x, &y, &w, &h);
+      ogmrip_video_codec_set_crop_size (encoding->priv->video_codec, x, y, w, h);
+    }
+
+    /*
+     * Compute scaling parameters
+     */
+    if (encoding->priv->autoscale &&
+        ogmrip_video_codec_get_scaler (encoding->priv->video_codec) != OGMRIP_SCALER_NONE)
+    {
+      gdouble bpp;
+      guint w, h;
+
+      bpp = ogmrip_video_codec_get_bits_per_pixel (encoding->priv->video_codec);
+      ogmrip_encoding_autoscale (encoding, bpp, &w, &h);
+      ogmrip_video_codec_set_scale_size (encoding->priv->video_codec, w, h);
+    }
+
+    /*
+     * Set ensure sync
+     */
+    if (encoding->priv->audio_codecs && g_settings_get_boolean (settings, OGMRIP_PROFILE_ENSURE_SYNC))
+    {
+      OGMDvdStream *stream;
+
+      stream = ogmrip_codec_get_input (OGMRIP_CODEC (encoding->priv->audio_codecs->data));
+      ogmrip_video_codec_set_ensure_sync (encoding->priv->video_codec, OGMDVD_AUDIO_STREAM (stream));
+    }
+
+    /*
+     * Encode video stream
+     */
+    result = ogmrip_encoding_run_codec (encoding, OGMRIP_CODEC (encoding->priv->video_codec), error);
+    if (result != OGMJOB_RESULT_SUCCESS)
+      goto encode_cleanup;
+  }
+
+  result = ogmrip_encoding_merge (encoding, error);
+
+encode_cleanup:
+  g_signal_emit (encoding, signals[COMPLETE], 0, NULL, result);
+
+  return result;
 }
 

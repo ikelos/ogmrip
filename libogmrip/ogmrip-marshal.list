@@ -21,5 +21,5 @@
 #   NONE        deprecated alias for VOID
 #   BOOL        deprecated alias for BOOLEAN
                                                                                                                                         
-VOID:OBJECT,STRING
-VOID:UINT,STRING
+VOID:OBJECT,DOUBLE
+VOID:OBJECT,UINT
