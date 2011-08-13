@@ -16,8 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef __OGMRIP_PROFILE_EDITOR_H__
-#define __OGMRIP_PROFILE_EDITOR_H__
+#ifndef __OGMRIP_PROFILE_EDITOR_DIALOG_H__
+#define __OGMRIP_PROFILE_EDITOR_DIALOG_H__
 
 #include <ogmrip.h>
 #include <gtk/gtk.h>
@@ -51,5 +51,5 @@ GtkWidget * ogmrip_profile_editor_dialog_new      (OGMRipProfile *profile);
 
 G_END_DECLS
 
-#endif /* __OGMRIP_PROFILE_EDITOR_H__ */
+#endif /* __OGMRIP_PROFILE_EDITOR_DIALOG_H__ */
 

@@ -20,7 +20,7 @@
 #include "config.h"
 #endif
 
-#include "ogmrip-profile-editor.h"
+#include "ogmrip-profile-editor-dialog.h"
 #include "ogmrip-options-plugin.h"
 #include "ogmrip-helper.h"
 
@@ -438,6 +438,12 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
   GtkTreeIter iter;
 
   (*G_OBJECT_CLASS (ogmrip_profile_editor_dialog_parent_class)->constructed) (gobject);
+
+  if (!dialog->priv->profile)
+  {
+    g_critical ("No profile specified");
+    return;
+  }
 
   misc = gtk_dialog_get_action_area (GTK_DIALOG (gobject));
 /*

@@ -26,7 +26,7 @@
 #include <ogmrip-helper.h>
 #include <ogmrip-list-item.h>
 #include <ogmrip-options-plugin.h>
-#include <ogmrip-profile-editor.h>
+#include <ogmrip-profile-editor-dialog.h>
 #include <ogmrip-subp-chooser-widget.h>
 #include <ogmrip-subp-file-chooser-dialog.h>
 
