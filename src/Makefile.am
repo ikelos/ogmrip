@@ -2,26 +2,26 @@ bin_PROGRAMS = \
   ogmrip
 
 ogmrip_SOURCES = \
-  ogmrip-crop-dialog.c      \
-  ogmrip-settings.c         \
-  ogmrip-main.c             \
-  ogmrip-options-dialog.c   \
-  ogmrip-pref-dialog.c      \
-  ogmrip-profiles.c         \
-  ogmrip-progress-dialog.c  \
-  ogmrip-queue-dialog.c     \
-  ogmrip-spell-dialog.c     \
+  ogmrip-crop-dialog.c             \
+  ogmrip-settings.c                \
+  ogmrip-main.c                    \
+  ogmrip-options-dialog.c          \
+  ogmrip-pref-dialog.c             \
+  ogmrip-profiles.c                \
+  ogmrip-progress-dialog.c         \
+  ogmrip-encoding-manager-dialog.c \
+  ogmrip-spell-dialog.c            \
   ogmrip-update-dialog.c
 
 EXTRA_DIST = \
-  ogmrip-crop-dialog.h      \
-  ogmrip-settings.h         \
-  ogmrip-options-dialog.h   \
-  ogmrip-pref-dialog.h      \
-  ogmrip-profiles.h         \
-  ogmrip-progress-dialog.h  \
-  ogmrip-queue-dialog.h     \
-  ogmrip-spell-dialog.h     \
+  ogmrip-crop-dialog.h             \
+  ogmrip-settings.h                \
+  ogmrip-options-dialog.h          \
+  ogmrip-pref-dialog.h             \
+  ogmrip-profiles.h                \
+  ogmrip-progress-dialog.h         \
+  ogmrip-encoding-manager-dialog.h \
+  ogmrip-spell-dialog.h            \
   ogmrip-update-dialog.h
 
 ogmrip_LDADD = \

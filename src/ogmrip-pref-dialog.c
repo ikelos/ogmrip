@@ -60,6 +60,7 @@ ogmrip_pref_dialog_folder_setting_changed (GtkWidget *chooser, const gchar *key)
 
   path = g_settings_get_string (settings, key);
   gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (chooser), path);
+  ogmrip_fs_set_tmp_dir (path);
   g_free (path);
 
   g_signal_handlers_unblock_by_func (chooser,
@@ -87,13 +88,11 @@ ogmrip_pref_dialog_lang_chooser_changed (GtkWidget *chooser, const gchar *key)
 static void
 ogmrip_pref_dialog_lang_setting_changed (GtkWidget *chooser, const gchar *key)
 {
-  guint lang;
-
   g_signal_handlers_block_by_func (chooser,
       ogmrip_pref_dialog_lang_chooser_changed, (gpointer) key);
 
-  g_settings_get (settings, key, "u", &lang);
-  ogmrip_language_chooser_set_active (GTK_COMBO_BOX (chooser), lang);
+  ogmrip_language_chooser_set_active (GTK_COMBO_BOX (chooser),
+      g_settings_get_uint (settings, key));
 
   g_signal_handlers_unblock_by_func (chooser,
       ogmrip_pref_dialog_lang_chooser_changed, (gpointer) key);
