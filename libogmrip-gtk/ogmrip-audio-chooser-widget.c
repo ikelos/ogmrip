@@ -93,7 +93,7 @@ ogmrip_audio_chooser_widget_combo_changed (OGMRipAudioChooserWidget *widget)
   if (source != NULL && type == OGMRIP_SOURCE_STREAM)
   {
     ogmrip_audio_options_dialog_set_label (OGMRIP_AUDIO_OPTIONS_DIALOG (widget->priv->dialog),
-        ogmdvd_audio_stream_get_name (OGMDVD_AUDIO_STREAM (source)));
+        ogmdvd_audio_stream_get_label (OGMDVD_AUDIO_STREAM (source)));
     ogmrip_audio_options_dialog_set_language (OGMRIP_AUDIO_OPTIONS_DIALOG (widget->priv->dialog),
         ogmdvd_audio_stream_get_language (OGMDVD_AUDIO_STREAM (source)));
   }

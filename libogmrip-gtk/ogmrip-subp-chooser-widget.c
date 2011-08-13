@@ -93,7 +93,7 @@ ogmrip_subp_chooser_widget_combo_changed (OGMRipSubpChooserWidget *widget)
   if (source != NULL && type == OGMRIP_SOURCE_STREAM)
   {
     ogmrip_subp_options_dialog_set_label (OGMRIP_SUBP_OPTIONS_DIALOG (widget->priv->dialog),
-        ogmdvd_subp_stream_get_name (OGMDVD_SUBP_STREAM (source)));
+        ogmdvd_subp_stream_get_label (OGMDVD_SUBP_STREAM (source)));
     ogmrip_subp_options_dialog_set_language (OGMRIP_SUBP_OPTIONS_DIALOG (widget->priv->dialog),
         ogmdvd_subp_stream_get_language (OGMDVD_SUBP_STREAM (source)));
   }
@@ -288,5 +288,21 @@ ogmrip_subp_chooser_widget_get_options (OGMRipSubpChooserWidget *chooser)
     return NULL;
 
   return OGMRIP_SUBP_OPTIONS (chooser->priv->dialog);
+}
+
+const gchar *
+ogmrip_subp_chooser_widget_get_label (OGMRipSubpChooserWidget *chooser)
+{
+  g_return_val_if_fail (OGMRIP_IS_SUBP_CHOOSER_WIDGET (chooser), NULL);
+
+  return ogmrip_subp_options_dialog_get_label (OGMRIP_SUBP_OPTIONS_DIALOG (chooser->priv->dialog));
+}
+
+gint
+ogmrip_subp_chooser_widget_get_language (OGMRipSubpChooserWidget *chooser)
+{
+  g_return_val_if_fail (OGMRIP_IS_SUBP_CHOOSER_WIDGET (chooser), -1);
+
+  return ogmrip_subp_options_dialog_get_language (OGMRIP_SUBP_OPTIONS_DIALOG (chooser->priv->dialog));
 }
 
