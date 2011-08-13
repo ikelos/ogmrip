@@ -35,23 +35,11 @@ typedef struct
 
 struct _OGMRipProfilePriv
 {
-  gchar *name;
   GSList *sections;
-};
-
-enum 
-{
-  PROP_0,
-  PROP_NAME
 };
 
 static void ogmrip_profile_constructed  (GObject    *gobject);
 static void ogmrip_profile_dispose      (GObject    *gobject);
-static void ogmrip_profile_get_property (GObject    *gobject,
-                                         guint      property_id,
-                                         GValue     *value,
-                                         GParamSpec *pspec);
-
 
 static gboolean
 ogmrip_profile_has_schema (const gchar *schema)
@@ -124,11 +112,6 @@ ogmrip_profile_class_init (OGMRipProfileClass *klass)
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->constructed = ogmrip_profile_constructed;
   gobject_class->dispose = ogmrip_profile_dispose;
-  gobject_class->get_property = ogmrip_profile_get_property;
-
-  g_object_class_install_property (gobject_class, PROP_NAME,
-      g_param_spec_string ("name", "name", "name",
-        NULL, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipProfilePriv));
 }
@@ -149,8 +132,6 @@ ogmrip_profile_constructed (GObject *gobject)
   G_OBJECT_CLASS (ogmrip_profile_parent_class)->constructed (gobject);
 
   g_object_get (profile, "path", &path, NULL);
-  profile->priv->name = g_path_get_basename (path);
-  g_free (path);
 
   section = ogmrip_profile_section_new (profile, "subp");
   profile->priv->sections = g_slist_prepend (profile->priv->sections, section);
@@ -191,6 +172,8 @@ ogmrip_profile_constructed (GObject *gobject)
 
   if (section)
     profile->priv->sections = g_slist_prepend (profile->priv->sections, section);
+
+  g_free (path);
 }
 
 static void
@@ -207,22 +190,6 @@ ogmrip_profile_dispose (GObject *gobject)
   }
 
   G_OBJECT_CLASS (ogmrip_profile_parent_class)->dispose (gobject);
-}
-
-static void
-ogmrip_profile_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
-{
-  OGMRipProfile *profile = OGMRIP_PROFILE (gobject);
-
-  switch (property_id) 
-  {
-    case PROP_NAME:
-      g_value_set_string (value, profile->priv->name);
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
-      break;
-  }
 }
 
 OGMRipProfile *
@@ -408,7 +375,7 @@ ogmrip_profile_dump (OGMRipProfile *profile, GFile *file, GError **error)
 {
   xmlNode *root, *node;
   GSettings *settings;
-  gchar **sections;
+  gchar *str, **sections;
   guint i;
 
   g_return_val_if_fail (OGMRIP_IS_PROFILE (profile), FALSE);
@@ -417,9 +384,13 @@ ogmrip_profile_dump (OGMRipProfile *profile, GFile *file, GError **error)
 
   root = xmlNewNode (NULL, BAD_CAST "profile");
 
-  xmlSetProp (root, BAD_CAST "name", BAD_CAST profile->priv->name);
+  str = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_NAME);
+  xmlSetProp (root, BAD_CAST "name", BAD_CAST str);
+  g_free (str);
 
-  ogmrip_profile_dump_section (G_SETTINGS (profile), root);
+  str = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_VERSION);
+  xmlSetProp (root, BAD_CAST "version", BAD_CAST str);
+  g_free (str);
 
   sections = g_settings_list_children (G_SETTINGS (profile));
   for (i = 0; sections[i]; i ++)
@@ -484,9 +455,7 @@ ogmrip_profile_get_child (OGMRipProfile *profile, const gchar *name)
 {
   OGMRipProfileSection *section;
   GSList *link;
-/*
-  gchar *path, *new_path;
-*/
+
   g_return_val_if_fail (OGMRIP_IS_PROFILE (profile), NULL);
   g_return_val_if_fail (name != NULL, NULL);
 
@@ -496,23 +465,7 @@ ogmrip_profile_get_child (OGMRipProfile *profile, const gchar *name)
     if (g_str_equal (section->name, name))
       return section->settings;
   }
-/*
-  g_return_val_if_fail (schema != NULL, NULL);
 
-  section = g_new0 (OGMRipProfileSection, 1);
-  section->name = g_strdup (name);
-
-  g_object_get (profile, "path", &path, NULL);
-  new_path = g_build_filename (path, name, NULL);
-  g_free (path);
-
-  section->settings = g_settings_new_with_path (schema, new_path);
-  g_free (new_path);
-
-  profile->priv->sections = g_slist_append (profile->priv->sections, section);
-
-  return section->settings;
-*/
   return NULL;
 }
 
