@@ -38,8 +38,7 @@
 enum
 {
   PROP_0,
-  PROP_ENCODING,
-  PROP_TITLE
+  PROP_ENCODING
 };
 
 enum
@@ -234,11 +233,11 @@ ogmrip_options_dialog_profile_combo_changed (OGMRipOptionsDialog *dialog)
     video_codec = ogmrip_plugin_get_video_codec_by_name (codec);
     g_free (codec);
 
-    g_settings_get (settings, OGMRIP_PROFILE_SCALER, "u", &scaler);
+    scaler = g_settings_get_uint (settings, OGMRIP_PROFILE_SCALER);
     can_crop = g_settings_get_boolean (settings, OGMRIP_PROFILE_CAN_CROP);
 
     settings = ogmrip_profile_get_child (profile, OGMRIP_PROFILE_GENERAL);
-    g_settings_get (settings, OGMRIP_PROFILE_ENCODING_METHOD, "u", &method);
+    method = g_settings_get_uint (settings, OGMRIP_PROFILE_ENCODING_METHOD);
   }
 
   sensitive = gtk_widget_is_sensitive (dialog->priv->crop_check);
@@ -328,29 +327,9 @@ ogmrip_options_dialog_edit_profiles_button_clicked (OGMRipOptionsDialog *parent)
 static void
 ogmrip_options_dialog_crop_button_clicked (OGMRipOptionsDialog *parent)
 {
-  GtkWidget *dialog;
-
-  /*
-   * TODO make a helper function ?
-   */
-
-  if (!ogmdvd_title_open (parent->priv->title, NULL))
+  if (ogmrip_open_title (GTK_WINDOW (parent), parent->priv->title))
   {
-    OGMDvdDisc *disc;
-    gint response;
-
-    disc = ogmdvd_title_get_disc (parent->priv->title);
-
-    dialog = ogmrip_load_dvd_dialog_new (GTK_WINDOW (parent), disc, ogmdvd_disc_get_label (disc), TRUE);
-    response = gtk_dialog_run (GTK_DIALOG (dialog));
-    gtk_widget_destroy (dialog);
-
-    if (response == GTK_RESPONSE_ACCEPT)
-      ogmdvd_title_open (parent->priv->title, NULL);
-  }
-
-  if (ogmdvd_title_is_open (parent->priv->title))
-  {
+    GtkWidget *dialog;
     guint l, t, r, b;
 
     ogmrip_options_dialog_get_crop (parent, &l, &t, &r, &b);
@@ -380,20 +359,20 @@ ogmrip_options_dialog_autocrop_button_clicked (OGMRipOptionsDialog *parent)
   OGMDvdVideoStream *stream;
   guint x, y, w, h;
 
-  /*
-   * TODO The title must have been analyzed
-   */
+  if (ogmrip_open_title (GTK_WINDOW (parent), parent->priv->title))
+  {
+    ogmdvd_title_analyze (parent->priv->title, NULL, NULL, NULL);
 
-  stream = ogmdvd_title_get_video_stream (parent->priv->title);
-  ogmdvd_video_stream_get_crop_size (stream, &x, &y, &w, &h);
+    stream = ogmdvd_title_get_video_stream (parent->priv->title);
+    ogmdvd_video_stream_get_crop_size (stream, &x, &y, &w, &h);
 
-  if (!w || !h)
-    ogmdvd_video_stream_get_resolution (ogmdvd_title_get_video_stream (parent->priv->title), &w, &h);
+    ogmrip_options_dialog_set_crop (parent, x, y, w, h);
+    ogmrip_options_dialog_update_scale_combo (parent);
 
-  ogmrip_options_dialog_set_crop (parent, x, y, w, h);
-  ogmrip_options_dialog_update_scale_combo (parent);
+    gtk_widget_set_sensitive (parent->priv->autocrop_button, FALSE);
 
-  gtk_widget_set_sensitive (parent->priv->autocrop_button, FALSE);
+    ogmdvd_title_close (parent->priv->title);
+  }
 }
 
 static void
@@ -409,7 +388,7 @@ ogmrip_options_dialog_autoscale_button_clicked (OGMRipOptionsDialog *dialog)
   profile = ogmrip_profile_chooser_get_active (GTK_COMBO_BOX (dialog->priv->profile_combo));
   codec = ogmrip_profile_get_video_codec_type (profile, NULL);
 
-  encoding = ogmrip_encoding_new ();
+  encoding = ogmrip_encoding_new (dialog->priv->title);
 
   spawn = g_object_new (codec, "input", ogmdvd_title_get_video_stream (dialog->priv->title), NULL);
   ogmrip_encoding_set_video_codec (encoding, OGMRIP_VIDEO_CODEC (spawn));
@@ -430,7 +409,7 @@ static void
 ogmrip_options_dialog_test_button_clicked (OGMRipOptionsDialog *dialog)
 {
   /*
-   * TODO
+   * TODO compressibility test
    */
 }
 
@@ -470,10 +449,6 @@ ogmrip_options_dialog_class_init (OGMRipOptionsDialogClass *klass)
   g_object_class_install_property (G_OBJECT_CLASS (klass), PROP_ENCODING,
       g_param_spec_object ("encoding", "encoding", "encoding",
         OGMRIP_TYPE_ENCODING, G_PARAM_STATIC_STRINGS | G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
-
-  g_object_class_install_property (G_OBJECT_CLASS (klass), PROP_TITLE,
-      g_param_spec_pointer ("title", "title", "title",
-        G_PARAM_STATIC_STRINGS | G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
 
   g_type_class_add_private (klass, sizeof (OGMRipOptionsDialogPriv));
 }
@@ -653,10 +628,6 @@ ogmrip_options_dialog_constructed (GObject *gobject)
 
   g_object_unref (builder);
 
-  /*
-   * TODO use values from encoding
-   */
-
   ogmrip_options_dialog_profile_combo_changed (dialog);
   ogmrip_options_dialog_update_scale_combo (dialog);
 }
@@ -670,9 +641,6 @@ ogmrip_options_dialog_get_property (GObject *gobject, guint property_id, GValue 
   {
     case PROP_ENCODING:
       g_value_set_object (value, dialog->priv->encoding);
-      break;
-    case PROP_TITLE:
-      g_value_set_pointer (value, dialog->priv->title);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -689,11 +657,8 @@ ogmrip_options_dialog_set_property (GObject *gobject, guint property_id, const G
   {
     case PROP_ENCODING:
       dialog->priv->encoding = g_value_dup_object (value);
-      break;
-    case PROP_TITLE:
-      dialog->priv->title = g_value_get_pointer (value);
-      if (dialog->priv->title)
-        ogmdvd_title_ref (dialog->priv->title);
+      if (dialog->priv->encoding)
+        dialog->priv->title = ogmrip_encoding_get_title (dialog->priv->encoding);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -758,9 +723,9 @@ ogmrip_options_dialog_response (GtkDialog *dialog, gint response_id)
 }
 
 GtkWidget *
-ogmrip_options_dialog_new (OGMRipEncoding *encoding, OGMDvdTitle *title)
+ogmrip_options_dialog_new (OGMRipEncoding *encoding)
 {
-  return g_object_new (OGMRIP_TYPE_OPTIONS_DIALOG, "encoding", encoding, "title", title, NULL);
+  return g_object_new (OGMRIP_TYPE_OPTIONS_DIALOG, "encoding", encoding, NULL);
 }
 
 void
