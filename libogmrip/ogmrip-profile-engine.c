@@ -27,6 +27,7 @@
 
 struct _OGMRipProfileEnginePriv
 {
+  GSettings *settings;
   GHashTable *profiles;
 };
 
@@ -36,14 +37,23 @@ enum
   PROP_PROFILES
 };
 
+enum
+{
+  ADD,
+  REMOVE,
+  LAST_SIGNAL
+};
+
 static OGMRipProfileEngine *default_engine = NULL;
+
+static guint signals[LAST_SIGNAL] = { 0 };
 
 static void
 ogmrip_profile_add_name (const gchar *key, OGMRipProfile *profile, GArray *array)
 {
   gchar *name;
 
-  g_object_get (profile, "name", &name, NULL);
+  name = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_NAME);
   g_array_append_val (array, name);
 }
 
@@ -113,6 +123,20 @@ ogmrip_profile_engine_set_property (GObject *gobject, guint property_id, const G
 }
 
 static void
+ogmrip_profile_engine_dispose (GObject *gobject)
+{
+  OGMRipProfileEngine *engine = OGMRIP_PROFILE_ENGINE (gobject);
+
+  if (engine->priv->settings)
+  {
+    g_object_unref (engine->priv->settings);
+    engine->priv->settings= NULL;
+  }
+
+  G_OBJECT_CLASS (ogmrip_profile_engine_parent_class)->dispose (gobject);
+}
+
+static void
 ogmrip_profile_engine_finalize (GObject *gobject)
 {
   OGMRipProfileEngine *engine = OGMRIP_PROFILE_ENGINE (gobject);
@@ -127,6 +151,7 @@ ogmrip_profile_engine_init (OGMRipProfileEngine *engine)
 {
   engine->priv = OGMRIP_PROFILE_ENGINE_GET_PRIVATE (engine);
 
+  engine->priv->settings = g_settings_new_with_path ("org.ogmrip.profiles", "/apps/ogmrip/preferences/");
   engine->priv->profiles = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
 }
 
@@ -138,11 +163,22 @@ ogmrip_profile_engine_class_init (OGMRipProfileEngineClass *klass)
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->get_property = ogmrip_profile_engine_get_property;
   gobject_class->set_property = ogmrip_profile_engine_set_property;
+  gobject_class->dispose = ogmrip_profile_engine_dispose;
   gobject_class->finalize = ogmrip_profile_engine_finalize;
 
   g_object_class_install_property (gobject_class, PROP_PROFILES,
       g_param_spec_boxed ("profiles", "profiles", "profiles",
         G_TYPE_STRV, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  signals[ADD] = g_signal_new ("add", G_TYPE_FROM_CLASS (klass),
+      G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+      G_STRUCT_OFFSET (OGMRipProfileEngineClass, add), NULL, NULL,
+      g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, OGMRIP_TYPE_PROFILE);
+
+  signals[REMOVE] = g_signal_new ("remove", G_TYPE_FROM_CLASS (klass),
+      G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+      G_STRUCT_OFFSET (OGMRipProfileEngineClass, remove), NULL, NULL,
+      g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, OGMRIP_TYPE_PROFILE);
 
   g_type_class_add_private (klass, sizeof (OGMRipProfileEnginePriv));
 }
@@ -151,7 +187,11 @@ OGMRipProfileEngine *
 ogmrip_profile_engine_get_default (void)
 {
   if (!default_engine)
+  {
     default_engine = g_object_new (OGMRIP_TYPE_PROFILE_ENGINE, NULL);
+    g_settings_bind (default_engine->priv->settings, "profiles",
+        default_engine, "profiles", G_SETTINGS_BIND_DEFAULT);
+  }
 
   return default_engine;
 }
@@ -165,10 +205,19 @@ ogmrip_profile_engine_get (OGMRipProfileEngine *engine, const gchar *name)
 }
 
 static gboolean
-ogmrip_profile_engine_check (OGMRipProfileEngine *engine, OGMRipProfile *profile)
+compare_by_name (const gchar *key, OGMRipProfile *value, const gchar *name)
+{
+  return g_str_equal (key, name);
+}
+
+static gboolean
+ogmrip_profile_engine_check (OGMRipProfileEngine *engine, OGMRipProfile *profile, const gchar *name)
 {
   GType container, codec;
   gchar *str;
+
+  if (g_hash_table_find (engine->priv->profiles, (GHRFunc) compare_by_name, (gpointer) name))
+    return FALSE;
 
   ogmrip_profile_get (profile, OGMRIP_PROFILE_GENERAL, OGMRIP_PROFILE_CONTAINER, "s", &str);
   container = ogmrip_plugin_get_container_by_name (str);
@@ -209,17 +258,14 @@ ogmrip_profile_engine_add (OGMRipProfileEngine *engine, OGMRipProfile *profile)
   g_return_if_fail (OGMRIP_IS_PROFILE_ENGINE (engine));
   g_return_if_fail (OGMRIP_IS_PROFILE (profile));
 
-  /*
-   * TODO Check if profile is already there
-   */
-
-  if (ogmrip_profile_engine_check (engine, profile))
+  name = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_NAME);
+  if (ogmrip_profile_engine_check (engine, profile, name))
   {
-    g_object_get (profile, "name", &name, NULL);
     g_hash_table_insert (engine->priv->profiles, name, g_object_ref (profile));
+    g_signal_emit (engine, signals[ADD], 0, profile);
+    g_object_notify (G_OBJECT (engine), "profiles");
   }
-
-  g_object_notify (G_OBJECT (engine), "profiles");
+  g_free (name);
 }
 
 void
@@ -230,11 +276,13 @@ ogmrip_profile_engine_remove (OGMRipProfileEngine *engine, OGMRipProfile *profil
   g_return_if_fail (OGMRIP_IS_PROFILE_ENGINE (engine));
   g_return_if_fail (OGMRIP_IS_PROFILE (profile));
 
-  g_object_get (profile, "name", &name, NULL);
-  g_hash_table_remove (engine->priv->profiles, name);
+  name = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_NAME);
+  if (g_hash_table_remove (engine->priv->profiles, name))
+  {
+    g_signal_emit (engine, signals[REMOVE], 0, profile);
+    g_object_notify (G_OBJECT (engine), "profiles");
+  }
   g_free (name);
-
-  g_object_notify (G_OBJECT (engine), "profiles");
 }
 
 GSList *

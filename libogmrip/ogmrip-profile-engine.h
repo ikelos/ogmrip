@@ -44,6 +44,11 @@ struct _OGMRipProfileEngine
 struct _OGMRipProfileEngineClass
 {
   GObjectClass parent_class;
+
+  void (* add)    (OGMRipProfileEngine *engine,
+                   OGMRipProfile       *profile);
+  void (* remove) (OGMRipProfileEngine *engine,
+                   OGMRipProfile       *profile);
 };
 
 GType                 ogmrip_profile_engine_get_type    (void) G_GNUC_CONST;
