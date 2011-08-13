@@ -8,7 +8,6 @@ ogmrip_SOURCES = \
   ogmrip-options-dialog.c   \
   ogmrip-pref-dialog.c      \
   ogmrip-profiles.c         \
-  ogmrip-profiles-dialog.c  \
   ogmrip-progress-dialog.c  \
   ogmrip-queue-dialog.c     \
   ogmrip-spell-dialog.c     \
@@ -20,7 +19,6 @@ EXTRA_DIST = \
   ogmrip-options-dialog.h   \
   ogmrip-pref-dialog.h      \
   ogmrip-profiles.h         \
-  ogmrip-profiles-dialog.h  \
   ogmrip-progress-dialog.h  \
   ogmrip-queue-dialog.h     \
   ogmrip-spell-dialog.h     \
