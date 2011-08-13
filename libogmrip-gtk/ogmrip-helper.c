@@ -444,134 +444,27 @@ ogmrip_statusbar_pop (GtkStatusbar *statusbar)
   gtk_statusbar_pop (statusbar, id);
 }
 
-/**
- * ogmrip_message_dialog_newv:
- * @parent: A #GtkWindow
- * @type: A #GtkMessageType
- * @format: printf()-style format string, or NULL
- * @args: Arguments for @format
- *
- * Creates a new message dialog, which is a simple dialog with an icon
- * indicating the dialog type (error, warning, etc.) and some text the user may
- * want to see.
- *
- * Returns: A new #GtkMessageDialog
- */
-GtkWidget *
-ogmrip_message_dialog_newv (GtkWindow *parent, GtkMessageType type, const gchar *format, va_list args)
+void
+ogmrip_run_error_dialog (GtkWindow *parent, GError *error, const gchar *format, ...)
 {
-  GtkWidget *dialog = NULL;
-  GtkButtonsType buttons = GTK_BUTTONS_NONE;
-  const gchar *stock_id = NULL;
+  GtkWidget *dialog;
   gchar *message;
+  va_list args;
 
-  g_return_val_if_fail (parent == NULL || GTK_IS_WINDOW (parent), NULL);
-
-  switch (type)
-  {
-    case GTK_MESSAGE_ERROR:
-      buttons = GTK_BUTTONS_CLOSE;
-      stock_id = GTK_STOCK_DIALOG_ERROR;
-      break;
-    case GTK_MESSAGE_QUESTION:
-      buttons = GTK_BUTTONS_YES_NO;
-      stock_id = GTK_STOCK_DIALOG_QUESTION;
-      break;
-    case GTK_MESSAGE_INFO:
-      buttons = GTK_BUTTONS_CLOSE;
-      stock_id = GTK_STOCK_DIALOG_INFO;
-      break;
-    case GTK_MESSAGE_WARNING:
-      buttons = GTK_BUTTONS_CLOSE;
-      stock_id = GTK_STOCK_DIALOG_WARNING;
-      break;
-    default:
-      break;
-  }
-
-  dialog = gtk_message_dialog_new (parent,
-      GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT, type, buttons, NULL);
-
-  if (!dialog)
-    return NULL;
-
+  va_start (args, format);
   message = g_strdup_vprintf (format, args);
-  gtk_message_dialog_set_markup (GTK_MESSAGE_DIALOG (dialog), message);
+  va_end (args);
+
+  dialog = gtk_message_dialog_new_with_markup (parent,
+      GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+      GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "<b>%s</b>", message);
   g_free (message);
 
-  if (stock_id)
-    gtk_window_set_icon_from_stock (GTK_WINDOW (dialog), stock_id);
+  if (error)
+    gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog), "%s", error->message);
 
-  gtk_window_set_gravity (GTK_WINDOW (dialog), GDK_GRAVITY_CENTER);
-  gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_CENTER_ON_PARENT);
-
-  return dialog;
-}
-
-/**
- * ogmrip_message_dialog_new:
- * @parent: A #GtkWindow
- * @type: A #GtkMessageType
- * @format: printf()-style format string, or NULL
- * @...: Arguments for @format
- *
- * Creates a new message dialog, which is a simple dialog with an icon
- * indicating the dialog type (error, warning, etc.) and some text the user may
- * want to see.
- *
- * Returns: A new #GtkMessageDialog
- */
-GtkWidget *
-ogmrip_message_dialog_new (GtkWindow *parent, GtkMessageType type, const gchar *format, ...)
-{
-  GtkWidget *dialog;
-  va_list args;
-
-  g_return_val_if_fail (parent == NULL || GTK_IS_WINDOW (parent), NULL);
-
-  va_start (args, format);
-  dialog = ogmrip_message_dialog_newv (parent, type, format, args);
-  va_end (args);
-
-  return dialog;
-}
-
-/**
- * ogmrip_message_dialog:
- * @parent: A #GtkWindow
- * @type: A #GtkMessageType
- * @format: printf()-style format string, or NULL
- * @...: Arguments for @format
- *
- * Creates and displays a new message dialog, which is a simple dialog with an
- * icon indicating the dialog type (error, warning, etc.) and some text the user
- * may want to see.
- *
- * Returns: The response ID
- */
-gint
-ogmrip_message_dialog (GtkWindow *parent, GtkMessageType type, const gchar *format, ...)
-{
-  GtkWidget *dialog;
-  va_list args;
-
-  g_return_val_if_fail (parent == NULL || GTK_IS_WINDOW (parent), GTK_RESPONSE_NONE);
-
-  va_start (args, format);
-  dialog = ogmrip_message_dialog_newv (parent, type, format, args);
-  va_end (args);
-
-  if (dialog)
-  {
-    gint response;
-
-    response = gtk_dialog_run (GTK_DIALOG (dialog));
-    gtk_widget_destroy (dialog);
-
-    return response;
-  }
-
-  return GTK_RESPONSE_NONE;
+  gtk_dialog_run (GTK_DIALOG (dialog));
+  gtk_widget_destroy (dialog);
 }
 
 enum
@@ -871,49 +764,60 @@ ogmrip_drive_eject_idle (OGMDvdDrive *drive)
   return FALSE;
 }
 
-/**
- * ogmrip_load_dvd_dialog_new:
- * @parent: Transient parent of the dialog, or NULL
- * @disc: An #OGMDvdDisc
- * @name: The name of the DVD
- * @cancellable: Whether the dialog is cancellable
- *
- * Creates a dialog waiting for the given DVD to be inserted.
- *
- * Returns: a newly created dialog
- */
-GtkWidget *
-ogmrip_load_dvd_dialog_new (GtkWindow *parent, OGMDvdDisc *disc, const gchar *name, gboolean cancellable)
+gboolean
+ogmrip_open_title (GtkWindow *parent, OGMDvdTitle *title)
 {
-  GtkWidget *dialog;
+  GError *error = NULL;
   OGMDvdMonitor *monitor;
   OGMDvdDrive *drive;
+  GtkWidget *dialog;
 
-  g_return_val_if_fail (parent == NULL || GTK_IS_WINDOW (parent), NULL);
-  g_return_val_if_fail (disc != NULL, NULL);
-  g_return_val_if_fail (name != NULL, NULL);
+  g_return_val_if_fail (parent == NULL || GTK_IS_WINDOW (parent), FALSE);
+  g_return_val_if_fail (title != NULL, FALSE);
+
+  if (ogmdvd_title_is_open (title))
+    return TRUE;
 
   monitor = ogmdvd_monitor_get_default ();
-  drive = ogmdvd_monitor_get_drive (monitor, ogmdvd_disc_get_device (disc));
+  drive = ogmdvd_monitor_get_drive (monitor,
+      ogmdvd_disc_get_device (ogmdvd_title_get_disc (title)));
   g_object_unref (monitor);
 
   if (!drive)
-    return NULL;
+    return FALSE;
 
   dialog = gtk_message_dialog_new_with_markup (parent,
       GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-      GTK_MESSAGE_INFO, cancellable ? GTK_BUTTONS_CANCEL : GTK_BUTTONS_NONE,
-      "<b>%s</b>\n\n%s", name, _("Please insert the DVD required to encode this title."));
-  // gtk_label_set_selectable (GTK_LABEL (GTK_MESSAGE_DIALOG (dialog)->label), FALSE);
-  gtk_window_set_icon_from_stock (GTK_WINDOW (dialog), GTK_STOCK_DIALOG_INFO);
+      GTK_MESSAGE_INFO, GTK_BUTTONS_CANCEL, "<b>%s</b>\n\n%s",
+      ogmdvd_disc_get_label (ogmdvd_title_get_disc (title)),
+      _("Please insert the DVD required to encode this title."));
 
-  g_signal_connect_swapped_while_alive (drive, "medium-added", G_CALLBACK (gtk_dialog_response_accept), dialog);
+  g_signal_connect (dialog, "delete-event",
+      G_CALLBACK (gtk_widget_hide_on_delete), NULL);
+  g_signal_connect_swapped (drive, "medium-added",
+      G_CALLBACK (gtk_dialog_response_accept), dialog);
 
-  g_signal_connect_swapped (dialog, "destroy", G_CALLBACK (g_object_unref), drive);
+  do
+  {
+    g_clear_error (&error);
+    if (ogmdvd_title_open (title, &error))
+      break;
 
-  g_idle_add ((GSourceFunc) ogmrip_drive_eject_idle, drive);
+    if (error && error->code != OGMDVD_DISC_ERROR_ID)
+      break;
 
-  return dialog;
+    g_idle_add ((GSourceFunc) ogmrip_drive_eject_idle, drive);
+
+    if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_CANCEL)
+      break;
+  }
+  while (1);
+
+  g_object_unref (drive);
+  gtk_widget_destroy (dialog);
+  g_clear_error (&error);
+
+  return ogmdvd_title_is_open (title);
 }
 
 /**

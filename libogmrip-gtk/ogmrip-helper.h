@@ -131,23 +131,17 @@ gboolean              gtk_tree_row_reference_get_iter  (GtkTreeRowReference *ref
  * OGMRip
  */
 
-GtkWidget * ogmrip_message_dialog_new (GtkWindow      *parent,
-                                       GtkMessageType type,
-                                       const gchar    *format,
-                                       ...);
-gint        ogmrip_message_dialog     (GtkWindow      *parent, 
-                                       GtkMessageType type, 
-                                       const gchar    *format, 
-                                       ...);
+void ogmrip_run_error_dialog (GtkWindow   *parent,
+                              GError      *error,
+                              const gchar *format,
+                              ...);
 
 /*
  * OGMDvd
  */
 
-GtkWidget * ogmrip_load_dvd_dialog_new (GtkWindow   *parent,
-                                        OGMDvdDisc  *disc,
-                                        const gchar *name,
-                                        gboolean    cancellable);
+gboolean ogmrip_open_title (GtkWindow   *parent,
+                            OGMDvdTitle *title);
 
 /*
  * Languages
