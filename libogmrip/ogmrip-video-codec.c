@@ -88,7 +88,8 @@ enum
   PROP_DERING,
   PROP_SCALER,
   PROP_DEINT,
-  PROP_QUALITY
+  PROP_QUALITY,
+  PROP_DELAY
 };
 
 static void ogmrip_video_codec_dispose      (GObject      *gobject);
@@ -168,6 +169,10 @@ ogmrip_video_codec_class_init (OGMRipVideoCodecClass *klass)
         g_param_spec_boolean ("dering", "Dering property", "Set dering", 
            TRUE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
+  g_object_class_install_property (gobject_class, PROP_DELAY, 
+        g_param_spec_uint ("start-delay", "Start delay property", "Set start delay", 
+           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
   g_type_class_add_private (klass, sizeof (OGMRipVideoCodecPriv));
 }
 
@@ -245,6 +250,9 @@ ogmrip_video_codec_set_property (GObject *gobject, guint property_id, const GVal
     case PROP_DEINT:
       ogmrip_video_codec_set_deinterlacer (video, g_value_get_uint (value));
       break;
+    case PROP_QUALITY:
+      ogmrip_video_codec_set_quality (video, g_value_get_uint (value));
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
@@ -293,6 +301,12 @@ ogmrip_video_codec_get_property (GObject *gobject, guint property_id, GValue *va
       break;
     case PROP_DEINT:
       g_value_set_uint (value, video->priv->deint);
+      break;
+    case PROP_QUALITY:
+      g_value_set_uint (value, video->priv->quality);
+      break;
+    case PROP_DELAY:
+      g_value_set_uint (value, 0);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
