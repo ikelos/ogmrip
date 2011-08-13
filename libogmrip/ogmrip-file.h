@@ -81,7 +81,7 @@ typedef struct _OGMRipSubpFile  OGMRipSubpFile;
 
 GQuark       ogmrip_file_error_quark                 (void);
 
-void         ogmrip_file_ref                         (OGMRipFile      *file);
+OGMRipFile * ogmrip_file_ref                         (OGMRipFile      *file);
 void         ogmrip_file_unref                       (OGMRipFile      *file);
 void         ogmrip_file_set_unlink_on_unref         (OGMRipFile      *file,
                                                       gboolean        do_unlink);

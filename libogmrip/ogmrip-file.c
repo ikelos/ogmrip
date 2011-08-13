@@ -261,13 +261,17 @@ ogmrip_file_construct (OGMRipFile *file, const gchar *filename)
  * @file: an #OGMRipFile
  *
  * Increments the reference count of an #OGMRipFile.
+ *
+ * Returns: @file
  */
-void
+OGMRipFile *
 ogmrip_file_ref (OGMRipFile *file)
 {
-  g_return_if_fail (file != NULL);
+  g_return_val_if_fail (file != NULL, NULL);
 
   file->ref ++;
+
+  return file;
 }
 
 /**
