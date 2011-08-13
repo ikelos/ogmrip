@@ -60,7 +60,6 @@ ogmrip_pref_dialog_folder_setting_changed (GtkWidget *chooser, const gchar *key)
 
   path = g_settings_get_string (settings, key);
   gtk_file_chooser_set_current_folder (GTK_FILE_CHOOSER (chooser), path);
-  ogmrip_fs_set_tmp_dir (path);
   g_free (path);
 
   g_signal_handlers_unblock_by_func (chooser,

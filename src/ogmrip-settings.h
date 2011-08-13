@@ -36,13 +36,11 @@ G_BEGIN_DECLS
 #define OGMRIP_SETTINGS_LOG_OUTPUT           "create-log-file"
 #define OGMRIP_SETTINGS_THREADS              "threads"
 #define OGMRIP_SETTINGS_AUTO_SUBP            "auto-subp"
-#define OGMRIP_SETTINGS_PROFILES             "profiles"
 
 enum
 {
   OGMRIP_AFTER_ENC_REMOVE,
   OGMRIP_AFTER_ENC_KEEP,
-  OGMRIP_AFTER_ENC_UPDATE,
   OGMRIP_AFTER_ENC_ASK
 };
 

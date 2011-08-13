@@ -24,17 +24,20 @@
 #include "ogmrip-gtk.h"
 #include "ogmrip-settings.h"
 
+#include "ogmrip-encoding-manager-dialog.h"
 #include "ogmrip-options-dialog.h"
 #include "ogmrip-pref-dialog.h"
-#include "ogmrip-profiles-dialog.h"
-#include "ogmrip-queue-dialog.h"
+#include "ogmrip-progress-dialog.h"
 
 #ifdef HAVE_ENCHANT_SUPPORT
 #include "ogmrip-spell-dialog.h"
 #endif /* HAVE_ENCHANT_SUPPORT */
 
 #include <glib/gi18n.h>
+#include <glib/gstdio.h>
 #include <stdlib.h>
+
+#include <libxml/tree.h>
 
 #ifdef HAVE_LIBNOTIFY_SUPPORT
 #include <libnotify/notify.h>
@@ -75,6 +78,189 @@ typedef struct
 
 extern GSettings *settings;
 
+#ifdef HAVE_ENCHANT_SUPPORT
+/*
+ * Performs spell checking
+ */
+static void
+ogmrip_main_spell_check (OGMRipData *data, const gchar *filename, gint lang)
+{
+  GtkWidget *dialog;
+
+  GIOChannel *input = NULL, *output = NULL;
+  GIOStatus status;
+
+  gboolean retval = FALSE;
+  gchar *text, *corrected;
+  gchar *new_file;
+
+  input = g_io_channel_new_file (filename, "r", NULL);
+  if (!input)
+    goto spell_check_cleanup;
+
+  new_file = ogmrip_fs_mktemp ("sub.XXXXXX", NULL);
+  if (!new_file)
+    goto spell_check_cleanup;
+
+  output = g_io_channel_new_file (new_file, "w", NULL);
+  if (!output)
+    goto spell_check_cleanup;
+
+  dialog = ogmrip_spell_dialog_new (ogmdvd_get_language_iso639_1 (lang));
+  if (!dialog)
+  {
+    ogmrip_run_error_dialog (GTK_WINDOW (data->window), NULL,
+        "<big><b>%s</b></big>\n\n%s", _("Could not create dictionary"), _("Spell will not be checked."));
+    goto spell_check_cleanup;
+  }
+
+  gtk_window_set_parent (GTK_WINDOW (dialog), GTK_WINDOW (data->window));
+  gtk_widget_show (dialog);
+
+  do
+  {
+    status = g_io_channel_read_line (input, &text, NULL, NULL, NULL);
+    if (status == G_IO_STATUS_NORMAL)
+    {
+      retval = ogmrip_spell_dialog_check_text (OGMRIP_SPELL_DIALOG (dialog), text, &corrected);
+      if (retval)
+      {
+        do
+        {
+          status = g_io_channel_write_chars (output, corrected ? corrected : text, -1, NULL, NULL);
+        }
+        while (status == G_IO_STATUS_AGAIN);
+
+        g_free (corrected);
+      }
+      g_free (text);
+    }
+  }
+  while (retval == TRUE && (status == G_IO_STATUS_NORMAL || status == G_IO_STATUS_AGAIN));
+
+  gtk_widget_destroy (dialog);
+
+  retval &= status == G_IO_STATUS_EOF;
+
+spell_check_cleanup:
+  if (output)
+  {
+    g_io_channel_shutdown (output, TRUE, NULL);
+    g_io_channel_unref (output);
+  }
+
+  if (input)
+  {
+    g_io_channel_shutdown (input, TRUE, NULL);
+    g_io_channel_unref (input);
+  }
+
+  if (retval)
+    retval = ogmrip_fs_rename (new_file, filename, NULL);
+  else
+    g_unlink (new_file);
+
+  g_free (new_file);
+}
+#endif /* HAVE_ENCHANT_SUPPORT */
+
+#ifdef HAVE_DBUS_SUPPORT
+#define PM_DBUS_SERVICE           "org.gnome.SessionManager"
+#define PM_DBUS_INHIBIT_PATH      "/org/gnome/SessionManager"
+#define PM_DBUS_INHIBIT_INTERFACE "org.gnome.SessionManager"
+
+static gint
+ogmrip_main_dbus_inhibit (OGMRipData *data)
+{
+  GError *error = NULL;
+
+  DBusGConnection *conn;
+  DBusGProxy *proxy;
+  gboolean res;
+  guint cookie;
+
+  conn = dbus_g_bus_get (DBUS_BUS_SESSION, &error);
+  if (!conn)
+  {
+    g_warning ("Couldn't get a DBUS connection: %s", error->message);
+    g_error_free (error);
+    return -1;
+  }
+
+  proxy = dbus_g_proxy_new_for_name (conn,
+      PM_DBUS_SERVICE, PM_DBUS_INHIBIT_PATH, PM_DBUS_INHIBIT_INTERFACE);
+
+  if (proxy == NULL)
+  {
+    g_warning ("Could not get DBUS proxy: %s", PM_DBUS_SERVICE);
+    return -1;
+  }
+
+  res = dbus_g_proxy_call (proxy, "Inhibit", &error,
+      G_TYPE_STRING, "Brasero",
+      G_TYPE_UINT, GDK_WINDOW_XID (gtk_widget_get_window (data->window)),
+      G_TYPE_STRING, "Encoding",
+      G_TYPE_UINT, 1 | 4,
+      G_TYPE_INVALID,
+      G_TYPE_UINT, &cookie,
+      G_TYPE_INVALID);
+
+  if (!res)
+  {
+    g_warning ("Failed to inhibit the system from suspending: %s", error->message);
+    g_error_free (error);
+    cookie = -1;
+  }
+
+  g_object_unref (G_OBJECT (proxy));
+  dbus_g_connection_unref (conn);
+
+  return cookie;
+}
+
+static void
+ogmrip_main_dbus_uninhibit (OGMRipData *data, guint cookie)
+{
+  GError *error = NULL;
+
+  DBusGConnection *conn;
+  DBusGProxy *proxy;
+  gboolean res;
+
+  conn = dbus_g_bus_get (DBUS_BUS_SESSION, &error);
+  if (!conn)
+  {
+    g_warning ("Couldn't get a DBUS connection: %s", error->message);
+    g_error_free (error);
+    return;
+  }
+
+  proxy = dbus_g_proxy_new_for_name (conn,
+      PM_DBUS_SERVICE, PM_DBUS_INHIBIT_PATH, PM_DBUS_INHIBIT_INTERFACE);
+
+  if (proxy == NULL)
+  {
+    g_warning ("Could not get DBUS proxy: %s", PM_DBUS_SERVICE);
+    dbus_g_connection_unref (conn);
+    return;
+  }
+
+  res = dbus_g_proxy_call (proxy, "Uninhibit", &error,
+      G_TYPE_UINT, cookie,
+      G_TYPE_INVALID,
+      G_TYPE_INVALID);
+
+  if (!res)
+  {
+    g_warning ("Failed to restore the system power manager: %s", error->message);
+    g_error_free (error);
+  }
+
+  g_object_unref (G_OBJECT (proxy));
+  dbus_g_connection_unref (conn);
+}
+#endif /* HAVE_DBUS_SUPPORT */
+
 /*
  * Loads a media
  */
@@ -87,15 +273,8 @@ ogmrip_main_load (OGMRipData *data, const gchar *path)
   disc = ogmdvd_disc_new (path, &error);
   if (!disc)
   {
-    if (error)
-    {
-      ogmrip_message_dialog (GTK_WINDOW (data->window), GTK_MESSAGE_ERROR, "<big><b>%s</b></big>\n\n%s", 
-          _("Could not open the DVD"), _(error->message));
-      g_error_free (error);
-    }
-    else
-      ogmrip_message_dialog (GTK_WINDOW (data->window), GTK_MESSAGE_ERROR, "<big><b>%s</b></big>\n\n%s",
-          _("Could not read the DVD"), _("Unknown error"));
+    ogmrip_run_error_dialog (GTK_WINDOW (data->window), error, ("Could not open the DVD"));
+    g_clear_error (&error);
   }
   else
   {
@@ -117,6 +296,198 @@ ogmrip_main_load (OGMRipData *data, const gchar *path)
 }
 
 /*
+ * Cleans an encoding
+ */
+static void
+ogmrip_main_clean (OGMRipData *data, OGMRipEncoding *encoding, gboolean error)
+{
+  if (!g_settings_get_boolean (settings, OGMRIP_SETTINGS_KEEP_TMP))
+  {
+    OGMRipCodec *codec;
+    GList *list, *link;
+
+    codec = ogmrip_encoding_get_video_codec (encoding);
+    g_unlink (ogmrip_codec_get_output (codec));
+
+    list = ogmrip_encoding_get_audio_codecs (encoding);
+    for (link = list; link; link = link->next)
+      g_unlink (ogmrip_codec_get_output (link->data));
+    g_list_free (list);
+
+    list = ogmrip_encoding_get_subp_codecs (encoding);
+    for (link = list; link; link = link->next)
+      g_unlink (ogmrip_codec_get_output (link->data));
+    g_list_free (list);
+
+    list = ogmrip_encoding_get_chapters (encoding);
+    for (link = list; link; link = link->next)
+      g_unlink (ogmrip_codec_get_output (link->data));
+    g_list_free (list);
+  }
+
+  if (!error && !g_settings_get_boolean (settings, OGMRIP_SETTINGS_LOG_OUTPUT))
+  {
+    const gchar *filename;
+
+    filename = ogmrip_encoding_get_log_file (encoding);
+    if (filename)
+      g_unlink (filename);
+  }
+
+  if (g_settings_get_boolean (settings, OGMRIP_SETTINGS_COPY_DVD))
+  {
+    guint after;
+
+    after = g_settings_get_uint (settings, OGMRIP_SETTINGS_AFTER_ENC);
+    if (after == OGMRIP_AFTER_ENC_ASK)
+    {
+      GtkWidget *dialog;
+
+      dialog = gtk_message_dialog_new (GTK_WINDOW (data->window), 
+          GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+          GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
+          _("Do you want to remove the copy of the DVD ?"));
+      after = gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES ?
+        OGMRIP_AFTER_ENC_REMOVE : OGMRIP_AFTER_ENC_KEEP;
+      gtk_widget_destroy (dialog);
+    }
+
+    if (after == OGMRIP_AFTER_ENC_REMOVE)
+    {
+      OGMDvdTitle *title;
+      const gchar *path;
+
+      title = ogmrip_encoding_get_title (encoding);
+      path = ogmdvd_disc_get_device (ogmdvd_title_get_disc (title));
+      ogmrip_fs_rmdir (path, TRUE, NULL);
+    }
+  }
+}
+
+/*
+ * Displays the error message
+ */
+static void
+ogmrip_main_display_error (OGMRipData *data, OGMRipEncoding *encoding, GError *error)
+{
+  GtkWidget *dialog, *area, *widget;
+  const gchar *filename;
+
+  dialog = gtk_message_dialog_new_with_markup (GTK_WINDOW (data->window),
+      GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+      GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "<b>%s</b>", _("Encoding failed"));
+
+  if (error)
+    gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog), "%s", error->message);
+  else
+    gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog), "%s", _("Unknown error"));
+
+  filename = ogmrip_encoding_get_log_file (encoding);
+  if (filename)
+  {
+    GFileInputStream *stream;
+    GtkTextBuffer *buffer;
+    GtkTextIter iter;
+    GFile *file;
+
+    gchar text[2048];
+    gssize n;
+
+    area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+
+    widget = gtk_expander_new_with_mnemonic ("_Show the log file");
+    gtk_expander_set_expanded (GTK_EXPANDER (widget), FALSE);
+    gtk_container_add (GTK_CONTAINER (area), widget);
+    gtk_widget_show (widget);
+
+    area = gtk_scrolled_window_new (NULL, NULL);
+    gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (area), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
+    gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (area), GTK_SHADOW_IN);
+    gtk_container_add (GTK_CONTAINER (widget), area);
+    gtk_widget_show (area);
+
+    widget = gtk_text_view_new ();
+    gtk_text_view_set_editable (GTK_TEXT_VIEW (widget), FALSE);
+    gtk_container_add (GTK_CONTAINER (area), widget);
+    gtk_widget_show (widget);
+
+    gtk_widget_set_size_request (widget, 700, 400);
+
+    file = g_file_new_for_path (filename);
+    stream = g_file_read (file, NULL, NULL);
+    g_object_unref (file);
+
+    buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (widget));
+    gtk_text_buffer_get_start_iter (buffer, &iter);
+
+    while ((n = g_input_stream_read (G_INPUT_STREAM (stream), text, 2048, NULL, NULL)) > 0)
+      gtk_text_buffer_insert (buffer, &iter, text, n);
+
+    g_object_unref (stream);
+  }
+
+  gtk_dialog_run (GTK_DIALOG (dialog));
+  gtk_widget_destroy (dialog);
+}
+
+/*
+ * Encodes an encoding
+ */
+static void
+ogmrip_main_encode (OGMRipData *data, OGMRipEncoding *encoding)
+{
+  if (ogmrip_open_title (GTK_WINDOW (data->window), ogmrip_encoding_get_title (encoding)))
+  {
+    GError *error = NULL;
+    GtkWidget *dialog;
+    gint result;
+
+#ifdef HAVE_DBUS_SUPPORT
+    gint cookie;
+
+    cookie = ogmrip_main_dbus_inhibit (data);
+#endif /* HAVE_DBUS_SUPPORT */
+
+    dialog = ogmrip_progress_dialog_new (encoding);
+    gtk_window_set_parent (GTK_WINDOW (dialog), GTK_WINDOW (data->window));
+    gtk_window_set_modal (GTK_WINDOW (dialog), TRUE);
+    gtk_window_present (GTK_WINDOW (dialog));
+
+    /*
+     * TODO copy-dvd
+     */
+
+    result = ogmrip_encoding_encode (encoding, &error);
+
+    ogmrip_main_clean (data, encoding, result == OGMJOB_RESULT_ERROR);
+
+#ifdef HAVE_DBUS_SUPPORT
+    if (cookie >= 0)
+      ogmrip_main_dbus_uninhibit (data, cookie);
+#endif /* HAVE_DBUS_SUPPORT */
+
+    ogmdvd_title_close (ogmrip_encoding_get_title (encoding));
+
+    if (result == OGMJOB_RESULT_ERROR || error != NULL)
+    {
+      ogmrip_main_display_error (data, encoding, error);
+      g_clear_error (&error);
+    }
+  }
+}
+
+/*
+ * Enqueues an encoding
+ */
+static void
+ogmrip_main_enqueue (OGMRipData *data, OGMRipEncoding *encoding)
+{
+  /*
+   * TODO enqueue
+   */
+}
+
+/*
  * Adds an audio chooser
  */
 static void
@@ -134,10 +505,8 @@ ogmrip_main_add_audio_chooser (OGMRipData *data)
 
   if (title)
   {
-    gint lang;
-
-    g_settings_get (settings, OGMRIP_SETTINGS_PREF_AUDIO, "u", &lang);
-    ogmrip_source_chooser_select_language (OGMRIP_SOURCE_CHOOSER (chooser), lang);
+    ogmrip_source_chooser_select_language (OGMRIP_SOURCE_CHOOSER (chooser),
+        g_settings_get_uint (settings, OGMRIP_SETTINGS_PREF_AUDIO));
 
     if (!ogmrip_source_chooser_get_active (OGMRIP_SOURCE_CHOOSER (chooser), NULL))
     {
@@ -174,10 +543,8 @@ ogmrip_main_add_subp_chooser (OGMRipData *data)
 
   if (title)
   {
-    gint lang;
-
-    g_settings_get (settings, OGMRIP_SETTINGS_PREF_SUBP, "u", &lang);
-    ogmrip_source_chooser_select_language (OGMRIP_SOURCE_CHOOSER (chooser), lang);
+    ogmrip_source_chooser_select_language (OGMRIP_SOURCE_CHOOSER (chooser),
+        g_settings_get_uint (settings, OGMRIP_SETTINGS_PREF_SUBP));
 
     if (!ogmrip_source_chooser_get_active (OGMRIP_SOURCE_CHOOSER (chooser), NULL))
     {
@@ -196,10 +563,23 @@ ogmrip_main_add_subp_chooser (OGMRipData *data)
       G_CALLBACK (gtk_container_remove), data->subp_list);
 }
 
+static const gchar *fourcc[] =
+{
+  NULL,
+  "XVID",
+  "DIVX",
+  "DX50",
+  "FMP4"
+};
+
+/*
+ * Creates a container
+ */
 static OGMRipContainer *
 ogmrip_main_create_container (OGMRipData *data, OGMRipProfile *profile)
 {
   OGMRipContainer *container;
+  GSettings *settings;
   GType type;
 
   type = ogmrip_profile_get_container_type (profile, NULL);
@@ -209,18 +589,28 @@ ogmrip_main_create_container (OGMRipData *data, OGMRipProfile *profile)
   ogmrip_container_set_label (container,
       gtk_entry_get_text (GTK_ENTRY (data->title_entry)));
 
-  /*
-   * TODO add chapters' names
-   */
+  settings = ogmrip_profile_get_child (profile, OGMRIP_PROFILE_GENERAL);
+
+  ogmrip_container_set_fourcc (container,
+      fourcc[g_settings_get_uint (settings, OGMRIP_PROFILE_FOURCC)]);
+  ogmrip_container_set_split (container,
+      g_settings_get_uint (settings, OGMRIP_PROFILE_TARGET_NUMBER),
+      g_settings_get_uint (settings, OGMRIP_PROFILE_TARGET_SIZE));
 
   return container;
 }
 
+/*
+ * Creates a video codec
+ */
 static OGMRipCodec *
-ogmrip_main_create_video_codec (OGMRipData *data, OGMRipProfile *profile, OGMDvdVideoStream *stream)
+ogmrip_main_create_video_codec (OGMRipData *data, OGMRipProfile *profile,
+    OGMDvdVideoStream *stream, guint start_chap, gint end_chap)
 {
   OGMRipCodec *codec;
+  GSettings *settings;
   GType type;
+  guint w, h, m;
 
   type = ogmrip_profile_get_video_codec_type (profile, NULL);
   if (type == G_TYPE_NONE)
@@ -228,14 +618,61 @@ ogmrip_main_create_video_codec (OGMRipData *data, OGMRipProfile *profile, OGMDvd
 
   codec = g_object_new (type, "input", stream, NULL);
 
+  ogmrip_codec_set_chapters (codec, start_chap, end_chap);
+
+  settings = ogmrip_profile_get_child (profile, OGMRIP_PROFILE_VIDEO);
+
   ogmrip_video_codec_set_angle (OGMRIP_VIDEO_CODEC (codec),
       gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (data->angle_spin)));
+  ogmrip_video_codec_set_passes (OGMRIP_VIDEO_CODEC (codec),
+      g_settings_get_uint (settings, OGMRIP_PROFILE_PASSES));
+  ogmrip_video_codec_set_scaler (OGMRIP_VIDEO_CODEC (codec),
+      g_settings_get_uint (settings, OGMRIP_PROFILE_SCALER));
+  ogmrip_video_codec_set_turbo (OGMRIP_VIDEO_CODEC (codec),
+      g_settings_get_boolean (settings, OGMRIP_PROFILE_TURBO));
+  ogmrip_video_codec_set_denoise (OGMRIP_VIDEO_CODEC (codec),
+      g_settings_get_boolean (settings, OGMRIP_PROFILE_DENOISE));
+  ogmrip_video_codec_set_deblock (OGMRIP_VIDEO_CODEC (codec),
+      g_settings_get_boolean (settings, OGMRIP_PROFILE_DEBLOCK));
+  ogmrip_video_codec_set_dering (OGMRIP_VIDEO_CODEC (codec),
+      g_settings_get_boolean (settings, OGMRIP_PROFILE_DERING));
+  ogmrip_video_codec_set_quality (OGMRIP_VIDEO_CODEC (codec),
+      g_settings_get_uint (settings, OGMRIP_PROFILE_QUALITY));
+
+  w = g_settings_get_uint (settings, OGMRIP_PROFILE_MIN_WIDTH);
+  h = g_settings_get_uint (settings, OGMRIP_PROFILE_MIN_HEIGHT);
+
+  if (w > 0 && h > 0)
+    ogmrip_video_codec_set_min_size (OGMRIP_VIDEO_CODEC (codec), w, h);
+
+  w = g_settings_get_uint (settings, OGMRIP_PROFILE_MAX_WIDTH);
+  h = g_settings_get_uint (settings, OGMRIP_PROFILE_MAX_HEIGHT);
+
+  if (w > 0 && h > 0)
+    ogmrip_video_codec_set_max_size (OGMRIP_VIDEO_CODEC (codec), w, h,
+        g_settings_get_boolean (settings, OGMRIP_PROFILE_EXPAND));
+
+  ogmrip_profile_get (profile, OGMRIP_PROFILE_GENERAL, OGMRIP_PROFILE_ENCODING_METHOD, "u", &m);
+  if (m == OGMRIP_ENCODING_BITRATE)
+    ogmrip_video_codec_set_bitrate (OGMRIP_VIDEO_CODEC (codec),
+        g_settings_get_uint (settings, OGMRIP_PROFILE_BITRATE));
+  else if (m == OGMRIP_ENCODING_QUANTIZER)
+    ogmrip_video_codec_set_quantizer (OGMRIP_VIDEO_CODEC (codec),
+        g_settings_get_double (settings, OGMRIP_PROFILE_QUANTIZER));
+
+  /*
+   * TODO hardsub
+   */
 
   return codec;
 }
 
+/*
+ * Creates an audio codec
+ */
 static OGMRipCodec *
-ogmrip_main_create_audio_codec (OGMRipData *data, OGMRipProfile *profile, OGMRipSourceChooser *chooser, OGMDvdAudioStream *stream)
+ogmrip_main_create_audio_codec (OGMRipData *data, OGMRipProfile *profile,
+    OGMRipSourceChooser *chooser, OGMDvdAudioStream *stream, guint start_chap, gint end_chap)
 {
   OGMRipAudioOptions *options;
   OGMRipCodec *codec;
@@ -254,6 +691,7 @@ ogmrip_main_create_audio_codec (OGMRipData *data, OGMRipProfile *profile, OGMRip
   if (!codec)
     return NULL;
 
+  ogmrip_codec_set_chapters (codec, start_chap, end_chap);
   ogmrip_audio_codec_set_label (OGMRIP_AUDIO_CODEC (codec),
       ogmrip_audio_chooser_widget_get_label (OGMRIP_AUDIO_CHOOSER_WIDGET (chooser)));
   ogmrip_audio_codec_set_language (OGMRIP_AUDIO_CODEC (codec),
@@ -290,66 +728,320 @@ ogmrip_main_create_audio_codec (OGMRipData *data, OGMRipProfile *profile, OGMRip
 }
 
 /*
- * Add subp streams and files to the encoding
+ * Creates a subp codec
  */
-/*
-static gboolean
-ogmrip_main_add_encoding_subp (OGMRipData *data, OGMRipEncoding *encoding, GtkWidget *chooser, GError **error)
+static OGMRipCodec *
+ogmrip_main_create_subp_codec (OGMRipData *data, OGMRipProfile *profile,
+    OGMRipSourceChooser *chooser, OGMDvdSubpStream *stream, guint start_chap, gint end_chap)
 {
-  OGMRipSource *source;
-  gint type;
+  OGMRipSubpOptions *options;
+  OGMRipCodec *codec;
+  GSettings *settings;
+  GType type;
 
-  source = ogmrip_source_chooser_get_active (OGMRIP_SOURCE_CHOOSER (chooser), &type);
+  options = ogmrip_subp_chooser_widget_get_options (OGMRIP_SUBP_CHOOSER_WIDGET (chooser));
+  if (options)
+    type = ogmrip_subp_options_get_codec (options);
+  else
+    type = ogmrip_profile_get_subp_codec_type (profile, NULL);
 
-  if (type == OGMRIP_SOURCE_FILE)
-    return ogmrip_encoding_add_subp_file (encoding, OGMRIP_FILE (source), error);
+  if (type == G_TYPE_NONE || type == OGMRIP_TYPE_HARDSUB)
+    return NULL;
 
-  if (type == OGMRIP_SOURCE_STREAM)
+  codec = g_object_new (type, "input", stream, NULL);
+  if (!codec)
+    return NULL;
+
+  settings = ogmrip_profile_get_child (profile, OGMRIP_PROFILE_SUBP);
+
+  ogmrip_codec_set_chapters (codec, start_chap, end_chap);
+  ogmrip_subp_codec_set_label (OGMRIP_SUBP_CODEC (codec),
+      ogmrip_subp_chooser_widget_get_label (OGMRIP_SUBP_CHOOSER_WIDGET (chooser)));
+  ogmrip_subp_codec_set_language (OGMRIP_SUBP_CODEC (codec),
+      ogmrip_subp_chooser_widget_get_language (OGMRIP_SUBP_CHOOSER_WIDGET (chooser)));
+
+  if (options)
   {
-    OGMRipSubpOptions *options;
-    gboolean new_options;
-
-    options = g_object_get_data (G_OBJECT (chooser), "__subp_options__");
-    new_options = options == NULL;
-
-    if (new_options)
-    {
-      options = g_new0 (OGMRipSubpOptions, 1);
-      ogmrip_subp_options_init (options);
-
-      options->language = ogmdvd_subp_stream_get_language (OGMDVD_SUBP_STREAM (source));
-    }
-
-    if (options->defaults)
-    {
-      OGMRipProfile *profile;
-
-      profile = ogmrip_encoding_get_profile (encoding);
-
-      options->codec = ogmrip_profile_get_subp_codec_type (profile, NULL);
-      ogmrip_profile_get (profile, OGMRIP_PROFILE_SUBP, OGMRIP_PROFILE_FORCED_ONLY, "b", &options->forced_subs);
-      ogmrip_profile_get (profile, OGMRIP_PROFILE_SUBP, OGMRIP_PROFILE_SPELL_CHECK, "b", &options->spell);
-      ogmrip_profile_get (profile, OGMRIP_PROFILE_SUBP, OGMRIP_PROFILE_CHARACTER_SET, "u", &options->charset);
-      ogmrip_profile_get (profile, OGMRIP_PROFILE_SUBP, OGMRIP_PROFILE_NEWLINE_STYLE, "u", &options->newline);
-    }
-
-    if (!ogmrip_encoding_add_subp_stream (encoding, OGMDVD_SUBP_STREAM (source), options, error))
-    {
-      if (new_options)
-      {
-        ogmrip_subp_options_reset (options);
-        g_free (options);
-      }
-
-      return FALSE;
-    }
-
-    return TRUE;
+    ogmrip_subp_codec_set_character_set (OGMRIP_SUBP_CODEC (codec),
+        ogmrip_subp_options_get_character_set (options));
+    ogmrip_subp_codec_set_newline_style (OGMRIP_SUBP_CODEC (codec),
+        ogmrip_subp_options_get_newline_style (options));
+    ogmrip_subp_codec_set_forced_only (OGMRIP_SUBP_CODEC (codec),
+        ogmrip_subp_options_get_forced_only (options));
+  }
+  else
+  {
+    ogmrip_subp_codec_set_character_set (OGMRIP_SUBP_CODEC (codec),
+        g_settings_get_uint (settings, OGMRIP_PROFILE_CHARACTER_SET));
+    ogmrip_subp_codec_set_newline_style (OGMRIP_SUBP_CODEC (codec),
+        g_settings_get_uint (settings, OGMRIP_PROFILE_NEWLINE_STYLE));
+    ogmrip_subp_codec_set_forced_only (OGMRIP_SUBP_CODEC (codec),
+        g_settings_get_boolean (settings, OGMRIP_PROFILE_FORCED_ONLY));
   }
 
-  return FALSE;
+  return codec;
 }
+
+/*
+ * Creates a chapters codec
+ */
+static OGMRipCodec *
+ogmrip_main_create_chapters_codec (OGMRipData *data, OGMDvdVideoStream *stream, guint start_chap, gint end_chap)
+{
+  OGMRipCodec *codec;
+  guint last_chap, chap;
+  gchar *label;
+
+  codec = ogmrip_chapters_new (stream);
+  if (!codec)
+    return NULL;
+
+  ogmrip_chapters_set_language (OGMRIP_CHAPTERS (codec),
+      g_settings_get_uint (settings, OGMRIP_SETTINGS_CHAPTER_LANG));
+
+  ogmrip_codec_set_chapters (codec, start_chap, end_chap);
+
+  ogmrip_codec_get_chapters (codec, &start_chap, &last_chap);
+  for (chap = start_chap; chap <= last_chap; chap ++)
+  {
+    label = ogmdvd_chapter_list_get_label (OGMDVD_CHAPTER_LIST (data->chapter_list), chap);
+    if (!label)
+      break;
+
+    ogmrip_chapters_set_label (OGMRIP_CHAPTERS (codec), chap, label);
+    g_free (label);
+  }
+
+  return codec;
+}
+
+/*
+ * Sets the name of the output file
+ */
+static void
+ogmrip_main_set_filename (OGMRipData *data, OGMRipEncoding *encoding)
+{
+  GString *filename;
+  OGMRipContainer *container;
+  OGMRipCodec *codec;
+  gchar *path, *str;
+  guint format;
+
+  format = g_settings_get_uint (settings, OGMRIP_SETTINGS_FILENAME);
+
+  filename = g_string_new (gtk_entry_get_text (GTK_ENTRY (data->title_entry)));
+
+  if (format >= 1)
+  {
+    codec = ogmrip_encoding_get_nth_audio_codec (encoding, 0);
+    if (codec)
+    {
+      gint lang;
+
+      lang = ogmrip_audio_codec_get_language (OGMRIP_AUDIO_CODEC (codec));
+      if (lang >= 0)
+        g_string_append_printf (filename, " - %s", ogmdvd_get_language_label (lang));
+    }
+  }
+
+  if (format >= 2)
+  {
+    codec = ogmrip_encoding_get_video_codec (encoding);
+    if (codec)
+      g_string_append_printf (filename, " - %s", ogmrip_plugin_get_video_codec_name (G_OBJECT_TYPE (codec)));
+  }
+
+  if (format >= 3)
+  {
+    codec = ogmrip_encoding_get_nth_audio_codec (encoding, 0);
+    if (codec)
+      g_string_append_printf (filename, " - %s", ogmrip_plugin_get_audio_codec_name (G_OBJECT_TYPE (codec)));
+  }
+
+  container = ogmrip_encoding_get_container (encoding);
+  g_string_append_printf (filename, ".%s", ogmrip_plugin_get_container_name (G_OBJECT_TYPE (container)));
+
+  path = g_settings_get_string (settings, OGMRIP_SETTINGS_OUTPUT_DIR);
+  str = g_build_filename (path, filename->str, NULL);
+  g_string_free (filename, TRUE);
+  g_free (path);
+
+  ogmrip_container_set_output (container, str);
+
+  path = ogmrip_fs_set_extension (str, "log");
+  g_free (str);
+
+  ogmrip_encoding_set_log_file (encoding, path);
+  g_free (path);
+}
+
+/*
+ * Imports a simple chapter file
+ */
+gboolean
+ogmrip_main_import_simple_chapters (OGMRipData *data, const gchar *filename)
+{
+  FILE *file;
+  gchar buf[201], *str;
+  gint chap;
+
+  file = fopen (filename, "r");
+  if (!file)
+    return FALSE;
+
+  while (!feof (file))
+  {
+    if (fgets (buf, 200, file) != NULL)
+    {
+      if (sscanf (buf, "CHAPTER%02dNAME=", &chap) == 1 && chap > 0)
+      {
+        str = g_strstrip (strchr (buf, '='));
+        ogmdvd_chapter_list_set_label (OGMDVD_CHAPTER_LIST (data->chapter_list), chap - 1, str + 1);
+      }
+    }
+  }
+
+  fclose (file);
+
+  return TRUE;
+}
+
+/*
+ * Imports a matroska chapter file
+ */
+static gboolean
+ogmrip_main_import_matroska_chapters (OGMRipData *data, const gchar *filename)
+{
+  xmlDoc *doc;
+  xmlNode *node, *child;
+  xmlChar *str;
+
+  gint chap = 0;
+
+  doc = xmlParseFile (filename);
+  if (!doc)
+    return FALSE;
+
+  node = xmlDocGetRootElement (doc);
+  if (!node)
+  {
+    xmlFreeDoc (doc);
+    return FALSE;
+  }
+
+  if (!xmlStrEqual (node->name, (xmlChar *) "Chapters"))
+  {
+    xmlFreeDoc (doc);
+    return FALSE;
+  }
+
+  for (node = node->children; node; node = node->next)
+    if (xmlStrEqual (node->name, (xmlChar *) "EditionEntry"))
+      break;
+
+  if (!node)
+  {
+    xmlFreeDoc (doc);
+    return FALSE;
+  }
+
+  for (node = node->children; node; node = node->next)
+  {
+    if (xmlStrEqual (node->name, (xmlChar *) "ChapterAtom"))
+    {
+      for (child = node->children; child; child = child->next)
+        if (xmlStrEqual (child->name, (xmlChar *) "ChapterDisplay"))
+          break;
+
+      if (child)
+      {
+        for (child = child->children; child; child = child->next)
+          if (xmlStrEqual (child->name, (xmlChar *) "ChapterString"))
+            break;
+
+        if (child)
+        {
+          str = xmlNodeGetContent (child);
+          ogmdvd_chapter_list_set_label (OGMDVD_CHAPTER_LIST (data->chapter_list), chap, (gchar *) str);
+          chap ++;
+        }
+      }
+    }
+  }
+
+  xmlFreeDoc (doc);
+
+  return TRUE;
+}
+
+/*
+ * Exports to a simple chapter file
+ */
+static void
+ogmrip_main_export_simple_chapters (OGMRipData *data, const gchar *filename)
+{
+  guint start_chap;
+  gint end_chap;
+
+  if (ogmrip_chapter_list_get_selected (OGMRIP_CHAPTER_LIST (data->chapter_list), &start_chap, &end_chap))
+  {
+    GError *error = NULL;
+    OGMDvdTitle *title;
+    OGMRipCodec *chapters;
+    gchar *label;
+    guint i;
+
+    title = ogmdvd_title_chooser_get_active (OGMDVD_TITLE_CHOOSER (data->title_chooser));
+
+    chapters = ogmrip_chapters_new (ogmdvd_title_get_video_stream (title));
+    ogmrip_codec_set_chapters (OGMRIP_CODEC (chapters), start_chap, end_chap);
+
+    for (i = 0; ; i++)
+    {
+      label = ogmdvd_chapter_list_get_label (OGMDVD_CHAPTER_LIST (data->chapter_list), i);
+      if (!label)
+        break;
+      ogmrip_chapters_set_label (OGMRIP_CHAPTERS (chapters), i, label);
+      g_free (label);
+    }
+
+    if (ogmjob_spawn_run (OGMJOB_SPAWN (chapters), &error) != OGMJOB_RESULT_SUCCESS)
+    {
+/*
+      ogmrip_message_dialog (GTK_WINDOW (data->window), GTK_MESSAGE_ERROR, "<b>%s</b>\n\n%s",
+          _("Could not export the chapters"), error->message);
 */
+      g_error_free (error);
+    }
+  }
+}
+
+static void
+ogmrip_main_encoding_completed (OGMRipData *data, OGMJobSpawn *spawn, guint result, OGMRipEncoding *encoding)
+{
+  if (result == OGMJOB_RESULT_SUCCESS && spawn != NULL)
+  {
+    if (OGMRIP_IS_SUBP_CODEC (spawn))
+    {
+#ifdef HAVE_ENCHANT_SUPPORT
+      if (ogmrip_plugin_get_subp_codec_text (G_OBJECT_TYPE (spawn)))
+      {
+        OGMRipProfile *profile;
+        gboolean spell_check;
+
+        profile = ogmrip_encoding_get_profile (encoding);
+        ogmrip_profile_get (profile, OGMRIP_PROFILE_SUBP, OGMRIP_PROFILE_SPELL_CHECK, "b", &spell_check);
+
+        if (spell_check)
+          ogmrip_main_spell_check (data,
+              ogmrip_codec_get_output (OGMRIP_CODEC (spawn)),
+              ogmrip_subp_codec_get_language (OGMRIP_SUBP_CODEC (spawn)));
+      }
+#endif
+    }
+  }
+}
+
 /*
  * When the eject button is activated
  */
@@ -423,20 +1115,17 @@ ogmrip_main_extract_activated (OGMRipData *data)
 
   guint start_chap;
   gint end_chap, response;
+
   GList *list, *link;
 
   title = ogmdvd_title_chooser_get_active (OGMDVD_TITLE_CHOOSER (data->title_chooser));
 
-  encoding = ogmrip_encoding_new ();
+  encoding = ogmrip_encoding_new (title);
   ogmrip_encoding_set_relative (encoding,
       gtk_widget_is_sensitive (data->relative_check) &
       gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (data->relative_check)));
 
-  /*
-   * TODO set filename
-   */
-
-  dialog = ogmrip_options_dialog_new (encoding, title);
+  dialog = ogmrip_options_dialog_new (encoding);
   gtk_window_set_parent (GTK_WINDOW (dialog), GTK_WINDOW (data->window));
 
   response = gtk_dialog_run (GTK_DIALOG (dialog));
@@ -449,60 +1138,123 @@ ogmrip_main_extract_activated (OGMRipData *data)
 
   ogmrip_chapter_list_get_selected (OGMRIP_CHAPTER_LIST (data->chapter_list), &start_chap, &end_chap);
 
-  codec = ogmrip_main_create_video_codec (data, profile, ogmdvd_title_get_video_stream (title));
+  /*
+   * TODO compressibility test
+   */
+
+  codec = ogmrip_main_create_video_codec (data, profile,
+      ogmdvd_title_get_video_stream (title), start_chap, end_chap);
+
   if (codec)
   {
     guint x, y, w, h;
-
-    ogmrip_encoding_set_video_codec (encoding, OGMRIP_VIDEO_CODEC (codec));
-    ogmrip_codec_set_chapters (codec, start_chap, end_chap);
+    glong t;
+    gint d;
 
     ogmrip_options_dialog_get_crop_size (OGMRIP_OPTIONS_DIALOG (dialog), &x, &y, &w, &h);
     ogmrip_video_codec_set_crop_size (OGMRIP_VIDEO_CODEC (codec), x, y, w, h);
 
     ogmrip_options_dialog_get_scale_size (OGMRIP_OPTIONS_DIALOG (dialog), &w, &h);
     ogmrip_video_codec_set_scale_size (OGMRIP_VIDEO_CODEC (codec), w, h);
+
+    d = ogmrip_options_dialog_get_deinterlacer (OGMRIP_OPTIONS_DIALOG (dialog));
+    ogmrip_video_codec_set_deinterlacer (OGMRIP_VIDEO_CODEC (codec), d);
+
+    d = ogmrip_video_codec_get_start_delay (OGMRIP_VIDEO_CODEC (codec));
+    ogmrip_container_set_start_delay (container, d);
+
+    ogmrip_encoding_set_video_codec (encoding, OGMRIP_VIDEO_CODEC (codec));
+    g_object_unref (codec);
+
+    t = g_settings_get_uint (settings, OGMRIP_SETTINGS_THREADS);
+#ifdef HAVE_SYSCONF_NPROC
+    if (!t)
+      t = sysconf (_SC_NPROCESSORS_ONLN);
+#endif
+    ogmrip_video_codec_set_threads (OGMRIP_VIDEO_CODEC (codec), t ? t : 1);
   }
+
+  gtk_widget_destroy (dialog);
 
   list = gtk_container_get_children (GTK_CONTAINER (data->audio_list));
   for (link = list; link; link = link->next)
   {
     source = ogmrip_source_chooser_get_active (link->data, &type);
     if (type == OGMRIP_SOURCE_FILE)
-    {
-    }
+      ogmrip_encoding_add_file (encoding, OGMRIP_FILE (source));
     else if (type == OGMRIP_SOURCE_STREAM)
     {
-      codec = ogmrip_main_create_audio_codec (data, profile, OGMRIP_SOURCE_CHOOSER (link->data), OGMDVD_AUDIO_STREAM (source));
+      codec = ogmrip_main_create_audio_codec (data, profile,
+          OGMRIP_SOURCE_CHOOSER (link->data), OGMDVD_AUDIO_STREAM (source), start_chap, end_chap);
+
       if (codec)
       {
         ogmrip_encoding_add_audio_codec (encoding, OGMRIP_AUDIO_CODEC (codec));
-        ogmrip_codec_set_chapters (codec, start_chap, end_chap);
+        g_object_unref (codec);
       }
     }
   }
   g_list_free (list);
-/*
+
   list = gtk_container_get_children (GTK_CONTAINER (data->subp_list));
   for (link = list; link; link = link->next)
   {
+    source = ogmrip_source_chooser_get_active (link->data, &type);
+    if (type == OGMRIP_SOURCE_FILE)
+      ogmrip_encoding_add_file (encoding, OGMRIP_FILE (source));
+    else if (type == OGMRIP_SOURCE_STREAM)
+    {
+      codec = ogmrip_main_create_subp_codec (data, profile,
+          OGMRIP_SOURCE_CHOOSER (link->data), OGMDVD_SUBP_STREAM (source), start_chap, end_chap);
+
+      if (codec)
+      {
+        ogmrip_encoding_add_subp_codec (encoding, OGMRIP_SUBP_CODEC (codec));
+        g_object_unref (codec);
+      }
+    }
   }
   g_list_free (list);
-*/
-  gtk_widget_destroy (dialog);
+
+  codec = ogmrip_main_create_chapters_codec (data,
+      ogmdvd_title_get_video_stream (title), start_chap, end_chap);
+
+  if (codec)
+  {
+    ogmrip_encoding_add_chapters (encoding, OGMRIP_CHAPTERS (codec));
+    g_object_unref (codec);
+  }
+
+  if (g_settings_get_boolean (settings, OGMRIP_SETTINGS_AUTO_SUBP) && 
+      !ogmrip_encoding_get_nth_subp_codec (encoding, 0))
+  {
+    codec = ogmrip_encoding_get_nth_audio_codec (encoding, 0);
+    if (codec)
+    {
+      list = ogmdvd_title_get_subp_streams (ogmrip_encoding_get_title (encoding));
+      for (link = list; link; link = link->next)
+      {
+        if (ogmrip_audio_codec_get_language (OGMRIP_AUDIO_CODEC (codec)) ==
+            ogmdvd_subp_stream_get_language (link->data))
+        {
+          codec = ogmrip_encoding_get_video_codec (encoding);
+          ogmrip_video_codec_set_hard_subp (OGMRIP_VIDEO_CODEC (codec), link->data, TRUE);
+          break;
+        }
+      }
+      g_list_free (list);
+    }
+  }
+
+  g_signal_connect_swapped (encoding, "complete",
+      G_CALLBACK (ogmrip_main_encoding_completed), data);
+
+  ogmrip_main_set_filename (data, encoding);
 
   if (response == OGMRIP_RESPONSE_EXTRACT)
-  {
-    /*
-     * TODO encode
-     */
-  }
+    ogmrip_main_encode (data, encoding);
   else if (response == OGMRIP_RESPONSE_ENQUEUE)
-  {
-    /*
-     * TODO enqueue
-     */
-  }
+    ogmrip_main_enqueue (data, encoding);
 }
 
 /*
@@ -514,6 +1266,10 @@ ogmrip_main_play_activated (OGMRipData *data, GtkWidget *button)
   GError *error = NULL;
 
   OGMDvdTitle *title;
+  OGMRipSource *source;
+  OGMRipSourceType type;
+  GList *list, *link;
+
   guint start_chap;
   gint end_chap;
 
@@ -529,15 +1285,34 @@ ogmrip_main_play_activated (OGMRipData *data, GtkWidget *button)
   ogmrip_chapter_list_get_selected (OGMRIP_CHAPTER_LIST (data->chapter_list), &start_chap, &end_chap);
   ogmrip_player_set_chapters (data->player, start_chap, end_chap);
 
-  /*
-   * TODO set audio and subp streams
-   */
+  list = gtk_container_get_children (GTK_CONTAINER (data->audio_list));
+  for (link = list; link; link = link->next)
+  {
+    source = ogmrip_source_chooser_get_active (link->data, &type);
+    if (type == OGMRIP_SOURCE_STREAM)
+    {
+      ogmrip_player_set_audio_stream (data->player, OGMDVD_AUDIO_STREAM (source));
+      break;
+    }
+  }
+  g_list_free (list);
+
+  list = gtk_container_get_children (GTK_CONTAINER (data->subp_list));
+  for (link = list; link; link = link->next)
+  {
+    source = ogmrip_source_chooser_get_active (link->data, &type);
+    if (type == OGMRIP_SOURCE_STREAM)
+    {
+      ogmrip_player_set_subp_stream (data->player, OGMDVD_SUBP_STREAM (source));
+      break;
+    }
+  }
+  g_list_free (list);
 
   if (!ogmrip_player_play (data->player, &error))
   {
-    ogmrip_message_dialog (GTK_WINDOW (data->window), GTK_MESSAGE_ERROR,
-        "<big><b>%s</b></big>\n\n%s", _("Can't play DVD title"), error->message);
-    g_error_free (error);
+    ogmrip_run_error_dialog (GTK_WINDOW (data->window), error, _("Can't play DVD title"));
+    g_clear_error (&error);
   }
 }
 
@@ -565,10 +1340,10 @@ ogmrip_main_import_chapters_activated (OGMRipData *data)
     filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
     if (filename)
     {
-      /*
-       * TODO import chapters
-       */
-
+      if (!ogmrip_main_import_matroska_chapters (data, filename))
+        if (!ogmrip_main_import_simple_chapters (data, filename))
+          ogmrip_run_error_dialog (GTK_WINDOW (data->window), NULL,
+              _("Could not open the chapters file '%s'"), filename);
       g_free (filename);
     }
   }
@@ -595,10 +1370,7 @@ ogmrip_main_export_chapters_activated (OGMRipData *data)
     filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
     if (filename)
     {
-      /*
-       * TODO export chapters
-       */
-
+      ogmrip_main_export_simple_chapters (data, filename);
       g_free (filename);
     }
   }
@@ -628,7 +1400,7 @@ ogmrip_main_profiles_activated (OGMRipData *data)
 {
   GtkWidget *dialog;
 
-  dialog = ogmrip_profiles_dialog_new ();
+  dialog = ogmrip_profile_manager_dialog_new ();
   gtk_window_set_parent (GTK_WINDOW (dialog), GTK_WINDOW (data->window));
 
   gtk_dialog_run (GTK_DIALOG (dialog));
@@ -643,7 +1415,7 @@ ogmrip_main_encodings_activated (OGMRipData *data)
 {
   GtkWidget *dialog;
 
-  dialog = ogmrip_queue_dialog_new ();
+  dialog = ogmrip_encoding_manager_dialog_new ();
   gtk_window_set_parent (GTK_WINDOW (dialog), GTK_WINDOW (data->window));
 
   gtk_dialog_run (GTK_DIALOG (dialog));
@@ -1089,8 +1861,6 @@ ogmrip_init (void)
 #endif /* HAVE_LIBNOTIFY_SUPPORT */
 
   engine = ogmrip_profile_engine_get_default ();
-  g_settings_bind (settings, OGMRIP_SETTINGS_PROFILES,
-      engine, "profiles", G_SETTINGS_BIND_DEFAULT);
 }
 
 static void

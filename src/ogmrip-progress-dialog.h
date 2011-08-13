@@ -23,13 +23,6 @@
 
 G_BEGIN_DECLS
 
-enum
-{
-  OGMRIP_RESPONSE_CANCEL_ALL,
-  OGMRIP_RESPONSE_SUSPEND,
-  OGMRIP_RESPONSE_RESUME
-};
-
 #define OGMRIP_TYPE_PROGRESS_DIALOG            (ogmrip_progress_dialog_get_type ())
 #define OGMRIP_PROGRESS_DIALOG(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_PROGRESS_DIALOG, OGMRipProgressDialog))
 #define OGMRIP_PROGRESS_DIALOG_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_PROGRESS_DIALOG, OGMRipProgressDialogClass))
@@ -52,17 +45,9 @@ struct _OGMRipProgressDialogClass
   GtkDialogClass parent_class;
 };
 
-GType            ogmrip_progress_dialog_get_type       (void);
-
-GtkWidget *      ogmrip_progress_dialog_new            (void);
-
-void             ogmrip_progress_dialog_set_encoding   (OGMRipProgressDialog *dialog,
-                                                        OGMRipEncoding       *encoding);
-OGMRipEncoding * ogmrip_progress_dialog_get_encoding   (OGMRipProgressDialog *dialog);
-
-void             ogmrip_progress_dialog_can_quit       (OGMRipProgressDialog *dialog,
-                                                        gboolean             can_quit);
-gboolean         ogmrip_progress_dialog_get_quit       (OGMRipProgressDialog *dialog);
+GType            ogmrip_progress_dialog_get_type     (void);
+GtkWidget *      ogmrip_progress_dialog_new          (OGMRipEncoding       *encoding);
+OGMRipEncoding * ogmrip_progress_dialog_get_encoding (OGMRipProgressDialog *dialog);
 
 G_END_DECLS
 
