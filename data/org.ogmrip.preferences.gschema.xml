@@ -7,6 +7,7 @@
       <summary>The chapter language</summary>
     </key>
     <key name="filename" type="u">
+      <range min="0" max="3"/>
       <default>3</default>
       <summary>The filename pattern of the movie</summary>
     </key>
@@ -32,6 +33,7 @@
       <summary>If a subtitle stream should be automatically hardcoded</summary>
     </key>
     <key name="after-encoding" type="u">
+      <range min="0" max="2"/>
       <default>0</default>
       <summary>What to do after the encoding</summary>
     </key>
@@ -54,11 +56,6 @@
     <key name="threads" type="u">
       <default>1</default>
       <summary>The maximum number of threads</summary>
-    </key>
-    <!-- Profiles -->
-    <key name="profiles" type="as">
-      <default>[]</default>
-      <summary>The list of all available profiles</summary>
     </key>
   </schema>
 </schemalist>

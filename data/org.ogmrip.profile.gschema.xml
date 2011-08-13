@@ -1,5 +1,12 @@
 <?xml version="1.0"?>
 <schemalist>
+  <schema id="org.ogmrip.profiles">
+    <!-- Profiles -->
+    <key name="profiles" type="as">
+      <default>[]</default>
+      <summary>The list of all available profiles</summary>
+    </key>
+  </schema>
   <schema id="org.ogmrip.profile">
     <key name="name" type="s">
       <default>''</default>
