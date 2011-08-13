@@ -189,9 +189,7 @@ ogmrip_video_codec_init (OGMRipVideoCodec *video)
 static void
 ogmrip_video_codec_dispose (GObject *gobject)
 {
-  OGMRipVideoCodec *video;
-
-  video = OGMRIP_VIDEO_CODEC (gobject);
+  OGMRipVideoCodec *video = OGMRIP_VIDEO_CODEC (gobject);
 
   if (video->priv->astream)
     ogmdvd_stream_unref (OGMDVD_STREAM (video->priv->astream));
@@ -207,9 +205,7 @@ ogmrip_video_codec_dispose (GObject *gobject)
 static void
 ogmrip_video_codec_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
 {
-  OGMRipVideoCodec *video;
-
-  video = OGMRIP_VIDEO_CODEC (gobject);
+  OGMRipVideoCodec *video = OGMRIP_VIDEO_CODEC (gobject);
 
   switch (property_id) 
   {
@@ -258,9 +254,7 @@ ogmrip_video_codec_set_property (GObject *gobject, guint property_id, const GVal
 static void
 ogmrip_video_codec_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
 {
-  OGMRipVideoCodec *video;
-
-  video = OGMRIP_VIDEO_CODEC (gobject);
+  OGMRipVideoCodec *video = OGMRIP_VIDEO_CODEC (gobject);
 
   switch (property_id) 
   {

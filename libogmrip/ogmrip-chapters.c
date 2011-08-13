@@ -28,13 +28,29 @@
 #define OGMRIP_CHAPTERS_GET_PRIVATE(o) \
     (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_CHAPTERS, OGMRipChaptersPriv))
 
-static void ogmrip_chapters_finalize (GObject     *gobject);
-static gint ogmrip_chapters_run      (OGMJobSpawn *spawn);
+static void ogmrip_chapters_constructed  (GObject      *gobject);
+static void ogmrip_chapters_finalize     (GObject      *gobject);
+static void ogmrip_chapters_set_property (GObject      *gobject,
+                                          guint        property_id,
+                                          const GValue *value,
+                                          GParamSpec   *pspec);
+static void ogmrip_chapters_get_property (GObject      *gobject,
+                                          guint        property_id,
+                                          GValue       *value,
+                                          GParamSpec   *pspec);
+static gint ogmrip_chapters_run          (OGMJobSpawn  *spawn);
 
 struct _OGMRipChaptersPriv
 {
   gint nchapters;
   gchar **labels;
+  guint language;
+};
+
+enum 
+{
+  PROP_0,
+  PROP_LANGUAGE
 };
 
 G_DEFINE_TYPE (OGMRipChapters, ogmrip_chapters, OGMRIP_TYPE_CODEC)
@@ -46,10 +62,17 @@ ogmrip_chapters_class_init (OGMRipChaptersClass *klass)
   OGMJobSpawnClass *spawn_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
-  spawn_class = OGMJOB_SPAWN_CLASS (klass);
-
+  gobject_class->constructed = ogmrip_chapters_constructed;
   gobject_class->finalize = ogmrip_chapters_finalize;
+  gobject_class->get_property = ogmrip_chapters_get_property;
+  gobject_class->set_property = ogmrip_chapters_set_property;
+
+  spawn_class = OGMJOB_SPAWN_CLASS (klass);
   spawn_class->run = ogmrip_chapters_run;
+
+  g_object_class_install_property (gobject_class, PROP_LANGUAGE, 
+        g_param_spec_uint ("language", "Language property", "Set language", 
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipChaptersPriv));
 }
@@ -61,23 +84,64 @@ ogmrip_chapters_init (OGMRipChapters *chapters)
 }
 
 static void
+ogmrip_chapters_constructed (GObject *gobject)
+{
+  OGMRipChapters *chapters = OGMRIP_CHAPTERS (gobject);
+  OGMDvdStream *stream;
+
+  stream = ogmrip_codec_get_input (OGMRIP_CODEC (chapters));
+
+  chapters->priv->nchapters = ogmdvd_title_get_n_chapters (ogmdvd_stream_get_title (stream));
+  if (chapters->priv->nchapters > 0)
+    chapters->priv->labels = g_new0 (gchar *, chapters->priv->nchapters + 1);
+
+  G_OBJECT_CLASS (ogmrip_chapters_parent_class)->constructed (gobject);
+}
+
+static void
 ogmrip_chapters_finalize (GObject *gobject)
 {
-  OGMRipChapters *chapters;
+  OGMRipChapters *chapters = OGMRIP_CHAPTERS (gobject);
 
-  chapters = OGMRIP_CHAPTERS (gobject);
   if (chapters->priv->labels)
   {
-    gint i;
-
-    for (i = 0; i < chapters->priv->nchapters; i++)
-      g_free (chapters->priv->labels[i]);
-
-    g_free (chapters->priv->labels);
+    g_strfreev (chapters->priv->labels);
     chapters->priv->labels = NULL;
   }
 
   G_OBJECT_CLASS (ogmrip_chapters_parent_class)->finalize (gobject);
+}
+
+static void
+ogmrip_chapters_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
+{
+  OGMRipChapters *chapters = OGMRIP_CHAPTERS (gobject);
+
+  switch (property_id) 
+  {
+    case PROP_LANGUAGE: 
+      chapters->priv->language = g_value_get_uint (value);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
+      break;
+  }
+}
+
+static void
+ogmrip_chapters_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
+{
+  OGMRipChapters *chapters = OGMRIP_CHAPTERS (gobject);
+
+  switch (property_id) 
+  {
+    case PROP_LANGUAGE:
+      g_value_set_uint (value, chapters->priv->language);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
+      break;
+  }
 }
 
 static void
@@ -139,37 +203,18 @@ ogmrip_chapters_run (OGMJobSpawn *spawn)
 
 /**
  * ogmrip_chapters_new:
- * @title: An #OGMDvdTitle
- * @output: The output file
+ * @stream: An #OGMDvdVideoStream
  *
  * Creates a new #OGMRipChapters.
  *
  * Returns: The new #OGMRipChapters
  */
-OGMJobSpawn *
-ogmrip_chapters_new (OGMDvdTitle *title, const gchar *output)
+OGMRipCodec *
+ogmrip_chapters_new (OGMDvdVideoStream *stream)
 {
-  OGMRipChapters *chapters;
+  g_return_val_if_fail (stream != NULL, NULL);
 
-  g_return_val_if_fail (title != NULL, NULL);
-  g_return_val_if_fail (output && *output, NULL);
-
-  chapters = g_object_new (OGMRIP_TYPE_CHAPTERS, "input", title, "output", output, NULL);
-
-  if (chapters->priv->labels)
-  {
-    gint i;
-
-    for (i = 0; i < chapters->priv->nchapters; i++)
-      g_free (chapters->priv->labels[i]);
-    g_free (chapters->priv->labels);
-  }
-
-  chapters->priv->nchapters = ogmdvd_title_get_n_chapters (title);
-  if (chapters->priv->nchapters > 0)
-    chapters->priv->labels = g_new0 (gchar *, chapters->priv->nchapters);
-
-  return OGMJOB_SPAWN (chapters);
+  return g_object_new (OGMRIP_TYPE_CHAPTERS, "input", stream, NULL);
 }
 
 /**
@@ -210,5 +255,38 @@ ogmrip_chapters_get_label (OGMRipChapters *chapters, guint n)
   g_return_val_if_fail (n < chapters->priv->nchapters, NULL);
 
   return chapters->priv->labels[n];
+}
+
+/**
+ * ogmrip_chapters_set_language:
+ * @chapters: an #OGMRipChapters
+ * @language: the language
+ *
+ * Sets the language of the chapters.
+ */
+void
+ogmrip_chapters_set_language (OGMRipChapters *chapters, guint language)
+{
+  g_return_if_fail (OGMRIP_IS_CHAPTERS (chapters));
+
+  chapters->priv->language = language;
+
+  g_object_notify (G_OBJECT (chapters), "language");
+}
+
+/**
+ * ogmrip_chapters_get_language:
+ * @chapters: an #OGMRipChapters
+ *
+ * Gets the language of the chapters.
+ *
+ * Returns: the language
+ */
+gint
+ogmrip_chapters_get_language (OGMRipChapters *chapters)
+{
+  g_return_val_if_fail (OGMRIP_IS_CHAPTERS (chapters), -1);
+
+  return chapters->priv->language;
 }
 

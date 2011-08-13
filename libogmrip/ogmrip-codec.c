@@ -187,9 +187,7 @@ ogmrip_codec_finalize (GObject *gobject)
 static void
 ogmrip_codec_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
 {
-  OGMRipCodec *codec;
-
-  codec = OGMRIP_CODEC (gobject);
+  OGMRipCodec *codec = OGMRIP_CODEC (gobject);
 
   switch (property_id) 
   {
@@ -214,9 +212,7 @@ ogmrip_codec_set_property (GObject *gobject, guint property_id, const GValue *va
 static void
 ogmrip_codec_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
 {
-  OGMRipCodec *codec;
-
-  codec = OGMRIP_CODEC (gobject);
+  OGMRipCodec *codec = OGMRIP_CODEC (gobject);
 
   switch (property_id) 
   {

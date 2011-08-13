@@ -45,14 +45,16 @@ struct _OGMRipChaptersClass
   OGMRipCodecClass parent_class;
 };
 
-GType         ogmrip_chapters_get_type  (void);
-OGMJobSpawn * ogmrip_chapters_new       (OGMDvdTitle    *title,
-                                         const gchar    *output);
-const gchar * ogmrip_chapters_get_label (OGMRipChapters *chapters, 
-                                         guint          n);
-void          ogmrip_chapters_set_label (OGMRipChapters *chapters, 
-                                         guint          n, 
-                                         const gchar    *label);
+GType         ogmrip_chapters_get_type     (void);
+OGMRipCodec * ogmrip_chapters_new          (OGMDvdVideoStream *stream);
+const gchar * ogmrip_chapters_get_label    (OGMRipChapters    *chapters, 
+                                            guint             n);
+void          ogmrip_chapters_set_label    (OGMRipChapters    *chapters, 
+                                            guint             n, 
+                                            const gchar       *label);
+void          ogmrip_chapters_set_language (OGMRipChapters    *chapters,
+                                            guint             language);
+gint          ogmrip_chapters_get_language (OGMRipChapters    *chapters);
 
 G_END_DECLS
 

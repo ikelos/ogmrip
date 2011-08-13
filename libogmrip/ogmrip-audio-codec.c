@@ -129,9 +129,8 @@ ogmrip_audio_codec_init (OGMRipAudioCodec *audio)
 static void
 ogmrip_audio_codec_finalize (GObject *gobject)
 {
-  OGMRipAudioCodec *audio;
+  OGMRipAudioCodec *audio = OGMRIP_AUDIO_CODEC (gobject);
 
-  audio = OGMRIP_AUDIO_CODEC (gobject);
   if (audio->priv->label)
   {
     g_free (audio->priv->label);
@@ -144,9 +143,7 @@ ogmrip_audio_codec_finalize (GObject *gobject)
 static void
 ogmrip_audio_codec_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
 {
-  OGMRipAudioCodec *audio;
-
-  audio = OGMRIP_AUDIO_CODEC (gobject);
+  OGMRipAudioCodec *audio = OGMRIP_AUDIO_CODEC (gobject);
 
   switch (property_id) 
   {
@@ -181,9 +178,7 @@ ogmrip_audio_codec_set_property (GObject *gobject, guint property_id, const GVal
 static void
 ogmrip_audio_codec_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
 {
-  OGMRipAudioCodec *audio;
-
-  audio = OGMRIP_AUDIO_CODEC (gobject);
+  OGMRipAudioCodec *audio = OGMRIP_AUDIO_CODEC (gobject);
 
   switch (property_id) 
   {

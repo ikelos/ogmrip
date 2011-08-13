@@ -34,6 +34,7 @@ struct _OGMRipSubpCodecPriv
   gboolean forced_only;
 
   gchar *label;
+  guint language;
 
   OGMRipCharset charset;
   OGMRipNewline newline;
@@ -44,7 +45,9 @@ enum
   PROP_0,
   PROP_FORCED_ONLY,
   PROP_CHARSET,
-  PROP_NEWLINE
+  PROP_NEWLINE,
+  PROP_LABEL,
+  PROP_LANGUAGE
 };
 
 static void ogmrip_subp_codec_finalize     (GObject      *gobject);
@@ -75,12 +78,20 @@ ogmrip_subp_codec_class_init (OGMRipSubpCodecClass *klass)
            FALSE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_CHARSET,
-      g_param_spec_uint ("charset", "Charset property", "Set charset",
+      g_param_spec_uint ("character-set", "Charset property", "Set charset",
         0, OGMRIP_CHARSET_ASCII, 0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_NEWLINE,
-      g_param_spec_uint ("newline", "Newline property", "Set newline",
+      g_param_spec_uint ("newline-style", "Newline property", "Set newline",
         0, OGMRIP_NEWLINE_CR_LF, 0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_LABEL, 
+        g_param_spec_string ("label", "Label property", "Set label", 
+           NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_LANGUAGE, 
+        g_param_spec_uint ("language", "Language property", "Set language", 
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipSubpCodecPriv));
 }
@@ -94,9 +105,8 @@ ogmrip_subp_codec_init (OGMRipSubpCodec *subp)
 static void
 ogmrip_subp_codec_finalize (GObject *gobject)
 {
-  OGMRipSubpCodec *subp;
+  OGMRipSubpCodec *subp = OGMRIP_SUBP_CODEC (gobject);
 
-  subp = OGMRIP_SUBP_CODEC (gobject);
   if (subp->priv->label)
   {
     g_free (subp->priv->label);
@@ -109,9 +119,7 @@ ogmrip_subp_codec_finalize (GObject *gobject)
 static void
 ogmrip_subp_codec_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
 {
-  OGMRipSubpCodec *subp;
-
-  subp = OGMRIP_SUBP_CODEC (gobject);
+  OGMRipSubpCodec *subp = OGMRIP_SUBP_CODEC (gobject);
 
   switch (property_id) 
   {
@@ -124,6 +132,13 @@ ogmrip_subp_codec_set_property (GObject *gobject, guint property_id, const GValu
     case PROP_NEWLINE: 
       subp->priv->newline = g_value_get_uint (value);
       break;
+    case PROP_LABEL: 
+      g_free (subp->priv->label);
+      subp->priv->label = g_value_dup_string (value);
+      break;
+    case PROP_LANGUAGE: 
+      subp->priv->language = g_value_get_uint (value);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
@@ -133,9 +148,7 @@ ogmrip_subp_codec_set_property (GObject *gobject, guint property_id, const GValu
 static void
 ogmrip_subp_codec_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
 {
-  OGMRipSubpCodec *subp;
-
-  subp = OGMRIP_SUBP_CODEC (gobject);
+  OGMRipSubpCodec *subp = OGMRIP_SUBP_CODEC (gobject);
 
   switch (property_id) 
   {
@@ -147,6 +160,12 @@ ogmrip_subp_codec_get_property (GObject *gobject, guint property_id, GValue *val
       break;
     case PROP_NEWLINE:
       g_value_set_uint (value, subp->priv->newline);
+      break;
+    case PROP_LABEL:
+      g_value_set_string (value, subp->priv->label);
+      break;
+    case PROP_LANGUAGE:
+      g_value_set_uint (value, subp->priv->language);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -188,20 +207,20 @@ ogmrip_subp_codec_get_forced_only (OGMRipSubpCodec *subp)
 }
 
 /**
- * ogmrip_subp_codec_set_charset:
+ * ogmrip_subp_codec_set_character_set:
  * @subp: an #OGMRipSubpCodec
  * @charset: the #OGMRipCharset
  *
  * Sets the character set of text subtitles
  */
 void
-ogmrip_subp_codec_set_charset (OGMRipSubpCodec *subp, OGMRipCharset charset)
+ogmrip_subp_codec_set_character_set (OGMRipSubpCodec *subp, OGMRipCharset charset)
 {
   g_return_if_fail (OGMRIP_IS_SUBP_CODEC (subp));
 
   subp->priv->charset = charset;
 
-  g_object_notify (G_OBJECT (subp), "charset");
+  g_object_notify (G_OBJECT (subp), "character-set");
 }
 
 /**
@@ -213,7 +232,7 @@ ogmrip_subp_codec_set_charset (OGMRipSubpCodec *subp, OGMRipCharset charset)
  * Returns: an #OGMRipCharset, or -1
  */
 gint
-ogmrip_subp_codec_get_charset (OGMRipSubpCodec *subp)
+ogmrip_subp_codec_get_character_set (OGMRipSubpCodec *subp)
 { 
   g_return_val_if_fail (OGMRIP_IS_SUBP_CODEC (subp), -1);
       
@@ -221,24 +240,24 @@ ogmrip_subp_codec_get_charset (OGMRipSubpCodec *subp)
 } 
     
 /**
- * ogmrip_subp_codec_set_newline:
+ * ogmrip_subp_codec_set_newline_style:
  * @subp: an #OGMRipSubpCodec
  * @newline: the #OGMRipNewline
  *
  * Sets the end-of-line characters of text subtitles
  */
 void
-ogmrip_subp_codec_set_newline (OGMRipSubpCodec *subp, OGMRipNewline newline)
+ogmrip_subp_codec_set_newline_style (OGMRipSubpCodec *subp, OGMRipNewline newline)
 { 
   g_return_if_fail (OGMRIP_IS_SUBP_CODEC (subp));
 
   subp->priv->newline = newline;
 
-  g_object_notify (G_OBJECT (subp), "newline");
+  g_object_notify (G_OBJECT (subp), "newline-style");
 }
 
 /**
- * ogmrip_subp_codec_get_newline:
+ * ogmrip_subp_codec_get_newline_style:
  * @subp: an #OGMRipSubpCodec
  *
  * Gets the end-of-line characters of text subtitles
@@ -246,7 +265,7 @@ ogmrip_subp_codec_set_newline (OGMRipSubpCodec *subp, OGMRipNewline newline)
  * Returns: the #OGMRipNewline, or -1
  */
 gint
-ogmrip_subp_codec_get_newline (OGMRipSubpCodec *subp) 
+ogmrip_subp_codec_get_newline_style (OGMRipSubpCodec *subp) 
 {
   g_return_val_if_fail (OGMRIP_IS_SUBP_CODEC (subp), -1);
 
@@ -273,6 +292,8 @@ ogmrip_subp_codec_set_label (OGMRipSubpCodec *subp, const gchar *label)
 
   if (label)
     subp->priv->label = g_strdup (label);
+
+  g_object_notify (G_OBJECT (subp), "label");
 }
 
 /**
@@ -289,5 +310,38 @@ ogmrip_subp_codec_get_label (OGMRipSubpCodec *subp)
   g_return_val_if_fail (OGMRIP_IS_SUBP_CODEC (subp), NULL);
 
   return subp->priv->label;
+}
+
+/**
+ * ogmrip_subp_codec_set_language:
+ * @subp: an #OGMRipSubpCodec
+ * @language: the language
+ *
+ * Sets the language of the track.
+ */
+void
+ogmrip_subp_codec_set_language (OGMRipSubpCodec *subp, guint language)
+{
+  g_return_if_fail (OGMRIP_IS_SUBP_CODEC (subp));
+
+  subp->priv->language = language;
+
+  g_object_notify (G_OBJECT (subp), "language");
+}
+
+/**
+ * ogmrip_subp_codec_get_language:
+ * @subp: an #OGMRipSubpCodec
+ *
+ * Gets the language of the track.
+ *
+ * Returns: the language
+ */
+gint
+ogmrip_subp_codec_get_language (OGMRipSubpCodec *subp)
+{
+  g_return_val_if_fail (OGMRIP_IS_SUBP_CODEC (subp), -1);
+
+  return subp->priv->language;
 }
 

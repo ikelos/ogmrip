@@ -77,11 +77,11 @@ gint          ogmrip_container_get_overhead    (OGMRipContainer     *container);
 void          ogmrip_container_add_file        (OGMRipContainer     *container,
                                                 const gchar         *filename,
                                                 OGMRipFormatType    format,
-                                                const gchar         *name,
+                                                const gchar         *label,
                                                 guint               language);
 void          ogmrip_container_remove_file     (OGMRipContainer     *container,
                                                 const gchar         *filename);
-GSList *      ogmrip_container_get_files       (OGMRipContainer     *container);
+GList *       ogmrip_container_get_files       (OGMRipContainer     *container);
 OGMRipFile *  ogmrip_container_get_nth_file    (OGMRipContainer     *container,
                                                 gint                n);
 gint          ogmrip_container_get_n_files     (OGMRipContainer     *container);
