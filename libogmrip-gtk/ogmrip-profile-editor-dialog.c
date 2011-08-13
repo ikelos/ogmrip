@@ -232,12 +232,9 @@ ogmrip_profile_editor_dialog_set_user_entry_visibility (GtkWidget *chooser, GtkT
 static gboolean
 ogmrip_profile_editor_set_expand_sensitivity (GValue *value, GVariant *variant, gpointer settings)
 {
-  guint width, height;
-
-  g_settings_get (settings, OGMRIP_PROFILE_MAX_WIDTH, "u", &width);
-  g_settings_get (settings, OGMRIP_PROFILE_MAX_HEIGHT, "u", &height);
-
-  g_value_set_boolean (value, width > 0 && height > 0);
+  g_value_set_boolean (value,
+      g_settings_get_uint (settings, OGMRIP_PROFILE_MAX_WIDTH) > 0 &&
+      g_settings_get_uint (settings, OGMRIP_PROFILE_MAX_HEIGHT) > 0);
 
   return TRUE;
 }
