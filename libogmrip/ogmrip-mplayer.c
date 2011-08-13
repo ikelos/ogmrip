@@ -1188,13 +1188,8 @@ static void
 ogmrip_mencoder_container_foreach_file (OGMRipContainer *container,
     const gchar *filename, OGMRipFormatType format, const gchar *name, guint lang, GPtrArray *argv)
 {
-  /*
-   * TODO check audio format
-   */
-/*
-  if (ogmrip_file_get_type (file) == OGMRIP_FILE_TYPE_AUDIO)
+  if (OGMRIP_IS_AUDIO_FORMAT (format))
   {
-*/
     gint demuxer;
 
     demuxer = ogmrip_mplayer_audio_file_get_demuxer (format);
@@ -1217,9 +1212,7 @@ ogmrip_mencoder_container_foreach_file (OGMRipContainer *container,
 
       g_free (s1);
     }
-/*
   }
-*/
 }
 
 /**
