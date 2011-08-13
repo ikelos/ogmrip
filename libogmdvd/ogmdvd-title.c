@@ -37,10 +37,17 @@
 #include "ogmdvd-reader.h"
 #include "ogmdvd-parser.h"
 
-#include <stdio.h>
 #include <ogmjob.h>
 
 #include <glib/gi18n-lib.h>
+#include <glib/gstdio.h>
+
+typedef struct
+{
+  OGMDvdTitle *title;
+  OGMDvdTitleCallback callback;
+  gpointer user_data;
+} OGMDvdProgress;
 
 /**
  * ogmdvd_title_ref:
@@ -394,12 +401,12 @@ ogmdvd_stream_find_by_nr (OGMDvdStream *stream, guint nr)
 OGMDvdAudioStream *
 ogmdvd_title_get_nth_audio_stream (OGMDvdTitle *title, guint nr)
 {
-  GSList *link;
+  GList *link;
 
   g_return_val_if_fail (title != NULL, NULL);
   g_return_val_if_fail (nr < title->nr_of_audio_streams, NULL);
 
-  link = g_slist_find_custom (title->audio_streams, GUINT_TO_POINTER (nr), (GCompareFunc) ogmdvd_stream_find_by_nr);
+  link = g_list_find_custom (title->audio_streams, GUINT_TO_POINTER (nr), (GCompareFunc) ogmdvd_stream_find_by_nr);
   if (!link)
     return NULL;
 
@@ -412,41 +419,14 @@ ogmdvd_title_get_nth_audio_stream (OGMDvdTitle *title, guint nr)
  *
  * Returns a list of audio stream.
  *
- * Returns: The #GSList, or NULL
+ * Returns: The #GList, or NULL
  */
-GSList *
+GList *
 ogmdvd_title_get_audio_streams (OGMDvdTitle *title)
 {
   g_return_val_if_fail (title != NULL, NULL);
 
-  g_slist_foreach (title->audio_streams, (GFunc) ogmdvd_stream_ref, NULL);
-
-  return g_slist_copy (title->audio_streams);;
-}
-
-/**
- * ogmdvd_title_find_audio_stream:
- * @title: An #OGMDvdTitle
- * @func: A #GCompareFunc
- * @data: The data to pass to @func
- *
- * Searches for an audio stream with custom criteria.
- *
- * Returns: An #OGMDvdAudioStream, or NULL
- */
-OGMDvdAudioStream *
-ogmdvd_title_find_audio_stream (OGMDvdTitle *title, GCompareFunc func, gpointer data)
-{
-  GSList *link;
-
-  g_return_val_if_fail (title != NULL, NULL);
-  g_return_val_if_fail (func != NULL, NULL);
-
-  link = g_slist_find_custom (title->audio_streams, data, func);
-  if (!link)
-    return NULL;
-
-  return link->data;
+  return g_list_copy (title->audio_streams);;
 }
 
 /**
@@ -477,12 +457,12 @@ ogmdvd_title_get_n_subp_streams (OGMDvdTitle *title)
 OGMDvdSubpStream *
 ogmdvd_title_get_nth_subp_stream (OGMDvdTitle *title, guint nr)
 {
-  GSList *link;
+  GList *link;
 
   g_return_val_if_fail (title != NULL, NULL);
   g_return_val_if_fail (nr < title->nr_of_subp_streams, NULL);
 
-  link = g_slist_find_custom (title->subp_streams, GUINT_TO_POINTER (nr), (GCompareFunc) ogmdvd_stream_find_by_nr);
+  link = g_list_find_custom (title->subp_streams, GUINT_TO_POINTER (nr), (GCompareFunc) ogmdvd_stream_find_by_nr);
   if (!link)
     return NULL;
 
@@ -495,41 +475,14 @@ ogmdvd_title_get_nth_subp_stream (OGMDvdTitle *title, guint nr)
  *
  * Returns a list of subp stream.
  *
- * Returns: The #GSList, or NULL
+ * Returns: The #GList, or NULL
  */
-GSList *
+GList *
 ogmdvd_title_get_subp_streams (OGMDvdTitle *title)
 {
   g_return_val_if_fail (title != NULL, NULL);
 
-  g_slist_foreach (title->subp_streams, (GFunc) ogmdvd_stream_ref, NULL);
-
-  return g_slist_copy (title->subp_streams);
-}
-
-/**
- * ogmdvd_title_find_subp_stream:
- * @title: An #OGMDvdTitle
- * @func: A #GCompareFunc
- * @data: The data to pass to @func
- *
- * Searches for a subp stream with custom criteria.
- *
- * Returns: An #OGMDvdSubpStream, or NULL
- */
-OGMDvdSubpStream *
-ogmdvd_title_find_subp_stream (OGMDvdTitle *title, GCompareFunc func, gpointer data)
-{
-  GSList *link;
-
-  g_return_val_if_fail (title != NULL, NULL);
-  g_return_val_if_fail (func != NULL, NULL);
-
-  link = g_slist_find_custom (title->subp_streams, data, func);
-  if (!link)
-    return NULL;
-
-  return link->data;
+  return g_list_copy (title->subp_streams);
 }
 
 /**
@@ -842,20 +795,44 @@ ogmdvd_title_crop_watch (OGMJobExec *exec, const gchar *buffer, OGMDvdCrop *info
   return -1.0;
 }
 
-gboolean
-ogmdvd_title_analyze (OGMDvdTitle *title)
+static void
+ogmdvd_title_analyze_progress_cb (OGMJobSpawn *spawn, gdouble fraction, OGMDvdProgress *progress)
 {
-  OGMJobSpawn *spawn;
+  progress->callback (progress->title, fraction / 2, progress->user_data);
+}
+
+static void
+ogmdvd_title_crop_progress_cb (OGMJobSpawn *spawn, gdouble fraction, OGMDvdProgress *progress)
+{
+  progress->callback (progress->title, 0.5 + fraction / 2, progress->user_data);
+}
+
+gboolean
+ogmdvd_title_analyze (OGMDvdTitle *title, OGMDvdTitleCallback callback, gpointer user_data, GError **error)
+{
+  OGMJobSpawn *spawn, *queue;
+  OGMDvdProgress progress;
   OGMDvdAnalyze analyze;
   OGMDvdCrop crop;
 
   gdouble length, start, step;
+  gboolean is_open;
   gchar **argv;
+  gint result;
 
   g_return_val_if_fail (title != NULL, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   if (title->analyzed)
     return TRUE;
+
+  is_open = ogmdvd_title_is_open (title);
+  if (!is_open && !ogmdvd_title_open (title, error))
+    return FALSE;
+
+  progress.title = title;
+  progress.callback = callback;
+  progress.user_data = user_data;
 
   memset (&analyze, 0, sizeof (OGMDvdAnalyze));
   analyze.nframes = 500;
@@ -866,8 +843,19 @@ ogmdvd_title_analyze (OGMDvdTitle *title)
   ogmjob_exec_add_watch_full (OGMJOB_EXEC (spawn),
       (OGMJobWatch) ogmdvd_title_analyze_watch, &analyze, TRUE, FALSE, FALSE);
 
-  ogmjob_spawn_run (spawn, NULL);
+  if (callback)
+    g_signal_connect (spawn, "progress",
+        G_CALLBACK (ogmdvd_title_analyze_progress_cb), &progress);
+
+  result = ogmjob_spawn_run (spawn, error);
   g_object_unref (spawn);
+
+  if (result != OGMJOB_RESULT_SUCCESS)
+  {
+    if (!is_open)
+      ogmdvd_title_close (title);
+    return FALSE;
+  }
 
   if (analyze.nsections > 0)
   {
@@ -917,6 +905,12 @@ ogmdvd_title_analyze (OGMDvdTitle *title)
   length = ogmdvd_title_get_length (title, NULL);
   step = length / 5.;
 
+  queue = ogmjob_queue_new ();
+
+  if (callback)
+    g_signal_connect (queue, "progress",
+        G_CALLBACK (ogmdvd_title_crop_progress_cb), &progress);
+
   for (start = step; start < length; start += step)
   {
     argv = ogmdvd_title_crop_command (title, start, crop.nframes);
@@ -925,8 +919,18 @@ ogmdvd_title_analyze (OGMDvdTitle *title)
     ogmjob_exec_add_watch_full (OGMJOB_EXEC (spawn),
         (OGMJobWatch) ogmdvd_title_crop_watch, &crop, TRUE, FALSE, FALSE);
 
-    ogmjob_spawn_run (spawn, NULL);
+    ogmjob_container_add (OGMJOB_CONTAINER (queue), spawn);
     g_object_unref (spawn);
+  }
+
+  result = ogmjob_spawn_run (queue, error);
+  g_object_unref (queue);
+
+  if (result != OGMJOB_RESULT_SUCCESS)
+  {
+    if (!is_open)
+      ogmdvd_title_close (title);
+    return FALSE;
   }
 
   title->video_stream->crop_x = g_ulist_get_most_frequent (crop.x);
@@ -940,6 +944,14 @@ ogmdvd_title_analyze (OGMDvdTitle *title)
 
   title->video_stream->crop_h = g_ulist_get_most_frequent (crop.h);
   g_ulist_free (crop.h);
+
+  if (!title->video_stream->crop_w)
+    ogmdvd_video_stream_get_resolution (title->video_stream, &title->video_stream->crop_w, NULL);
+
+  if (!title->video_stream->crop_h)
+    ogmdvd_video_stream_get_resolution (title->video_stream, NULL, &title->video_stream->crop_h);
+
+  ogmdvd_title_close (title);
 
   title->analyzed = TRUE;
 

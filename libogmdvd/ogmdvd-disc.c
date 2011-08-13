@@ -31,6 +31,9 @@
 #include "ogmdvd-priv.h"
 #include "ogmdvd-enums.h"
 #include "ogmdvd-title.h"
+#include "ogmdvd-video.h"
+
+#include <ogmjob.h>
 
 #include <sys/ioctl.h>
 #include <sys/types.h>
@@ -42,6 +45,7 @@
 
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
+#include <gio/gio.h>
 
 #if defined(__FreeBSD__) || defined(__NetBSD__)
 #include <sys/cdio.h>
@@ -57,6 +61,13 @@
 #ifdef __linux__
 #include <linux/cdrom.h>
 #endif /* __linux__ */
+
+typedef struct
+{
+  OGMDvdDisc *disc;
+  OGMDvdDiscCallback callback;
+  gpointer user_data;
+} OGMDvdProgress;
 
 #ifndef HAVE_DVD_FILE_SIZE
 uint32_t UDFFindFile( dvd_reader_t *device, char *filename, uint32_t *size );
@@ -319,6 +330,8 @@ ogmdvd_video_stream_new (OGMDvdTitle *title, ifo_handle_t *vts_file)
   stream->display_aspect_ratio = attr->display_aspect_ratio;
   stream->permitted_df = attr->permitted_df;
 
+  ogmdvd_video_stream_get_resolution (stream, &stream->crop_w, &stream->crop_h);
+
   return stream;
 }
 
@@ -439,7 +452,7 @@ ogmdvd_title_new (OGMDvdDisc *disc, dvd_reader_t *reader, ifo_handle_t *vmg_file
     {
       stream = ogmdvd_audio_stream_new (title, vts_file, title->nr_of_audio_streams, i);
       if (stream)
-        title->audio_streams = g_slist_append (title->audio_streams, stream);
+        title->audio_streams = g_list_append (title->audio_streams, stream);
       title->nr_of_audio_streams ++;
     }
   }
@@ -450,7 +463,7 @@ ogmdvd_title_new (OGMDvdDisc *disc, dvd_reader_t *reader, ifo_handle_t *vmg_file
     {
       stream = ogmdvd_subp_stream_new (title, vts_file, title->nr_of_subp_streams, i);
       if (stream)
-        title->subp_streams = g_slist_append (title->subp_streams, stream);
+        title->subp_streams = g_list_append (title->subp_streams, stream);
       title->nr_of_subp_streams ++;
     }
   }
@@ -477,15 +490,15 @@ ogmdvd_title_free (OGMDvdTitle *title)
 
   if (title->audio_streams)
   {
-    g_slist_foreach (title->audio_streams, (GFunc) g_free, NULL);
-    g_slist_free (title->audio_streams);
+    g_list_foreach (title->audio_streams, (GFunc) g_free, NULL);
+    g_list_free (title->audio_streams);
     title->audio_streams = NULL;
   }
 
   if (title->subp_streams)
   {
-    g_slist_foreach (title->subp_streams, (GFunc) g_free, NULL);
-    g_slist_free (title->subp_streams);
+    g_list_foreach (title->subp_streams, (GFunc) g_free, NULL);
+    g_list_free (title->subp_streams);
     title->subp_streams = NULL;
   }
 
@@ -570,15 +583,27 @@ ogmdvd_disc_free (OGMDvdDisc *disc)
 
   if (disc->titles)
   {
-    g_slist_foreach (disc->titles, (GFunc) ogmdvd_title_free, NULL);
-    g_slist_free (disc->titles);
+    g_list_foreach (disc->titles, (GFunc) ogmdvd_title_free, NULL);
+    g_list_free (disc->titles);
     disc->titles = NULL;
+  }
+
+  if (disc->monitor)
+  {
+    g_object_unref (disc->monitor);
+    disc->monitor = NULL;
   }
 
   if (disc->device)
   {
     g_free (disc->device);
     disc->device = NULL;
+  }
+
+  if (disc->orig_device)
+  {
+    g_free (disc->orig_device);
+    disc->orig_device = NULL;
   }
 
   if (disc->label)
@@ -660,7 +685,7 @@ ogmdvd_disc_new (const gchar *device, GError **error)
   {
     title = ogmdvd_title_new (disc, reader, vmg_file, nr);
     if (title)
-      disc->titles = g_slist_append (disc->titles, title);
+      disc->titles = g_list_append (disc->titles, title);
   }
 
   disc->vmg_size = dvd_reader_get_vts_size (reader, 0);
@@ -894,12 +919,12 @@ ogmdvd_title_find_by_nr (OGMDvdTitle *title, guint nr)
 OGMDvdTitle *
 ogmdvd_disc_get_nth_title (OGMDvdDisc *disc, guint nr)
 {
-  GSList *link;
+  GList *link;
 
   g_return_val_if_fail (disc != NULL, NULL);
   g_return_val_if_fail (nr >= 0 && nr < disc->ntitles, NULL);
 
-  link = g_slist_find_custom (disc->titles, GUINT_TO_POINTER (nr), (GCompareFunc) ogmdvd_title_find_by_nr);
+  link = g_list_find_custom (disc->titles, GUINT_TO_POINTER (nr), (GCompareFunc) ogmdvd_title_find_by_nr);
   if (!link)
     return NULL;
 
@@ -912,15 +937,143 @@ ogmdvd_disc_get_nth_title (OGMDvdDisc *disc, guint nr)
  *
  * Returns a list of all the titles of @disc.
  *
- * Returns: A #GSList, or NULL
+ * Returns: A #GList, or NULL
  */
-GSList *
+GList *
 ogmdvd_disc_get_titles (OGMDvdDisc *disc)
 {
   g_return_val_if_fail (disc != NULL, NULL);
 
-  g_slist_foreach (disc->titles, (GFunc) ogmdvd_title_ref, NULL);
+  return g_list_copy (disc->titles);;
+}
 
-  return g_slist_copy (disc->titles);;
+static gchar **
+ogmdvd_disc_copy_command (OGMDvdDisc *disc, const gchar *path)
+{
+  GPtrArray *argv;
+  const gchar *device;
+/*
+  gint vid;
+*/
+  argv = g_ptr_array_new ();
+  g_ptr_array_add (argv, g_strdup ("dvdcpy"));
+  g_ptr_array_add (argv, g_strdup ("-s"));
+  g_ptr_array_add (argv, g_strdup ("skip"));
+  g_ptr_array_add (argv, g_strdup ("-o"));
+  g_ptr_array_add (argv, g_strdup (path));
+  g_ptr_array_add (argv, g_strdup ("-m"));
+/*
+  vid = ogmdvd_title_get_nr (title);
+  g_ptr_array_add (argv, g_strdup ("-t"));
+  g_ptr_array_add (argv, g_strdup_printf ("%d", vid + 1));
+*/
+  device = ogmdvd_disc_get_device (disc);
+  g_ptr_array_add (argv, g_strdup (device));
+
+  g_ptr_array_add (argv, NULL);
+
+  return (gchar **) g_ptr_array_free (argv, FALSE);
+}
+
+static gdouble
+ogmdvd_disc_copy_watch (OGMJobExec *exec, const gchar *buffer, gpointer data)
+{
+  guint bytes, total, percent;
+
+  if (sscanf (buffer, "%u/%u blocks written (%u%%)", &bytes, &total, &percent) == 3)
+    return percent / 100.;
+
+  return -1;
+}
+
+static void
+ogmdvd_disc_copy_progress_cb (OGMJobSpawn *spawn, gdouble fraction, OGMDvdProgress *progress)
+{
+  progress->callback (progress->disc, fraction, progress->user_data);
+}
+
+static void
+ogmdvd_disc_device_changed_cb (GFileMonitor *monitor, GFile *file, GFile *other_file, GFileMonitorEvent event_type, OGMDvdDisc *disc)
+{
+  if (event_type == G_FILE_MONITOR_EVENT_DELETED)
+  {
+    g_free (disc->device);
+    disc->device = disc->orig_device;
+    disc->orig_device = NULL;
+
+    g_object_unref (monitor);
+  }
+}
+
+gboolean
+ogmdvd_disc_copy (OGMDvdDisc *disc, const gchar *path, OGMDvdDiscCallback callback, gpointer user_data, GError **error)
+{
+  OGMJobSpawn *spawn;
+  GFile *file;
+
+  struct stat buf;
+  const gchar *device;
+  gboolean is_open;
+  gchar **argv;
+  gint result;
+
+  g_return_val_if_fail (disc != NULL, FALSE);
+  g_return_val_if_fail (path != NULL, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  device = ogmdvd_disc_get_device (disc);
+  if (g_stat (device, &buf) != 0)
+    return FALSE;
+
+  if (!S_ISBLK (buf.st_mode))
+    return TRUE;
+
+  is_open = ogmdvd_disc_is_open (disc);
+  if (!is_open && !ogmdvd_disc_open (disc, error))
+    return FALSE;
+
+  argv = ogmdvd_disc_copy_command (disc, path);
+
+  spawn = ogmjob_exec_newv (argv);
+  ogmjob_exec_add_watch_full (OGMJOB_EXEC (spawn),
+      (OGMJobWatch) ogmdvd_disc_copy_watch, NULL, TRUE, FALSE, FALSE);
+
+  if (callback)
+  {
+    OGMDvdProgress progress;
+
+    progress.disc = disc;
+    progress.callback = callback;
+    progress.user_data = user_data;
+
+    g_signal_connect (spawn, "progress",
+        G_CALLBACK (ogmdvd_disc_copy_progress_cb), &progress);
+  }
+
+  result = ogmjob_spawn_run (spawn, error);
+  g_object_unref (spawn);
+
+  if (!is_open)
+    ogmdvd_disc_close (disc);
+
+  if (result != OGMJOB_RESULT_SUCCESS)
+    return FALSE;
+
+  if (disc->orig_device)
+    g_free (disc->orig_device);
+  disc->orig_device = disc->device;
+  disc->device = g_strdup (path);
+
+  if (disc->monitor)
+    g_object_unref (disc->monitor);
+
+  file = g_file_new_for_path (path);
+  disc->monitor = g_file_monitor_file (file, G_FILE_MONITOR_NONE, NULL, NULL);
+  g_object_unref (file);
+
+  g_signal_connect (disc->monitor, "changed",
+      G_CALLBACK (ogmdvd_disc_device_changed_cb), disc);
+
+  return TRUE;
 }
 

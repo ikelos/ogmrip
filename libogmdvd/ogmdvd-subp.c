@@ -63,15 +63,15 @@ ogmdvd_subp_stream_get_language (OGMDvdSubpStream *subp)
 }
 
 /**
- * ogmdvd_subp_stream_get_name:
+ * ogmdvd_subp_stream_get_label:
  * @subp: An #OGMDvdSubpStream
  *
- * Returns the name of the subp stream.
+ * Returns the label of the subp stream.
  *
- * Returns: the name, or NULL
+ * Returns: the label, or NULL
  */
 const gchar *
-ogmdvd_subp_stream_get_name (OGMDvdSubpStream *subp)
+ogmdvd_subp_stream_get_label (OGMDvdSubpStream *subp)
 {
   g_return_val_if_fail (subp != NULL, NULL);
 

@@ -27,6 +27,8 @@
 #include <stdint.h>
 #endif
 
+#include <gio/gio.h>
+
 #include <dvdread/ifo_types.h>
 #include <dvdread/ifo_read.h>
 
@@ -41,16 +43,19 @@ struct _OGMDvdDisc
 {
   guint ref;
   gchar *device;
+  gchar *orig_device;
   gchar *label;
   gchar *id;
 
   guint ntitles;
-  GSList *titles;
+  GList *titles;
 
   guint64 vmg_size;
 
   dvd_reader_t *reader;
   ifo_handle_t *vmg_file;
+
+  GFileMonitor *monitor;
 };
 
 /**
@@ -67,10 +72,10 @@ struct _OGMDvdTitle
   OGMDvdVideoStream *video_stream;
 
   guint8 nr_of_audio_streams;
-  GSList *audio_streams;
+  GList *audio_streams;
 
   guint8 nr_of_subp_streams;
-  GSList *subp_streams;
+  GList *subp_streams;
 
   gulong *length_of_chapters;
   guint8 nr_of_chapters;

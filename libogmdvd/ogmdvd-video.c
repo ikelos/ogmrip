@@ -73,34 +73,40 @@ ogmdvd_video_stream_get_framerate (OGMDvdVideoStream *stream, guint *numerator, 
 void
 ogmdvd_video_stream_get_resolution (OGMDvdVideoStream *stream, guint *width, guint *height)
 {
-  g_return_if_fail (stream != NULL);
-  g_return_if_fail (width != NULL);
-  g_return_if_fail (height != NULL);
+  guint w, h;
 
-  *width = 0;
-  *height = 480;
+  g_return_if_fail (stream != NULL);
+
+  w = 0;
+  h = 480;
   if (stream->video_format != 0)
-    *height = 576;
+    h = 576;
 
   switch (stream->picture_size)
   {
     case 0:
-      *width = 720;
+      w = 720;
       break;
     case 1:
-      *width = 704;
+      w = 704;
       break;
     case 2:
-      *width = 352;
+      w = 352;
       break;
     case 3:
-      *width = 352;
-      *width /= 2;
+      w = 352;
+      w /= 2;
       break;
     default:
       g_assert_not_reached ();
       break;
   }
+
+  if (width)
+    *width = w;
+
+  if (height)
+    *height = h;
 }
 
 void
