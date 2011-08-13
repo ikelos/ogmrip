@@ -20,9 +20,8 @@
 #include "config.h"
 #endif
 
-#include "ogmrip-container.h"
-#include "ogmrip-plugin.h"
-#include "ogmjob-exec.h"
+#include <ogmjob.h>
+#include <ogmrip.h>
 
 #include <math.h>
 #include <unistd.h>
@@ -83,6 +82,7 @@ ogmrip_ogg_split_watch (OGMJobExec *exec, const gchar *buffer, OGMRipContainer *
 static gchar *
 ogmrip_ogg_get_sync (OGMRipContainer *container)
 {
+/*
   guint start_delay;
 
   start_delay = ogmrip_container_get_start_delay (container);
@@ -111,7 +111,7 @@ ogmrip_ogg_get_sync (OGMRipContainer *container)
 
     return buf;
   }
-
+*/
   return NULL;
 }
 
@@ -149,49 +149,41 @@ ogmrip_ogg_merge_append_audio_file (OGMRipContainer *ogg,
 
 static void
 ogmrip_ogg_merge_append_subp_file (OGMRipContainer *ogg, 
-    const gchar *filename, guint demuxer, gint language, GPtrArray *argv)
+    const gchar *filename, gint language, GPtrArray *argv)
 {
   struct stat buf;
 
   if (g_stat (filename, &buf) == 0 && buf.st_size > 0)
   {
-    if (demuxer != OGMRIP_SUBP_DEMUXER_VOBSUB)
+    if (language > -1)
     {
-      if (language > -1)
-      {
-        g_ptr_array_add (argv, g_strdup ("-c"));
-        g_ptr_array_add (argv, g_strdup_printf ("LANGUAGE=%s",
-              g_strdup (ogmdvd_get_language_label (language))));
-      }
-
-      g_ptr_array_add (argv, g_strdup ("--novideo"));
-      g_ptr_array_add (argv, g_strdup ("--noaudio"));
-
-      g_ptr_array_add (argv, g_strdup (filename));
+      g_ptr_array_add (argv, g_strdup ("-c"));
+      g_ptr_array_add (argv, g_strdup_printf ("LANGUAGE=%s",
+            g_strdup (ogmdvd_get_language_label (language))));
     }
+
+    g_ptr_array_add (argv, g_strdup ("--novideo"));
+    g_ptr_array_add (argv, g_strdup ("--noaudio"));
+
+    g_ptr_array_add (argv, g_strdup (filename));
   }
 }
 
 static void
-ogmrip_ogg_merge_foreach_audio (OGMRipContainer *ogg, 
-    OGMRipCodec *codec, guint demuxer, gint language, GPtrArray *argv)
+ogmrip_ogg_merge_foreach_file (OGMRipContainer *ogg, const gchar *filename,
+    OGMRipFormatType format, const gchar *name, guint language, GPtrArray *argv)
 {
-  const gchar *input;
-
-  input = ogmrip_codec_get_output (codec);
-  ogmrip_ogg_merge_append_audio_file (ogg, input, language, argv);
+  if (OGMRIP_IS_VIDEO_FORMAT (format))
+  {
+    g_ptr_array_add (argv, g_strdup ("--noaudio"));
+    g_ptr_array_add (argv, g_strdup (filename));
+  }
+  else if (OGMRIP_IS_AUDIO_FORMAT (format))
+    ogmrip_ogg_merge_append_audio_file (ogg, filename, language, argv);
+  else if (OGMRIP_IS_SUBP_FORMAT (format))
+    ogmrip_ogg_merge_append_subp_file (ogg, filename, language, argv);
 }
-
-static void
-ogmrip_ogg_merge_foreach_subp (OGMRipContainer *ogg, 
-    OGMRipCodec *codec, guint demuxer, gint language, GPtrArray *argv)
-{
-  const gchar *input;
-
-  input = ogmrip_codec_get_output (codec);
-  ogmrip_ogg_merge_append_subp_file (ogg, input, demuxer, language, argv);
-}
-
+/*
 #if (defined(GLIB_SIZEOF_SIZE_T) && GLIB_SIZEOF_SIZE_T == 4)
 static void
 ogmrip_ogg_merge_foreach_chapters (OGMRipContainer *ogg, 
@@ -217,41 +209,12 @@ ogmrip_ogg_merge_foreach_chapters (OGMRipContainer *ogg,
   }
 }
 #endif
-
-static void
-ogmrip_ogg_merge_foreach_file (OGMRipContainer *ogg, OGMRipFile *file, GPtrArray *argv)
-{
-  gchar *filename;
-
-  filename = ogmrip_file_get_filename (file);
-  if (filename)
-  {
-    gint lang;
-
-    lang = ogmrip_file_get_language (file);
-
-    switch (ogmrip_file_get_type (file))
-    {
-      case OGMRIP_FILE_TYPE_AUDIO:
-        ogmrip_ogg_merge_append_audio_file (ogg, filename, lang, argv);
-        break;
-      case OGMRIP_FILE_TYPE_SUBP:
-        ogmrip_ogg_merge_append_subp_file (ogg, filename, OGMRIP_SUBP_DEMUXER_AUTO, lang, argv);
-        break;
-      default:
-        g_assert_not_reached ();
-        break;
-    }
-  }
-  g_free (filename);
-}
-
+*/
 static gchar **
 ogmrip_ogg_merge_command (OGMRipContainer *ogg, const gchar *output)
 {
   GPtrArray *argv;
-  OGMRipVideoCodec *video;
-  const gchar *label, *fourcc, *filename;
+  const gchar *label, *fourcc;
 
   if (!output)
     output = ogmrip_container_get_output (ogg);
@@ -277,27 +240,17 @@ ogmrip_ogg_merge_command (OGMRipContainer *ogg, const gchar *output)
     g_ptr_array_add (argv, g_strdup_printf ("TITLE=%s", label));
   }
 
-  if ((video = ogmrip_container_get_video (ogg)))
-  {
-    filename = ogmrip_codec_get_output (OGMRIP_CODEC (video));
-
-    g_ptr_array_add (argv, g_strdup ("--noaudio"));
-    g_ptr_array_add (argv, g_strdup (filename));
-  }
-
-  ogmrip_container_foreach_audio (ogg, 
-      (OGMRipContainerCodecFunc) ogmrip_ogg_merge_foreach_audio, argv);
-  ogmrip_container_foreach_subp (ogg, 
-      (OGMRipContainerCodecFunc) ogmrip_ogg_merge_foreach_subp, argv);
   ogmrip_container_foreach_file (ogg,
-      (OGMRipContainerFileFunc) ogmrip_ogg_merge_foreach_file, argv);
+      (OGMRipContainerFunc) ogmrip_ogg_merge_foreach_file, argv);
 
 #if (defined(GLIB_SIZEOF_SIZE_T) && GLIB_SIZEOF_SIZE_T == 4)
   /*
    * ogmmerge segfaults when merging chapters on platforms other than 32-bit
    */
+/*
   ogmrip_container_foreach_chapters (ogg, 
       (OGMRipContainerCodecFunc) ogmrip_ogg_merge_foreach_chapters, argv);
+*/
 #endif
 
   g_ptr_array_add (argv, NULL);
@@ -362,16 +315,7 @@ ogmrip_ogg_run (OGMJobSpawn *spawn)
   ogmrip_container_get_split (OGMRIP_CONTAINER (spawn), &tnumber, NULL);
   if (tnumber > 1)
   {
-    OGMRipVideoCodec *video;
-    const gchar *tmpname;
-    gchar *dirname;
-
-    video = ogmrip_container_get_video (OGMRIP_CONTAINER (spawn));
-    tmpname = ogmrip_codec_get_output (OGMRIP_CODEC (video));
-    dirname = g_path_get_dirname (tmpname);
-
-    file = g_build_filename (dirname, "merge.XXXXXX", NULL);
-    g_free (dirname);
+    file = g_build_filename (ogmrip_fs_get_tmp_dir (), "merge.XXXXXX", NULL);
 
     fd = g_mkstemp (file);
     if (fd < 0)

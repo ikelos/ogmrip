@@ -20,13 +20,8 @@
 #include "config.h"
 #endif
 
-#include "ogmrip-container.h"
-#include "ogmrip-plugin.h"
-#include "ogmrip-fs.h"
-#include "ogmrip-version.h"
-
-#include "ogmjob-exec.h"
-#include "ogmjob-queue.h"
+#include <ogmjob.h>
+#include <ogmrip.h>
 
 #include <string.h>
 #include <unistd.h>
@@ -54,42 +49,35 @@ struct _OGMRipAviClass
   OGMRipContainerClass parent_class;
 };
 
+enum
+{
+  PROP_0,
+  PROP_OVERHEAD
+};
+
 GType ogmrip_avi_get_type (void);
-static gint ogmrip_avi_run (OGMJobSpawn *spawn);
-static gint ogmrip_avi_get_overhead (OGMRipContainer *container);
+static void ogmrip_avi_get_property (GObject     *gobject,
+                                     guint       property_id,
+                                     GValue      *value,
+                                     GParamSpec  *pspec);
+static gint ogmrip_avi_run          (OGMJobSpawn *spawn);
 
 static void
-ogmrip_avi_append_audio_file (OGMRipContainer *avi, const gchar *filename, GPtrArray *argv)
+ogmrip_avi_foreach_file (OGMRipContainer *avi, const gchar *filename,
+    OGMRipFormatType format, const gchar *name, guint language, GPtrArray *argv)
 {
-  struct stat buf;
-
-  if (g_stat (filename, &buf) == 0 && buf.st_size > 0)
-    g_ptr_array_add (argv, g_strdup (filename));
-}
-
-static void
-ogmrip_avi_foreach_audio (OGMRipContainer *avi, 
-    OGMRipCodec *codec, guint demuxer, gint language, GPtrArray *argv)
-{
-  const gchar *input;
-
-  input = ogmrip_codec_get_output (codec);
-  ogmrip_avi_append_audio_file (avi, input, argv);
-}
-
-static void
-ogmrip_avi_foreach_file (OGMRipContainer *avi, OGMRipFile *file, GPtrArray *argv)
-{
-  if (ogmrip_file_get_type (file) == OGMRIP_FILE_TYPE_AUDIO)
+  if (OGMRIP_IS_VIDEO_FORMAT (format) || OGMRIP_IS_AUDIO_FORMAT (format))
   {
-    gchar *filename;
+    struct stat buf;
 
-    filename = ogmrip_file_get_filename (file);
-    if (filename)
+    if (OGMRIP_IS_VIDEO_FORMAT (format))
     {
-      ogmrip_avi_append_audio_file (avi, filename, argv);
-      g_free (filename);
+      g_ptr_array_add (argv, g_strdup ("-n"));
+      g_ptr_array_add (argv, g_strdup ("-i"));
     }
+
+    if (g_stat (filename, &buf) == 0 && buf.st_size > 0)
+      g_ptr_array_add (argv, g_strdup (filename));
   }
 }
 
@@ -97,8 +85,7 @@ static gchar **
 ogmrip_avi_command (OGMRipContainer *avi, GError **error)
 {
   GPtrArray *argv;
-  OGMRipVideoCodec *video;
-  const gchar *output, *filename, *fourcc;
+  const gchar *output, *fourcc;
   guint tsize, tnumber;
 
   argv = g_ptr_array_new ();
@@ -108,19 +95,8 @@ ogmrip_avi_command (OGMRipContainer *avi, GError **error)
   g_ptr_array_add (argv, g_strdup ("-o"));
   g_ptr_array_add (argv, g_strdup (output));
 
-  if ((video = ogmrip_container_get_video (avi)))
-  {
-    filename = ogmrip_codec_get_output (OGMRIP_CODEC (video));
-
-    g_ptr_array_add (argv, g_strdup ("-n"));
-    g_ptr_array_add (argv, g_strdup ("-i"));
-    g_ptr_array_add (argv, g_strdup (filename));
-  }
-
-  ogmrip_container_foreach_audio (avi, 
-      (OGMRipContainerCodecFunc) ogmrip_avi_foreach_audio, argv);
-  ogmrip_container_foreach_file (avi, 
-      (OGMRipContainerFileFunc) ogmrip_avi_foreach_file, argv);
+  ogmrip_container_foreach_file (avi,
+      (OGMRipContainerFunc) ogmrip_avi_foreach_file, argv);
 
   ogmrip_container_get_split (avi, &tnumber, &tsize);
   if (tnumber > 1)
@@ -180,14 +156,18 @@ G_DEFINE_TYPE (OGMRipAvi, ogmrip_avi, OGMRIP_TYPE_CONTAINER)
 static void
 ogmrip_avi_class_init (OGMRipAviClass *klass)
 {
+  GObjectClass *gobject_class;
   OGMJobSpawnClass *spawn_class;
-  OGMRipContainerClass *container_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->get_property = ogmrip_avi_get_property;
 
   spawn_class = OGMJOB_SPAWN_CLASS (klass);
   spawn_class->run = ogmrip_avi_run;
 
-  container_class = OGMRIP_CONTAINER_CLASS (klass);
-  container_class->get_overhead = ogmrip_avi_get_overhead;
+  g_object_class_install_property (gobject_class, PROP_OVERHEAD,
+      g_param_spec_uint ("overhead", "overhead", "overhead",
+        0, G_MAXUINT, AVI_OVERHEAD, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 }
 
 static void
@@ -196,18 +176,25 @@ ogmrip_avi_init (OGMRipAvi *avi)
 }
 
 static void
-ogmrip_avi_foreach_subp (OGMRipContainer *avi, 
-    OGMRipCodec *codec, guint demuxer, gint language, OGMJobContainer *queue)
+ogmrip_avi_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
+{
+  switch (property_id)
+  {
+    case PROP_OVERHEAD:
+      g_value_set_uint (value, AVI_OVERHEAD);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
+      break;
+  }
+}
+
+static void
+ogmrip_avi_foreach_subp (OGMRipContainer *avi, const gchar *filename,
+    OGMRipFormatType format, const gchar *name, guint language, OGMJobSpawn *queue)
 {
   OGMJobSpawn *child;
-
-  const gchar *filename;
-  gchar *input, **argv = NULL;
-  gint format;
-
-  filename = ogmrip_codec_get_output (codec);
-
-  format = ogmrip_plugin_get_subp_codec_format (G_TYPE_FROM_INSTANCE (codec));
+  gchar *input, **argv;
 
   if (format == OGMRIP_FORMAT_SRT)
   {
@@ -271,20 +258,14 @@ ogmrip_avi_run (OGMJobSpawn *spawn)
   ogmjob_container_add (OGMJOB_CONTAINER (queue), child);
   g_object_unref (child);
 
-  ogmrip_container_foreach_subp (OGMRIP_CONTAINER (spawn), 
-      (OGMRipContainerCodecFunc) ogmrip_avi_foreach_subp, queue);
+  ogmrip_container_foreach_file (OGMRIP_CONTAINER (spawn), 
+      (OGMRipContainerFunc) ogmrip_avi_foreach_subp, queue);
 
   result = OGMJOB_SPAWN_CLASS (ogmrip_avi_parent_class)->run (spawn);
 
   ogmjob_container_remove (OGMJOB_CONTAINER (spawn), queue);
 
   return result;
-}
-
-static gint
-ogmrip_avi_get_overhead (OGMRipContainer *container)
-{
-  return AVI_OVERHEAD;
 }
 
 static OGMRipContainerPlugin avi_plugin =

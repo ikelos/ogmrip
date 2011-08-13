@@ -108,7 +108,8 @@ enum
   PROP_VBV_BUFSIZE,
   PROP_VBV_MAXRATE,
   PROP_WEIGHT_B,
-  PROP_WEIGHT_P
+  PROP_WEIGHT_P,
+  PROP_DELAY
 };
 
 enum
@@ -136,21 +137,18 @@ enum
   B_PYRAMID_NORMAL
 };
 
-static void ogmrip_x264_finalize        (GObject           *gobject);
-static void ogmrip_x264_get_property    (GObject           *gobject,
-                                         guint             property_id,
-                                         GValue            *value,
-                                         GParamSpec        *pspec);
-static void ogmrip_x264_set_property    (GObject           *gobject,
-                                         guint             property_id,
-                                         const GValue      *value,
-                                         GParamSpec        *pspec);
-static gint ogmrip_x264_run             (OGMJobSpawn       *spawn);
-static gint ogmrip_x264_get_start_delay (OGMRipVideoCodec  *video);
-static void ogmrip_x264_set_quality     (OGMRipVideoCodec  *video,
-                                         OGMRipQualityType quality);
-static void ogmrip_x264_set_profile     (OGMRipCodec       *codec,
-                                         OGMRipProfile     *profile);
+static void ogmrip_x264_finalize     (GObject      *gobject);
+static void ogmrip_x264_notify       (GObject      *gobject,
+                                      GParamSpec   *pspec);
+static void ogmrip_x264_get_property (GObject      *gobject,
+                                      guint        property_id,
+                                      GValue       *value,
+                                      GParamSpec   *pspec);
+static void ogmrip_x264_set_property (GObject      *gobject,
+                                      guint        property_id,
+                                      const GValue *value,
+                                      GParamSpec   *pspec);
+static gint ogmrip_x264_run          (OGMJobSpawn  *spawn);
 
 static const gchar * const properties[] =
 {
@@ -412,23 +410,15 @@ ogmrip_x264_class_init (OGMRipX264Class *klass)
 {
   GObjectClass *gobject_class;
   OGMJobSpawnClass *spawn_class;
-  OGMRipVideoCodecClass *video_class;
-  OGMRipCodecClass *codec_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->finalize = ogmrip_x264_finalize;
+  gobject_class->notify = ogmrip_x264_notify;
   gobject_class->get_property = ogmrip_x264_get_property;
   gobject_class->set_property = ogmrip_x264_set_property;
 
   spawn_class = OGMJOB_SPAWN_CLASS (klass);
   spawn_class->run = ogmrip_x264_run;
-
-  video_class = OGMRIP_VIDEO_CODEC_CLASS (klass);
-  video_class->get_start_delay = ogmrip_x264_get_start_delay;
-  video_class->set_quality = ogmrip_x264_set_quality;
-
-  codec_class = OGMRIP_CODEC_CLASS (klass);
-  codec_class->set_profile = ogmrip_x264_set_profile;
 
   g_object_class_install_property (gobject_class, PROP_8X8DCT,
       g_param_spec_boolean (OGMRIP_X264_PROP_8X8DCT,
@@ -535,6 +525,10 @@ ogmrip_x264_class_init (OGMRipX264Class *klass)
   g_object_class_install_property (gobject_class, PROP_WEIGHT_P,
       g_param_spec_uint (OGMRIP_X264_PROP_WEIGHT_P,
         "Weight P property", "Set weight P", 0, 2, OGMRIP_X264_DEFAULT_WEIGHT_P, G_PARAM_READWRITE));
+
+  g_object_class_install_property (gobject_class, PROP_DELAY,
+      g_param_spec_uint ("start-delay", "Start delay property", "Set start delay",
+        0, G_MAXUINT, 1, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 }
 
 static void
@@ -574,6 +568,44 @@ ogmrip_x264_finalize (GObject *gobject)
   g_free (x264->partitions);
 
   G_OBJECT_CLASS (ogmrip_x264_parent_class)->finalize (gobject);
+}
+
+static void
+ogmrip_x264_notify (GObject *gobject, GParamSpec *pspec)
+{
+  OGMRipX264 *x264 = OGMRIP_X264 (gobject);
+
+  if (g_str_equal (pspec, "quality"))
+  {
+    ogmrip_x264_init (x264);
+
+    // ogmrip_video_codec_set_max_b_frames (OGMRIP_VIDEO_CODEC (x264), OGMRIP_X264_DEFAULT_B_FRAMES);
+
+    switch (ogmrip_video_codec_get_quality (OGMRIP_VIDEO_CODEC (x264)))
+    {
+      case OGMRIP_QUALITY_EXTREME:
+        x264->b_adapt = 2;
+        x264->brdo = TRUE;
+        x264->direct = DIRECT_AUTO;
+        x264->frameref = 16;
+        x264->me = ME_UMH;
+        x264->merange = 24;
+        x264->rc_lookahead = 60;
+        x264->subq = 10;
+        // ogmrip_video_codec_set_max_b_frames (OGMRIP_VIDEO_CODEC (x264), 8);
+        break;
+      case OGMRIP_QUALITY_HIGH:
+        x264->b_adapt = 2;
+        x264->direct = DIRECT_AUTO;
+        x264->frameref = 5;
+        x264->me = ME_UMH;
+        x264->rc_lookahead = 50;
+        x264->subq = 8;
+        break;
+      default:
+        break;
+    }
+  }
 }
 
 static void
@@ -657,6 +689,13 @@ ogmrip_x264_get_property (GObject *gobject, guint property_id, GValue *value, GP
       break;
     case PROP_WEIGHT_P:
       g_value_set_uint (value, x264->weight_p);
+      break;
+    case PROP_DELAY:
+/*
+      if (ogmrip_video_codec_get_max_b_frames (video) > 0)
+        return 2;
+*/
+      g_value_set_uint (value, 1);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -797,58 +836,6 @@ ogmrip_x264_run (OGMJobSpawn *spawn)
   return result;
 }
 
-static gint
-ogmrip_x264_get_start_delay (OGMRipVideoCodec *video)
-{
-/*
-  if (ogmrip_video_codec_get_max_b_frames (video) > 0)
-    return 2;
-*/
-  return 1;
-}
-
-static void
-ogmrip_x264_set_default_values (OGMRipX264 *x264)
-{
-  ogmrip_x264_init (x264);
-
-  // ogmrip_video_codec_set_max_b_frames (OGMRIP_VIDEO_CODEC (x264), OGMRIP_X264_DEFAULT_B_FRAMES);
-}
-
-static void
-ogmrip_x264_set_quality (OGMRipVideoCodec *video, OGMRipQualityType quality)
-{
-  OGMRipX264 *x264;
-
-  x264 = OGMRIP_X264 (video);
-  ogmrip_x264_set_default_values (x264);
-
-  switch (quality)
-  {
-    case OGMRIP_QUALITY_EXTREME:
-      x264->b_adapt = 2;
-      x264->brdo = TRUE;
-      x264->direct = DIRECT_AUTO;
-      x264->frameref = 16;
-      x264->me = ME_UMH;
-      x264->merange = 24;
-      x264->rc_lookahead = 60;
-      x264->subq = 10;
-      // ogmrip_video_codec_set_max_b_frames (OGMRIP_VIDEO_CODEC (x264), 8);
-      break;
-    case OGMRIP_QUALITY_HIGH:
-      x264->b_adapt = 2;
-      x264->direct = DIRECT_AUTO;
-      x264->frameref = 5;
-      x264->me = ME_UMH;
-      x264->rc_lookahead = 50;
-      x264->subq = 8;
-      break;
-    default:
-      break;
-  }
-}
-
 static OGMRipVideoPlugin x264_plugin =
 {
   NULL,
@@ -914,11 +901,10 @@ ogmrip_x264_check_option (const gchar *option)
 
   return status == 0;
 }
-
+/*
 static void
 ogmrip_x264_set_profile (OGMRipCodec *codec, OGMRipProfile *profile)
 {
-/*
   OGMRipSettings *settings;
 
   settings = ogmrip_settings_get_default ();
@@ -934,9 +920,8 @@ ogmrip_x264_set_profile (OGMRipCodec *codec, OGMRipProfile *profile)
       g_free (key);
     }
   }
-*/
 }
-
+*/
 OGMRipVideoPlugin *
 ogmrip_init_plugin (GError **error)
 {
@@ -978,22 +963,7 @@ ogmrip_init_plugin (GError **error)
   x264_have_weight_p       = ogmrip_x264_check_option ("weightp=2");
   x264_have_slow_firstpass = ogmrip_x264_check_option ("slow_firstpass");
   x264_have_nombtree       = ogmrip_x264_check_option ("nombtree");
-/*
-  settings = ogmrip_settings_get_default ();
-  if (settings)
-  {
-    GObjectClass *klass;
-    guint i;
 
-    klass = g_type_class_ref (OGMRIP_TYPE_X264);
-
-    for (i = 0; properties[i]; i++)
-      ogmrip_settings_install_key_from_property (settings, klass,
-          OGMRIP_X264_SECTION, properties[i], properties[i]);
-
-    g_type_class_unref (klass);
-  }
-*/
   x264_plugin.type = OGMRIP_TYPE_X264;
 
   return &x264_plugin;

@@ -20,11 +20,8 @@
 #include "config.h"
 #endif
 
-#include "ogmrip-container.h"
-#include "ogmrip-fs.h"
-#include "ogmrip-version.h"
-#include "ogmrip-plugin.h"
-#include "ogmjob-exec.h"
+#include <ogmjob.h>
+#include <ogmrip.h>
 
 #include <errno.h>
 #include <stdio.h>
@@ -57,10 +54,6 @@ struct _OGMRipMatroskaClass
 
 GType ogmrip_matroska_get_type (void);
 static gint ogmrip_matroska_run (OGMJobSpawn *spawn);
-static gint ogmrip_matroska_get_overhead (OGMRipContainer *container);
-
-static gint major_version = 0;
-static gint minor_version = 0;
 
 static gdouble
 ogmrip_matroska_watch (OGMJobExec *exec, const gchar *buffer, OGMRipContainer *matroska)
@@ -79,6 +72,7 @@ ogmrip_matroska_watch (OGMJobExec *exec, const gchar *buffer, OGMRipContainer *m
 static gchar *
 ogmrip_matroska_get_sync (OGMRipContainer *container)
 {
+/*
   guint start_delay;
 
   start_delay = ogmrip_container_get_start_delay (container);
@@ -107,7 +101,7 @@ ogmrip_matroska_get_sync (OGMRipContainer *container)
 
     return buf;
   }
-
+*/
   return NULL;
 }
 
@@ -156,13 +150,13 @@ ogmrip_matroska_append_audio_file (OGMRipContainer *matroska, const gchar *filen
 
 static void
 ogmrip_matroska_append_subp_file (OGMRipContainer *matroska, const gchar *filename,
-    const gchar *label, gint demuxer, gint charset, gint language, GPtrArray *argv)
+    const gchar *label, gint format, gint language, GPtrArray *argv)
 {
   gchar *real_filename;
   gboolean do_merge;
   struct stat buf;
 
-  if (demuxer == OGMRIP_SUBP_DEMUXER_VOBSUB)
+  if (format == OGMRIP_FORMAT_VOBSUB)
   {
     if (!g_str_has_suffix (filename, ".idx"))
     {
@@ -216,7 +210,7 @@ ogmrip_matroska_append_subp_file (OGMRipContainer *matroska, const gchar *filena
       g_ptr_array_add (argv, g_strdup ("--track-name"));
       g_ptr_array_add (argv, g_strconcat ("0:", label, NULL));
     }
-
+/*
     switch (charset)
     {
       case OGMRIP_CHARSET_UTF8:
@@ -232,7 +226,7 @@ ogmrip_matroska_append_subp_file (OGMRipContainer *matroska, const gchar *filena
         g_ptr_array_add (argv, g_strdup ("0:ASCII"));
         break;
     }
-
+*/
     g_ptr_array_add (argv, g_strdup ("-s"));
     g_ptr_array_add (argv, g_strdup ("0"));
     g_ptr_array_add (argv, g_strdup ("-D"));
@@ -241,19 +235,7 @@ ogmrip_matroska_append_subp_file (OGMRipContainer *matroska, const gchar *filena
     g_ptr_array_add (argv, real_filename);
   }
 }
-
-static void
-ogmrip_matroska_foreach_audio (OGMRipContainer *matroska, 
-    OGMRipCodec *codec, guint demuxer, gint language, GPtrArray *argv)
-{
-  const gchar *input, *label;
-
-  input = ogmrip_codec_get_output (codec);
-  label = ogmrip_audio_codec_get_label (OGMRIP_AUDIO_CODEC (codec));
-
-  ogmrip_matroska_append_audio_file (matroska, input, label, language, argv);
-}
-
+/*
 static void
 ogmrip_matroska_foreach_subp (OGMRipContainer *matroska, 
     OGMRipCodec *codec, guint demuxer, gint language, GPtrArray *argv)
@@ -326,13 +308,25 @@ ogmrip_matroska_foreach_file (OGMRipContainer *matroska, OGMRipFile *file, GPtrA
   }
   g_free (filename);
 }
+*/
+static void
+ogmrip_matroska_foreach_file (OGMRipContainer *matroska, const gchar *filename,
+    OGMRipFormatType format, const gchar *name, guint language, GPtrArray *argv)
+{
+  if (OGMRIP_IS_VIDEO_FORMAT (format))
+  {
+  }
+  else if (OGMRIP_IS_AUDIO_FORMAT (format))
+    ogmrip_matroska_append_audio_file (matroska, filename, name, language, argv);
+  else if (OGMRIP_IS_SUBP_FORMAT (format))
+    ogmrip_matroska_append_subp_file (matroska, filename, name, format, language, argv);
+}
 
 gchar **
 ogmrip_matroska_command (OGMRipContainer *matroska)
 {
   GPtrArray *argv;
-  OGMRipVideoCodec *video;
-  const gchar *output, *label, *filename, *fourcc;
+  const gchar *output, *label, *fourcc;
   guint tsize, tnumber;
 
   argv = g_ptr_array_new ();
@@ -348,16 +342,16 @@ ogmrip_matroska_command (OGMRipContainer *matroska)
     g_ptr_array_add (argv, g_strdup ("--fourcc"));
     g_ptr_array_add (argv, g_strconcat ("0:", fourcc, NULL));
   }
-
+/*
   if ((video = ogmrip_container_get_video (matroska)))
   {
     if (major_version == 1)
     {
       if (ogmrip_plugin_get_video_codec_format (G_TYPE_FROM_INSTANCE (video)) == OGMRIP_FORMAT_H264)
       {
-        /*
+        /?*
          * Option to merge h264 streams
-         */
+         *?/
         g_ptr_array_add (argv, g_strdup ("--engage"));
         g_ptr_array_add (argv, g_strdup ("allow_avc_in_vfw_mode"));
       }
@@ -383,6 +377,9 @@ ogmrip_matroska_command (OGMRipContainer *matroska)
       (OGMRipContainerCodecFunc) ogmrip_matroska_foreach_chapters, argv);
   ogmrip_container_foreach_file (matroska, 
       (OGMRipContainerFileFunc) ogmrip_matroska_foreach_file, argv);
+*/
+  ogmrip_container_foreach_file (matroska,
+      (OGMRipContainerFunc) ogmrip_matroska_foreach_file, argv);
 
   label = ogmrip_container_get_label (matroska);
   if (label)
@@ -409,13 +406,9 @@ static void
 ogmrip_matroska_class_init (OGMRipMatroskaClass *klass)
 {
   OGMJobSpawnClass *spawn_class;
-  OGMRipContainerClass *container_class;
 
   spawn_class = OGMJOB_SPAWN_CLASS (klass);
   spawn_class->run = ogmrip_matroska_run;
-
-  container_class = OGMRIP_CONTAINER_CLASS (klass);
-  container_class->get_overhead = ogmrip_matroska_get_overhead;
 }
 
 static void
@@ -451,13 +444,13 @@ ogmrip_matroska_run (OGMJobSpawn *spawn)
 
   return result;
 }
-
+/*
 static gint
 ogmrip_matroska_get_overhead (OGMRipContainer *container)
 {
   return MKV_OVERHEAD;
 }
-
+*/
 static OGMRipContainerPlugin mkv_plugin =
 {
   NULL,
@@ -501,24 +494,6 @@ ogmrip_init_plugin (GError **error)
   guint i = 0;
 
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
-
-  if (!g_spawn_command_line_sync ("mkvmerge --version", &output, NULL, NULL, NULL))
-  {
-    g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("mkvmerge is missing"));
-    return NULL;
-  }
-
-  if (strncmp (output, "mkvmerge v", 10) == 0)
-  {
-    gchar *end;
-
-    errno = 0;
-    major_version = strtoul (output + 10, &end, 10);
-    if (!errno && *end == '.')
-      minor_version = strtoul (end + 1, NULL, 10);
-  }
-
-  g_free (output);
 
   if (!g_spawn_command_line_sync ("mkvmerge --list-types", &output, NULL, NULL, NULL))
   {

@@ -55,9 +55,18 @@ struct _OGMRipMp3Class
   OGMRipAudioCodecClass parent_class;
 };
 
+enum
+{
+  PROP_0,
+  PROP_SPF
+};
+
 GType ogmrip_mp3_get_type (void);
-static gint ogmrip_mp3_run (OGMJobSpawn *spawn);
-static gint ogmrip_mp3_get_samples_per_frame (OGMRipAudioCodec *audio);
+static void ogmrip_mp3_get_property (GObject     *gobject,
+                                     guint       property_id,
+                                     GValue      *value,
+                                     GParamSpec  *pspec);
+static gint ogmrip_mp3_run          (OGMJobSpawn *spawn);
 
 static gchar **
 ogmrip_mp3_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input, const gchar *output)
@@ -124,19 +133,37 @@ G_DEFINE_TYPE (OGMRipMp3, ogmrip_mp3, OGMRIP_TYPE_AUDIO_CODEC)
 static void
 ogmrip_mp3_class_init (OGMRipMp3Class *klass)
 {
+  GObjectClass *gobject_class;
   OGMJobSpawnClass *spawn_class;
-  OGMRipAudioCodecClass *audio_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->get_property = ogmrip_mp3_get_property;
 
   spawn_class = OGMJOB_SPAWN_CLASS (klass);
   spawn_class->run = ogmrip_mp3_run;
 
-  audio_class = OGMRIP_AUDIO_CODEC_CLASS (klass);
-  audio_class->get_samples_per_frame = ogmrip_mp3_get_samples_per_frame;
+  g_object_class_install_property (gobject_class, PROP_SPF,
+      g_param_spec_uint ("samples-per-frame", "Samples per frame property", "Set samples per frame",
+        0, G_MAXUINT, MP3_SPF, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 }
 
 static void
 ogmrip_mp3_init (OGMRipMp3 *mp3)
 {
+}
+
+static void
+ogmrip_mp3_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
+{
+  switch (property_id)
+  {
+    case PROP_SPF:
+      g_value_set_uint (value, MP3_SPF);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
+      break;
+  }
 }
 
 static gint
@@ -188,12 +215,6 @@ ogmrip_mp3_run (OGMJobSpawn *spawn)
   g_free (fifo);
 
   return result;
-}
-
-static gint
-ogmrip_mp3_get_samples_per_frame (OGMRipAudioCodec *audio)
-{
-  return MP3_SPF;
 }
 
 static OGMRipAudioPlugin mp3_plugin =

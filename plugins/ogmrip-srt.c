@@ -152,8 +152,8 @@ ogmrip_gocr_command (OGMRipSubpCodec *subp, const gchar *input)
   g_ptr_array_add (argv, g_strdup ("gocr"));
   g_ptr_array_add (argv, g_strdup ("-v"));
   g_ptr_array_add (argv, g_strdup ("1"));
+/*
   g_ptr_array_add (argv, g_strdup ("-f"));
-
   switch (ogmrip_subp_codec_get_charset (subp))
   {
     case OGMRIP_CHARSET_UTF8:
@@ -166,7 +166,7 @@ ogmrip_gocr_command (OGMRipSubpCodec *subp, const gchar *input)
       g_ptr_array_add (argv, g_strdup ("ASCII"));
       break;
   }
-
+*/
   g_ptr_array_add (argv, g_strdup ("-m"));
   g_ptr_array_add (argv, g_strdup ("4"));
   g_ptr_array_add (argv, g_strdup ("-m"));
@@ -188,8 +188,8 @@ ogmrip_ocrad_command (OGMRipSubpCodec *subp, const gchar *input)
   g_ptr_array_add (argv, g_strdup ("ocrad"));
   g_ptr_array_add (argv, g_strdup ("-v"));
   g_ptr_array_add (argv, g_strdup ("-f"));
+/*
   g_ptr_array_add (argv, g_strdup ("-F"));
-
   switch (ogmrip_subp_codec_get_charset (subp))
   {
     case OGMRIP_CHARSET_UTF8:
@@ -200,7 +200,7 @@ ogmrip_ocrad_command (OGMRipSubpCodec *subp, const gchar *input)
       g_ptr_array_add (argv, g_strdup ("byte"));
       break;
   }
-
+*/
   g_ptr_array_add (argv, g_strdup ("-l"));
   g_ptr_array_add (argv, g_strdup ("0"));
   g_ptr_array_add (argv, g_strdup ("-o"));
@@ -262,7 +262,7 @@ ogmrip_srt_command (OGMRipSubpCodec *subp, const gchar *input, const gchar *outp
 
   g_ptr_array_add (argv, g_strdup ("-t"));
   g_ptr_array_add (argv, g_strdup ("srt"));
-
+/*
   switch (ogmrip_subp_codec_get_newline (OGMRIP_SUBP_CODEC (subp)))
   {
     case OGMRIP_NEWLINE_LF:
@@ -280,7 +280,7 @@ ogmrip_srt_command (OGMRipSubpCodec *subp, const gchar *input, const gchar *outp
     default:
       break;
   }
-
+*/
   g_ptr_array_add (argv, g_strdup ("-i"));
   g_ptr_array_add (argv, g_strdup (input));
   g_ptr_array_add (argv, g_strdup ("-o"));

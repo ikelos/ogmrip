@@ -306,25 +306,6 @@ ogmrip_mp4_la_LIBADD = \
 	$(top_builddir)/libogmrip/libogmrip-mplayer.la
 endif
 
-if HAVE_LAVF_SUPPORT
-containers_LTLIBRARIES += \
-  ogmrip-mov.la 
-
-ogmrip_mov_la_SOURCES = \
-  ogmrip-mov.c
-
-ogmrip_mov_la_LDFLAGS = \
-  -export-dynamic -module -avoid-version
-
-ogmrip_mov_la_LIBTOOLFLAGS = \
-  --tag=disable-static
-
-ogmrip_mov_la_LIBADD = \
-  $(top_builddir)/libogmjob/libogmjob.la \
-  $(top_builddir)/libogmrip/libogmrip.la \
-	$(top_builddir)/libogmrip/libogmrip-mplayer.la
-endif
-
 #
 # Options
 #

@@ -20,14 +20,11 @@
 #include "config.h"
 #endif
 
-#include "ogmrip-fs.h"
-#include "ogmrip-mplayer.h"
-#include "ogmrip-plugin.h"
-#include "ogmrip-version.h"
 #include "ogmrip-xvid.h"
+#include "ogmrip-mplayer.h"
 
-#include "ogmjob-exec.h"
-#include "ogmjob-queue.h"
+#include <ogmrip.h>
+#include <ogmjob.h>
 
 #include <stdio.h>
 #include <unistd.h>
@@ -114,19 +111,17 @@ enum
   PROP_VHQ
 };
 
-static gint ogmrip_xvid_run             (OGMJobSpawn       *spawn);
-static void ogmrip_xvid_set_quality     (OGMRipVideoCodec  *video,
-                                         OGMRipQualityType quality);
-static void ogmrip_xvid_get_property    (GObject           *gobject,
-                                         guint             property_id,
-                                         GValue            *value,
-                                         GParamSpec        *pspec);
-static void ogmrip_xvid_set_property    (GObject           *gobject,
-                                         guint             property_id,
-                                         const GValue      *value,
-                                         GParamSpec        *pspec);
-static void ogmrip_xvid_set_profile     (OGMRipCodec       *codec,
-                                         OGMRipProfile     *profile);
+static void ogmrip_xvid_notify       (GObject      *gobject,
+                                      GParamSpec   *pspec);
+static gint ogmrip_xvid_run          (OGMJobSpawn  *spawn);
+static void ogmrip_xvid_get_property (GObject      *gobject,
+                                      guint        property_id,
+                                      GValue       *value,
+                                      GParamSpec   *pspec);
+static void ogmrip_xvid_set_property (GObject      *gobject,
+                                      guint        property_id,
+                                      const GValue *value,
+                                      GParamSpec   *pspec);
 
 static const gchar * const properties[] =
 {
@@ -216,6 +211,7 @@ ogmrip_xvid_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   };
 
   output = ogmrip_codec_get_output (OGMRIP_CODEC (video));
+  title = ogmdvd_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video)));
 
   xvid = OGMRIP_XVID (video);
 
@@ -251,7 +247,7 @@ ogmrip_xvid_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
     else
       g_string_append (options, ":nogmc");
 
-    interlaced = ogmrip_video_codec_is_interlaced (video);
+    interlaced = ogmdvd_title_get_interlaced (title);
     if (interlaced > 0 && ogmrip_video_codec_get_deinterlacer (video) != OGMRIP_DEINT_NONE)
       interlaced = 0;
 
@@ -361,7 +357,6 @@ ogmrip_xvid_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   g_ptr_array_add (argv, g_strdup ("-xvidencopts"));
   g_ptr_array_add (argv, g_string_free (options, FALSE));
 
-  title = ogmdvd_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video)));
   vid = ogmdvd_title_get_nr (title);
 
   if (MPLAYER_CHECK_VERSION (1,0,0,1))
@@ -384,21 +379,14 @@ ogmrip_xvid_class_init (OGMRipXvidClass *klass)
 {
   GObjectClass *gobject_class;
   OGMJobSpawnClass *spawn_class;
-  OGMRipVideoCodecClass *video_class;
-  OGMRipCodecClass *codec_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->notify = ogmrip_xvid_notify;
   gobject_class->get_property = ogmrip_xvid_get_property;
   gobject_class->set_property = ogmrip_xvid_set_property;
 
   spawn_class = OGMJOB_SPAWN_CLASS (klass);
   spawn_class->run = ogmrip_xvid_run;
-
-  video_class = OGMRIP_VIDEO_CODEC_CLASS (klass);
-  video_class->set_quality = ogmrip_xvid_set_quality;
-
-  codec_class = OGMRIP_CODEC_CLASS (klass);
-  codec_class->set_profile = ogmrip_xvid_set_profile;
 
   g_object_class_install_property (gobject_class, PROP_PROFILE,
       g_param_spec_uint (OGMRIP_XVID_PROP_PROFILE,
@@ -544,6 +532,43 @@ ogmrip_xvid_init (OGMRipXvid *xvid)
   xvid->grayscale = OGMRIP_XVID_DEFAULT_GRAYSCALE;
   xvid->qpel = OGMRIP_XVID_DEFAULT_QPEL;
   xvid->trellis = OGMRIP_XVID_DEFAULT_TRELLIS;
+}
+
+static void
+ogmrip_xvid_notify (GObject *gobject, GParamSpec *pspec)
+{
+  OGMRipXvid *xvid = OGMRIP_XVID (gobject);
+
+  if (g_str_equal (pspec->name, "quality"))
+  {
+    ogmrip_xvid_init (xvid);
+
+    // ogmrip_video_codec_set_max_b_frames (OGMRIP_VIDEO_CODEC (xvid), OGMRIP_XVID_DEFAULT_BFRAMES);
+
+    switch (ogmrip_video_codec_get_quality (OGMRIP_VIDEO_CODEC (xvid)))
+    {
+      case OGMRIP_QUALITY_EXTREME:
+        xvid->chroma_opt = TRUE;
+        xvid->quant_type = 1;
+        xvid->bvhq = 1;
+        xvid->vhq = 4;
+        break;
+      case OGMRIP_QUALITY_HIGH:
+        xvid->chroma_opt = TRUE;
+        xvid->quant_type = 0;
+        xvid->bvhq = 1;
+        xvid->vhq = 2;
+        break;
+      case OGMRIP_QUALITY_NORMAL:
+        xvid->chroma_opt = FALSE;
+        xvid->quant_type = 0;
+        xvid->bvhq = 0;
+        xvid->vhq = 0;
+        break;
+      default:
+        break;
+    }
+  }
 }
 
 static void
@@ -811,52 +836,10 @@ ogmrip_xvid_run (OGMJobSpawn *spawn)
 
   return result;
 }
-
-static void
-ogmrip_xvid_set_default_values (OGMRipXvid *xvid)
-{
-  ogmrip_xvid_init (xvid);
-
-  // ogmrip_video_codec_set_max_b_frames (OGMRIP_VIDEO_CODEC (xvid), OGMRIP_XVID_DEFAULT_BFRAMES);
-}
-
-static void
-ogmrip_xvid_set_quality (OGMRipVideoCodec *video, OGMRipQualityType quality)
-{
-  OGMRipXvid *xvid;
-
-  xvid = OGMRIP_XVID (video);
-  ogmrip_xvid_set_default_values (xvid);
-
-  switch (quality)
-  {
-    case OGMRIP_QUALITY_EXTREME:
-      xvid->chroma_opt = TRUE;
-      xvid->quant_type = 1;
-      xvid->bvhq = 1;
-      xvid->vhq = 4;
-      break;
-    case OGMRIP_QUALITY_HIGH:
-      xvid->chroma_opt = TRUE;
-      xvid->quant_type = 0;
-      xvid->bvhq = 1;
-      xvid->vhq = 2;
-      break;
-    case OGMRIP_QUALITY_NORMAL:
-      xvid->chroma_opt = FALSE;
-      xvid->quant_type = 0;
-      xvid->bvhq = 0;
-      xvid->vhq = 0;
-      break;
-    default:
-      break;
-  }
-}
-
+/*
 static void
 ogmrip_xvid_set_profile (OGMRipCodec *codec, OGMRipProfile *profile)
 {
-/*
   OGMRipSettings *settings;
 
   settings = ogmrip_settings_get_default ();
@@ -872,9 +855,8 @@ ogmrip_xvid_set_profile (OGMRipCodec *codec, OGMRipProfile *profile)
       g_free (key);
     }
   }
-*/
 }
-
+*/
 static OGMRipVideoPlugin xvid_plugin =
 {
   NULL,

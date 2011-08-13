@@ -68,7 +68,7 @@ struct _OGMRipMp4Class
 
 GType ogmrip_mp4_get_type (void);
 static gint ogmrip_mp4_run (OGMJobSpawn *spawn);
-
+/*
 static void
 ogmrip_mp4_append_audio_file (OGMRipContainer *mp4, const gchar *filename,
     gint format, gint language, GPtrArray *argv)
@@ -322,7 +322,7 @@ ogmrip_mencoder_extract_command (OGMRipVideoCodec *video, const gchar *output)
 static gint
 ogmrip_mp4_get_n_audio_files (OGMRipContainer *mp4)
 {
-  GSList *files, *file;
+  GList *files, *file;
   guint n_audio = 0;
 
   files = ogmrip_container_get_files (mp4);
@@ -354,13 +354,14 @@ ogmrip_mp4_get_n_subp_files (OGMRipContainer *mp4)
 
   return n_subp;
 }
-
+*/
 static gchar **
 ogmrip_mp4_create_command (OGMRipContainer *mp4, const gchar *input, const gchar *output)
 {
   GPtrArray *argv;
-  OGMRipVideoCodec *video;
+//  OGMRipVideoCodec *video;
   const gchar *label, *fmt = NULL;
+/*
   gchar fps[8];
 
   if ((video = ogmrip_container_get_video (mp4)))
@@ -390,14 +391,14 @@ ogmrip_mp4_create_command (OGMRipContainer *mp4, const gchar *input, const gchar
     if (!fmt)
       return NULL;
   }
-
+*/
   argv = g_ptr_array_new ();
   g_ptr_array_add (argv, g_strdup (PROGRAM));
-
+/*
   if (ogmrip_container_get_n_audio (mp4) + ogmrip_mp4_get_n_audio_files (mp4) <= 1 &&
       ogmrip_container_get_n_subp (mp4) + ogmrip_mp4_get_n_subp_files (mp4) < 1)
     g_ptr_array_add (argv, g_strdup ("-isma"));
-
+*/
   g_ptr_array_add (argv, g_strdup ("-nodrop"));
   g_ptr_array_add (argv, g_strdup ("-new"));
 
@@ -416,6 +417,7 @@ ogmrip_mp4_create_command (OGMRipContainer *mp4, const gchar *input, const gchar
 
   if (fmt)
   {
+/*
     if (!input)
       input = ogmrip_codec_get_output (OGMRIP_CODEC (video));
 
@@ -424,8 +426,9 @@ ogmrip_mp4_create_command (OGMRipContainer *mp4, const gchar *input, const gchar
 
     g_ptr_array_add (argv, g_strdup ("-add"));
     g_ptr_array_add (argv, g_strdup_printf ("%s:fmt=%s:fps=%s#video", input, fmt, fps));
+*/
   }
-
+/*
   ogmrip_container_foreach_audio (mp4, 
       (OGMRipContainerCodecFunc) ogmrip_mp4_foreach_audio, argv);
   ogmrip_container_foreach_subp (mp4, 
@@ -434,7 +437,7 @@ ogmrip_mp4_create_command (OGMRipContainer *mp4, const gchar *input, const gchar
       (OGMRipContainerCodecFunc) ogmrip_mp4_foreach_chapters, argv);
   ogmrip_container_foreach_file (mp4, 
       (OGMRipContainerFileFunc) ogmrip_mp4_foreach_file, argv);
-
+*/
   g_ptr_array_add (argv, g_strdup (output));
 
   g_ptr_array_add (argv, NULL);
@@ -528,7 +531,7 @@ static void
 ogmrip_mp4_init (OGMRipMp4 *mp4)
 {
 }
-
+/*
 static gchar *
 ogmrip_mp4_get_h264_filename (OGMRipVideoCodec *video)
 {
@@ -551,12 +554,12 @@ ogmrip_mp4_get_n_vobsub (OGMRipContainer *container, OGMRipCodec *codec, guint d
   if (ogmrip_plugin_get_subp_codec_format (G_TYPE_FROM_INSTANCE (codec)) == OGMRIP_FORMAT_VOBSUB)
     (*nvobsub) ++;
 }
-
+*/
 static gint
 ogmrip_mp4_run (OGMJobSpawn *spawn)
 {
   OGMJobSpawn *queue, *child;
-  OGMRipVideoCodec *video;
+//  OGMRipVideoCodec *video;
   OGMRipMp4 *mp4;
 
   gchar **argv, *filename = NULL;
@@ -574,7 +577,7 @@ ogmrip_mp4_run (OGMJobSpawn *spawn)
   queue = ogmjob_queue_new ();
   ogmjob_container_add (OGMJOB_CONTAINER (spawn), queue);
   g_object_unref (queue);
-
+/*
   video = ogmrip_container_get_video (OGMRIP_CONTAINER (spawn));
   if (ogmrip_plugin_get_video_codec_format (G_TYPE_FROM_INSTANCE (video)) == OGMRIP_FORMAT_H264)
   {
@@ -612,16 +615,19 @@ ogmrip_mp4_run (OGMJobSpawn *spawn)
     ogmjob_container_add (OGMJOB_CONTAINER (queue), child);
     g_object_unref (child);
   }
-
+*/
   argv = ogmrip_mp4_create_command (OGMRIP_CONTAINER (spawn), filename, output);
   if (argv)
   {
+/*
     gint nvobsub = 0;
 
     ogmrip_container_foreach_subp (OGMRIP_CONTAINER (spawn), (OGMRipContainerCodecFunc) ogmrip_mp4_get_n_vobsub, &nvobsub);
-
+*/
     mp4->old_percent = 0;
+/*
     mp4->nstreams = 2 + ogmrip_container_get_n_audio (OGMRIP_CONTAINER (spawn)) + nvobsub;
+*/
     mp4->streams = 0;
 
     child = ogmjob_exec_newv (argv);
