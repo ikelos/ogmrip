@@ -117,23 +117,23 @@ ogmrip_container_class_init (OGMRipContainerClass *klass)
 
   g_object_class_install_property (gobject_class, PROP_OUTPUT, 
         g_param_spec_string ("output", "Output property", "Set output file", 
-           NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           NULL, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_LABEL, 
         g_param_spec_string ("label", "Label property", "Set label", 
-           NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           NULL, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_FOURCC, 
         g_param_spec_string ("fourcc", "FourCC property", "Set fourcc", 
-           NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           NULL, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_TSIZE, 
         g_param_spec_uint ("target-size", "Target size property", "Set target size", 
-           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_TNUMBER, 
         g_param_spec_uint ("target-number", "Target number property", "Set target number", 
-           0, G_MAXUINT, 1, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           0, G_MAXUINT, 1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_OVERHEAD, 
         g_param_spec_uint ("overhead", "Overhead property", "Get overhead", 
@@ -141,7 +141,7 @@ ogmrip_container_class_init (OGMRipContainerClass *klass)
 
   g_object_class_install_property (gobject_class, PROP_START_DELAY, 
         g_param_spec_uint ("start-delay", "Start delay property", "Set start delay", 
-           0, G_MAXINT, 0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           0, G_MAXINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipContainerPriv));
 }

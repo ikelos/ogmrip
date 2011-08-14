@@ -389,116 +389,116 @@ ogmrip_xvid_class_init (OGMRipXvidClass *klass)
   spawn_class->run = ogmrip_xvid_run;
 
   g_object_class_install_property (gobject_class, PROP_PROFILE,
-      g_param_spec_uint (OGMRIP_XVID_PROP_PROFILE,
-        "Profile property", "Set profile", 0, 16, OGMRIP_XVID_DEFAULT_PROFILE, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_XVID_PROP_PROFILE, "Profile property", "Set profile",
+        0, 16, OGMRIP_XVID_DEFAULT_PROFILE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_QUANT_TYPE,
-      g_param_spec_uint (OGMRIP_XVID_PROP_QUANT_TYPE,
-        NULL, NULL, 0, 1, OGMRIP_XVID_DEFAULT_QUANT_TYPE, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_XVID_PROP_QUANT_TYPE, NULL, NULL,
+        0, 1, OGMRIP_XVID_DEFAULT_QUANT_TYPE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_ME_QUALITY,
-      g_param_spec_uint (OGMRIP_XVID_PROP_ME_QUALITY,
-        NULL, NULL, 0, 6, OGMRIP_XVID_DEFAULT_ME_QUALITY, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_XVID_PROP_ME_QUALITY, NULL, NULL,
+        0, 6, OGMRIP_XVID_DEFAULT_ME_QUALITY, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_VHQ,
-      g_param_spec_uint (OGMRIP_XVID_PROP_VHQ,
-        NULL, NULL, 0, 4, OGMRIP_XVID_DEFAULT_VHQ, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_XVID_PROP_VHQ, NULL, NULL,
+        0, 4, OGMRIP_XVID_DEFAULT_VHQ, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_BVHQ,
-      g_param_spec_uint (OGMRIP_XVID_PROP_BVHQ,
-        NULL, NULL, 0, 1, OGMRIP_XVID_DEFAULT_BVHQ, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_XVID_PROP_BVHQ, NULL, NULL,
+        0, 1, OGMRIP_XVID_DEFAULT_BVHQ, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_PAR,
-      g_param_spec_uint (OGMRIP_XVID_PROP_PAR,
-        NULL, NULL, 0, 6, OGMRIP_XVID_DEFAULT_PAR, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_XVID_PROP_PAR, NULL, NULL,
+        0, 6, OGMRIP_XVID_DEFAULT_PAR, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_MIN_IQUANT,
-      g_param_spec_uint (OGMRIP_XVID_PROP_MIN_IQUANT,
-        NULL, NULL, 0, 31, OGMRIP_XVID_DEFAULT_MIN_IQUANT, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_XVID_PROP_MIN_IQUANT, NULL, NULL,
+        0, 31, OGMRIP_XVID_DEFAULT_MIN_IQUANT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_MAX_IQUANT,
-      g_param_spec_uint (OGMRIP_XVID_PROP_MAX_IQUANT,
-        NULL, NULL, 0, 31, OGMRIP_XVID_DEFAULT_MAX_IQUANT, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_XVID_PROP_MAX_IQUANT, NULL, NULL,
+        0, 31, OGMRIP_XVID_DEFAULT_MAX_IQUANT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_MIN_PQUANT,
-      g_param_spec_uint (OGMRIP_XVID_PROP_MIN_PQUANT,
-        NULL, NULL, 0, 31, OGMRIP_XVID_DEFAULT_MIN_PQUANT, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_XVID_PROP_MIN_PQUANT, NULL, NULL,
+        0, 31, OGMRIP_XVID_DEFAULT_MIN_PQUANT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_MAX_PQUANT,
-      g_param_spec_uint (OGMRIP_XVID_PROP_MAX_PQUANT,
-        NULL, NULL, 0, 31, OGMRIP_XVID_DEFAULT_MAX_PQUANT, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_XVID_PROP_MAX_PQUANT, NULL, NULL,
+        0, 31, OGMRIP_XVID_DEFAULT_MAX_PQUANT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_MIN_BQUANT,
-      g_param_spec_uint (OGMRIP_XVID_PROP_MIN_BQUANT,
-        NULL, NULL, 0, 31, OGMRIP_XVID_DEFAULT_MIN_BQUANT, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_XVID_PROP_MIN_BQUANT, NULL, NULL,
+        0, 31, OGMRIP_XVID_DEFAULT_MIN_BQUANT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_MAX_BQUANT,
-      g_param_spec_uint (OGMRIP_XVID_PROP_MAX_BQUANT,
-        NULL, NULL, 0, 31, OGMRIP_XVID_DEFAULT_MAX_BQUANT, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_XVID_PROP_MAX_BQUANT, NULL, NULL,
+        0, 31, OGMRIP_XVID_DEFAULT_MAX_BQUANT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
     g_object_class_install_property (gobject_class, PROP_MAX_KEYINT,
-        g_param_spec_uint (OGMRIP_XVID_PROP_MAX_KEYINT,
-          NULL, NULL, 0, G_MAXUINT, OGMRIP_XVID_DEFAULT_MAX_KEYINT, G_PARAM_READWRITE));
+        g_param_spec_uint (OGMRIP_XVID_PROP_MAX_KEYINT, NULL, NULL,
+          0, G_MAXUINT, OGMRIP_XVID_DEFAULT_MAX_KEYINT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_FRAME_DROP_RATIO,
-      g_param_spec_uint (OGMRIP_XVID_PROP_FRAME_DROP_RATIO,
-        NULL, NULL, 0, 100, OGMRIP_XVID_DEFAULT_FRAME_DROP_RATIO, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_XVID_PROP_FRAME_DROP_RATIO, NULL, NULL,
+        0, 100, OGMRIP_XVID_DEFAULT_FRAME_DROP_RATIO, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_BQUANT_RATIO,
-      g_param_spec_uint (OGMRIP_XVID_PROP_BQUANT_RATIO,
-        NULL, NULL, 0, 1000, OGMRIP_XVID_DEFAULT_BQUANT_RATIO, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_XVID_PROP_BQUANT_RATIO, NULL, NULL,
+        0, 1000, OGMRIP_XVID_DEFAULT_BQUANT_RATIO, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_BQUANT_OFFSET,
-      g_param_spec_int (OGMRIP_XVID_PROP_BQUANT_OFFSET,
-        NULL, NULL, -1000, 1000, OGMRIP_XVID_DEFAULT_BQUANT_OFFSET, G_PARAM_READWRITE));
+      g_param_spec_int (OGMRIP_XVID_PROP_BQUANT_OFFSET, NULL, NULL,
+        -1000, 1000, OGMRIP_XVID_DEFAULT_BQUANT_OFFSET, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_PAR_WIDTH,
-      g_param_spec_uint (OGMRIP_XVID_PROP_PAR_WIDTH,
-        NULL, NULL, 1, 255, OGMRIP_XVID_DEFAULT_PAR_WIDTH, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_XVID_PROP_PAR_WIDTH, NULL, NULL,
+        1, 255, OGMRIP_XVID_DEFAULT_PAR_WIDTH, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_PAR_HEIGHT,
-      g_param_spec_uint (OGMRIP_XVID_PROP_PAR_HEIGHT,
-        NULL, NULL, 1, 255, OGMRIP_XVID_DEFAULT_PAR_HEIGHT, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_XVID_PROP_PAR_HEIGHT, NULL, NULL,
+        1, 255, OGMRIP_XVID_DEFAULT_PAR_HEIGHT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_GMC,
-      g_param_spec_boolean (OGMRIP_XVID_PROP_GMC,
-        NULL, NULL, OGMRIP_XVID_DEFAULT_GMC, G_PARAM_READWRITE));
+      g_param_spec_boolean (OGMRIP_XVID_PROP_GMC, NULL, NULL,
+        OGMRIP_XVID_DEFAULT_GMC, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_INTERLACING,
-      g_param_spec_boolean (OGMRIP_XVID_PROP_INTERLACING,
-        NULL, NULL, OGMRIP_XVID_DEFAULT_INTERLACING, G_PARAM_READWRITE));
+      g_param_spec_boolean (OGMRIP_XVID_PROP_INTERLACING, NULL, NULL,
+        OGMRIP_XVID_DEFAULT_INTERLACING, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_CHROMA_ME,
-      g_param_spec_boolean (OGMRIP_XVID_PROP_CHROMA_ME,
-        NULL, NULL, OGMRIP_XVID_DEFAULT_CHROMA_ME, G_PARAM_READWRITE));
+      g_param_spec_boolean (OGMRIP_XVID_PROP_CHROMA_ME, NULL, NULL,
+        OGMRIP_XVID_DEFAULT_CHROMA_ME, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_CHROMA_OPT,
-      g_param_spec_boolean (OGMRIP_XVID_PROP_CHROMA_OPT,
-        NULL, NULL, OGMRIP_XVID_DEFAULT_CHROMA_OPT, G_PARAM_READWRITE));
+      g_param_spec_boolean (OGMRIP_XVID_PROP_CHROMA_OPT, NULL, NULL,
+        OGMRIP_XVID_DEFAULT_CHROMA_OPT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_PACKED,
-      g_param_spec_boolean (OGMRIP_XVID_PROP_PACKED,
-        NULL, NULL, OGMRIP_XVID_DEFAULT_PACKED, G_PARAM_READWRITE));
+      g_param_spec_boolean (OGMRIP_XVID_PROP_PACKED, NULL, NULL,
+        OGMRIP_XVID_DEFAULT_PACKED, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_CLOSED_GOP,
-      g_param_spec_boolean (OGMRIP_XVID_PROP_CLOSED_GOP,
-        NULL, NULL, OGMRIP_XVID_DEFAULT_CLOSED_GOP, G_PARAM_READWRITE));
+      g_param_spec_boolean (OGMRIP_XVID_PROP_CLOSED_GOP, NULL, NULL,
+        OGMRIP_XVID_DEFAULT_CLOSED_GOP, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_CARTOON,
-      g_param_spec_boolean (OGMRIP_XVID_PROP_CARTOON,
-        NULL, NULL, OGMRIP_XVID_DEFAULT_CARTOON, G_PARAM_READWRITE));
+      g_param_spec_boolean (OGMRIP_XVID_PROP_CARTOON, NULL, NULL,
+        OGMRIP_XVID_DEFAULT_CARTOON, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_GRAYSCALE,
-      g_param_spec_boolean (OGMRIP_XVID_PROP_GRAYSCALE,
-        NULL, NULL, OGMRIP_XVID_DEFAULT_GRAYSCALE, G_PARAM_READWRITE));
+      g_param_spec_boolean (OGMRIP_XVID_PROP_GRAYSCALE, NULL, NULL,
+        OGMRIP_XVID_DEFAULT_GRAYSCALE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_QPEL,
-      g_param_spec_boolean (OGMRIP_XVID_PROP_QPEL,
-        NULL, NULL, OGMRIP_XVID_DEFAULT_QPEL, G_PARAM_READWRITE));
+      g_param_spec_boolean (OGMRIP_XVID_PROP_QPEL, NULL, NULL,
+        OGMRIP_XVID_DEFAULT_QPEL, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_TRELLIS,
-      g_param_spec_boolean (OGMRIP_XVID_PROP_TRELLIS,
-        NULL, NULL, OGMRIP_XVID_DEFAULT_TRELLIS, G_PARAM_READWRITE));
+      g_param_spec_boolean (OGMRIP_XVID_PROP_TRELLIS, NULL, NULL,
+        OGMRIP_XVID_DEFAULT_TRELLIS, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 }
 
 static void

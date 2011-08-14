@@ -79,7 +79,7 @@ ogmdvd_chapter_list_class_init (OGMDvdChapterListClass *klass)
 
   g_object_class_install_property (object_class, PROP_TITLE, 
         g_param_spec_pointer ("title", "Title property", "The DVD title",
-          G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMDvdChapterListPriv));
 }

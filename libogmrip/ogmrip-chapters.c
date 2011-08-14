@@ -72,7 +72,7 @@ ogmrip_chapters_class_init (OGMRipChaptersClass *klass)
 
   g_object_class_install_property (gobject_class, PROP_LANGUAGE, 
         g_param_spec_uint ("language", "Language property", "Set language", 
-           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipChaptersPriv));
 }

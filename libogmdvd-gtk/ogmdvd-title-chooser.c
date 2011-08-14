@@ -36,7 +36,7 @@ ogmdvd_title_chooser_default_init (OGMDvdTitleChooserInterface *iface)
 {
   g_object_interface_install_property (iface,
       g_param_spec_pointer ("disc", "Disc property", "The DVD disc",
-        G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 }
 
 /**

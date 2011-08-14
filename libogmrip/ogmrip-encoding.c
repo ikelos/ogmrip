@@ -134,39 +134,39 @@ ogmrip_encoding_class_init (OGMRipEncodingClass *klass)
 /*
   g_object_class_install_property (gobject_class, PROP_AUDIO_CODECS, 
         g_param_spec_boxed ("audio-codecs", "Audio codecs property", "Set audio codecs", 
-           G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 */
   g_object_class_install_property (gobject_class, PROP_AUTOCROP, 
         g_param_spec_boolean ("autocrop", "Autocrop property", "Set autocrop", 
-           TRUE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_AUTOSCALE, 
         g_param_spec_boolean ("autoscale", "Autoscale property", "Set autoscale", 
-           TRUE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_CONTAINER, 
         g_param_spec_object ("container", "Container property", "Set the container", 
-           OGMRIP_TYPE_CONTAINER, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           OGMRIP_TYPE_CONTAINER, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_LOG_FILE, 
         g_param_spec_string ("log-file", "Log file property", "Set the log file", 
-           NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           NULL, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_PROFILE, 
         g_param_spec_object ("profile", "Profile property", "Set the profile", 
-           OGMRIP_TYPE_PROFILE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           OGMRIP_TYPE_PROFILE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_RELATIVE, 
         g_param_spec_boolean ("relative", "Relative property", "Set relative", 
-           FALSE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 /*
   g_object_class_install_property (gobject_class, PROP_SUBP_CODECS, 
         g_param_spec_boxed ("subp-codecs", "Subp codecs property", "Set subp codecs", 
-           G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 */
   g_object_class_install_property (gobject_class, PROP_TEST, 
         g_param_spec_boolean ("test", "Test property", "Set test", 
-           TRUE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_TITLE, 
         g_param_spec_pointer ("title", "Title property", "Set title", 
@@ -174,7 +174,7 @@ ogmrip_encoding_class_init (OGMRipEncodingClass *klass)
 
   g_object_class_install_property (gobject_class, PROP_VIDEO_CODEC, 
         g_param_spec_object ("video-codec", "Video codec property", "Set video codec", 
-           OGMRIP_TYPE_VIDEO_CODEC, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           OGMRIP_TYPE_VIDEO_CODEC, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipEncodingPriv));
 }

@@ -27,23 +27,23 @@ ogmrip_audio_options_default_init (OGMRipAudioOptionsInterface *iface)
   g_object_interface_install_property (iface,
       g_param_spec_uint ("channels", "Channels property", "Set channels",
         OGMDVD_AUDIO_CHANNELS_MONO, OGMDVD_AUDIO_CHANNELS_5_1, OGMDVD_AUDIO_CHANNELS_STEREO,
-        G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_interface_install_property (iface,
       g_param_spec_gtype ("codec", "Codec property", "Set codec",
-        OGMRIP_TYPE_AUDIO_CODEC, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+        OGMRIP_TYPE_AUDIO_CODEC, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_interface_install_property (iface,
       g_param_spec_boolean ("normalize", "Normalize property", "Set normalize",
-        TRUE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+        TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_interface_install_property (iface,
       g_param_spec_uint ("quality", "Quality property", "Set quality",
-        0, 10, 3, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+        0, 10, 3, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_interface_install_property (iface,
       g_param_spec_uint ("sample-rate", "Sample rate property", "Set sample rate",
-        0, G_MAXUINT, 48000, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+        0, G_MAXUINT, 48000, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 }
 
 guint

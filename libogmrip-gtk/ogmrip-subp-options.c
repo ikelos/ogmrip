@@ -27,24 +27,24 @@ ogmrip_subp_options_default_init (OGMRipSubpOptionsInterface *iface)
   g_object_interface_install_property (iface,
       g_param_spec_uint ("character-set", "Character set property", "Set character set",
         OGMRIP_CHARSET_UTF8, OGMRIP_CHARSET_ASCII, OGMRIP_CHARSET_UTF8,
-        G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_interface_install_property (iface,
       g_param_spec_gtype ("codec", "Codec property", "Set codec",
-        OGMRIP_TYPE_SUBP_CODEC, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+        OGMRIP_TYPE_SUBP_CODEC, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_interface_install_property (iface,
       g_param_spec_boolean ("forced-only", "Forced only property", "Set forced only",
-        FALSE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+        FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_interface_install_property (iface,
       g_param_spec_uint ("newline-style", "Newline style property", "Set newline style",
         OGMRIP_NEWLINE_LF, OGMRIP_NEWLINE_CR, OGMRIP_NEWLINE_LF,
-        G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_interface_install_property (iface,
       g_param_spec_boolean ("spell-check", "Spell check property", "Set spell check",
-        FALSE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+        FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 }
 
 OGMRipCharset

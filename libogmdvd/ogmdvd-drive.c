@@ -364,7 +364,7 @@ ogmdvd_drive_class_init (OGMDvdDriveClass *klass)
 
   g_object_class_install_property (object_class, PROP_GDRIVE,
       g_param_spec_object ("gdrive", "GDrive", "A GDrive object for the drive",
-        G_TYPE_DRIVE, G_PARAM_READWRITE));
+        G_TYPE_DRIVE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMDvdDrivePriv));
 }

@@ -297,96 +297,96 @@ ogmrip_lavc_class_init (OGMRipLavcClass *klass)
   spawn_class->run = ogmrip_lavc_run;
 
   g_object_class_install_property (gobject_class, PROP_HEADER,
-      g_param_spec_uint (OGMRIP_LAVC_PROP_HEADER,
-        "Header property", "Set header", 0, 3, 0, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_LAVC_PROP_HEADER, "Header property", "Set header",
+        0, 3, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_CMP,
-      g_param_spec_uint (OGMRIP_LAVC_PROP_CMP,
-        "Cmp property", "Set cmp", 0, 2000, 0, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_LAVC_PROP_CMP, "Cmp property", "Set cmp",
+        0, 2000, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_PRECMP,
-      g_param_spec_uint (OGMRIP_LAVC_PROP_PRECMP,
-        "Precmp property", "Set precmp", 0, 2000, 0, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_LAVC_PROP_PRECMP, "Precmp property", "Set precmp",
+        0, 2000, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_SUBCMP,
-      g_param_spec_uint (OGMRIP_LAVC_PROP_SUBCMP,
-        "Subcmp property", "Set subcmp", 0, 2000, 0, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_LAVC_PROP_SUBCMP, "Subcmp property", "Set subcmp",
+        0, 2000, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_DIA,
-      g_param_spec_int (OGMRIP_LAVC_PROP_DIA,
-        "Dia property", "Set dia", -99, 6, 1, G_PARAM_READWRITE));
+      g_param_spec_int (OGMRIP_LAVC_PROP_DIA, "Dia property", "Set dia",
+        -99, 6, 1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_PREDIA,
-      g_param_spec_int (OGMRIP_LAVC_PROP_PREDIA,
-        "Predia property", "Set predia", -99, 6, 1, G_PARAM_READWRITE));
+      g_param_spec_int (OGMRIP_LAVC_PROP_PREDIA, "Predia property", "Set predia",
+        -99, 6, 1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_MBD,
-      g_param_spec_uint (OGMRIP_LAVC_PROP_MBD,
-        "Mbd property", "Set mbd", 0, 2, 0, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_LAVC_PROP_MBD, "Mbd property", "Set mbd",
+        0, 2, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_QNS,
-      g_param_spec_uint (OGMRIP_LAVC_PROP_QNS,
-        "Qns property", "Set qns", 0, 3, 0, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_LAVC_PROP_QNS, "Qns property", "Set qns",
+        0, 3, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_VB_STRATEGY,
-      g_param_spec_uint (OGMRIP_LAVC_PROP_VB_STRATEGY,
-        "VB strategy property", "Set bv strategy", 0, 2, 0, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_LAVC_PROP_VB_STRATEGY, "VB strategy property", "Set bv strategy",
+        0, 2, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_LAST_PRED,
-      g_param_spec_uint (OGMRIP_LAVC_PROP_LAST_PRED,
-        "Last pref property", "Set last pred", 0, 99, 0, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_LAVC_PROP_LAST_PRED, "Last pref property", "Set last pred",
+        0, 99, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_PREME,
-      g_param_spec_uint (OGMRIP_LAVC_PROP_PREME,
-        "Preme property", "Set preme", 0, 2, 1, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_LAVC_PROP_PREME, "Preme property", "Set preme",
+        0, 2, 1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_VQCOMP,
-      g_param_spec_double (OGMRIP_LAVC_PROP_VQCOMP,
-        "Vqcomp property", "Set vqcomp", 0.0, 1.0, 0.5, G_PARAM_READWRITE));
+      g_param_spec_double (OGMRIP_LAVC_PROP_VQCOMP, "Vqcomp property", "Set vqcomp",
+        0.0, 1.0, 0.5, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_MV0,
-      g_param_spec_boolean (OGMRIP_LAVC_PROP_MV0,
-        "Mv0 property", "Set mv0", FALSE, G_PARAM_READWRITE));
+      g_param_spec_boolean (OGMRIP_LAVC_PROP_MV0, "Mv0 property", "Set mv0",
+        FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_DC,
-      g_param_spec_uint (OGMRIP_LAVC_PROP_DC,
-        "DC property", "Set dc", 1, G_MAXUINT, 8, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_LAVC_PROP_DC, "DC property", "Set dc",
+        1, G_MAXUINT, 8, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_KEYINT,
-      g_param_spec_uint (OGMRIP_LAVC_PROP_KEYINT,
-        "Keyint property", "Set keyint", 1, G_MAXUINT, 250, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_LAVC_PROP_KEYINT, "Keyint property", "Set keyint",
+        1, G_MAXUINT, 250, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_BUF_SIZE,
-      g_param_spec_uint (OGMRIP_LAVC_PROP_BUF_SIZE,
-        "Buffer size property", "Set buffer size", 0, G_MAXUINT, 0, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_LAVC_PROP_BUF_SIZE, "Buffer size property", "Set buffer size",
+        0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_MIN_RATE,
-      g_param_spec_uint (OGMRIP_LAVC_PROP_MIN_RATE,
-        "Min rate property", "Set min rate", 0, G_MAXUINT, 0, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_LAVC_PROP_MIN_RATE, "Min rate property", "Set min rate",
+        0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_MAX_RATE,
-      g_param_spec_uint (OGMRIP_LAVC_PROP_MAX_RATE,
-        "Max rate property", "Set max rate", 0, G_MAXUINT, 0, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_LAVC_PROP_MAX_RATE, "Max rate property", "Set max rate",
+        0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_STRICT,
-      g_param_spec_uint (OGMRIP_LAVC_PROP_STRICT,
-        "Strict property", "Set strict", 0, 3, 2, G_PARAM_READWRITE));
+      g_param_spec_uint (OGMRIP_LAVC_PROP_STRICT, "Strict property", "Set strict",
+        0, 3, 2, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_GRAYSCALE,
-      g_param_spec_boolean (OGMRIP_LAVC_PROP_GRAYSCALE,
-        "Grayscale property", "Set grayscale", FALSE, G_PARAM_READWRITE));
+      g_param_spec_boolean (OGMRIP_LAVC_PROP_GRAYSCALE, "Grayscale property", "Set grayscale",
+        FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_QPEL,
-      g_param_spec_boolean (OGMRIP_LAVC_PROP_QPEL,
-        "Qpel property", "Set qpel", FALSE, G_PARAM_READWRITE));
+      g_param_spec_boolean (OGMRIP_LAVC_PROP_QPEL, "Qpel property", "Set qpel",
+        FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_TRELLIS,
-      g_param_spec_boolean (OGMRIP_LAVC_PROP_TRELLIS,
-        "Trellis property", "Set trellis", TRUE, G_PARAM_READWRITE));
+      g_param_spec_boolean (OGMRIP_LAVC_PROP_TRELLIS, "Trellis property", "Set trellis",
+        TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_V4MV,
-      g_param_spec_boolean (OGMRIP_LAVC_PROP_V4MV,
-        "4MV property", "Set 4mv", TRUE, G_PARAM_READWRITE));
+      g_param_spec_boolean (OGMRIP_LAVC_PROP_V4MV, "4MV property", "Set 4mv",
+        TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipLavcPriv));
 }

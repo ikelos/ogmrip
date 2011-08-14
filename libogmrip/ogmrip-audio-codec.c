@@ -83,19 +83,19 @@ ogmrip_audio_codec_class_init (OGMRipAudioCodecClass *klass)
 
   g_object_class_install_property (gobject_class, PROP_QUALITY, 
         g_param_spec_uint ("quality", "Quality property", "Set quality", 
-           0, 10, 3, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           0, 10, 3, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_NORMALIZE, 
         g_param_spec_boolean ("normalize", "Normalize property", "Set normalize", 
-           FALSE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_CHANNELS, 
         g_param_spec_uint ("channels", "Channels property", "Set channels", 
-           0, 10, OGMDVD_AUDIO_CHANNELS_STEREO, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           0, 10, OGMDVD_AUDIO_CHANNELS_STEREO, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_SRATE, 
         g_param_spec_uint ("sample-rate", "Sample rate property", "Set sample rate", 
-           0, G_MAXUINT, 48000, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           0, G_MAXUINT, 48000, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_SPF, 
         g_param_spec_uint ("samples-per-frame", "Samples per frame property", "Set samples per frame", 
@@ -103,15 +103,15 @@ ogmrip_audio_codec_class_init (OGMRipAudioCodecClass *klass)
 
   g_object_class_install_property (gobject_class, PROP_FAST, 
         g_param_spec_boolean ("fast", "Fast property", "Set fast", 
-           FALSE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_LABEL, 
         g_param_spec_string ("label", "Label property", "Set label", 
-           NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           NULL, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_LANGUAGE, 
         g_param_spec_uint ("language", "Language property", "Set language", 
-           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipAudioCodecPriv));
 }

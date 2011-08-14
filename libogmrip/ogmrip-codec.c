@@ -115,7 +115,7 @@ ogmrip_codec_class_init (OGMRipCodecClass *klass)
 
   g_object_class_install_property (gobject_class, PROP_OUTPUT, 
         g_param_spec_string ("output", "Output property", "Set output file", 
-           NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           NULL, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_LENGTH, 
         g_param_spec_double ("length", "Length property", "Get length", 
@@ -123,11 +123,11 @@ ogmrip_codec_class_init (OGMRipCodecClass *klass)
 
   g_object_class_install_property (gobject_class, PROP_START_CHAPTER, 
         g_param_spec_int ("start-chapter", "Start chapter property", "Set start chapter", 
-           0, G_MAXINT, 0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           0, G_MAXINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_END_CHAPTER, 
         g_param_spec_int ("end-chapter", "End chapter property", "Set end chapter", 
-           -1, G_MAXINT, -1, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           -1, G_MAXINT, -1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipCodecPriv));
 }

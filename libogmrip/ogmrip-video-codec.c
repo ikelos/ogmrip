@@ -116,58 +116,58 @@ ogmrip_video_codec_class_init (OGMRipVideoCodecClass *klass)
 
   g_object_class_install_property (gobject_class, PROP_ANGLE, 
         g_param_spec_uint ("angle", "Angle property", "Set angle", 
-           1, G_MAXUINT, 1, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           1, G_MAXUINT, 1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_BITRATE, 
         g_param_spec_uint ("bitrate", "Bitrate property", "Set bitrate", 
-           4000, 24000000, 800000, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           4000, 24000000, 800000, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_QUANTIZER, 
         g_param_spec_double ("quantizer", "Quantizer property", "Set quantizer", 
-           -1.0, 31.0, -1.0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           -1.0, 31.0, -1.0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_BPP, 
         g_param_spec_double ("bpp", "Bits per pixel property", "Set bits per pixel", 
-           0.0, 1.0, 0.25, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           0.0, 1.0, 0.25, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_PASSES, 
         g_param_spec_uint ("passes", "Passes property", "Set the number of passes", 
-           1, G_MAXUINT, 1, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           1, G_MAXUINT, 1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_THREADS, 
         g_param_spec_uint ("threads", "Threads property", "Set the number of threads", 
-           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_SCALER, 
         g_param_spec_uint ("scaler", "Scaler property", "Set the scaler", 
            OGMRIP_SCALER_NONE, OGMRIP_SCALER_BICUBIC_SPLINE, OGMRIP_SCALER_GAUSS,
-           G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_DEINT, 
         g_param_spec_uint ("deinterlacer", "Deinterlacer property", "Set the deinterlacer", 
            OGMRIP_DEINT_NONE, OGMRIP_DEINT_YADIF, OGMRIP_DEINT_NONE,
-           G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_QUALITY, 
         g_param_spec_uint ("quality", "Quality property", "Set the quality", 
            OGMRIP_QUALITY_EXTREME, OGMRIP_QUALITY_USER, OGMRIP_QUALITY_NORMAL,
-           G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_TURBO, 
         g_param_spec_boolean ("turbo", "Turbo property", "Set turbo", 
-           FALSE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_DENOISE, 
         g_param_spec_boolean ("denoise", "Denoise property", "Set denoise", 
-           FALSE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_DEBLOCK, 
         g_param_spec_boolean ("deblock", "Deblock property", "Set deblock", 
-           TRUE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_DERING, 
         g_param_spec_boolean ("dering", "Dering property", "Set dering", 
-           TRUE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_DELAY, 
         g_param_spec_uint ("start-delay", "Start delay property", "Set start delay", 

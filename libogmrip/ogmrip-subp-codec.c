@@ -75,23 +75,23 @@ ogmrip_subp_codec_class_init (OGMRipSubpCodecClass *klass)
 
   g_object_class_install_property (gobject_class, PROP_FORCED_ONLY, 
         g_param_spec_boolean ("forced-only", "Forced only property", "Set forced only", 
-           FALSE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_CHARSET,
       g_param_spec_uint ("character-set", "Charset property", "Set charset",
-        0, OGMRIP_CHARSET_ASCII, 0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+        0, OGMRIP_CHARSET_ASCII, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_NEWLINE,
       g_param_spec_uint ("newline-style", "Newline property", "Set newline",
-        0, OGMRIP_NEWLINE_CR_LF, 0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+        0, OGMRIP_NEWLINE_CR_LF, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_LABEL, 
         g_param_spec_string ("label", "Label property", "Set label", 
-           NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           NULL, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_LANGUAGE, 
         g_param_spec_uint ("language", "Language property", "Set language", 
-           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipSubpCodecPriv));
 }
