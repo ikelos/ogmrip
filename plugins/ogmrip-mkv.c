@@ -52,8 +52,18 @@ struct _OGMRipMatroskaClass
   OGMRipContainerClass parent_class;
 };
 
+enum
+{
+  PROP_0,
+  PROP_OVERHEAD
+};
+
 GType ogmrip_matroska_get_type (void);
-static gint ogmrip_matroska_run (OGMJobSpawn *spawn);
+static void ogmrip_matroska_get_property (GObject     *gobject,
+                                          guint       property_id,
+                                          GValue      *value,
+                                          GParamSpec  *pspec);
+static gint ogmrip_matroska_run          (OGMJobSpawn *spawn);
 
 static gdouble
 ogmrip_matroska_watch (OGMJobExec *exec, const gchar *buffer, OGMRipContainer *matroska)
@@ -237,20 +247,6 @@ ogmrip_matroska_append_subp_file (OGMRipContainer *matroska, const gchar *filena
 }
 /*
 static void
-ogmrip_matroska_foreach_subp (OGMRipContainer *matroska, 
-    OGMRipCodec *codec, guint demuxer, gint language, GPtrArray *argv)
-{
-  const gchar *input, *label;
-  gint charset;
-
-  input = ogmrip_codec_get_output (codec);
-  label = ogmrip_subp_codec_get_label (OGMRIP_SUBP_CODEC (codec));
-  charset = ogmrip_subp_codec_get_charset (OGMRIP_SUBP_CODEC (codec));
-
-  ogmrip_matroska_append_subp_file (matroska, input, label, demuxer, charset, language, argv);
-}
-
-static void
 ogmrip_matroska_foreach_chapters (OGMRipContainer *matroska, 
     OGMRipCodec *codec, guint demuxer, gint language, GPtrArray *argv)
 {
@@ -278,35 +274,6 @@ ogmrip_matroska_foreach_chapters (OGMRipContainer *matroska,
 
     g_ptr_array_add (argv, g_strdup (input));
   }
-}
-
-static void
-ogmrip_matroska_foreach_file (OGMRipContainer *matroska, OGMRipFile *file, GPtrArray *argv)
-{
-  gchar *filename;
-
-  filename = ogmrip_file_get_filename (file);
-  if (filename)
-  {
-    gint charset, lang;
-
-    lang = ogmrip_file_get_language (file);
-
-    switch (ogmrip_file_get_type (file))
-    {
-      case OGMRIP_FILE_TYPE_AUDIO:
-        ogmrip_matroska_append_audio_file (matroska, filename, NULL, lang, argv);
-        break;
-      case OGMRIP_FILE_TYPE_SUBP:
-        charset = ogmrip_subp_file_get_charset (OGMRIP_SUBP_FILE (file));
-        ogmrip_matroska_append_subp_file (matroska, filename, NULL, OGMRIP_SUBP_DEMUXER_AUTO, charset, lang, argv);
-        break;
-      default:
-        g_assert_not_reached ();
-        break;
-    }
-  }
-  g_free (filename);
 }
 */
 static void
@@ -345,18 +312,6 @@ ogmrip_matroska_command (OGMRipContainer *matroska)
 /*
   if ((video = ogmrip_container_get_video (matroska)))
   {
-    if (major_version == 1)
-    {
-      if (ogmrip_plugin_get_video_codec_format (G_TYPE_FROM_INSTANCE (video)) == OGMRIP_FORMAT_H264)
-      {
-        /?*
-         * Option to merge h264 streams
-         *?/
-        g_ptr_array_add (argv, g_strdup ("--engage"));
-        g_ptr_array_add (argv, g_strdup ("allow_avc_in_vfw_mode"));
-      }
-    }
-
     g_ptr_array_add (argv, g_strdup ("--command-line-charset"));
     g_ptr_array_add (argv, g_strdup ("UTF-8"));
 
@@ -368,15 +323,6 @@ ogmrip_matroska_command (OGMRipContainer *matroska)
     g_ptr_array_add (argv, g_strdup ("-S"));
     g_ptr_array_add (argv, g_strdup (filename));
   }
-
-  ogmrip_container_foreach_audio (matroska, 
-      (OGMRipContainerCodecFunc) ogmrip_matroska_foreach_audio, argv);
-  ogmrip_container_foreach_subp (matroska, 
-      (OGMRipContainerCodecFunc) ogmrip_matroska_foreach_subp, argv);
-  ogmrip_container_foreach_chapters (matroska, 
-      (OGMRipContainerCodecFunc) ogmrip_matroska_foreach_chapters, argv);
-  ogmrip_container_foreach_file (matroska, 
-      (OGMRipContainerFileFunc) ogmrip_matroska_foreach_file, argv);
 */
   ogmrip_container_foreach_file (matroska,
       (OGMRipContainerFunc) ogmrip_matroska_foreach_file, argv);
@@ -405,15 +351,37 @@ G_DEFINE_TYPE (OGMRipMatroska, ogmrip_matroska, OGMRIP_TYPE_CONTAINER)
 static void
 ogmrip_matroska_class_init (OGMRipMatroskaClass *klass)
 {
+  GObjectClass *gobject_class;
   OGMJobSpawnClass *spawn_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->get_property = ogmrip_matroska_get_property;
 
   spawn_class = OGMJOB_SPAWN_CLASS (klass);
   spawn_class->run = ogmrip_matroska_run;
+
+  g_object_class_install_property (gobject_class, PROP_OVERHEAD, 
+        g_param_spec_uint ("overhead", "Overhead property", "Get overhead", 
+           0, G_MAXUINT, MKV_OVERHEAD, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 }
 
 static void
 ogmrip_matroska_init (OGMRipMatroska *matroska)
 {
+}
+
+static void
+ogmrip_matroska_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
+{
+  switch (property_id)
+  {
+    case PROP_OVERHEAD:
+      g_value_set_uint (value, MKV_OVERHEAD);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
+      break;
+  }
 }
 
 static gint
@@ -444,13 +412,7 @@ ogmrip_matroska_run (OGMJobSpawn *spawn)
 
   return result;
 }
-/*
-static gint
-ogmrip_matroska_get_overhead (OGMRipContainer *container)
-{
-  return MKV_OVERHEAD;
-}
-*/
+
 static OGMRipContainerPlugin mkv_plugin =
 {
   NULL,
