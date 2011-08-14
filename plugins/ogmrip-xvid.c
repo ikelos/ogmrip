@@ -21,10 +21,9 @@
 #endif
 
 #include "ogmrip-xvid.h"
-#include "ogmrip-mplayer.h"
 
-#include <ogmrip.h>
 #include <ogmjob.h>
+#include <ogmrip-mplayer.h>
 
 #include <stdio.h>
 #include <unistd.h>

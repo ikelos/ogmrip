@@ -22,10 +22,9 @@
 
 #include <glib/gi18n.h>
 
+#include "ogmrip-xvid.h"
 #include "ogmrip-helper.h"
 #include "ogmrip-options-plugin.h"
-#include "ogmrip-plugin.h"
-#include "ogmrip-xvid.h"
 
 #define OGMRIP_GLADE_FILE "ogmrip/ogmrip-xvid.glade"
 #define OGMRIP_GLADE_ROOT "root"

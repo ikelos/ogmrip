@@ -20,12 +20,11 @@
 #include "config.h"
 #endif
 
-#include <glib/gi18n.h>
-
+#include "ogmrip-x264.h"
 #include "ogmrip-helper.h"
 #include "ogmrip-options-plugin.h"
-#include "ogmrip-plugin.h"
-#include "ogmrip-x264.h"
+
+#include <glib/gi18n.h>
 
 #define OGMRIP_GLADE_FILE "ogmrip/ogmrip-x264.glade"
 #define OGMRIP_GLADE_ROOT "root"

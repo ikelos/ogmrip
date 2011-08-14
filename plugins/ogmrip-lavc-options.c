@@ -20,13 +20,13 @@
 #include "config.h"
 #endif
 
-#include <glib/gi18n.h>
-
-#include "ogmrip-helper.h"
-#include "ogmrip-lavc.h"
 #include "ogmrip-lavc-mpeg4.h"
+
+#include "ogmrip-lavc.h"
+#include "ogmrip-helper.h"
 #include "ogmrip-options-plugin.h"
-#include "ogmrip-plugin.h"
+
+#include <glib/gi18n.h>
 
 #define OGMRIP_GLADE_FILE "ogmrip/ogmrip-lavc.glade"
 #define OGMRIP_GLADE_ROOT "root"

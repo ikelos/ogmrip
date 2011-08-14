@@ -20,9 +20,8 @@
 #include "config.h"
 #endif
 
-#include "ogmrip-lavc.h"
-#include "ogmrip-lavc-mpeg4.h"
-#include "ogmrip-plugin.h"
+#include <ogmrip-lavc.h>
+#include <ogmrip-lavc-mpeg4.h>
 
 #include <glib/gi18n-lib.h>
 

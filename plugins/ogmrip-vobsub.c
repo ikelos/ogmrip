@@ -20,13 +20,9 @@
 #include "config.h"
 #endif
 
-#include "ogmrip-mplayer.h"
-#include "ogmrip-plugin.h"
-#include "ogmrip-subp-codec.h"
-#include "ogmrip-version.h"
-
-#include "ogmjob-queue.h"
-#include "ogmjob-exec.h"
+#include <ogmjob.h>
+#include <ogmrip.h>
+#include <ogmrip-mplayer.h>
 
 #include <errno.h>
 #include <fcntl.h>

@@ -19,7 +19,7 @@
 #ifndef __OGMRIP_XVID_H__
 #define __OGMRIP_XVID_H__
 
-#include <ogmrip-codec.h>
+#include <ogmrip.h>
 
 G_BEGIN_DECLS
 
