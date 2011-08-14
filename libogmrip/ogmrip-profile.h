@@ -23,7 +23,7 @@
 
 G_BEGIN_DECLS
 
-#define OGMRIP_PROFILE_PATH   "/apps/ogmrip/profiles/"
+#define OGMRIP_PROFILE_PATH "/apps/ogmrip/profiles/"
 
 #define OGMRIP_TYPE_PROFILE          (ogmrip_profile_get_type ())
 #define OGMRIP_PROFILE(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_PROFILE, OGMRipProfile))
@@ -47,25 +47,25 @@ struct _OGMRipProfileClass
   GSettingsClass parent_class;
 };
 
-GType           ogmrip_profile_get_type          (void);
-OGMRipProfile * ogmrip_profile_new               (const gchar   *name);
-OGMRipProfile * ogmrip_profile_new_from_file     (GFile         *file,
-                                                  GError        **error);
-gboolean        ogmrip_profile_dump              (OGMRipProfile *profile,
-                                                  GFile         *file,
-                                                  GError        **error);
-void            ogmrip_profile_get               (OGMRipProfile *profile,
-                                                  const gchar   *section,
-                                                  const gchar   *key,
-                                                  const gchar   *format,
-                                                  ...);
-gboolean        ogmrip_profile_set               (OGMRipProfile *profile,
-                                                  const gchar   *section,
-                                                  const gchar   *key,
-                                                  const gchar   *format,
-                                                  ...);
-GSettings *     ogmrip_profile_get_child         (OGMRipProfile *profile,
-                                                  const gchar   *name);
+GType           ogmrip_profile_get_type      (void);
+OGMRipProfile * ogmrip_profile_new           (const gchar   *name);
+OGMRipProfile * ogmrip_profile_new_from_file (GFile         *file,
+                                              GError        **error);
+gboolean        ogmrip_profile_dump          (OGMRipProfile *profile,
+                                              GFile         *file,
+                                              GError        **error);
+void            ogmrip_profile_get           (OGMRipProfile *profile,
+                                              const gchar   *section,
+                                              const gchar   *key,
+                                              const gchar   *format,
+                                              ...);
+gboolean        ogmrip_profile_set           (OGMRipProfile *profile,
+                                              const gchar   *section,
+                                              const gchar   *key,
+                                              const gchar   *format,
+                                              ...);
+GSettings *     ogmrip_profile_get_child     (OGMRipProfile *profile,
+                                              const gchar   *name);
 
 G_END_DECLS
 

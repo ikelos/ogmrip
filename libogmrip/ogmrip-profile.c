@@ -27,19 +27,26 @@
 #define OGMRIP_PROFILE_GET_PRIVATE(o) \
     (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_PROFILE, OGMRipProfilePriv))
 
-typedef struct
-{
-  GSettings *settings;
-  gchar *name;
-} OGMRipProfileSection;
-
 struct _OGMRipProfilePriv
 {
-  GSList *sections;
+  GSettings *general_settings;
+  gchar *container;
+
+  GSettings *video_settings;
+  gchar *video_codec;
+
+  GSettings *audio_settings;
+  gchar *audio_codec;
+
+  GSettings *subp_settings;
+  gchar *subp_codec;
+
+  gchar *path;
 };
 
 static void ogmrip_profile_constructed  (GObject    *gobject);
 static void ogmrip_profile_dispose      (GObject    *gobject);
+static void ogmrip_profile_finalize     (GObject    *gobject);
 
 static gboolean
 ogmrip_profile_has_schema (const gchar *schema)
@@ -58,48 +65,11 @@ ogmrip_profile_has_schema (const gchar *schema)
   return FALSE;
 }
 
-static OGMRipProfileSection *
-ogmrip_profile_section_new (OGMRipProfile *profile, const gchar *name)
-{
-  OGMRipProfileSection *section;
-
-  section = g_new0 (OGMRipProfileSection, 1);
-  section->name = g_strdup (name);
-
-  section->settings = g_settings_get_child (G_SETTINGS (profile), name);
-
-  return section;
-}
-
-static OGMRipProfileSection *
-ogmrip_profile_section_new_for_codec (OGMRipProfile *profile, const gchar *path, const gchar *name)
-{
-  OGMRipProfileSection *section;
-  gchar *schema, *new_path;
-
-  schema = g_strconcat ("org.ogmrip.", name, NULL);
-  if (!ogmrip_profile_has_schema (schema))
-  {
-    g_free (schema);
-    return NULL;
-  }
-
-  section = g_new0 (OGMRipProfileSection, 1);
-  section->name = g_strdup (name);
-
-  new_path = g_strconcat (path, name, "/", NULL);
-  section->settings = g_settings_new_with_path (schema, new_path);
-  g_free (new_path);
-
-  return section;
-}
-
 static void
-ogmrip_profile_section_free (OGMRipProfileSection *section)
+ogmrip_profile_codec_changed (GSettings *settings, const gchar *key, gchar **name)
 {
-  g_object_unref (section->settings);
-  g_free (section->name);
-  g_free (section);
+  g_free (*name);
+  *name = g_settings_get_string (settings, key);
 }
 
 G_DEFINE_TYPE (OGMRipProfile, ogmrip_profile, G_TYPE_SETTINGS)
@@ -112,6 +82,7 @@ ogmrip_profile_class_init (OGMRipProfileClass *klass)
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->constructed = ogmrip_profile_constructed;
   gobject_class->dispose = ogmrip_profile_dispose;
+  gobject_class->finalize = ogmrip_profile_finalize;
 
   g_type_class_add_private (klass, sizeof (OGMRipProfilePriv));
 }
@@ -126,54 +97,34 @@ static void
 ogmrip_profile_constructed (GObject *gobject)
 {
   OGMRipProfile *profile = OGMRIP_PROFILE (gobject);
-  OGMRipProfileSection *section;
-  gchar *path, *name;
 
   G_OBJECT_CLASS (ogmrip_profile_parent_class)->constructed (gobject);
 
-  g_object_get (profile, "path", &path, NULL);
+  profile->priv->general_settings = g_settings_get_child (G_SETTINGS (profile), OGMRIP_PROFILE_GENERAL);
+  profile->priv->container = g_settings_get_string (profile->priv->general_settings, OGMRIP_PROFILE_CONTAINER);
 
-  section = ogmrip_profile_section_new (profile, "subp");
-  profile->priv->sections = g_slist_prepend (profile->priv->sections, section);
+  g_signal_connect (profile->priv->general_settings, "changed::" OGMRIP_PROFILE_CONTAINER,
+      G_CALLBACK (ogmrip_profile_codec_changed), &profile->priv->container);
 
-  name = g_settings_get_string (section->settings, OGMRIP_PROFILE_CODEC);
-  section = ogmrip_profile_section_new_for_codec (profile, path, name);
-  g_free (name);
+  profile->priv->video_settings = g_settings_get_child (G_SETTINGS (profile), OGMRIP_PROFILE_VIDEO);
+  profile->priv->video_codec = g_settings_get_string (profile->priv->general_settings, OGMRIP_PROFILE_CODEC);
 
-  if (section)
-    profile->priv->sections = g_slist_prepend (profile->priv->sections, section);
+  g_signal_connect (profile->priv->video_settings, "changed::" OGMRIP_PROFILE_CODEC,
+      G_CALLBACK (ogmrip_profile_codec_changed), &profile->priv->video_codec);
 
-  section = ogmrip_profile_section_new (profile, "audio");
-  profile->priv->sections = g_slist_prepend (profile->priv->sections, section);
+  profile->priv->audio_settings = g_settings_get_child (G_SETTINGS (profile), OGMRIP_PROFILE_AUDIO);
+  profile->priv->audio_codec = g_settings_get_string (profile->priv->general_settings, OGMRIP_PROFILE_CODEC);
 
-  name = g_settings_get_string (section->settings, OGMRIP_PROFILE_CODEC);
-  section = ogmrip_profile_section_new_for_codec (profile, path, name);
-  g_free (name);
+  g_signal_connect (profile->priv->audio_settings, "changed::" OGMRIP_PROFILE_CODEC,
+      G_CALLBACK (ogmrip_profile_codec_changed), &profile->priv->audio_codec);
 
-  if (section)
-    profile->priv->sections = g_slist_prepend (profile->priv->sections, section);
+  profile->priv->subp_settings = g_settings_get_child (G_SETTINGS (profile), OGMRIP_PROFILE_SUBP);
+  profile->priv->subp_codec = g_settings_get_string (profile->priv->general_settings, OGMRIP_PROFILE_CODEC);
 
-  section = ogmrip_profile_section_new (profile, "video");
-  profile->priv->sections = g_slist_prepend (profile->priv->sections, section);
+  g_signal_connect (profile->priv->subp_settings, "changed::" OGMRIP_PROFILE_CODEC,
+      G_CALLBACK (ogmrip_profile_codec_changed), &profile->priv->subp_codec);
 
-  name = g_settings_get_string (section->settings, OGMRIP_PROFILE_CODEC);
-  section = ogmrip_profile_section_new_for_codec (profile, path, name);
-  g_free (name);
-
-  if (section)
-    profile->priv->sections = g_slist_prepend (profile->priv->sections, section);
-
-  section = ogmrip_profile_section_new (profile, "general");
-  profile->priv->sections = g_slist_prepend (profile->priv->sections, section);
-
-  name = g_settings_get_string (section->settings, OGMRIP_PROFILE_CONTAINER);
-  section = ogmrip_profile_section_new_for_codec (profile, path, name);
-  g_free (name);
-
-  if (section)
-    profile->priv->sections = g_slist_prepend (profile->priv->sections, section);
-
-  g_free (path);
+  g_object_get (profile, "path", &profile->priv->path, NULL);
 }
 
 static void
@@ -181,15 +132,39 @@ ogmrip_profile_dispose (GObject *gobject)
 {
   OGMRipProfile *profile = OGMRIP_PROFILE (gobject);
 
-  if (profile->priv->sections)
+  if (profile->priv->general_settings)
   {
-    g_slist_foreach (profile->priv->sections,
-        (GFunc) ogmrip_profile_section_free, NULL);
-    g_slist_free (profile->priv->sections);
-    profile->priv->sections = NULL;
+    g_object_unref (profile->priv->general_settings);
+    profile->priv->general_settings = NULL;
+  }
+
+  if (profile->priv->video_settings)
+  {
+    g_object_unref (profile->priv->video_settings);
+    profile->priv->video_settings = NULL;
+  }
+
+  if (profile->priv->audio_settings)
+  {
+    g_object_unref (profile->priv->audio_settings);
+    profile->priv->audio_settings = NULL;
+  }
+
+  if (profile->priv->subp_settings)
+  {
+    g_object_unref (profile->priv->subp_settings);
+    profile->priv->subp_settings = NULL;
   }
 
   G_OBJECT_CLASS (ogmrip_profile_parent_class)->dispose (gobject);
+}
+
+static void
+ogmrip_profile_finalize (GObject *gobject)
+{
+  g_free (OGMRIP_PROFILE (gobject)->priv->path);
+
+  G_OBJECT_CLASS (ogmrip_profile_parent_class)->finalize (gobject);
 }
 
 OGMRipProfile *
@@ -450,21 +425,52 @@ ogmrip_profile_set (OGMRipProfile *profile, const gchar *section, const gchar *k
   return g_settings_set_value (settings, key, value);
 }
 
+static GSettings *
+ogmrip_profile_get_child_for_codec (OGMRipProfile *profile, const gchar *name)
+{
+  GSettings *settings = NULL;
+  gchar *schema;
+
+  schema = g_strconcat ("org.ogmrip.", name, NULL);
+  if (ogmrip_profile_has_schema (schema))
+  {
+    gchar *path;
+
+    path = g_strconcat (profile->priv->path, name, "/", NULL);
+    settings = g_settings_new_with_path (schema, path);
+    g_free (path);
+  }
+  g_free (schema);
+
+  return settings;
+}
+
 GSettings *
 ogmrip_profile_get_child (OGMRipProfile *profile, const gchar *name)
 {
-  OGMRipProfileSection *section;
-  GSList *link;
+  if (g_str_equal (name, OGMRIP_PROFILE_GENERAL))
+    return profile->priv->general_settings;
 
-  g_return_val_if_fail (OGMRIP_IS_PROFILE (profile), NULL);
-  g_return_val_if_fail (name != NULL, NULL);
+  if (g_str_equal (name, OGMRIP_PROFILE_VIDEO))
+    return profile->priv->video_settings;
 
-  for (link = profile->priv->sections; link; link = link->next)
-  {
-    section = link->data;
-    if (g_str_equal (section->name, name))
-      return section->settings;
-  }
+  if (g_str_equal (name, OGMRIP_PROFILE_AUDIO))
+    return profile->priv->audio_settings;
+
+  if (g_str_equal (name, OGMRIP_PROFILE_SUBP))
+    return profile->priv->subp_settings;
+
+  if (g_str_equal (name, profile->priv->container))
+    return ogmrip_profile_get_child_for_codec (profile, name);
+
+  if (g_str_equal (name, profile->priv->video_codec))
+    return ogmrip_profile_get_child_for_codec (profile, name);
+
+  if (g_str_equal (name, profile->priv->audio_codec))
+    return ogmrip_profile_get_child_for_codec (profile, name);
+
+  if (g_str_equal (name, profile->priv->subp_codec))
+    return ogmrip_profile_get_child_for_codec (profile, name);
 
   return NULL;
 }
