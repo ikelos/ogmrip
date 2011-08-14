@@ -94,6 +94,16 @@ ogmrip_profile_get_subp_codec_type (OGMRipProfile *profile, const gchar *name)
   return codec;
 }
 
+static void
+ogmrip_settings_tmp_dir_changed (GSettings *settings, const gchar *key)
+{
+  gchar *path;
+
+  path = g_settings_get_string (settings, key);
+  ogmrip_fs_set_tmp_dir (path);
+  g_free (path);
+}
+
 void
 ogmrip_settings_init (void)
 {
@@ -112,6 +122,9 @@ ogmrip_settings_init (void)
     if (!strlen (path))
       g_settings_set_string (settings, OGMRIP_SETTINGS_TMP_DIR, g_get_tmp_dir ());
     g_free (path);
+
+    g_object_connect (settings, "changed::" OGMRIP_SETTINGS_TMP_DIR,
+        G_CALLBACK (ogmrip_settings_tmp_dir_changed), NULL);
   }
 }
 
