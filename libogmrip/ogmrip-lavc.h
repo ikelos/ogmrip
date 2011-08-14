@@ -31,6 +31,7 @@ G_BEGIN_DECLS
 #define OGMRIP_LAVC_PROP_HEADER      "header"
 #define OGMRIP_LAVC_PROP_KEYINT      "keyint"
 #define OGMRIP_LAVC_PROP_LAST_PRED   "last-pred"
+#define OGMRIP_LAVC_PROP_MAX_BFRAMES "max-bframes"
 #define OGMRIP_LAVC_PROP_MAX_RATE    "max-rate"
 #define OGMRIP_LAVC_PROP_MBD         "mbd"
 #define OGMRIP_LAVC_PROP_MIN_RATE    "min-rate"
@@ -114,6 +115,9 @@ gint          ogmrip_lavc_get_keyint      (OGMRipLavc           *lavc);
 void          ogmrip_lavc_set_buf_size    (OGMRipLavc           *lavc,
                                            guint                buf_size);
 gint          ogmrip_lavc_get_buf_size    (OGMRipLavc           *lavc);
+void          ogmrip_lavc_set_max_bframes (OGMRipLavc           *lavc,
+                                           guint                max_bframes);
+gint          ogmrip_lavc_get_max_bframes (OGMRipLavc           *lavc);
 void          ogmrip_lavc_set_min_rate    (OGMRipLavc           *lavc,
                                            guint                min_rate);
 gint          ogmrip_lavc_get_min_rate    (OGMRipLavc           *lavc);

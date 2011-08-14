@@ -55,6 +55,7 @@ struct _OGMRipX264
   guint frameref;
   guint keyint;
   guint level_idc;
+  guint max_bframes;
   guint me;
   guint merange;
   guint rc_lookahead;
@@ -96,6 +97,7 @@ enum
   PROP_GLOBAL_HEADER,
   PROP_KEYINT,
   PROP_LEVEL_IDC,
+  PROP_MAX_BFRAMES,
   PROP_ME,
   PROP_MERANGE,
   PROP_MIXED_REFS,
@@ -149,37 +151,6 @@ static void ogmrip_x264_set_property (GObject      *gobject,
                                       const GValue *value,
                                       GParamSpec   *pspec);
 static gint ogmrip_x264_run          (OGMJobSpawn  *spawn);
-
-static const gchar * const properties[] =
-{
-  OGMRIP_X264_PROP_8X8DCT,
-  OGMRIP_X264_PROP_AUD,
-  OGMRIP_X264_PROP_B_ADAPT,
-  OGMRIP_X264_PROP_B_PYRAMID,
-  OGMRIP_X264_PROP_BFRAMES,
-  OGMRIP_X264_PROP_BRDO,
-  OGMRIP_X264_PROP_CABAC,
-  OGMRIP_X264_PROP_CQM,
-  OGMRIP_X264_PROP_DIRECT,
-  OGMRIP_X264_PROP_FRAMEREF,
-  OGMRIP_X264_PROP_GLOBAL_HEADER,
-  OGMRIP_X264_PROP_KEYINT,
-  OGMRIP_X264_PROP_LEVEL_IDC,
-  OGMRIP_X264_PROP_ME,
-  OGMRIP_X264_PROP_MERANGE,
-  OGMRIP_X264_PROP_MIXED_REFS,
-  OGMRIP_X264_PROP_PARTITIONS,
-  OGMRIP_X264_PROP_PSY_RD,
-  OGMRIP_X264_PROP_PSY_TRELLIS,
-  OGMRIP_X264_PROP_RC_LOOKAHEAD,
-  OGMRIP_X264_PROP_SUBQ,
-  OGMRIP_X264_PROP_TRELLIS,
-  OGMRIP_X264_PROP_VBV_BUFSIZE,
-  OGMRIP_X264_PROP_VBV_MAXRATE,
-  OGMRIP_X264_PROP_WEIGHT_B,
-  OGMRIP_X264_PROP_WEIGHT_P,
-  NULL
-};
 
 static const gchar *me_name[] =
 {
@@ -239,7 +210,7 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   GString *options;
 
   const gchar *output;
-  gint quality, bitrate, vid, threads, bframes;
+  gint quality, bitrate, vid, threads;
   gboolean cartoon;
 
   output = ogmrip_codec_get_output (OGMRIP_CODEC (video));
@@ -282,9 +253,7 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   if (x264_have_lookahead)
     g_string_append_printf (options, ":rc_lookahead=%u", x264->rc_lookahead);
 
-  bframes = 0;
-  // bframes = ogmrip_video_codec_get_max_b_frames (video);
-  g_string_append_printf (options, ":bframes=%d", cartoon ? bframes + 2 : bframes);
+  g_string_append_printf (options, ":bframes=%d", cartoon ? x264->max_bframes + 2 : x264->max_bframes);
 
   if (pass != passes)
   {
@@ -336,7 +305,7 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
     if (x264_have_partitions && x264->partitions)
       g_string_append_printf (options, ":partitions=%s", x264->partitions);
 
-    if (x264_have_bime && bframes > 0)
+    if (x264_have_bime && x264->max_bframes > 0)
       g_string_append (options, ":bime");
 
     if (x264_have_psy && x264->subq >= 6)
@@ -429,7 +398,7 @@ ogmrip_x264_class_init (OGMRipX264Class *klass)
         OGMRIP_X264_DEFAULT_AUD, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_B_ADAPT,
-      g_param_spec_uint (OGMRIP_X264_PROP_B_ADAPT, "B adapt", "Set b adapt",
+      g_param_spec_uint (OGMRIP_X264_PROP_B_ADAPT, "B adapt property", "Set b adapt",
         0, 2, OGMRIP_X264_DEFAULT_B_ADAPT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   if (x264_have_b_pyramid)
@@ -472,6 +441,10 @@ ogmrip_x264_class_init (OGMRipX264Class *klass)
   g_object_class_install_property (gobject_class, PROP_LEVEL_IDC,
       g_param_spec_uint (OGMRIP_X264_PROP_LEVEL_IDC, "Level IDC property", "Set level IDC",
         0, 51, OGMRIP_X264_DEFAULT_LEVEL_IDC, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_MAX_BFRAMES,
+      g_param_spec_uint (OGMRIP_X264_PROP_MAX_BFRAMES, "B-frames property", "Set B-frames",
+        0, 16, OGMRIP_X264_DEFAULT_MAX_BFRAMES, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_ME,
       g_param_spec_uint (OGMRIP_X264_PROP_ME, "Motion estimation property", "Set motion estimation",
@@ -544,6 +517,7 @@ ogmrip_x264_init (OGMRipX264 *x264)
   x264->global_header = OGMRIP_X264_DEFAULT_GLOBAL_HEADER;
   x264->keyint = OGMRIP_X264_DEFAULT_KEYINT;
   x264->level_idc = OGMRIP_X264_DEFAULT_LEVEL_IDC;
+  x264->max_bframes = OGMRIP_X264_DEFAULT_MAX_BFRAMES;
   x264->me = OGMRIP_X264_DEFAULT_ME;
   x264->merange = OGMRIP_X264_DEFAULT_MERANGE;
   x264->mixed_refs = OGMRIP_X264_DEFAULT_MIXED_REFS;
@@ -578,8 +552,6 @@ ogmrip_x264_notify (GObject *gobject, GParamSpec *pspec)
   {
     ogmrip_x264_init (x264);
 
-    // ogmrip_video_codec_set_max_b_frames (OGMRIP_VIDEO_CODEC (x264), OGMRIP_X264_DEFAULT_B_FRAMES);
-
     switch (ogmrip_video_codec_get_quality (OGMRIP_VIDEO_CODEC (x264)))
     {
       case OGMRIP_QUALITY_EXTREME:
@@ -587,11 +559,11 @@ ogmrip_x264_notify (GObject *gobject, GParamSpec *pspec)
         x264->brdo = TRUE;
         x264->direct = DIRECT_AUTO;
         x264->frameref = 16;
+        x264->max_bframes = 8;
         x264->me = ME_UMH;
         x264->merange = 24;
         x264->rc_lookahead = 60;
         x264->subq = 10;
-        // ogmrip_video_codec_set_max_b_frames (OGMRIP_VIDEO_CODEC (x264), 8);
         break;
       case OGMRIP_QUALITY_HIGH:
         x264->b_adapt = 2;
@@ -650,6 +622,9 @@ ogmrip_x264_get_property (GObject *gobject, guint property_id, GValue *value, GP
     case PROP_LEVEL_IDC:
       g_value_set_uint (value, x264->level_idc);
       break;
+    case PROP_MAX_BFRAMES:
+      g_value_set_uint (value, x264->max_bframes);
+      break;
     case PROP_ME:
       g_value_set_uint (value, x264->me);
       break;
@@ -690,11 +665,7 @@ ogmrip_x264_get_property (GObject *gobject, guint property_id, GValue *value, GP
       g_value_set_uint (value, x264->weight_p);
       break;
     case PROP_DELAY:
-/*
-      if (ogmrip_video_codec_get_max_b_frames (video) > 0)
-        return 2;
-*/
-      g_value_set_uint (value, 1);
+      g_value_set_uint (value, x264->max_bframes > 0 ? 2 : 1);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -744,6 +715,9 @@ ogmrip_x264_set_property (GObject *gobject, guint property_id, const GValue *val
       break;
     case PROP_LEVEL_IDC:
       x264->level_idc = g_value_get_uint (value);
+      break;
+    case PROP_MAX_BFRAMES:
+      x264->max_bframes = g_value_get_uint (value);
       break;
     case PROP_ME:
       x264->me = g_value_get_uint (value);

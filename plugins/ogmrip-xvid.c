@@ -64,6 +64,7 @@ struct _OGMRipXvid
   gint min_bquant;
   gint min_iquant;
   gint min_pquant;
+  gint max_bframes;
   gint max_keyint;
   gint par;
   gint par_height;
@@ -92,6 +93,7 @@ enum
   PROP_GMC,
   PROP_GRAYSCALE,
   PROP_INTERLACING,
+  PROP_MAX_BFRAMES,
   PROP_MAX_BQUANT,
   PROP_MAX_IQUANT,
   PROP_MAX_PQUANT,
@@ -176,7 +178,7 @@ ogmrip_xvid_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   GString *options;
 
   const char *output;
-  gint quality, bitrate, vid, threads, bframes, interlaced;
+  gint bitrate, vid, threads, interlaced;
 
   static const gchar *profiles[] =
   {
@@ -220,10 +222,6 @@ ogmrip_xvid_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   g_ptr_array_add (argv, g_strdup ("-ovc"));
   g_ptr_array_add (argv, g_strdup ("xvid"));
 
-  quality = ogmrip_video_codec_get_quality (video);
-  // bframes = ogmrip_video_codec_get_max_b_frames (video);
-  bframes = 0;
-
   options = g_string_new (NULL);
 
   if (xvid->quant_type)
@@ -238,7 +236,7 @@ ogmrip_xvid_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
 
   g_string_append_printf (options, ":vhq=%u:bvhq=%u", xvid->vhq, xvid->bvhq);
 
-  if (quality == OGMRIP_QUALITY_USER)
+  if (ogmrip_video_codec_get_quality (video) == OGMRIP_QUALITY_USER)
   {
     g_string_append_printf (options, ":profile=%s", profiles[CLAMP (xvid->profile, 0, 16)]);
 
@@ -298,15 +296,15 @@ ogmrip_xvid_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
         g_string_append_printf (options, ":par_width=%d:par_height=%d", xvid->par_width, xvid->par_height);
     }
 
-    g_string_append_printf (options, ":max_bframes=%d", bframes);
+    g_string_append_printf (options, ":max_bframes=%d", xvid->max_bframes);
 
-    if (bframes == 0)
+    if (xvid->max_bframes == 0)
       g_string_append_printf (options, ":frame_drop_ratio=%u", xvid->frame_drop_ratio);
   }
   else
   {
     g_string_append (options, ":autoaspect");
-    g_string_append_printf (options, ":max_bframes=%d", bframes);
+    g_string_append_printf (options, ":max_bframes=%d", xvid->max_bframes);
   }
 
   if (xvid->qpel)
@@ -436,6 +434,10 @@ ogmrip_xvid_class_init (OGMRipXvidClass *klass)
       g_param_spec_uint (OGMRIP_XVID_PROP_MAX_BQUANT, NULL, NULL,
         0, 31, OGMRIP_XVID_DEFAULT_MAX_BQUANT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
+  g_object_class_install_property (gobject_class, PROP_MAX_BFRAMES,
+      g_param_spec_uint (OGMRIP_XVID_PROP_MAX_BFRAMES, NULL, NULL,
+        0, 4, OGMRIP_XVID_DEFAULT_MAX_BFRAMES, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
     g_object_class_install_property (gobject_class, PROP_MAX_KEYINT,
         g_param_spec_uint (OGMRIP_XVID_PROP_MAX_KEYINT, NULL, NULL,
           0, G_MAXUINT, OGMRIP_XVID_DEFAULT_MAX_KEYINT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
@@ -514,6 +516,7 @@ ogmrip_xvid_init (OGMRipXvid *xvid)
   xvid->bquant_ratio = OGMRIP_XVID_DEFAULT_BQUANT_RATIO;
   xvid->bvhq = OGMRIP_XVID_DEFAULT_BVHQ;
   xvid->frame_drop_ratio = OGMRIP_XVID_DEFAULT_FRAME_DROP_RATIO;
+  xvid->max_bframes = OGMRIP_XVID_DEFAULT_MAX_BFRAMES;
   xvid->max_bquant = OGMRIP_XVID_DEFAULT_MAX_BQUANT;
   xvid->max_iquant = OGMRIP_XVID_DEFAULT_MAX_IQUANT;
   xvid->max_pquant = OGMRIP_XVID_DEFAULT_MAX_PQUANT;
@@ -542,8 +545,6 @@ ogmrip_xvid_notify (GObject *gobject, GParamSpec *pspec)
   if (g_str_equal (pspec->name, "quality"))
   {
     ogmrip_xvid_init (xvid);
-
-    // ogmrip_video_codec_set_max_b_frames (OGMRIP_VIDEO_CODEC (xvid), OGMRIP_XVID_DEFAULT_BFRAMES);
 
     switch (ogmrip_video_codec_get_quality (OGMRIP_VIDEO_CODEC (xvid)))
     {
@@ -609,6 +610,9 @@ ogmrip_xvid_get_property (GObject *gobject, guint property_id, GValue *value, GP
       break;
     case PROP_MAX_BQUANT:
       g_value_set_int (value, xvid->min_bquant);
+      break;
+    case PROP_MAX_BFRAMES:
+      g_value_set_int (value, xvid->max_bframes);
       break;
     case PROP_MAX_KEYINT:
       g_value_set_int (value, xvid->max_keyint);
@@ -708,6 +712,9 @@ ogmrip_xvid_set_property (GObject *gobject, guint property_id, const GValue *val
       break;
     case PROP_MAX_BQUANT:
       xvid->max_bquant = g_value_get_int (value);
+      break;
+    case PROP_MAX_BFRAMES:
+      xvid->max_bframes = g_value_get_int (value);
       break;
     case PROP_MAX_KEYINT:
       xvid->max_keyint = g_value_get_int (value);

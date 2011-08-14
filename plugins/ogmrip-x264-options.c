@@ -224,7 +224,7 @@ ogmrip_x264_dialog_constructed (GObject *gobject)
       G_CALLBACK (ogmrip_x264_dialog_profile_changed), dialog);
 */
   widget = gtk_builder_get_widget (builder, "bframes-spin");
-  g_settings_bind (settings, OGMRIP_X264_PROP_BFRAMES,
+  g_settings_bind (settings, OGMRIP_X264_PROP_MAX_BFRAMES,
       widget, "value", G_SETTINGS_BIND_DEFAULT);
 /*
   g_signal_connect_swapped (widget, "value-changed",

@@ -53,6 +53,7 @@ enum
   PROP_HEADER,
   PROP_KEYINT,
   PROP_LAST_PRED,
+  PROP_MAX_BFRAMES,
   PROP_MAX_RATE,
   PROP_MBD,
   PROP_MIN_RATE,
@@ -91,6 +92,7 @@ struct _OGMRipLavcPriv
 
   guint dc;
   guint keyint;
+  guint max_bframes;
   guint buf_size, min_rate, max_rate;
   guint strict;
 };
@@ -106,34 +108,6 @@ static void ogmrip_lavc_set_property (GObject      *gobject,
 static void ogmrip_lavc_notify       (GObject      *object,
                                       GParamSpec   *pspec);
 static gint ogmrip_lavc_run          (OGMJobSpawn  *spawn);
-
-static const gchar * const properties[] =
-{
-  OGMRIP_LAVC_PROP_BUF_SIZE,
-  OGMRIP_LAVC_PROP_CMP,
-  OGMRIP_LAVC_PROP_DC,
-  OGMRIP_LAVC_PROP_DIA,
-  OGMRIP_LAVC_PROP_GRAYSCALE,
-  OGMRIP_LAVC_PROP_HEADER,
-  OGMRIP_LAVC_PROP_KEYINT,
-  OGMRIP_LAVC_PROP_LAST_PRED,
-  OGMRIP_LAVC_PROP_MAX_RATE,
-  OGMRIP_LAVC_PROP_MBD,
-  OGMRIP_LAVC_PROP_MIN_RATE,
-  OGMRIP_LAVC_PROP_MV0,
-  OGMRIP_LAVC_PROP_PRECMP,
-  OGMRIP_LAVC_PROP_PREDIA,
-  OGMRIP_LAVC_PROP_PREME,
-  OGMRIP_LAVC_PROP_QNS,
-  OGMRIP_LAVC_PROP_QPEL,
-  OGMRIP_LAVC_PROP_STRICT,
-  OGMRIP_LAVC_PROP_SUBCMP,
-  OGMRIP_LAVC_PROP_TRELLIS,
-  OGMRIP_LAVC_PROP_V4MV,
-  OGMRIP_LAVC_PROP_VB_STRATEGY,
-  OGMRIP_LAVC_PROP_VQCOMP,
-  NULL
-};
 
 static gdouble
 ogmrip_lavc_get_quantizer (OGMRipVideoCodec *video)
@@ -233,9 +207,9 @@ ogmrip_lavc_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
 
   if (lavc->priv->header != 0)
     g_string_append_printf (options, ":vglobal=%d", lavc->priv->header);
-/*
-  g_string_append_printf (options, ":vmax_b_frames=%d", ogmrip_video_codec_get_max_b_frames (video));
-*/
+
+  g_string_append_printf (options, ":vmax_b_frames=%d", lavc->priv->max_bframes);
+
   bitrate = ogmrip_video_codec_get_bitrate (video);
   if (bitrate > 0)
     g_string_append_printf (options, ":vbitrate=%u", bitrate);
@@ -360,6 +334,10 @@ ogmrip_lavc_class_init (OGMRipLavcClass *klass)
       g_param_spec_uint (OGMRIP_LAVC_PROP_BUF_SIZE, "Buffer size property", "Set buffer size",
         0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
+  g_object_class_install_property (gobject_class, PROP_MAX_BFRAMES,
+      g_param_spec_uint (OGMRIP_LAVC_PROP_MAX_BFRAMES, "Max B-frames property", "Set max B-frames",
+        0, 4, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_property (gobject_class, PROP_MIN_RATE,
       g_param_spec_uint (OGMRIP_LAVC_PROP_MIN_RATE, "Min rate property", "Set min rate",
         0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
@@ -460,6 +438,9 @@ ogmrip_lavc_get_property (GObject *gobject, guint property_id, GValue *value, GP
     case PROP_BUF_SIZE:
       g_value_set_uint (value, ogmrip_lavc_get_buf_size (OGMRIP_LAVC (gobject)));
       break;
+    case PROP_MAX_BFRAMES:
+      g_value_set_uint (value, ogmrip_lavc_get_max_bframes (OGMRIP_LAVC (gobject)));
+      break;
     case PROP_MIN_RATE:
       g_value_set_uint (value, ogmrip_lavc_get_min_rate (OGMRIP_LAVC (gobject)));
       break;
@@ -540,6 +521,9 @@ ogmrip_lavc_set_property (GObject *gobject, guint property_id, const GValue *val
     case PROP_BUF_SIZE:
       ogmrip_lavc_set_buf_size (OGMRIP_LAVC (gobject), g_value_get_uint (value));
       break;
+    case PROP_MAX_BFRAMES:
+      ogmrip_lavc_set_max_bframes (OGMRIP_LAVC (gobject), g_value_get_uint (value));
+      break;
     case PROP_MIN_RATE:
       ogmrip_lavc_set_min_rate (OGMRIP_LAVC (gobject), g_value_get_uint (value));
       break;
@@ -575,19 +559,19 @@ ogmrip_lavc_set_quality (OGMRipLavc *lavc, OGMRipQualityType quality)
   switch (quality)
   {
     case OGMRIP_QUALITY_EXTREME:
-      // ogmrip_video_codec_set_max_b_frames (video, 2);
       lavc->priv->mbd = 2;
       lavc->priv->vb_strategy = 1;
       lavc->priv->last_pred = 3;
+      lavc->priv->max_bframes = 2;
       lavc->priv->preme = 2;
       lavc->priv->qns = 2;
       lavc->priv->vqcomp = 0.5;
       lavc->priv->mv0 = TRUE;
       break;
     case OGMRIP_QUALITY_HIGH:
-      // ogmrip_video_codec_set_max_b_frames (video, 2);
       lavc->priv->mbd = 2;
       lavc->priv->vb_strategy = 1;
+      lavc->priv->max_bframes = 2;
       lavc->priv->last_pred = 2;
       lavc->priv->preme = 1;
       lavc->priv->qns = 0;
@@ -595,10 +579,10 @@ ogmrip_lavc_set_quality (OGMRipLavc *lavc, OGMRipQualityType quality)
       lavc->priv->mv0 = FALSE;
       break;
     case OGMRIP_QUALITY_NORMAL:
-      // ogmrip_video_codec_set_max_b_frames (video, 0);
       lavc->priv->mbd = 2;
       lavc->priv->vb_strategy = 0;
       lavc->priv->last_pred = 0;
+      lavc->priv->max_bframes = 0;
       lavc->priv->preme = 1;
       lavc->priv->qns = 0;
       lavc->priv->vqcomp = 0.5;
@@ -857,6 +841,37 @@ ogmrip_lavc_get_buf_size (OGMRipLavc *lavc)
   g_return_val_if_fail (OGMRIP_IS_LAVC (lavc), -1);
 
   return lavc->priv->buf_size;
+}
+
+/**
+ * ogmrip_lavc_set_max_bframes:
+ * @lavc: An #OGMRipLavc
+ * @max_bframes: The max number of B-frames
+ *
+ * Sets the maximum number of B-frames
+ */
+void
+ogmrip_lavc_set_max_bframes (OGMRipLavc *lavc, guint max_bframes)
+{
+  g_return_if_fail (OGMRIP_IS_LAVC (lavc));
+
+  lavc->priv->max_bframes = max_bframes;
+}
+
+/**
+ * ogmrip_lavc_get_max_bframes:
+ * @lavc: An #OGMRipLavc
+ *
+ * Gets the maximum number of B-frames
+ *
+ * Returns: The maximum number of B-frames, or -1
+ */
+gint
+ogmrip_lavc_get_max_bframes (OGMRipLavc *lavc)
+{
+  g_return_val_if_fail (OGMRIP_IS_LAVC (lavc), -1);
+
+  return lavc->priv->max_bframes;
 }
 
 /**
