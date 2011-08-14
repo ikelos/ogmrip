@@ -110,19 +110,19 @@ ogmrip_profile_constructed (GObject *gobject)
       G_CALLBACK (ogmrip_profile_codec_changed), &profile->priv->container);
 
   profile->priv->video_settings = g_settings_get_child (G_SETTINGS (profile), OGMRIP_PROFILE_VIDEO);
-  profile->priv->video_codec = g_settings_get_string (profile->priv->general_settings, OGMRIP_PROFILE_CODEC);
+  profile->priv->video_codec = g_settings_get_string (profile->priv->video_settings, OGMRIP_PROFILE_CODEC);
 
   g_signal_connect (profile->priv->video_settings, "changed::" OGMRIP_PROFILE_CODEC,
       G_CALLBACK (ogmrip_profile_codec_changed), &profile->priv->video_codec);
 
   profile->priv->audio_settings = g_settings_get_child (G_SETTINGS (profile), OGMRIP_PROFILE_AUDIO);
-  profile->priv->audio_codec = g_settings_get_string (profile->priv->general_settings, OGMRIP_PROFILE_CODEC);
+  profile->priv->audio_codec = g_settings_get_string (profile->priv->audio_settings, OGMRIP_PROFILE_CODEC);
 
   g_signal_connect (profile->priv->audio_settings, "changed::" OGMRIP_PROFILE_CODEC,
       G_CALLBACK (ogmrip_profile_codec_changed), &profile->priv->audio_codec);
 
   profile->priv->subp_settings = g_settings_get_child (G_SETTINGS (profile), OGMRIP_PROFILE_SUBP);
-  profile->priv->subp_codec = g_settings_get_string (profile->priv->general_settings, OGMRIP_PROFILE_CODEC);
+  profile->priv->subp_codec = g_settings_get_string (profile->priv->subp_settings, OGMRIP_PROFILE_CODEC);
 
   g_signal_connect (profile->priv->subp_settings, "changed::" OGMRIP_PROFILE_CODEC,
       G_CALLBACK (ogmrip_profile_codec_changed), &profile->priv->subp_codec);

@@ -414,7 +414,6 @@
                         <items>
                           <item translatable="yes">Remove the copy</item>
                           <item translatable="yes">Keep the copy on the hard drive</item>
-                          <item translatable="yes">Keep the copy and update the GUI</item>
                           <item translatable="yes">Ask the user</item>
                         </items>
                       </object>

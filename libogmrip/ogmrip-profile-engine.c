@@ -133,17 +133,13 @@ ogmrip_profile_engine_dispose (GObject *gobject)
     engine->priv->settings= NULL;
   }
 
+  if (engine->priv->profiles)
+  {
+    g_hash_table_destroy (engine->priv->profiles);
+    engine->priv->profiles = NULL;
+  }
+
   G_OBJECT_CLASS (ogmrip_profile_engine_parent_class)->dispose (gobject);
-}
-
-static void
-ogmrip_profile_engine_finalize (GObject *gobject)
-{
-  OGMRipProfileEngine *engine = OGMRIP_PROFILE_ENGINE (gobject);
-
-  g_hash_table_destroy (engine->priv->profiles);
-
-  G_OBJECT_CLASS (ogmrip_profile_engine_parent_class)->finalize (gobject);
 }
 
 static void
@@ -164,7 +160,6 @@ ogmrip_profile_engine_class_init (OGMRipProfileEngineClass *klass)
   gobject_class->get_property = ogmrip_profile_engine_get_property;
   gobject_class->set_property = ogmrip_profile_engine_set_property;
   gobject_class->dispose = ogmrip_profile_engine_dispose;
-  gobject_class->finalize = ogmrip_profile_engine_finalize;
 
   g_object_class_install_property (gobject_class, PROP_PROFILES,
       g_param_spec_boxed ("profiles", "profiles", "profiles",

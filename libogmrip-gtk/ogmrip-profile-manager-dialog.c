@@ -380,8 +380,9 @@ static void
 ogmrip_profile_manager_dialog_init (OGMRipProfileManagerDialog *dialog)
 {
   GError *error = NULL;
-
+/*
   GSList *list, *link;
+*/
   GtkWidget *area, *widget, *image;
   GtkBuilder *builder;
 
@@ -394,13 +395,11 @@ ogmrip_profile_manager_dialog_init (OGMRipProfileManagerDialog *dialog)
     return;
   }
 
-  gtk_dialog_add_buttons (GTK_DIALOG (dialog),
-      GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
-      NULL);
+  gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE);
+  gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
   gtk_container_set_border_width (GTK_CONTAINER (dialog), 5);
   gtk_window_set_default_size (GTK_WINDOW (dialog), 450, -1);
   gtk_window_set_title (GTK_WINDOW (dialog), _("Edit Profiles"));
-  gtk_window_set_icon_from_stock (GTK_WINDOW (dialog), GTK_STOCK_PREFERENCES);
 
   area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
 
@@ -470,11 +469,6 @@ ogmrip_profile_manager_dialog_init (OGMRipProfileManagerDialog *dialog)
   g_signal_connect_swapped (dialog->priv->engine, "remove",
       G_CALLBACK (ogmrip_profile_manager_dialog_remove_profile), dialog);
 
-  list = ogmrip_profile_engine_get_list (dialog->priv->engine);
-  for (link = list; link; link = link->next)
-    ogmrip_profile_manager_dialog_add_profile (dialog, link->data);
-  g_slist_free (list);
-
   g_object_unref (builder);
 }
 
@@ -492,6 +486,8 @@ ogmrip_profile_manager_dialog_dispose (GObject *gobject)
     g_object_unref (dialog->priv->engine);
     dialog->priv->engine = NULL;
   }
+
+  G_OBJECT_CLASS (ogmrip_profile_manager_dialog_parent_class)->dispose (gobject);
 }
 
 GtkWidget *

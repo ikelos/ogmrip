@@ -27,7 +27,7 @@
 
 #include <glib/gi18n.h>
 
-#define OGMRIP_GLADE_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-encoding_manager.glade"
+#define OGMRIP_GLADE_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-queue.glade"
 #define OGMRIP_GLADE_ROOT "root"
 
 #define OGMRIP_ENCODING_MANAGER_DIALOG_GET_PRIVATE(o) \
@@ -124,11 +124,10 @@ ogmrip_encoding_manager_dialog_init (OGMRipEncodingManagerDialog *dialog)
   gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE);
   gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_EXECUTE, GTK_RESPONSE_ACCEPT);
 
-  gtk_window_set_title (GTK_WINDOW (dialog), _("Encoding EncodingManager"));
+  gtk_window_set_title (GTK_WINDOW (dialog), _("Encoding Manager"));
   gtk_window_set_default_size (GTK_WINDOW (dialog), 500, 300);
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
   gtk_dialog_set_response_sensitive (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT, FALSE);
-  gtk_window_set_icon_from_stock (GTK_WINDOW (dialog), GTK_STOCK_PROPERTIES);
   gtk_container_set_border_width (GTK_CONTAINER (dialog), 5);
 
   action_group = gtk_action_group_new ("MenuActions");

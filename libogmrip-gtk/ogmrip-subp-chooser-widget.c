@@ -186,7 +186,7 @@ ogmrip_subp_chooser_widget_init (OGMRipSubpChooserWidget *widget)
   g_signal_connect_swapped (widget->priv->chooser, "notify::title",
       G_CALLBACK (ogmrip_subp_chooser_widget_combo_title_notified), widget);
 
-  widget->priv->button = gtk_button_new_with_label (_("..."));
+  widget->priv->button = gtk_button_new_with_label ("...");
   gtk_box_pack_start (GTK_BOX (widget), widget->priv->button, FALSE, FALSE, 0);
   gtk_widget_set_sensitive (widget->priv->button, FALSE);
   gtk_widget_show (widget->priv->button);

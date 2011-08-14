@@ -123,7 +123,7 @@ ogmrip_settings_init (void)
       g_settings_set_string (settings, OGMRIP_SETTINGS_TMP_DIR, g_get_tmp_dir ());
     g_free (path);
 
-    g_object_connect (settings, "changed::" OGMRIP_SETTINGS_TMP_DIR,
+    g_signal_connect (settings, "changed::" OGMRIP_SETTINGS_TMP_DIR,
         G_CALLBACK (ogmrip_settings_tmp_dir_changed), NULL);
   }
 }
