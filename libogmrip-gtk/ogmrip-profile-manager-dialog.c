@@ -151,23 +151,6 @@ ogmrip_profile_manager_dialog_remove_profile (OGMRipProfileManagerDialog *dialog
   }
 }
 
-static gchar *
-ogmrip_profile_create_name (OGMRipProfileEngine *engine)
-{
-  gchar **strv;
-  guint i, n, m = 0;
-
-  g_object_get (engine, "profiles", &strv, NULL);
-
-  for (i = 0; strv[i]; i ++)
-    if (sscanf (strv[i], "profile-%u", &n))
-      m = MAX (m, n) + 1;
-
-  g_strfreev (strv);
-
-  return g_strdup_printf ("profile-%u", m);
-}
-
 static void
 ogmrip_profile_manager_dialog_new_button_clicked (OGMRipProfileManagerDialog *dialog)
 {
@@ -177,11 +160,8 @@ ogmrip_profile_manager_dialog_new_button_clicked (OGMRipProfileManagerDialog *di
   if (name)
   {
     OGMRipProfile *profile;
-    gchar *str;
 
-    str = ogmrip_profile_create_name (dialog->priv->engine);
-    profile = ogmrip_profile_new (str);
-    g_free (str);
+    profile = ogmrip_profile_new (NULL);
 
     g_settings_set_string (G_SETTINGS (profile), OGMRIP_PROFILE_NAME, name);
     g_free (name);
@@ -199,9 +179,22 @@ ogmrip_profile_manager_dialog_copy_button_clicked (OGMRipProfileManagerDialog *d
 
   if (gtk_tree_selection_get_selected (dialog->priv->selection, &model, &iter))
   {
-    /*
-     * TODO copy profile
-     */
+    OGMRipProfile *profile, *new_profile;
+    gchar *name, *new_name;
+
+    profile = ogmrip_profile_store_get_profile (GTK_LIST_STORE (model), &iter);
+
+    name = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_NAME);
+    new_name = g_strconcat (_("Copy of"), " ", name, NULL);
+    g_free (name);
+
+    new_profile = ogmrip_profile_copy (profile, NULL);
+    g_settings_set_string (G_SETTINGS (new_profile), OGMRIP_PROFILE_NAME, new_name);
+    g_free (new_name);
+    
+
+    ogmrip_profile_engine_add (dialog->priv->engine, new_profile);
+    g_object_unref (new_profile);
   }
 }
 

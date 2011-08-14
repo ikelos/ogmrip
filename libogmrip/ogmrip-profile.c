@@ -17,6 +17,7 @@
  */
 
 #include "ogmrip-profile.h"
+#include "ogmrip-profile-engine.h"
 #include "ogmrip-profile-keys.h"
 #include "ogmrip-marshal.h"
 
@@ -53,10 +54,12 @@ ogmrip_profile_has_schema (const gchar *schema)
 {
   const gchar * const *schemas;
   guint i;
-/*
+
+#if GLIB_CHECK_VERSION(2, 28, 0)
   schemas = g_settings_list_relocatable_schemas ();
-*/
+#else
   schemas = g_settings_list_schemas ();
+#endif
 
   for (i = 0; schemas[i]; i ++)
     if (g_str_equal (schemas[i], schema))
@@ -167,19 +170,111 @@ ogmrip_profile_finalize (GObject *gobject)
   G_OBJECT_CLASS (ogmrip_profile_parent_class)->finalize (gobject);
 }
 
+static gchar *
+ogmrip_profile_create_name (void)
+{
+  OGMRipProfileEngine *engine;
+  gchar **strv;
+  guint i, n, m = 0;
+
+  engine = ogmrip_profile_engine_get_default ();
+
+  g_object_get (engine, "profiles", &strv, NULL);
+
+  for (i = 0; strv[i]; i ++)
+    if (sscanf (strv[i], "profile-%u", &n))
+      m = MAX (m, n) + 1;
+
+  g_strfreev (strv);
+
+  return g_strdup_printf ("profile-%u", m);
+}
+
 OGMRipProfile *
 ogmrip_profile_new (const gchar *name)
 {
   OGMRipProfile *profile;
   gchar *path;
 
-  g_return_val_if_fail (name != NULL, NULL);
+  if (name)
+    path = g_strconcat (OGMRIP_PROFILE_PATH, name, "/", NULL);
+  else
+  {
+    gchar *str;
 
-  path = g_strconcat (OGMRIP_PROFILE_PATH, name, "/", NULL);
+    str = ogmrip_profile_create_name ();
+    path = g_strconcat (OGMRIP_PROFILE_PATH, str, "/", NULL);
+    g_free (str);
+  }
+
   profile = g_object_new (OGMRIP_TYPE_PROFILE, "schema", "org.ogmrip.profile", "path", path, NULL);
   g_free (path);
 
   return profile;
+}
+
+static void
+ogmrip_profile_copy_section (OGMRipProfile *profile1, OGMRipProfile *profile2, const gchar *name)
+{
+  GSettings *src, *dst;
+  GVariant *value;
+  gchar **keys;
+  guint i;
+
+  src = ogmrip_profile_get_child (profile1, name);
+  if (!src)
+    return;
+
+  dst = ogmrip_profile_get_child (profile2, name);
+  if (!dst)
+    return;
+
+  keys = g_settings_list_keys (src);
+  for (i = 0; keys[i]; i ++)
+  {
+    value = g_settings_get_value (src, keys[i]);
+    g_settings_set_value (dst, keys[i], value);
+    g_variant_unref (value);
+    g_free (keys[i]);
+  }
+  g_free (keys);
+}
+
+OGMRipProfile *
+ogmrip_profile_copy (OGMRipProfile *profile, gchar *name)
+{
+  OGMRipProfile *new_profile;
+  gchar *str;
+
+  new_profile = ogmrip_profile_new (name);
+  if (!new_profile)
+    return NULL;
+
+  ogmrip_profile_copy_section (profile, new_profile, OGMRIP_PROFILE_GENERAL);
+
+  str = g_settings_get_string (profile->priv->general_settings, OGMRIP_PROFILE_CONTAINER);
+  ogmrip_profile_copy_section (profile, new_profile, str);
+  g_free (str);
+
+  ogmrip_profile_copy_section (profile, new_profile, OGMRIP_PROFILE_VIDEO);
+
+  str = g_settings_get_string (profile->priv->video_settings, OGMRIP_PROFILE_CODEC);
+  ogmrip_profile_copy_section (profile, new_profile, str);
+  g_free (str);
+
+  ogmrip_profile_copy_section (profile, new_profile, OGMRIP_PROFILE_AUDIO);
+
+  str = g_settings_get_string (profile->priv->audio_settings, OGMRIP_PROFILE_CODEC);
+  ogmrip_profile_copy_section (profile, new_profile, str);
+  g_free (str);
+
+  ogmrip_profile_copy_section (profile, new_profile, OGMRIP_PROFILE_SUBP);
+
+  str = g_settings_get_string (profile->priv->subp_settings, OGMRIP_PROFILE_CODEC);
+  ogmrip_profile_copy_section (profile, new_profile, str);
+  g_free (str);
+
+  return new_profile;
 }
 
 static gint
@@ -331,27 +426,37 @@ ogmrip_profile_dump_key (GSettings *settings, xmlNode *root, const gchar *key)
 }
 
 static void
-ogmrip_profile_dump_section (GSettings *settings, xmlNode *root)
+ogmrip_profile_dump_section (OGMRipProfile *profile, xmlNode *root, const gchar *name)
 {
-  gchar **keys;
-  guint i;
+  GSettings *settings;
 
-  keys = g_settings_list_keys (settings);
-  for (i = 0; keys[i]; i ++)
+  settings = ogmrip_profile_get_child (profile, name);
+  if (settings)
   {
-    ogmrip_profile_dump_key (settings, root, keys[i]);
-    g_free (keys[i]);
+    xmlNode *node;
+    gchar **keys;
+    guint i;
+
+    node = xmlNewNode (NULL, BAD_CAST "section");
+    xmlAddChild (root, node);
+
+    xmlSetProp (node, BAD_CAST "name", BAD_CAST name);
+
+    keys = g_settings_list_keys (settings);
+    for (i = 0; keys[i]; i ++)
+    {
+      ogmrip_profile_dump_key (settings, node, keys[i]);
+      g_free (keys[i]);
+    }
+    g_free (keys);
   }
-  g_free (keys);
 }
 
 gboolean
 ogmrip_profile_dump (OGMRipProfile *profile, GFile *file, GError **error)
 {
-  xmlNode *root, *node;
-  GSettings *settings;
-  gchar *str, **sections;
-  guint i;
+  xmlNode *root;
+  gchar *str;
 
   g_return_val_if_fail (OGMRIP_IS_PROFILE (profile), FALSE);
   g_return_val_if_fail (G_IS_FILE (file), FALSE);
@@ -367,20 +472,29 @@ ogmrip_profile_dump (OGMRipProfile *profile, GFile *file, GError **error)
   xmlSetProp (root, BAD_CAST "version", BAD_CAST str);
   g_free (str);
 
-  sections = g_settings_list_children (G_SETTINGS (profile));
-  for (i = 0; sections[i]; i ++)
-  {
-    settings = g_settings_get_child (G_SETTINGS (profile), sections[i]);
+  ogmrip_profile_dump_section (profile, root, OGMRIP_PROFILE_GENERAL);
 
-    node = xmlNewNode (NULL, BAD_CAST "section");
-    xmlAddChild (root, node);
+  str = g_settings_get_string (profile->priv->general_settings, OGMRIP_PROFILE_CONTAINER);
+  ogmrip_profile_dump_section (profile, root, str);
+  g_free (str);
 
-    xmlSetProp (node, BAD_CAST "name", BAD_CAST sections[i]);
-    g_free (sections[i]);
+  ogmrip_profile_dump_section (profile, root, OGMRIP_PROFILE_VIDEO);
 
-    ogmrip_profile_dump_section (settings, node);
-  }
-  g_free (sections);
+  str = g_settings_get_string (profile->priv->video_settings, OGMRIP_PROFILE_CODEC);
+  ogmrip_profile_dump_section (profile, root, str);
+  g_free (str);
+
+  ogmrip_profile_dump_section (profile, root, OGMRIP_PROFILE_AUDIO);
+
+  str = g_settings_get_string (profile->priv->audio_settings, OGMRIP_PROFILE_CODEC);
+  ogmrip_profile_dump_section (profile, root, str);
+  g_free (str);
+
+  ogmrip_profile_dump_section (profile, root, OGMRIP_PROFILE_SUBP);
+
+  str = g_settings_get_string (profile->priv->subp_settings, OGMRIP_PROFILE_CODEC);
+  ogmrip_profile_dump_section (profile, root, str);
+  g_free (str);
 
   return FALSE;
 }
