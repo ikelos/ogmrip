@@ -13,7 +13,6 @@ data/ogmrip-spell.glade
 data/ogmrip-update.glade
 data/ogmrip-x264.glade
 data/ogmrip-xvid.glade
-data/profiles.xml.in
 
 libogmdvd/ogmdvd-disc.c
 libogmdvd/ogmdvd-title.c
@@ -35,25 +34,31 @@ libogmrip/ogmrip-hardsub.c
 libogmrip/ogmrip-lavc.c
 libogmrip/ogmrip-novideo.c
 libogmrip/ogmrip-plugin.c
+libogmrip/ogmrip-profile.c
 
+libogmrip-gtk/ogmrip-audio-chooser-widget.c
+libogmrip-gtk/ogmrip-audio-file-chooser-dialog.c
+libogmrip-gtk/ogmrip-audio-options-dialog.c
 libogmrip-gtk/ogmrip-chapter-list.c
-libogmrip-gtk/ogmrip-chooser-list.c
+libogmrip-gtk/ogmrip-file-chooser-dialog.c
 libogmrip-gtk/ogmrip-helper.c
+libogmrip-gtk/ogmrip-list-item.c
+libogmrip-gtk/ogmrip-profile-editor-dialog.c
+libogmrip-gtk/ogmrip-profile-manager-dialog.c
 libogmrip-gtk/ogmrip-source-chooser.c
 libogmrip-gtk/ogmrip-source-chooser-widget.c
+libogmrip-gtk/ogmrip-subp-chooser-widget.c
+libogmrip-gtk/ogmrip-subp-file-chooser-dialog.c
+libogmrip-gtk/ogmrip-subp-options-dialog.c
 
-src/ogmrip-audio-options.c
 src/ogmrip-crop-dialog.c
+src/ogmrip-encoding-manager-dialog.c
 src/ogmrip-main.c
 src/ogmrip-options-dialog.c
 src/ogmrip-pref-dialog.c
 src/ogmrip-profiles.c
-src/ogmrip-profile-editor.c
-src/ogmrip-profiles-dialog.c
 src/ogmrip-progress-dialog.c
-src/ogmrip-queue-dialog.c
 src/ogmrip-spell-dialog.c
-src/ogmrip-subp-options.c
 src/ogmrip-update-dialog.c
 
 plugins/ogmrip-aac.c
@@ -62,7 +67,6 @@ plugins/ogmrip-avi.c
 plugins/ogmrip-lavc-mpeg4.c
 plugins/ogmrip-lavc-options.c
 plugins/ogmrip-mkv.c
-plugins/ogmrip-mov.c
 plugins/ogmrip-mp3.c
 plugins/ogmrip-mp4.c
 plugins/ogmrip-ogg.c
