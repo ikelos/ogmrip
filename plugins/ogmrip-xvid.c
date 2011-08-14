@@ -893,22 +893,7 @@ ogmrip_init_plugin (GError **error)
     g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MEncoder is built without XviD support"));
     return NULL;
   }
-/*
-  settings = ogmrip_settings_get_default ();
-  if (settings)
-  {
-    GObjectClass *klass;
-    guint i;
 
-    klass = g_type_class_ref (OGMRIP_TYPE_XVID);
-
-    for (i = 0; properties[i]; i++)
-      ogmrip_settings_install_key_from_property (settings, klass,
-          OGMRIP_XVID_SECTION, properties[i], properties[i]);
-
-    g_type_class_unref (klass);
-  }
-*/
   xvid_plugin.type = OGMRIP_TYPE_XVID;
 
   return &xvid_plugin;
