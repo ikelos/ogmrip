@@ -84,6 +84,7 @@ ogmrip_codec_set_input (OGMRipCodec *codec, OGMDvdStream *input)
   if (codec->priv->input)
     ogmdvd_stream_unref (codec->priv->input);
 
+  codec->priv->input = input;
   codec->priv->title = ogmdvd_stream_get_title (input);
 
   codec->priv->dirty = TRUE;
