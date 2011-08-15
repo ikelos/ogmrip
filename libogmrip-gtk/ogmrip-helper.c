@@ -1109,7 +1109,6 @@ ogmrip_profile_store_get_profile (GtkListStore *store, GtkTreeIter *iter)
 OGMRipProfile *
 ogmrip_profile_chooser_get_active (GtkComboBox *chooser)
 {
-  OGMRipProfile *profile;
   GtkTreeModel *model;
   GtkTreeIter iter;
 
@@ -1117,8 +1116,7 @@ ogmrip_profile_chooser_get_active (GtkComboBox *chooser)
     return NULL;
 
   model = gtk_combo_box_get_model (chooser);
-  gtk_tree_model_get (model, &iter, COL_PROFILE_OBJECT, &profile, -1);
 
-  return profile;
+  return ogmrip_profile_store_get_profile (GTK_LIST_STORE (model), &iter);
 }
 

@@ -256,7 +256,7 @@ ogmrip_profile_engine_add (OGMRipProfileEngine *engine, OGMRipProfile *profile)
   name = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_NAME);
   if (ogmrip_profile_engine_check (engine, profile, name))
   {
-    g_hash_table_insert (engine->priv->profiles, name, g_object_ref (profile));
+    g_hash_table_insert (engine->priv->profiles, g_strdup (name), g_object_ref (profile));
     g_signal_emit (engine, signals[ADD], 0, profile);
     g_object_notify (G_OBJECT (engine), "profiles");
   }

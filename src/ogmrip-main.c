@@ -1129,6 +1129,12 @@ ogmrip_main_extract_activated (OGMRipData *data)
   gtk_window_set_parent (GTK_WINDOW (dialog), GTK_WINDOW (data->window));
 
   response = gtk_dialog_run (GTK_DIALOG (dialog));
+  if (response != OGMRIP_RESPONSE_EXTRACT && response != OGMRIP_RESPONSE_ENQUEUE)
+  {
+    gtk_widget_destroy (dialog);
+    g_object_unref (encoding);
+    return;
+  }
 
   profile = ogmrip_encoding_get_profile (encoding);
 
@@ -1877,16 +1883,22 @@ ogmrip_uninit (void)
   ogmrip_plugin_uninit ();
 }
 
+static GOptionEntry opts[] =
+{
+  { "debug", 0,  0, G_OPTION_ARG_NONE, &debug, "Enable debug messages", NULL },
+  { NULL,    0,  0, 0,                 NULL,  NULL,                     NULL }
+};
+
 int
 main (int argc, char *argv[])
 {
   OGMRipData *data;
 
-  GOptionEntry opts[] =
-  {
-    { "debug", 0,  0, G_OPTION_ARG_NONE, &debug, "Enable debug messages", NULL },
-    { NULL,    0,  0, 0,                 NULL,  NULL,                     NULL }
-  };
+#ifdef ENABLE_NLS
+  bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
+  bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
+  textdomain (GETTEXT_PACKAGE);
+#endif /* ENABLE_NLS */
 
   if (!gtk_init_with_args (&argc, &argv, "<DVD DEVICE>", opts, GETTEXT_PACKAGE, NULL))
     return EXIT_FAILURE;
@@ -1895,12 +1907,6 @@ main (int argc, char *argv[])
     ogmjob_log_set_print_stdout (TRUE);
 
   ogmrip_init ();
-
-#ifdef ENABLE_NLS
-  bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
-  bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
-  textdomain (GETTEXT_PACKAGE);
-#endif /* ENABLE_NLS */
 
   data = ogmrip_main_new ();
 
