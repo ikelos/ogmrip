@@ -301,6 +301,8 @@ ogmrip_options_dialog_profile_setting_changed (OGMRipOptionsDialog *dialog)
   g_free (str);
 
   ogmrip_profile_chooser_set_active (GTK_COMBO_BOX (dialog->priv->profile_combo), profile);
+  if (gtk_combo_box_get_active (GTK_COMBO_BOX (dialog->priv->profile_combo)) < 0)
+    gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->profile_combo), 0);
 
   g_signal_handlers_unblock_by_func (dialog->priv->profile_combo,
       ogmrip_options_dialog_profile_chooser_changed, dialog);
