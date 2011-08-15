@@ -98,6 +98,8 @@ static void ogmrip_options_dialog_dispose      (GObject      *gobject);
 static void ogmrip_options_dialog_response     (GtkDialog    *dialog,
                                                 gint         response_id);
 
+extern GSettings *settings;
+
 static const guint m[] = { 0, 1, 1, 1, 3, 5, 1 };
 static const guint d[] = { 0, 8, 4, 2, 4, 6, 1 };
 
@@ -212,7 +214,10 @@ ogmrip_options_dialog_update_scale_combo (OGMRipOptionsDialog *dialog)
 }
 
 static void
-ogmrip_options_dialog_profile_combo_changed (OGMRipOptionsDialog *dialog)
+ogmrip_options_dialog_profile_setting_changed (OGMRipOptionsDialog *dialog);
+
+static void
+ogmrip_options_dialog_profile_chooser_changed (OGMRipOptionsDialog *dialog)
 {
   OGMRipProfile *profile;
 
@@ -220,6 +225,9 @@ ogmrip_options_dialog_profile_combo_changed (OGMRipOptionsDialog *dialog)
   OGMRipEncodingMethod method = 0;
   OGMRipScalerType scaler = 0;
   gboolean sensitive, can_crop = FALSE;
+
+  g_signal_handlers_block_by_func (settings,
+      ogmrip_options_dialog_profile_setting_changed, dialog);
 
   profile = ogmrip_profile_chooser_get_active (GTK_COMBO_BOX (dialog->priv->profile_combo));
   if (profile)
@@ -271,6 +279,31 @@ ogmrip_options_dialog_profile_combo_changed (OGMRipOptionsDialog *dialog)
         !gtk_widget_get_visible (dialog->priv->test_box));
 
   gtk_widget_set_sensitive (dialog->priv->deint_check, video_codec != G_TYPE_NONE);
+
+  g_signal_handlers_unblock_by_func (settings,
+      ogmrip_options_dialog_profile_setting_changed, dialog);
+}
+
+static void
+ogmrip_options_dialog_profile_setting_changed (OGMRipOptionsDialog *dialog)
+{
+  OGMRipProfileEngine *engine;
+  OGMRipProfile *profile;
+  gchar *str;
+
+  g_signal_handlers_block_by_func (dialog->priv->profile_combo,
+      ogmrip_options_dialog_profile_chooser_changed, dialog);
+
+  engine = ogmrip_profile_engine_get_default ();
+
+  str = g_settings_get_string (settings, OGMRIP_SETTINGS_PROFILE);
+  profile = ogmrip_profile_engine_get (engine, str);
+  g_free (str);
+
+  ogmrip_profile_chooser_set_active (GTK_COMBO_BOX (dialog->priv->profile_combo), profile);
+
+  g_signal_handlers_unblock_by_func (dialog->priv->profile_combo,
+      ogmrip_options_dialog_profile_chooser_changed, dialog);
 }
 
 static void
@@ -530,7 +563,9 @@ ogmrip_options_dialog_constructed (GObject *gobject)
   dialog->priv->profile_combo = gtk_builder_get_widget (builder, "profile-combo");
   ogmrip_profile_chooser_construct (GTK_COMBO_BOX (dialog->priv->profile_combo));
   g_signal_connect_swapped (dialog->priv->profile_combo, "changed",
-      G_CALLBACK (ogmrip_options_dialog_profile_combo_changed), dialog);
+      G_CALLBACK (ogmrip_options_dialog_profile_chooser_changed), dialog);
+  g_signal_connect_swapped (settings, "changed::" OGMRIP_SETTINGS_PROFILE,
+      G_CALLBACK (ogmrip_options_dialog_profile_setting_changed), dialog);
 /*
   if (dialog->priv->action == OGMRIP_OPTIONS_DIALOG_CREATE)
     ogmrip_settings_bind_custom (settings, OGMRIP_GCONF_GENERAL, OGMRIP_GCONF_PROFILE,
@@ -628,7 +663,7 @@ ogmrip_options_dialog_constructed (GObject *gobject)
 
   g_object_unref (builder);
 
-  ogmrip_options_dialog_profile_combo_changed (dialog);
+  ogmrip_options_dialog_profile_setting_changed (dialog);
   ogmrip_options_dialog_update_scale_combo (dialog);
 }
 
@@ -686,7 +721,9 @@ ogmrip_options_dialog_response (GtkDialog *dialog, gint response_id)
   OGMRipOptionsDialog *options = OGMRIP_OPTIONS_DIALOG (dialog);
   OGMRipProfile *profile;
 
-  if (response_id != OGMRIP_RESPONSE_EXTRACT && response_id != OGMRIP_RESPONSE_EXTRACT && response_id != GTK_RESPONSE_CLOSE)
+  if (response_id != OGMRIP_RESPONSE_EXTRACT &&
+      response_id != OGMRIP_RESPONSE_ENQUEUE &&
+      response_id != GTK_RESPONSE_CLOSE)
     return;
 
   if (response_id == GTK_RESPONSE_CLOSE)

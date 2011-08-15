@@ -683,13 +683,15 @@ ogmrip_subp_codec_chooser_filter (GtkComboBox *chooser, GType container)
 void
 ogmrip_codec_chooser_set_active (GtkComboBox *chooser, const char *name)
 {
-  GtkTreeModel *model;
-  GtkTreeIter iter;
-
-  model = gtk_combo_box_get_model (chooser);
-  if (gtk_tree_model_get_iter_first (model, &iter))
+  if (!name)
+    gtk_combo_box_set_active (chooser, -1);
+  else
   {
-    if (name)
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+
+    model = gtk_combo_box_get_model (chooser);
+    if (gtk_tree_model_get_iter_first (model, &iter))
     {
       gchar *str;
 
@@ -705,10 +707,10 @@ ogmrip_codec_chooser_set_active (GtkComboBox *chooser, const char *name)
         g_free (str);
       }
       while (gtk_tree_model_iter_next (model, &iter));
-    }
 
-    if (gtk_combo_box_get_active (chooser) < 0)
-      gtk_combo_box_set_active (chooser, 0);
+      if (gtk_combo_box_get_active (chooser) < 0)
+        gtk_combo_box_set_active (chooser, 0);
+    }
   }
 }
 
@@ -1118,5 +1120,39 @@ ogmrip_profile_chooser_get_active (GtkComboBox *chooser)
   model = gtk_combo_box_get_model (chooser);
 
   return ogmrip_profile_store_get_profile (GTK_LIST_STORE (model), &iter);
+}
+
+void
+ogmrip_profile_chooser_set_active (GtkComboBox *chooser, OGMRipProfile *profile)
+{
+  if (!profile)
+    gtk_combo_box_set_active (chooser, -1);
+  else
+  {
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+
+    model = gtk_combo_box_get_model (chooser);
+    if (gtk_tree_model_get_iter_first (model, &iter))
+    {
+      OGMRipProfile *p;
+
+      do
+      {
+        gtk_tree_model_get (model, &iter, COL_PROFILE_OBJECT, &p, -1);
+        g_object_unref (p);
+
+        if (p == profile)
+        {
+          gtk_combo_box_set_active_iter (chooser, &iter);
+          break;
+        }
+      }
+      while (gtk_tree_model_iter_next (model, &iter));
+
+      if (gtk_combo_box_get_active (chooser) < 0)
+        gtk_combo_box_set_active (chooser, 0);
+    }
+  }
 }
 

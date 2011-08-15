@@ -189,6 +189,8 @@ void            ogmrip_profile_store_set_name     (GtkListStore  *store,
 OGMRipProfile * ogmrip_profile_store_get_profile  (GtkListStore  *store,
                                                    GtkTreeIter   *iter);
 OGMRipProfile * ogmrip_profile_chooser_get_active (GtkComboBox   *chooser);
+void            ogmrip_profile_chooser_set_active (GtkComboBox   *chooser,
+                                                   OGMRipProfile *profile);
 
 const gchar *   ogmrip_get_system_profiles_dir   (void);
 const gchar *   ogmrip_get_user_profiles_dir     (void);
