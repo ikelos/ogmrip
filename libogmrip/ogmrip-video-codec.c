@@ -1021,10 +1021,14 @@ void
 ogmrip_video_codec_set_scale_size (OGMRipVideoCodec *video, guint width, guint height)
 {
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
-  g_return_if_fail (width > 0 && height > 0);
 
-  video->priv->scale_width = width;
-  video->priv->scale_height = height;
+  ogmrip_video_codec_get_raw_size (video, &video->priv->scale_width, &video->priv->scale_height);
+
+  if (width && height)
+  {
+    video->priv->scale_width = width;
+    video->priv->scale_height = height;
+  }
 
   ogmrip_video_codec_autosize (video);
 }
