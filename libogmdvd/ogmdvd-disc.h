@@ -79,7 +79,7 @@ gint          ogmdvd_disc_get_n_titles  (OGMDvdDisc         *disc);
 OGMDvdTitle * ogmdvd_disc_get_nth_title (OGMDvdDisc         *disc,
                                          guint              nr);
 GList *       ogmdvd_disc_get_titles    (OGMDvdDisc         *disc);
-gboolean      ogmdvd_disc_copy          (OGMDvdDisc         *title,
+gboolean      ogmdvd_disc_copy          (OGMDvdDisc         *disc,
                                          const gchar        *path,
                                          OGMDvdDiscCallback callback,
                                          gpointer           user_data,
