@@ -24,11 +24,12 @@
 
 G_BEGIN_DECLS
 
-#define OGMRIP_TYPE_SUBP_CODEC          (ogmrip_subp_codec_get_type ())
-#define OGMRIP_SUBP_CODEC(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_SUBP_CODEC, OGMRipSubpCodec))
-#define OGMRIP_SUBP_CODEC_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_SUBP_CODEC, OGMRipSubpCodecClass))
-#define OGMRIP_IS_SUBP_CODEC(obj)       (G_TYPE_CHECK_INSTANCE_TYPE ((obj), OGMRIP_TYPE_SUBP_CODEC))
-#define OGMRIP_IS_SUBP_CODEC_CLASS(obj) (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_SUBP_CODEC))
+#define OGMRIP_TYPE_SUBP_CODEC           (ogmrip_subp_codec_get_type ())
+#define OGMRIP_SUBP_CODEC(obj)           (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_SUBP_CODEC, OGMRipSubpCodec))
+#define OGMRIP_SUBP_CODEC_CLASS(klass)   (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_SUBP_CODEC, OGMRipSubpCodecClass))
+#define OGMRIP_IS_SUBP_CODEC(obj)        (G_TYPE_CHECK_INSTANCE_TYPE ((obj), OGMRIP_TYPE_SUBP_CODEC))
+#define OGMRIP_IS_SUBP_CODEC_CLASS(obj)  (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_SUBP_CODEC))
+#define OGMRIP_SUBP_CODEC_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), OGMRIP_TYPE_SUBP_CODEC, OGMRipSubpCodecClass))
 
 typedef struct _OGMRipSubpCodec      OGMRipSubpCodec;
 typedef struct _OGMRipSubpCodecPriv  OGMRipSubpCodecPriv;
