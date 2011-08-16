@@ -40,6 +40,7 @@ libogmrip-gtk/ogmrip-audio-chooser-widget.c
 libogmrip-gtk/ogmrip-audio-file-chooser-dialog.c
 libogmrip-gtk/ogmrip-audio-options-dialog.c
 libogmrip-gtk/ogmrip-chapter-list.c
+libogmrip-gtk/ogmrip-encoding-manager-dialog.c
 libogmrip-gtk/ogmrip-file-chooser-dialog.c
 libogmrip-gtk/ogmrip-helper.c
 libogmrip-gtk/ogmrip-list-item.c
@@ -52,7 +53,6 @@ libogmrip-gtk/ogmrip-subp-file-chooser-dialog.c
 libogmrip-gtk/ogmrip-subp-options-dialog.c
 
 src/ogmrip-crop-dialog.c
-src/ogmrip-encoding-manager-dialog.c
 src/ogmrip-main.c
 src/ogmrip-options-dialog.c
 src/ogmrip-pref-dialog.c
