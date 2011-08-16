@@ -24,6 +24,7 @@
 #include <glib/gi18n.h>
 
 #include <libxml/parser.h>
+#include <libxml/xmlsave.h>
 
 #define OGMRIP_PROFILE_GET_PRIVATE(o) \
     (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_PROFILE, OGMRipProfilePriv))
@@ -42,12 +43,22 @@ struct _OGMRipProfilePriv
   GSettings *subp_settings;
   gchar *subp_codec;
 
-  gchar *path;
+  gchar *name, *path;
 };
 
-static void ogmrip_profile_constructed  (GObject    *gobject);
-static void ogmrip_profile_dispose      (GObject    *gobject);
-static void ogmrip_profile_finalize     (GObject    *gobject);
+enum
+{
+  PROP_0,
+  PROP_NAME
+};
+
+static void ogmrip_profile_constructed  (GObject      *gobject);
+static void ogmrip_profile_dispose      (GObject      *gobject);
+static void ogmrip_profile_finalize     (GObject      *gobject);
+static void ogmrip_profile_get_property (GObject      *gobject,
+                                         guint        property_id,
+                                         GValue       *value,
+                                         GParamSpec   *pspec);
 
 static gboolean
 ogmrip_profile_has_schema (const gchar *schema)
@@ -86,6 +97,11 @@ ogmrip_profile_class_init (OGMRipProfileClass *klass)
   gobject_class->constructed = ogmrip_profile_constructed;
   gobject_class->dispose = ogmrip_profile_dispose;
   gobject_class->finalize = ogmrip_profile_finalize;
+  gobject_class->get_property = ogmrip_profile_get_property;
+
+  g_object_class_install_property (gobject_class, PROP_NAME,
+      g_param_spec_string ("name", "Name property", "Get name",
+        NULL, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipProfilePriv));
 }
@@ -100,6 +116,7 @@ static void
 ogmrip_profile_constructed (GObject *gobject)
 {
   OGMRipProfile *profile = OGMRIP_PROFILE (gobject);
+  gchar *str;
 
   G_OBJECT_CLASS (ogmrip_profile_parent_class)->constructed (gobject);
 
@@ -128,6 +145,10 @@ ogmrip_profile_constructed (GObject *gobject)
       G_CALLBACK (ogmrip_profile_codec_changed), &profile->priv->subp_codec);
 
   g_object_get (profile, "path", &profile->priv->path, NULL);
+
+  str = g_path_get_dirname (profile->priv->path);
+  profile->priv->name = g_path_get_basename (str);
+  g_free (str);
 }
 
 static void
@@ -165,9 +186,24 @@ ogmrip_profile_dispose (GObject *gobject)
 static void
 ogmrip_profile_finalize (GObject *gobject)
 {
+  g_free (OGMRIP_PROFILE (gobject)->priv->name);
   g_free (OGMRIP_PROFILE (gobject)->priv->path);
 
   G_OBJECT_CLASS (ogmrip_profile_parent_class)->finalize (gobject);
+}
+
+static void
+ogmrip_profile_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
+{
+  switch (property_id)
+  {
+    case PROP_NAME:
+      g_value_set_string (value, OGMRIP_PROFILE (gobject)->priv->name);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
+      break;
+  }
 }
 
 static gchar *
@@ -452,15 +488,46 @@ ogmrip_profile_dump_section (OGMRipProfile *profile, xmlNode *root, const gchar 
   }
 }
 
+static int
+xmlWriteOutputStream (GOutputStream *ostream, const gchar *buffer, int len)
+{
+  return g_output_stream_write (ostream, buffer, len, NULL, NULL);
+}
+
+static int
+xmlCloseOutputStream (GOutputStream *ostream)
+{
+  if (g_output_stream_close (ostream, NULL, NULL))
+    return 0;
+
+  return -1;
+}
+
 gboolean
 ogmrip_profile_dump (OGMRipProfile *profile, GFile *file, GError **error)
 {
+  GFileOutputStream *ostream;
+  xmlSaveCtxt *ctxt;
   xmlNode *root;
+
   gchar *str;
+  gint len;
 
   g_return_val_if_fail (OGMRIP_IS_PROFILE (profile), FALSE);
   g_return_val_if_fail (G_IS_FILE (file), FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  ostream = g_file_create (file, G_FILE_CREATE_NONE, NULL, error);
+  if (!ostream)
+    return FALSE;
+
+  ctxt = xmlSaveToIO ((xmlOutputWriteCallback) xmlWriteOutputStream,
+      (xmlOutputCloseCallback) xmlCloseOutputStream, ostream, NULL, 0);
+  if (!ctxt)
+  {
+    g_object_unref (ostream);
+    return FALSE;
+  }
 
   root = xmlNewNode (NULL, BAD_CAST "profile");
 
@@ -496,7 +563,13 @@ ogmrip_profile_dump (OGMRipProfile *profile, GFile *file, GError **error)
   ogmrip_profile_dump_section (profile, root, str);
   g_free (str);
 
-  return FALSE;
+  len = xmlSaveTree (ctxt, root);
+
+  xmlFreeNode (root);
+  xmlSaveClose (ctxt);
+  g_object_unref (ostream);
+
+  return len > 0;
 }
 
 void
