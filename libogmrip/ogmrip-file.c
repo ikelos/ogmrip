@@ -397,12 +397,12 @@ ogmrip_file_get_size (OGMRipFile *file)
  *
  * Returns: The filename, or NULL
  */
-gchar *
+const gchar *
 ogmrip_file_get_filename (OGMRipFile *file)
 {
   g_return_val_if_fail (file != NULL, NULL);
 
-  return g_strdup (file->filename);
+  return file->filename;
 }
 
 static void

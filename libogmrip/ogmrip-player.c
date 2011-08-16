@@ -137,7 +137,7 @@ ogmrip_mplayer_play_command (OGMRipPlayer *player)
   else if (player->priv->afile)
   {
     g_ptr_array_add (argv, g_strdup ("-audiofile"));
-    g_ptr_array_add (argv, ogmrip_file_get_filename (player->priv->afile));
+    g_ptr_array_add (argv, g_strdup (ogmrip_file_get_filename (player->priv->afile)));
   }
   else
     g_ptr_array_add (argv, g_strdup ("-nosound"));

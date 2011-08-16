@@ -215,16 +215,13 @@ ogmrip_source_chooser_widget_set_file (OGMRipSourceChooserWidget *chooser, OGMRi
   if (ogmrip_source_chooser_widget_get_file_iter (chooser, &iter))
   {
     OGMRipFile *old_file;
-    gchar *filename, *basename;
+    gchar *basename;
 
     gtk_tree_model_get (GTK_TREE_MODEL (chooser->priv->store), &iter, SOURCE_COLUMN, &old_file, -1);
     if (old_file)
       ogmrip_file_unref (old_file);
 
-    filename = ogmrip_file_get_filename (file);
-    basename = g_path_get_basename (filename);
-    g_free (filename);
-
+    basename = g_path_get_basename (ogmrip_file_get_filename (file));
     gtk_list_store_set (chooser->priv->store, &iter, TEXT_COLUMN, basename,
         TYPE_COLUMN, OGMRIP_SOURCE_FILE, LANG_COLUMN, ogmrip_file_get_language (file), SOURCE_COLUMN, file, -1);
     g_free (basename);

@@ -79,42 +79,42 @@ typedef struct _OGMRipVideoFile OGMRipVideoFile;
 typedef struct _OGMRipAudioFile OGMRipAudioFile;
 typedef struct _OGMRipSubpFile  OGMRipSubpFile;
 
-GQuark       ogmrip_file_error_quark                 (void);
+GQuark        ogmrip_file_error_quark                 (void);
 
-OGMRipFile * ogmrip_file_ref                         (OGMRipFile      *file);
-void         ogmrip_file_unref                       (OGMRipFile      *file);
-void         ogmrip_file_set_unlink_on_unref         (OGMRipFile      *file,
-                                                      gboolean        do_unlink);
-gboolean     ogmrip_file_get_unlink_on_unref         (OGMRipFile      *file);
-gint         ogmrip_file_get_type                    (OGMRipFile      *file);
-gint         ogmrip_file_get_format                  (OGMRipFile      *file);
-gint64       ogmrip_file_get_size                    (OGMRipFile      *file);
-gchar *      ogmrip_file_get_filename                (OGMRipFile      *file);
-void         ogmrip_file_set_language                (OGMRipFile      *file,
-                                                      gint            lang);
-gint         ogmrip_file_get_language                (OGMRipFile      *file);
+OGMRipFile *  ogmrip_file_ref                         (OGMRipFile      *file);
+void          ogmrip_file_unref                       (OGMRipFile      *file);
+void          ogmrip_file_set_unlink_on_unref         (OGMRipFile      *file,
+                                                       gboolean        do_unlink);
+gboolean      ogmrip_file_get_unlink_on_unref         (OGMRipFile      *file);
+gint          ogmrip_file_get_type                    (OGMRipFile      *file);
+gint          ogmrip_file_get_format                  (OGMRipFile      *file);
+gint64        ogmrip_file_get_size                    (OGMRipFile      *file);
+const gchar * ogmrip_file_get_filename                (OGMRipFile      *file);
+void          ogmrip_file_set_language                (OGMRipFile      *file,
+                                                       gint            lang);
+gint          ogmrip_file_get_language                (OGMRipFile      *file);
 
-OGMRipFile * ogmrip_video_file_new                   (const gchar     *filename,
-                                                      GError          **error);
-gint         ogmrip_video_file_get_bitrate           (OGMRipVideoFile *video);
-gdouble      ogmrip_video_file_get_length            (OGMRipVideoFile *video);
-void         ogmrip_video_file_get_size              (OGMRipVideoFile *video,
-                                                      guint           *width,
-                                                      guint           *height);
-gdouble      ogmrip_video_file_get_framerate         (OGMRipVideoFile *video);
-gdouble      ogmrip_video_file_get_aspect_ratio      (OGMRipVideoFile *video);
+OGMRipFile *  ogmrip_video_file_new                   (const gchar     *filename,
+                                                       GError          **error);
+gint          ogmrip_video_file_get_bitrate           (OGMRipVideoFile *video);
+gdouble       ogmrip_video_file_get_length            (OGMRipVideoFile *video);
+void          ogmrip_video_file_get_size              (OGMRipVideoFile *video,
+                                                       guint           *width,
+                                                       guint           *height);
+gdouble       ogmrip_video_file_get_framerate         (OGMRipVideoFile *video);
+gdouble       ogmrip_video_file_get_aspect_ratio      (OGMRipVideoFile *video);
 
-OGMRipFile * ogmrip_audio_file_new                   (const gchar     *filename,
-                                                      GError          **error);
-gint         ogmrip_audio_file_get_bitrate           (OGMRipAudioFile *audio);
-gdouble      ogmrip_audio_file_get_length            (OGMRipAudioFile *audio);
-gint         ogmrip_audio_file_get_sample_rate       (OGMRipAudioFile *audio);
-gint         ogmrip_audio_file_get_samples_per_frame (OGMRipAudioFile *audio);
-gint         ogmrip_audio_file_get_channels          (OGMRipAudioFile *audio);
+OGMRipFile *  ogmrip_audio_file_new                   (const gchar     *filename,
+                                                       GError          **error);
+gint          ogmrip_audio_file_get_bitrate           (OGMRipAudioFile *audio);
+gdouble       ogmrip_audio_file_get_length            (OGMRipAudioFile *audio);
+gint          ogmrip_audio_file_get_sample_rate       (OGMRipAudioFile *audio);
+gint          ogmrip_audio_file_get_samples_per_frame (OGMRipAudioFile *audio);
+gint          ogmrip_audio_file_get_channels          (OGMRipAudioFile *audio);
 
-OGMRipFile * ogmrip_subp_file_new                    (const gchar     *filename,
-                                                      GError          **error);
-gint         ogmrip_subp_file_get_charset            (OGMRipSubpFile  *subp);
+OGMRipFile *  ogmrip_subp_file_new                    (const gchar     *filename,
+                                                       GError          **error);
+gint          ogmrip_subp_file_get_charset            (OGMRipSubpFile  *subp);
 
 G_END_DECLS
 
