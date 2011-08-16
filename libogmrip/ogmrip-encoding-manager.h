@@ -30,6 +30,14 @@ G_BEGIN_DECLS
 #define OGMRIP_IS_ENCODING_MANAGER_CLASS(obj) (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_ENCODING_MANAGER))
 #define OGMRIP_ENCODING_MANAGER_ERROR         (ogmrip_encoding_manager_error_quark ())
 
+typedef enum
+{
+  OGMRIP_DIRECTION_UP,
+  OGMRIP_DIRECTION_DOWN,
+  OGMRIP_DIRECTION_TOP,
+  OGMRIP_DIRECTION_BOTTOM
+} OGMRipDirection;
+
 typedef struct _OGMRipEncodingManager      OGMRipEncodingManager;
 typedef struct _OGMRipEncodingManagerPriv  OGMRipEncodingManagerPriv;
 typedef struct _OGMRipEncodingManagerClass OGMRipEncodingManagerClass;
@@ -44,62 +52,27 @@ struct _OGMRipEncodingManager
 struct _OGMRipEncodingManagerClass
 {
   GObjectClass parent_class;
+
+  void (* add)    (OGMRipEncodingManager *manager,
+                   OGMRipEncoding        *encoding);
+  void (* remove) (OGMRipEncodingManager *manager,
+                   OGMRipEncoding        *encoding);
+  void (* move)   (OGMRipEncodingManager *manager,
+                   OGMRipEncoding        *encoding,
+                   OGMRipDirection       direction);
 };
 
-/**
- * OGMRipCleanupType:
- * @OGMRIP_CLEANUP_REMOVE_ALL: Remove the temporary files of all encodings
- * @OGMRIP_CLEANUP_KEEP_ALL: Keep the temporary files of all encodings
- * @OGMRIP_CLEANUP_KEEP_LAST: Keep the temporary files of the last encoding only
- *
- * How to clean up the temporary files of the encodings.
- */
-typedef enum
-{
-  OGMRIP_CLEANUP_REMOVE_ALL,
-  OGMRIP_CLEANUP_KEEP_ALL,
-  OGMRIP_CLEANUP_KEEP_LAST
-} OGMRipCleanupType;
+GType                   ogmrip_encoding_manager_get_type (void);
+OGMRipEncodingManager * ogmrip_encoding_manager_new      (void);
+void                    ogmrip_encoding_manager_add      (OGMRipEncodingManager *manager,
+                                                          OGMRipEncoding        *encoding);
+void                    ogmrip_encoding_manager_remove   (OGMRipEncodingManager *manager,
+                                                          OGMRipEncoding        *encoding);
+void                    ogmrip_encoding_manager_move     (OGMRipEncodingManager *manager,
+                                                          OGMRipEncoding        *encoding,
+                                                          OGMRipDirection       direction);
+GList *                 ogmrip_encoding_manager_get_list (OGMRipEncodingManager *manager);
 
-/**
- * OGMRipEncodingFunc:
- * @encoding: An #OGMRipEncoding
- * @data: The user data
- *
- * Specifies the type of functions passed to ogmrip_encoding_manager_foreach().
- *
- * Returns: %FALSE to stop calling the function.
- */
-typedef gboolean (* OGMRipEncodingFunc) (OGMRipEncoding *encoding,
-                                         gpointer       data);
-
-GType                   ogmrip_encoding_manager_get_type    (void);
-
-OGMRipEncodingManager * ogmrip_encoding_manager_new         (void);
-
-gint                    ogmrip_encoding_manager_run         (OGMRipEncodingManager *manager,
-                                                             GError                **error);
-void                    ogmrip_encoding_manager_cancel      (OGMRipEncodingManager *manager);
-
-void                    ogmrip_encoding_manager_add         (OGMRipEncodingManager *manager,
-                                                             OGMRipEncoding        *encoding);
-void                    ogmrip_encoding_manager_remove      (OGMRipEncodingManager *manager,
-                                                             OGMRipEncoding        *encoding);
-
-gboolean                ogmrip_encoding_manager_foreach     (OGMRipEncodingManager *manager,
-                                                             OGMRipEncodingFunc    func,
-                                                             gpointer              data);
-
-OGMRipEncoding *        ogmrip_encoding_manager_find        (OGMRipEncodingManager *manager,
-                                                             OGMRipEncodingFunc    func,
-                                                             gpointer              data);
-
-OGMRipEncoding *        ogmrip_encoding_manager_nth         (OGMRipEncodingManager *manager,
-                                                             gint                  n);
-
-void                    ogmrip_encoding_manager_set_cleanup (OGMRipEncodingManager *manager,
-                                                             OGMRipCleanupType     type);
-gint                    ogmrip_encoding_manager_get_cleanup (OGMRipEncodingManager *manager);
 
 G_END_DECLS
 

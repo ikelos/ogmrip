@@ -23,6 +23,7 @@
 #include <ogmrip-audio-chooser-widget.h>
 #include <ogmrip-audio-file-chooser-dialog.h>
 #include <ogmrip-chapter-list.h>
+#include <ogmrip-encoding-manager-dialog.h>
 #include <ogmrip-helper.h>
 #include <ogmrip-list-item.h>
 #include <ogmrip-options-plugin.h>

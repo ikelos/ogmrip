@@ -31,6 +31,7 @@
         <child>
           <object class="GtkButton" id="top-button">
             <property name="visible">True</property>
+            <property name="sensitive">False</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
             <property name="tooltip_text" translatable="yes">Move encoding to top</property>
@@ -49,6 +50,7 @@
         <child>
           <object class="GtkButton" id="up-button">
             <property name="visible">True</property>
+            <property name="sensitive">False</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
             <property name="tooltip_text" translatable="yes">Move encoding up</property>
@@ -67,6 +69,7 @@
         <child>
           <object class="GtkButton" id="down-button">
             <property name="visible">True</property>
+            <property name="sensitive">False</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
             <property name="tooltip_text" translatable="yes">Move encoding down</property>
@@ -85,6 +88,7 @@
         <child>
           <object class="GtkButton" id="bottom-button">
             <property name="visible">True</property>
+            <property name="sensitive">False</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
             <property name="tooltip_text" translatable="yes">Move encoding to bottom</property>

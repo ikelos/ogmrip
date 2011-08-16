@@ -46,7 +46,7 @@ struct _OGMRipEncodingManagerDialogClass
 };
 
 GType       ogmrip_encoding_manager_dialog_get_type (void);
-GtkWidget * ogmrip_encoding_manager_dialog_new      (void);
+GtkWidget * ogmrip_encoding_manager_dialog_new      (OGMRipEncodingManager *manager);
 
 G_END_DECLS
 

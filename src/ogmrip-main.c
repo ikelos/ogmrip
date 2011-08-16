@@ -24,7 +24,6 @@
 #include "ogmrip-gtk.h"
 #include "ogmrip-settings.h"
 
-#include "ogmrip-encoding-manager-dialog.h"
 #include "ogmrip-options-dialog.h"
 #include "ogmrip-pref-dialog.h"
 #include "ogmrip-progress-dialog.h"
@@ -73,6 +72,7 @@ typedef struct
 
   GtkAction *extract_action;
 
+  OGMRipEncodingManager *manager;
   OGMRipPlayer *player;
 } OGMRipData;
 
@@ -474,17 +474,6 @@ ogmrip_main_encode (OGMRipData *data, OGMRipEncoding *encoding)
       g_clear_error (&error);
     }
   }
-}
-
-/*
- * Enqueues an encoding
- */
-static void
-ogmrip_main_enqueue (OGMRipData *data, OGMRipEncoding *encoding)
-{
-  /*
-   * TODO enqueue
-   */
 }
 
 /*
@@ -1260,7 +1249,10 @@ ogmrip_main_extract_activated (OGMRipData *data)
   if (response == OGMRIP_RESPONSE_EXTRACT)
     ogmrip_main_encode (data, encoding);
   else if (response == OGMRIP_RESPONSE_ENQUEUE)
-    ogmrip_main_enqueue (data, encoding);
+  {
+    ogmrip_encoding_manager_add (data->manager, encoding);
+    g_object_unref (encoding);
+  }
 }
 
 /*
@@ -1421,7 +1413,7 @@ ogmrip_main_encodings_activated (OGMRipData *data)
 {
   GtkWidget *dialog;
 
-  dialog = ogmrip_encoding_manager_dialog_new ();
+  dialog = ogmrip_encoding_manager_dialog_new (data->manager);
   gtk_window_set_parent (GTK_WINDOW (dialog), GTK_WINDOW (data->window));
 
   gtk_dialog_run (GTK_DIALOG (dialog));
@@ -1553,6 +1545,12 @@ ogmrip_main_destroyed (OGMRipData *data)
   {
     g_object_unref (data->player);
     data->player = NULL;
+  }
+  
+  if (data->manager)
+  {
+    g_object_unref (data->manager);
+    data->manager = NULL;
   }
 
   g_free (data);
@@ -1839,6 +1837,8 @@ ogmrip_main_new (void)
   data->relative_check = gtk_builder_get_widget (builder, "relative-check");
   data->angle_spin = gtk_builder_get_widget (builder, "angle-spin");
 
+  data->manager = ogmrip_encoding_manager_new ();
+
   g_object_unref (builder);
 
   ogmrip_main_title_chooser_changed (data);
@@ -1886,7 +1886,7 @@ ogmrip_uninit (void)
 static GOptionEntry opts[] =
 {
   { "debug", 0,  0, G_OPTION_ARG_NONE, &debug, "Enable debug messages", NULL },
-  { NULL,    0,  0, 0,                 NULL,  NULL,                     NULL }
+  { NULL,    0,  0, 0,                 NULL,   NULL,                    NULL }
 };
 
 int
