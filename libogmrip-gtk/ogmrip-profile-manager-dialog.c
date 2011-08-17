@@ -26,7 +26,8 @@
 #include "ogmrip-helper.h"
 
 #include <ogmrip.h>
-#include <glib/gi18n.h>
+
+#include <glib/gi18n-lib.h>
 
 #define OGMRIP_GLADE_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-profiles.glade"
 #define OGMRIP_GLADE_ROOT "root"
@@ -191,7 +192,6 @@ ogmrip_profile_manager_dialog_copy_button_clicked (OGMRipProfileManagerDialog *d
     new_profile = ogmrip_profile_copy (profile, NULL);
     g_settings_set_string (G_SETTINGS (new_profile), OGMRIP_PROFILE_NAME, new_name);
     g_free (new_name);
-    
 
     ogmrip_profile_engine_add (dialog->priv->engine, new_profile);
     g_object_unref (new_profile);

@@ -23,10 +23,14 @@
  * @include: ogmrip-encoding-manager.h
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "ogmrip-encoding-manager.h"
 #include "ogmrip-marshal.h"
 
-#include <glib/gi18n.h>
+#include <glib/gi18n-lib.h>
 
 #include <string.h>
 
