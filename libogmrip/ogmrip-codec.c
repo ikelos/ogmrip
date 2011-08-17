@@ -310,25 +310,22 @@ ogmrip_codec_get_input (OGMRipCodec *codec)
 void
 ogmrip_codec_set_chapters (OGMRipCodec *codec, guint start, gint end)
 {
+  gint nchap;
+
   g_return_if_fail (OGMRIP_IS_CODEC (codec));
 
-  if (codec->priv->start_chap != start || codec->priv->end_chap != end)
-  {
-    gint nchap;
+  nchap = ogmdvd_title_get_n_chapters (codec->priv->title);
 
-    nchap = ogmdvd_title_get_n_chapters (codec->priv->title);
+  if (end < 0)
+    end = nchap - 1;
 
-    if (end < 0)
-      end = nchap - 1;
+  codec->priv->start_chap = MIN ((gint) start, nchap - 1);
+  codec->priv->end_chap = CLAMP (end, (gint) start, nchap - 1);
 
-    codec->priv->start_chap = MIN ((gint) start, nchap - 1);
-    codec->priv->end_chap = CLAMP (end, (gint) start, nchap - 1);
+  codec->priv->start_second = -1.0;
+  codec->priv->play_length = -1.0;
 
-    codec->priv->start_second = -1.0;
-    codec->priv->play_length = -1.0;
-
-    codec->priv->dirty = TRUE;
-  }
+  codec->priv->dirty = TRUE;
 }
 
 /**
