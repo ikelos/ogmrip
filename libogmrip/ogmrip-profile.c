@@ -449,7 +449,7 @@ ogmrip_profile_dump_key (GSettings *settings, xmlNode *root, const gchar *key)
 {
   xmlNode *node;
   GVariant *variant;
-  gchar *str;
+  gchar *str, *escaped;
 
   node = xmlNewNode (NULL, BAD_CAST "key");
   xmlAddChild (root, node);
@@ -459,8 +459,11 @@ ogmrip_profile_dump_key (GSettings *settings, xmlNode *root, const gchar *key)
   variant = g_settings_get_value (settings, key);
 
   str = g_variant_print (variant, FALSE);
-  xmlNodeSetContent (node, BAD_CAST str);
+  escaped = g_markup_escape_text (str, -1);
   g_free (str);
+
+  xmlNodeSetContent (node, BAD_CAST escaped);
+  g_free (escaped);
 
   g_variant_unref (variant);
 }
@@ -521,7 +524,7 @@ ogmrip_profile_dump (OGMRipProfile *profile, GFile *file, GError **error)
   g_return_val_if_fail (G_IS_FILE (file), FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  ostream = g_file_create (file, G_FILE_CREATE_NONE, NULL, error);
+  ostream = g_file_replace (file, NULL, FALSE, G_FILE_CREATE_NONE, NULL, error);
   if (!ostream)
     return FALSE;
 
@@ -535,13 +538,15 @@ ogmrip_profile_dump (OGMRipProfile *profile, GFile *file, GError **error)
 
   root = xmlNewNode (NULL, BAD_CAST "profile");
 
-  str = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_NAME);
+  g_object_get (profile, "name", &str, NULL);
   xmlSetProp (root, BAD_CAST "name", BAD_CAST str);
   g_free (str);
 
   str = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_VERSION);
   xmlSetProp (root, BAD_CAST "version", BAD_CAST str);
   g_free (str);
+
+  ogmrip_profile_dump_key (G_SETTINGS (profile), root, OGMRIP_PROFILE_NAME);
 
   ogmrip_profile_dump_section (profile, root, OGMRIP_PROFILE_GENERAL);
 
