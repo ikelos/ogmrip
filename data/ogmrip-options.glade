@@ -82,6 +82,7 @@
       <object class="GtkCheckButton" id="crop-check">
         <property name="label" translatable="yes">Automatic _cropping</property>
         <property name="visible">True</property>
+        <property name="sensitive">False</property>
         <property name="can_focus">True</property>
         <property name="receives_default">False</property>
         <property name="use_underline">True</property>
@@ -96,6 +97,7 @@
     <child>
       <object class="GtkAlignment" id="crop-box">
         <property name="visible">False</property>
+        <property name="sensitive">False</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
         <property name="left_padding">12</property>
         <child>
@@ -232,6 +234,7 @@
       <object class="GtkCheckButton" id="scale-check">
         <property name="label" translatable="yes">Automatic _scaling</property>
         <property name="visible">True</property>
+        <property name="sensitive">False</property>
         <property name="can_focus">True</property>
         <property name="receives_default">False</property>
         <property name="use_underline">True</property>
@@ -246,6 +249,7 @@
     <child>
       <object class="GtkAlignment" id="scale-box">
         <property name="visible">False</property>
+        <property name="sensitive">False</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
         <property name="left_padding">12</property>
         <child>
@@ -356,6 +360,7 @@
       <object class="GtkCheckButton" id="test-check">
         <property name="label" translatable="yes">Automatic c_ompressibility check</property>
         <property name="visible">True</property>
+        <property name="sensitive">False</property>
         <property name="can_focus">True</property>
         <property name="receives_default">False</property>
         <property name="use_underline">True</property>
@@ -369,6 +374,7 @@
     <child>
       <object class="GtkAlignment" id="test-box">
         <property name="visible">False</property>
+        <property name="sensitive">False</property>
         <property name="left_padding">12</property>
         <child>
           <object class="GtkButton" id="test-button">
@@ -387,6 +393,7 @@
       <object class="GtkCheckButton" id="deint-check">
         <property name="label" translatable="yes">_Deinterlace</property>
         <property name="visible">True</property>
+        <property name="sensitive">False</property>
         <property name="can_focus">True</property>
         <property name="receives_default">False</property>
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>

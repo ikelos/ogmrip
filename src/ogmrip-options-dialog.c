@@ -214,22 +214,13 @@ ogmrip_options_dialog_update_scale_combo (OGMRipOptionsDialog *dialog)
 }
 
 static void
-ogmrip_options_dialog_profile_setting_changed (OGMRipOptionsDialog *dialog);
-
-static void
-ogmrip_options_dialog_profile_chooser_changed (OGMRipOptionsDialog *dialog)
+ogmrip_options_dialog_set_sensitivity (OGMRipOptionsDialog *dialog, OGMRipProfile *profile)
 {
-  OGMRipProfile *profile;
-
   GType video_codec = G_TYPE_NONE;
   OGMRipEncodingMethod method = 0;
   OGMRipScalerType scaler = 0;
   gboolean sensitive, can_crop = FALSE;
 
-  g_signal_handlers_block_by_func (settings,
-      ogmrip_options_dialog_profile_setting_changed, dialog);
-
-  profile = ogmrip_profile_chooser_get_active (GTK_COMBO_BOX (dialog->priv->profile_combo));
   if (profile)
   {
     GSettings *settings;
@@ -280,6 +271,33 @@ ogmrip_options_dialog_profile_chooser_changed (OGMRipOptionsDialog *dialog)
 
   gtk_widget_set_sensitive (dialog->priv->deint_check, video_codec != G_TYPE_NONE);
 
+  gtk_dialog_set_response_sensitive (GTK_DIALOG (dialog), OGMRIP_RESPONSE_ENQUEUE, profile != NULL);
+  gtk_dialog_set_response_sensitive (GTK_DIALOG (dialog), OGMRIP_RESPONSE_EXTRACT, profile != NULL);
+}
+
+static void
+ogmrip_options_dialog_profile_setting_changed (OGMRipOptionsDialog *dialog);
+
+static void
+ogmrip_options_dialog_profile_chooser_changed (OGMRipOptionsDialog *dialog)
+{
+  OGMRipProfile *profile;
+
+  g_signal_handlers_block_by_func (settings,
+      ogmrip_options_dialog_profile_setting_changed, dialog);
+
+  profile = ogmrip_profile_chooser_get_active (GTK_COMBO_BOX (dialog->priv->profile_combo));
+  if (profile)
+  {
+    gchar *name;
+
+    g_object_get (profile, "name", &name, NULL);
+    g_settings_set_string (settings, OGMRIP_SETTINGS_PROFILE, name);
+    g_free (name);
+  }
+
+  ogmrip_options_dialog_set_sensitivity (dialog, profile);
+
   g_signal_handlers_unblock_by_func (settings,
       ogmrip_options_dialog_profile_setting_changed, dialog);
 }
@@ -303,6 +321,9 @@ ogmrip_options_dialog_profile_setting_changed (OGMRipOptionsDialog *dialog)
   ogmrip_profile_chooser_set_active (GTK_COMBO_BOX (dialog->priv->profile_combo), profile);
   if (gtk_combo_box_get_active (GTK_COMBO_BOX (dialog->priv->profile_combo)) < 0)
     gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->profile_combo), 0);
+
+  ogmrip_options_dialog_set_sensitivity (dialog,
+      ogmrip_profile_chooser_get_active (GTK_COMBO_BOX (dialog->priv->profile_combo)));
 
   g_signal_handlers_unblock_by_func (dialog->priv->profile_combo,
       ogmrip_options_dialog_profile_chooser_changed, dialog);
@@ -540,6 +561,7 @@ ogmrip_options_dialog_constructed (GObject *gobject)
     widget = gtk_button_new_with_mnemonic (_("En_queue"));
     gtk_dialog_add_action_widget (GTK_DIALOG (dialog), widget, OGMRIP_RESPONSE_ENQUEUE);
     gtk_widget_set_can_default (widget, TRUE);
+    gtk_widget_set_sensitive (widget, FALSE);
     gtk_widget_show (widget);
 
     image = gtk_image_new_from_stock (GTK_STOCK_ADD, GTK_ICON_SIZE_BUTTON);
@@ -548,6 +570,7 @@ ogmrip_options_dialog_constructed (GObject *gobject)
     widget = gtk_button_new_with_mnemonic (_("E_xtract"));
     gtk_dialog_add_action_widget (GTK_DIALOG (dialog), widget, OGMRIP_RESPONSE_EXTRACT);
     gtk_widget_set_can_default (widget, TRUE);
+    gtk_widget_set_sensitive (widget, FALSE);
     gtk_widget_show (widget);
 
     image = gtk_image_new_from_stock (GTK_STOCK_CONVERT, GTK_ICON_SIZE_BUTTON);
