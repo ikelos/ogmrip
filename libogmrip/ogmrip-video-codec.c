@@ -89,7 +89,18 @@ enum
   PROP_SCALER,
   PROP_DEINT,
   PROP_QUALITY,
-  PROP_DELAY
+  PROP_DELAY,
+  PROP_MIN_WIDTH,
+  PROP_MIN_HEIGHT,
+  PROP_MAX_WIDTH,
+  PROP_MAX_HEIGHT,
+  PROP_EXPAND,
+  PROP_CROP_X,
+  PROP_CROP_Y,
+  PROP_CROP_WIDTH,
+  PROP_CROP_HEIGHT,
+  PROP_SCALE_WIDTH,
+  PROP_SCALE_HEIGHT
 };
 
 static void ogmrip_video_codec_dispose      (GObject      *gobject);
@@ -173,6 +184,50 @@ ogmrip_video_codec_class_init (OGMRipVideoCodecClass *klass)
         g_param_spec_uint ("start-delay", "Start delay property", "Set start delay", 
            0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
+  g_object_class_install_property (gobject_class, PROP_MIN_WIDTH, 
+        g_param_spec_uint ("min-width", "Min width property", "Set min width", 
+           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_MIN_HEIGHT, 
+        g_param_spec_uint ("min-height", "Min height property", "Set min height", 
+           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_MAX_WIDTH, 
+        g_param_spec_uint ("max-width", "Max width property", "Set max width", 
+           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_MAX_HEIGHT, 
+        g_param_spec_uint ("max-height", "Max height property", "Set max height", 
+           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_EXPAND, 
+        g_param_spec_boolean ("expand", "Expand property", "Set expand", 
+           FALSE, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_CROP_X, 
+        g_param_spec_uint ("crop-x", "Crop x property", "Set crop x", 
+           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_CROP_Y, 
+        g_param_spec_uint ("crop-y", "Crop y property", "Set crop y", 
+           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_CROP_WIDTH, 
+        g_param_spec_uint ("crop-width", "Crop width property", "Set crop width", 
+           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_CROP_HEIGHT, 
+        g_param_spec_uint ("crop-height", "Crop height property", "Set crop height", 
+           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_SCALE_WIDTH, 
+        g_param_spec_uint ("scale-width", "Scale width property", "Set scale width", 
+           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_SCALE_HEIGHT, 
+        g_param_spec_uint ("scale-height", "Scale height property", "Set scale height", 
+           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
   g_type_class_add_private (klass, sizeof (OGMRipVideoCodecPriv));
 }
 
@@ -253,6 +308,39 @@ ogmrip_video_codec_set_property (GObject *gobject, guint property_id, const GVal
     case PROP_QUALITY:
       ogmrip_video_codec_set_quality (video, g_value_get_uint (value));
       break;
+    case PROP_MIN_WIDTH:
+      ogmrip_video_codec_set_min_size (video, g_value_get_uint (value), video->priv->min_height);
+      break;
+    case PROP_MIN_HEIGHT:
+      ogmrip_video_codec_set_min_size (video, video->priv->min_width, g_value_get_uint (value));
+      break;
+    case PROP_MAX_WIDTH:
+      ogmrip_video_codec_set_max_size (video, g_value_get_uint (value), video->priv->max_height, video->priv->expand);
+      break;
+    case PROP_MAX_HEIGHT:
+      ogmrip_video_codec_set_max_size (video, video->priv->max_width, g_value_get_uint (value), video->priv->expand);
+      break;
+    case PROP_EXPAND:
+      ogmrip_video_codec_set_max_size (video, video->priv->max_width, video->priv->max_height, g_value_get_boolean (value));
+      break;
+    case PROP_CROP_X:
+      ogmrip_video_codec_set_crop_size (video, g_value_get_uint (value), video->priv->crop_y, video->priv->crop_width, video->priv->crop_height);
+      break;
+    case PROP_CROP_Y:
+      ogmrip_video_codec_set_crop_size (video, video->priv->crop_x, g_value_get_uint (value), video->priv->crop_width, video->priv->crop_height);
+      break;
+    case PROP_CROP_WIDTH:
+      ogmrip_video_codec_set_crop_size (video, video->priv->crop_x, video->priv->crop_y, g_value_get_uint (value), video->priv->crop_height);
+      break;
+    case PROP_CROP_HEIGHT:
+      ogmrip_video_codec_set_crop_size (video, video->priv->crop_x, video->priv->crop_y, video->priv->crop_width, g_value_get_uint (value));
+      break;
+    case PROP_SCALE_WIDTH:
+      ogmrip_video_codec_set_scale_size (video, g_value_get_uint (value), video->priv->scale_height);
+      break;
+    case PROP_SCALE_HEIGHT:
+      ogmrip_video_codec_set_scale_size (video, video->priv->scale_width, g_value_get_uint (value));
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
@@ -307,6 +395,39 @@ ogmrip_video_codec_get_property (GObject *gobject, guint property_id, GValue *va
       break;
     case PROP_DELAY:
       g_value_set_uint (value, 0);
+      break;
+    case PROP_MIN_WIDTH:
+      g_value_set_uint (value, video->priv->min_width);
+      break;
+    case PROP_MIN_HEIGHT:
+      g_value_set_uint (value, video->priv->min_height);
+      break;
+    case PROP_MAX_WIDTH:
+      g_value_set_uint (value, video->priv->max_width);
+      break;
+    case PROP_MAX_HEIGHT:
+      g_value_set_uint (value, video->priv->max_height);
+      break;
+    case PROP_EXPAND:
+      g_value_set_boolean (value, video->priv->expand);
+      break;
+    case PROP_CROP_X:
+      g_value_set_uint (value, video->priv->crop_x);
+      break;
+    case PROP_CROP_Y:
+      g_value_set_uint (value, video->priv->crop_y);
+      break;
+    case PROP_CROP_WIDTH:
+      g_value_set_uint (value, video->priv->crop_width);
+      break;
+    case PROP_CROP_HEIGHT:
+      g_value_set_uint (value, video->priv->crop_height);
+      break;
+    case PROP_SCALE_WIDTH:
+      g_value_set_uint (value, video->priv->scale_width);
+      break;
+    case PROP_SCALE_HEIGHT:
+      g_value_set_uint (value, video->priv->scale_height);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
