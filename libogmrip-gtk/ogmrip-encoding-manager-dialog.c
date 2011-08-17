@@ -53,8 +53,6 @@ struct _OGMRipEncodingManagerDialogPriv
 
   GtkListStore *store;
   GtkTreeSelection *selection;
-
-  GtkWidget *popup;
 };
 
 static void ogmrip_encoding_manager_dialog_dispose      (GObject      *gobject);
@@ -259,6 +257,29 @@ ogmrip_encoding_manager_dialog_get_active (OGMRipEncodingManagerDialog *dialog)
   return encoding;
 }
 
+static gboolean
+ogmrip_encoding_manager_dialog_treeview_button_pressed (GtkWidget *popup, GdkEventButton *event)
+{
+  if (event->type == GDK_BUTTON_PRESS  &&  event->button == 3)
+  {
+    gtk_menu_popup (GTK_MENU (popup), NULL, NULL,
+        NULL, NULL, event->button, gdk_event_get_time ((GdkEvent*) event));
+
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+static gboolean
+ogmrip_encoding_manager_dialog_treeview_popup_menu (GtkWidget *popup)
+{
+  gtk_menu_popup (GTK_MENU (popup), NULL, NULL,
+      NULL, NULL, 0, gdk_event_get_time (NULL));
+
+  return TRUE;
+}
+
 static void
 ogmrip_encoding_manager_dialog_clear_activated (OGMRipEncodingManagerDialog *dialog)
 {
@@ -311,11 +332,34 @@ ogmrip_encoding_manager_dialog_import_activated (OGMRipEncodingManagerDialog *di
 }
 
 static void
-ogmrip_encoding_manager_dialog_export_activated (OGMRipEncodingManagerDialog *dialog)
+ogmrip_encoding_manager_dialog_export_activated (OGMRipEncodingManagerDialog *parent)
 {
-  /*
-   * TODO export encoding
-   */
+  OGMRipEncoding *encoding;
+  
+  encoding = ogmrip_encoding_manager_dialog_get_active (parent);
+  if (encoding)
+  {
+    GtkWidget *dialog;
+
+    dialog = gtk_file_chooser_dialog_new (_("Export Encoding"),
+        GTK_WINDOW (parent), GTK_FILE_CHOOSER_ACTION_SAVE,
+        GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
+        GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
+        NULL);
+    gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog), TRUE);
+
+    if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
+    {
+      GError *error = NULL;
+      GFile *file;
+
+      file = gtk_file_chooser_get_file (GTK_FILE_CHOOSER (dialog));
+      if (!ogmrip_encoding_dump (encoding, file, &error))
+        ogmrip_run_error_dialog (GTK_WINDOW (dialog), error, _("Could not export the encoding"));
+      g_object_unref (file);
+    }
+    gtk_widget_destroy (dialog);
+  }
 }
 
 static void
@@ -382,7 +426,7 @@ ogmrip_encoding_manager_dialog_init (OGMRipEncodingManagerDialog *dialog)
 {
   GError *error = NULL;
 
-  GtkWidget *area, *widget;
+  GtkWidget *area, *widget, *popup;
   GtkBuilder *builder;
 
   GtkAction *action;
@@ -420,7 +464,7 @@ ogmrip_encoding_manager_dialog_init (OGMRipEncodingManagerDialog *dialog)
   gtk_ui_manager_insert_action_group (ui_manager, action_group, 0);
   gtk_ui_manager_add_ui_from_string (ui_manager, ui_description, -1, NULL);
 
-  dialog->priv->popup = gtk_ui_manager_get_widget (ui_manager, "/Popup");
+  popup = gtk_ui_manager_get_widget (ui_manager, "/Popup");
 
   area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
 
@@ -429,6 +473,11 @@ ogmrip_encoding_manager_dialog_init (OGMRipEncodingManagerDialog *dialog)
   gtk_widget_show (widget);
 
   widget = gtk_builder_get_widget (builder, "treeview");
+  gtk_menu_attach_to_widget (GTK_MENU (popup), widget, NULL);
+  g_signal_connect_swapped (widget, "button-press-event",
+      G_CALLBACK (ogmrip_encoding_manager_dialog_treeview_button_pressed), popup);
+  g_signal_connect_swapped (widget, "popup-menu",
+      G_CALLBACK (ogmrip_encoding_manager_dialog_treeview_popup_menu), popup);
 
   dialog->priv->store = gtk_list_store_new (COL_LAST, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT,
       G_TYPE_STRING, OGMRIP_TYPE_ENCODING, G_TYPE_BOOLEAN);
