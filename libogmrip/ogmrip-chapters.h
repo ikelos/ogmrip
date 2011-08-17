@@ -23,11 +23,12 @@
 
 G_BEGIN_DECLS
 
-#define OGMRIP_TYPE_CHAPTERS          (ogmrip_chapters_get_type ())
-#define OGMRIP_CHAPTERS(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_CHAPTERS, OGMRipChapters))
-#define OGMRIP_CHAPTERS_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_CHAPTERS, OGMRipChaptersClass))
-#define OGMRIP_IS_CHAPTERS(obj)       (G_TYPE_CHECK_INSTANCE_TYPE ((obj), OGMRIP_TYPE_CHAPTERS))
-#define OGMRIP_IS_CHAPTERS_CLASS(obj) (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_CHAPTERS))
+#define OGMRIP_TYPE_CHAPTERS           (ogmrip_chapters_get_type ())
+#define OGMRIP_CHAPTERS(obj)           (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_CHAPTERS, OGMRipChapters))
+#define OGMRIP_CHAPTERS_CLASS(klass)   (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_CHAPTERS, OGMRipChaptersClass))
+#define OGMRIP_IS_CHAPTERS(obj)        (G_TYPE_CHECK_INSTANCE_TYPE ((obj), OGMRIP_TYPE_CHAPTERS))
+#define OGMRIP_IS_CHAPTERS_CLASS(obj)  (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_CHAPTERS))
+#define OGMRIP_CHAPTERS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), OGMRIP_TYPE_CHAPTERS, OGMRipChaptersClass))
 
 typedef struct _OGMRipChapters      OGMRipChapters;
 typedef struct _OGMRipChaptersPriv  OGMRipChaptersPriv;
