@@ -285,29 +285,32 @@ ogmrip_profile_manager_dialog_export_button_clicked (OGMRipProfileManagerDialog 
 
   if (gtk_tree_selection_get_selected (parent->priv->selection, &model, &iter))
   {
-    GtkWidget *dialog;
+    OGMRipProfile *profile;
 
-    dialog = gtk_file_chooser_dialog_new (_("Export profile as"),
-        GTK_WINDOW (parent), GTK_FILE_CHOOSER_ACTION_SAVE,
-        GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
-        GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
-        NULL);
-    gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog), TRUE);
-
-    if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
+    profile = ogmrip_profile_store_get_profile (GTK_LIST_STORE (model), &iter);
+    if (profile)
     {
-      OGMRipProfile *profile;
-      GFile *file;
+      GtkWidget *dialog;
 
-      file = gtk_file_chooser_get_file (GTK_FILE_CHOOSER (dialog));
+      dialog = gtk_file_chooser_dialog_new (_("Export Profile"),
+          GTK_WINDOW (parent), GTK_FILE_CHOOSER_ACTION_SAVE,
+          GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
+          GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
+          NULL);
+      gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog), TRUE);
 
-      profile = ogmrip_profile_store_get_profile (GTK_LIST_STORE (model), &iter);
-      ogmrip_profile_dump (profile, file, NULL);
-      g_object_unref (profile);
+      if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
+      {
+        GError *error = NULL;
+        GFile *file;
 
-      g_object_unref (file);
+        file = gtk_file_chooser_get_file (GTK_FILE_CHOOSER (dialog));
+        if (!ogmrip_profile_dump (profile, file, NULL))
+          ogmrip_run_error_dialog (GTK_WINDOW (dialog), error, _("Could not export the profile"));
+        g_object_unref (file);
+      }
+      gtk_widget_destroy (dialog);
     }
-    gtk_widget_destroy (dialog);
   }
 }
 
