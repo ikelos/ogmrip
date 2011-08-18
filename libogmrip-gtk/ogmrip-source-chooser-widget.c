@@ -267,9 +267,7 @@ ogmrip_source_chooser_widget_changed (GtkComboBox *combo)
 
           toplevel = gtk_widget_get_toplevel (GTK_WIDGET (chooser));
           ogmrip_run_error_dialog (GTK_WINDOW (toplevel), error, _("Cannot open file"));
-
-          if (error)
-            g_error_free (error);
+          g_clear_error (&error);
         }
       }
       gtk_widget_hide (chooser->priv->dialog);

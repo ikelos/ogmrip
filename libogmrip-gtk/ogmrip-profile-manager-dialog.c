@@ -305,8 +305,11 @@ ogmrip_profile_manager_dialog_export_button_clicked (OGMRipProfileManagerDialog 
         GFile *file;
 
         file = gtk_file_chooser_get_file (GTK_FILE_CHOOSER (dialog));
-        if (!ogmrip_profile_dump (profile, file, NULL))
+        if (!ogmrip_profile_dump (profile, file, &error))
+        {
           ogmrip_run_error_dialog (GTK_WINDOW (dialog), error, _("Could not export the profile"));
+          g_clear_error (&error);
+        }
         g_object_unref (file);
       }
       gtk_widget_destroy (dialog);
