@@ -324,11 +324,39 @@ ogmrip_encoding_manager_dialog_remove_activated (OGMRipEncodingManagerDialog *di
 }
 
 static void
-ogmrip_encoding_manager_dialog_import_activated (OGMRipEncodingManagerDialog *dialog)
+ogmrip_encoding_manager_dialog_import_activated (OGMRipEncodingManagerDialog *parent)
 {
-  /*
-   * TODO import encoding
-   */
+  GtkWidget *dialog;
+
+  dialog = gtk_file_chooser_dialog_new (_("Import Encoding"),
+      GTK_WINDOW (parent), GTK_FILE_CHOOSER_ACTION_OPEN,
+      GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
+      GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
+      NULL);
+
+  if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
+  {
+    GError *error = NULL;
+    GFile *file;
+
+    OGMRipEncoding *encoding;
+
+    file = gtk_file_chooser_get_file (GTK_FILE_CHOOSER (dialog));
+
+    encoding = ogmrip_encoding_new_from_file (file, &error);
+    if (encoding)
+    {
+      ogmrip_encoding_manager_add (parent->priv->manager, encoding);
+      g_object_unref (encoding);
+    }
+    else
+    {
+      ogmrip_run_error_dialog (GTK_WINDOW (dialog), error, _("Could not export the encoding"));
+      g_clear_error (&error);
+    }
+    g_object_unref (file);
+  }
+  gtk_widget_destroy (dialog);
 }
 
 static void
@@ -355,7 +383,10 @@ ogmrip_encoding_manager_dialog_export_activated (OGMRipEncodingManagerDialog *pa
 
       file = gtk_file_chooser_get_file (GTK_FILE_CHOOSER (dialog));
       if (!ogmrip_encoding_dump (encoding, file, &error))
+      {
         ogmrip_run_error_dialog (GTK_WINDOW (dialog), error, _("Could not export the encoding"));
+        g_clear_error (&error);
+      }
       g_object_unref (file);
     }
     gtk_widget_destroy (dialog);

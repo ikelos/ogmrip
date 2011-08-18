@@ -87,6 +87,11 @@ struct _OGMRipEncodingClass
 
 GType              ogmrip_encoding_get_type            (void);
 OGMRipEncoding *   ogmrip_encoding_new                 (OGMDvdTitle      *title);
+OGMRipEncoding *   ogmrip_encoding_new_from_file       (GFile            *file,
+                                                        GError           **error);
+gboolean           ogmrip_encoding_dump                (OGMRipEncoding   *encoding,
+                                                        GFile            *file,
+                                                        GError           **error);
 OGMRipCodec *      ogmrip_encoding_get_video_codec     (OGMRipEncoding   *encoding);
 void               ogmrip_encoding_set_video_codec     (OGMRipEncoding   *encoding,
                                                         OGMRipVideoCodec *codec);

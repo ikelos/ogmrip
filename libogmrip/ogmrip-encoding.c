@@ -28,19 +28,19 @@
 #endif
 
 #include "ogmrip-encoding.h"
+#include "ogmrip-profile-engine.h"
 #include "ogmrip-profile-keys.h"
 #include "ogmrip-hardsub.h"
 #include "ogmrip-marshal.h"
 #include "ogmrip-plugin.h"
+#include "ogmrip-xml.h"
 #include "ogmrip-fs.h"
 
 #include <glib/gstdio.h>
-
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <glib/gi18n-lib.h>
 
 #include <math.h>
-#include <unistd.h>
+#include <string.h>
 
 #define OGMRIP_ENCODING_GET_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_ENCODING, OGMRipEncodingPriv))
@@ -382,6 +382,703 @@ ogmrip_encoding_new (OGMDvdTitle *title)
   return g_object_new (OGMRIP_TYPE_ENCODING, "title", title, NULL);
 }
 
+static void
+ogmrip_encoding_parse_property (OGMRipXml *xml, gpointer gobject, gpointer klass)
+{
+  gchar *property;
+
+  property = ogmrip_xml_get_string (xml, "name");
+  if (property)
+  {
+    if (g_str_equal (property, "profile"))
+    {
+      OGMRipProfileEngine *engine;
+      OGMRipProfile *profile;
+      gchar *str;
+
+      engine = ogmrip_profile_engine_get_default ();
+
+      str = ogmrip_xml_get_string (xml, NULL);
+      profile = ogmrip_profile_engine_get (engine, str);
+      g_free (str);
+
+      if (profile)
+        ogmrip_encoding_set_profile (gobject, profile);
+    }
+    else
+    {
+      GParamSpec *pspec;
+
+      pspec = g_object_class_find_property (klass, property);
+      if (pspec)
+      {
+        GValue value = { 0 };
+
+        g_value_init (&value, pspec->value_type);
+
+        ogmrip_xml_get_value (xml, NULL, &value);
+        g_object_set_property (gobject, property, &value);
+
+        g_value_unset (&value);
+      }
+    }
+
+    g_free (property);
+  }
+}
+
+static void
+ogmrip_encoding_parse_properties (OGMRipXml *xml, gpointer gobject, gpointer klass)
+{
+  if (ogmrip_xml_children (xml))
+  {
+    do
+    {
+      if (g_str_equal (ogmrip_xml_get_name (xml), "property"))
+        ogmrip_encoding_parse_property (xml, gobject, klass);
+    }
+    while (ogmrip_xml_next (xml));
+
+    ogmrip_xml_parent (xml);
+  }
+}
+
+static void
+ogmrip_encoding_parse_container (OGMRipEncoding *encoding, OGMRipXml *xml)
+{
+  gchar *name;
+
+  name = ogmrip_xml_get_string (xml, "type");
+  if (name)
+  {
+    GType type;
+
+    type = ogmrip_plugin_get_container_by_name (name);
+    if (type != G_TYPE_NONE)
+    {
+      OGMRipContainer *container;
+      OGMRipContainerClass *klass;
+
+      container = g_object_new (type, NULL);
+      ogmrip_encoding_set_container (encoding, container);
+      g_object_unref (container);
+
+      klass = OGMRIP_CONTAINER_GET_CLASS (container);
+      ogmrip_encoding_parse_properties (xml, container, klass);
+    }
+    
+    g_free (name);
+  }
+}
+
+static void
+ogmrip_encoding_parse_video_codec (OGMRipEncoding *encoding, OGMRipXml *xml)
+{
+  gchar *name;
+
+  name = ogmrip_xml_get_string (xml, "type");
+  if (name)
+  {
+    GType type;
+
+    type = ogmrip_plugin_get_video_codec_by_name (name);
+    if (type != G_TYPE_NONE)
+    {
+      OGMDvdTitle *title;
+      OGMRipVideoCodec *codec;
+      OGMRipVideoCodecClass *klass;
+
+      title = ogmrip_encoding_get_title (encoding);
+
+      codec = g_object_new (type, "input", ogmdvd_title_get_video_stream (title), NULL);
+      ogmrip_encoding_set_video_codec (encoding, OGMRIP_VIDEO_CODEC (codec));
+      g_object_unref (codec);
+
+      klass = OGMRIP_VIDEO_CODEC_GET_CLASS (codec);
+      ogmrip_encoding_parse_properties (xml, codec, klass);
+    }
+    
+    g_free (name);
+  }
+}
+
+static void
+ogmrip_encoding_parse_audio_codec (OGMRipEncoding *encoding, OGMRipXml *xml)
+{
+  gchar *name;
+
+  name = ogmrip_xml_get_string (xml, "type");
+  if (name)
+  {
+    GType type;
+
+    type = ogmrip_plugin_get_audio_codec_by_name (name);
+    if (type != G_TYPE_NONE)
+    {
+      OGMDvdAudioStream *stream;
+      guint nr;
+
+      nr = ogmrip_xml_get_uint (xml, "stream");
+
+      stream = ogmdvd_title_get_nth_audio_stream (ogmrip_encoding_get_title (encoding), nr);
+      if (stream)
+      {
+        OGMRipAudioCodec *codec;
+        OGMRipAudioCodecClass *klass;
+
+
+        codec = g_object_new (type, "input", stream, NULL);
+        ogmrip_encoding_add_audio_codec (encoding, OGMRIP_AUDIO_CODEC (codec));
+        g_object_unref (codec);
+
+        klass = OGMRIP_AUDIO_CODEC_GET_CLASS (codec);
+        ogmrip_encoding_parse_properties (xml, codec, klass);
+      }
+    }
+    
+    g_free (name);
+  }
+}
+
+static void
+ogmrip_encoding_parse_audio_codecs (OGMRipEncoding *encoding, OGMRipXml *xml)
+{
+  if (ogmrip_xml_children (xml))
+  {
+    do
+    {
+      if (g_str_equal (ogmrip_xml_get_name (xml), "audio-codec"))
+        ogmrip_encoding_parse_audio_codec (encoding, xml);
+    }
+    while (ogmrip_xml_next (xml));
+
+    ogmrip_xml_parent (xml);
+  }
+}
+
+static void
+ogmrip_encoding_parse_subp_codec (OGMRipEncoding *encoding, OGMRipXml *xml)
+{
+  gchar *name;
+
+  name = ogmrip_xml_get_string (xml, "type");
+  if (name)
+  {
+    GType type;
+
+    type = ogmrip_plugin_get_subp_codec_by_name (name);
+    if (type != G_TYPE_NONE)
+    {
+      OGMDvdSubpStream *stream;
+      guint nr;
+
+      nr = ogmrip_xml_get_uint (xml, "stream");
+
+      stream = ogmdvd_title_get_nth_subp_stream (ogmrip_encoding_get_title (encoding), nr);
+      if (stream)
+      {
+        OGMRipSubpCodec *codec;
+        OGMRipSubpCodecClass *klass;
+
+        codec = g_object_new (type, "input", stream, NULL);
+        ogmrip_encoding_add_subp_codec (encoding, OGMRIP_SUBP_CODEC (codec));
+        g_object_unref (codec);
+
+        klass = OGMRIP_SUBP_CODEC_GET_CLASS (codec);
+        ogmrip_encoding_parse_properties (xml, codec, klass);
+      }
+    }
+    
+    g_free (name);
+  }
+}
+
+static void
+ogmrip_encoding_parse_subp_codecs (OGMRipEncoding *encoding, OGMRipXml *xml)
+{
+  if (ogmrip_xml_children (xml))
+  {
+    do
+    {
+      if (g_str_equal (ogmrip_xml_get_name (xml), "subp-codec"))
+        ogmrip_encoding_parse_subp_codec (encoding, xml);
+    }
+    while (ogmrip_xml_next (xml));
+
+    ogmrip_xml_parent (xml);
+  }
+}
+
+static void
+ogmrip_encoding_parse_chapter (OGMRipEncoding *encoding, OGMRipXml *xml)
+{
+  OGMRipCodec *chapters;
+  OGMRipChaptersClass *klass;
+
+  chapters = ogmrip_chapters_new (ogmdvd_title_get_video_stream (ogmrip_encoding_get_title (encoding)));
+  ogmrip_encoding_add_chapters (encoding, OGMRIP_CHAPTERS (chapters));
+  g_object_unref (chapters);
+
+  klass = OGMRIP_CHAPTERS_GET_CLASS (chapters);
+
+  if (ogmrip_xml_children (xml))
+  {
+    guint number;
+    gchar *str;
+
+    do
+    {
+      if (g_str_equal (ogmrip_xml_get_name (xml), "property"))
+        ogmrip_encoding_parse_property (xml, chapters, klass);
+      else if (g_str_equal (ogmrip_xml_get_name (xml), "label"))
+      {
+        str = ogmrip_xml_get_string (xml, NULL);
+        if (str)
+        {
+          number = ogmrip_xml_get_uint (xml, "number");
+          ogmrip_chapters_set_label (OGMRIP_CHAPTERS (chapters), number, str);
+          g_free (str);
+        }
+      }
+    }
+    while (ogmrip_xml_next (xml));
+
+    ogmrip_xml_parent (xml);
+  }
+}
+
+static void
+ogmrip_encoding_parse_chapters (OGMRipEncoding *encoding, OGMRipXml *xml)
+{
+  if (ogmrip_xml_children (xml))
+  {
+    do
+    {
+      if (g_str_equal (ogmrip_xml_get_name (xml), "chapter"))
+        ogmrip_encoding_parse_chapter (encoding, xml);
+    }
+    while (ogmrip_xml_next (xml));
+
+    ogmrip_xml_parent (xml);
+  }
+}
+
+static void
+ogmrip_encoding_parse_files (OGMRipEncoding *encoding, OGMRipXml *xml)
+{
+  if (ogmrip_xml_children (xml))
+  {
+    do
+    {
+      if (g_str_equal (ogmrip_xml_get_name (xml), "file"))
+      {
+        /*
+         * TODO parse file
+         */
+      }
+    }
+    while (ogmrip_xml_next (xml));
+
+    ogmrip_xml_parent (xml);
+  }
+}
+
+static void
+ogmrip_encoding_parse (OGMRipEncoding *encoding, OGMRipXml *xml)
+{
+  if (ogmrip_xml_children (xml))
+  {
+    OGMRipEncodingClass *klass;
+    const gchar *name;
+
+    klass = OGMRIP_ENCODING_GET_CLASS (encoding);
+
+    do
+    {
+      name = ogmrip_xml_get_name (xml);
+
+      if (g_str_equal (name, "property"))
+        ogmrip_encoding_parse_property (xml, encoding, klass);
+      else if (g_str_equal (name, "container"))
+        ogmrip_encoding_parse_container (encoding, xml);
+      else if (g_str_equal (name, "video-codec"))
+        ogmrip_encoding_parse_video_codec (encoding, xml);
+      else if (g_str_equal (name, "audio-codecs"))
+        ogmrip_encoding_parse_audio_codecs (encoding, xml);
+      else if (g_str_equal (name, "subp-codecs"))
+        ogmrip_encoding_parse_subp_codecs (encoding, xml);
+      else if (g_str_equal (name, "chapters"))
+        ogmrip_encoding_parse_chapters (encoding, xml);
+      else if (g_str_equal (name, "files"))
+        ogmrip_encoding_parse_files (encoding, xml);
+    }
+    while (ogmrip_xml_next (xml));
+  }
+}
+
+static OGMRipEncoding *
+ogmrip_encoding_new_from_xml (OGMRipXml *xml, GError **error)
+{
+  OGMRipEncoding *encoding = NULL;
+  OGMDvdDisc *disc;
+  gchar *str;
+
+  if (!g_str_equal (ogmrip_xml_get_name (xml), "encoding"))
+    return NULL;
+
+  str = ogmrip_xml_get_string (xml, "device");
+  if (!str)
+    return NULL;
+
+  disc = ogmdvd_disc_new (str, error);
+  g_free (str);
+
+  if (!disc)
+    return NULL;
+
+  str = ogmrip_xml_get_string (xml, "id");
+  if (str)
+  {
+    if (!g_str_equal (str, ogmdvd_disc_get_id (disc)))
+    {
+      g_set_error (error, OGMDVD_DISC_ERROR, OGMDVD_DISC_ERROR_ID,
+          _("Device does not contain the expected DVD"));
+      ogmdvd_disc_unref (disc);
+    }
+    else
+    {
+      OGMDvdTitle *title;
+      guint nr;
+
+      nr = ogmrip_xml_get_uint (xml, "title");
+
+      title = ogmdvd_disc_get_nth_title (disc, nr);
+      if (title)
+      {
+        encoding = ogmrip_encoding_new (title);
+        if (encoding)
+          ogmrip_encoding_parse (encoding, xml);
+      }
+    }
+  }
+
+  ogmdvd_disc_unref (disc);
+
+  return encoding;
+}
+
+OGMRipEncoding *
+ogmrip_encoding_new_from_file (GFile *file, GError **error)
+{
+  OGMRipXml *xml;
+  OGMRipEncoding *encoding;
+
+  g_return_val_if_fail (G_IS_FILE (file), NULL);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  xml = ogmrip_xml_new_from_file (file, error);
+  if (!xml)
+    return NULL;
+
+  encoding = ogmrip_encoding_new_from_xml (xml, error);
+  if (encoding == NULL && error != NULL && *error == NULL)
+  {
+    gchar *filename;
+
+    filename = g_file_get_basename (file);
+    g_set_error (error, 0, 0, _("'%s' does not contain a valid encoding"), filename);
+    g_free (filename);
+  }
+
+  ogmrip_xml_free (xml);
+
+  return encoding;
+}
+
+static void
+ogmrip_encoding_dump_property (OGMRipXml *xml, gpointer gobject, gpointer klass, const gchar *property)
+{
+  GParamSpec *pspec;
+
+  pspec = g_object_class_find_property (klass, property);
+  if (pspec)
+  {
+    GValue value = { 0 };
+
+    ogmrip_xml_append (xml, "property");
+
+    g_value_init (&value, pspec->value_type);
+    g_object_get_property (gobject, property, &value);
+
+    ogmrip_xml_set_string (xml, "name", property);
+    ogmrip_xml_set_value (xml, NULL, &value);
+
+    g_value_unset (&value);
+
+    ogmrip_xml_parent (xml);
+  }
+}
+
+static void
+ogmrip_encoding_dump_container (OGMRipXml *xml, OGMRipContainer *container)
+{
+  OGMRipContainerClass *klass;
+
+  if (!container)
+    return;
+
+  ogmrip_xml_append (xml, "container");
+
+  ogmrip_xml_set_string (xml, "type",
+      ogmrip_plugin_get_container_name (G_OBJECT_TYPE (container)));
+
+  klass = OGMRIP_CONTAINER_GET_CLASS (container);
+
+  ogmrip_encoding_dump_property (xml, container, klass, "fourcc");
+  ogmrip_encoding_dump_property (xml, container, klass, "label");
+  ogmrip_encoding_dump_property (xml, container, klass, "start-delay");
+  ogmrip_encoding_dump_property (xml, container, klass, "target-number");
+  ogmrip_encoding_dump_property (xml, container, klass, "target-size");
+
+  ogmrip_xml_parent (xml);
+}
+
+static void
+ogmrip_encoding_dump_video_codec (OGMRipXml *xml, OGMRipVideoCodec *codec)
+{
+  OGMRipVideoCodecClass *klass;
+
+  if (!codec)
+    return;
+
+  ogmrip_xml_append (xml, "video-codec");
+
+  ogmrip_xml_set_string (xml, "type",
+      ogmrip_plugin_get_video_codec_name (G_OBJECT_TYPE (codec)));
+
+  klass = OGMRIP_VIDEO_CODEC_GET_CLASS (codec);
+
+  ogmrip_encoding_dump_property (xml, codec, klass, "start-chapter");
+  ogmrip_encoding_dump_property (xml, codec, klass, "end-chapter");
+  ogmrip_encoding_dump_property (xml, codec, klass, "angle");
+  ogmrip_encoding_dump_property (xml, codec, klass, "bitrate");
+  ogmrip_encoding_dump_property (xml, codec, klass, "bpp");
+  ogmrip_encoding_dump_property (xml, codec, klass, "deblock");
+  ogmrip_encoding_dump_property (xml, codec, klass, "deinterlacer");
+  ogmrip_encoding_dump_property (xml, codec, klass, "denoise");
+  ogmrip_encoding_dump_property (xml, codec, klass, "dering");
+  ogmrip_encoding_dump_property (xml, codec, klass, "passes");
+  ogmrip_encoding_dump_property (xml, codec, klass, "quality");
+  ogmrip_encoding_dump_property (xml, codec, klass, "quantizer");
+  ogmrip_encoding_dump_property (xml, codec, klass, "scaler");
+  ogmrip_encoding_dump_property (xml, codec, klass, "threads");
+  ogmrip_encoding_dump_property (xml, codec, klass, "turbo");
+  ogmrip_encoding_dump_property (xml, codec, klass, "min-width");
+  ogmrip_encoding_dump_property (xml, codec, klass, "min-height");
+  ogmrip_encoding_dump_property (xml, codec, klass, "max-width");
+  ogmrip_encoding_dump_property (xml, codec, klass, "max-height");
+  ogmrip_encoding_dump_property (xml, codec, klass, "expand");
+  ogmrip_encoding_dump_property (xml, codec, klass, "crop-x");
+  ogmrip_encoding_dump_property (xml, codec, klass, "crop-y");
+  ogmrip_encoding_dump_property (xml, codec, klass, "crop-width");
+  ogmrip_encoding_dump_property (xml, codec, klass, "crop-height");
+  ogmrip_encoding_dump_property (xml, codec, klass, "scale-width");
+  ogmrip_encoding_dump_property (xml, codec, klass, "scale-height");
+
+  ogmrip_xml_parent (xml);
+}
+
+static void
+ogmrip_encoding_dump_audio_codec (OGMRipXml *xml, OGMRipAudioCodec *codec)
+{
+  OGMRipAudioCodecClass *klass;
+
+  if (!codec)
+    return;
+
+  ogmrip_xml_append (xml, "audio-codec");
+
+  ogmrip_xml_set_string (xml, "type",
+      ogmrip_plugin_get_audio_codec_name (G_OBJECT_TYPE (codec)));
+  ogmrip_xml_set_uint (xml, "stream",
+      ogmdvd_stream_get_nr (ogmrip_codec_get_input (OGMRIP_CODEC (codec))));
+
+  klass = OGMRIP_AUDIO_CODEC_GET_CLASS (codec);
+
+  ogmrip_encoding_dump_property (xml, codec, klass, "start-chapter");
+  ogmrip_encoding_dump_property (xml, codec, klass, "end-chapter");
+  ogmrip_encoding_dump_property (xml, codec, klass, "channels");
+  ogmrip_encoding_dump_property (xml, codec, klass, "fast");
+  ogmrip_encoding_dump_property (xml, codec, klass, "label");
+  ogmrip_encoding_dump_property (xml, codec, klass, "language");
+  ogmrip_encoding_dump_property (xml, codec, klass, "normalize");
+  ogmrip_encoding_dump_property (xml, codec, klass, "quality");
+  ogmrip_encoding_dump_property (xml, codec, klass, "sample-rate");
+
+  ogmrip_xml_parent (xml);
+}
+
+static void
+ogmrip_encoding_dump_subp_codec (OGMRipXml *xml, OGMRipSubpCodec *codec)
+{
+  OGMRipSubpCodecClass *klass;
+
+  if (!codec)
+    return;
+
+  ogmrip_xml_append (xml, "subp-codec");
+
+  ogmrip_xml_set_string (xml, "type",
+      ogmrip_plugin_get_subp_codec_name (G_OBJECT_TYPE (codec)));
+  ogmrip_xml_set_uint (xml, "stream",
+      ogmdvd_stream_get_nr (ogmrip_codec_get_input (OGMRIP_CODEC (codec))));
+
+  klass = OGMRIP_SUBP_CODEC_GET_CLASS (codec);
+
+  ogmrip_encoding_dump_property (xml, codec, klass, "start-chapter");
+  ogmrip_encoding_dump_property (xml, codec, klass, "end-chapter");
+  ogmrip_encoding_dump_property (xml, codec, klass, "character-set");
+  ogmrip_encoding_dump_property (xml, codec, klass, "forced-only");
+  ogmrip_encoding_dump_property (xml, codec, klass, "label");
+  ogmrip_encoding_dump_property (xml, codec, klass, "language");
+  ogmrip_encoding_dump_property (xml, codec, klass, "newline-style");
+
+  ogmrip_xml_parent (xml);
+}
+
+static void
+ogmrip_encoding_dump_chapters (OGMRipXml *xml, OGMRipChapters *chapters)
+{
+  OGMRipChaptersClass *klass;
+  guint start, end, i;
+
+  if (!chapters)
+    return;
+
+  ogmrip_xml_append (xml, "chapter");
+
+  klass = OGMRIP_CHAPTERS_GET_CLASS (chapters);
+
+  ogmrip_encoding_dump_property (xml, chapters, klass, "start-chapter");
+  ogmrip_encoding_dump_property (xml, chapters, klass, "end-chapter");
+  ogmrip_encoding_dump_property (xml, chapters, klass, "language");
+
+  ogmrip_codec_get_chapters (OGMRIP_CODEC (chapters), &start, &end);
+  for (i = start; i <= end; i ++)
+  {
+    ogmrip_xml_append (xml, "label");
+
+    ogmrip_xml_set_uint (xml, "number", i);
+    ogmrip_xml_set_string (xml, NULL,
+        ogmrip_chapters_get_label (chapters, i));
+
+    ogmrip_xml_parent (xml);
+  }
+
+  ogmrip_xml_parent (xml);
+}
+
+static void
+ogmrip_encoding_dump_file (OGMRipXml *xml, OGMRipFile *file)
+{
+  if (!file)
+    return;
+
+  ogmrip_xml_append (xml, "file");
+
+  ogmrip_xml_set_string (xml, "filename",
+      ogmrip_file_get_filename (file));
+
+  ogmrip_xml_parent (xml);
+}
+
+gboolean
+ogmrip_encoding_dump (OGMRipEncoding *encoding, GFile *file, GError **error)
+{
+  OGMRipXml *xml;
+  OGMRipEncodingClass *klass;
+  GList *link;
+
+  g_return_val_if_fail (OGMRIP_IS_ENCODING (encoding), FALSE);
+  g_return_val_if_fail (G_IS_FILE (file), FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  xml = ogmrip_xml_new ();
+
+  ogmrip_xml_append (xml, "encoding");
+
+  ogmrip_xml_set_string (xml, "device",
+      ogmdvd_disc_get_device (ogmdvd_title_get_disc (encoding->priv->title)));
+  ogmrip_xml_set_string (xml, "id",
+      ogmdvd_disc_get_id (ogmdvd_title_get_disc (encoding->priv->title)));
+  ogmrip_xml_set_int (xml, "title",
+      ogmdvd_title_get_nr (encoding->priv->title));
+
+  if (encoding->priv->profile)
+  {
+    gchar *str;
+
+    ogmrip_xml_append (xml, "property");
+    ogmrip_xml_set_string (xml, "name", "profile");
+
+    g_object_get (encoding->priv->profile, "name", &str, NULL);
+    ogmrip_xml_set_string (xml, NULL, str);
+    g_free (str);
+
+    ogmrip_xml_parent (xml);
+  }
+
+  klass = OGMRIP_ENCODING_GET_CLASS (encoding);
+/*
+  if (encoding->priv->log_file)
+    ogmrip_encoding_dump_property (xml, encoding, klass, "log-file");
+*/
+  ogmrip_encoding_dump_property (xml, encoding, klass, "relative");
+  ogmrip_encoding_dump_property (xml, encoding, klass, "autocrop");
+  ogmrip_encoding_dump_property (xml, encoding, klass, "autoscale");
+  ogmrip_encoding_dump_property (xml, encoding, klass, "test");
+
+  ogmrip_encoding_dump_container (xml, encoding->priv->container);
+  ogmrip_encoding_dump_video_codec (xml, encoding->priv->video_codec);
+
+  if (encoding->priv->audio_codecs)
+  {
+    ogmrip_xml_append (xml, "audio-codecs");
+    for (link = encoding->priv->audio_codecs; link; link = link->next)
+      ogmrip_encoding_dump_audio_codec (xml, link->data);
+    ogmrip_xml_parent (xml);
+  }
+
+  if (encoding->priv->subp_codecs)
+  {
+    ogmrip_xml_append (xml, "subp-codecs");
+    for (link = encoding->priv->subp_codecs; link; link = link->next)
+      ogmrip_encoding_dump_subp_codec (xml, link->data);
+    ogmrip_xml_parent (xml);
+  }
+
+  if (encoding->priv->chapters)
+  {
+    ogmrip_xml_append (xml, "chapters");
+    for (link = encoding->priv->chapters; link; link = link->next)
+      ogmrip_encoding_dump_chapters (xml, link->data);
+    ogmrip_xml_parent (xml);
+  }
+
+  if (encoding->priv->files)
+  {
+    ogmrip_xml_append (xml, "files");
+    for (link = encoding->priv->files; link; link = link->next)
+      ogmrip_encoding_dump_file (xml, link->data);
+    ogmrip_xml_parent (xml);
+  }
+
+  ogmrip_xml_save (xml, file, error);
+  ogmrip_xml_free (xml);
+
+  return TRUE;
+}
+
 void
 ogmrip_encoding_add_audio_codec (OGMRipEncoding *encoding, OGMRipAudioCodec *codec)
 {
@@ -560,7 +1257,7 @@ ogmrip_encoding_set_log_file (OGMRipEncoding *encoding, const gchar *filename)
   }
   
   if (filename)
-    filename = g_strdup (filename);
+    encoding->priv->log_file = g_strdup (filename);
 
   g_object_notify (G_OBJECT (encoding), "log-file");
 }

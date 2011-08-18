@@ -37,5 +37,6 @@
 #include <ogmrip-subp-codec.h>
 #include <ogmrip-version.h>
 #include <ogmrip-video-codec.h>
+#include <ogmrip-xml.h>
 
 #endif /* __OGMRIP_H__ */
