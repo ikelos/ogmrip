@@ -327,10 +327,10 @@ ogmrip_xvid_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   bitrate = ogmrip_video_codec_get_bitrate (video);
   if (bitrate > 0)
   {
-    if (bitrate < 16001)
-      g_string_append_printf (options, ":bitrate=%u", bitrate / 1000);
-    else
+    if (bitrate > 16000)
       g_string_append_printf (options, ":bitrate=%u", bitrate);
+    else
+      g_string_append_printf (options, ":bitrate=%u", bitrate / 1000);
   }
   else
     g_string_append_printf (options, ":fixed_quant=%.0lf", ogmrip_xvid_get_quantizer (video));

@@ -212,7 +212,12 @@ ogmrip_lavc_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
 
   bitrate = ogmrip_video_codec_get_bitrate (video);
   if (bitrate > 0)
-    g_string_append_printf (options, ":vbitrate=%u", bitrate);
+  {
+    if (bitrate > 16000)
+      g_string_append_printf (options, ":vbitrate=%u", MIN (bitrate, 24000000));
+    else
+      g_string_append_printf (options, ":vbitrate=%u", MAX (bitrate, 4000) / 1000);
+  }
   else
     g_string_append_printf (options, ":vqscale=%.0lf", ogmrip_lavc_get_quantizer (video));
 

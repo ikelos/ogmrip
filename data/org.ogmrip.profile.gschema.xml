@@ -55,7 +55,6 @@
       <summary>The video codec</summary>
     </key>
     <key name="bitrate" type="u">
-      <range min="4" max="16000"/>
       <default>800</default>
       <summary>The video bitrate</summary>
     </key>

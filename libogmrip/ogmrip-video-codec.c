@@ -42,7 +42,7 @@ struct _OGMRipVideoCodecPriv
 {
   gdouble bpp;
   gdouble quantizer;
-  gint bitrate;
+  guint bitrate;
   guint angle;
   guint passes;
   guint threads;
@@ -131,11 +131,11 @@ ogmrip_video_codec_class_init (OGMRipVideoCodecClass *klass)
 
   g_object_class_install_property (gobject_class, PROP_BITRATE, 
         g_param_spec_uint ("bitrate", "Bitrate property", "Set bitrate", 
-           4000, 24000000, 800000, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+           0, G_MAXUINT, 800000, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_QUANTIZER, 
         g_param_spec_double ("quantizer", "Quantizer property", "Set quantizer", 
-           -1.0, 31.0, -1.0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+           0.0, 31.0, 0.0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_BPP, 
         g_param_spec_double ("bpp", "Bits per pixel property", "Set bits per pixel", 
@@ -239,7 +239,7 @@ ogmrip_video_codec_init (OGMRipVideoCodec *video)
   video->priv->quality = OGMRIP_QUALITY_NORMAL;
   video->priv->astream = NULL;
   video->priv->bitrate = 800000;
-  video->priv->quantizer = -1.0;
+  video->priv->quantizer = 0.0;
   video->priv->turbo = FALSE;
   video->priv->angle = 1;
   video->priv->bpp = 0.25;
@@ -570,19 +570,21 @@ ogmrip_video_codec_get_angle (OGMRipVideoCodec *video)
  * @video: an #OGMRipVideoCodec
  * @bitrate: the video bitrate
  *
- * Sets the video bitrate to be used in bits/second, 4000 being the lowest and
- * 24000000 the highest available bitrates.
+ * Sets the video bitrate to be used in bits/second.
  */
 void
 ogmrip_video_codec_set_bitrate (OGMRipVideoCodec *video, guint bitrate)
 {
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
 
-  video->priv->bitrate = CLAMP (bitrate, 4000, 24000000);
-  video->priv->quantizer = -1.0;
+  if (video->priv->bitrate > 0)
+  {
+    video->priv->bitrate = bitrate;
+    video->priv->quantizer = 0.0;
 
-  g_object_notify (G_OBJECT (video), "bitrate");
-  g_object_notify (G_OBJECT (video), "quantizer");
+    g_object_notify (G_OBJECT (video), "bitrate");
+    g_object_notify (G_OBJECT (video), "quantizer");
+  }
 }
 
 /**
@@ -614,11 +616,14 @@ ogmrip_video_codec_set_quantizer (OGMRipVideoCodec *video, gdouble quantizer)
 {
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
 
-  video->priv->quantizer = CLAMP (quantizer, 0, 31);
-  video->priv->bitrate = -1;
+  if (quantizer > 0.0)
+  {
+    video->priv->quantizer = CLAMP (quantizer, 1, 31);
+    video->priv->bitrate = 0;
 
-  g_object_notify (G_OBJECT (video), "quantizer");
-  g_object_notify (G_OBJECT (video), "bitrate");
+    g_object_notify (G_OBJECT (video), "quantizer");
+    g_object_notify (G_OBJECT (video), "bitrate");
+  }
 }
 
 /**
