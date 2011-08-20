@@ -1005,13 +1005,18 @@ void
 ogmrip_video_codec_get_raw_size (OGMRipVideoCodec *video, guint *width, guint *height)
 {
   OGMDvdStream *stream;
+  guint w, h;
 
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
-  g_return_if_fail (width != NULL);
-  g_return_if_fail (height != NULL);
 
   stream = ogmrip_codec_get_input (OGMRIP_CODEC (video));
-  ogmdvd_video_stream_get_resolution (OGMDVD_VIDEO_STREAM (stream), width, height);
+  ogmdvd_video_stream_get_resolution (OGMDVD_VIDEO_STREAM (stream), &w, &h);
+
+  if (width)
+    *width = w;
+
+  if (height)
+    *height = h;
 }
 
 /**
@@ -1032,25 +1037,29 @@ ogmrip_video_codec_get_crop_size (OGMRipVideoCodec *video, guint *x, guint *y, g
   guint raw_width, raw_height;
 
   g_return_val_if_fail (OGMRIP_IS_VIDEO_CODEC (video), FALSE);
-  g_return_val_if_fail (x != NULL, FALSE);
-  g_return_val_if_fail (y != NULL, FALSE);
-  g_return_val_if_fail (width != NULL, FALSE);
-  g_return_val_if_fail (height != NULL, FALSE);
 
   ogmrip_video_codec_get_raw_size (video, &raw_width, &raw_height);
 
-  *x = video->priv->crop_x;
-  *y = video->priv->crop_y;
-  *width = video->priv->crop_width;
-  *height = video->priv->crop_height;
+  if (!video->priv->crop_width)
+    video->priv->crop_width = raw_width;
 
-  if (*x == 0 && *y == 0 && *width == 0 && *height == 0)
-  {
-    *width = raw_width;
-    *height = raw_height;
-  }
+  if (!video->priv->crop_height)
+    video->priv->crop_height = raw_height;
 
-  if (*x == 0 && *y == 0 && *width == raw_width && *height == raw_height)
+  if (x)
+    *x = video->priv->crop_x;
+
+  if (y)
+    *y = video->priv->crop_y;
+
+  if (width)
+    *width = video->priv->crop_width;
+
+  if (height)
+    *height = video->priv->crop_height;
+
+  if (video->priv->crop_x == 0 && video->priv->crop_width == raw_width &&
+      video->priv->crop_y == 0 && video->priv->crop_height == raw_height)
     return FALSE;
 
   return TRUE;
@@ -1075,25 +1084,28 @@ ogmrip_video_codec_set_crop_size (OGMRipVideoCodec *video, guint x, guint y, gui
 
   ogmrip_video_codec_get_raw_size (video, &raw_width, &raw_height);
 
-  if (width > 0 && height > 0)
+  if (!width)
+    width = raw_width;
+
+  if (!height)
+    height = raw_height;
+
+  if (x + width > raw_width)
+    x = 0;
+
+  if (y + height > raw_height)
+    y = 0;
+
+  if (x + width <= raw_width)
   {
-    if (x + width > raw_width)
-      x = 0;
+    video->priv->crop_x = x;
+    video->priv->crop_width = (width / 16) * 16;
+  }
 
-    if (y + height > raw_height)
-      y = 0;
-
-    if (x + width <= raw_width)
-    {
-      video->priv->crop_x = x;
-      video->priv->crop_width = (width / 16) * 16;
-    }
-
-    if (y + height <= raw_height)
-    {
-      video->priv->crop_y = y;
-      video->priv->crop_height = (height / 16) * 16;
-    }
+  if (y + height <= raw_height)
+  {
+    video->priv->crop_y = y;
+    video->priv->crop_height = (height / 16) * 16;
   }
 }
 
@@ -1111,28 +1123,24 @@ gboolean
 ogmrip_video_codec_get_scale_size (OGMRipVideoCodec *video, guint *width, guint *height)
 {
   guint raw_width, raw_height;
-  guint scale_width, scale_height;
 
   g_return_val_if_fail (OGMRIP_IS_VIDEO_CODEC (video), FALSE);
 
   ogmrip_video_codec_get_raw_size (video, &raw_width, &raw_height);
 
-  scale_width = video->priv->scale_width;
-  scale_height = video->priv->scale_height;
+  if (!video->priv->scale_width)
+    video->priv->scale_width = raw_width;
 
-  if (!scale_width)
-    scale_width = raw_width;
-
-  if (!scale_height)
-    scale_height = raw_height;
+  if (!video->priv->scale_height)
+    video->priv->scale_height = raw_height;
 
   if (width)
-    *width = 16 * ROUND (scale_width / 16.0);
+    *width = 16 * ROUND (video->priv->scale_width / 16.0);
 
   if (height)
-    *height = 16 * ROUND (scale_height / 16.0);
+    *height = 16 * ROUND (video->priv->scale_height / 16.0);
 
-  return scale_width != raw_width || scale_height != raw_height;
+  return video->priv->scale_width != raw_width || video->priv->scale_height != raw_height;
 }
 
 /**
@@ -1146,15 +1154,14 @@ ogmrip_video_codec_get_scale_size (OGMRipVideoCodec *video, guint *width, guint 
 void
 ogmrip_video_codec_set_scale_size (OGMRipVideoCodec *video, guint width, guint height)
 {
+  guint raw_width, raw_height;
+
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
 
-  ogmrip_video_codec_get_raw_size (video, &video->priv->scale_width, &video->priv->scale_height);
+  ogmrip_video_codec_get_raw_size (video, &raw_width, &raw_height);
 
-  if (width && height)
-  {
-    video->priv->scale_width = width;
-    video->priv->scale_height = height;
-  }
+  video->priv->scale_width = width > 0 ? width : raw_width;
+  video->priv->scale_height = height > 0 ? height : raw_height;
 
   ogmrip_video_codec_autosize (video);
 }
@@ -1200,7 +1207,6 @@ void
 ogmrip_video_codec_set_max_size (OGMRipVideoCodec *video, guint width, guint height, gboolean expand)
 {
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
-  g_return_if_fail (width > 0 && height > 0);
 
   video->priv->max_width = width;
   video->priv->max_height = height;
@@ -1245,7 +1251,6 @@ void
 ogmrip_video_codec_set_min_size (OGMRipVideoCodec *video, guint width, guint height)
 {
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
-  g_return_if_fail (width >= 0 && height >= 0);
 
   video->priv->min_width = width;
   video->priv->min_height = height;
