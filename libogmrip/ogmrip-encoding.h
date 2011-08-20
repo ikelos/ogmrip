@@ -89,7 +89,7 @@ GType              ogmrip_encoding_get_type            (void);
 OGMRipEncoding *   ogmrip_encoding_new                 (OGMDvdTitle      *title);
 OGMRipEncoding *   ogmrip_encoding_new_from_file       (GFile            *file,
                                                         GError           **error);
-gboolean           ogmrip_encoding_dump                (OGMRipEncoding   *encoding,
+gboolean           ogmrip_encoding_export              (OGMRipEncoding   *encoding,
                                                         GFile            *file,
                                                         GError           **error);
 OGMRipCodec *      ogmrip_encoding_get_video_codec     (OGMRipEncoding   *encoding);
@@ -110,6 +110,7 @@ void               ogmrip_encoding_add_chapters        (OGMRipEncoding   *encodi
 GList *            ogmrip_encoding_get_chapters        (OGMRipEncoding   *encoding);
 void               ogmrip_encoding_add_file            (OGMRipEncoding   *encoding,
                                                         OGMRipFile       *file);
+GList *            ogmrip_encoding_get_files           (OGMRipEncoding   *encoding);
 gboolean           ogmrip_encoding_get_autocrop        (OGMRipEncoding   *encoding);
 void               ogmrip_encoding_set_autocrop        (OGMRipEncoding   *encoding,
                                                         gboolean         autocrop);

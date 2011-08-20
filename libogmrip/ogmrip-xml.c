@@ -28,7 +28,7 @@
 #include <libxml/parser.h>
 #include <libxml/xmlsave.h>
 
-struct _OGMRipXml
+struct _OGMRipXML
 {
   xmlDoc *doc;
   xmlNode *root;
@@ -67,28 +67,28 @@ xmlCloseOutputStream (GOutputStream *ostream)
   return -1;
 }
 
-OGMRipXml *
+OGMRipXML *
 ogmrip_xml_new (void)
 {
-  OGMRipXml *xml;
+  OGMRipXML *xml;
 
-  xml = g_new0 (OGMRipXml, 1);
+  xml = g_new0 (OGMRipXML, 1);
   xml->doc = xmlNewDoc (BAD_CAST "1.0");
 
   return xml;
 }
 
-OGMRipXml *
+OGMRipXML *
 ogmrip_xml_new_from_file (GFile *file, GError **error)
 {
-  OGMRipXml *xml;
+  OGMRipXML *xml;
 
   g_return_val_if_fail (G_IS_FILE (file), NULL);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   xmlKeepBlanksDefault (0);
 
-  xml = g_new0 (OGMRipXml, 1);
+  xml = g_new0 (OGMRipXML, 1);
 
   xml->istream = g_file_read (file, NULL, error);
   if (!xml->istream)
@@ -119,7 +119,7 @@ ogmrip_xml_new_from_file (GFile *file, GError **error)
 }
 
 void
-ogmrip_xml_free (OGMRipXml *xml)
+ogmrip_xml_free (OGMRipXML *xml)
 {
   g_return_if_fail (xml != NULL);
 
@@ -133,7 +133,7 @@ ogmrip_xml_free (OGMRipXml *xml)
 }
 
 gboolean
-ogmrip_xml_save (OGMRipXml *xml, GFile *file, GError **error)
+ogmrip_xml_save (OGMRipXML *xml, GFile *file, GError **error)
 {
   GFileOutputStream *ostream;
   xmlSaveCtxt *ctxt;
@@ -163,13 +163,13 @@ ogmrip_xml_save (OGMRipXml *xml, GFile *file, GError **error)
 }
 
 void
-ogmrip_xml_reset (OGMRipXml *xml)
+ogmrip_xml_reset (OGMRipXML *xml)
 {
   xml->node = xml->root;
 }
 
 gboolean
-ogmrip_xml_previous (OGMRipXml *xml)
+ogmrip_xml_previous (OGMRipXML *xml)
 {
   if (!xml->node || !xml->node->prev)
     return FALSE;
@@ -180,7 +180,7 @@ ogmrip_xml_previous (OGMRipXml *xml)
 }
 
 gboolean
-ogmrip_xml_next (OGMRipXml *xml)
+ogmrip_xml_next (OGMRipXML *xml)
 {
   if (!xml->node || !xml->node->next)
     return FALSE;
@@ -191,7 +191,7 @@ ogmrip_xml_next (OGMRipXml *xml)
 }
 
 gboolean
-ogmrip_xml_children (OGMRipXml *xml)
+ogmrip_xml_children (OGMRipXML *xml)
 {
   if (!xml->node || !xml->node->children)
     return FALSE;
@@ -202,7 +202,7 @@ ogmrip_xml_children (OGMRipXml *xml)
 }
 
 gboolean
-ogmrip_xml_parent (OGMRipXml *xml)
+ogmrip_xml_parent (OGMRipXML *xml)
 {
   if (!xml->node || !xml->node->parent)
     return FALSE;
@@ -213,7 +213,7 @@ ogmrip_xml_parent (OGMRipXml *xml)
 }
 
 const gchar *
-ogmrip_xml_get_name (OGMRipXml *xml)
+ogmrip_xml_get_name (OGMRipXML *xml)
 {
   if (!xml->node)
     return NULL;
@@ -222,7 +222,7 @@ ogmrip_xml_get_name (OGMRipXml *xml)
 }
 
 void
-ogmrip_xml_append (OGMRipXml *xml, const gchar *name)
+ogmrip_xml_append (OGMRipXML *xml, const gchar *name)
 {
   xmlNode *node;
 
@@ -239,7 +239,7 @@ ogmrip_xml_append (OGMRipXml *xml, const gchar *name)
 }
 
 void
-ogmrip_xml_get_value (OGMRipXml *xml, const gchar *property, GValue *value)
+ogmrip_xml_get_value (OGMRipXML *xml, const gchar *property, GValue *value)
 {
   switch (value->g_type)
   {
@@ -265,7 +265,7 @@ ogmrip_xml_get_value (OGMRipXml *xml, const gchar *property, GValue *value)
 }
 
 void
-ogmrip_xml_set_value (OGMRipXml *xml, const gchar *property, const GValue *value)
+ogmrip_xml_set_value (OGMRipXML *xml, const gchar *property, const GValue *value)
 {
   switch (value->g_type)
   {
@@ -290,8 +290,31 @@ ogmrip_xml_set_value (OGMRipXml *xml, const gchar *property, const GValue *value
   }
 }
 
+GVariant *
+ogmrip_xml_get_variant (OGMRipXML *xml, const gchar *property, const GVariantType *type)
+{
+  GVariant *variant;
+  gchar *str;
+
+  str = ogmrip_xml_get_string (xml, property);
+  variant = g_variant_parse (type, str, NULL, NULL, NULL);
+  g_free (str);
+
+  return variant;
+}
+
+void
+ogmrip_xml_set_variant (OGMRipXML *xml, const gchar *property, GVariant *value)
+{
+  gchar *str;
+
+  str = g_variant_print (value, FALSE);
+  ogmrip_xml_set_string (xml, property, str);
+  g_free (str);
+}
+
 gboolean
-ogmrip_xml_get_boolean (OGMRipXml *xml, const gchar *property)
+ogmrip_xml_get_boolean (OGMRipXML *xml, const gchar *property)
 {
   gchar *str;
   gboolean val;
@@ -307,13 +330,13 @@ ogmrip_xml_get_boolean (OGMRipXml *xml, const gchar *property)
 }
 
 void
-ogmrip_xml_set_boolean (OGMRipXml *xml, const gchar *property, gboolean value)
+ogmrip_xml_set_boolean (OGMRipXML *xml, const gchar *property, gboolean value)
 {
   ogmrip_xml_set_string (xml, property, value ? "true" : "false");
 }
 
 gint
-ogmrip_xml_get_int (OGMRipXml *xml, const gchar *property)
+ogmrip_xml_get_int (OGMRipXML *xml, const gchar *property)
 {
   gchar *str;
   gint val;
@@ -329,7 +352,7 @@ ogmrip_xml_get_int (OGMRipXml *xml, const gchar *property)
 }
 
 void
-ogmrip_xml_set_int (OGMRipXml *xml, const gchar *property, gint value)
+ogmrip_xml_set_int (OGMRipXML *xml, const gchar *property, gint value)
 {
   gchar *str;
 
@@ -339,7 +362,7 @@ ogmrip_xml_set_int (OGMRipXml *xml, const gchar *property, gint value)
 }
 
 guint
-ogmrip_xml_get_uint (OGMRipXml *xml, const gchar *property)
+ogmrip_xml_get_uint (OGMRipXML *xml, const gchar *property)
 {
   gchar *str;
   guint val;
@@ -355,7 +378,7 @@ ogmrip_xml_get_uint (OGMRipXml *xml, const gchar *property)
 }
 
 void
-ogmrip_xml_set_uint (OGMRipXml *xml, const gchar *property, guint value)
+ogmrip_xml_set_uint (OGMRipXML *xml, const gchar *property, guint value)
 {
   gchar *str;
 
@@ -365,7 +388,7 @@ ogmrip_xml_set_uint (OGMRipXml *xml, const gchar *property, guint value)
 }
 
 gdouble
-ogmrip_xml_get_double (OGMRipXml *xml, const gchar *property)
+ogmrip_xml_get_double (OGMRipXML *xml, const gchar *property)
 {
   gchar *str;
   gdouble val;
@@ -381,7 +404,7 @@ ogmrip_xml_get_double (OGMRipXml *xml, const gchar *property)
 }
 
 void
-ogmrip_xml_set_double (OGMRipXml *xml, const gchar *property, gdouble value)
+ogmrip_xml_set_double (OGMRipXML *xml, const gchar *property, gdouble value)
 {
   gchar *str;
 
@@ -392,7 +415,7 @@ ogmrip_xml_set_double (OGMRipXml *xml, const gchar *property, gdouble value)
 }
 
 gchar *
-ogmrip_xml_get_string (OGMRipXml *xml, const gchar *property)
+ogmrip_xml_get_string (OGMRipXML *xml, const gchar *property)
 {
   if (!xml->node)
     return NULL;
@@ -404,14 +427,18 @@ ogmrip_xml_get_string (OGMRipXml *xml, const gchar *property)
 }
 
 void
-ogmrip_xml_set_string (OGMRipXml *xml, const gchar *property, const gchar *value)
+ogmrip_xml_set_string (OGMRipXML *xml, const gchar *property, const gchar *value)
 {
   if (xml->node)
   {
+    xmlChar *escaped;
+
+    escaped = xmlEncodeEntitiesReentrant (xml->doc, BAD_CAST value);
     if (property)
-      xmlSetProp (xml->node, BAD_CAST property, BAD_CAST value);
+      xmlSetProp (xml->node, BAD_CAST property, escaped);
     else
-      xmlNodeSetContent (xml->node, BAD_CAST value);
+      xmlNodeSetContent (xml->node, escaped);
+    xmlFree (escaped);
   }
 }
 

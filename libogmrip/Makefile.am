@@ -15,6 +15,7 @@ libogmrip_la_SOURCES =      \
   ogmrip-dvdcpy.c           \
   ogmrip-encoding.c         \
   ogmrip-encoding-manager.c \
+  ogmrip-encoding-parser.c  \
   ogmrip-file.c             \
   ogmrip-fs.c               \
   ogmrip-hardsub.c          \
@@ -40,6 +41,7 @@ libogmrip_la_HEADERS =      \
   ogmrip-dvdcpy.h           \
   ogmrip-encoding.h         \
   ogmrip-encoding-manager.h \
+  ogmrip-encoding-parser.h  \
   ogmrip-enums.h            \
   ogmrip-file.h             \
   ogmrip-fs.h               \

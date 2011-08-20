@@ -382,7 +382,7 @@ ogmrip_encoding_manager_dialog_export_activated (OGMRipEncodingManagerDialog *pa
       GFile *file;
 
       file = gtk_file_chooser_get_file (GTK_FILE_CHOOSER (dialog));
-      if (!ogmrip_encoding_dump (encoding, file, &error))
+      if (!ogmrip_encoding_export (encoding, file, &error))
       {
         ogmrip_run_error_dialog (GTK_WINDOW (dialog), error, _("Could not export the encoding"));
         g_clear_error (&error);
