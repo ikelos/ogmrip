@@ -1,7 +1,0 @@
-* libogmspawn
-  - completion of asynchronous spawns
-
-* libogmrip
-  - support for ripping multiple dvd titles
-  - support for ripping not contiguous chapters
-
