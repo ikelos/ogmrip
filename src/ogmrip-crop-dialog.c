@@ -212,17 +212,20 @@ ogmrip_crop_dialog_spin_value_changed (OGMRipCropDialog *dialog)
 }
 
 static void
-ogmrip_crop_dialog_scale_value_changed (OGMRipCropDialog *dialog, GtkWidget *scale)
+ogmrip_crop_dialog_scale_button_released (OGMRipCropDialog *dialog, GdkEventButton *event, GtkWidget *scale)
 {
-  gulong frame;
-  gchar *text;
+  if (event->button == 1)
+  {
+    gulong frame;
+    gchar *text;
 
-  frame = (guint) gtk_range_get_value (GTK_RANGE (scale));
-  text = g_strdup_printf (_("Frame %lu of %lu"), frame, dialog->priv->length);
-  gtk_label_set_text (GTK_LABEL (dialog->priv->label), text);
-  g_free (text);
+    frame = (guint) gtk_range_get_value (GTK_RANGE (scale));
+    text = g_strdup_printf (_("Frame %lu of %lu"), frame, dialog->priv->length);
+    gtk_label_set_text (GTK_LABEL (dialog->priv->label), text);
+    g_free (text);
 
-  ogmrip_crop_dialog_grab_frame (dialog, frame);
+    ogmrip_crop_dialog_grab_frame (dialog, frame);
+  }
 }
 
 G_DEFINE_TYPE (OGMRipCropDialog, ogmrip_crop_dialog, GTK_TYPE_DIALOG)
@@ -287,11 +290,8 @@ ogmrip_crop_dialog_init (OGMRipCropDialog *dialog)
   dialog->priv->label = gtk_builder_get_widget (builder, "frame-label");
 
   dialog->priv->scale = gtk_builder_get_widget (builder, "frame-scale");
-  /*
-   * TODO gtk_range_set_update_policy (GTK_RANGE (dialog->priv->scale), GTK_UPDATE_DELAYED);
-   */
-  g_signal_connect_swapped (dialog->priv->scale, "value-changed",
-      G_CALLBACK (ogmrip_crop_dialog_scale_value_changed), dialog);
+  g_signal_connect_swapped (dialog->priv->scale, "button-release-event",
+      G_CALLBACK (ogmrip_crop_dialog_scale_button_released), dialog);
 
   g_object_unref (builder);
 }
