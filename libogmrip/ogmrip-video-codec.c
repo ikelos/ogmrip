@@ -186,47 +186,47 @@ ogmrip_video_codec_class_init (OGMRipVideoCodecClass *klass)
 
   g_object_class_install_property (gobject_class, PROP_MIN_WIDTH, 
         g_param_spec_uint ("min-width", "Min width property", "Set min width", 
-           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_MIN_HEIGHT, 
         g_param_spec_uint ("min-height", "Min height property", "Set min height", 
-           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_MAX_WIDTH, 
         g_param_spec_uint ("max-width", "Max width property", "Set max width", 
-           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_MAX_HEIGHT, 
         g_param_spec_uint ("max-height", "Max height property", "Set max height", 
-           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_EXPAND, 
         g_param_spec_boolean ("expand", "Expand property", "Set expand", 
-           FALSE, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+           FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_CROP_X, 
         g_param_spec_uint ("crop-x", "Crop x property", "Set crop x", 
-           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_CROP_Y, 
         g_param_spec_uint ("crop-y", "Crop y property", "Set crop y", 
-           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_CROP_WIDTH, 
         g_param_spec_uint ("crop-width", "Crop width property", "Set crop width", 
-           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_CROP_HEIGHT, 
         g_param_spec_uint ("crop-height", "Crop height property", "Set crop height", 
-           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_SCALE_WIDTH, 
         g_param_spec_uint ("scale-width", "Scale width property", "Set scale width", 
-           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_SCALE_HEIGHT, 
         g_param_spec_uint ("scale-height", "Scale height property", "Set scale height", 
-           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipVideoCodecPriv));
 }
