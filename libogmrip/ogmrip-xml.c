@@ -291,13 +291,13 @@ ogmrip_xml_set_value (OGMRipXML *xml, const gchar *property, const GValue *value
 }
 
 GVariant *
-ogmrip_xml_get_variant (OGMRipXML *xml, const gchar *property, const GVariantType *type)
+ogmrip_xml_get_variant (OGMRipXML *xml, const gchar *property, const gchar *format)
 {
   GVariant *variant;
   gchar *str;
 
   str = ogmrip_xml_get_string (xml, property);
-  variant = g_variant_parse (type, str, NULL, NULL, NULL);
+  variant = g_variant_parse ((const GVariantType *) format, str, NULL, NULL, NULL);
   g_free (str);
 
   return variant;

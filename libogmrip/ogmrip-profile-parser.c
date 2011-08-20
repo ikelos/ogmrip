@@ -35,7 +35,7 @@ ogmrip_profile_parse_key (GSettings *settings, OGMRipXML *xml)
   variant1 = g_settings_get_value (settings, name);
   type = g_variant_get_type (variant1);
 
-  variant2 = ogmrip_xml_get_variant (xml, NULL, type);
+  variant2 = ogmrip_xml_get_variant (xml, NULL, (const gchar *) type);
   if (variant2)
     g_settings_set_value (settings, name, variant2);
 
@@ -74,7 +74,7 @@ ogmrip_profile_parse (OGMRipProfile *profile, OGMRipXML *xml, GError **error)
   g_return_val_if_fail (xml != NULL, FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  variant = ogmrip_xml_get_variant (xml, "version", (const GVariantType *) "(uu)");
+  variant = ogmrip_xml_get_variant (xml, "version", "(uu)");
   if (variant)
     g_settings_set_value (G_SETTINGS (profile), OGMRIP_PROFILE_VERSION, variant);
 
