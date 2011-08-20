@@ -25,6 +25,7 @@ libogmrip_la_SOURCES =      \
   ogmrip-plugin.c           \
   ogmrip-profile.c          \
   ogmrip-profile-engine.c   \
+  ogmrip-profile-parser.c   \
   ogmrip-subp-codec.c       \
   ogmrip-version.c          \
   ogmrip-video-codec.c      \
@@ -53,6 +54,7 @@ libogmrip_la_HEADERS =      \
   ogmrip-profile.h          \
   ogmrip-profile-engine.h   \
   ogmrip-profile-keys.h     \
+  ogmrip-profile-parser.h   \
   ogmrip-subp-codec.h       \
   ogmrip-version.h          \
   ogmrip-video-codec.h      \

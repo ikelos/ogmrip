@@ -23,12 +23,12 @@
 #include "ogmrip-profile.h"
 #include "ogmrip-profile-engine.h"
 #include "ogmrip-profile-keys.h"
+#include "ogmrip-profile-parser.h"
 #include "ogmrip-marshal.h"
 
 #include <glib/gi18n-lib.h>
 
-#include <libxml/parser.h>
-#include <libxml/xmlsave.h>
+#include <stdio.h>
 
 #define OGMRIP_PROFILE_GET_PRIVATE(o) \
     (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_PROFILE, OGMRipProfilePriv))
@@ -317,268 +317,75 @@ ogmrip_profile_copy (OGMRipProfile *profile, gchar *name)
   return new_profile;
 }
 
-static gint
-xmlReadInputStream (GInputStream *istream, gchar *buffer, gint len)
+static OGMRipProfile *
+ogmrip_profile_new_from_xml (OGMRipXML *xml, GError **error)
 {
-  return g_input_stream_read (istream, buffer, len, NULL, NULL);
-}
+  OGMRipProfile *profile;
+  gchar *str;
 
-static gint
-xmlCloseInputStream (GInputStream *istream)
-{
-  if (!g_input_stream_close (istream, NULL, NULL))
-    return -1;
-
-  return 0;
-}
-
-static void
-ogmrip_profile_parse_key (GSettings *settings, xmlNode *node)
-{
-  GError *error = NULL;
-  GVariant *variant1, *variant2;
-  const GVariantType *type;
-  gchar *name, *value;
-
-  name = (gchar *) xmlGetProp (node, BAD_CAST "name");
-
-  variant1 = g_settings_get_value (settings, name);
-  type = g_variant_get_type (variant1);
-
-  value = (gchar *) xmlNodeGetContent (node);
-  variant2 = g_variant_parse (type, value, NULL, NULL, &error);
-  g_free (value);
-
-  if (variant2)
-    g_settings_set_value (settings, name, variant2);
-  else
-  {
-    g_error ("%s", error->message);
-    g_error_free (error);
-  }
-
-  g_free (name);
-  g_variant_unref (variant1);
-}
-
-static void
-ogmrip_profile_parse_section (OGMRipProfile *profile, xmlNode *node)
-{
-  GSettings *settings;
-  gchar *name;
-
-  name = (gchar *) xmlGetProp (node, BAD_CAST "name");
-  settings = ogmrip_profile_get_child (profile, name);
-  g_free (name);
-
-  for (node = node->children; node; node = node->next)
-    ogmrip_profile_parse_key (settings, node);
-}
-
-OGMRipProfile *
-ogmrip_profile_new_from_file (GFile *file, GError **error)
-{
-  OGMRipProfile *profile = NULL;
-  GFileInputStream *istream;
-
-  xmlDoc *doc;
-  xmlNode *root, *node;
-  gchar *name;
-
-  g_return_val_if_fail (G_IS_FILE (file), NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-
-  xmlKeepBlanksDefault (0);
-
-  istream = g_file_read (file, NULL, error);
-  if (!istream)
+  if (!g_str_equal (ogmrip_xml_get_name (xml), "profile"))
     return NULL;
 
-  doc = xmlReadIO ((xmlInputReadCallback) xmlReadInputStream,
-      (xmlInputCloseCallback) xmlCloseInputStream, istream, NULL, NULL, 0);
+  str = ogmrip_xml_get_string (xml, "name");
+  if (!str)
+    return NULL;
 
-  if (!doc)
-  {
-    gchar *filename;
+  profile = ogmrip_profile_new (str);
+  if (profile)
+    ogmrip_profile_parse (profile, xml, error);
 
-    filename = g_file_get_basename (file);
-    g_set_error (error, 0, 0, _("'%s' does not contain a valid profile"), filename);
-    g_free (filename);
-
-    g_object_unref (istream);
-
-    return FALSE;
-  }
-
-  root = xmlDocGetRootElement (doc);
-  if (!root || !xmlStrEqual (root->name, BAD_CAST "profile"))
-  {
-    gchar *filename;
-
-    filename = g_file_get_basename (file);
-    g_set_error (error, 0, 0, _("'%s' does not contain a valid profile"), filename);
-    g_free (filename);
-
-    goto cleanup;
-  }
-
-  name = (gchar *) xmlGetProp (root, BAD_CAST "name");
-  g_assert (name != NULL);
-
-  profile = ogmrip_profile_new (name);
-
-  for (node = root->children; node; node = node->next)
-  {
-    if (xmlStrEqual (node->name, BAD_CAST "section"))
-      ogmrip_profile_parse_section (profile, node);
-    else if (xmlStrEqual (node->name, BAD_CAST "key"))
-      ogmrip_profile_parse_key (G_SETTINGS (profile), node);
-  }
-
-cleanup:
-  xmlFreeDoc (doc);
-  xmlCleanupParser ();
-
-  g_object_unref (istream);
+  g_free (str);
 
   return profile;
 }
 
-static void
-ogmrip_profile_dump_key (GSettings *settings, xmlNode *root, const gchar *key)
+
+OGMRipProfile *
+ogmrip_profile_new_from_file (GFile *file, GError **error)
 {
-  xmlNode *node;
-  GVariant *variant;
-  gchar *str, *escaped;
+  OGMRipXML *xml;
+  OGMRipProfile *profile;
 
-  node = xmlNewNode (NULL, BAD_CAST "key");
-  xmlAddChild (root, node);
+  g_return_val_if_fail (G_IS_FILE (file), NULL);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  xmlSetProp (node, BAD_CAST "name", BAD_CAST key);
+  xml = ogmrip_xml_new_from_file (file, error);
+  if (!xml)
+    return NULL;
 
-  variant = g_settings_get_value (settings, key);
-
-  str = g_variant_print (variant, FALSE);
-  escaped = g_markup_escape_text (str, -1);
-  g_free (str);
-
-  xmlNodeSetContent (node, BAD_CAST escaped);
-  g_free (escaped);
-
-  g_variant_unref (variant);
-}
-
-static void
-ogmrip_profile_dump_section (OGMRipProfile *profile, xmlNode *root, const gchar *name)
-{
-  GSettings *settings;
-
-  settings = ogmrip_profile_get_child (profile, name);
-  if (settings)
+  profile = ogmrip_profile_new_from_xml (xml, error);
+  if (profile == NULL && error != NULL && *error == NULL)
   {
-    xmlNode *node;
-    gchar **keys;
-    guint i;
+    gchar *filename;
 
-    node = xmlNewNode (NULL, BAD_CAST "section");
-    xmlAddChild (root, node);
-
-    xmlSetProp (node, BAD_CAST "name", BAD_CAST name);
-
-    keys = g_settings_list_keys (settings);
-    for (i = 0; keys[i]; i ++)
-    {
-      ogmrip_profile_dump_key (settings, node, keys[i]);
-      g_free (keys[i]);
-    }
-    g_free (keys);
+    filename = g_file_get_basename (file);
+    g_set_error (error, 0, 0, _("'%s' does not contain a valid encoding"), filename);
+    g_free (filename);
   }
-}
 
-static int
-xmlWriteOutputStream (GOutputStream *ostream, const gchar *buffer, int len)
-{
-  return g_output_stream_write (ostream, buffer, len, NULL, NULL);
-}
+  ogmrip_xml_free (xml);
 
-static int
-xmlCloseOutputStream (GOutputStream *ostream)
-{
-  if (g_output_stream_close (ostream, NULL, NULL))
-    return 0;
-
-  return -1;
+  return profile;
 }
 
 gboolean
-ogmrip_profile_dump (OGMRipProfile *profile, GFile *file, GError **error)
+ogmrip_profile_export (OGMRipProfile *profile, GFile *file, GError **error)
 {
-  GFileOutputStream *ostream;
-  xmlSaveCtxt *ctxt;
-  xmlNode *root;
-
-  gchar *str;
-  gint len;
+  OGMRipXML *xml;
+  gboolean retval;
 
   g_return_val_if_fail (OGMRIP_IS_PROFILE (profile), FALSE);
   g_return_val_if_fail (G_IS_FILE (file), FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  ostream = g_file_replace (file, NULL, FALSE, G_FILE_CREATE_NONE, NULL, error);
-  if (!ostream)
-    return FALSE;
+  xml = ogmrip_xml_new ();
 
-  ctxt = xmlSaveToIO ((xmlOutputWriteCallback) xmlWriteOutputStream,
-      (xmlOutputCloseCallback) xmlCloseOutputStream, ostream, NULL, 0);
-  if (!ctxt)
-  {
-    g_object_unref (ostream);
-    return FALSE;
-  }
+  retval = ogmrip_profile_dump (profile, xml, error) &&
+    ogmrip_xml_save (xml, file, error);
 
-  root = xmlNewNode (NULL, BAD_CAST "profile");
+  ogmrip_xml_free (xml);
 
-  g_object_get (profile, "name", &str, NULL);
-  xmlSetProp (root, BAD_CAST "name", BAD_CAST str);
-  g_free (str);
-
-  str = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_VERSION);
-  xmlSetProp (root, BAD_CAST "version", BAD_CAST str);
-  g_free (str);
-
-  ogmrip_profile_dump_key (G_SETTINGS (profile), root, OGMRIP_PROFILE_NAME);
-
-  ogmrip_profile_dump_section (profile, root, OGMRIP_PROFILE_GENERAL);
-
-  str = g_settings_get_string (profile->priv->general_settings, OGMRIP_PROFILE_CONTAINER);
-  ogmrip_profile_dump_section (profile, root, str);
-  g_free (str);
-
-  ogmrip_profile_dump_section (profile, root, OGMRIP_PROFILE_VIDEO);
-
-  str = g_settings_get_string (profile->priv->video_settings, OGMRIP_PROFILE_CODEC);
-  ogmrip_profile_dump_section (profile, root, str);
-  g_free (str);
-
-  ogmrip_profile_dump_section (profile, root, OGMRIP_PROFILE_AUDIO);
-
-  str = g_settings_get_string (profile->priv->audio_settings, OGMRIP_PROFILE_CODEC);
-  ogmrip_profile_dump_section (profile, root, str);
-  g_free (str);
-
-  ogmrip_profile_dump_section (profile, root, OGMRIP_PROFILE_SUBP);
-
-  str = g_settings_get_string (profile->priv->subp_settings, OGMRIP_PROFILE_CODEC);
-  ogmrip_profile_dump_section (profile, root, str);
-  g_free (str);
-
-  len = xmlSaveTree (ctxt, root);
-
-  xmlFreeNode (root);
-  xmlSaveClose (ctxt);
-  g_object_unref (ostream);
-
-  return len > 0;
+  return retval;
 }
 
 void

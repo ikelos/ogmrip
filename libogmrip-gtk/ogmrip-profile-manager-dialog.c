@@ -305,7 +305,7 @@ ogmrip_profile_manager_dialog_export_button_clicked (OGMRipProfileManagerDialog 
         GFile *file;
 
         file = gtk_file_chooser_get_file (GTK_FILE_CHOOSER (dialog));
-        if (!ogmrip_profile_dump (profile, file, &error))
+        if (!ogmrip_profile_export (profile, file, &error))
         {
           ogmrip_run_error_dialog (GTK_WINDOW (dialog), error, _("Could not export the profile"));
           g_clear_error (&error);
@@ -352,7 +352,7 @@ ogmrip_profile_manager_dialog_import_button_clicked (OGMRipProfileManagerDialog 
           GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, _("Cannot load profile"));
       gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog), 
           "%s", error ? error->message : _("Unknown error"));
-      g_error_free (error);
+      g_clear_error (&error);
 
       gtk_dialog_run (GTK_DIALOG (dialog));
     }

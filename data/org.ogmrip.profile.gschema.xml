@@ -12,8 +12,8 @@
       <default>''</default>
       <summary>The name of the profile</summary>
     </key>
-    <key name="version" type="u">
-      <default>0</default>
+    <key name="version" type="(uu)">
+      <default>(0,0)</default>
       <summary>The version of the profile</summary>
     </key>
     <child name="general" schema="org.ogmrip.profile.general"/>

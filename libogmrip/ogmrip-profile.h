@@ -53,7 +53,7 @@ OGMRipProfile * ogmrip_profile_new_from_file (GFile         *file,
                                               GError        **error);
 OGMRipProfile * ogmrip_profile_copy          (OGMRipProfile *profile,
                                               gchar         *name);
-gboolean        ogmrip_profile_dump          (OGMRipProfile *profile,
+gboolean        ogmrip_profile_export        (OGMRipProfile *profile,
                                               GFile         *file,
                                               GError        **error);
 void            ogmrip_profile_get           (OGMRipProfile *profile,
