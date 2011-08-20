@@ -853,7 +853,7 @@ ogmrip_get_user_profiles_dir (void)
   static gchar *dir = NULL;
 
   if (!dir)
-    dir = g_build_filename (g_get_home_dir (), ".ogmrip", "profiles", NULL);
+    dir = g_build_filename (g_get_user_data_dir (), "ogmrip", "profiles", NULL);
 
   return dir;
 }
