@@ -53,6 +53,8 @@ struct _OGMRipProfileEngineClass
 
 GType                 ogmrip_profile_engine_get_type    (void) G_GNUC_CONST;
 OGMRipProfileEngine * ogmrip_profile_engine_get_default (void);
+void                  ogmrip_profile_engine_add_path    (OGMRipProfileEngine *engine,
+                                                         const gchar         *path);
 OGMRipProfile *       ogmrip_profile_engine_get         (OGMRipProfileEngine *engine,
                                                          const gchar         *name);
 void                  ogmrip_profile_engine_add         (OGMRipProfileEngine *engine,

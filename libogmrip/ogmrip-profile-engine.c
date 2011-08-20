@@ -19,6 +19,7 @@
 #include "ogmrip-profile-engine.h"
 #include "ogmrip-profile-keys.h"
 #include "ogmrip-plugin.h"
+#include "ogmrip-xml.h"
 
 #include <string.h>
 
@@ -29,6 +30,7 @@ struct _OGMRipProfileEnginePriv
 {
   GSettings *settings;
   GHashTable *profiles;
+  GList *paths;
 };
 
 enum
@@ -189,6 +191,21 @@ ogmrip_profile_engine_dispose (GObject *gobject)
 }
 
 static void
+ogmrip_profile_engine_finalize (GObject *gobject)
+{
+  OGMRipProfileEngine *engine = OGMRIP_PROFILE_ENGINE (gobject);
+
+  if (engine->priv->paths)
+  {
+    g_list_foreach (engine->priv->paths, (GFunc) g_free, NULL);
+    g_list_free (engine->priv->paths);
+    engine->priv->paths = NULL;
+  }
+
+  G_OBJECT_CLASS (ogmrip_profile_engine_parent_class)->finalize (gobject);
+}
+
+static void
 ogmrip_profile_engine_add_internal (OGMRipProfileEngine *engine, OGMRipProfile *profile)
 {
   gchar *name;
@@ -231,6 +248,7 @@ ogmrip_profile_engine_class_init (OGMRipProfileEngineClass *klass)
   gobject_class->get_property = ogmrip_profile_engine_get_property;
   gobject_class->set_property = ogmrip_profile_engine_set_property;
   gobject_class->dispose = ogmrip_profile_engine_dispose;
+  gobject_class->finalize = ogmrip_profile_engine_finalize;
 
   klass->add = ogmrip_profile_engine_add_internal;
   klass->remove = ogmrip_profile_engine_remove_internal;
@@ -263,6 +281,101 @@ ogmrip_profile_engine_get_default (void)
   }
 
   return default_engine;
+}
+
+static void
+ogmrip_profile_engine_load_file (OGMRipProfileEngine *engine, const gchar *filename)
+{
+  GFile *file;
+  OGMRipXML *xml;
+
+  file = g_file_new_for_path (filename);
+
+  xml = ogmrip_xml_new_from_file (file, NULL);
+  if (xml)
+  {
+    gchar *name;
+
+    name = ogmrip_xml_get_string (xml, "name");
+    if (name)
+    {
+      OGMRipProfile *profile;
+
+      profile = ogmrip_profile_engine_get (engine, name);
+      if (profile)
+      {
+/*
+        GVariant *variant;
+        guint major1, minor1, major2, minor2;
+
+        g_settings_get (G_SETTINGS (profile), "version", "(uu)", &major1, &minor1);
+
+        variant = ogmrip_xml_get_variant (xml, "version", "(uu)");
+        g_variant_get (variant, "(uu)", &major2, &minor2);
+        g_variant_unref (variant);
+
+        if (major2 > major1 || (major2 == major1 && minor2 > minor1))
+        {
+        }
+*/
+      }
+      else
+      {
+        profile = ogmrip_profile_new_from_file (file, NULL);
+        ogmrip_profile_engine_add (engine, profile);
+        g_object_unref (profile);
+      }
+      g_free (name);
+    }
+
+    ogmrip_xml_free (xml);
+  }
+
+  g_object_unref (file);
+}
+
+static void
+ogmrip_profile_engine_load_dir (OGMRipProfileEngine *engine, const gchar *path)
+{
+  GDir *dir;
+
+  dir = g_dir_open (path, 0, NULL);
+  if (dir)
+  {
+    const gchar *basename;
+    gchar *filename;
+
+    while ((basename = g_dir_read_name (dir)))
+    {
+      filename = g_build_filename (path, basename, NULL);
+      ogmrip_profile_engine_load_file (engine, filename);
+      g_free (filename);
+    }
+
+    g_dir_close (dir);
+  }
+}
+
+void
+ogmrip_profile_engine_rescan (OGMRipProfileEngine *engine)
+{
+  GList *link;
+
+  g_return_if_fail (OGMRIP_IS_PROFILE_ENGINE (engine));
+
+  for (link = engine->priv->paths; link; link = link->next)
+    ogmrip_profile_engine_load_dir (engine, link->data);
+}
+
+void
+ogmrip_profile_engine_add_path (OGMRipProfileEngine *engine, const gchar *path)
+{
+  g_return_if_fail (OGMRIP_IS_PROFILE_ENGINE (engine));
+  g_return_if_fail (path != NULL); 
+
+  engine->priv->paths = g_list_append (engine->priv->paths, g_strdup  (path));
+
+  ogmrip_profile_engine_load_dir (engine, path);
 }
 
 OGMRipProfile *

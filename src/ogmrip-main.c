@@ -1864,6 +1864,8 @@ static gboolean debug = FALSE;
 static void
 ogmrip_init (void)
 {
+  OGMRipProfileEngine *engine;
+
   ogmrip_settings_init ();
 
   ogmrip_plugin_init ();
@@ -1873,7 +1875,11 @@ ogmrip_init (void)
   notify_init (PACKAGE_NAME);
 #endif /* HAVE_LIBNOTIFY_SUPPORT */
 
-  ogmrip_profile_engine_get_default ();
+  engine = ogmrip_profile_engine_get_default ();
+  ogmrip_profile_engine_add_path (engine,
+      ogmrip_get_system_profiles_dir ());
+  ogmrip_profile_engine_add_path (engine,
+      ogmrip_get_user_profiles_dir ());
 }
 
 static void
