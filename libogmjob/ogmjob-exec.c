@@ -381,7 +381,7 @@ ogmjob_exec_construct (OGMJobExec *exec, const gchar *command_line)
 #ifdef G_ENABLE_DEBUG
     g_warning ("%s", error->message);
 #endif
-    g_error_free (error);
+    g_clear_error (&error);
     return;
   }
 

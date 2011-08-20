@@ -1000,7 +1000,7 @@ ogmrip_main_export_simple_chapters (OGMRipData *data, const gchar *filename)
       ogmrip_message_dialog (GTK_WINDOW (data->window), GTK_MESSAGE_ERROR, "<b>%s</b>\n\n%s",
           _("Could not export the chapters"), error->message);
 */
-      g_error_free (error);
+      g_clear_error (&error);
     }
   }
 }

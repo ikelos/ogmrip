@@ -195,6 +195,7 @@ ogmrip_spell_dialog_init (OGMRipSpellDialog *dialog)
     g_warning ("Couldn't load builder file: %s", error->message);
     g_object_unref (builder);
     g_error_free (error);
+    return;
   }
 
   gtk_dialog_add_buttons (GTK_DIALOG (dialog),
