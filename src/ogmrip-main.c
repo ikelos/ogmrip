@@ -477,6 +477,147 @@ ogmrip_main_encode (OGMRipData *data, OGMRipEncoding *encoding)
 }
 
 /*
+ * Imports a simple chapter file
+ */
+static gboolean
+ogmrip_main_import_simple_chapters (OGMRipData *data, const gchar *filename)
+{
+  FILE *file;
+  gchar buf[201], *str;
+  gint chap;
+
+  file = fopen (filename, "r");
+  if (!file)
+    return FALSE;
+
+  while (!feof (file))
+  {
+    if (fgets (buf, 200, file) != NULL)
+    {
+      if (sscanf (buf, "CHAPTER%02dNAME=", &chap) == 1 && chap > 0)
+      {
+        str = g_strstrip (strchr (buf, '='));
+        ogmdvd_chapter_list_set_label (OGMDVD_CHAPTER_LIST (data->chapter_list), chap - 1, str + 1);
+      }
+    }
+  }
+
+  fclose (file);
+
+  return TRUE;
+}
+
+/*
+ * Imports a matroska chapter file
+ */
+static gboolean
+ogmrip_main_import_matroska_chapters (OGMRipData *data, const gchar *filename)
+{
+  xmlDoc *doc;
+  xmlNode *node, *child;
+  xmlChar *str;
+
+  gint chap = 0;
+
+  doc = xmlParseFile (filename);
+  if (!doc)
+    return FALSE;
+
+  node = xmlDocGetRootElement (doc);
+  if (!node)
+  {
+    xmlFreeDoc (doc);
+    return FALSE;
+  }
+
+  if (!xmlStrEqual (node->name, (xmlChar *) "Chapters"))
+  {
+    xmlFreeDoc (doc);
+    return FALSE;
+  }
+
+  for (node = node->children; node; node = node->next)
+    if (xmlStrEqual (node->name, (xmlChar *) "EditionEntry"))
+      break;
+
+  if (!node)
+  {
+    xmlFreeDoc (doc);
+    return FALSE;
+  }
+
+  for (node = node->children; node; node = node->next)
+  {
+    if (xmlStrEqual (node->name, (xmlChar *) "ChapterAtom"))
+    {
+      for (child = node->children; child; child = child->next)
+        if (xmlStrEqual (child->name, (xmlChar *) "ChapterDisplay"))
+          break;
+
+      if (child)
+      {
+        for (child = child->children; child; child = child->next)
+          if (xmlStrEqual (child->name, (xmlChar *) "ChapterString"))
+            break;
+
+        if (child)
+        {
+          str = xmlNodeGetContent (child);
+          ogmdvd_chapter_list_set_label (OGMDVD_CHAPTER_LIST (data->chapter_list), chap, (gchar *) str);
+          chap ++;
+        }
+      }
+    }
+  }
+
+  xmlFreeDoc (doc);
+
+  return TRUE;
+}
+
+/*
+ * Exports to a simple chapter file
+ */
+static void
+ogmrip_main_export_simple_chapters (OGMRipData *data, const gchar *filename)
+{
+  guint start_chap;
+  gint end_chap;
+
+  if (ogmrip_chapter_list_get_selected (OGMRIP_CHAPTER_LIST (data->chapter_list), &start_chap, &end_chap))
+  {
+    GError *error = NULL;
+    OGMDvdTitle *title;
+    OGMRipCodec *chapters;
+    gchar *label;
+    guint i;
+
+    title = ogmdvd_title_chooser_get_active (OGMDVD_TITLE_CHOOSER (data->title_chooser));
+
+    chapters = ogmrip_chapters_new (ogmdvd_title_get_video_stream (title));
+    ogmrip_codec_set_chapters (OGMRIP_CODEC (chapters), start_chap, end_chap);
+
+    for (i = 0; ; i++)
+    {
+      label = ogmdvd_chapter_list_get_label (OGMDVD_CHAPTER_LIST (data->chapter_list), i);
+      if (!label)
+        break;
+      ogmrip_chapters_set_label (OGMRIP_CHAPTERS (chapters), i, label);
+      g_free (label);
+    }
+
+    if (ogmjob_spawn_run (OGMJOB_SPAWN (chapters), &error) != OGMJOB_RESULT_SUCCESS)
+    {
+/*
+      ogmrip_message_dialog (GTK_WINDOW (data->window), GTK_MESSAGE_ERROR, "<b>%s</b>\n\n%s",
+          _("Could not export the chapters"), error->message);
+*/
+      g_clear_error (&error);
+    }
+  }
+}
+
+/*
  * Adds an audio chooser
  */
 static void
@@ -865,146 +1006,8 @@ ogmrip_main_set_filename (OGMRipData *data, OGMRipEncoding *encoding)
 }
 
 /*
- * Imports a simple chapter file
+ * When an encoding has completed
  */
-gboolean
-ogmrip_main_import_simple_chapters (OGMRipData *data, const gchar *filename)
-{
-  FILE *file;
-  gchar buf[201], *str;
-  gint chap;
-
-  file = fopen (filename, "r");
-  if (!file)
-    return FALSE;
-
-  while (!feof (file))
-  {
-    if (fgets (buf, 200, file) != NULL)
-    {
-      if (sscanf (buf, "CHAPTER%02dNAME=", &chap) == 1 && chap > 0)
-      {
-        str = g_strstrip (strchr (buf, '='));
-        ogmdvd_chapter_list_set_label (OGMDVD_CHAPTER_LIST (data->chapter_list), chap - 1, str + 1);
-      }
-    }
-  }
-
-  fclose (file);
-
-  return TRUE;
-}
-
-/*
- * Imports a matroska chapter file
- */
-static gboolean
-ogmrip_main_import_matroska_chapters (OGMRipData *data, const gchar *filename)
-{
-  xmlDoc *doc;
-  xmlNode *node, *child;
-  xmlChar *str;
-
-  gint chap = 0;
-
-  doc = xmlParseFile (filename);
-  if (!doc)
-    return FALSE;
-
-  node = xmlDocGetRootElement (doc);
-  if (!node)
-  {
-    xmlFreeDoc (doc);
-    return FALSE;
-  }
-
-  if (!xmlStrEqual (node->name, (xmlChar *) "Chapters"))
-  {
-    xmlFreeDoc (doc);
-    return FALSE;
-  }
-
-  for (node = node->children; node; node = node->next)
-    if (xmlStrEqual (node->name, (xmlChar *) "EditionEntry"))
-      break;
-
-  if (!node)
-  {
-    xmlFreeDoc (doc);
-    return FALSE;
-  }
-
-  for (node = node->children; node; node = node->next)
-  {
-    if (xmlStrEqual (node->name, (xmlChar *) "ChapterAtom"))
-    {
-      for (child = node->children; child; child = child->next)
-        if (xmlStrEqual (child->name, (xmlChar *) "ChapterDisplay"))
-          break;
-
-      if (child)
-      {
-        for (child = child->children; child; child = child->next)
-          if (xmlStrEqual (child->name, (xmlChar *) "ChapterString"))
-            break;
-
-        if (child)
-        {
-          str = xmlNodeGetContent (child);
-          ogmdvd_chapter_list_set_label (OGMDVD_CHAPTER_LIST (data->chapter_list), chap, (gchar *) str);
-          chap ++;
-        }
-      }
-    }
-  }
-
-  xmlFreeDoc (doc);
-
-  return TRUE;
-}
-
-/*
- * Exports to a simple chapter file
- */
-static void
-ogmrip_main_export_simple_chapters (OGMRipData *data, const gchar *filename)
-{
-  guint start_chap;
-  gint end_chap;
-
-  if (ogmrip_chapter_list_get_selected (OGMRIP_CHAPTER_LIST (data->chapter_list), &start_chap, &end_chap))
-  {
-    GError *error = NULL;
-    OGMDvdTitle *title;
-    OGMRipCodec *chapters;
-    gchar *label;
-    guint i;
-
-    title = ogmdvd_title_chooser_get_active (OGMDVD_TITLE_CHOOSER (data->title_chooser));
-
-    chapters = ogmrip_chapters_new (ogmdvd_title_get_video_stream (title));
-    ogmrip_codec_set_chapters (OGMRIP_CODEC (chapters), start_chap, end_chap);
-
-    for (i = 0; ; i++)
-    {
-      label = ogmdvd_chapter_list_get_label (OGMDVD_CHAPTER_LIST (data->chapter_list), i);
-      if (!label)
-        break;
-      ogmrip_chapters_set_label (OGMRIP_CHAPTERS (chapters), i, label);
-      g_free (label);
-    }
-
-    if (ogmjob_spawn_run (OGMJOB_SPAWN (chapters), &error) != OGMJOB_RESULT_SUCCESS)
-    {
-/*
-      ogmrip_message_dialog (GTK_WINDOW (data->window), GTK_MESSAGE_ERROR, "<b>%s</b>\n\n%s",
-          _("Could not export the chapters"), error->message);
-*/
-      g_clear_error (&error);
-    }
-  }
-}
-
 static void
 ogmrip_main_encoding_completed (OGMRipData *data, OGMJobSpawn *spawn, guint result, OGMRipEncoding *encoding)
 {
@@ -1574,6 +1577,9 @@ ogmrip_main_item_selected (GtkWidget *item, GtkWidget *statusbar)
   }
 }
 
+/*
+ * When the play signal is emitted
+ */
 static void
 ogmrip_main_player_play (OGMRipPlayer *player, GtkWidget *button)
 {
@@ -1588,6 +1594,9 @@ ogmrip_main_player_play (OGMRipPlayer *player, GtkWidget *button)
   gtk_widget_show (image);
 }
 
+/*
+ * When the stop signal is emitted
+ */
 static void
 ogmrip_main_player_stop (OGMRipPlayer *player, GtkWidget *button)
 {
@@ -1855,8 +1864,6 @@ static gboolean debug = FALSE;
 static void
 ogmrip_init (void)
 {
-  OGMRipProfileEngine *engine;
-
   ogmrip_settings_init ();
 
   ogmrip_plugin_init ();
@@ -1866,7 +1873,7 @@ ogmrip_init (void)
   notify_init (PACKAGE_NAME);
 #endif /* HAVE_LIBNOTIFY_SUPPORT */
 
-  engine = ogmrip_profile_engine_get_default ();
+  ogmrip_profile_engine_get_default ();
 }
 
 static void
