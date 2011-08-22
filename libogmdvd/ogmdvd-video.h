@@ -40,9 +40,6 @@ gint     ogmdvd_video_stream_get_display_aspect (OGMDvdVideoStream *stream);
 void     ogmdvd_video_stream_get_aspect_ratio   (OGMDvdVideoStream *stream,
                                                  guint             *numerator,
                                                  guint             *denominator);
-gboolean ogmdvd_video_stream_get_telecine       (OGMDvdVideoStream *stream);
-gboolean ogmdvd_video_stream_get_interlaced     (OGMDvdVideoStream *stream);
-gboolean ogmdvd_video_stream_get_progressive    (OGMDvdVideoStream *stream);
 
 G_END_DECLS
 
