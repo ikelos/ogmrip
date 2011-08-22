@@ -81,6 +81,7 @@ OGMDvdTitle * ogmdvd_disc_get_nth_title (OGMDvdDisc         *disc,
 GList *       ogmdvd_disc_get_titles    (OGMDvdDisc         *disc);
 gboolean      ogmdvd_disc_copy          (OGMDvdDisc         *disc,
                                          const gchar        *path,
+                                         GCancellable       *cancellable,
                                          OGMDvdDiscCallback callback,
                                          gpointer           user_data,
                                          GError             **error);

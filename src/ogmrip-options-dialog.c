@@ -417,7 +417,7 @@ ogmrip_options_dialog_autocrop_button_clicked (OGMRipOptionsDialog *parent)
 
   if (ogmrip_open_title (GTK_WINDOW (parent), parent->priv->title))
   {
-    ogmdvd_title_analyze (parent->priv->title, NULL, NULL, NULL);
+    ogmdvd_title_analyze (parent->priv->title, NULL, NULL, NULL, NULL);
 
     stream = ogmdvd_title_get_video_stream (parent->priv->title);
     ogmdvd_video_stream_get_crop_size (stream, &x, &y, &w, &h);

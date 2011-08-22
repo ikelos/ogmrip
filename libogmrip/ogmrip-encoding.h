@@ -99,11 +99,13 @@ void               ogmrip_encoding_add_audio_codec     (OGMRipEncoding   *encodi
                                                         OGMRipAudioCodec *codec);
 OGMRipCodec *      ogmrip_encoding_get_nth_audio_codec (OGMRipEncoding   *encoding,
                                                         gint             n);
+gint               ogmrip_encoding_get_n_audio_codecs  (OGMRipEncoding   *encoding);
 GList *            ogmrip_encoding_get_audio_codecs    (OGMRipEncoding   *encoding);
 void               ogmrip_encoding_add_subp_codec      (OGMRipEncoding   *encoding,
                                                         OGMRipSubpCodec  *codec);
 OGMRipCodec *      ogmrip_encoding_get_nth_subp_codec  (OGMRipEncoding   *encoding,
                                                         gint             n);
+gint               ogmrip_encoding_get_n_subp_codecs   (OGMRipEncoding   *encoding);
 GList *            ogmrip_encoding_get_subp_codecs     (OGMRipEncoding   *encoding);
 void               ogmrip_encoding_add_chapters        (OGMRipEncoding   *encoding,
                                                         OGMRipChapters   *chapters);
@@ -120,6 +122,9 @@ void               ogmrip_encoding_set_autoscale       (OGMRipEncoding   *encodi
 OGMRipContainer *  ogmrip_encoding_get_container       (OGMRipEncoding   *encoding);
 void               ogmrip_encoding_set_container       (OGMRipEncoding   *encoding,
                                                         OGMRipContainer  *container);
+gboolean           ogmrip_encoding_get_copy            (OGMRipEncoding   *encoding);
+void               ogmrip_encoding_set_copy            (OGMRipEncoding   *encoding,
+                                                        gboolean         copy);
 const gchar *      ogmrip_encoding_get_log_file        (OGMRipEncoding   *encoding);
 void               ogmrip_encoding_set_log_file        (OGMRipEncoding   *encoding,
                                                         const gchar      *filename);

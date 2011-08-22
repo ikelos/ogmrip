@@ -98,27 +98,87 @@ static const char *ui_description =
 "  </popup>"
 "</ui>";
 
+#ifdef HAVE_LIBNOTIFY_SUPPORT
+static gboolean
+ogmrip_progress_dialog_get_visibility (OGMRipProgressDialog *dialog)
+{
+  GdkWindowState state;
+
+#if GTK_CHECK_VERSION(2,19,0)
+  if (!gtk_widget_get_realized (GTK_WIDGET (dialog)))
+#else
+  if (!GTK_WIDGET_REALIZED (dialog))
+#endif
+    return FALSE;
+
+  if (dialog->priv->iconified)
+    return FALSE;
+
+  state = gdk_window_get_state (gtk_widget_get_window (GTK_WIDGET (dialog)));
+  if (state & (GDK_WINDOW_STATE_WITHDRAWN | GDK_WINDOW_STATE_ICONIFIED))
+    return FALSE;
+
+  return TRUE;
+}
+#endif
+
+static void
+ogmrip_progress_dialog_set_label (OGMRipProgressDialog *dialog, const gchar *label)
+{
+  gchar *str;
+
+  if (dialog->priv->label)
+    g_free (dialog->priv->label);
+  dialog->priv->label = g_strdup (label);
+
+  str = g_strdup_printf ("<i>%s</i>", label);
+  gtk_label_set_markup (GTK_LABEL (dialog->priv->stage_label), str);
+  g_free (str);
+
+#ifdef HAVE_LIBNOTIFY_SUPPORT
+  if (dialog->priv->notification && !ogmrip_progress_dialog_get_visibility (dialog))
+  {
+    g_object_set (dialog->priv->notification, "body", label, NULL);
+    notify_notification_show (dialog->priv->notification, NULL);
+  }
+#endif
+}
+
 static void
 ogmrip_progress_dialog_encoding_run (OGMRipProgressDialog *dialog, OGMJobSpawn *spawn, OGMRipEncoding *encoding)
 {
+  OGMDvdStream *stream;
+  gchar *message;
+
   if (spawn)
   {
     if (OGMRIP_IS_VIDEO_CODEC (spawn))
-    {
-    }
+      ogmrip_progress_dialog_set_label (dialog, _("Encoding video title"));
+    else if (OGMRIP_IS_CHAPTERS (spawn))
+      ogmrip_progress_dialog_set_label (dialog, _("Extracting chapters information"));
+    else if (OGMRIP_IS_CONTAINER (spawn))
+      ogmrip_progress_dialog_set_label (dialog, _("Merging audio and video streams"));
+    else if (OGMRIP_IS_COPY (spawn))
+      ogmrip_progress_dialog_set_label (dialog, _("DVD backup"));
+    else if (OGMRIP_IS_ANALYZE (spawn))
+      ogmrip_progress_dialog_set_label (dialog, _("Analyzing video stream"));
     else if (OGMRIP_IS_AUDIO_CODEC (spawn))
     {
+      stream = ogmrip_codec_get_input (OGMRIP_CODEC (spawn));
+      message = g_strdup_printf (_("Extracting audio stream %d"), ogmdvd_stream_get_nr (stream) + 1);
+      ogmrip_progress_dialog_set_label (dialog, message);
+      g_free (message);
     }
     else if (OGMRIP_IS_SUBP_CODEC (spawn))
     {
-    }
-    else if (OGMRIP_IS_CHAPTERS (spawn))
-    {
-    }
-    else if (OGMRIP_IS_CONTAINER (spawn))
-    {
+      stream = ogmrip_codec_get_input (OGMRIP_CODEC (spawn));
+      message = g_strdup_printf (_("Extracting subtitle stream %d"), ogmdvd_stream_get_nr (stream) + 1);
+      ogmrip_progress_dialog_set_label (dialog, message);
+      g_free (message);
     }
   }
+
+  gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (dialog->priv->stage_progress), 0);
 }
 
 static void

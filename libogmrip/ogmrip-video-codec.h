@@ -132,6 +132,9 @@ void                ogmrip_video_codec_get_aspect_ratio   (OGMRipVideoCodec  *vi
 void                ogmrip_video_codec_set_aspect_ratio   (OGMRipVideoCodec  *video,
                                                            guint             num,
                                                            guint             denom);
+void                ogmrip_video_codec_get_framerate      (OGMRipVideoCodec  *video,
+                                                           guint             *num,
+                                                           guint             *denom);
 OGMDvdAudioStream * ogmrip_video_codec_get_ensure_sync    (OGMRipVideoCodec  *video);
 void                ogmrip_video_codec_set_ensure_sync    (OGMRipVideoCodec  *video,
                                                            OGMDvdAudioStream *stream);

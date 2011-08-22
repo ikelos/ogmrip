@@ -987,6 +987,12 @@ ogmdvd_disc_copy_watch (OGMJobExec *exec, const gchar *buffer, gpointer data)
 }
 
 static void
+ogmdvd_disc_copy_cancel_cb (GCancellable *cancellable, OGMJobSpawn *spawn)
+{
+  ogmjob_spawn_cancel (spawn);
+}
+
+static void
 ogmdvd_disc_copy_progress_cb (OGMJobSpawn *spawn, gdouble fraction, OGMDvdProgress *progress)
 {
   progress->callback (progress->disc, fraction, progress->user_data);
@@ -1006,20 +1012,26 @@ ogmdvd_disc_device_changed_cb (GFileMonitor *monitor, GFile *file, GFile *other_
 }
 
 gboolean
-ogmdvd_disc_copy (OGMDvdDisc *disc, const gchar *path, OGMDvdDiscCallback callback, gpointer user_data, GError **error)
+ogmdvd_disc_copy (OGMDvdDisc *disc, const gchar *path, GCancellable *cancellable,
+    OGMDvdDiscCallback callback, gpointer user_data, GError **error)
 {
   OGMJobSpawn *spawn;
   GFile *file;
 
   struct stat buf;
   const gchar *device;
+  gulong handler_id;
   gboolean is_open;
   gchar **argv;
   gint result;
 
   g_return_val_if_fail (disc != NULL, FALSE);
   g_return_val_if_fail (path != NULL, FALSE);
+  g_return_val_if_fail (cancellable == NULL || G_IS_CANCELLABLE (cancellable), FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return FALSE;
 
   device = ogmdvd_disc_get_device (disc);
   if (g_stat (device, &buf) != 0)
@@ -1038,6 +1050,9 @@ ogmdvd_disc_copy (OGMDvdDisc *disc, const gchar *path, OGMDvdDiscCallback callba
   ogmjob_exec_add_watch_full (OGMJOB_EXEC (spawn),
       (OGMJobWatch) ogmdvd_disc_copy_watch, NULL, TRUE, FALSE, FALSE);
 
+  handler_id = cancellable ? g_cancellable_connect (cancellable,
+      G_CALLBACK (ogmdvd_disc_copy_cancel_cb), spawn, NULL) : 0;
+
   if (callback)
   {
     OGMDvdProgress progress;
@@ -1052,6 +1067,9 @@ ogmdvd_disc_copy (OGMDvdDisc *disc, const gchar *path, OGMDvdDiscCallback callba
 
   result = ogmjob_spawn_run (spawn, error);
   g_object_unref (spawn);
+
+  if (handler_id)
+    g_cancellable_disconnect (cancellable, handler_id);
 
   if (!is_open)
     ogmdvd_disc_close (disc);

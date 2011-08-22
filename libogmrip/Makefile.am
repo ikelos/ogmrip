@@ -8,11 +8,12 @@ BUILT_SOURCES = \
   ogmrip-marshal.h
 
 libogmrip_la_SOURCES =      \
+  ogmrip-analyze.c          \
   ogmrip-audio-codec.c      \
   ogmrip-chapters.c         \
   ogmrip-codec.c            \
   ogmrip-container.c        \
-  ogmrip-dvdcpy.c           \
+  ogmrip-copy.c             \
   ogmrip-encoding.c         \
   ogmrip-encoding-manager.c \
   ogmrip-encoding-parser.c  \
@@ -35,11 +36,12 @@ libogmrip_ladir = \
   $(includedir)/ogmrip
 
 libogmrip_la_HEADERS =      \
+  ogmrip-analyze.h          \
   ogmrip-audio-codec.h      \
   ogmrip-chapters.h         \
   ogmrip-codec.h            \
   ogmrip-container.h        \
-  ogmrip-dvdcpy.h           \
+  ogmrip-copy.h             \
   ogmrip-encoding.h         \
   ogmrip-encoding-manager.h \
   ogmrip-encoding-parser.h  \

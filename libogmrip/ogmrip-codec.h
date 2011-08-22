@@ -19,9 +19,10 @@
 #ifndef __OGMRIP_CODEC_H__
 #define __OGMRIP_CODEC_H__
 
-#include <ogmrip-profile.h>
-#include <ogmjob-bin.h>
+#include <ogmjob.h>
 #include <ogmdvd.h>
+
+#include <ogmrip-profile.h>
 
 G_BEGIN_DECLS
 

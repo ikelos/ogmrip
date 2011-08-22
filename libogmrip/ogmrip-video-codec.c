@@ -1304,6 +1304,26 @@ ogmrip_video_codec_set_aspect_ratio (OGMRipVideoCodec *video, guint num, guint d
   video->priv->aspect_denom = denom;
 }
 
+void
+ogmrip_video_codec_get_framerate (OGMRipVideoCodec *video, guint *num, guint *denom)
+{
+  OGMDvdStream *stream;
+
+  g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
+  g_return_if_fail (num != NULL);
+  g_return_if_fail (denom != NULL);
+
+  stream = ogmrip_codec_get_input (OGMRIP_CODEC (video));
+  ogmdvd_video_stream_get_framerate (OGMDVD_VIDEO_STREAM (stream), num, denom);
+
+  if (ogmdvd_video_stream_get_telecine (OGMDVD_VIDEO_STREAM (stream)) ||
+      ogmdvd_video_stream_get_progressive (OGMDVD_VIDEO_STREAM (stream)))
+  {
+    *num = 24000;
+    *denom = 1001;
+  }
+}
+
 /**
  * ogmrip_video_codec_autoscale:
  * @video: an #OGMRipVideoCodec

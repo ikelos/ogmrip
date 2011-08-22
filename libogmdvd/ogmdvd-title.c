@@ -807,21 +807,32 @@ ogmdvd_title_crop_progress_cb (OGMJobSpawn *spawn, gdouble fraction, OGMDvdProgr
   progress->callback (progress->title, 0.5 + fraction / 2, progress->user_data);
 }
 
+static void
+ogmdvd_title_analyze_cancel_cb (GCancellable *cancellable, OGMJobSpawn *spawn)
+{
+  ogmjob_spawn_cancel (spawn);
+}
+
 gboolean
-ogmdvd_title_analyze (OGMDvdTitle *title, OGMDvdTitleCallback callback, gpointer user_data, GError **error)
+ogmdvd_title_analyze (OGMDvdTitle *title, GCancellable *cancellable, OGMDvdTitleCallback callback, gpointer user_data, GError **error)
 {
   OGMJobSpawn *spawn, *queue;
   OGMDvdProgress progress;
   OGMDvdAnalyze analyze;
   OGMDvdCrop crop;
 
+  gulong handler_id;
   gdouble length, start, step;
   gboolean is_open;
   gchar **argv;
   gint result;
 
   g_return_val_if_fail (title != NULL, FALSE);
+  g_return_val_if_fail (cancellable == NULL || G_IS_CANCELLABLE (cancellable), FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return FALSE;
 
   if (title->analyzed)
     return TRUE;
@@ -843,12 +854,18 @@ ogmdvd_title_analyze (OGMDvdTitle *title, OGMDvdTitleCallback callback, gpointer
   ogmjob_exec_add_watch_full (OGMJOB_EXEC (spawn),
       (OGMJobWatch) ogmdvd_title_analyze_watch, &analyze, TRUE, FALSE, FALSE);
 
+  handler_id = cancellable ? g_cancellable_connect (cancellable,
+      G_CALLBACK (ogmdvd_title_analyze_cancel_cb), spawn, NULL) : 0;
+
   if (callback)
     g_signal_connect (spawn, "progress",
         G_CALLBACK (ogmdvd_title_analyze_progress_cb), &progress);
 
   result = ogmjob_spawn_run (spawn, error);
   g_object_unref (spawn);
+
+  if (handler_id)
+    g_cancellable_disconnect (cancellable, handler_id);
 
   if (result != OGMJOB_RESULT_SUCCESS)
   {
@@ -907,6 +924,9 @@ ogmdvd_title_analyze (OGMDvdTitle *title, OGMDvdTitleCallback callback, gpointer
 
   queue = ogmjob_queue_new ();
 
+  handler_id = cancellable ? g_cancellable_connect (cancellable,
+      G_CALLBACK (ogmdvd_title_analyze_cancel_cb), spawn, NULL) : 0;
+
   if (callback)
     g_signal_connect (queue, "progress",
         G_CALLBACK (ogmdvd_title_crop_progress_cb), &progress);
@@ -925,6 +945,9 @@ ogmdvd_title_analyze (OGMDvdTitle *title, OGMDvdTitleCallback callback, gpointer
 
   result = ogmjob_spawn_run (queue, error);
   g_object_unref (queue);
+
+  if (handler_id)
+    g_cancellable_disconnect (cancellable, handler_id);
 
   if (result != OGMJOB_RESULT_SUCCESS)
   {

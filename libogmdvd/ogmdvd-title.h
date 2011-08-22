@@ -61,6 +61,7 @@ OGMDvdSubpStream *  ogmdvd_title_get_nth_subp_stream  (OGMDvdTitle         *titl
                                                        guint               nr);
 GList *             ogmdvd_title_get_subp_streams     (OGMDvdTitle         *title);
 gboolean            ogmdvd_title_analyze              (OGMDvdTitle         *title,
+                                                       GCancellable        *cancellable,
                                                        OGMDvdTitleCallback callback,
                                                        gpointer            user_data,
                                                        GError              **error);

@@ -33,6 +33,8 @@
 #include "ogmrip-hardsub.h"
 #include "ogmrip-marshal.h"
 #include "ogmrip-plugin.h"
+#include "ogmrip-analyze.h"
+#include "ogmrip-copy.h"
 #include "ogmrip-fs.h"
 
 #include <glib/gstdio.h>
@@ -61,6 +63,7 @@ struct _OGMRipEncodingPriv
   gboolean relative;
   gboolean autocrop;
   gboolean autoscale;
+  gboolean copy;
   gboolean test;
 };
 
@@ -71,6 +74,7 @@ enum
   PROP_AUTOCROP,
   PROP_AUTOSCALE,
   PROP_CONTAINER,
+  PROP_COPY,
   PROP_LOG_FILE,
   PROP_PROFILE,
   PROP_RELATIVE,
@@ -146,6 +150,10 @@ ogmrip_encoding_class_init (OGMRipEncodingClass *klass)
   g_object_class_install_property (gobject_class, PROP_CONTAINER, 
         g_param_spec_object ("container", "Container property", "Set the container", 
            OGMRIP_TYPE_CONTAINER, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_COPY, 
+        g_param_spec_boolean ("copy", "Copy property", "Set copy", 
+           TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_LOG_FILE, 
         g_param_spec_string ("log-file", "Log file property", "Set the log file", 
@@ -286,6 +294,9 @@ ogmrip_encoding_set_property (GObject *gobject, guint property_id, const GValue 
     case PROP_CONTAINER:
       ogmrip_encoding_set_container (encoding, g_value_get_object (value));
       break;
+    case PROP_COPY:
+      encoding->priv->copy = g_value_get_boolean (value);
+      break;
     case PROP_LOG_FILE:
       ogmrip_encoding_set_log_file (encoding, g_value_get_string (value));
       break;
@@ -337,6 +348,9 @@ ogmrip_encoding_get_property (GObject *gobject, guint property_id, GValue *value
       break;
     case PROP_CONTAINER:
       g_value_set_object (value, encoding->priv->container);
+      break;
+    case PROP_COPY:
+      g_value_set_boolean (value, encoding->priv->copy);
       break;
     case PROP_LOG_FILE:
       g_value_set_string (value, encoding->priv->log_file);
@@ -523,6 +537,14 @@ ogmrip_encoding_get_audio_codecs (OGMRipEncoding *encoding)
   return g_list_copy (encoding->priv->audio_codecs);
 }
 
+gint
+ogmrip_encoding_get_n_audio_codecs (OGMRipEncoding *encoding)
+{
+  g_return_val_if_fail (OGMRIP_IS_ENCODING (encoding), -1);
+
+  return g_list_length (encoding->priv->audio_codecs);
+}
+
 void
 ogmrip_encoding_add_subp_codec (OGMRipEncoding *encoding, OGMRipSubpCodec *codec)
 {
@@ -550,6 +572,14 @@ ogmrip_encoding_get_nth_subp_codec (OGMRipEncoding *encoding, gint n)
     return link->data;
 
   return NULL;
+}
+
+gint
+ogmrip_encoding_get_n_subp_codecs (OGMRipEncoding *encoding)
+{
+  g_return_val_if_fail (OGMRIP_IS_ENCODING (encoding), -1);
+
+  return g_list_length (encoding->priv->subp_codecs);
 }
 
 GList *
@@ -650,6 +680,24 @@ ogmrip_encoding_set_container (OGMRipEncoding *encoding, OGMRipContainer *contai
   encoding->priv->container = container;
 
   g_object_notify (G_OBJECT (encoding), "container");
+}
+
+gboolean
+ogmrip_encoding_get_copy (OGMRipEncoding *encoding)
+{
+  g_return_val_if_fail (OGMRIP_IS_ENCODING (encoding), FALSE);
+
+  return encoding->priv->copy;
+}
+
+void
+ogmrip_encoding_set_copy (OGMRipEncoding *encoding, gboolean copy)
+{
+  g_return_if_fail (OGMRIP_IS_ENCODING (encoding));
+
+  encoding->priv->copy = copy;
+
+  g_object_notify (G_OBJECT (encoding), "copy");
 }
 
 const gchar *
@@ -1008,6 +1056,130 @@ ogmrip_encoding_autoscale (OGMRipEncoding *encoding, gdouble bpp, guint *width, 
   *width = MIN (*width, rw);
 }
 
+static gboolean
+get_space_left (const gchar *path, guint64 *space, gchar **id, GError **error)
+{
+  GFile *file;
+  GFileInfo *info;
+
+  file = g_file_new_for_path (path);
+  info = g_file_query_info (file,
+      G_FILE_ATTRIBUTE_FILESYSTEM_FREE "," G_FILE_ATTRIBUTE_ID_FILESYSTEM,
+      G_FILE_QUERY_INFO_NONE, NULL, error);
+  g_object_unref (file);
+
+  *space = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE);
+  *id = g_strdup (g_file_info_get_attribute_string (info, G_FILE_ATTRIBUTE_ID_FILESYSTEM));
+
+  g_object_unref (info);
+
+  return TRUE;
+}
+
+static gboolean
+ogmrip_encoding_check_space (OGMRipEncoding *encoding, guint64 output_size, guint64 tmp_size, GError **error)
+{
+  OGMRipContainer *container;
+  guint64 output_space, tmp_space;
+  gchar *output_id, *tmp_id, *str;
+  gboolean retval = FALSE;
+
+  if (output_size + tmp_size == 0)
+    return TRUE;
+
+  container = ogmrip_encoding_get_container (encoding);
+
+  if (!get_space_left (ogmrip_container_get_output (container), &output_space, &output_id, error))
+    return FALSE;
+
+  if (!get_space_left (ogmrip_fs_get_tmp_dir (), &tmp_space, &tmp_id, error))
+  {
+    g_free (tmp_id);
+    return FALSE;
+  }
+
+  if (g_str_equal (output_id, tmp_id))
+  {
+    retval = output_size + tmp_size < output_space;
+    if (!retval)
+    {
+      str = g_format_size_for_display (output_size + tmp_size);
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NO_SPACE,
+          _("Not enough space to store output and temporary files (%s needed)."), str);
+      g_free (str);
+    }
+  }
+  else
+  {
+    retval = output_size < output_space;
+    if (!retval)
+    {
+      str = g_format_size_for_display (output_size);
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NO_SPACE,
+          _("Not enough space to store the output file (%s needed)."), str);
+      g_free (str);
+    }
+    else
+    {
+      retval = tmp_size < tmp_space;
+      if (!retval)
+      {
+        str = g_format_size_for_display (output_size);
+        g_set_error (error, G_IO_ERROR, G_IO_ERROR_NO_SPACE,
+            _("Not enough space to store the temporary files (%s needed)."), str);
+        g_free (str);
+      }
+    }
+  }
+
+  g_free (output_id);
+  g_free (tmp_id);
+
+  return retval;
+}
+
+static gint
+ogmrip_encoding_copy (OGMRipEncoding *encoding, GError **error)
+{
+  OGMDvdDisc *disc;
+  OGMJobSpawn *spawn;
+  gboolean result;
+  gchar *output;
+
+  disc = ogmdvd_title_get_disc (encoding->priv->title);
+
+  output = ogmrip_fs_mktemp ("ogmrip.XXXXXX", error);
+  if (!output)
+    return OGMJOB_RESULT_ERROR;
+
+  spawn = ogmrip_copy_new (disc, output);
+
+  g_signal_emit (encoding, signals[RUN], 0, spawn);
+  result = ogmjob_spawn_run (OGMJOB_SPAWN (spawn), error);
+  g_signal_emit (encoding, signals[COMPLETE], 0, spawn, result);
+
+  g_object_unref (spawn);
+
+  return result;
+}
+
+static gint
+ogmrip_encoding_analyze (OGMRipEncoding *encoding, GError **error)
+{
+  OGMJobSpawn *spawn;
+  gboolean result;
+
+  spawn = ogmrip_analyze_new (encoding->priv->title);
+
+  g_signal_emit (encoding, signals[RUN], 0, spawn);
+  result = ogmjob_spawn_run (OGMJOB_SPAWN (spawn), error);
+  g_signal_emit (encoding, signals[COMPLETE], 0, spawn, result);
+
+  g_object_unref (spawn);
+
+  return result;
+}
+
 static gint
 get_audio_stream_format (OGMRipCodec *codec)
 {
@@ -1043,9 +1215,17 @@ ogmrip_encoding_run_codec (OGMRipEncoding *encoding, OGMRipCodec *codec, GError 
 {
   const gchar *label = NULL;
   gint result, format = -1, lang = -1;
-  gchar *output;
+  gchar *output = NULL;
 
-  output = ogmrip_fs_mktemp ("ogmrip.XXXXXX", error);
+  if (OGMRIP_IS_VIDEO_CODEC (codec))
+    output = ogmrip_fs_mktemp ("video.XXXXXX", error);
+  else if (OGMRIP_IS_AUDIO_CODEC (codec))
+    output = ogmrip_fs_mktemp ("audio.XXXXXX", error);
+  else if (OGMRIP_IS_SUBP_CODEC (codec))
+    output = ogmrip_fs_mktemp ("subp.XXXXXX", error);
+  else if (OGMRIP_IS_CHAPTERS (codec))
+    output = ogmrip_fs_mktemp ("chapters.XXXXXX", error);
+
   if (!output)
     return OGMJOB_RESULT_ERROR;
 
@@ -1112,20 +1292,24 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GError **error)
   g_return_val_if_fail (error == NULL || *error == NULL, OGMJOB_RESULT_ERROR);
   g_return_val_if_fail (ogmdvd_title_is_open (encoding->priv->title), OGMJOB_RESULT_ERROR);
 
-  /*
-   * TODO check space
-   */
+  if (!ogmrip_encoding_check_space (encoding, 0, 0, error))
+    return FALSE;
 
   g_signal_emit (encoding, signals[RUN], 0, NULL);
 
   settings = ogmrip_profile_get_child (encoding->priv->profile, OGMRIP_PROFILE_GENERAL);
 
-  if (encoding->priv->video_codec)
+  if (encoding->priv->copy)
   {
-    OGMDvdStream *stream;
+    result = ogmrip_encoding_copy (encoding, error);
+    if (result != OGMJOB_RESULT_SUCCESS)
+      goto encode_cleanup;
+  }
 
-    stream = ogmrip_codec_get_input (OGMRIP_CODEC (encoding->priv->video_codec));
-    if (!ogmdvd_title_analyze (ogmdvd_stream_get_title (stream), NULL, NULL, error))
+  if (encoding->priv->title)
+  {
+    result = ogmrip_encoding_analyze (encoding, error);
+    if (result != OGMJOB_RESULT_SUCCESS)
       goto encode_cleanup;
   }
 

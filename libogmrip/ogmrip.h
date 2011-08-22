@@ -19,10 +19,11 @@
 #ifndef __OGMRIP_H__
 #define __OGMRIP_H__
 
+#include <ogmrip-analyze.h>
 #include <ogmrip-audio-codec.h>
 #include <ogmrip-chapters.h>
 #include <ogmrip-container.h>
-#include <ogmrip-dvdcpy.h>
+#include <ogmrip-copy.h>
 #include <ogmrip-encoding.h>
 #include <ogmrip-encoding-manager.h>
 #include <ogmrip-enums.h>

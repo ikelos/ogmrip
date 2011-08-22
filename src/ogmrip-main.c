@@ -453,10 +453,6 @@ ogmrip_main_encode (OGMRipData *data, OGMRipEncoding *encoding)
     gtk_window_set_modal (GTK_WINDOW (dialog), TRUE);
     gtk_window_present (GTK_WINDOW (dialog));
 
-    /*
-     * TODO copy-dvd
-     */
-
     result = ogmrip_encoding_encode (encoding, &error);
 
     ogmrip_main_clean (data, encoding, result == OGMJOB_RESULT_ERROR);
@@ -1129,6 +1125,9 @@ ogmrip_main_extract_activated (OGMRipData *data)
   }
 
   profile = ogmrip_encoding_get_profile (encoding);
+
+  ogmrip_encoding_set_copy (encoding,
+      g_settings_get_boolean (settings, OGMRIP_SETTINGS_COPY_DVD));
 
   container = ogmrip_main_create_container (data, profile);
   ogmrip_encoding_set_container (encoding, container);
