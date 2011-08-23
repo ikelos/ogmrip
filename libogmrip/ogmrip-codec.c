@@ -35,18 +35,12 @@ struct _OGMRipCodecPriv
 {
   OGMDvdTitle *title;
   OGMDvdStream *input;
-  OGMDvdTime time_;
   gchar *output;
-
-  gboolean do_unlink;
-  gboolean dirty;
-
-  gdouble length;
 
   guint start_chap;
   gint end_chap;
 
-  gdouble start_second;
+  gdouble start_position;
   gdouble play_length;
 };
 
@@ -55,9 +49,10 @@ enum
   PROP_0,
   PROP_INPUT,
   PROP_OUTPUT,
-  PROP_LENGTH,
   PROP_START_CHAPTER,
-  PROP_END_CHAPTER
+  PROP_END_CHAPTER,
+  PROP_PLAY_LENGTH,
+  PROP_START_POSITION
 };
 
 static void ogmrip_codec_constructed  (GObject      *gobject);
@@ -87,7 +82,6 @@ ogmrip_codec_set_input (OGMRipCodec *codec, OGMDvdStream *input)
   codec->priv->input = input;
   codec->priv->title = ogmdvd_stream_get_title (input);
 
-  codec->priv->dirty = TRUE;
   codec->priv->start_chap = 0;
   codec->priv->end_chap = -1;
 }
@@ -118,10 +112,6 @@ ogmrip_codec_class_init (OGMRipCodecClass *klass)
         g_param_spec_string ("output", "Output property", "Set output file", 
            NULL, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
-  g_object_class_install_property (gobject_class, PROP_LENGTH, 
-        g_param_spec_double ("length", "Length property", "Get length", 
-           0.0, G_MAXDOUBLE, 0.0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-
   g_object_class_install_property (gobject_class, PROP_START_CHAPTER, 
         g_param_spec_int ("start-chapter", "Start chapter property", "Set start chapter", 
            0, G_MAXINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
@@ -129,6 +119,14 @@ ogmrip_codec_class_init (OGMRipCodecClass *klass)
   g_object_class_install_property (gobject_class, PROP_END_CHAPTER, 
         g_param_spec_int ("end-chapter", "End chapter property", "Set end chapter", 
            -1, G_MAXINT, -1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_PLAY_LENGTH, 
+        g_param_spec_double ("play-length", "Play length property", "Get play length", 
+           -1.0, G_MAXDOUBLE, -1.0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_START_POSITION, 
+        g_param_spec_double ("start-position", "Start position property", "Get start position", 
+           0.0, G_MAXDOUBLE, 0.0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipCodecPriv));
 }
@@ -140,7 +138,6 @@ ogmrip_codec_init (OGMRipCodec *codec)
 
   codec->priv->end_chap = -1;
   codec->priv->play_length = -1.0;
-  codec->priv->start_second = -1.0;
 }
 
 static void
@@ -175,9 +172,6 @@ ogmrip_codec_finalize (GObject *gobject)
 
   if (codec->priv->output)
   {
-    if (codec->priv->do_unlink && g_file_test (codec->priv->output, G_FILE_TEST_IS_REGULAR))
-      g_unlink (codec->priv->output);
-
     g_free (codec->priv->output);
     codec->priv->output = NULL;
   }
@@ -204,6 +198,12 @@ ogmrip_codec_set_property (GObject *gobject, guint property_id, const GValue *va
     case PROP_END_CHAPTER: 
       ogmrip_codec_set_chapters (codec, codec->priv->start_chap, g_value_get_int (value));
       break;
+    case PROP_PLAY_LENGTH:
+      ogmrip_codec_set_play_length (codec, g_value_get_double (value));
+      break;
+    case PROP_START_POSITION:
+      ogmrip_codec_set_start_position (codec, g_value_get_double (value));
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
@@ -223,14 +223,17 @@ ogmrip_codec_get_property (GObject *gobject, guint property_id, GValue *value, G
     case PROP_OUTPUT:
       g_value_set_string (value, codec->priv->output);
       break;
-    case PROP_LENGTH: 
-      g_value_set_double (value, ogmrip_codec_get_length (codec, NULL));
-      break;
     case PROP_START_CHAPTER: 
       g_value_set_int (value, codec->priv->start_chap);
       break;
     case PROP_END_CHAPTER: 
       g_value_set_int (value, codec->priv->end_chap);
+      break;
+    case PROP_PLAY_LENGTH:
+      g_value_set_double (value, codec->priv->play_length);
+      break;
+    case PROP_START_POSITION:
+      g_value_set_double (value, codec->priv->start_position);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -321,11 +324,6 @@ ogmrip_codec_set_chapters (OGMRipCodec *codec, guint start, gint end)
 
   codec->priv->start_chap = MIN ((gint) start, nchap - 1);
   codec->priv->end_chap = CLAMP (end, (gint) start, nchap - 1);
-
-  codec->priv->start_second = -1.0;
-  codec->priv->play_length = -1.0;
-
-  codec->priv->dirty = TRUE;
 }
 
 /**
@@ -375,37 +373,37 @@ ogmrip_codec_sec_to_time (gdouble length, gdouble fps, OGMDvdTime *dtime)
  * Returns: the length in seconds, or -1.0
  */
 gdouble
-ogmrip_codec_get_length (OGMRipCodec *codec, OGMDvdTime *length)
+ogmrip_codec_get_length (OGMRipCodec *codec, OGMDvdTime *time_)
 {
+  gint nchap;
+
   g_return_val_if_fail (OGMRIP_IS_CODEC (codec), -1.0);
 
   if (!codec->priv->title)
     return -1.0;
 
-  if (codec->priv->dirty)
+  if (codec->priv->play_length > 0.0)
   {
+    gdouble length;
     guint num, denom;
 
+    length = codec->priv->play_length;
+
     ogmdvd_video_stream_get_framerate (ogmdvd_title_get_video_stream (codec->priv->title), &num, &denom);
+    ogmrip_codec_sec_to_time (length, num / (gdouble) denom, time_);
 
-    if (codec->priv->play_length > 0.0)
-    {
-      codec->priv->length = codec->priv->play_length;
-      ogmrip_codec_sec_to_time (codec->priv->play_length, num / (gdouble) denom, &codec->priv->time_);
-    }
-    else if (codec->priv->start_chap == 0 && codec->priv->end_chap == -1)
-      codec->priv->length = ogmdvd_title_get_length (codec->priv->title, &codec->priv->time_);
-    else
-      codec->priv->length = ogmdvd_title_get_chapters_length (codec->priv->title, 
-            codec->priv->start_chap, codec->priv->end_chap, &codec->priv->time_);
-
-    codec->priv->dirty = FALSE;
+    return length;
   }
 
-  if (length)
-    *length = codec->priv->time_;
+  nchap = ogmdvd_title_get_n_chapters (codec->priv->title);
 
-  return codec->priv->length;
+  if (codec->priv->start_chap == 0 &&
+      (codec->priv->end_chap == -1 ||
+       codec->priv->end_chap == nchap - 1))
+    return ogmdvd_title_get_length (codec->priv->title, time_);
+
+  return ogmdvd_title_get_chapters_length (codec->priv->title,
+      codec->priv->start_chap, codec->priv->end_chap, time_);
 }
 
 /**
@@ -421,12 +419,7 @@ ogmrip_codec_set_play_length (OGMRipCodec *codec, gdouble length)
   g_return_if_fail (OGMRIP_IS_CODEC (codec));
   g_return_if_fail (length > 0.0);
 
-  codec->priv->start_chap = 0;
-  codec->priv->end_chap = -1;
-
   codec->priv->play_length = length;
-
-  codec->priv->dirty = TRUE;
 }
 
 /**
@@ -458,10 +451,7 @@ ogmrip_codec_set_start_position (OGMRipCodec *codec, gdouble start)
   g_return_if_fail (OGMRIP_IS_CODEC (codec));
   g_return_if_fail (start >= 0.0);
 
-  codec->priv->start_chap = 0;
-  codec->priv->end_chap = -1;
-
-  codec->priv->start_second = start;
+  codec->priv->start_position = start;
 }
 
 /**
@@ -477,6 +467,6 @@ ogmrip_codec_get_start_position (OGMRipCodec *codec)
 {
   g_return_val_if_fail (OGMRIP_IS_CODEC (codec), -1);
 
-  return codec->priv->start_second;
+  return codec->priv->start_position;
 }
 
