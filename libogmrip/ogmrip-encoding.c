@@ -153,7 +153,7 @@ ogmrip_encoding_class_init (OGMRipEncodingClass *klass)
 
   g_object_class_install_property (gobject_class, PROP_COPY, 
         g_param_spec_boolean ("copy", "Copy property", "Set copy", 
-           TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+           FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_LOG_FILE, 
         g_param_spec_string ("log-file", "Log file property", "Set the log file", 
@@ -695,6 +695,18 @@ ogmrip_encoding_set_copy (OGMRipEncoding *encoding, gboolean copy)
 {
   g_return_if_fail (OGMRIP_IS_ENCODING (encoding));
 
+  if (copy)
+  {
+    OGMDvdDisc *disc;
+    struct stat buf;
+
+    disc = ogmdvd_title_get_disc (encoding->priv->title);
+
+    copy = FALSE;
+    if (g_stat (ogmdvd_disc_get_device (disc), &buf) == 0)
+      copy = S_ISBLK (buf.st_mode);
+  }
+
   encoding->priv->copy = copy;
 
   g_object_notify (G_OBJECT (encoding), "copy");
@@ -1138,6 +1150,12 @@ ogmrip_encoding_check_space (OGMRipEncoding *encoding, guint64 output_size, guin
   return retval;
 }
 
+static void
+ogmrip_encoding_task_progressed (OGMRipEncoding *encoding, gdouble fraction, OGMJobSpawn *spawn)
+{
+  g_signal_emit (encoding, signals[PROGRESS], 0, spawn, fraction);
+}
+
 static gint
 ogmrip_encoding_copy (OGMRipEncoding *encoding, GError **error)
 {
@@ -1153,6 +1171,8 @@ ogmrip_encoding_copy (OGMRipEncoding *encoding, GError **error)
     return OGMJOB_RESULT_ERROR;
 
   spawn = ogmrip_copy_new (disc, output);
+  g_signal_connect_swapped (spawn, "progress",
+      G_CALLBACK (ogmrip_encoding_task_progressed), encoding);
 
   g_signal_emit (encoding, signals[RUN], 0, spawn);
   result = ogmjob_spawn_run (OGMJOB_SPAWN (spawn), error);
@@ -1170,6 +1190,8 @@ ogmrip_encoding_analyze (OGMRipEncoding *encoding, GError **error)
   gboolean result;
 
   spawn = ogmrip_analyze_new (encoding->priv->title);
+  g_signal_connect_swapped (spawn, "progress",
+      G_CALLBACK (ogmrip_encoding_task_progressed), encoding);
 
   g_signal_emit (encoding, signals[RUN], 0, spawn);
   result = ogmjob_spawn_run (OGMJOB_SPAWN (spawn), error);
@@ -1232,9 +1254,15 @@ ogmrip_encoding_run_codec (OGMRipEncoding *encoding, OGMRipCodec *codec, GError 
   ogmrip_codec_set_output (codec, output);
   g_free (output);
 
+  g_signal_connect_swapped (codec, "progress",
+      G_CALLBACK (ogmrip_encoding_task_progressed), encoding);
+
   g_signal_emit (encoding, signals[RUN], 0, codec);
   result = ogmjob_spawn_run (OGMJOB_SPAWN (codec), error);
   g_signal_emit (encoding, signals[COMPLETE], 0, codec, result);
+
+  g_signal_handlers_disconnect_by_func (codec,
+      ogmrip_encoding_task_progressed, encoding);
 
   if (result != OGMJOB_RESULT_SUCCESS)
     return result;
@@ -1274,9 +1302,15 @@ ogmrip_encoding_merge (OGMRipEncoding *encoding, GError **error)
 {
   gint result;
 
+  g_signal_connect_swapped (encoding->priv->container, "progress",
+      G_CALLBACK (ogmrip_encoding_task_progressed), encoding);
+
   g_signal_emit (encoding, signals[RUN], 0, encoding->priv->container);
   result = ogmjob_spawn_run (OGMJOB_SPAWN (encoding->priv->container), error);
   g_signal_emit (encoding, signals[COMPLETE], 0, encoding->priv->container, result);
+
+  g_signal_handlers_disconnect_by_func (encoding->priv->container,
+      ogmrip_encoding_task_progressed, encoding);
 
   return result;
 }
