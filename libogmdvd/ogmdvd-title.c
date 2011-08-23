@@ -974,7 +974,8 @@ ogmdvd_title_analyze (OGMDvdTitle *title, GCancellable *cancellable, OGMDvdTitle
   if (!title->video_stream->crop_h)
     ogmdvd_video_stream_get_resolution (title->video_stream, NULL, &title->video_stream->crop_h);
 
-  ogmdvd_title_close (title);
+  if (!is_open)
+    ogmdvd_title_close (title);
 
   title->analyzed = TRUE;
 
