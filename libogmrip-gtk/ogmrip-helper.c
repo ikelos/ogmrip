@@ -780,6 +780,9 @@ ogmrip_open_title (GtkWindow *parent, OGMDvdTitle *title)
   if (ogmdvd_title_is_open (title))
     return TRUE;
 
+  if (ogmdvd_title_open (title, &error))
+    return TRUE;
+
   monitor = ogmdvd_monitor_get_default ();
   drive = ogmdvd_monitor_get_drive (monitor,
       ogmdvd_disc_get_device (ogmdvd_title_get_disc (title)));
