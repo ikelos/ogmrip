@@ -334,7 +334,7 @@ ogmrip_main_clean (OGMRipData *data, OGMRipEncoding *encoding, gboolean error)
       g_unlink (filename);
   }
 
-  if (g_settings_get_boolean (settings, OGMRIP_SETTINGS_COPY_DVD))
+  if (ogmrip_encoding_get_copy (encoding))
   {
     guint after;
 
@@ -454,6 +454,8 @@ ogmrip_main_encode (OGMRipData *data, OGMRipEncoding *encoding)
     gtk_window_present (GTK_WINDOW (dialog));
 
     result = ogmrip_encoding_encode (encoding, &error);
+
+    gtk_widget_destroy (dialog);
 
     ogmrip_main_clean (data, encoding, result == OGMJOB_RESULT_ERROR);
 
@@ -673,14 +675,7 @@ ogmrip_main_add_subp_chooser (OGMRipData *data)
         g_settings_get_uint (settings, OGMRIP_SETTINGS_PREF_SUBP));
 
     if (!ogmrip_source_chooser_get_active (OGMRIP_SOURCE_CHOOSER (chooser), NULL))
-    {
-      OGMDvdSubpStream *stream = NULL;
-
-      if (ogmdvd_title_get_n_subp_streams (title) > 0)
-        stream = ogmdvd_title_get_nth_subp_stream (title, 0);
-
-      ogmrip_source_chooser_set_active (OGMRIP_SOURCE_CHOOSER (chooser), (OGMRipSource *) stream);
-    }
+      ogmrip_source_chooser_set_active (OGMRIP_SOURCE_CHOOSER (chooser), NULL);
   }
 
   g_signal_connect_swapped (chooser, "add-clicked",
@@ -1135,9 +1130,6 @@ ogmrip_main_extract_activated (OGMRipData *data)
 
   ogmrip_chapter_list_get_selected (OGMRIP_CHAPTER_LIST (data->chapter_list), &start_chap, &end_chap);
 
-  /*
-   * TODO compressibility test
-   */
 
   codec = ogmrip_main_create_video_codec (data, profile,
       ogmdvd_title_get_video_stream (title), start_chap, end_chap);
