@@ -29,6 +29,7 @@
 #include <ogmrip-options-plugin.h>
 #include <ogmrip-profile-editor-dialog.h>
 #include <ogmrip-profile-manager-dialog.h>
+#include <ogmrip-progress-dialog.h>
 #include <ogmrip-subp-chooser-widget.h>
 #include <ogmrip-subp-file-chooser-dialog.h>
 

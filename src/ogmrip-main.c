@@ -26,7 +26,6 @@
 
 #include "ogmrip-options-dialog.h"
 #include "ogmrip-pref-dialog.h"
-#include "ogmrip-progress-dialog.h"
 
 #ifdef HAVE_ENCHANT_SUPPORT
 #include "ogmrip-spell-dialog.h"
@@ -115,7 +114,7 @@ ogmrip_main_spell_check (OGMRipData *data, const gchar *filename, gint lang)
   }
 
   gtk_window_set_parent (GTK_WINDOW (dialog), GTK_WINDOW (data->window));
-  gtk_widget_show (dialog);
+  gtk_window_present (GTK_WINDOW (dialog));
 
   do
   {
@@ -197,7 +196,7 @@ ogmrip_main_dbus_inhibit (OGMRipData *data)
   }
 
   res = dbus_g_proxy_call (proxy, "Inhibit", &error,
-      G_TYPE_STRING, "Brasero",
+      G_TYPE_STRING, "OGMRip",
       G_TYPE_UINT, GDK_WINDOW_XID (gtk_widget_get_window (data->window)),
       G_TYPE_STRING, "Encoding",
       G_TYPE_UINT, 1 | 4,
@@ -430,6 +429,76 @@ ogmrip_main_display_error (OGMRipData *data, OGMRipEncoding *encoding, GError *e
   gtk_widget_destroy (dialog);
 }
 
+static void
+ogmrip_main_encoding_spawn_run (OGMRipEncoding *encoding, OGMJobSpawn *spawn, OGMRipProgressDialog *dialog)
+{
+  OGMDvdStream *stream;
+  gchar *message;
+
+  if (spawn)
+  {
+    if (OGMRIP_IS_VIDEO_CODEC (spawn))
+      ogmrip_progress_dialog_set_message (dialog, _("Encoding video title"));
+    else if (OGMRIP_IS_CHAPTERS (spawn))
+      ogmrip_progress_dialog_set_message (dialog, _("Extracting chapters information"));
+    else if (OGMRIP_IS_CONTAINER (spawn))
+      ogmrip_progress_dialog_set_message (dialog, _("Merging audio and video streams"));
+    else if (OGMRIP_IS_COPY (spawn))
+      ogmrip_progress_dialog_set_message (dialog, _("DVD backup"));
+    else if (OGMRIP_IS_ANALYZE (spawn))
+      ogmrip_progress_dialog_set_message (dialog, _("Analyzing video stream"));
+    else if (OGMRIP_IS_TEST (spawn))
+      ogmrip_progress_dialog_set_message (dialog, _("Running the compressibility test"));
+    else if (OGMRIP_IS_AUDIO_CODEC (spawn))
+    {
+      stream = ogmrip_codec_get_input (OGMRIP_CODEC (spawn));
+      message = g_strdup_printf (_("Extracting audio stream %d"), ogmdvd_stream_get_nr (stream) + 1);
+      ogmrip_progress_dialog_set_message (dialog, message);
+      g_free (message);
+    }
+    else if (OGMRIP_IS_SUBP_CODEC (spawn))
+    {
+      stream = ogmrip_codec_get_input (OGMRIP_CODEC (spawn));
+      message = g_strdup_printf (_("Extracting subtitle stream %d"), ogmdvd_stream_get_nr (stream) + 1);
+      ogmrip_progress_dialog_set_message (dialog, message);
+      g_free (message);
+    }
+  }
+
+  ogmrip_progress_dialog_set_fraction (dialog, 0.0);
+}
+
+static void
+ogmrip_main_encoding_spawn_progress (OGMRipEncoding *encoding, OGMJobSpawn *spawn, gdouble fraction, OGMRipProgressDialog *dialog)
+{
+  ogmrip_progress_dialog_set_fraction (dialog, fraction);
+}
+
+static void
+ogmrip_main_progress_dialog_response (GtkWidget *parent, gint response_id, OGMRipEncoding *encoding)
+{
+  GtkWidget *dialog;
+
+  switch (response_id)
+  {
+    case OGMRIP_RESPONSE_SUSPEND:
+      ogmrip_encoding_suspend (encoding);
+      break;
+    case OGMRIP_RESPONSE_RESUME:
+      ogmrip_encoding_resume (encoding);
+      break;
+    default:
+      dialog = gtk_message_dialog_new (GTK_WINDOW (parent),
+          GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+          GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
+          _("Are you sure you want to cancel the encoding process?"));
+      if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES)
+        ogmrip_encoding_cancel (encoding);
+      gtk_widget_destroy (dialog);
+      break;
+  }
+}
+
 /*
  * Encodes an encoding
  */
@@ -448,12 +517,29 @@ ogmrip_main_encode (OGMRipData *data, OGMRipEncoding *encoding)
     cookie = ogmrip_main_dbus_inhibit (data);
 #endif /* HAVE_DBUS_SUPPORT */
 
-    dialog = ogmrip_progress_dialog_new (encoding);
-    gtk_window_set_parent (GTK_WINDOW (dialog), GTK_WINDOW (data->window));
-    gtk_window_set_modal (GTK_WINDOW (dialog), TRUE);
+    dialog = ogmrip_progress_dialog_new (GTK_WINDOW (data->window),
+        GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT, TRUE);
+    ogmrip_progress_dialog_set_title (OGMRIP_PROGRESS_DIALOG (dialog),
+        ogmrip_container_get_label (ogmrip_encoding_get_container (encoding)));
+
+    g_signal_connect (dialog, "response",
+        G_CALLBACK (ogmrip_main_progress_dialog_response), encoding);
+    g_signal_connect (dialog, "delete-event",
+        G_CALLBACK (gtk_true), NULL);
+
     gtk_window_present (GTK_WINDOW (dialog));
 
+    g_signal_connect (encoding, "run",
+        G_CALLBACK (ogmrip_main_encoding_spawn_run), dialog);
+    g_signal_connect (encoding, "progress",
+        G_CALLBACK (ogmrip_main_encoding_spawn_progress), dialog);
+
     result = ogmrip_encoding_encode (encoding, &error);
+
+    g_signal_handlers_disconnect_by_func (encoding,
+        ogmrip_main_encoding_spawn_run, dialog);
+    g_signal_handlers_disconnect_by_func (encoding,
+        ogmrip_main_encoding_spawn_progress, dialog);
 
     gtk_widget_destroy (dialog);
 
@@ -1129,7 +1215,6 @@ ogmrip_main_extract_activated (OGMRipData *data)
   g_object_unref (container);
 
   ogmrip_chapter_list_get_selected (OGMRIP_CHAPTER_LIST (data->chapter_list), &start_chap, &end_chap);
-
 
   codec = ogmrip_main_create_video_codec (data, profile,
       ogmdvd_title_get_video_stream (title), start_chap, end_chap);
@@ -1926,7 +2011,7 @@ main (int argc, char *argv[])
     }
   }
 
-  gtk_widget_show (data->window);
+  gtk_window_present (GTK_WINDOW (data->window));
 
   gtk_main ();
 

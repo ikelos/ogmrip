@@ -14,6 +14,7 @@ libogmrip_gtk_la_SOURCES =           \
   ogmrip-options-plugin.c            \
   ogmrip-profile-editor-dialog.c     \
   ogmrip-profile-manager-dialog.c    \
+  ogmrip-progress-dialog.c           \
   ogmrip-source-chooser.c            \
   ogmrip-source-chooser-widget.c     \
   ogmrip-subp-chooser-widget.c       \
@@ -37,6 +38,7 @@ libogmrip_gtk_la_HEADERS =           \
   ogmrip-options-plugin.h            \
   ogmrip-profile-editor-dialog.h     \
   ogmrip-profile-manager-dialog.h    \
+  ogmrip-progress-dialog.h           \
   ogmrip-source-chooser.h            \
   ogmrip-source-chooser-widget.h     \
   ogmrip-subp-chooser-widget.h       \

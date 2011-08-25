@@ -21,6 +21,7 @@
 #endif
 
 #include "ogmrip-progress-dialog.h"
+#include "ogmrip-helper.h"
 
 #include <glib/gi18n.h>
 
@@ -37,50 +38,24 @@
 
 struct _OGMRipProgressDialogPriv
 {
-  OGMRipEncoding *encoding;
-
   GtkWidget *title_label;
-  GtkWidget *stage_label;
+  GtkWidget *message_label;
   GtkWidget *eta_label;
-  GtkWidget *stage_progress;
+  GtkWidget *progress;
   GtkWidget *popup_menu;
 
   GtkStatusIcon *status_icon;
-
-  gchar *title;
-  gchar *label;
-
   gboolean iconified;
+
+  gulong start_time;
+  gulong suspend_time;
 
 #ifdef HAVE_LIBNOTIFY_SUPPORT
   NotifyNotification *notification;
 #endif /* HAVE_LIBNOTIFY_SUPPORT */
-
 };
 
-enum
-{
-  PROP_0,
-  PROP_ENCODING
-};
-
-enum
-{
-  OGMRIP_RESPONSE_CANCEL_ALL,
-  OGMRIP_RESPONSE_SUSPEND,
-  OGMRIP_RESPONSE_RESUME,
-  OGMRIP_RESPONSE_QUIT
-};
-
-static void ogmrip_progress_dialog_dispose      (GObject      *gobject);
-static void ogmrip_progress_dialog_get_property (GObject      *gobject,
-                                                 guint        property_id,
-                                                 GValue       *value,
-                                                 GParamSpec   *pspec);
-static void ogmrip_progress_dialog_set_property (GObject      *gobject,
-                                                 guint        property_id,
-                                                 const GValue *value,
-                                                 GParamSpec   *pspec);
+static void ogmrip_progress_dialog_dispose (GObject *gobject);
 
 static const GtkActionEntry action_entries[] =
 {
@@ -122,77 +97,6 @@ ogmrip_progress_dialog_get_visibility (OGMRipProgressDialog *dialog)
 }
 #endif
 
-static void
-ogmrip_progress_dialog_set_label (OGMRipProgressDialog *dialog, const gchar *label)
-{
-  gchar *str;
-
-  if (dialog->priv->label)
-    g_free (dialog->priv->label);
-  dialog->priv->label = g_strdup (label);
-
-  str = g_strdup_printf ("<i>%s</i>", label);
-  gtk_label_set_markup (GTK_LABEL (dialog->priv->stage_label), str);
-  g_free (str);
-
-#ifdef HAVE_LIBNOTIFY_SUPPORT
-  if (dialog->priv->notification && !ogmrip_progress_dialog_get_visibility (dialog))
-  {
-    g_object_set (dialog->priv->notification, "body", label, NULL);
-    notify_notification_show (dialog->priv->notification, NULL);
-  }
-#endif
-}
-
-static void
-ogmrip_progress_dialog_encoding_run (OGMRipProgressDialog *dialog, OGMJobSpawn *spawn, OGMRipEncoding *encoding)
-{
-  OGMDvdStream *stream;
-  gchar *message;
-
-  if (spawn)
-  {
-    if (OGMRIP_IS_VIDEO_CODEC (spawn))
-      ogmrip_progress_dialog_set_label (dialog, _("Encoding video title"));
-    else if (OGMRIP_IS_CHAPTERS (spawn))
-      ogmrip_progress_dialog_set_label (dialog, _("Extracting chapters information"));
-    else if (OGMRIP_IS_CONTAINER (spawn))
-      ogmrip_progress_dialog_set_label (dialog, _("Merging audio and video streams"));
-    else if (OGMRIP_IS_COPY (spawn))
-      ogmrip_progress_dialog_set_label (dialog, _("DVD backup"));
-    else if (OGMRIP_IS_ANALYZE (spawn))
-      ogmrip_progress_dialog_set_label (dialog, _("Analyzing video stream"));
-    else if (OGMRIP_IS_AUDIO_CODEC (spawn))
-    {
-      stream = ogmrip_codec_get_input (OGMRIP_CODEC (spawn));
-      message = g_strdup_printf (_("Extracting audio stream %d"), ogmdvd_stream_get_nr (stream) + 1);
-      ogmrip_progress_dialog_set_label (dialog, message);
-      g_free (message);
-    }
-    else if (OGMRIP_IS_SUBP_CODEC (spawn))
-    {
-      stream = ogmrip_codec_get_input (OGMRIP_CODEC (spawn));
-      message = g_strdup_printf (_("Extracting subtitle stream %d"), ogmdvd_stream_get_nr (stream) + 1);
-      ogmrip_progress_dialog_set_label (dialog, message);
-      g_free (message);
-    }
-  }
-
-  gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (dialog->priv->stage_progress), 0);
-}
-
-static void
-ogmrip_progress_dialog_encoding_progress (OGMRipProgressDialog *dialog, OGMJobSpawn *spawn, gdouble fraction, OGMRipEncoding *encoding)
-{
-  gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (dialog->priv->stage_progress), CLAMP (fraction, 0.0, 1.0));
-}
-
-static void
-ogmrip_progress_dialog_cancel_menu_activated (OGMRipProgressDialog *dialog)
-{
-  gtk_dialog_response (GTK_DIALOG (dialog), GTK_RESPONSE_CANCEL);
-}
-
 static gboolean
 ogmrip_progress_dialog_state_changed (OGMRipProgressDialog *dialog, GdkEventWindowState *event)
 {
@@ -208,21 +112,38 @@ ogmrip_progress_dialog_iconify (OGMRipProgressDialog *dialog)
 }
 
 static void
+ogmrip_progress_dialog_suspend (OGMRipProgressDialog *dialog)
+{
+  GTimeVal tv;
+
+  g_get_current_time (&tv);
+  dialog->priv->suspend_time = tv.tv_sec;
+
+  gtk_dialog_response (GTK_DIALOG (dialog), OGMRIP_RESPONSE_SUSPEND);
+}
+
+static void
+ogmrip_progress_dialog_resume (OGMRipProgressDialog *dialog)
+{
+  GTimeVal tv;
+
+  g_get_current_time (&tv);
+  dialog->priv->start_time += tv.tv_sec - dialog->priv->suspend_time;
+
+  gtk_dialog_response (GTK_DIALOG (dialog), OGMRIP_RESPONSE_RESUME);
+}
+
+static void
+ogmrip_progress_dialog_cancel (OGMRipProgressDialog *dialog)
+{
+  gtk_dialog_response (GTK_DIALOG (dialog), GTK_RESPONSE_CANCEL);
+}
+
+static void
 ogmrip_progress_dialog_status_icon_popup_menu (OGMRipProgressDialog *dialog, guint button, guint activate_time)
 {
   gtk_menu_popup (GTK_MENU (dialog->priv->popup_menu), NULL, NULL, gtk_status_icon_position_menu,
       dialog->priv->status_icon, button, activate_time);
-}
-
-static void
-ogmrip_progress_dialog_set_encoding (OGMRipProgressDialog *dialog, OGMRipEncoding *encoding)
-{
-  dialog->priv->encoding = g_object_ref (encoding);
-
-  g_signal_connect_swapped (encoding, "run",
-      G_CALLBACK (ogmrip_progress_dialog_encoding_run), dialog);
-  g_signal_connect_swapped (encoding, "progress",
-      G_CALLBACK (ogmrip_progress_dialog_encoding_progress), dialog);
 }
 
 G_DEFINE_TYPE (OGMRipProgressDialog, ogmrip_progress_dialog, GTK_TYPE_DIALOG)
@@ -234,12 +155,6 @@ ogmrip_progress_dialog_class_init (OGMRipProgressDialogClass *klass)
   
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->dispose = ogmrip_progress_dialog_dispose;
-  gobject_class->get_property = ogmrip_progress_dialog_get_property;
-  gobject_class->set_property = ogmrip_progress_dialog_set_property;
-
-  g_object_class_install_property (gobject_class, PROP_ENCODING,
-      g_param_spec_object ("encoding", "Encoding property", "Set encoding",
-        OGMRIP_TYPE_ENCODING, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipProgressDialogPriv));
 }
@@ -250,7 +165,6 @@ ogmrip_progress_dialog_init (OGMRipProgressDialog *dialog)
   GError *error = NULL;
 
   GtkWidget *area, *root, *button, *image;
-  GtkSizeGroup *group;
   GtkBuilder *builder;
 
   GtkAction *action;
@@ -273,14 +187,11 @@ ogmrip_progress_dialog_init (OGMRipProgressDialog *dialog)
   g_signal_connect (dialog, "window-state-event",
       G_CALLBACK (ogmrip_progress_dialog_state_changed), NULL);
 
-  group = gtk_size_group_new (GTK_SIZE_GROUP_HORIZONTAL);
-
   area = gtk_dialog_get_action_area (GTK_DIALOG (dialog));
   gtk_button_box_set_layout (GTK_BUTTON_BOX (area), GTK_BUTTONBOX_EDGE);
 
   gtk_window_set_title (GTK_WINDOW (dialog), _("Progress"));
   gtk_window_set_default_size (GTK_WINDOW (dialog), 450, -1);
-  gtk_window_set_icon_from_stock (GTK_WINDOW (dialog), GTK_STOCK_EXECUTE);
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CANCEL);
 
   area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
@@ -309,7 +220,6 @@ ogmrip_progress_dialog_init (OGMRipProgressDialog *dialog)
 
   button = gtk_button_new_with_mnemonic (_("Resume"));
   gtk_dialog_add_action_widget (GTK_DIALOG (dialog), button, OGMRIP_RESPONSE_RESUME);
-  gtk_size_group_add_widget (group, button);
 
   image = gtk_image_new_from_stock (GTK_STOCK_MEDIA_PLAY, GTK_ICON_SIZE_BUTTON);
   gtk_button_set_image (GTK_BUTTON (button), image);
@@ -317,10 +227,12 @@ ogmrip_progress_dialog_init (OGMRipProgressDialog *dialog)
   action = gtk_action_group_get_action (action_group, "Resume");
   g_object_bind_property (button, "visible", action, "visible", G_BINDING_SYNC_CREATE);
 
+  g_signal_connect_swapped (action, "activate", G_CALLBACK (ogmrip_progress_dialog_resume), dialog);
+
   button = gtk_button_new_with_mnemonic (_("Suspend"));
   gtk_dialog_add_action_widget (GTK_DIALOG (dialog), button, OGMRIP_RESPONSE_SUSPEND);
-  gtk_size_group_add_widget (group, button);
-  gtk_widget_show (button);
+
+  g_signal_connect_swapped (action, "activate", G_CALLBACK (ogmrip_progress_dialog_suspend), dialog);
 
   image = gtk_image_new_from_stock (GTK_STOCK_MEDIA_PAUSE, GTK_ICON_SIZE_BUTTON);
   gtk_button_set_image (GTK_BUTTON (button), image);
@@ -328,9 +240,11 @@ ogmrip_progress_dialog_init (OGMRipProgressDialog *dialog)
   action = gtk_action_group_get_action (action_group, "Suspend");
   g_object_bind_property (button, "visible", action, "visible", G_BINDING_SYNC_CREATE);
 
-  button = gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
-  g_signal_connect_swapped (button, "clicked", 
-      G_CALLBACK (ogmrip_progress_dialog_cancel_menu_activated), dialog);
+  gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
+
+  action = gtk_action_group_get_action (action_group, "Cancel");
+
+  g_signal_connect_swapped (action, "activate", G_CALLBACK (ogmrip_progress_dialog_cancel), dialog);
 
   dialog->priv->status_icon = gtk_status_icon_new_from_file (OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_ICON_FILE);
   g_signal_connect_swapped (dialog->priv->status_icon, "popup_menu",
@@ -341,9 +255,10 @@ ogmrip_progress_dialog_init (OGMRipProgressDialog *dialog)
 #endif /* HAVE_LIBNOTIFY_SUPPORT */
 
   dialog->priv->title_label = gtk_builder_get_widget (builder, "title-label");
-  dialog->priv->stage_label = gtk_builder_get_widget (builder, "stage-label");
-  dialog->priv->stage_progress = gtk_builder_get_widget (builder, "stage-progress");
+  dialog->priv->message_label = gtk_builder_get_widget (builder, "message-label");
   dialog->priv->eta_label = gtk_builder_get_widget (builder, "eta-label");
+
+  dialog->priv->progress = gtk_builder_get_widget (builder, "progressbar");
 
   g_object_unref (builder);
 }
@@ -352,29 +267,6 @@ static void
 ogmrip_progress_dialog_dispose (GObject *gobject)
 {
   OGMRipProgressDialog *dialog = OGMRIP_PROGRESS_DIALOG (gobject);
-
-  if (dialog->priv->encoding)
-  {
-    g_signal_handlers_disconnect_by_func (dialog->priv->encoding,
-        ogmrip_progress_dialog_encoding_run, dialog);
-    g_signal_handlers_disconnect_by_func (dialog->priv->encoding,
-        ogmrip_progress_dialog_encoding_progress, dialog);
-
-    g_object_unref (dialog->priv->encoding);
-    dialog->priv->encoding = NULL;
-  }
-
-  if (dialog->priv->title)
-  {
-    g_free (dialog->priv->title);
-    dialog->priv->title = NULL;
-  }
-
-  if (dialog->priv->label)
-  {
-    g_free (dialog->priv->label);
-    dialog->priv->label = NULL;
-  }
 
   if (dialog->priv->status_icon)
   {
@@ -393,49 +285,121 @@ ogmrip_progress_dialog_dispose (GObject *gobject)
   G_OBJECT_CLASS (ogmrip_progress_dialog_parent_class)->dispose (gobject);
 }
 
-static void
-ogmrip_progress_dialog_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
-{
-  OGMRipProgressDialog *dialog = OGMRIP_PROGRESS_DIALOG (gobject);
-
-  switch (property_id)
-  {
-    case PROP_ENCODING:
-      g_value_set_object (value, dialog->priv->encoding);
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
-      break;
-  }
-}
-
-static void
-ogmrip_progress_dialog_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
-{
-  OGMRipProgressDialog *dialog = OGMRIP_PROGRESS_DIALOG (gobject);
-
-  switch (property_id)
-  {
-    case PROP_ENCODING:
-      ogmrip_progress_dialog_set_encoding (dialog, g_value_get_object (value));
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
-      break;
-  }
-}
-
 GtkWidget *
-ogmrip_progress_dialog_new (OGMRipEncoding *encoding)
+ogmrip_progress_dialog_new (GtkWindow *parent, GtkDialogFlags flags, gboolean can_suspend)
 {
-  g_return_val_if_fail (OGMRIP_IS_ENCODING (encoding), NULL);
+  GtkWidget *dialog, *button;
 
-  return g_object_new (OGMRIP_TYPE_PROGRESS_DIALOG, "encoding", encoding, NULL);
+  dialog = g_object_new (OGMRIP_TYPE_PROGRESS_DIALOG, NULL);
+
+  if (parent)
+    gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (parent));
+
+  if (flags & GTK_DIALOG_MODAL)
+    gtk_window_set_modal (GTK_WINDOW (dialog), TRUE);
+
+  if (flags & GTK_DIALOG_DESTROY_WITH_PARENT)
+    gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
+
+  button = gtk_dialog_get_widget_for_response (GTK_DIALOG (dialog), OGMRIP_RESPONSE_SUSPEND);
+  gtk_widget_set_visible (button, can_suspend);
+
+  return dialog;
 }
 
-OGMRipEncoding *
-ogmrip_progress_dialog_get_encoding (OGMRipProgressDialog *dialog)
+void
+ogmrip_progress_dialog_set_title (OGMRipProgressDialog *dialog, const gchar *title)
 {
-  return dialog->priv->encoding;
+  g_return_if_fail (OGMRIP_IS_PROGRESS_DIALOG (dialog));
+
+  if (!title)
+    gtk_label_set_text (GTK_LABEL (dialog->priv->title_label), "");
+  else
+  {
+    gchar *str;
+
+    str = g_strdup_printf ("<big><b>%s</b></big>", title);
+    gtk_label_set_markup (GTK_LABEL (dialog->priv->title_label), str);
+    g_free (str);
+  }
+
+#ifdef HAVE_LIBNOTIFY_SUPPORT
+  notify_notification_update (dialog->priv->notification, title, "Dummy",
+      OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_ICON_FILE);
+#endif /* HAVE_LIBNOTIFY_SUPPORT */
+}
+
+void
+ogmrip_progress_dialog_set_message (OGMRipProgressDialog *dialog, const gchar *message)
+{
+  g_return_if_fail (OGMRIP_IS_PROGRESS_DIALOG (dialog));
+
+  if (!message)
+    gtk_label_set_text (GTK_LABEL (dialog->priv->message_label), "");
+  else
+  {
+    gchar *str;
+
+    str = g_strdup_printf ("<i>%s</i>", message);
+    gtk_label_set_markup (GTK_LABEL (dialog->priv->message_label), str);
+    g_free (str);
+  }
+
+#ifdef HAVE_LIBNOTIFY_SUPPORT
+  if (dialog->priv->notification && !ogmrip_progress_dialog_get_visibility (dialog))
+  {
+    g_object_set (dialog->priv->notification, "body", message, NULL);
+    notify_notification_show (dialog->priv->notification, NULL);
+  }
+#endif
+}
+
+void
+ogmrip_progress_dialog_set_fraction (OGMRipProgressDialog *dialog, gdouble fraction)
+{
+  GTimeVal tv;
+  gulong eta;
+  gchar *str;
+
+  g_return_if_fail (OGMRIP_IS_PROGRESS_DIALOG (dialog));
+
+  gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (dialog->priv->progress), fraction);
+
+  if (fraction <= 0.0)
+  {
+    g_get_current_time (&tv);
+    dialog->priv->start_time = tv.tv_sec;
+  }
+
+  g_get_current_time (&tv);
+  eta = (1.0 - fraction) * (tv.tv_sec - dialog->priv->start_time) / fraction;
+
+  if (eta >= 3600)
+    str = g_strdup_printf ("%ld hour(s) %ld minute(s)", eta / 3600, (eta % 3600) / 60);
+  else
+    str = g_strdup_printf ("%ld minute(s)", eta / 60);
+
+  gtk_label_set_text (GTK_LABEL (dialog->priv->eta_label), str);
+  g_free (str);
+
+  if (dialog->priv->status_icon)
+  {
+/*
+    str = g_strdup_printf (_("%s: %02.0lf%% done"), dialog->priv->label, fraction * 100);
+    gtk_status_icon_set_tooltip_text (dialog->priv->status_icon, str);
+    g_free (str);
+*/
+  }
+/*
+  parent = gtk_window_get_transient_for (GTK_WINDOW (dialog));
+  if (parent)
+  {
+    gchar *title;
+
+    title = g_strdup_printf ("OGMRip: %s: %.0f%%", dialog->priv->label, CLAMP (fraction, 0.0, 1.0) * 100);
+    gtk_window_set_title (parent, title);
+    g_free (title);
+  }
+*/
 }
 

@@ -19,7 +19,7 @@
 #ifndef __OGMRIP_PROGRESS_DIALOG_H__
 #define __OGMRIP_PROGRESS_DIALOG_H__
 
-#include <ogmrip-gtk.h>
+#include <gtk/gtk.h>
 
 G_BEGIN_DECLS
 
@@ -45,9 +45,22 @@ struct _OGMRipProgressDialogClass
   GtkDialogClass parent_class;
 };
 
-GType            ogmrip_progress_dialog_get_type     (void);
-GtkWidget *      ogmrip_progress_dialog_new          (OGMRipEncoding       *encoding);
-OGMRipEncoding * ogmrip_progress_dialog_get_encoding (OGMRipProgressDialog *dialog);
+enum
+{
+  OGMRIP_RESPONSE_SUSPEND,
+  OGMRIP_RESPONSE_RESUME
+};
+
+GType       ogmrip_progress_dialog_get_type     (void);
+GtkWidget * ogmrip_progress_dialog_new          (GtkWindow            *parent,
+                                                 GtkDialogFlags       flags,
+                                                 gboolean             can_suspend);
+void        ogmrip_progress_dialog_set_title    (OGMRipProgressDialog *dialog,
+                                                 const gchar          *title);
+void        ogmrip_progress_dialog_set_message  (OGMRipProgressDialog *dialog,
+                                                 const gchar          *message);
+void        ogmrip_progress_dialog_set_fraction (OGMRipProgressDialog *dialog,
+                                                 gdouble              fraction);
 
 G_END_DECLS
 
