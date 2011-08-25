@@ -50,6 +50,7 @@ struct _OGMRipEncodingPriv
 {
   OGMDvdTitle *title;
 
+  OGMRipEncodingMethod method;
   OGMRipProfile *profile;
   gchar *log_file;
 
@@ -60,6 +61,7 @@ struct _OGMRipEncodingPriv
   GList *chapters;
   GList *files;
 
+  gboolean ensure_sync;
   gboolean relative;
   gboolean autocrop;
   gboolean autoscale;
@@ -75,6 +77,8 @@ enum
   PROP_AUTOSCALE,
   PROP_CONTAINER,
   PROP_COPY,
+  PROP_ENSURE_SYNC,
+  PROP_METHOD,
   PROP_LOG_FILE,
   PROP_PROFILE,
   PROP_RELATIVE,
@@ -95,13 +99,13 @@ enum
 static void   ogmrip_encoding_constructed   (GObject      *gobject);
 static void   ogmrip_encoding_dispose       (GObject      *gobject);
 static void   ogmrip_encoding_finalize      (GObject      *gobject);
-static void   ogmrip_encoding_set_property  (GObject      *gobject,
-                                             guint        property_id,
-                                             const GValue *value,
-                                             GParamSpec   *pspec);
 static void   ogmrip_encoding_get_property  (GObject      *gobject,
                                              guint        property_id,
                                              GValue       *value,
+                                             GParamSpec   *pspec);
+static void   ogmrip_encoding_set_property  (GObject      *gobject,
+                                             guint        property_id,
+                                             const GValue *value,
                                              GParamSpec   *pspec);
 
 guint signals[LAST_SIGNAL] = { 0 };
@@ -155,9 +159,18 @@ ogmrip_encoding_class_init (OGMRipEncodingClass *klass)
         g_param_spec_boolean ("copy", "Copy property", "Set copy", 
            FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
+  g_object_class_install_property (gobject_class, PROP_ENSURE_SYNC, 
+        g_param_spec_boolean ("ensure-sync", "Ensure sync property", "Set ensure sync", 
+           TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_property (gobject_class, PROP_LOG_FILE, 
         g_param_spec_string ("log-file", "Log file property", "Set the log file", 
            NULL, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_METHOD, 
+        g_param_spec_uint ("method", "Method property", "Set the method", 
+           OGMRIP_ENCODING_SIZE, OGMRIP_ENCODING_QUANTIZER, OGMRIP_ENCODING_SIZE,
+           G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_PROFILE, 
         g_param_spec_object ("profile", "Profile property", "Set the profile", 
@@ -191,6 +204,7 @@ ogmrip_encoding_init (OGMRipEncoding *encoding)
 {
   encoding->priv = OGMRIP_ENCODING_GET_PRIVATE (encoding);
 
+  encoding->priv->ensure_sync = TRUE;
   encoding->priv->autocrop = TRUE;
   encoding->priv->autoscale = TRUE;
   encoding->priv->test = TRUE;
@@ -274,61 +288,6 @@ ogmrip_encoding_finalize (GObject *gobject)
 }
 
 static void
-ogmrip_encoding_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
-{
-  OGMRipEncoding *encoding = OGMRIP_ENCODING (gobject);
-
-  switch (property_id) 
-  {
-/*
-    case PROP_AUDIO_CODECS:
-      encoding->priv->audio_codecs = g_value_get_boxed (value);
-      break;
-*/
-    case PROP_AUTOCROP:
-      encoding->priv->autocrop = g_value_get_boolean (value);
-      break;
-    case PROP_AUTOSCALE:
-      encoding->priv->autoscale = g_value_get_boolean (value);
-      break;
-    case PROP_CONTAINER:
-      ogmrip_encoding_set_container (encoding, g_value_get_object (value));
-      break;
-    case PROP_COPY:
-      encoding->priv->copy = g_value_get_boolean (value);
-      break;
-    case PROP_LOG_FILE:
-      ogmrip_encoding_set_log_file (encoding, g_value_get_string (value));
-      break;
-    case PROP_PROFILE:
-      ogmrip_encoding_set_profile (encoding, g_value_get_object (value));
-      break;
-    case PROP_RELATIVE:
-      encoding->priv->relative = g_value_get_boolean (value);
-      break;
-/*
-    case PROP_SUBP_CODECS:
-      encoding->priv->subp_codecs = g_value_get_boxed (value);
-      break;
-*/
-    case PROP_TEST:
-      encoding->priv->test = g_value_get_boolean (value);
-      break;
-    case PROP_TITLE:
-      encoding->priv->title = g_value_get_pointer (value);
-      if (encoding->priv->title)
-        ogmdvd_title_ref (encoding->priv->title);
-      break;
-    case PROP_VIDEO_CODEC:
-      ogmrip_encoding_set_video_codec (encoding, g_value_get_object (value));
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
-      break;
-  }
-}
-
-static void
 ogmrip_encoding_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
 {
   OGMRipEncoding *encoding = OGMRIP_ENCODING (gobject);
@@ -352,8 +311,14 @@ ogmrip_encoding_get_property (GObject *gobject, guint property_id, GValue *value
     case PROP_COPY:
       g_value_set_boolean (value, encoding->priv->copy);
       break;
+    case PROP_ENSURE_SYNC:
+      g_value_set_boolean (value, encoding->priv->ensure_sync);
+      break;
     case PROP_LOG_FILE:
       g_value_set_string (value, encoding->priv->log_file);
+      break;
+    case PROP_METHOD:
+      g_value_set_uint (value, encoding->priv->method);
       break;
     case PROP_PROFILE:
       g_value_set_object (value, encoding->priv->profile);
@@ -374,6 +339,67 @@ ogmrip_encoding_get_property (GObject *gobject, guint property_id, GValue *value
       break;
     case PROP_VIDEO_CODEC:
       g_value_set_object (value, encoding->priv->video_codec);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
+      break;
+  }
+}
+
+static void
+ogmrip_encoding_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
+{
+  OGMRipEncoding *encoding = OGMRIP_ENCODING (gobject);
+
+  switch (property_id) 
+  {
+/*
+    case PROP_AUDIO_CODECS:
+      encoding->priv->audio_codecs = g_value_get_boxed (value);
+      break;
+*/
+    case PROP_AUTOCROP:
+      encoding->priv->autocrop = g_value_get_boolean (value);
+      break;
+    case PROP_AUTOSCALE:
+      encoding->priv->autoscale = g_value_get_boolean (value);
+      break;
+    case PROP_CONTAINER:
+      ogmrip_encoding_set_container (encoding, g_value_get_object (value));
+      break;
+    case PROP_COPY:
+      encoding->priv->copy = g_value_get_boolean (value);
+      break;
+    case PROP_ENSURE_SYNC:
+      encoding->priv->ensure_sync = g_value_get_boolean (value);
+      break;
+    case PROP_LOG_FILE:
+      ogmrip_encoding_set_log_file (encoding, g_value_get_string (value));
+      break;
+    case PROP_METHOD:
+      encoding->priv->method = g_value_get_uint (value);
+      break;
+    case PROP_PROFILE:
+      ogmrip_encoding_set_profile (encoding, g_value_get_object (value));
+      break;
+    case PROP_RELATIVE:
+      encoding->priv->relative = g_value_get_boolean (value);
+      break;
+/*
+    case PROP_SUBP_CODECS:
+      encoding->priv->subp_codecs = g_value_get_boxed (value);
+      break;
+*/
+    case PROP_TEST:
+      encoding->priv->test = g_value_get_boolean (value);
+      break;
+    case PROP_TITLE:
+      encoding->priv->title = g_value_get_pointer (value);
+      if (encoding->priv->title)
+        ogmdvd_title_ref (encoding->priv->title);
+      break;
+    case PROP_VIDEO_CODEC:
+      ogmrip_encoding_set_video_codec (encoding, g_value_get_object (value));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -712,6 +738,24 @@ ogmrip_encoding_set_copy (OGMRipEncoding *encoding, gboolean copy)
   g_object_notify (G_OBJECT (encoding), "copy");
 }
 
+gboolean
+ogmrip_encoding_get_ensure_sync (OGMRipEncoding *encoding)
+{
+  g_return_val_if_fail (OGMRIP_IS_ENCODING (encoding), FALSE);
+
+  return encoding->priv->ensure_sync;
+}
+
+void
+ogmrip_encoding_set_ensure_sync (OGMRipEncoding *encoding, gboolean ensure_sync)
+{
+  g_return_if_fail (OGMRIP_IS_ENCODING (encoding));
+
+  encoding->priv->ensure_sync = ensure_sync;
+
+  g_object_notify (G_OBJECT (encoding), "ensure-sync");
+}
+
 const gchar *
 ogmrip_encoding_get_log_file (OGMRipEncoding *encoding)
 {
@@ -735,6 +779,24 @@ ogmrip_encoding_set_log_file (OGMRipEncoding *encoding, const gchar *filename)
     encoding->priv->log_file = g_strdup (filename);
 
   g_object_notify (G_OBJECT (encoding), "log-file");
+}
+
+gint
+ogmrip_encoding_get_method (OGMRipEncoding *encoding)
+{
+  g_return_val_if_fail (OGMRIP_IS_ENCODING (encoding), -1);
+
+  return encoding->priv->method;
+}
+
+void
+ogmrip_encoding_set_method (OGMRipEncoding *encoding, OGMRipEncodingMethod method)
+{
+  g_return_if_fail (OGMRIP_IS_ENCODING (encoding));
+
+  encoding->priv->method = method;
+
+  g_object_notify (G_OBJECT (encoding), "method");
 }
 
 OGMRipProfile *
@@ -1319,7 +1381,6 @@ gint
 ogmrip_encoding_encode (OGMRipEncoding *encoding, GError **error)
 {
   gint result = OGMJOB_RESULT_ERROR;
-  GSettings *settings;
   GList *list, *link;
 
   g_return_val_if_fail (OGMRIP_IS_ENCODING (encoding), OGMJOB_RESULT_ERROR);
@@ -1331,8 +1392,9 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GError **error)
 
   g_signal_emit (encoding, signals[RUN], 0, NULL);
 
-  settings = ogmrip_profile_get_child (encoding->priv->profile, OGMRIP_PROFILE_GENERAL);
-
+  /*
+   * Copy the media
+   */
   if (encoding->priv->copy)
   {
     result = ogmrip_encoding_copy (encoding, error);
@@ -1340,6 +1402,9 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GError **error)
       goto encode_cleanup;
   }
 
+  /*
+   * Analyze the title
+   */
   if (encoding->priv->title)
   {
     result = ogmrip_encoding_analyze (encoding, error);
@@ -1393,13 +1458,10 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GError **error)
 
   if (encoding->priv->video_codec)
   {
-    OGMRipEncodingMethod method;
-
     /*
      * Compute bitrate if encoding by size
      */
-    g_settings_get (settings, OGMRIP_PROFILE_ENCODING_METHOD, "u", &method);
-    if (method == OGMRIP_ENCODING_SIZE)
+    if (encoding->priv->method == OGMRIP_ENCODING_SIZE)
       ogmrip_video_codec_set_bitrate (encoding->priv->video_codec,
           ogmrip_encoding_autobitrate (encoding));
 
@@ -1407,7 +1469,7 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GError **error)
      * Get cropping parameters
      */
     if (encoding->priv->autocrop &&
-        g_settings_get_boolean (settings, OGMRIP_PROFILE_CAN_CROP))
+        ogmrip_video_codec_get_can_crop (encoding->priv->video_codec))
     {
       OGMDvdStream *stream;
       guint x, y, w, h;
@@ -1434,7 +1496,7 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GError **error)
     /*
      * Set ensure sync
      */
-    if (encoding->priv->audio_codecs && g_settings_get_boolean (settings, OGMRIP_PROFILE_ENSURE_SYNC))
+    if (encoding->priv->audio_codecs && encoding->priv->ensure_sync)
     {
       OGMDvdStream *stream;
 

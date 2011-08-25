@@ -58,6 +58,7 @@ struct _OGMRipVideoCodecPriv
   guint min_height;
   guint aspect_num;
   guint aspect_denom;
+  gboolean can_crop;
   gboolean denoise;
   gboolean deblock;
   gboolean dering;
@@ -78,6 +79,7 @@ enum
   PROP_0,
   PROP_ANGLE,
   PROP_BITRATE,
+  PROP_CAN_CROP,
   PROP_QUANTIZER,
   PROP_BPP,
   PROP_PASSES,
@@ -132,6 +134,10 @@ ogmrip_video_codec_class_init (OGMRipVideoCodecClass *klass)
   g_object_class_install_property (gobject_class, PROP_BITRATE, 
         g_param_spec_uint ("bitrate", "Bitrate property", "Set bitrate", 
            0, G_MAXUINT, 800000, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_CAN_CROP, 
+        g_param_spec_boolean ("can-crop", "Can crop property", "Set can crop", 
+           TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_QUANTIZER, 
         g_param_spec_double ("quantizer", "Quantizer property", "Set quantizer", 
@@ -239,11 +245,12 @@ ogmrip_video_codec_init (OGMRipVideoCodec *video)
   video->priv->quality = OGMRIP_QUALITY_NORMAL;
   video->priv->astream = NULL;
   video->priv->bitrate = 800000;
-  video->priv->quantizer = 0.0;
-  video->priv->turbo = FALSE;
+  video->priv->turbo = TRUE;
+  video->priv->can_crop = TRUE;
   video->priv->angle = 1;
   video->priv->bpp = 0.25;
   video->priv->passes = 1;
+  video->priv->can_crop = TRUE;
 }
 
 static void
@@ -322,6 +329,9 @@ ogmrip_video_codec_set_property (GObject *gobject, guint property_id, const GVal
       break;
     case PROP_EXPAND:
       ogmrip_video_codec_set_max_size (video, video->priv->max_width, video->priv->max_height, g_value_get_boolean (value));
+      break;
+    case PROP_CAN_CROP:
+      ogmrip_video_codec_set_can_crop (video, g_value_get_boolean (value));
       break;
     case PROP_CROP_X:
       ogmrip_video_codec_set_crop_size (video, g_value_get_uint (value), video->priv->crop_y, video->priv->crop_width, video->priv->crop_height);
@@ -410,6 +420,9 @@ ogmrip_video_codec_get_property (GObject *gobject, guint property_id, GValue *va
       break;
     case PROP_EXPAND:
       g_value_set_boolean (value, video->priv->expand);
+      break;
+    case PROP_CAN_CROP:
+      g_value_set_boolean (value, video->priv->can_crop);
       break;
     case PROP_CROP_X:
       g_value_set_uint (value, video->priv->crop_x);
@@ -601,6 +614,24 @@ ogmrip_video_codec_get_bitrate (OGMRipVideoCodec *video)
   g_return_val_if_fail (OGMRIP_IS_VIDEO_CODEC (video), -1);
 
   return video->priv->bitrate;
+}
+
+gboolean
+ogmrip_video_codec_get_can_crop (OGMRipVideoCodec *video)
+{
+  g_return_val_if_fail (OGMRIP_IS_VIDEO_CODEC (video), FALSE);
+
+  return video->priv->can_crop;
+}
+
+void
+ogmrip_video_codec_set_can_crop (OGMRipVideoCodec *video, gboolean can_crop)
+{
+  g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
+
+  video->priv->can_crop = can_crop;
+
+  g_object_notify (G_OBJECT (video), "can-crop");
 }
 
 /**

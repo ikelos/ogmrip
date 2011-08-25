@@ -47,6 +47,17 @@ ogmrip_encoding_parse_property (OGMRipXML *xml, gpointer gobject, gpointer klass
       if (profile)
         ogmrip_encoding_set_profile (gobject, profile);
     }
+    else if (g_str_equal (property, "log-file"))
+    {
+      gchar *utf8, *filename;
+
+      utf8 = ogmrip_xml_get_string (xml, NULL);
+      filename = utf8 ? g_filename_from_utf8 (utf8, -1, NULL, NULL, NULL) : NULL;
+      g_free (utf8);
+
+      ogmrip_encoding_set_log_file (gobject, filename);
+      g_free (filename);
+    }
     else
     {
       GParamSpec *pspec;
@@ -458,6 +469,7 @@ ogmrip_encoding_dump_video_codec (OGMRipXML *xml, OGMRipCodec *codec)
   ogmrip_encoding_dump_property (xml, codec, klass, "angle");
   ogmrip_encoding_dump_property (xml, codec, klass, "bitrate");
   ogmrip_encoding_dump_property (xml, codec, klass, "bpp");
+  ogmrip_encoding_dump_property (xml, codec, klass, "can-crop");
   ogmrip_encoding_dump_property (xml, codec, klass, "deblock");
   ogmrip_encoding_dump_property (xml, codec, klass, "deinterlacer");
   ogmrip_encoding_dump_property (xml, codec, klass, "denoise");
@@ -608,6 +620,7 @@ ogmrip_encoding_dump (OGMRipEncoding *encoding, OGMRipXML *xml, GError **error)
   OGMRipProfile *profile;
   OGMDvdTitle *title;
   GList *list, *link;
+  const gchar *log;
   gchar *utf8;
 
   g_return_val_if_fail (OGMRIP_IS_ENCODING (encoding), FALSE);
@@ -643,13 +656,21 @@ ogmrip_encoding_dump (OGMRipEncoding *encoding, OGMRipXML *xml, GError **error)
   }
 
   klass = OGMRIP_ENCODING_GET_CLASS (encoding);
-/*
-  if (encoding->priv->log_file)
-    ogmrip_encoding_dump_property (xml, encoding, klass, "log-file");
-*/
-  ogmrip_encoding_dump_property (xml, encoding, klass, "relative");
+
+  log = ogmrip_encoding_get_log_file (encoding);
+  if (log)
+  {
+    utf8 = g_filename_to_utf8 (log, -1, NULL, NULL, NULL);
+    ogmrip_xml_set_string (xml, "log-file", utf8);
+    g_free (utf8);
+  }
+
   ogmrip_encoding_dump_property (xml, encoding, klass, "autocrop");
   ogmrip_encoding_dump_property (xml, encoding, klass, "autoscale");
+  ogmrip_encoding_dump_property (xml, encoding, klass, "copy");
+  ogmrip_encoding_dump_property (xml, encoding, klass, "ensure-sync");
+  ogmrip_encoding_dump_property (xml, encoding, klass, "method");
+  ogmrip_encoding_dump_property (xml, encoding, klass, "relative");
   ogmrip_encoding_dump_property (xml, encoding, klass, "test");
 
   ogmrip_encoding_dump_container (xml, ogmrip_encoding_get_container (encoding));
