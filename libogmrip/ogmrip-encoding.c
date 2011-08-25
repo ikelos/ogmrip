@@ -1352,7 +1352,10 @@ ogmrip_encoding_run_codec (OGMRipEncoding *encoding, OGMRipCodec *codec, GError 
     lang = ogmrip_subp_codec_get_language (OGMRIP_SUBP_CODEC (codec));
   }
   else if (OGMRIP_IS_CHAPTERS (codec))
+  {
+    format = OGMRIP_FORMAT_CHAPTERS;
     lang = ogmrip_chapters_get_language (OGMRIP_CHAPTERS (codec));
+  }
 
   ogmrip_container_add_file (encoding->priv->container, output, format, label, lang);
 

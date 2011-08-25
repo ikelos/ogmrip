@@ -59,6 +59,7 @@ G_BEGIN_DECLS
  * @OGMRIP_FORMAT_MJPEG: The MJPEG video format
  * @OGMRIP_FORMAT_FLAC: The Flac audio format
  * @OGMRIP_FORMAT_VP8: The VP8 video format
+ * @OGMRIP_FORMAT_CHAPTERS: The chapters format
  *
  * The formats supported by OGMRip.
  */
@@ -98,44 +99,46 @@ typedef enum
   OGMRIP_FORMAT_MJPEG,
   OGMRIP_FORMAT_FLAC,
   OGMRIP_FORMAT_VP8,
+  OGMRIP_FORMAT_CHAPTERS,
 } OGMRipFormatType;
 
-#define OGMRIP_IS_VIDEO_FORMAT(format) ((format) == OGMRIP_FORMAT_MPEG1  || \
-                                        (format) == OGMRIP_FORMAT_MPEG2  || \
-                                        (format) == OGMRIP_FORMAT_MPEG4  || \
-                                        (format) == OGMRIP_FORMAT_H264   || \
-                                        (format) == OGMRIP_FORMAT_THEORA || \
-                                        (format) == OGMRIP_FORMAT_DIRAC  || \
-                                        (format) == OGMRIP_FORMAT_MJPEG  || \
-                                        (format) == OGMRIP_FORMAT_MP12   || \
-                                        (format) == OGMRIP_FORMAT_VP8)
+#define OGMRIP_IS_VIDEO_FORMAT(format)    ((format) == OGMRIP_FORMAT_MPEG1  || \
+                                           (format) == OGMRIP_FORMAT_MPEG2  || \
+                                           (format) == OGMRIP_FORMAT_MPEG4  || \
+                                           (format) == OGMRIP_FORMAT_H264   || \
+                                           (format) == OGMRIP_FORMAT_THEORA || \
+                                           (format) == OGMRIP_FORMAT_DIRAC  || \
+                                           (format) == OGMRIP_FORMAT_MJPEG  || \
+                                           (format) == OGMRIP_FORMAT_MP12   || \
+                                           (format) == OGMRIP_FORMAT_VP8)
 
-#define OGMRIP_IS_AUDIO_FORMAT(format) ((format) == OGMRIP_FORMAT_PCM    || \
-                                        (format) == OGMRIP_FORMAT_MP3    || \
-                                        (format) == OGMRIP_FORMAT_AC3    || \
-                                        (format) == OGMRIP_FORMAT_DTS    || \
-                                        (format) == OGMRIP_FORMAT_AAC    || \
-                                        (format) == OGMRIP_FORMAT_VORBIS || \
-                                        (format) == OGMRIP_FORMAT_LPCM   || \
-                                        (format) == OGMRIP_FORMAT_BPCM   || \
-                                        (format) == OGMRIP_FORMAT_FLAC)
+#define OGMRIP_IS_AUDIO_FORMAT(format)    ((format) == OGMRIP_FORMAT_PCM    || \
+                                           (format) == OGMRIP_FORMAT_MP3    || \
+                                           (format) == OGMRIP_FORMAT_AC3    || \
+                                           (format) == OGMRIP_FORMAT_DTS    || \
+                                           (format) == OGMRIP_FORMAT_AAC    || \
+                                           (format) == OGMRIP_FORMAT_VORBIS || \
+                                           (format) == OGMRIP_FORMAT_LPCM   || \
+                                           (format) == OGMRIP_FORMAT_BPCM   || \
+                                           (format) == OGMRIP_FORMAT_FLAC)
 
-#define OGMRIP_IS_SUBP_FORMAT(format) ((format) == OGMRIP_FORMAT_MICRODVD   || \
-                                       (format) == OGMRIP_FORMAT_SUBRIP     || \
-                                       (format) == OGMRIP_FORMAT_SRT        || \
-                                       (format) == OGMRIP_FORMAT_SAMI       || \
-                                       (format) == OGMRIP_FORMAT_VPLAYER    || \
-                                       (format) == OGMRIP_FORMAT_RT         || \
-                                       (format) == OGMRIP_FORMAT_SSA        || \
-                                       (format) == OGMRIP_FORMAT_PJS        || \
-                                       (format) == OGMRIP_FORMAT_MPSUB      || \
-                                       (format) == OGMRIP_FORMAT_AQT        || \
-                                       (format) == OGMRIP_FORMAT_SRT_2_0    || \
-                                       (format) == OGMRIP_FORMAT_SUBRIP_0_9 || \
-                                       (format) == OGMRIP_FORMAT_JACOSUB    || \
-                                       (format) == OGMRIP_FORMAT_MPL_2      || \
-                                       (format) == OGMRIP_FORMAT_VOBSUB)
+#define OGMRIP_IS_SUBP_FORMAT(format)     ((format) == OGMRIP_FORMAT_MICRODVD   || \
+                                           (format) == OGMRIP_FORMAT_SUBRIP     || \
+                                           (format) == OGMRIP_FORMAT_SRT        || \
+                                           (format) == OGMRIP_FORMAT_SAMI       || \
+                                           (format) == OGMRIP_FORMAT_VPLAYER    || \
+                                           (format) == OGMRIP_FORMAT_RT         || \
+                                           (format) == OGMRIP_FORMAT_SSA        || \
+                                           (format) == OGMRIP_FORMAT_PJS        || \
+                                           (format) == OGMRIP_FORMAT_MPSUB      || \
+                                           (format) == OGMRIP_FORMAT_AQT        || \
+                                           (format) == OGMRIP_FORMAT_SRT_2_0    || \
+                                           (format) == OGMRIP_FORMAT_SUBRIP_0_9 || \
+                                           (format) == OGMRIP_FORMAT_JACOSUB    || \
+                                           (format) == OGMRIP_FORMAT_MPL_2      || \
+                                           (format) == OGMRIP_FORMAT_VOBSUB)
 
+#define OGMRIP_IS_CHAPTERS_FORMAT(format) ((format) == OGMRIP_FORMAT_CHAPTERS)
 /**
  * OGMRipScalerType:
  * @OGMRIP_SCALER_NONE: No scaling
