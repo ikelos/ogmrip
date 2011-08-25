@@ -410,25 +410,88 @@ ogmrip_options_dialog_crop_button_clicked (OGMRipOptionsDialog *parent)
 }
 
 static void
-ogmrip_options_dialog_autocrop_button_clicked (OGMRipOptionsDialog *parent)
+ogmrip_progress_dialog_response_cb (OGMRipProgressDialog *dialog, gint response_id, OGMJobSpawn *spawn)
 {
-  OGMDvdVideoStream *stream;
-  guint x, y, w, h;
+  ogmjob_spawn_cancel (spawn);
+}
 
+static void
+ogmrip_options_dialog_crop_and_test (OGMRipOptionsDialog *parent, gboolean crop, gboolean test)
+{
   if (ogmrip_open_title (GTK_WINDOW (parent), parent->priv->title))
   {
-    ogmdvd_title_analyze (parent->priv->title, NULL, NULL, NULL, NULL);
+    GtkWidget *dialog;
+    OGMJobSpawn *spawn;
+    gint result;
 
-    stream = ogmdvd_title_get_video_stream (parent->priv->title);
-    ogmdvd_video_stream_get_crop_size (stream, &x, &y, &w, &h);
+    dialog = ogmrip_progress_dialog_new (GTK_WINDOW (parent), 
+        GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT, FALSE);
+    ogmrip_progress_dialog_set_title (OGMRIP_PROGRESS_DIALOG (dialog),
+        ogmdvd_disc_get_label (ogmdvd_title_get_disc (parent->priv->title)));
+    gtk_window_present (GTK_WINDOW (dialog));
 
-    ogmrip_options_dialog_set_crop (parent, x, y, w, h);
-    ogmrip_options_dialog_update_scale_combo (parent);
+    result = OGMJOB_RESULT_SUCCESS;
 
-    gtk_widget_set_sensitive (parent->priv->autocrop_button, FALSE);
+    if (crop)
+    {
+      ogmrip_progress_dialog_set_message (OGMRIP_PROGRESS_DIALOG (dialog), _("Analyzing video stream"));
+
+      spawn = ogmrip_analyze_new (parent->priv->title);
+      g_signal_connect (dialog, "response", G_CALLBACK (ogmrip_progress_dialog_response_cb), spawn);
+
+      result = ogmjob_spawn_run (spawn, NULL);
+      g_object_unref (spawn);
+
+      if (result == OGMJOB_RESULT_SUCCESS)
+      {
+        OGMDvdVideoStream *stream;
+        guint x, y, w, h;
+
+        stream = ogmdvd_title_get_video_stream (parent->priv->title);
+        ogmdvd_video_stream_get_crop_size (stream, &x, &y, &w, &h);
+
+        ogmrip_options_dialog_set_crop (parent, x, y, w, h);
+        ogmrip_options_dialog_update_scale_combo (parent);
+
+        gtk_widget_set_sensitive (parent->priv->autocrop_button, FALSE);
+      }
+    }
+
+    if (test && result == OGMJOB_RESULT_SUCCESS)
+    {
+      ogmrip_progress_dialog_set_message (OGMRIP_PROGRESS_DIALOG (dialog), _("Running the compressibility test"));
+
+      /*
+       * TODO Compressibility test
+       */
+      spawn = ogmrip_test_new (NULL);
+      g_signal_connect (dialog, "response", G_CALLBACK (ogmrip_progress_dialog_response_cb), spawn);
+
+      result = ogmjob_spawn_run (spawn, NULL);
+      g_object_unref (spawn);
+
+      if (result == OGMJOB_RESULT_SUCCESS)
+      {
+/*
+        guint scale_w, scale_h;
+
+        ogmrip_encoding_get_scale (encoding, &scale_w, &scale_h);
+        ogmrip_options_dialog_set_scale (OGMRIP_OPTIONS_DIALOG (data->options_dialog), OGMRIP_OPTIONS_MANUAL, scale_w, scale_h);
+        gtk_window_present (GTK_WINDOW (data->options_dialog));
+*/
+      }
+    }
+
+    gtk_widget_destroy (dialog);
 
     ogmdvd_title_close (parent->priv->title);
   }
+}
+
+static void
+ogmrip_options_dialog_autocrop_button_clicked (OGMRipOptionsDialog *dialog)
+{
+  ogmrip_options_dialog_crop_and_test (dialog, TRUE, FALSE);
 }
 
 static void
@@ -464,9 +527,7 @@ ogmrip_options_dialog_autoscale_button_clicked (OGMRipOptionsDialog *dialog)
 static void
 ogmrip_options_dialog_test_button_clicked (OGMRipOptionsDialog *dialog)
 {
-  /*
-   * TODO compressibility test
-   */
+  ogmrip_options_dialog_crop_and_test (dialog, TRUE, TRUE);
 }
 
 static gboolean
