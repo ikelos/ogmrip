@@ -40,21 +40,6 @@ gchar * g_get_locale (gint category);
  */
 
 /**
- * g_signal_connect_while_alive:
- * @instance: the instance to connect to
- * @detailed_signal: a string of the form "signal-name::detail"
- * @c_handler: the #GCallback to connect
- * @alive: the instance to check for
- *
- * Connects a #GCallback function to a signal for a particular object automatically
- * disconnecting it when @alive is destroyed.
- *
- * Returns: the handler id
- */
-#define g_signal_connect_while_alive(instance, detailed_signal, c_handler, alive) \
-    g_signal_connect_data_while_alive ((instance), (detailed_signal), (c_handler), (alive), NULL, (GConnectFlags) 0)
-
-/**
  * g_signal_connect_swapped_while_alive:
  * @instance: the instance to connect to
  * @detailed_signal: a string of the form "signal-name::detail"
