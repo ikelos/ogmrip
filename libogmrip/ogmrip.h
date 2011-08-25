@@ -36,6 +36,7 @@
 #include <ogmrip-profile-engine.h>
 #include <ogmrip-profile-keys.h>
 #include <ogmrip-subp-codec.h>
+#include <ogmrip-test.h>
 #include <ogmrip-version.h>
 #include <ogmrip-video-codec.h>
 #include <ogmrip-xml.h>

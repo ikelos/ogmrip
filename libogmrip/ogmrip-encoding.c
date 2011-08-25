@@ -35,6 +35,7 @@
 #include "ogmrip-plugin.h"
 #include "ogmrip-analyze.h"
 #include "ogmrip-copy.h"
+#include "ogmrip-test.h"
 #include "ogmrip-fs.h"
 
 #include <glib/gstdio.h>
@@ -1237,7 +1238,7 @@ ogmrip_encoding_copy (OGMRipEncoding *encoding, GError **error)
       G_CALLBACK (ogmrip_encoding_task_progressed), encoding);
 
   g_signal_emit (encoding, signals[RUN], 0, spawn);
-  result = ogmjob_spawn_run (OGMJOB_SPAWN (spawn), error);
+  result = ogmjob_spawn_run (spawn, error);
   g_signal_emit (encoding, signals[COMPLETE], 0, spawn, result);
 
   g_object_unref (spawn);
@@ -1256,7 +1257,26 @@ ogmrip_encoding_analyze (OGMRipEncoding *encoding, GError **error)
       G_CALLBACK (ogmrip_encoding_task_progressed), encoding);
 
   g_signal_emit (encoding, signals[RUN], 0, spawn);
-  result = ogmjob_spawn_run (OGMJOB_SPAWN (spawn), error);
+  result = ogmjob_spawn_run (spawn, error);
+  g_signal_emit (encoding, signals[COMPLETE], 0, spawn, result);
+
+  g_object_unref (spawn);
+
+  return result;
+}
+
+static gint
+ogmrip_encoding_test (OGMRipEncoding *encoding, GError **error)
+{
+  OGMJobSpawn *spawn;
+  gboolean result;
+
+  spawn = ogmrip_test_new (encoding);
+  g_signal_connect_swapped (spawn, "progress",
+      G_CALLBACK (ogmrip_encoding_task_progressed), encoding);
+
+  g_signal_emit (encoding, signals[RUN], 0, spawn);
+  result = ogmjob_spawn_run (spawn, error);
   g_signal_emit (encoding, signals[COMPLETE], 0, spawn, result);
 
   g_object_unref (spawn);
@@ -1505,6 +1525,16 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GError **error)
 
       stream = ogmrip_codec_get_input (OGMRIP_CODEC (encoding->priv->audio_codecs->data));
       ogmrip_video_codec_set_ensure_sync (encoding->priv->video_codec, OGMDVD_AUDIO_STREAM (stream));
+    }
+
+    /*
+     * Run the compressibility test
+     */
+    if (encoding->priv->test)
+    {
+      result = ogmrip_encoding_test (encoding, error);
+      if (result != OGMJOB_RESULT_SUCCESS)
+        goto encode_cleanup;
     }
 
     /*
