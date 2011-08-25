@@ -62,6 +62,8 @@ struct _OGMRipEncodingPriv
   GList *chapters;
   GList *files;
 
+  OGMJobSpawn *spawn;
+
   gboolean ensure_sync;
   gboolean relative;
   gboolean autocrop;
@@ -97,17 +99,22 @@ enum
   LAST_SIGNAL
 };
 
-static void   ogmrip_encoding_constructed   (GObject      *gobject);
-static void   ogmrip_encoding_dispose       (GObject      *gobject);
-static void   ogmrip_encoding_finalize      (GObject      *gobject);
-static void   ogmrip_encoding_get_property  (GObject      *gobject,
-                                             guint        property_id,
-                                             GValue       *value,
-                                             GParamSpec   *pspec);
-static void   ogmrip_encoding_set_property  (GObject      *gobject,
-                                             guint        property_id,
-                                             const GValue *value,
-                                             GParamSpec   *pspec);
+static void   ogmrip_encoding_constructed   (GObject        *gobject);
+static void   ogmrip_encoding_dispose       (GObject        *gobject);
+static void   ogmrip_encoding_finalize      (GObject        *gobject);
+static void   ogmrip_encoding_get_property  (GObject        *gobject,
+                                             guint          property_id,
+                                             GValue         *value,
+                                             GParamSpec     *pspec);
+static void   ogmrip_encoding_set_property  (GObject        *gobject,
+                                             guint          property_id,
+                                             const GValue   *value,
+                                             GParamSpec     *pspec);
+static void   ogmrip_encoding_run           (OGMRipEncoding *encoding,
+                                             OGMJobSpawn    *spawn);
+static void   ogmrip_encoding_complete      (OGMRipEncoding *encoding,
+                                             OGMJobSpawn    *spawn,
+                                             guint          result);
 
 guint signals[LAST_SIGNAL] = { 0 };
 
@@ -124,6 +131,9 @@ ogmrip_encoding_class_init (OGMRipEncodingClass *klass)
   gobject_class->finalize = ogmrip_encoding_finalize;
   gobject_class->get_property = ogmrip_encoding_get_property;
   gobject_class->set_property = ogmrip_encoding_set_property;
+
+  klass->run = ogmrip_encoding_run;
+  klass->complete = ogmrip_encoding_complete;
 
   signals[RUN] = g_signal_new ("run", G_TYPE_FROM_CLASS (klass),
       G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
@@ -406,6 +416,18 @@ ogmrip_encoding_set_property (GObject *gobject, guint property_id, const GValue 
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
   }
+}
+
+static void
+ogmrip_encoding_run (OGMRipEncoding *encoding, OGMJobSpawn *spawn)
+{
+  encoding->priv->spawn = spawn;
+}
+
+static void
+ogmrip_encoding_complete (OGMRipEncoding *encoding, OGMJobSpawn *spawn, guint result)
+{
+  encoding->priv->spawn = NULL;
 }
 
 /**
@@ -1551,5 +1573,32 @@ encode_cleanup:
   g_signal_emit (encoding, signals[COMPLETE], 0, NULL, result);
 
   return result;
+}
+
+void
+ogmrip_encoding_cancel (OGMRipEncoding *encoding)
+{
+  g_return_if_fail (OGMRIP_IS_ENCODING (encoding));
+
+  if (encoding->priv->spawn)
+    ogmjob_spawn_cancel (encoding->priv->spawn);
+}
+
+void
+ogmrip_encoding_suspend (OGMRipEncoding *encoding)
+{
+  g_return_if_fail (OGMRIP_IS_ENCODING (encoding));
+
+  if (encoding->priv->spawn)
+    ogmjob_spawn_suspend (encoding->priv->spawn);
+}
+
+void
+ogmrip_encoding_resume (OGMRipEncoding *encoding)
+{
+  g_return_if_fail (OGMRIP_IS_ENCODING (encoding));
+
+  if (encoding->priv->spawn)
+    ogmjob_spawn_resume (encoding->priv->spawn);
 }
 
