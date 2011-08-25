@@ -83,36 +83,48 @@ static gchar *
 ogmrip_matroska_get_sync (OGMRipContainer *container)
 {
 /*
-  guint start_delay;
+  OGMDvdTitle *title;
+  guint num, denom;
+  gint start_delay;
+  gchar *buf;
 
   start_delay = ogmrip_container_get_start_delay (container);
-  if (start_delay > 0)
+  if (start_delay <= 0)
+    return NULL;
+
+  title = NULL;
+  if (ogmdvd_title_get_telecine (title) || ogmdvd_title_get_progressive (title))
   {
-    OGMRipVideoCodec *video;
-    guint num, denom;
-    gchar *buf;
-
-    video = ogmrip_container_get_video (container);
-    if (ogmrip_codec_get_telecine (OGMRIP_CODEC (video)) || ogmrip_codec_get_progressive (OGMRIP_CODEC (video)))
-    {
-      num = 24000;
-      denom = 1001;
-    }
-    else
-    {
-      OGMDvdStream *stream;
-
-      stream = ogmrip_codec_get_input (OGMRIP_CODEC (video));
-      ogmdvd_video_stream_get_framerate (OGMDVD_VIDEO_STREAM (stream), &num, &denom);
-    }
-
-    buf = g_new0 (gchar, G_ASCII_DTOSTR_BUF_SIZE);
-    g_ascii_formatd (buf, G_ASCII_DTOSTR_BUF_SIZE, "%.0f", (start_delay * denom * 1000) / (gdouble) num);
-
-    return buf;
+    num = 24000;
+    denom = 1001;
   }
+  else
+  {
+    OGMDvdVideoStream *stream;
+
+    stream = ogmdvd_title_get_video_stream (title);
+    ogmdvd_video_stream_get_framerate (OGMDVD_VIDEO_STREAM (stream), &num, &denom);
+  }
+
+  buf = g_new0 (gchar, G_ASCII_DTOSTR_BUF_SIZE);
+  g_ascii_formatd (buf, G_ASCII_DTOSTR_BUF_SIZE, "%.0f", (start_delay * denom * 1000) / (gdouble) num);
+
+  return buf;
 */
   return NULL;
+}
+
+static void
+ogmrip_matroska_append_video_file (OGMRipContainer *matroska, const gchar *filename, GPtrArray *argv)
+{
+  g_ptr_array_add (argv, g_strdup ("--command-line-charset"));
+  g_ptr_array_add (argv, g_strdup ("UTF-8"));
+
+  g_ptr_array_add (argv, g_strdup ("-d"));
+  g_ptr_array_add (argv, g_strdup ("0"));
+  g_ptr_array_add (argv, g_strdup ("-A"));
+  g_ptr_array_add (argv, g_strdup ("-S"));
+  g_ptr_array_add (argv, g_strdup (filename));
 }
 
 static void
@@ -245,16 +257,14 @@ ogmrip_matroska_append_subp_file (OGMRipContainer *matroska, const gchar *filena
     g_ptr_array_add (argv, real_filename);
   }
 }
-/*
+
 static void
-ogmrip_matroska_foreach_chapters (OGMRipContainer *matroska, 
-    OGMRipCodec *codec, guint demuxer, gint language, GPtrArray *argv)
+ogmrip_matroska_append_chapters_file (OGMRipContainer *matroska, const gchar *filename,
+    const gchar *label, gint format, gint language, GPtrArray *argv)
 {
-  const gchar *input;
   struct stat buf;
 
-  input = ogmrip_codec_get_output (codec);
-  if (g_stat (input, &buf) == 0 && buf.st_size > 0)
+  if (g_stat (filename, &buf) == 0 && buf.st_size > 0)
   {
     if (language > -1)
     {
@@ -272,21 +282,22 @@ ogmrip_matroska_foreach_chapters (OGMRipContainer *matroska,
     g_ptr_array_add (argv, g_strdup ("UTF-8"));
     g_ptr_array_add (argv, g_strdup ("--chapters"));
 
-    g_ptr_array_add (argv, g_strdup (input));
+    g_ptr_array_add (argv, g_strdup (filename));
   }
 }
-*/
+
 static void
 ogmrip_matroska_foreach_file (OGMRipContainer *matroska, const gchar *filename,
     OGMRipFormatType format, const gchar *name, guint language, GPtrArray *argv)
 {
   if (OGMRIP_IS_VIDEO_FORMAT (format))
-  {
-  }
+    ogmrip_matroska_append_video_file (matroska, filename, argv);
   else if (OGMRIP_IS_AUDIO_FORMAT (format))
     ogmrip_matroska_append_audio_file (matroska, filename, name, language, argv);
   else if (OGMRIP_IS_SUBP_FORMAT (format))
     ogmrip_matroska_append_subp_file (matroska, filename, name, format, language, argv);
+  else if (OGMRIP_IS_CHAPTERS_FORMAT (format))
+    ogmrip_matroska_append_chapters_file (matroska, filename, name, format, language, argv);
 }
 
 gchar **
@@ -309,21 +320,7 @@ ogmrip_matroska_command (OGMRipContainer *matroska)
     g_ptr_array_add (argv, g_strdup ("--fourcc"));
     g_ptr_array_add (argv, g_strconcat ("0:", fourcc, NULL));
   }
-/*
-  if ((video = ogmrip_container_get_video (matroska)))
-  {
-    g_ptr_array_add (argv, g_strdup ("--command-line-charset"));
-    g_ptr_array_add (argv, g_strdup ("UTF-8"));
 
-    filename = ogmrip_codec_get_output (OGMRIP_CODEC (video));
-
-    g_ptr_array_add (argv, g_strdup ("-d"));
-    g_ptr_array_add (argv, g_strdup ("0"));
-    g_ptr_array_add (argv, g_strdup ("-A"));
-    g_ptr_array_add (argv, g_strdup ("-S"));
-    g_ptr_array_add (argv, g_strdup (filename));
-  }
-*/
   ogmrip_container_foreach_file (matroska,
       (OGMRipContainerFunc) ogmrip_matroska_foreach_file, argv);
 
@@ -403,7 +400,7 @@ ogmrip_matroska_run (OGMJobSpawn *spawn)
   result = OGMJOB_SPAWN_CLASS (ogmrip_matroska_parent_class)->run (spawn);
 
   /*
-   * If mkvmerge resturns 1, it's only a warning
+   * If mkvmerge returns 1, it's only a warning
    */
   if (ogmjob_exec_get_status (OGMJOB_EXEC (child)) == 1)
     result = OGMJOB_RESULT_SUCCESS;
