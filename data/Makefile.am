@@ -1,7 +1,7 @@
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = ogmrip.pc \
-                 ogmdvd.pc \
-                 ogmjob.pc
+pkgconfig_DATA = ogmrip-encode.pc \
+                 ogmrip-dvd.pc    \
+                 ogmrip-job.pc
 
 profilesdir = $(datadir)/ogmrip/profiles
 profilesfile = profile-avi.xml.in \
@@ -19,8 +19,8 @@ gsettings_SCHEMAS = org.ogmrip.preferences.gschema.xml \
 
 if HAVE_GTK_SUPPORT
 
-pkgconfig_DATA += ogmrip-gtk.pc \
-                  ogmdvd-gtk.pc
+pkgconfig_DATA += ogmrip-encode-gtk.pc \
+                  ogmrip-dvd-gtk.pc
 
 uidir = $(datadir)/ogmrip/ui
 ui_DATA = ogmrip-ui.xml               \

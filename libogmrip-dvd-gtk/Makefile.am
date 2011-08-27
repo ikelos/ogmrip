@@ -1,11 +1,11 @@
 lib_LTLIBRARIES = \
-  libogmdvd-gtk.la
+  libogmrip-dvd-gtk.la
 
 BUILT_SOURCES = \
   ogmdvd-marshal.c \
   ogmdvd-marshal.h
 
-libogmdvd_gtk_la_SOURCES =        \
+libogmrip_dvd_gtk_la_SOURCES =    \
   ogmdvd-chapter-list.c           \
   ogmdvd-drive-chooser.c          \
   ogmdvd-drive-chooser-widget.c   \
@@ -14,10 +14,10 @@ libogmdvd_gtk_la_SOURCES =        \
   ogmdvd-title-chooser.c          \
   ogmdvd-title-chooser-widget.c
 
-libogmdvd_gtk_ladir = \
-  $(includedir)/ogmdvd
+libogmrip_dvd_gtk_ladir = \
+  $(includedir)/ogmrip-dvd
 
-libogmdvd_gtk_la_HEADERS =        \
+libogmrip_dvd_gtk_la_HEADERS =    \
   ogmdvd-chapter-list.h           \
   ogmdvd-drive-chooser.h          \
   ogmdvd-drive-chooser-widget.h   \
@@ -27,11 +27,11 @@ libogmdvd_gtk_la_HEADERS =        \
   ogmdvd-title-chooser-widget.h   \
   ogmdvd-gtk.h
 
-libogmdvd_gtk_la_LDFLAGS = \
+libogmrip_dvd_gtk_la_LDFLAGS = \
   -version-info $(OGMDVD_GTK_LT_VERSION)
 
-libogmdvd_gtk_la_LIBADD = \
-  $(top_builddir)/libogmdvd/libogmdvd.la
+libogmrip_dvd_gtk_la_LIBADD = \
+  $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la
 
 ogmdvd-marshal.h: ogmdvd-marshal.list $(GLIB_GENMARSHAL)
 	$(GLIB_GENMARSHAL) $< --header --prefix=ogmdvd_cclosure_marshal > $@
@@ -44,7 +44,7 @@ EXTRA_DIST = \
   ogmdvd-marshal.list
 
 INCLUDES = \
-  -I$(top_srcdir)/libogmdvd
+  -I$(top_srcdir)/libogmrip-dvd
 
 CLEANFILES = \
   $(BUILT_SOURCES)

@@ -1,11 +1,11 @@
 lib_LTLIBRARIES = \
-  libogmjob.la
+  libogmrip-job.la
 
 BUILT_SOURCES = \
   ogmjob-marshal.c \
   ogmjob-marshal.h
 
-libogmjob_la_SOURCES = \
+libogmrip_job_la_SOURCES = \
   ogmjob-bin.c       \
   ogmjob-container.c \
   ogmjob-exec.c      \
@@ -16,10 +16,10 @@ libogmjob_la_SOURCES = \
   ogmjob-queue.c     \
   ogmjob-spawn.c
 
-libogmjob_ladir = \
-  $(includedir)/ogmjob
+libogmrip_job_ladir = \
+  $(includedir)/ogmrip-job
 
-libogmjob_la_HEADERS =  \
+libogmrip_job_la_HEADERS =  \
   ogmjob-bin.h         \
   ogmjob-container.h   \
   ogmjob-exec.h        \
@@ -31,7 +31,7 @@ libogmjob_la_HEADERS =  \
   ogmjob-spawn.h       \
   ogmjob.h
 
-libogmjob_la_LDFLAGS = \
+libogmrip_job_la_LDFLAGS = \
   -version-info $(OGMJOB_LT_VERSION)
 
 ogmjob-marshal.h: ogmjob-marshal.list $(GLIB_GENMARSHAL)

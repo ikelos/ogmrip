@@ -1,5 +1,5 @@
 lib_LTLIBRARIES =   \
-  libogmrip.la \
+  libogmrip-encode.la \
   libogmrip-mplayer.la \
   libogmrip-lavc.la
 
@@ -7,7 +7,7 @@ BUILT_SOURCES = \
   ogmrip-marshal.c \
   ogmrip-marshal.h
 
-libogmrip_la_SOURCES =      \
+libogmrip_encode_la_SOURCES = \
   ogmrip-analyze.c          \
   ogmrip-audio-codec.c      \
   ogmrip-chapters.c         \
@@ -33,10 +33,10 @@ libogmrip_la_SOURCES =      \
   ogmrip-video-codec.c      \
   ogmrip-xml.c
 
-libogmrip_ladir = \
-  $(includedir)/ogmrip
+libogmrip_encode_ladir = \
+  $(includedir)/ogmrip-encode
 
-libogmrip_la_HEADERS =      \
+libogmrip_encode_la_HEADERS = \
   ogmrip-analyze.h          \
   ogmrip-audio-codec.h      \
   ogmrip-chapters.h         \
@@ -65,12 +65,12 @@ libogmrip_la_HEADERS =      \
   ogmrip-xml.h              \
   ogmrip.h
 
-libogmrip_la_LDFLAGS = \
+libogmrip_encode_la_LDFLAGS = \
   -version-info $(OGMRIP_LT_VERSION)
 
-libogmrip_la_LIBADD = \
-  $(top_builddir)/libogmdvd/libogmdvd.la \
-  $(top_builddir)/libogmjob/libogmjob.la
+libogmrip_encode_la_LIBADD = \
+  $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la \
+  $(top_builddir)/libogmrip-job/libogmrip-job.la
 
 ogmrip-marshal.h: ogmrip-marshal.list $(GLIB_GENMARSHAL)
 	$(GLIB_GENMARSHAL) $< --header --prefix=ogmrip_cclosure_marshal > $@
@@ -90,12 +90,12 @@ libogmrip_mplayer_la_LDFLAGS = \
   -version-info $(OGMRIP_LT_VERSION)
 
 libogmrip_mplayer_la_LIBADD = \
-  $(top_builddir)/libogmdvd/libogmdvd.la \
-  $(top_builddir)/libogmjob/libogmjob.la \
-  $(top_builddir)/libogmrip/libogmrip.la
+  $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la \
+  $(top_builddir)/libogmrip-job/libogmrip-job.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la
 
 libogmrip_mplayer_ladir = \
-  $(includedir)/ogmrip
+  $(includedir)/ogmrip-encode
 
 libogmrip_mplayer_la_HEADERS = \
   ogmrip-mplayer.h
@@ -107,13 +107,13 @@ libogmrip_lavc_la_LDFLAGS = \
   -version-info $(OGMRIP_LT_VERSION)
 
 libogmrip_lavc_la_LIBADD = \
-  $(top_builddir)/libogmdvd/libogmdvd.la \
-  $(top_builddir)/libogmjob/libogmjob.la \
-  $(top_builddir)/libogmrip/libogmrip.la \
-	$(top_builddir)/libogmrip/libogmrip-mplayer.la
+  $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la \
+  $(top_builddir)/libogmrip-job/libogmrip-job.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
 
 libogmrip_lavc_ladir = \
-  $(includedir)/ogmrip
+  $(includedir)/ogmrip-encode
 
 libogmrip_lavc_la_HEADERS = \
   ogmrip-lavc.h
@@ -123,8 +123,8 @@ EXTRA_DIST = \
   ogmrip-version.h.in
 
 INCLUDES = \
-  -I$(top_srcdir)/libogmjob \
-  -I$(top_srcdir)/libogmdvd \
+  -I$(top_srcdir)/libogmrip-job \
+  -I$(top_srcdir)/libogmrip-dvd \
   -DOGMRIP_LIB_DIR=\""$(libdir)"\" \
   -DOGMRIP_DATA_DIR=\""$(datadir)"\"
 
@@ -134,7 +134,7 @@ INCLUDES += \
 endif
 
 ogmripincdir = \
-  $(includedir)/ogmrip
+  $(includedir)/ogmrip-encode
 
 ogmripinc_DATA = \
   ogmrip-version.h

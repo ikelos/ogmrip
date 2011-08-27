@@ -1,14 +1,14 @@
 SUBDIRS = \
-  libogmjob \
-  libogmdvd \
-  libogmrip \
+  libogmrip-job   \
+  libogmrip-dvd   \
+  libogmrip-encode \
   avibox \
   dvdcpy
 
 if HAVE_GTK_SUPPORT
 SUBDIRS +=      \
-  libogmdvd-gtk \
-  libogmrip-gtk \
+  libogmrip-dvd-gtk \
+  libogmrip-encode-gtk \
   src
 endif
 

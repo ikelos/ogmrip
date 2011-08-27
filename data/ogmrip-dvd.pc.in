@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: ogmrip-dvd
+Description: ogmrip-dvd is a library for reading DVD informations.
+Requires: ogmrip-media
+Version: @VERSION@
+Libs: -L${libdir} -logmrip-dvd -ldvdread
+Cflags: -I${includedir}/ogmrip-dvd
+

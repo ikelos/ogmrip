@@ -1,7 +1,7 @@
 lib_LTLIBRARIES = \
-  libogmdvd.la
+  libogmrip-dvd.la
 
-libogmdvd_la_SOURCES = \
+libogmrip_dvd_la_SOURCES = \
   ogmdvd-audio.c     \
   ogmdvd-contrib.c   \
   ogmdvd-device.c    \
@@ -18,7 +18,7 @@ libogmdvd_la_SOURCES = \
   ogmdvd-transport.c \
   ogmdvd-video.c
 
-libogmdvd_la_HEADERS = \
+libogmrip_dvd_la_HEADERS = \
   ogmdvd-audio.h   \
   ogmdvd-disc.h    \
   ogmdvd-drive.h   \
@@ -34,14 +34,14 @@ libogmdvd_la_HEADERS = \
   ogmdvd-video.h   \
   ogmdvd.h
 
-libogmdvd_la_LDFLAGS = \
+libogmrip_dvd_la_LDFLAGS = \
   -version-info $(OGMDVD_LT_VERSION)
 
-libogmdvd_la_LIBADD = \
-  $(top_builddir)/libogmjob/libogmjob.la
+libogmrip_dvd_la_LIBADD = \
+  $(top_builddir)/libogmrip-job/libogmrip-job.la
 
-libogmdvd_ladir = \
-  $(includedir)/ogmdvd
+libogmrip_dvd_ladir = \
+  $(includedir)/ogmrip-dvd
 
 EXTRA_DIST = \
   ogmdvd-contrib.h   \
@@ -50,4 +50,4 @@ EXTRA_DIST = \
   ogmdvd-priv.h
 
 INCLUDES = \
-  -I$(top_srcdir)/libogmjob
+  -I$(top_srcdir)/libogmrip-job

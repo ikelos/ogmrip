@@ -22,9 +22,9 @@ ogmrip_lavc_mpeg4_la_LIBTOOLFLAGS = \
   --tag=disable-static
 
 ogmrip_lavc_mpeg4_la_LIBADD = \
-  $(top_builddir)/libogmrip/libogmrip.la      \
-  $(top_builddir)/libogmrip/libogmrip-lavc.la \
-  $(top_builddir)/libogmrip/libogmrip-mplayer.la
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-lavc.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
 
 video_codecs_HEADERS += \
   ogmrip-lavc-mpeg4.h
@@ -44,8 +44,9 @@ ogmrip_xvid_la_LIBTOOLFLAGS = \
   --tag=disable-static
 
 ogmrip_xvid_la_LIBADD = \
-  $(top_builddir)/libogmrip/libogmrip.la \
-  $(top_builddir)/libogmrip/libogmrip-mplayer.la
+  $(top_builddir)/libogmrip-job/libogmrip-job.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
 
 video_codecs_HEADERS += \
   ogmrip-xvid.h
@@ -65,9 +66,9 @@ ogmrip_theora_la_LIBTOOLFLAGS = \
   --tag=disable-static
 
 ogmrip_theora_la_LIBADD = \
-  $(top_builddir)/libogmjob/libogmjob.la \
-	$(top_builddir)/libogmrip/libogmrip.la \
-	$(top_builddir)/libogmrip/libogmrip-mplayer.la
+  $(top_builddir)/libogmrip-job/libogmrip-job.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
 endif
 
 if HAVE_X264_SUPPORT
@@ -84,9 +85,10 @@ ogmrip_x264_la_LIBTOOLFLAGS = \
   --tag=disable-static
 
 ogmrip_x264_la_LIBADD = \
-  $(top_builddir)/libogmrip/libogmrip.la \
-  $(top_builddir)/libogmrip/libogmrip-mplayer.la \
-	-lm
+  $(top_builddir)/libogmrip-job/libogmrip-job.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la \
+  -lm
 
 video_codecs_HEADERS += \
   ogmrip-x264.h
@@ -112,8 +114,9 @@ ogmrip_acopy_la_LIBTOOLFLAGS = \
   --tag=disable-static
 
 ogmrip_acopy_la_LIBADD = \
-  $(top_builddir)/libogmrip/libogmrip.la \
-  $(top_builddir)/libogmrip/libogmrip-mplayer.la
+  $(top_builddir)/libogmrip-job/libogmrip-job.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
 
 ogmrip_wav_la_SOURCES = \
   ogmrip-wav.c
@@ -125,8 +128,9 @@ ogmrip_wav_la_LIBTOOLFLAGS = \
   --tag=disable-static
 
 ogmrip_wav_la_LIBADD = \
-  $(top_builddir)/libogmrip/libogmrip.la \
-  $(top_builddir)/libogmrip/libogmrip-mplayer.la
+  $(top_builddir)/libogmrip-job/libogmrip-job.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
 
 if HAVE_MP3_SUPPORT
 audio_codecs_LTLIBRARIES += \
@@ -142,9 +146,9 @@ ogmrip_mp3_la_LIBTOOLFLAGS = \
   --tag=disable-static
 
 ogmrip_mp3_la_LIBADD = \
-  $(top_builddir)/libogmjob/libogmjob.la \
-  $(top_builddir)/libogmrip/libogmrip.la \
-	$(top_builddir)/libogmrip/libogmrip-mplayer.la
+  $(top_builddir)/libogmrip-job/libogmrip-job.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
 endif
 
 if HAVE_VORBIS_SUPPORT
@@ -161,9 +165,9 @@ ogmrip_vorbis_la_LIBTOOLFLAGS = \
   --tag=disable-static
 
 ogmrip_vorbis_la_LIBADD = \
-  $(top_builddir)/libogmjob/libogmjob.la \
-  $(top_builddir)/libogmrip/libogmrip.la \
-	$(top_builddir)/libogmrip/libogmrip-mplayer.la
+  $(top_builddir)/libogmrip-job/libogmrip-job.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
 endif
 
 if HAVE_AAC_SUPPORT
@@ -180,9 +184,9 @@ ogmrip_aac_la_LIBTOOLFLAGS = \
   --tag=disable-static
 
 ogmrip_aac_la_LIBADD = \
-  $(top_builddir)/libogmjob/libogmjob.la \
-  $(top_builddir)/libogmrip/libogmrip.la \
-	$(top_builddir)/libogmrip/libogmrip-mplayer.la
+  $(top_builddir)/libogmrip-job/libogmrip-job.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
 endif
 
 #
@@ -204,9 +208,9 @@ ogmrip_vobsub_la_LIBTOOLFLAGS = \
   --tag=disable-static
 
 ogmrip_vobsub_la_LIBADD = \
-  $(top_builddir)/libogmjob/libogmjob.la \
-  $(top_builddir)/libogmrip/libogmrip.la \
-	$(top_builddir)/libogmrip/libogmrip-mplayer.la
+  $(top_builddir)/libogmrip-job/libogmrip-job.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
 
 if HAVE_SRT_SUPPORT
 subp_codecs_LTLIBRARIES += \
@@ -222,9 +226,10 @@ ogmrip_srt_la_LIBTOOLFLAGS = \
   --tag=disable-static
 
 ogmrip_srt_la_LIBADD = \
-  $(top_builddir)/libogmdvd/libogmdvd.la \
-  $(top_builddir)/libogmrip/libogmrip.la \
-	$(top_builddir)/libogmrip/libogmrip-mplayer.la
+  $(top_builddir)/libogmrip-job/libogmrip-job.la \
+  $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
 endif
 
 #
@@ -246,9 +251,9 @@ ogmrip_avi_la_LIBTOOLFLAGS = \
   --tag=disable-static
 
 ogmrip_avi_la_LIBADD = \
-  $(top_builddir)/libogmjob/libogmjob.la \
-  $(top_builddir)/libogmrip/libogmrip.la \
-	$(top_builddir)/libogmrip/libogmrip-mplayer.la
+  $(top_builddir)/libogmrip-job/libogmrip-job.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
 
 if HAVE_OGM_SUPPORT
 containers_LTLIBRARIES += \
@@ -264,8 +269,9 @@ ogmrip_ogg_la_LIBTOOLFLAGS = \
   --tag=disable-static
 
 ogmrip_ogg_la_LIBADD = \
-  $(top_builddir)/libogmdvd/libogmdvd.la \
-  $(top_builddir)/libogmrip/libogmrip.la
+  $(top_builddir)/libogmrip-job/libogmrip-job.la \
+  $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la
 endif
 
 if HAVE_MKV_SUPPORT
@@ -282,9 +288,9 @@ ogmrip_mkv_la_LIBTOOLFLAGS = \
   --tag=disable-static
 
 ogmrip_mkv_la_LIBADD = \
-  $(top_builddir)/libogmdvd/libogmdvd.la \
-  $(top_builddir)/libogmjob/libogmjob.la \
-  $(top_builddir)/libogmrip/libogmrip.la
+  $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la \
+  $(top_builddir)/libogmrip-job/libogmrip-job.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la
 endif
 
 if HAVE_MP4_SUPPORT
@@ -301,9 +307,10 @@ ogmrip_mp4_la_LIBTOOLFLAGS = \
   --tag=disable-static
 
 ogmrip_mp4_la_LIBADD = \
-  $(top_builddir)/libogmdvd/libogmdvd.la \
-  $(top_builddir)/libogmrip/libogmrip.la \
-	$(top_builddir)/libogmrip/libogmrip-mplayer.la
+  $(top_builddir)/libogmrip-job/libogmrip-job.la \
+  $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
 endif
 
 #
@@ -329,9 +336,9 @@ ogmrip_lavc_options_la_LIBTOOLFLAGS = \
   --tag=disable-static
 
 ogmrip_lavc_options_la_LIBADD = \
-  $(top_builddir)/libogmrip/libogmrip.la \
-  $(top_builddir)/libogmrip/libogmrip-lavc.la \
-  $(top_builddir)/libogmrip-gtk/libogmrip-gtk.la
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-lavc.la \
+  $(top_builddir)/libogmrip-encode-gtk/libogmrip-encode-gtk.la
 endif
 
 if HAVE_XVID_SUPPORT
@@ -348,8 +355,8 @@ ogmrip_xvid_options_la_LIBTOOLFLAGS = \
   --tag=disable-static
 
 ogmrip_xvid_options_la_LIBADD = \
-  $(top_builddir)/libogmrip/libogmrip.la \
-  $(top_builddir)/libogmrip-gtk/libogmrip-gtk.la
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
+  $(top_builddir)/libogmrip-encode-gtk/libogmrip-encode-gtk.la
 endif
 
 if HAVE_X264_SUPPORT
@@ -366,8 +373,8 @@ ogmrip_x264_options_la_LIBTOOLFLAGS = \
   --tag=disable-static
 
 ogmrip_x264_options_la_LIBADD = \
-  $(top_builddir)/libogmrip/libogmrip.la \
-  $(top_builddir)/libogmrip-gtk/libogmrip-gtk.la
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
+  $(top_builddir)/libogmrip-encode-gtk/libogmrip-encode-gtk.la
 endif
 endif
 
@@ -376,15 +383,15 @@ endif
 #
 
 INCLUDES = \
-  -I$(top_srcdir)/libogmjob \
-  -I$(top_srcdir)/libogmdvd \
-  -I$(top_srcdir)/libogmrip \
+  -I$(top_srcdir)/libogmrip-job \
+  -I$(top_srcdir)/libogmrip-dvd \
+  -I$(top_srcdir)/libogmrip-encode \
   -DOGMRIP_LIB_DIR=\""$(libdir)"\" \
   -DOGMRIP_DATA_DIR=\""$(datadir)"\"
 
 if HAVE_GTK_SUPPORT
 INCLUDES += \
-  -I$(top_srcdir)/libogmrip-gtk
+  -I$(top_srcdir)/libogmrip-encode-gtk
 endif
 
 if MAINTAINER_MODE

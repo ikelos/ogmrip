@@ -21,19 +21,19 @@ EXTRA_DIST = \
   ogmrip-update-dialog.h
 
 ogmrip_LDADD = \
-  $(top_builddir)/libogmdvd/libogmdvd.la         \
-  $(top_builddir)/libogmdvd-gtk/libogmdvd-gtk.la \
-  $(top_builddir)/libogmjob/libogmjob.la         \
-  $(top_builddir)/libogmrip/libogmrip.la         \
-  $(top_builddir)/libogmrip-gtk/libogmrip-gtk.la
+  $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la         \
+  $(top_builddir)/libogmrip-dvd-gtk/libogmrip-dvd-gtk.la \
+  $(top_builddir)/libogmrip-job/libogmrip-job.la         \
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la   \
+  $(top_builddir)/libogmrip-encode-gtk/libogmrip-encode-gtk.la
 
 INCLUDES = \
-  -I$(top_srcdir)/libogmdvd     \
-  -I$(top_srcdir)/libogmdvd-gtk \
-  -I$(top_srcdir)/libogmjob     \
-  -I$(top_srcdir)/libogmrip     \
-  -I$(top_builddir)/libogmrip   \
-  -I$(top_srcdir)/libogmrip-gtk \
+  -I$(top_srcdir)/libogmrip-dvd        \
+  -I$(top_srcdir)/libogmrip-dvd-gtk    \
+  -I$(top_srcdir)/libogmrip-job        \
+  -I$(top_srcdir)/libogmrip-encode     \
+  -I$(top_srcdir)/libogmrip-encode-gtk \
+  -I$(top_builddir)/libogmrip-encode   \
   -DOGMRIP_DATA_DIR=\""$(datadir)"\"
 
 if MAINTAINER_MODE
