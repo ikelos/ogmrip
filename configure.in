@@ -137,22 +137,6 @@ LIBS="$LIBS $GTK_LIBS"
 
 dnl **************************************************************
 
-AC_ARG_ENABLE(dbus-support,
-  AC_HELP_STRING([--disable-dbus-support], [disable DBus support]),
-  [have_dbus_support="$enableval"], [have_dbus_support="yes"])
-
-if test x"$have_dbus_support" != x"no"; then
-  PKG_CHECK_MODULES(DBUS, [dbus-glib-1 >= 0.7.2], [have_dbus_support=yes], [have_dbus_support=no])
-  if test x"$have_dbus_support" = x"yes"; then
-    AC_DEFINE(HAVE_DBUS_SUPPORT, 1, [Define to 1 if dbus-glib is installed.])
-  fi
-fi
-
-CFLAGS="$CFLAGS $DBUS_CFLAGS "
-LIBS="$LIBS $DBUS_LIBS"
-
-dnl **************************************************************
-
 AC_ARG_ENABLE(enchant-support,
   AC_HELP_STRING([--disable-enchant-support], [disable Enchant support]),
   [have_enchant_support="$enableval"], [have_enchant_support="yes"])
@@ -486,12 +470,6 @@ if test x"$have_gtk_support" = xyes; then
   AC_MSG_NOTICE([** The GUI will be build])
 else
   AC_MSG_NOTICE([   The GUI will not be build])
-fi
-
-if test x"$have_dbus_support" = xyes; then
-  AC_MSG_NOTICE([** DBus support enabled])
-else
-  AC_MSG_NOTICE([   DBus support disabled])
 fi
 
 if test x"$have_enchant_support" = xyes; then

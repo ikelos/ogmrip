@@ -41,14 +41,9 @@
 #include <libnotify/notify.h>
 #endif /* HAVE_LIBNOTIFY_SUPPORT */
 
-#ifdef HAVE_DBUS_SUPPORT
-#include <gdk/gdkx.h>
-#include <dbus/dbus-glib.h>
-#endif /* HAVE_DBUS_SUPPORT */
-
-#define OGMRIP_UI_FILE      "ogmrip"  G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-ui.xml"
-#define OGMRIP_GLADE_FILE   "ogmrip"  G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-main.glade"
-#define OGMRIP_ICON_FILE    "pixmaps" G_DIR_SEPARATOR_S "ogmrip.png"
+#define OGMRIP_UI_FILE    "ogmrip"  G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-ui.xml"
+#define OGMRIP_GLADE_FILE "ogmrip"  G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-main.glade"
+#define OGMRIP_ICON_FILE  "pixmaps" G_DIR_SEPARATOR_S "ogmrip.png"
 
 #define OGMRIP_DEFAULT_FILE_NAME "movie"
 
@@ -163,7 +158,6 @@ spell_check_cleanup:
 }
 #endif /* HAVE_ENCHANT_SUPPORT */
 
-#ifdef HAVE_DBUS_SUPPORT
 #define PM_DBUS_SERVICE           "org.gnome.SessionManager"
 #define PM_DBUS_INHIBIT_PATH      "/org/gnome/SessionManager"
 #define PM_DBUS_INHIBIT_INTERFACE "org.gnome.SessionManager"
@@ -173,12 +167,11 @@ ogmrip_main_dbus_inhibit (OGMRipData *data)
 {
   GError *error = NULL;
 
-  DBusGConnection *conn;
-  DBusGProxy *proxy;
-  gboolean res;
+  GDBusConnection *conn;
+  GVariant *res;
   guint cookie;
 
-  conn = dbus_g_bus_get (DBUS_BUS_SESSION, &error);
+  conn = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
   if (!conn)
   {
     g_warning ("Couldn't get a DBUS connection: %s", error->message);
@@ -186,33 +179,33 @@ ogmrip_main_dbus_inhibit (OGMRipData *data)
     return -1;
   }
 
-  proxy = dbus_g_proxy_new_for_name (conn,
-      PM_DBUS_SERVICE, PM_DBUS_INHIBIT_PATH, PM_DBUS_INHIBIT_INTERFACE);
+  res = g_dbus_connection_call_sync (conn,
+      PM_DBUS_SERVICE,
+      PM_DBUS_INHIBIT_PATH,
+      PM_DBUS_INHIBIT_INTERFACE,
+      "Inhibit",
+      g_variant_new("(susu)",
+        g_get_application_name (),
+        0,
+        "Encoding",
+        1 | 4),
+      G_VARIANT_TYPE ("(u)"),
+      G_DBUS_CALL_FLAGS_NONE,
+      -1,
+      NULL,
+      &error);
 
-  if (proxy == NULL)
+  if (res)
   {
-    g_warning ("Could not get DBUS proxy: %s", PM_DBUS_SERVICE);
-    return -1;
+    g_variant_get (res, "(u)", &cookie);
+    g_variant_unref (res);
   }
-
-  res = dbus_g_proxy_call (proxy, "Inhibit", &error,
-      G_TYPE_STRING, "OGMRip",
-      G_TYPE_UINT, GDK_WINDOW_XID (gtk_widget_get_window (data->window)),
-      G_TYPE_STRING, "Encoding",
-      G_TYPE_UINT, 1 | 4,
-      G_TYPE_INVALID,
-      G_TYPE_UINT, &cookie,
-      G_TYPE_INVALID);
-
-  if (!res)
+  else
   {
     g_warning ("Failed to inhibit the system from suspending: %s", error->message);
     g_error_free (error);
     cookie = -1;
   }
-
-  g_object_unref (G_OBJECT (proxy));
-  dbus_g_connection_unref (conn);
 
   return cookie;
 }
@@ -222,11 +215,10 @@ ogmrip_main_dbus_uninhibit (OGMRipData *data, guint cookie)
 {
   GError *error = NULL;
 
-  DBusGConnection *conn;
-  DBusGProxy *proxy;
-  gboolean res;
+  GDBusConnection *conn;
+  GVariant *res;
 
-  conn = dbus_g_bus_get (DBUS_BUS_SESSION, &error);
+  conn = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
   if (!conn)
   {
     g_warning ("Couldn't get a DBUS connection: %s", error->message);
@@ -234,31 +226,27 @@ ogmrip_main_dbus_uninhibit (OGMRipData *data, guint cookie)
     return;
   }
 
-  proxy = dbus_g_proxy_new_for_name (conn,
-      PM_DBUS_SERVICE, PM_DBUS_INHIBIT_PATH, PM_DBUS_INHIBIT_INTERFACE);
+  res = g_dbus_connection_call_sync (conn,
+      PM_DBUS_SERVICE,
+      PM_DBUS_INHIBIT_PATH,
+      PM_DBUS_INHIBIT_INTERFACE,
+      "Uninhibit",
+      g_variant_new("(u)",
+        cookie),
+      NULL,
+      G_DBUS_CALL_FLAGS_NONE,
+      -1,
+      NULL,
+      &error);
 
-  if (proxy == NULL)
-  {
-    g_warning ("Could not get DBUS proxy: %s", PM_DBUS_SERVICE);
-    dbus_g_connection_unref (conn);
-    return;
-  }
-
-  res = dbus_g_proxy_call (proxy, "Uninhibit", &error,
-      G_TYPE_UINT, cookie,
-      G_TYPE_INVALID,
-      G_TYPE_INVALID);
-
-  if (!res)
+  if (res)
+    g_variant_unref (res);
+  else
   {
     g_warning ("Failed to restore the system power manager: %s", error->message);
     g_error_free (error);
   }
-
-  g_object_unref (G_OBJECT (proxy));
-  dbus_g_connection_unref (conn);
 }
-#endif /* HAVE_DBUS_SUPPORT */
 
 /*
  * Loads a media
@@ -509,13 +497,9 @@ ogmrip_main_encode (OGMRipData *data, OGMRipEncoding *encoding)
   {
     GError *error = NULL;
     GtkWidget *dialog;
-    gint result;
-
-#ifdef HAVE_DBUS_SUPPORT
-    gint cookie;
+    gint result, cookie;
 
     cookie = ogmrip_main_dbus_inhibit (data);
-#endif /* HAVE_DBUS_SUPPORT */
 
     dialog = ogmrip_progress_dialog_new (GTK_WINDOW (data->window),
         GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT, TRUE);
@@ -545,10 +529,8 @@ ogmrip_main_encode (OGMRipData *data, OGMRipEncoding *encoding)
 
     ogmrip_main_clean (data, encoding, result == OGMJOB_RESULT_ERROR);
 
-#ifdef HAVE_DBUS_SUPPORT
     if (cookie >= 0)
       ogmrip_main_dbus_uninhibit (data, cookie);
-#endif /* HAVE_DBUS_SUPPORT */
 
     ogmdvd_title_close (ogmrip_encoding_get_title (encoding));
 
