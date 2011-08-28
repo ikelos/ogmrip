@@ -1,0 +1,27 @@
+ogmrip-main.c
+- hardsub
+
+ogmrip-options-dialog.c
+- test de compressibilité
+
+ogmrip-encoding-manager.c
+- comment connaitre les encodages non faits ?
+
+ogmrip-container.c
+- comment ajouter le charset pour les sous-titres ?
+- comment ajouter le delay pour les pistes audio ?
+
+ogmrip-mp4.c
+- comment savoir si la vidéo a été encodée avec global_header ?
+
+ogmrip-xvid.glade
+- ajouter trellis, qpel, grayscale, cartoon, b frames
+
+ogmrip-lavc.glade
+- ajouter trellis, qpel, grayscale, v4mv, b frames
+
+ogmrip-x264.glade
+- ajouter trellis, partitions, b frames
+
+all
+- corriger les entêtes
