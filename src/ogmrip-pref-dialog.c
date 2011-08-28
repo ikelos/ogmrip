@@ -77,7 +77,7 @@ ogmrip_pref_dialog_lang_chooser_changed (GtkWidget *chooser, const gchar *key)
   g_signal_handlers_block_by_func (settings,
       ogmrip_pref_dialog_lang_setting_changed, chooser);
 
-  lang = ogmrip_language_chooser_get_active (GTK_COMBO_BOX (chooser));
+  lang = ogmrip_language_chooser_widget_get_active (OGMRIP_LANGUAGE_CHOOSER_WIDGET (chooser));
   g_settings_set (settings, key, "u", lang);
 
   g_signal_handlers_unblock_by_func (settings,
@@ -90,7 +90,7 @@ ogmrip_pref_dialog_lang_setting_changed (GtkWidget *chooser, const gchar *key)
   g_signal_handlers_block_by_func (chooser,
       ogmrip_pref_dialog_lang_chooser_changed, (gpointer) key);
 
-  ogmrip_language_chooser_set_active (GTK_COMBO_BOX (chooser),
+  ogmrip_language_chooser_widget_set_active (OGMRIP_LANGUAGE_CHOOSER_WIDGET (chooser),
       g_settings_get_uint (settings, key));
 
   g_signal_handlers_unblock_by_func (chooser,
@@ -110,7 +110,10 @@ ogmrip_pref_dialog_init (OGMRipPrefDialog *dialog)
   GError *error = NULL;
 
   GtkBuilder *builder;
-  GtkWidget *area, *widget;
+  GtkWidget *area, *widget, *chooser;
+
+  GtkTreeModel *model;
+  GtkTreeIter iter;
 
   builder = gtk_builder_new ();
   if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))
@@ -124,7 +127,6 @@ ogmrip_pref_dialog_init (OGMRipPrefDialog *dialog)
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
   gtk_window_set_title (GTK_WINDOW (dialog), _("Preferences"));
-  gtk_window_set_icon_from_stock (GTK_WINDOW (dialog), GTK_STOCK_PREFERENCES);
 
   area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
 
@@ -151,35 +153,58 @@ ogmrip_pref_dialog_init (OGMRipPrefDialog *dialog)
   widget = gtk_builder_get_widget (builder, "filename-combo");
   g_settings_bind (settings, OGMRIP_SETTINGS_FILENAME, widget, "active", G_SETTINGS_BIND_DEFAULT);
 
-  widget = gtk_builder_get_widget (builder, "pref-audio-combo");
-  ogmrip_language_chooser_construct (GTK_COMBO_BOX (widget));
+  area = gtk_builder_get_widget (builder, "pref-lang-table");
 
-  ogmrip_pref_dialog_lang_setting_changed (widget, OGMRIP_SETTINGS_PREF_AUDIO);
+  chooser = ogmrip_language_chooser_widget_new ();
+  gtk_table_attach (GTK_TABLE (area), chooser, 1, 2, 0, 1, GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0);
+  gtk_widget_show (chooser);
 
-  g_signal_connect (widget, "changed",
+  model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
+  gtk_list_store_append (GTK_LIST_STORE (model), &iter);
+  gtk_list_store_set (GTK_LIST_STORE (model), &iter,
+      OGMRIP_LANGUAGE_STORE_NAME_COLUMN, _("No favorite audio language"),
+      OGMRIP_LANGUAGE_STORE_CODE_COLUMN, 0, -1);
+
+  ogmrip_pref_dialog_lang_setting_changed (chooser, OGMRIP_SETTINGS_PREF_AUDIO);
+
+  g_signal_connect (chooser, "changed",
       G_CALLBACK (ogmrip_pref_dialog_lang_chooser_changed), OGMRIP_SETTINGS_PREF_AUDIO);
   g_signal_connect_swapped (settings, "changed::" OGMRIP_SETTINGS_PREF_AUDIO,
-      G_CALLBACK (ogmrip_pref_dialog_lang_setting_changed), widget);
+      G_CALLBACK (ogmrip_pref_dialog_lang_setting_changed), chooser);
 
-  widget = gtk_builder_get_widget (builder, "pref-subp-combo");
-  ogmrip_language_chooser_construct (GTK_COMBO_BOX (widget));
+  chooser = ogmrip_language_chooser_widget_new ();
+  gtk_table_attach (GTK_TABLE (area), chooser, 1, 2, 1, 2, GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0);
+  gtk_widget_show (chooser);
 
-  ogmrip_pref_dialog_lang_setting_changed (widget, OGMRIP_SETTINGS_PREF_SUBP);
+  model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
+  gtk_list_store_append (GTK_LIST_STORE (model), &iter);
+  gtk_list_store_set (GTK_LIST_STORE (model), &iter,
+      OGMRIP_LANGUAGE_STORE_NAME_COLUMN, _("No favorite subtitle language"),
+      OGMRIP_LANGUAGE_STORE_CODE_COLUMN, 0, -1);
 
-  g_signal_connect (widget, "changed",
+  ogmrip_pref_dialog_lang_setting_changed (chooser, OGMRIP_SETTINGS_PREF_SUBP);
+
+  g_signal_connect (chooser, "changed",
       G_CALLBACK (ogmrip_pref_dialog_lang_chooser_changed), OGMRIP_SETTINGS_PREF_SUBP);
   g_signal_connect_swapped (settings, "changed::" OGMRIP_SETTINGS_PREF_SUBP,
-      G_CALLBACK (ogmrip_pref_dialog_lang_setting_changed), widget);
+      G_CALLBACK (ogmrip_pref_dialog_lang_setting_changed), chooser);
 
-  widget = gtk_builder_get_widget (builder, "chapter-lang-combo");
-  ogmrip_language_chooser_construct (GTK_COMBO_BOX (widget));
+  chooser = ogmrip_language_chooser_widget_new ();
+  gtk_table_attach (GTK_TABLE (area), chooser, 1, 2, 2, 3, GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0);
+  gtk_widget_show (chooser);
 
-  ogmrip_pref_dialog_lang_setting_changed (widget, OGMRIP_SETTINGS_CHAPTER_LANG);
+  model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
+  gtk_list_store_append (GTK_LIST_STORE (model), &iter);
+  gtk_list_store_set (GTK_LIST_STORE (model), &iter,
+      OGMRIP_LANGUAGE_STORE_NAME_COLUMN, _("No chapters language"),
+      OGMRIP_LANGUAGE_STORE_CODE_COLUMN, 0, -1);
 
-  g_signal_connect (widget, "changed",
+  ogmrip_pref_dialog_lang_setting_changed (chooser, OGMRIP_SETTINGS_CHAPTER_LANG);
+
+  g_signal_connect (chooser, "changed",
       G_CALLBACK (ogmrip_pref_dialog_lang_chooser_changed), OGMRIP_SETTINGS_CHAPTER_LANG);
   g_signal_connect_swapped (settings, "changed::" OGMRIP_SETTINGS_CHAPTER_LANG,
-      G_CALLBACK (ogmrip_pref_dialog_lang_setting_changed), widget);
+      G_CALLBACK (ogmrip_pref_dialog_lang_setting_changed), chooser);
 
   /*
    * Advanced

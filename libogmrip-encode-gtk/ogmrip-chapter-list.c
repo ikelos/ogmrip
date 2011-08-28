@@ -85,7 +85,7 @@ ogmrip_chapter_extract_toggled (OGMRipChapterList *list, gchar *path)
     gtk_tree_model_get (model, &next_iter, COL_EXTRACT, &next_extract, -1);
 
   prev_iter = iter;
-  if (gtk_tree_model_iter_prev (model, &prev_iter))
+  if (gtk_tree_model_iter_previous (model, &prev_iter))
     gtk_tree_model_get (model, &prev_iter, COL_EXTRACT, &prev_extract, -1);
 
   gtk_tree_model_get (model, &iter, COL_EXTRACT, &extract, -1);

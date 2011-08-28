@@ -21,6 +21,9 @@
 #endif
 
 #include "ogmrip-encoding-manager-dialog.h"
+#include "ogmrip-profile-keys.h"
+#include "ogmrip-error-dialog.h"
+#include "ogmrip-helper.h"
 
 #include <glib/gi18n-lib.h>
 

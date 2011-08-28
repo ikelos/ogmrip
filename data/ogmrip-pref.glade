@@ -8,48 +8,6 @@
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
-  <object class="GtkListStore" id="chapter-lang-store">
-    <columns>
-      <!-- column-name lang -->
-      <column type="gchararray"/>
-      <!-- column-name id -->
-      <column type="guint"/>
-    </columns>
-    <data>
-      <row>
-        <col id="0" translatable="yes">No chapters language</col>
-        <col id="1">0</col>
-      </row>
-    </data>
-  </object>
-  <object class="GtkListStore" id="pref-audio-store">
-    <columns>
-      <!-- column-name lang -->
-      <column type="gchararray"/>
-      <!-- column-name id -->
-      <column type="guint"/>
-    </columns>
-    <data>
-      <row>
-        <col id="0" translatable="yes">No favorite audio language</col>
-        <col id="1">0</col>
-      </row>
-    </data>
-  </object>
-  <object class="GtkListStore" id="pref-subp-store">
-    <columns>
-      <!-- column-name lang -->
-      <column type="gchararray"/>
-      <!-- column-name id -->
-      <column type="guint"/>
-    </columns>
-    <data>
-      <row>
-        <col id="0" translatable="yes">No favorite subtitle language</col>
-        <col id="1">0</col>
-      </row>
-    </data>
-  </object>
   <object class="GtkNotebook" id="root">
     <property name="visible">True</property>
     <property name="can_focus">True</property>
@@ -196,7 +154,7 @@
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                 <property name="left_padding">12</property>
                 <child>
-                  <object class="GtkTable" id="table1">
+                  <object class="GtkTable" id="pref-lang-table">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
@@ -205,45 +163,26 @@
                     <property name="column_spacing">6</property>
                     <property name="row_spacing">6</property>
                     <child>
-                      <object class="GtkComboBox" id="pref-audio-combo">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="model">pref-audio-store</property>
-                        <child>
-                          <object class="GtkCellRendererText" id="pref-audio-renderer"/>
-                          <attributes>
-                            <attribute name="text">0</attribute>
-                          </attributes>
-                        </child>
-                      </object>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel" id="label6">
+                      <object class="GtkLabel" id="pref-audio-label">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                         <property name="xalign">0</property>
                         <property name="label" translatable="yes">_Audio:</property>
                         <property name="use_underline">True</property>
-                        <property name="mnemonic_widget">pref-audio-combo</property>
                       </object>
                       <packing>
                         <property name="x_options">GTK_FILL</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkLabel" id="label5">
+                      <object class="GtkLabel" id="pref-subp-label">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                         <property name="xalign">0</property>
                         <property name="label" translatable="yes">_Subtitles:</property>
                         <property name="use_underline">True</property>
-                        <property name="mnemonic_widget">pref-subp-combo</property>
                       </object>
                       <packing>
                         <property name="top_attach">1</property>
@@ -252,58 +191,18 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkLabel" id="label4">
+                      <object class="GtkLabel" id="chapter-lang-label">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                         <property name="xalign">0</property>
                         <property name="label" translatable="yes">_Chapters:</property>
                         <property name="use_underline">True</property>
-                        <property name="mnemonic_widget">chapter-lang-combo</property>
                       </object>
                       <packing>
                         <property name="top_attach">2</property>
                         <property name="bottom_attach">3</property>
                         <property name="x_options">GTK_FILL</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkComboBox" id="pref-subp-combo">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="model">pref-subp-store</property>
-                        <child>
-                          <object class="GtkCellRendererText" id="pref-subp-renderer"/>
-                          <attributes>
-                            <attribute name="text">0</attribute>
-                          </attributes>
-                        </child>
-                      </object>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">1</property>
-                        <property name="bottom_attach">2</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkComboBox" id="chapter-lang-combo">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                        <property name="model">chapter-lang-store</property>
-                        <child>
-                          <object class="GtkCellRendererText" id="chapter-lang-renderer"/>
-                          <attributes>
-                            <attribute name="text">0</attribute>
-                          </attributes>
-                        </child>
-                      </object>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">2</property>
-                        <property name="bottom_attach">3</property>
                       </packing>
                     </child>
                   </object>

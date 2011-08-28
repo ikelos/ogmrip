@@ -185,7 +185,6 @@ ogmrip_lavc_dialog_init (OGMRipLavcDialog *dialog)
   gtk_window_set_title (GTK_WINDOW (dialog), _("Lavc Options"));
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
-  gtk_window_set_icon_from_stock (GTK_WINDOW (dialog), GTK_STOCK_PREFERENCES);
 }
 
 static OGMRipVideoOptionsPlugin lavc_options_plugin =

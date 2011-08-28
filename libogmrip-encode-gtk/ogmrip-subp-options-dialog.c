@@ -21,6 +21,7 @@
 #endif
 
 #include "ogmrip-subp-options-dialog.h"
+#include "ogmrip-language-chooser-widget.h"
 #include "ogmrip-helper.h"
 
 #include <glib/gi18n-lib.h>
@@ -203,7 +204,6 @@ ogmrip_subp_options_dialog_init (OGMRipSubpOptionsDialog *dialog)
 
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
   gtk_window_set_title (GTK_WINDOW (dialog), _("Subtitles Options"));
-  gtk_window_set_icon_from_stock (GTK_WINDOW (dialog), GTK_STOCK_PROPERTIES);
 
   area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
 
@@ -254,18 +254,16 @@ ogmrip_subp_options_dialog_init (OGMRipSubpOptionsDialog *dialog)
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
   gtk_widget_show (label);
 
-  dialog->priv->lang_chooser = ogmrip_language_chooser_new ();
+  dialog->priv->lang_chooser = ogmrip_language_chooser_widget_new ();
+  gtk_label_set_mnemonic_widget (GTK_LABEL (label), dialog->priv->lang_chooser);
   gtk_table_attach (GTK_TABLE (table), dialog->priv->lang_chooser, 1, 2, 1, 2, GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0);
   gtk_widget_show (dialog->priv->lang_chooser);
 
   model = gtk_combo_box_get_model (GTK_COMBO_BOX (dialog->priv->lang_chooser));
-
-  gtk_list_store_append (GTK_LIST_STORE (model), &iter);
-  gtk_list_store_set (GTK_LIST_STORE (model), &iter, 0, _("None"), 1, 0, -1);
-
-  ogmrip_language_chooser_construct (GTK_COMBO_BOX (dialog->priv->lang_chooser));
-
-  gtk_label_set_mnemonic_widget (GTK_LABEL (label), dialog->priv->lang_chooser);
+  gtk_list_store_prepend (GTK_LIST_STORE (model), &iter);
+  gtk_list_store_set (GTK_LIST_STORE (model), &iter,
+      OGMRIP_LANGUAGE_STORE_NAME_COLUMN, _("None"),
+      OGMRIP_LANGUAGE_STORE_CODE_COLUMN, 0, -1);
 
   dialog->priv->default_check = gtk_check_button_new_with_mnemonic (_("Use _profile settings"));
   gtk_table_attach (GTK_TABLE (table), dialog->priv->default_check, 0, 2, 2, 3, GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0);
@@ -409,12 +407,12 @@ ogmrip_subp_options_dialog_set_label (OGMRipSubpOptionsDialog *dialog, const gch
 gint
 ogmrip_subp_options_dialog_get_language (OGMRipSubpOptionsDialog *dialog)
 {
-  return ogmrip_language_chooser_get_active (GTK_COMBO_BOX (dialog->priv->lang_chooser));
+  return ogmrip_language_chooser_widget_get_active (OGMRIP_LANGUAGE_CHOOSER_WIDGET (dialog->priv->lang_chooser));
 }
 
 void
 ogmrip_subp_options_dialog_set_language (OGMRipSubpOptionsDialog *dialog, gint lang)
 {
-  ogmrip_language_chooser_set_active (GTK_COMBO_BOX (dialog->priv->lang_chooser), lang);
+  ogmrip_language_chooser_widget_set_active (OGMRIP_LANGUAGE_CHOOSER_WIDGET (dialog->priv->lang_chooser), lang);
 }
 

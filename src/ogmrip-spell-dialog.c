@@ -202,7 +202,6 @@ ogmrip_spell_dialog_init (OGMRipSpellDialog *dialog)
       GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
       NULL);
   gtk_window_set_title (GTK_WINDOW (dialog), _("Spell Checking"));
-  gtk_window_set_icon_from_stock (GTK_WINDOW (dialog), GTK_STOCK_SPELL_CHECK);
 
   area = gtk_dialog_get_action_area (GTK_DIALOG (dialog));
 

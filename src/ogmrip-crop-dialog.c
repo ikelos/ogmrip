@@ -262,7 +262,6 @@ ogmrip_crop_dialog_init (OGMRipCropDialog *dialog)
       GTK_STOCK_OK, GTK_RESPONSE_OK,
       NULL);
   gtk_window_set_title (GTK_WINDOW (dialog), _("Cropping"));
-  gtk_window_set_icon_from_stock (GTK_WINDOW (dialog), GTK_STOCK_PROPERTIES);
 
   area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
 

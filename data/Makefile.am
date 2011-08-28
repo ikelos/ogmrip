@@ -1,5 +1,6 @@
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = ogmrip-encode.pc \
+                 ogmrip-media.pc  \
                  ogmrip-dvd.pc    \
                  ogmrip-job.pc
 

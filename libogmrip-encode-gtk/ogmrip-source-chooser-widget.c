@@ -29,6 +29,7 @@
 
 #include "ogmrip-source-chooser-widget.h"
 #include "ogmrip-file-chooser-dialog.h"
+#include "ogmrip-error-dialog.h"
 
 #include "ogmrip-helper.h"
 

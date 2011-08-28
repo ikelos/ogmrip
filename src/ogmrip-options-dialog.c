@@ -27,6 +27,8 @@
 
 #include <glib/gi18n.h>
 
+#include <stdlib.h>
+
 #define OGMRIP_GLADE_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-options.glade"
 #define OGMRIP_GLADE_ROOT "root"
 
@@ -102,6 +104,54 @@ extern GSettings *settings;
 
 static const guint m[] = { 0, 1, 1, 1, 3, 5, 1 };
 static const guint d[] = { 0, 8, 4, 2, 4, 6, 1 };
+
+static void
+gtk_label_set_int (GtkLabel *label, gint value)
+{
+  gchar *text;
+
+  text = g_strdup_printf ("%d", value);
+  gtk_label_set_text (label, text);
+  g_free (text);
+}
+
+static gint
+gtk_label_get_int (GtkLabel *label)
+{
+  return atoi (gtk_label_get_text (label));
+}
+
+OGMRipProfile *
+ogmrip_profile_chooser_get_active (GtkComboBox *chooser)
+{
+  GtkTreeModel *model;
+  GtkTreeIter iter;
+
+  if (!gtk_combo_box_get_active_iter (chooser, &iter))
+    return NULL;
+
+  model = gtk_combo_box_get_model (chooser);
+
+  return ogmrip_profile_store_get_profile (OGMRIP_PROFILE_STORE (model), &iter);
+}
+
+void
+ogmrip_profile_chooser_set_active (GtkComboBox *chooser, OGMRipProfile *profile)
+{
+  if (!profile)
+    gtk_combo_box_set_active (chooser, -1);
+  else
+  {
+    GtkTreeModel *model;
+    GtkTreeIter iter;
+
+    model = gtk_combo_box_get_model (chooser);
+    if (ogmrip_profile_store_get_iter (OGMRIP_PROFILE_STORE (model), &iter, profile))
+      gtk_combo_box_set_active_iter (chooser, &iter);
+    else
+      gtk_combo_box_set_active (chooser, 0);
+  }
+}
 
 static void
 scale_to_size (guint cw, guint ch, gdouble r, guint s, guint *sw, guint *sh)
@@ -371,7 +421,7 @@ ogmrip_options_dialog_edit_profiles_button_clicked (OGMRipOptionsDialog *parent)
     GtkWidget *dialog;
 
     dialog = ogmrip_profile_editor_dialog_new (profile);
-    gtk_window_set_parent (GTK_WINDOW (dialog), GTK_WINDOW (parent));
+    gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (parent));
     gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), FALSE);
 
     gtk_dialog_run (GTK_DIALOG (dialog));
@@ -609,7 +659,6 @@ ogmrip_options_dialog_constructed (GObject *gobject)
 
   gtk_window_set_title (GTK_WINDOW (dialog), _("Options"));
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
-  gtk_window_set_icon_from_stock (GTK_WINDOW (dialog), GTK_STOCK_PROPERTIES);
 
   if (ogmrip_encoding_get_profile (dialog->priv->encoding))
     gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE);
@@ -647,7 +696,16 @@ ogmrip_options_dialog_constructed (GObject *gobject)
   gtk_widget_show (widget);
 
   dialog->priv->profile_combo = gtk_builder_get_widget (builder, "profile-combo");
-  ogmrip_profile_chooser_construct (GTK_COMBO_BOX (dialog->priv->profile_combo));
+
+  store = (GtkListStore *) ogmrip_profile_store_new (NULL);
+  gtk_combo_box_set_model (GTK_COMBO_BOX (dialog->priv->profile_combo), GTK_TREE_MODEL (store));
+  g_object_unref (store);
+
+  renderer = gtk_cell_renderer_text_new ();
+  gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (dialog->priv->profile_combo), renderer, TRUE);
+  gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (dialog->priv->profile_combo),
+      renderer, "markup", OGMRIP_PROFILE_STORE_NAME_COLUMN, NULL);
+
   g_signal_connect_swapped (dialog->priv->profile_combo, "changed",
       G_CALLBACK (ogmrip_options_dialog_profile_chooser_changed), dialog);
   g_signal_connect_swapped (settings, "changed::" OGMRIP_SETTINGS_PROFILE,

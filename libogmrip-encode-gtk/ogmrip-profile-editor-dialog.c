@@ -59,6 +59,39 @@ static void ogmrip_profile_editor_dialog_set_property (GObject               *go
                                                        GParamSpec            *pspec);
 static void ogmrip_profile_editor_dialog_dispose      (GObject               *gobject);
 
+static GtkTreeRowReference *
+gtk_tree_model_get_row_reference (GtkTreeModel *model, GtkTreeIter *iter)
+{
+  GtkTreePath *path;
+  GtkTreeRowReference *ref;
+
+  path = gtk_tree_model_get_path (model, iter);
+  ref = gtk_tree_row_reference_new (model, path);
+  gtk_tree_path_free (path);
+
+  return ref;
+}
+
+static gboolean
+gtk_tree_row_reference_get_iter (GtkTreeRowReference *ref, GtkTreeIter *iter)
+{
+  GtkTreeModel *model;
+  GtkTreePath *path;
+  gboolean retval;
+
+  model = gtk_tree_row_reference_get_model (ref);
+
+  path = gtk_tree_row_reference_get_path (ref);
+  if (!path)
+    return FALSE;
+
+  retval = gtk_tree_model_get_iter (model, iter, path);
+
+  gtk_tree_path_free (path);
+
+  return retval;
+}
+
 static void
 ogmrip_profile_editor_dialog_update_codecs (OGMRipProfileEditorDialog *editor)
 {
@@ -457,7 +490,6 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
   gtk_container_set_border_width (GTK_CONTAINER (dialog), 5);
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
-  gtk_window_set_icon_from_stock (GTK_WINDOW (dialog), GTK_STOCK_PREFERENCES);
 
   builder = gtk_builder_new ();
   if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))

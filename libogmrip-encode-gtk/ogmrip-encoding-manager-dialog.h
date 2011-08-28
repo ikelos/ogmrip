@@ -19,7 +19,9 @@
 #ifndef __OGMRIP_ENCODING_MANAGER_DIALOG_H__
 #define __OGMRIP_ENCODING_MANAGER_DIALOG_H__
 
-#include <ogmrip-gtk.h>
+#include <gtk/gtk.h>
+
+#include <ogmrip-encoding-manager.h>
 
 G_BEGIN_DECLS
 

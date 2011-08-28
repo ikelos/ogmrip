@@ -1,4 +1,4 @@
-/* OGMDvd - A wrapper library around libripread
+/* OGMRip - A wrapper library around libdvdread
  * Copyright (C) 2004-2010 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -16,25 +16,19 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef __OGMRIP_GTK_H__
-#define __OGMRIP_GTK_H__
+#ifndef __OGMRIP_ERROR_DIALOG_H__
+#define __OGMRIP_ERROR_DIALOG_H__
 
-#include <ogmrip.h>
-#include <ogmrip-audio-chooser-widget.h>
-#include <ogmrip-audio-file-chooser-dialog.h>
-#include <ogmrip-chapter-list.h>
-#include <ogmrip-encoding-manager-dialog.h>
-#include <ogmrip-error-dialog.h>
-#include <ogmrip-helper.h>
-#include <ogmrip-language-chooser-widget.h>
-#include <ogmrip-list-item.h>
-#include <ogmrip-options-plugin.h>
-#include <ogmrip-profile-editor-dialog.h>
-#include <ogmrip-profile-manager-dialog.h>
-#include <ogmrip-profile-store.h>
-#include <ogmrip-progress-dialog.h>
-#include <ogmrip-subp-chooser-widget.h>
-#include <ogmrip-subp-file-chooser-dialog.h>
+#include <gtk/gtk.h>
 
-#endif /* __OGMRIP_GTK_H__ */
+G_BEGIN_DECLS
+
+void ogmrip_run_error_dialog (GtkWindow   *parent,
+                              GError      *error,
+                              const gchar *message_format,
+                              ...);
+
+G_END_DECLS
+
+#endif /* __OGMRIP_ERROR_DIALOG_H__ */
 

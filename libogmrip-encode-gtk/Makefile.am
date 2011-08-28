@@ -8,12 +8,16 @@ libogmrip_encode_gtk_la_SOURCES =    \
   ogmrip-audio-options-dialog.c      \
   ogmrip-chapter-list.c              \
   ogmrip-encoding-manager-dialog.c   \
+  ogmrip-error-dialog.c              \
   ogmrip-file-chooser-dialog.c       \
   ogmrip-helper.c                    \
+  ogmrip-language-chooser-widget.c   \
+  ogmrip-language-store.c            \
   ogmrip-list-item.c                 \
   ogmrip-options-plugin.c            \
   ogmrip-profile-editor-dialog.c     \
   ogmrip-profile-manager-dialog.c    \
+  ogmrip-profile-store.c             \
   ogmrip-progress-dialog.c           \
   ogmrip-source-chooser.c            \
   ogmrip-source-chooser-widget.c     \
@@ -32,12 +36,16 @@ libogmrip_encode_gtk_la_HEADERS =    \
   ogmrip-audio-options-dialog.h      \
   ogmrip-chapter-list.h              \
   ogmrip-encoding-manager-dialog.h   \
+  ogmrip-error-dialog.h              \
   ogmrip-file-chooser-dialog.h       \
   ogmrip-helper.h                    \
+  ogmrip-language-chooser-widget.h   \
+  ogmrip-language-store.h            \
   ogmrip-list-item.h                 \
   ogmrip-options-plugin.h            \
   ogmrip-profile-editor-dialog.h     \
   ogmrip-profile-manager-dialog.h    \
+  ogmrip-profile-store.h             \
   ogmrip-progress-dialog.h           \
   ogmrip-source-chooser.h            \
   ogmrip-source-chooser-widget.h     \

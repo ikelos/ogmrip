@@ -21,7 +21,7 @@
 #endif
 
 #include "ogmrip-file-chooser-dialog.h"
-#include "ogmrip-helper.h"
+#include "ogmrip-language-chooser-widget.h"
 
 #include <glib/gi18n-lib.h>
 
@@ -76,17 +76,15 @@ ogmrip_file_chooser_dialog_constructed (GObject *gobject)
   gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
   gtk_widget_show (label);
 
-  dialog->priv->lang_chooser = ogmrip_language_chooser_new ();
+  dialog->priv->lang_chooser = ogmrip_language_chooser_widget_new ();
   gtk_box_pack_start (GTK_BOX (hbox), dialog->priv->lang_chooser, TRUE, TRUE, 0);
   gtk_widget_show (dialog->priv->lang_chooser);
 
   model = gtk_combo_box_get_model (GTK_COMBO_BOX (dialog->priv->lang_chooser));
-
-  gtk_list_store_append (GTK_LIST_STORE (model), &iter);
-  gtk_list_store_set (GTK_LIST_STORE (model), &iter, 0, _("None"), 1, 0, -1);
-
-  gtk_combo_box_set_active_iter (GTK_COMBO_BOX (dialog->priv->lang_chooser), &iter);
-  ogmrip_language_chooser_construct (GTK_COMBO_BOX (dialog->priv->lang_chooser));
+  gtk_list_store_prepend (GTK_LIST_STORE (model), &iter);
+  gtk_list_store_set (GTK_LIST_STORE (model), &iter,
+      OGMRIP_LANGUAGE_STORE_NAME_COLUMN, _("None"),
+      OGMRIP_LANGUAGE_STORE_CODE_COLUMN, 0, -1);
 
   G_OBJECT_CLASS (ogmrip_file_chooser_dialog_parent_class)->constructed (gobject);
 }
@@ -110,7 +108,7 @@ ogmrip_file_chooser_dialog_get_file (OGMRipFileChooserDialog *chooser, GError **
     return NULL;
 
   ogmrip_file_set_language (file,
-      ogmrip_language_chooser_get_active (GTK_COMBO_BOX (chooser->priv->lang_chooser)));
+      ogmrip_language_chooser_widget_get_active (OGMRIP_LANGUAGE_CHOOSER_WIDGET (chooser->priv->lang_chooser)));
 
   return file;
 }

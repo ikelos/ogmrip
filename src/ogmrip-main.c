@@ -108,7 +108,9 @@ ogmrip_main_spell_check (OGMRipData *data, const gchar *filename, gint lang)
     goto spell_check_cleanup;
   }
 
-  gtk_window_set_parent (GTK_WINDOW (dialog), GTK_WINDOW (data->window));
+  gtk_window_set_modal (GTK_WINDOW (dialog), TRUE);
+  gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (data->window));
+  gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
   gtk_window_present (GTK_WINDOW (dialog));
 
   do
@@ -1128,7 +1130,8 @@ ogmrip_main_load_activated (OGMRipData *data)
   GtkWidget *dialog;
 
   dialog = ogmdvd_drive_chooser_dialog_new ();
-  gtk_window_set_parent (GTK_WINDOW (dialog), GTK_WINDOW (data->window));
+  gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (data->window));
+  gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
 
   g_signal_connect_swapped (dialog, "eject", G_CALLBACK (ogmrip_main_eject_activated), data);
 
@@ -1177,7 +1180,8 @@ ogmrip_main_extract_activated (OGMRipData *data)
       gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (data->relative_check)));
 
   dialog = ogmrip_options_dialog_new (encoding);
-  gtk_window_set_parent (GTK_WINDOW (dialog), GTK_WINDOW (data->window));
+  gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (data->window));
+  gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
 
   response = gtk_dialog_run (GTK_DIALOG (dialog));
   if (response != OGMRIP_RESPONSE_EXTRACT && response != OGMRIP_RESPONSE_ENQUEUE)
@@ -1445,7 +1449,8 @@ ogmrip_main_pref_activated (OGMRipData *data)
   GtkWidget *dialog;
 
   dialog = ogmrip_pref_dialog_new ();
-  gtk_window_set_parent (GTK_WINDOW (dialog), GTK_WINDOW (data->window));
+  gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (data->window));
+  gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
 
   gtk_dialog_run (GTK_DIALOG (dialog));
   gtk_widget_destroy (dialog);
@@ -1460,7 +1465,8 @@ ogmrip_main_profiles_activated (OGMRipData *data)
   GtkWidget *dialog;
 
   dialog = ogmrip_profile_manager_dialog_new ();
-  gtk_window_set_parent (GTK_WINDOW (dialog), GTK_WINDOW (data->window));
+  gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (data->window));
+  gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
 
   gtk_dialog_run (GTK_DIALOG (dialog));
   gtk_widget_destroy (dialog);
@@ -1475,7 +1481,8 @@ ogmrip_main_encodings_activated (OGMRipData *data)
   GtkWidget *dialog;
 
   dialog = ogmrip_encoding_manager_dialog_new (data->manager);
-  gtk_window_set_parent (GTK_WINDOW (dialog), GTK_WINDOW (data->window));
+  gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (data->window));
+  gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
 
   gtk_dialog_run (GTK_DIALOG (dialog));
   gtk_widget_destroy (dialog);
@@ -1923,6 +1930,7 @@ static void
 ogmrip_init (void)
 {
   OGMRipProfileEngine *engine;
+  gchar *path;
 
   ogmrip_settings_init ();
 
@@ -1934,10 +1942,14 @@ ogmrip_init (void)
 #endif /* HAVE_LIBNOTIFY_SUPPORT */
 
   engine = ogmrip_profile_engine_get_default ();
-  ogmrip_profile_engine_add_path (engine,
-      ogmrip_get_system_profiles_dir ());
-  ogmrip_profile_engine_add_path (engine,
-      ogmrip_get_user_profiles_dir ());
+
+  path = g_build_filename (OGMRIP_DATA_DIR, "ogmrip", "profiles", NULL);
+  ogmrip_profile_engine_add_path (engine, path);
+  g_free (path);
+
+  path = g_build_filename (g_get_user_data_dir (), "ogmrip", "profiles", NULL);
+  ogmrip_profile_engine_add_path (engine, path);
+  g_free (path);
 }
 
 static void
