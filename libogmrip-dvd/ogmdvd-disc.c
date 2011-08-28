@@ -29,7 +29,6 @@
 
 #include "ogmdvd-disc.h"
 #include "ogmdvd-priv.h"
-#include "ogmdvd-enums.h"
 #include "ogmdvd-title.h"
 #include "ogmdvd-video.h"
 

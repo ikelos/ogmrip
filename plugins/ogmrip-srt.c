@@ -222,7 +222,7 @@ ogmrip_tesseract_command (OGMRipSubpCodec *subp, const gchar *input, gboolean la
     const gchar *language;
 
     stream = ogmrip_codec_get_input (OGMRIP_CODEC (subp));
-    language = ogmdvd_get_language_iso639_2 (ogmdvd_subp_stream_get_language (OGMDVD_SUBP_STREAM (stream)));
+    language = ogmrip_language_get_iso639_2 (ogmdvd_subp_stream_get_language (OGMDVD_SUBP_STREAM (stream)));
 
     if (g_str_equal (language, "und"))
       OGMRIP_SRT (subp)->is_valid_lang = FALSE;

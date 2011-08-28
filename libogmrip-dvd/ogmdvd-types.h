@@ -21,15 +21,9 @@
 
 #include <gio/gio.h>
 
-G_BEGIN_DECLS
+#include <ogmrip-media.h>
 
-typedef struct
-{
-  guint hour;
-  guint min;
-  guint sec;
-  guint frames;
-} OGMDvdTime;
+G_BEGIN_DECLS
 
 #define OGMDVD_DISC(disc)          ((OGMDvdDisc *) (disc))
 #define OGMDVD_TITLE(title)        ((OGMDvdTitle *) (title))

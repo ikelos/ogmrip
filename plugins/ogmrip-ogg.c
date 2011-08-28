@@ -128,7 +128,7 @@ ogmrip_ogg_merge_append_audio_file (OGMRipContainer *ogg,
     {
       g_ptr_array_add (argv, g_strdup ("-c"));
       g_ptr_array_add (argv, g_strdup_printf ("LANGUAGE=%s", 
-            g_strdup (ogmdvd_get_language_label (language))));
+            g_strdup (ogmrip_language_get_label (language))));
     }
 
     sync = ogmrip_ogg_get_sync (ogg);
@@ -158,7 +158,7 @@ ogmrip_ogg_merge_append_subp_file (OGMRipContainer *ogg,
     {
       g_ptr_array_add (argv, g_strdup ("-c"));
       g_ptr_array_add (argv, g_strdup_printf ("LANGUAGE=%s",
-            g_strdup (ogmdvd_get_language_label (language))));
+            g_strdup (ogmrip_language_get_label (language))));
     }
 
     g_ptr_array_add (argv, g_strdup ("--novideo"));
@@ -181,7 +181,7 @@ ogmrip_ogg_merge_append_chapters_file (OGMRipContainer *ogg,
     {
       g_ptr_array_add (argv, g_strdup ("-c"));
       g_ptr_array_add (argv, g_strdup_printf ("LANGUAGE=%s",
-            g_strdup (ogmdvd_get_language_label (language))));
+            g_strdup (ogmrip_language_get_label (language))));
     }
 
     g_ptr_array_add (argv, g_strdup ("--novideo"));

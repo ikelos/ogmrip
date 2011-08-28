@@ -227,6 +227,7 @@ ogmrip_srt_la_LIBTOOLFLAGS = \
 
 ogmrip_srt_la_LIBADD = \
   $(top_builddir)/libogmrip-job/libogmrip-job.la \
+  $(top_builddir)/libogmrip-media/libogmrip-media.la \
   $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la \
   $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
   $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
@@ -270,6 +271,7 @@ ogmrip_ogg_la_LIBTOOLFLAGS = \
 
 ogmrip_ogg_la_LIBADD = \
   $(top_builddir)/libogmrip-job/libogmrip-job.la \
+  $(top_builddir)/libogmrip-media/libogmrip-media.la \
   $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la \
   $(top_builddir)/libogmrip-encode/libogmrip-encode.la
 endif
@@ -288,6 +290,7 @@ ogmrip_mkv_la_LIBTOOLFLAGS = \
   --tag=disable-static
 
 ogmrip_mkv_la_LIBADD = \
+  $(top_builddir)/libogmrip-media/libogmrip-media.la \
   $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la \
   $(top_builddir)/libogmrip-job/libogmrip-job.la \
   $(top_builddir)/libogmrip-encode/libogmrip-encode.la
@@ -308,6 +311,7 @@ ogmrip_mp4_la_LIBTOOLFLAGS = \
 
 ogmrip_mp4_la_LIBADD = \
   $(top_builddir)/libogmrip-job/libogmrip-job.la \
+  $(top_builddir)/libogmrip-media/libogmrip-media.la \
   $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la \
   $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
   $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
@@ -384,6 +388,7 @@ endif
 
 INCLUDES = \
   -I$(top_srcdir)/libogmrip-job \
+  -I$(top_srcdir)/libogmrip-media \
   -I$(top_srcdir)/libogmrip-dvd \
   -I$(top_srcdir)/libogmrip-encode \
   -DOGMRIP_LIB_DIR=\""$(libdir)"\" \

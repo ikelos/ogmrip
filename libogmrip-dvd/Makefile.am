@@ -7,7 +7,6 @@ libogmrip_dvd_la_SOURCES = \
   ogmdvd-device.c    \
   ogmdvd-disc.c      \
   ogmdvd-drive.c     \
-  ogmdvd-labels.c    \
   ogmdvd-monitor.c   \
   ogmdvd-parser.c    \
   ogmdvd-priv.c      \
@@ -22,8 +21,6 @@ libogmrip_dvd_la_HEADERS = \
   ogmdvd-audio.h   \
   ogmdvd-disc.h    \
   ogmdvd-drive.h   \
-  ogmdvd-enums.h   \
-  ogmdvd-labels.h  \
   ogmdvd-monitor.h \
   ogmdvd-parser.h  \
   ogmdvd-reader.h  \
@@ -50,4 +47,5 @@ EXTRA_DIST = \
   ogmdvd-priv.h
 
 INCLUDES = \
+  -I$(top_srcdir)/libogmrip-media \
   -I$(top_srcdir)/libogmrip-job

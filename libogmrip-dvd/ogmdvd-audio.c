@@ -30,6 +30,17 @@
 #include "ogmdvd-audio.h"
 #include "ogmdvd-priv.h"
 
+enum
+{
+  OGMDVD_AUDIO_FORMAT_AC3      = 0,
+  OGMDVD_AUDIO_FORMAT_MPEG1    = 2,
+  OGMDVD_AUDIO_FORMAT_MPEG2EXT = 3,
+  OGMDVD_AUDIO_FORMAT_LPCM     = 4,
+  OGMDVD_AUDIO_FORMAT_SDDS     = 5,
+  OGMDVD_AUDIO_FORMAT_DTS      = 6
+};
+
+
 /**
  * ogmdvd_audio_stream_get_format:
  * @audio: An #OGMDvdAudioStream
@@ -43,7 +54,17 @@ ogmdvd_audio_stream_get_format (OGMDvdAudioStream *audio)
 {
   g_return_val_if_fail (audio != NULL, -1);
 
-  return audio->format;
+  switch (audio->format)
+  {
+    case OGMDVD_AUDIO_FORMAT_AC3:
+      return OGMRIP_FORMAT_AC3;
+    case OGMDVD_AUDIO_FORMAT_LPCM:
+      return OGMRIP_FORMAT_LPCM;
+    case OGMDVD_AUDIO_FORMAT_DTS:
+      return OGMRIP_FORMAT_DTS;
+    default:
+      return OGMRIP_FORMAT_UNDEFINED;
+  }
 }
 
 /**
@@ -59,7 +80,19 @@ ogmdvd_audio_stream_get_channels (OGMDvdAudioStream *audio)
 {
   g_return_val_if_fail (audio != NULL, -1);
 
-  return audio->channels;
+  switch (audio->channels)
+  {
+    case 0:
+      return OGMRIP_AUDIO_CHANNELS_MONO;
+    case 1:
+      return OGMRIP_AUDIO_CHANNELS_STEREO;
+    case 3:
+      return OGMRIP_AUDIO_CHANNELS_SURROUND;
+    case 5:
+      return OGMRIP_AUDIO_CHANNELS_5_1;
+    default:
+      return OGMRIP_AUDIO_CHANNELS_UNDEFINED;
+  }
 }
 
 /**
@@ -91,7 +124,7 @@ ogmdvd_audio_stream_get_content (OGMDvdAudioStream *audio)
 {
   g_return_val_if_fail (audio != NULL, -1);
 
-  return audio->code_extension;
+  return audio->code_extension - 1;
 }
 
 /**

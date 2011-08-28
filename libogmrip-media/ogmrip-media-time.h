@@ -1,4 +1,4 @@
-/* OGMDvd - A wrapper library around libdvdread
+/* OGMRipMedia - A media library for OGMRip
  * Copyright (C) 2004-2010 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -16,25 +16,26 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef __OGMDVD_LABELS_H__
-#define __OGMDVD_LABELS_H__
+#ifndef __OGMRIP_MEDIA_TIME_H__
+#define __OGMRIP_MEDIA_TIME_H__
 
-#include <ogmdvd-types.h>
+#include <glib.h>
 
 G_BEGIN_DECLS
 
-const gchar * ogmdvd_get_video_format_label       (gint format);
-const gchar * ogmdvd_get_display_aspect_label     (gint aspect);
-const gchar * ogmdvd_get_audio_format_label       (gint format);
-const gchar * ogmdvd_get_audio_channels_label     (gint channels);
-const gchar * ogmdvd_get_audio_quantization_label (gint quantization);
-const gchar * ogmdvd_get_audio_content_label      (gint content);
-const gchar * ogmdvd_get_subp_content_label       (gint content);
-const gchar * ogmdvd_get_language_label           (gint code);
-const gchar * ogmdvd_get_language_iso639_1        (gint code);
-const gchar * ogmdvd_get_language_iso639_2        (gint code);
+typedef struct
+{
+  gulong hour;
+  gulong min;
+  gulong sec;
+  gulong msec;
+} OGMRipTime;
+
+gulong  ogmrip_time_to_msec (OGMRipTime *dtime);
+void    ogmrip_msec_to_time (gulong     msec,
+                             OGMRipTime *dtime);
 
 G_END_DECLS
 
-#endif /* __OGMDVD_LABELS_H__ */
+#endif /* __OGMRIP_MEDIA_TIME_H__ */
 

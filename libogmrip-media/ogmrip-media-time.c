@@ -1,4 +1,4 @@
-/* OGMDvd - A wrapper library around libdvdread
+/* OGMRipMedia - A media library for OGMRip
  * Copyright (C) 2004-2010 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -16,20 +16,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef __OGMDVD_H__
-#define __OGMDVD_H__
+#include "ogmrip-media-time.h"
 
-#include <ogmdvd-audio.h>
-#include <ogmdvd-disc.h>
-#include <ogmdvd-drive.h>
-#include <ogmdvd-monitor.h>
-#include <ogmdvd-parser.h>
-#include <ogmdvd-reader.h>
-#include <ogmdvd-stream.h>
-#include <ogmdvd-subp.h>
-#include <ogmdvd-title.h>
-#include <ogmdvd-types.h>
-#include <ogmdvd-video.h>
-
-#endif /* __OGMDVD_H__ */
+void
+ogmrip_msec_to_time (gulong msec, OGMRipTime *dtime)
+{
+  dtime->hour = msec / (60 * 60 * 1000);
+  dtime->min = msec / (60 * 1000) % 60;
+  dtime->sec = msec / 1000 % 60;
+  dtime->msec = msec % 1000;
+}
 

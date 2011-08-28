@@ -71,7 +71,7 @@ ogmdvd_title_chooser_widget_set_disc (OGMDvdTitleChooserWidget *chooser, OGMDvdD
   GtkTreeIter iter;
 
   OGMDvdTitle *title;
-  OGMDvdTime time_;
+  OGMRipTime time_;
 
   gint vid, nvid, format, aspect;
   glong length, longest;
@@ -105,15 +105,15 @@ ogmdvd_title_chooser_widget_set_disc (OGMDvdTitleChooserWidget *chooser, OGMDvdD
         length = ogmdvd_title_get_length (title, &time_);
 
         if (time_.hour > 0)
-          str_time = g_strdup_printf ("%02d:%02d %s", time_.hour, time_.min, _("hours"));
+          str_time = g_strdup_printf ("%02lu:%02lu %s", time_.hour, time_.min, _("hours"));
         else if (time_.min > 0)
-          str_time = g_strdup_printf ("%02d:%02d %s", time_.min, time_.sec, _("minutes"));
+          str_time = g_strdup_printf ("%02lu:%02lu %s", time_.min, time_.sec, _("minutes"));
         else
-          str_time = g_strdup_printf ("%02d %s", time_.sec, _("seconds"));
+          str_time = g_strdup_printf ("%02lu %s", time_.sec, _("seconds"));
 
         str = g_strdup_printf ("%s %02d (%s, %s, %s)", _("Title"), vid + 1, str_time,
-            ogmdvd_get_video_format_label (format), 
-            ogmdvd_get_display_aspect_label (aspect)); 
+            ogmrip_video_format_get_label (format), 
+            ogmrip_display_aspect_get_label (aspect)); 
         g_free (str_time);
 
         gtk_list_store_append (GTK_LIST_STORE (model), &iter);

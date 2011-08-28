@@ -51,12 +51,14 @@ libogmrip_encode_gtk_la_LDFLAGS = \
   -version-info $(OGMRIP_GTK_LT_VERSION)
 
 libogmrip_encode_gtk_la_LIBADD = \
+  $(top_builddir)/libogmrip-media/libogmrip-media.la \
   $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la \
   $(top_builddir)/libogmrip-dvd-gtk/libogmrip-dvd-gtk.la  \
   $(top_builddir)/libogmrip-job/libogmrip-job.la \
   $(top_builddir)/libogmrip-encode/libogmrip-encode.la
 
 INCLUDES = \
+  -I$(top_srcdir)/libogmrip-media    \
   -I$(top_srcdir)/libogmrip-dvd      \
   -I$(top_srcdir)/libogmrip-dvd-gtk  \
   -I$(top_srcdir)/libogmrip-job      \

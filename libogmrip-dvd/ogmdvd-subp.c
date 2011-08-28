@@ -43,7 +43,7 @@ ogmdvd_subp_stream_get_content (OGMDvdSubpStream *subp)
 {
   g_return_val_if_fail (subp != NULL, -1);
 
-  return subp->lang_extension;
+  return subp->lang_extension - 1;
 }
 
 /**

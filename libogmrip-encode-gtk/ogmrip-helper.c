@@ -900,11 +900,11 @@ ogmrip_language_chooser_construct (GtkComboBox *chooser)
 
   for (i = 2; i < ogmdvd_nlanguages; i ++)
   {
-    lang = ogmdvd_languages[i][OGMDVD_LANGUAGE_ISO639_1];
+    lang = ogmdvd_languages[i][OGMRIP_LANGUAGE_ISO639_1];
 
     gtk_list_store_append (GTK_LIST_STORE (model), &iter);
     gtk_list_store_set (GTK_LIST_STORE (model), &iter,
-        0, ogmdvd_languages[i][OGMDVD_LANGUAGE_NAME],
+        0, ogmdvd_languages[i][OGMRIP_LANGUAGE_NAME],
         1, (lang[0] << 8) | lang[1], -1);
   }
 }

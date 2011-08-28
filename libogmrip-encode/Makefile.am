@@ -124,6 +124,7 @@ EXTRA_DIST = \
 
 INCLUDES = \
   -I$(top_srcdir)/libogmrip-job \
+  -I$(top_srcdir)/libogmrip-media \
   -I$(top_srcdir)/libogmrip-dvd \
   -DOGMRIP_LIB_DIR=\""$(libdir)"\" \
   -DOGMRIP_DATA_DIR=\""$(datadir)"\"

@@ -44,15 +44,6 @@ ogmdvd_time_to_msec (dvd_time_t *dtime)
   return hour * 60 * 60 * 1000 + min * 60 * 1000 + sec * 1000 + (gfloat) frames * 1000.0 / fps;
 }
 
-void
-ogmdvd_msec_to_time (gulong msec, OGMDvdTime *dtime)
-{
-  dtime->hour = msec / (60 * 60 * 1000);
-  dtime->min = msec / (60 * 1000) % 60;
-  dtime->sec = msec / 1000 % 60;
-  dtime->frames = msec % 1000;
-}
-
 typedef struct
 {
   gint val;

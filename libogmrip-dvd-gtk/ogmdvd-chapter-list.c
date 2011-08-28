@@ -210,7 +210,7 @@ ogmdvd_chapter_list_set_title (OGMDvdChapterList *list, OGMDvdTitle *title)
 {
   GtkTreeModel *model;
   GtkTreeIter iter;
-  OGMDvdTime time_;
+  OGMRipTime time_;
 
   gint chap, nchap;
   gdouble seconds;
@@ -240,7 +240,7 @@ ogmdvd_chapter_list_set_title (OGMDvdChapterList *list, OGMDvdTitle *title)
 
       if ((seconds = ogmdvd_title_get_chapters_length (title, chap, chap, &time_)) > 0)
       {
-        str = g_strdup_printf ("%02d:%02d:%02d", time_.hour, time_.min, time_.sec);
+        str = g_strdup_printf ("%02lu:%02lu:%02lu", time_.hour, time_.min, time_.sec);
         gtk_list_store_set (GTK_LIST_STORE (model), &iter, COL_LENGTH, str, /*COL_SECONDS, seconds,*/ -1);
         g_free (str);
       }

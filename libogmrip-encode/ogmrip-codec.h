@@ -55,7 +55,7 @@ const gchar *  ogmrip_codec_get_output         (OGMRipCodec   *codec);
 void           ogmrip_codec_set_output         (OGMRipCodec   *codec,
                                                 const gchar   *output);
 gdouble        ogmrip_codec_get_length         (OGMRipCodec   *codec,
-                                                OGMDvdTime    *time_);
+                                                OGMRipTime    *time_);
 void           ogmrip_codec_get_chapters       (OGMRipCodec   *codec,
                                                 guint         *start,
                                                 guint         *end);

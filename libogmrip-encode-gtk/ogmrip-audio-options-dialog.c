@@ -86,7 +86,7 @@ ogmrip_audio_options_dialog_get_channels (OGMRipAudioOptionsDialog *dialog)
 }
 
 static void
-ogmrip_audio_options_dialog_set_channels (OGMRipAudioOptionsDialog *dialog, OGMDvdAudioChannels channels)
+ogmrip_audio_options_dialog_set_channels (OGMRipAudioOptionsDialog *dialog, OGMRipAudioChannels channels)
 {
   gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->channels_combo), channels);
 }

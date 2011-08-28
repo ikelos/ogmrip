@@ -1307,36 +1307,6 @@ ogmrip_encoding_test (OGMRipEncoding *encoding, GError **error)
 }
 
 static gint
-get_audio_stream_format (OGMRipCodec *codec)
-{
-  OGMDvdStream *stream;
-  gint format;
-
-  stream = ogmrip_codec_get_input (codec);
-  format = ogmdvd_audio_stream_get_format (OGMDVD_AUDIO_STREAM (stream));
-  
-  if (format == OGMDVD_AUDIO_FORMAT_AC3)
-    return OGMRIP_FORMAT_AC3;
-/*
-  if (format == OGMDVD_AUDIO_FORMAT_MPEG1)
-    return;
-
-  if (format == OGMDVD_AUDIO_FORMAT_MPEG2EXT)
-    return;
-*/
-  if (format == OGMDVD_AUDIO_FORMAT_LPCM)
-    return OGMRIP_FORMAT_LPCM;
-/*
-  if (format == OGMDVD_AUDIO_FORMAT_SDDS)
-    return;
-*/
-  if (format == OGMDVD_AUDIO_FORMAT_DTS)
-    return OGMRIP_FORMAT_DTS;
-
-  return -1;
-}
-
-static gint
 ogmrip_encoding_run_codec (OGMRipEncoding *encoding, OGMRipCodec *codec, GError **error)
 {
   const gchar *label = NULL;
@@ -1381,7 +1351,12 @@ ogmrip_encoding_run_codec (OGMRipEncoding *encoding, OGMRipCodec *codec, GError 
   {
     format = ogmrip_plugin_get_audio_codec_format (G_OBJECT_TYPE (codec));
     if (format == OGMRIP_FORMAT_COPY)
-      format = get_audio_stream_format (codec);
+    {
+      OGMDvdStream *stream;
+
+      stream = ogmrip_codec_get_input (codec);
+      format = ogmdvd_audio_stream_get_format (OGMDVD_AUDIO_STREAM (stream));
+    }
     label = ogmrip_audio_codec_get_label (OGMRIP_AUDIO_CODEC (codec));
     lang = ogmrip_audio_codec_get_language (OGMRIP_AUDIO_CODEC (codec));
   }

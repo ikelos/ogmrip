@@ -42,7 +42,7 @@ struct _OGMRipAudioCodecPriv
   gchar *label;
   guint language;
 
-  OGMDvdAudioChannels channels;
+  OGMRipAudioChannels channels;
 };
 
 enum 
@@ -91,7 +91,8 @@ ogmrip_audio_codec_class_init (OGMRipAudioCodecClass *klass)
 
   g_object_class_install_property (gobject_class, PROP_CHANNELS, 
         g_param_spec_uint ("channels", "Channels property", "Set channels", 
-           0, 10, OGMDVD_AUDIO_CHANNELS_STEREO, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+           OGMRIP_AUDIO_CHANNELS_UNDEFINED, OGMRIP_AUDIO_CHANNELS_7_1, OGMRIP_AUDIO_CHANNELS_STEREO,
+           G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_SRATE, 
         g_param_spec_uint ("sample-rate", "Sample rate property", "Set sample rate", 
@@ -120,7 +121,7 @@ static void
 ogmrip_audio_codec_init (OGMRipAudioCodec *audio)
 {
   audio->priv = OGMRIP_AUDIO_CODEC_GET_PRIVATE (audio);
-  audio->priv->channels = OGMDVD_AUDIO_CHANNELS_STEREO;
+  audio->priv->channels = OGMRIP_AUDIO_CHANNELS_STEREO;
 
   audio->priv->srate = 48000;
   audio->priv->quality = 3;
@@ -314,12 +315,12 @@ ogmrip_audio_codec_get_normalize (OGMRipAudioCodec *audio)
 /**
  * ogmrip_audio_codec_set_channels:
  * @audio: an #OGMRipAudioCodec
- * @channels: an #OGMDvdAudioChannels
+ * @channels: an #OGMRipAudioChannels
  *
  * Sets the number of channels of the output file.
  */
 void
-ogmrip_audio_codec_set_channels (OGMRipAudioCodec *audio, OGMDvdAudioChannels channels)
+ogmrip_audio_codec_set_channels (OGMRipAudioCodec *audio, OGMRipAudioChannels channels)
 {
   OGMDvdStream *stream;
   gint max_channels;

@@ -28,7 +28,6 @@
  */
 
 #include "ogmdvd-video.h"
-#include "ogmdvd-enums.h"
 #include "ogmdvd-priv.h"
 
 /**
@@ -191,12 +190,12 @@ ogmdvd_video_stream_get_display_aspect (OGMDvdVideoStream *stream)
   switch (stream->display_aspect_ratio)
   {
     case 0:
-      return OGMDVD_DISPLAY_ASPECT_4_3;
+      return OGMRIP_DISPLAY_ASPECT_4_3;
     case 1:
     case 3:
-      return OGMDVD_DISPLAY_ASPECT_16_9;
+      return OGMRIP_DISPLAY_ASPECT_16_9;
     default:
-      return -1;
+      return OGMRIP_DISPLAY_ASPECT_UNDEFINED;
   }
 }
 

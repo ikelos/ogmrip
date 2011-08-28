@@ -26,7 +26,7 @@ ogmrip_audio_options_default_init (OGMRipAudioOptionsInterface *iface)
 {
   g_object_interface_install_property (iface,
       g_param_spec_uint ("channels", "Channels property", "Set channels",
-        OGMDVD_AUDIO_CHANNELS_MONO, OGMDVD_AUDIO_CHANNELS_5_1, OGMDVD_AUDIO_CHANNELS_STEREO,
+        OGMRIP_AUDIO_CHANNELS_MONO, OGMRIP_AUDIO_CHANNELS_7_1, OGMRIP_AUDIO_CHANNELS_STEREO,
         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_interface_install_property (iface,
@@ -59,7 +59,7 @@ ogmrip_audio_options_get_channels (OGMRipAudioOptions *options)
 }
 
 void
-ogmrip_audio_options_set_channels (OGMRipAudioOptions *options, OGMDvdAudioChannels channels)
+ogmrip_audio_options_set_channels (OGMRipAudioOptions *options, OGMRipAudioChannels channels)
 {
   g_return_if_fail (OGMRIP_IS_AUDIO_OPTIONS (options));
 

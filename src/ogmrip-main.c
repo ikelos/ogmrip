@@ -105,7 +105,7 @@ ogmrip_main_spell_check (OGMRipData *data, const gchar *filename, gint lang)
   if (!output)
     goto spell_check_cleanup;
 
-  dialog = ogmrip_spell_dialog_new (ogmdvd_get_language_iso639_1 (lang));
+  dialog = ogmrip_spell_dialog_new (ogmrip_language_get_iso639_1 (lang));
   if (!dialog)
   {
     ogmrip_run_error_dialog (GTK_WINDOW (data->window), NULL,
@@ -1047,7 +1047,7 @@ ogmrip_main_set_filename (OGMRipData *data, OGMRipEncoding *encoding)
 
       lang = ogmrip_audio_codec_get_language (OGMRIP_AUDIO_CODEC (codec));
       if (lang >= 0)
-        g_string_append_printf (filename, " - %s", ogmdvd_get_language_label (lang));
+        g_string_append_printf (filename, " - %s", ogmrip_language_get_label (lang));
     }
   }
 
@@ -1582,14 +1582,14 @@ ogmrip_main_chapter_selection_changed (OGMRipData *data)
   else
   {
     OGMDvdTitle *title;
-    OGMDvdTime time_;
+    OGMRipTime time_;
 
     title = ogmdvd_title_chooser_get_active (OGMDVD_TITLE_CHOOSER (data->title_chooser));
     if (ogmdvd_title_get_chapters_length (title, start_chap, end_chap, &time_) > 0)
     {
       gchar *str;
 
-      str = g_strdup_printf ("%02d:%02d:%02d", time_.hour, time_.min, time_.sec);
+      str = g_strdup_printf ("%02lu:%02lu:%02lu", time_.hour, time_.min, time_.sec);
       gtk_label_set_text (GTK_LABEL (data->length_label), str);
       g_free (str);
     }

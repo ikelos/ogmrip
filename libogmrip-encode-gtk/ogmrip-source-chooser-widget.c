@@ -600,24 +600,24 @@ ogmrip_source_chooser_widget_add_audio_stream (OGMRipSourceChooserWidget *choose
     {
       if (bitrate > 0)
         str = g_strdup_printf ("%s %02d: %s (%s, %s, %s, %d kbps)", _("Track"), aid + 1, 
-            ogmdvd_get_audio_content_label (content), ogmdvd_get_language_label (lang), 
-            ogmdvd_get_audio_format_label (format), ogmdvd_get_audio_channels_label (channels),
+            ogmrip_audio_content_get_label (content), ogmrip_language_get_label (lang), 
+            ogmrip_format_type_get_label (format), ogmrip_audio_channels_get_label (channels),
             bitrate / 1000);
       else
         str = g_strdup_printf ("%s %02d: %s (%s, %s, %s)", _("Track"), aid + 1, 
-            ogmdvd_get_audio_content_label (content), ogmdvd_get_language_label (lang), 
-            ogmdvd_get_audio_format_label (format), ogmdvd_get_audio_channels_label (channels));
+            ogmrip_audio_content_get_label (content), ogmrip_language_get_label (lang), 
+            ogmrip_format_type_get_label (format), ogmrip_audio_channels_get_label (channels));
     }
     else
     {
       if (bitrate > 0)
         str = g_strdup_printf ("%s %02d (%s, %s, %s, %d kbps)", _("Track"), aid + 1, 
-            ogmdvd_get_language_label (lang), ogmdvd_get_audio_format_label (format), 
-            ogmdvd_get_audio_channels_label (channels), bitrate / 1000);
+            ogmrip_language_get_label (lang), ogmrip_format_type_get_label (format), 
+            ogmrip_audio_channels_get_label (channels), bitrate / 1000);
       else
         str = g_strdup_printf ("%s %02d (%s, %s, %s)", _("Track"), aid + 1, 
-            ogmdvd_get_language_label (lang), ogmdvd_get_audio_format_label (format), 
-            ogmdvd_get_audio_channels_label (channels));
+            ogmrip_language_get_label (lang), ogmrip_format_type_get_label (format), 
+            ogmrip_audio_channels_get_label (channels));
     }
 
     ogmrip_source_chooser_widget_get_stream_iter (chooser, &iter);
@@ -654,10 +654,10 @@ ogmrip_source_chooser_widget_add_subp_stream (OGMRipSourceChooserWidget *chooser
 
     if (content > 0)
       str = g_strdup_printf ("%s %02d: %s (%s)", _("Subtitle"), sid + 1, 
-          ogmdvd_get_subp_content_label (content), ogmdvd_get_language_label (lang));
+          ogmrip_subp_content_get_label (content), ogmrip_language_get_label (lang));
     else
       str = g_strdup_printf ("%s %02d (%s)", _("Subtitle"), sid + 1, 
-          ogmdvd_get_language_label (lang));
+          ogmrip_language_get_label (lang));
 
     ogmrip_source_chooser_widget_get_stream_iter (chooser, &iter);
     gtk_list_store_set (chooser->priv->store, &iter,

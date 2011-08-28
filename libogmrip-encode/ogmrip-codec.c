@@ -349,22 +349,10 @@ ogmrip_codec_get_chapters (OGMRipCodec *codec, guint *start, guint *end)
     *end = codec->priv->end_chap;
 }
 
-static void
-ogmrip_codec_sec_to_time (gdouble length, gdouble fps, OGMDvdTime *dtime)
-{
-  glong sec = (glong) length;
-
-  dtime->hour = sec / (60 * 60);
-  dtime->min = sec / 60 % 60;
-  dtime->sec = sec % 60;
-
-  dtime->frames = (length - sec) * fps;
-}
-
 /**
  * ogmrip_codec_get_length:
  * @codec: an #OGMRipCodec
- * @length: a pointer to store an #OGMDvdTime, or NULL
+ * @length: a pointer to store an #OGMRipTime, or NULL
  *
  * Returns the length of the encoding in seconds. If @length is not NULL, the
  * data structure will be filled with the length in hours, minutes seconds and
@@ -373,7 +361,7 @@ ogmrip_codec_sec_to_time (gdouble length, gdouble fps, OGMDvdTime *dtime)
  * Returns: the length in seconds, or -1.0
  */
 gdouble
-ogmrip_codec_get_length (OGMRipCodec *codec, OGMDvdTime *time_)
+ogmrip_codec_get_length (OGMRipCodec *codec, OGMRipTime *time_)
 {
   gint nchap;
 
@@ -384,15 +372,9 @@ ogmrip_codec_get_length (OGMRipCodec *codec, OGMDvdTime *time_)
 
   if (codec->priv->play_length > 0.0)
   {
-    gdouble length;
-    guint num, denom;
+    ogmrip_msec_to_time (codec->priv->play_length * 1000, time_);
 
-    length = codec->priv->play_length;
-
-    ogmdvd_video_stream_get_framerate (ogmdvd_title_get_video_stream (codec->priv->title), &num, &denom);
-    ogmrip_codec_sec_to_time (length, num / (gdouble) denom, time_);
-
-    return length;
+    return codec->priv->play_length;
   }
 
   nchap = ogmdvd_title_get_n_chapters (codec->priv->title);

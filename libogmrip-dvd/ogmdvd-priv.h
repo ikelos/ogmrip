@@ -231,9 +231,7 @@ struct _OGMDvdParser
   guint width, height;
 };
 
-gulong  ogmdvd_time_to_msec (dvd_time_t *dtime);
-void    ogmdvd_msec_to_time (gulong     msec,
-                             OGMDvdTime *dtime);
+gulong ogmdvd_time_to_msec (dvd_time_t *dtime);
 
 GSList * g_ulist_add_min           (GSList *ulist,
                                     gint   val);

@@ -19,7 +19,7 @@
 #ifndef __OGMRIP_PLUGIN_H__
 #define __OGMRIP_PLUGIN_H__
 
-#include <ogmrip-enums.h>
+#include <ogmrip-media.h>
 
 #include <glib-object.h>
 #include <gmodule.h>

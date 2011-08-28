@@ -74,17 +74,16 @@ ogmrip_mplayer_map_audio_id (OGMDvdAudioStream *astream)
 
   switch (ogmdvd_audio_stream_get_format (astream))
   {
-    case OGMDVD_AUDIO_FORMAT_MPEG1:
-    case OGMDVD_AUDIO_FORMAT_MPEG2EXT:
+    case OGMRIP_FORMAT_AC3:
+      aid += 128;
       break;
-    case OGMDVD_AUDIO_FORMAT_LPCM:
-      aid += 160;
-      break;
-    case OGMDVD_AUDIO_FORMAT_DTS:
+    case OGMRIP_FORMAT_DTS:
       aid += 136;
       break;
+    case OGMRIP_FORMAT_LPCM:
+      aid += 160;
+      break;
     default:
-      aid += 128;
       break;
   }
 

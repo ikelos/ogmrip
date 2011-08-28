@@ -21,29 +21,13 @@
 #endif
 
 /**
- * SECTION:ogmdvd-labels
+ * SECTION:ogmrip-media-labels
  * @title: Conversion functions
- * @include: ogmdvd-labels.h
+ * @include: ogmrip-media.h
  * @short_description: Converts enumerated types into human readable strings
  */
 
-#include "ogmdvd-labels.h"
-
-/**
- * SECTION:ogmdvd-enums
- * @title: Enumerations
- * @include: ogmdvd-enums.h
- * @short_description: Public enumerated types used throughout OGMDvd
- */
-
-#include "ogmdvd-enums.h"
-
-/**
- * SECTION:ogmdvd-types
- * @title: Types
- * @include: ogmdvd-types.h
- * @short_description: Public data structures used throughout OGMDvd
- */
+#include "ogmrip-media-labels.h"
 
 #include <string.h>
 
@@ -240,8 +224,54 @@ const gchar *ogmdvd_languages[][3] =
 
 const guint ogmdvd_nlanguages = G_N_ELEMENTS (ogmdvd_languages) - 1;
 
+const gchar *
+ogmrip_format_type_get_label (OGMRipFormatType format)
+{
+  static const gchar *format_type[] = 
+  {
+    "Undefined",
+    "MPEG1",
+    "MPEG2",
+    "MPEG4",
+    "h264",
+    "Theora",
+    "Dirac",
+    "PCM",
+    "MP3",
+    "AC3",
+    "DTS",
+    "AAC",
+    "Vorbis",
+    "MicroDVD",
+    "SubRip",
+    "SRT",
+    "SAMI",
+    "VPLAYER",
+    "RT",
+    "SSA",
+    "PJS",
+    "MPSub",
+    "AQT",
+    "SRT_2_0",
+    "SubRip_0_9",
+    "JacoSub",
+    "MPL_2",
+    "VOBSUB",
+    "COPY",
+    "LPCM",
+    "BPCM",
+    "MP12",
+    "MJPEG",
+    "Flac",
+    "VP8",
+    "Chapters"
+  };
+
+  return format_type[format + 1];
+}
+
 /**
- * ogmdvd_get_video_format_label:
+ * ogmrip_video_format_get_label:
  * @format: The video format
  *
  * Returns a human readable video format.
@@ -249,23 +279,20 @@ const guint ogmdvd_nlanguages = G_N_ELEMENTS (ogmdvd_languages) - 1;
  * Returns: A constant string, or NULL
  */
 const gchar *
-ogmdvd_get_video_format_label (gint format)
+ogmrip_video_format_get_label (OGMRipVideoFormat format)
 {
   static const gchar *video_format[] = 
   {
+    "Undefined",
     "NTSC",
-    "PAL",
-    "Error",
-    "Error"
+    "PAL"
   };
 
-  g_return_val_if_fail (format >= 0 && format <= 3, NULL);
-
-  return video_format[format];
+  return video_format[format + 1];
 }
 
 /**
- * ogmdvd_get_display_aspect_label:
+ * ogmrip_display_aspect_get_label:
  * @aspect: The display aspect
  *
  * Returns a human readable display aspect.
@@ -273,51 +300,20 @@ ogmdvd_get_video_format_label (gint format)
  * Returns: A constant string, or NULL
  */
 const gchar *
-ogmdvd_get_display_aspect_label (gint aspect)
+ogmrip_display_aspect_get_label (OGMRipDisplayAspect aspect)
 {
-  static gchar *display_aspect[] =
+  static const gchar *display_aspect[] =
   {
+    "Undefined",
     "4/3", 
-    "16/9", 
-    "?:?", 
-    "16/9"
+    "16/9",
   };
 
-  g_return_val_if_fail (aspect >= 0 && aspect <= 3, NULL);
-
-  return display_aspect[aspect];
+  return display_aspect[aspect + 1];
 }
 
 /**
- * ogmdvd_get_audio_format_label:
- * @format: The audio format
- *
- * Returns a human readable audio format.
- *
- * Returns: A constant string, or NULL
- */
-const gchar *
-ogmdvd_get_audio_format_label (gint format)
-{
-  static gchar *audio_format[] =
-  {
-    "AC3",
-    "Unknown",
-    "MPEG1",
-    "MPEG2EXT",
-    "LPCM",
-    "SDDS",
-    "DTS",
-    "Error"
-  };
-
-  g_return_val_if_fail (format >= 0 && format <= 7, NULL);
-
-  return audio_format[format];
-}
-
-/**
- * ogmdvd_get_audio_channels_label:
+ * ogmrip_audio_channels_get_label:
  * @channels: The number of channels
  *
  * Returns a human readable number of channels.
@@ -325,27 +321,24 @@ ogmdvd_get_audio_format_label (gint format)
  * Returns: A constant string, or NULL
  */
 const gchar *
-ogmdvd_get_audio_channels_label (gint channels)
+ogmrip_audio_channels_get_label (OGMRipAudioChannels channels)
 {
-  static gchar *audio_channels[] =
+  static const gchar *audio_channels[] =
   {
+    "Undefined",
     "Mono",
     "Stereo",
-    "Unknown",
     "Surround",
-    "Unknown",
     "5.1",
     "6.1",
     "7.1"
   };
 
-  g_return_val_if_fail (channels >= 0 && channels <= 7, NULL);
-
-  return audio_channels[channels];
+  return audio_channels[channels + 1];
 }
 
 /**
- * ogmdvd_get_audio_quantization_label:
+ * ogmrip_audio_quantization_get_label:
  * @quantization: The quantization
  *
  * Returns a human readable quantization.
@@ -353,23 +346,22 @@ ogmdvd_get_audio_channels_label (gint channels)
  * Returns: A constant string, or NULL
  */
 const gchar *
-ogmdvd_get_audio_quantization_label (gint quantization)
+ogmrip_audio_quantization_get_label (OGMRipAudioQuantization quantization)
 {
-  static gchar *audio_quantization[] = 
+  static const gchar *audio_quantization[] = 
   {
-    "16bit", 
-    "20bit", 
-    "24bit", 
-    "drc"
+    "Undefined",
+    "16 bits", 
+    "20 bits", 
+    "24 bits", 
+    "DRC"
   };
 
-  g_return_val_if_fail (quantization >= 0 && quantization <= 3, NULL);
-
-  return audio_quantization[quantization];
+  return audio_quantization[quantization + 1];
 }
 
 /**
- * ogmdvd_get_audio_content_label:
+ * ogmrip_audio_content_get_label:
  * @content: The audio content
  *
  * Returns a human readable audio content.
@@ -377,9 +369,9 @@ ogmdvd_get_audio_quantization_label (gint quantization)
  * Returns: A constant string, or NULL
  */
 const gchar *
-ogmdvd_get_audio_content_label (gint content)
+ogmrip_audio_content_get_label (OGMRipAudioContent content)
 {
-  static gchar *audio_content[] = 
+  static const gchar *audio_content[] = 
   {
     "Undefined", 
     "Normal", 
@@ -388,13 +380,11 @@ ogmdvd_get_audio_content_label (gint content)
     "Comments 2"
   };
 
-  g_return_val_if_fail (content >= 0 && content <= 4, NULL);
-
-  return audio_content[content];
+  return audio_content[content + 1];
 }
 
 /**
- * ogmdvd_get_subp_content_label:
+ * ogmrip_subp_content_get_label:
  * @content: The subtitles content
  *
  * Returns a human readable subtitles content.
@@ -402,35 +392,33 @@ ogmdvd_get_audio_content_label (gint content)
  * Returns: A constant string, or NULL
  */
 const gchar *
-ogmdvd_get_subp_content_label (gint content)
+ogmrip_subp_content_get_label (OGMRipSubpContent content)
 {
-  static gchar *subp_content[] = 
+  static const gchar *subp_content[] = 
   {
     "Undefined", 
     "Normal", 
     "Large", 
     "Children", 
     "Reserved", 
-    "Normal_CC", 
-    "Large_CC", 
-    "Children_CC",
+    "Normal CC", 
+    "Large CC", 
+    "Children CC",
     "Reserved", 
     "Forced", 
     "Reserved", 
     "Reserved", 
     "Reserved", 
     "Director", 
-    "Large_Director", 
-    "Children_Director"
+    "Large Director", 
+    "Children Director"
   };
 
-  g_return_val_if_fail (content >= 0 && content <= 15, NULL);
-
-  return subp_content[content];
+  return subp_content[content + 1];
 }
 
 /**
- * ogmdvd_get_language_label:
+ * ogmrip_language_get_label:
  * @code: The language code
  *
  * Returns a human readable language.
@@ -438,22 +426,22 @@ ogmdvd_get_subp_content_label (gint content)
  * Returns: A constant string, or NULL
  */
 const gchar *
-ogmdvd_get_language_label (gint code)
+ogmrip_language_get_label (gint code)
 {
   const gchar *lang;
   guint i;
 
-  lang = ogmdvd_get_language_iso639_1 (code);
+  lang = ogmrip_language_get_iso639_1 (code);
 
-  for (i = 0; ogmdvd_languages[i][OGMDVD_LANGUAGE_ISO639_1]; i++)
-    if (strcmp (ogmdvd_languages[i][OGMDVD_LANGUAGE_ISO639_1], lang) == 0)
-      return ogmdvd_languages[i][OGMDVD_LANGUAGE_NAME];
+  for (i = 0; ogmdvd_languages[i][OGMRIP_LANGUAGE_ISO639_1]; i++)
+    if (strcmp (ogmdvd_languages[i][OGMRIP_LANGUAGE_ISO639_1], lang) == 0)
+      return ogmdvd_languages[i][OGMRIP_LANGUAGE_NAME];
 
   return NULL;
 }
 
 /**
- * ogmdvd_get_language_iso639_1:
+ * ogmrip_language_get_iso639_1:
  * @code: The language code
  *
  * Returns an ISO 639-1 language.
@@ -461,7 +449,7 @@ ogmdvd_get_language_label (gint code)
  * Returns: A constant string, or NULL
  */
 const gchar *
-ogmdvd_get_language_iso639_1 (gint code)
+ogmrip_language_get_iso639_1 (gint code)
 {
   static gchar lang[3];
 
@@ -482,7 +470,7 @@ ogmdvd_get_language_iso639_1 (gint code)
 }
 
 /**
- * ogmdvd_get_language_iso639_2:
+ * ogmrip_language_get_iso639_2:
  * @code: The language code
  *
  * Returns an ISO 639-2 language.
@@ -490,16 +478,16 @@ ogmdvd_get_language_iso639_1 (gint code)
  * Returns: A constant string, or NULL
  */
 const gchar *
-ogmdvd_get_language_iso639_2 (gint code)
+ogmrip_language_get_iso639_2 (gint code)
 {
   const gchar *lang;
   guint i;
 
-  lang = ogmdvd_get_language_iso639_1 (code);
+  lang = ogmrip_language_get_iso639_1 (code);
 
-  for (i = 0; ogmdvd_languages[i][OGMDVD_LANGUAGE_ISO639_1]; i++)
-    if (strcmp (ogmdvd_languages[i][OGMDVD_LANGUAGE_ISO639_1], lang) == 0)
-      return ogmdvd_languages[i][OGMDVD_LANGUAGE_ISO639_2];
+  for (i = 0; ogmdvd_languages[i][OGMRIP_LANGUAGE_ISO639_1]; i++)
+    if (strcmp (ogmdvd_languages[i][OGMRIP_LANGUAGE_ISO639_1], lang) == 0)
+      return ogmdvd_languages[i][OGMRIP_LANGUAGE_ISO639_2];
 
   return NULL;
 }

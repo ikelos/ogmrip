@@ -1,4 +1,4 @@
-/* OGMDvd - A wrapper library around libdvdread
+/* OGMRipMedia - A media library for OGMRip
  * Copyright (C) 2004-2010 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -16,20 +16,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef __OGMDVD_H__
-#define __OGMDVD_H__
+#ifndef __OGMRIP_MEDIA_H__
+#define __OGMRIP_MEDIA_H__
 
-#include <ogmdvd-audio.h>
-#include <ogmdvd-disc.h>
-#include <ogmdvd-drive.h>
-#include <ogmdvd-monitor.h>
-#include <ogmdvd-parser.h>
-#include <ogmdvd-reader.h>
-#include <ogmdvd-stream.h>
-#include <ogmdvd-subp.h>
-#include <ogmdvd-title.h>
-#include <ogmdvd-types.h>
-#include <ogmdvd-video.h>
+#include <ogmrip-media-enums.h>
+#include <ogmrip-media-labels.h>
+#include <ogmrip-media-time.h>
 
-#endif /* __OGMDVD_H__ */
+#endif /* __OGMRIP_MEDIA_H__ */
 

@@ -1,6 +1,7 @@
 SUBDIRS = \
-  libogmrip-job   \
-  libogmrip-dvd   \
+  libogmrip-media  \
+  libogmrip-job    \
+  libogmrip-dvd    \
   libogmrip-encode \
   avibox \
   dvdcpy

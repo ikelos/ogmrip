@@ -19,7 +19,7 @@
 #ifndef __OGMRIP_FILE_H__
 #define __OGMRIP_FILE_H__
 
-#include <glib.h>
+#include <ogmrip-media.h>
 
 G_BEGIN_DECLS
 

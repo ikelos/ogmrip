@@ -28,7 +28,6 @@
  */
 
 #include "ogmdvd-disc.h"
-#include "ogmdvd-enums.h"
 #include "ogmdvd-title.h"
 #include "ogmdvd-stream.h"
 #include "ogmdvd-video.h"
@@ -240,7 +239,7 @@ ogmdvd_title_get_vts_size (OGMDvdTitle *title)
 /**
  * ogmdvd_title_get_length:
  * @title: An #OGMDvdTitle
- * @length: A pointer to set the #OGMDvdTime, or NULL
+ * @length: A pointer to set the #OGMRipTime, or NULL
  *
  * Returns the title length in seconds. If @length is not NULL, the data
  * structure will be filled with the length in hours, minutes seconds and
@@ -249,7 +248,7 @@ ogmdvd_title_get_vts_size (OGMDvdTitle *title)
  * Returns: The length in seconds, or -1.0
  */
 gdouble
-ogmdvd_title_get_length (OGMDvdTitle *title, OGMDvdTime  *length)
+ogmdvd_title_get_length (OGMDvdTitle *title, OGMRipTime  *length)
 {
   dvd_time_t *dtime = &title->playback_time;
 
@@ -257,10 +256,26 @@ ogmdvd_title_get_length (OGMDvdTitle *title, OGMDvdTime  *length)
 
   if (length)
   {
+    gulong frames;
+
     length->hour   = ((dtime->hour    & 0xf0) >> 4) * 10 + (dtime->hour    & 0x0f);
     length->min    = ((dtime->minute  & 0xf0) >> 4) * 10 + (dtime->minute  & 0x0f);
     length->sec    = ((dtime->second  & 0xf0) >> 4) * 10 + (dtime->second  & 0x0f);
-    length->frames = ((dtime->frame_u & 0x30) >> 4) * 10 + (dtime->frame_u & 0x0f);
+
+    frames = ((dtime->frame_u & 0x30) >> 4) * 10 + (dtime->frame_u & 0x0f);
+
+    switch ((dtime->frame_u & 0xc0) >> 6)
+    {
+      case 1:
+        length->msec = frames * 40;
+        break;
+      case 3:
+        length->msec = frames * 1001 / 30;
+        break;
+      default:
+        g_assert_not_reached ();
+        break;
+    }
   }
 
   return ogmdvd_time_to_msec (dtime) / 1000.0;
@@ -280,7 +295,7 @@ ogmdvd_title_get_length (OGMDvdTitle *title, OGMDvdTime  *length)
  * Returns: The length in seconds, or -1.0
  */
 gdouble
-ogmdvd_title_get_chapters_length (OGMDvdTitle *title, guint start, gint end, OGMDvdTime *length)
+ogmdvd_title_get_chapters_length (OGMDvdTitle *title, guint start, gint end, OGMRipTime *length)
 {
   gulong total;
 
@@ -298,7 +313,7 @@ ogmdvd_title_get_chapters_length (OGMDvdTitle *title, guint start, gint end, OGM
     total += title->length_of_chapters[start];
 
   if (length)
-    ogmdvd_msec_to_time (total, length);
+    ogmrip_msec_to_time (total, length);
 
   return total / 1000.0;
 }

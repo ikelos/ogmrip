@@ -31,6 +31,7 @@ libogmrip_dvd_gtk_la_LDFLAGS = \
   -version-info $(OGMDVD_GTK_LT_VERSION)
 
 libogmrip_dvd_gtk_la_LIBADD = \
+  $(top_builddir)/libogmrip-media/libogmrip-media.la \
   $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la
 
 ogmdvd-marshal.h: ogmdvd-marshal.list $(GLIB_GENMARSHAL)
@@ -44,6 +45,7 @@ EXTRA_DIST = \
   ogmdvd-marshal.list
 
 INCLUDES = \
+  -I$(top_srcdir)/libogmrip-media \
   -I$(top_srcdir)/libogmrip-dvd
 
 CLEANFILES = \

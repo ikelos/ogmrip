@@ -43,11 +43,11 @@ gboolean            ogmdvd_title_get_progressive      (OGMDvdTitle         *titl
 gboolean            ogmdvd_title_get_telecine         (OGMDvdTitle         *title);
 gboolean            ogmdvd_title_get_interlaced       (OGMDvdTitle         *title);
 gdouble             ogmdvd_title_get_length           (OGMDvdTitle         *title,
-                                                       OGMDvdTime          *length);
+                                                       OGMRipTime          *length);
 gdouble             ogmdvd_title_get_chapters_length  (OGMDvdTitle         *title, 
                                                        guint               start,
                                                        gint                end,
-                                                       OGMDvdTime          *length);
+                                                       OGMRipTime          *length);
 const guint *       ogmdvd_title_get_palette          (OGMDvdTitle         *title);
 gint                ogmdvd_title_get_n_angles         (OGMDvdTitle         *title);
 gint                ogmdvd_title_get_n_chapters       (OGMDvdTitle         *title);

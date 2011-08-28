@@ -21,6 +21,7 @@ EXTRA_DIST = \
   ogmrip-update-dialog.h
 
 ogmrip_LDADD = \
+  $(top_builddir)/libogmrip-media/libogmrip-media.la     \
   $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la         \
   $(top_builddir)/libogmrip-dvd-gtk/libogmrip-dvd-gtk.la \
   $(top_builddir)/libogmrip-job/libogmrip-job.la         \
@@ -28,6 +29,7 @@ ogmrip_LDADD = \
   $(top_builddir)/libogmrip-encode-gtk/libogmrip-encode-gtk.la
 
 INCLUDES = \
+  -I$(top_srcdir)/libogmrip-media      \
   -I$(top_srcdir)/libogmrip-dvd        \
   -I$(top_srcdir)/libogmrip-dvd-gtk    \
   -I$(top_srcdir)/libogmrip-job        \
