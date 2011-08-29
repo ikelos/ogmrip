@@ -86,7 +86,7 @@ struct _OGMRipEncodingClass
 };
 
 GType              ogmrip_encoding_get_type            (void);
-OGMRipEncoding *   ogmrip_encoding_new                 (OGMDvdTitle          *title);
+OGMRipEncoding *   ogmrip_encoding_new                 (OGMRipTitle          *title);
 OGMRipEncoding *   ogmrip_encoding_new_from_file       (GFile                *file,
                                                         GError               **error);
 gboolean           ogmrip_encoding_export              (OGMRipEncoding       *encoding,
@@ -140,7 +140,7 @@ void               ogmrip_encoding_set_profile         (OGMRipEncoding       *en
 gboolean           ogmrip_encoding_get_test            (OGMRipEncoding       *encoding);
 void               ogmrip_encoding_set_test            (OGMRipEncoding       *encoding,
                                                         gboolean             test);
-OGMDvdTitle *      ogmrip_encoding_get_title           (OGMRipEncoding       *encoding);
+OGMRipTitle *      ogmrip_encoding_get_title           (OGMRipEncoding       *encoding);
 gboolean           ogmrip_encoding_get_relative        (OGMRipEncoding       *encoding);
 void               ogmrip_encoding_set_relative        (OGMRipEncoding       *encoding,
                                                         gboolean             relative);

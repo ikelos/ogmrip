@@ -138,14 +138,14 @@ void                ogmrip_video_codec_set_aspect_ratio   (OGMRipVideoCodec  *vi
 void                ogmrip_video_codec_get_framerate      (OGMRipVideoCodec  *video,
                                                            guint             *num,
                                                            guint             *denom);
-OGMDvdAudioStream * ogmrip_video_codec_get_ensure_sync    (OGMRipVideoCodec  *video);
+OGMRipAudioStream * ogmrip_video_codec_get_ensure_sync    (OGMRipVideoCodec  *video);
 void                ogmrip_video_codec_set_ensure_sync    (OGMRipVideoCodec  *video,
-                                                           OGMDvdAudioStream *stream);
+                                                           OGMRipAudioStream *stream);
 
-OGMDvdSubpStream *  ogmrip_video_codec_get_hard_subp      (OGMRipVideoCodec  *video,
+OGMRipSubpStream *  ogmrip_video_codec_get_hard_subp      (OGMRipVideoCodec  *video,
                                                            gboolean          *forced);
 void                ogmrip_video_codec_set_hard_subp      (OGMRipVideoCodec  *video,
-                                                           OGMDvdSubpStream  *stream,
+                                                           OGMRipSubpStream  *stream,
                                                            gboolean          forced);
 
 G_END_DECLS

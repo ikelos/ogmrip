@@ -147,14 +147,14 @@ ogmdvd_drive_chooser_widget_add_device (GtkComboBox *combo_box, const gchar *dev
 
   if (gtk_list_store_iter_is_valid (GTK_LIST_STORE (model), &iter))
   {
-    OGMDvdDisc *disc;
+    OGMRipMedia *disc;
 
     disc = ogmdvd_disc_new (device, NULL);
     if (disc)
     {
       gchar *title, *text;
 
-      title = g_markup_escape_text (ogmdvd_disc_get_label (disc), -1);
+      title = g_markup_escape_text (ogmrip_media_get_label (disc), -1);
       text = g_strdup_printf ("<b>%s</b>\n%s", title, device);
       g_free (title);
 
@@ -353,7 +353,7 @@ ogmdvd_drive_chooser_widget_medium_removed (OGMDvdDriveChooserWidget *chooser, O
 static void
 ogmdvd_drive_chooser_widget_medium_added (OGMDvdDriveChooserWidget *chooser, OGMDvdDrive *drive)
 {
-  OGMDvdDisc *disc;
+  OGMRipMedia *disc;
 
   disc = ogmdvd_disc_new (ogmdvd_drive_get_device (drive), NULL);
   if (!disc)
@@ -368,7 +368,7 @@ ogmdvd_drive_chooser_widget_medium_added (OGMDvdDriveChooserWidget *chooser, OGM
     if (!name)
       name = g_strdup (_("Unknown Drive"));
 
-    title = g_markup_escape_text (ogmdvd_disc_get_label (disc), -1);
+    title = g_markup_escape_text (ogmrip_media_get_label (disc), -1);
     text = g_strdup_printf ("<b>%s</b>\n%s", title, name);
     g_free (title);
 
@@ -399,7 +399,11 @@ ogmdvd_drive_chooser_widget_medium_added (OGMDvdDriveChooserWidget *chooser, OGM
         DEVICE_COLUMN, ogmdvd_drive_get_device (drive), DRIVE_COLUMN, drive, -1);
     g_free (text);
 
-    ogmdvd_disc_unref (disc);
+    /*
+     * TODO unref ?
+     */
+
+    // g_object_unref (disc);
 
     if (gtk_combo_box_get_active (GTK_COMBO_BOX (chooser)) == -1)
       gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), 0);

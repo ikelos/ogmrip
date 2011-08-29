@@ -35,54 +35,57 @@ static void
 ogmdvd_title_chooser_default_init (OGMDvdTitleChooserInterface *iface)
 {
   g_object_interface_install_property (iface,
-      g_param_spec_pointer ("disc", "Disc property", "The DVD disc",
-        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+      g_param_spec_object ("media", "Media property", "The media",
+        OGMRIP_TYPE_MEDIA, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 }
 
 /**
  * ogmdvd_title_chooser_set_disc:
  * @chooser: An #OGMDvdTitleChooser
- * @disc: An #OGMDvdDisc
+ * @media: An #OGMRipMedia
  *
- * Sets the #OGMDvdDisc to select the title from.
+ * Sets the #OGMRipMedia to select the title from.
  */
 void
-ogmdvd_title_chooser_set_disc (OGMDvdTitleChooser *chooser, OGMDvdDisc *disc)
+ogmdvd_title_chooser_set_disc (OGMDvdTitleChooser *chooser, OGMRipMedia *media)
 {
   g_return_if_fail (OGMDVD_IS_TITLE_CHOOSER (chooser));
 
-  g_object_set (chooser, "disc", disc, NULL);
+  g_object_set (chooser, "media", media, NULL);
 }
 
 /**
  * ogmdvd_title_chooser_get_disc:
  * @chooser: An #OGMDvdTitleChooser
  *
- * Returns the #OGMDvdDisc which was passed to ogmdvd_title_chooser_set_disc().
+ * Returns the #OGMRipMedia which was passed to ogmdvd_title_chooser_set_disc().
  *
- * Returns: The current #OGMDvdDisc
+ * Returns: The current #OGMRipMedia
  */
-OGMDvdDisc *
+OGMRipMedia *
 ogmdvd_title_chooser_get_disc (OGMDvdTitleChooser *chooser)
 {
-  OGMDvdDisc *disc;
+  OGMRipMedia *media;
 
   g_return_val_if_fail (OGMDVD_IS_TITLE_CHOOSER (chooser), NULL);
 
-  g_object_get (chooser, "disc", &disc, NULL);
+  g_object_get (chooser, "media", &media, NULL);
 
-  return disc;
+  if (media)
+    g_object_unref (media);
+
+  return media;
 }
 
 /**
  * ogmdvd_title_chooser_set_active:
  * @chooser: An #OGMDvdTitleChooser
- * @title: An #OGMDvdTitle
+ * @title: An #OGMRipTitle
  *
- * Sets the active #OGMDvdTitle.
+ * Sets the active #OGMRipTitle.
  */
 void
-ogmdvd_title_chooser_set_active (OGMDvdTitleChooser *chooser, OGMDvdTitle *title)
+ogmdvd_title_chooser_set_active (OGMDvdTitleChooser *chooser, OGMRipTitle *title)
 {
   g_return_if_fail (OGMDVD_IS_TITLE_CHOOSER (chooser));
 
@@ -93,11 +96,11 @@ ogmdvd_title_chooser_set_active (OGMDvdTitleChooser *chooser, OGMDvdTitle *title
  * ogmdvd_title_chooser_get_active:
  * @chooser: An #OGMDvdTitleChooser
  *
- * Returns the active #OGMDvdTitle.
+ * Returns the active #OGMRipTitle.
  *
- * Returns: The active #OGMDvdTitle
+ * Returns: The active #OGMRipTitle
  */
-OGMDvdTitle *
+OGMRipTitle *
 ogmdvd_title_chooser_get_active (OGMDvdTitleChooser *chooser)
 {
   g_return_val_if_fail (OGMDVD_IS_TITLE_CHOOSER (chooser), NULL);

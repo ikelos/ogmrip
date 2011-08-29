@@ -38,12 +38,12 @@
 
 struct _OGMRipPlayerPriv
 {
-  OGMDvdTitle *title;
+  OGMRipTitle *title;
 
-  OGMDvdAudioStream *astream;
+  OGMRipAudioStream *astream;
   OGMRipFile *afile;
 
-  OGMDvdSubpStream *sstream;
+  OGMRipSubpStream *sstream;
   OGMRipFile *sfile;
 
   guint start_chap;
@@ -66,13 +66,13 @@ static void ogmrip_player_dispose (GObject *gobject);
 static int signals[LAST_SIGNAL] = { 0 };
 
 static gint
-ogmrip_mplayer_map_audio_id (OGMDvdAudioStream *astream)
+ogmrip_mplayer_map_audio_id (OGMRipStream *astream)
 {
   gint aid;
 
-  aid = ogmdvd_stream_get_id (OGMDVD_STREAM (astream));
+  aid = ogmrip_stream_get_id (astream);
 
-  switch (ogmdvd_audio_stream_get_format (astream))
+  switch (ogmrip_stream_get_format (astream))
   {
     case OGMRIP_FORMAT_AC3:
       aid += 128;
@@ -94,7 +94,7 @@ static gchar **
 ogmrip_mplayer_play_command (OGMRipPlayer *player)
 {
   GPtrArray *argv;
-  const gchar *device;
+  const gchar *uri;
   gint vid;
 
   argv = g_ptr_array_new ();
@@ -131,7 +131,7 @@ ogmrip_mplayer_play_command (OGMRipPlayer *player)
   {
     g_ptr_array_add (argv, g_strdup ("-aid"));
     g_ptr_array_add (argv, g_strdup_printf ("%d",
-          ogmrip_mplayer_map_audio_id (player->priv->astream)));
+          ogmrip_mplayer_map_audio_id (OGMRIP_STREAM (player->priv->astream))));
   }
   else if (player->priv->afile)
   {
@@ -147,7 +147,7 @@ ogmrip_mplayer_play_command (OGMRipPlayer *player)
     g_ptr_array_add (argv, g_strdup ("20"));
     g_ptr_array_add (argv, g_strdup ("-sid"));
     g_ptr_array_add (argv, g_strdup_printf ("%d",
-          ogmdvd_stream_get_id (OGMDVD_STREAM (player->priv->sstream))));
+          ogmrip_stream_get_id (OGMRIP_STREAM (player->priv->sstream))));
   }
   else if (ogmrip_check_mplayer_nosub ())
     g_ptr_array_add (argv, g_strdup ("-nosub"));
@@ -161,11 +161,16 @@ ogmrip_mplayer_play_command (OGMRipPlayer *player)
       g_ptr_array_add (argv, g_strdup_printf ("%d", player->priv->start_chap + 1));
   }
 
-  device = ogmdvd_disc_get_device (ogmdvd_title_get_disc (player->priv->title));
-  g_ptr_array_add (argv, g_strdup ("-dvd-device"));
-  g_ptr_array_add (argv, g_strdup (device));
+  uri = ogmrip_media_get_uri (ogmrip_title_get_media (player->priv->title));
+  if (!g_str_has_prefix (uri, "dvd://"))
+    g_warning ("Unknown scheme for '%s'", uri);
+  else
+  {
+    g_ptr_array_add (argv, g_strdup ("-dvd-device"));
+    g_ptr_array_add (argv, g_strdup (uri + 6));
+  }
 
-  vid = ogmdvd_title_get_nr (player->priv->title);
+  vid = ogmrip_title_get_nr (player->priv->title);
 
   if (MPLAYER_CHECK_VERSION (1,0,0,1))
     g_ptr_array_add (argv, g_strdup_printf ("dvd://%d", vid + 1));
@@ -235,24 +240,34 @@ ogmrip_player_dispose (GObject *gobject)
   player = OGMRIP_PLAYER (gobject);
 
   if (player->priv->title)
-    ogmdvd_title_unref (player->priv->title);
-  player->priv->title = NULL;
+  {
+    g_object_unref (player->priv->title);
+    player->priv->title = NULL;
+  }
 
   if (player->priv->astream)
-    ogmdvd_stream_unref (OGMDVD_STREAM (player->priv->astream));
-  player->priv->astream = NULL;
+  {
+    g_object_unref (player->priv->astream);
+    player->priv->astream = NULL;
+  }
 
   if (player->priv->afile)
+  {
     ogmrip_file_unref (player->priv->afile);
-  player->priv->afile = NULL;
+    player->priv->afile = NULL;
+  }
 
   if (player->priv->sstream)
-    ogmdvd_stream_unref (OGMDVD_STREAM (player->priv->sstream));
-  player->priv->sstream = NULL;
+  {
+    g_object_unref (player->priv->sstream);
+    player->priv->sstream = NULL;
+  }
 
   if (player->priv->sfile)
+  {
     ogmrip_file_unref (player->priv->sfile);
-  player->priv->sfile = NULL;
+    player->priv->sfile = NULL;
+  }
 
   G_OBJECT_CLASS (ogmrip_player_parent_class)->dispose (gobject);
 }
@@ -273,20 +288,20 @@ ogmrip_player_new (void)
 /**
  * ogmrip_player_set_title:
  * @player: an #OGMRipPlayer
- * @title: an #OGMDvdTitle
+ * @title: an #OGMRipTitle
  *
  * Sets the DVD title to play
  */
 void
-ogmrip_player_set_title (OGMRipPlayer *player, OGMDvdTitle *title)
+ogmrip_player_set_title (OGMRipPlayer *player, OGMRipTitle *title)
 {
   g_return_if_fail (OGMRIP_IS_PLAYER (player));
 
   if (title)
-    ogmdvd_title_ref (title);
+    g_object_ref (title);
 
   if (player->priv->title)
-    ogmdvd_title_unref (player->priv->title);
+    g_object_unref (player->priv->title);
 
   player->priv->title = title;
 }
@@ -294,21 +309,21 @@ ogmrip_player_set_title (OGMRipPlayer *player, OGMDvdTitle *title)
 /**
  * ogmrip_player_set_audio_stream:
  * @player: an #OGMRipPlayer
- * @stream: an #OGMDvdAudioStream
+ * @stream: an #OGMRipAudioStream
  *
  * Sets the audio stream to play
  */
 void
-ogmrip_player_set_audio_stream (OGMRipPlayer *player, OGMDvdAudioStream *stream)
+ogmrip_player_set_audio_stream (OGMRipPlayer *player, OGMRipAudioStream *stream)
 {
   g_return_if_fail (OGMRIP_IS_PLAYER (player));
   g_return_if_fail (stream != NULL);
 
   if (stream)
-    ogmdvd_stream_ref (OGMDVD_STREAM (stream));
+    g_object_ref (stream);
 
   if (player->priv->astream)
-    ogmdvd_stream_unref (OGMDVD_STREAM (player->priv->astream));
+    g_object_unref (player->priv->astream);
   player->priv->astream = stream;
 
   if (player->priv->afile)
@@ -333,7 +348,7 @@ ogmrip_player_set_audio_file (OGMRipPlayer *player, OGMRipFile *file)
     ogmrip_file_ref (file);
 
   if (player->priv->astream)
-    ogmdvd_stream_unref (OGMDVD_STREAM (player->priv->astream));
+    g_object_unref (player->priv->astream);
   player->priv->astream = NULL;
 
   if (player->priv->afile)
@@ -344,21 +359,21 @@ ogmrip_player_set_audio_file (OGMRipPlayer *player, OGMRipFile *file)
 /**
  * ogmrip_player_set_subp_stream:
  * @player: an #OGMRipPlayer
- * @stream: an #OGMDvdSubpStream
+ * @stream: an #OGMRipSubpStream
  *
  * Sets the subtitle stream to play
  */
 void
-ogmrip_player_set_subp_stream (OGMRipPlayer *player, OGMDvdSubpStream *stream)
+ogmrip_player_set_subp_stream (OGMRipPlayer *player, OGMRipSubpStream *stream)
 {
   g_return_if_fail (OGMRIP_IS_PLAYER (player));
   g_return_if_fail (stream != NULL);
 
   if (stream)
-    ogmdvd_stream_ref (OGMDVD_STREAM (stream));
+    g_object_ref (stream);
 
   if (player->priv->sstream)
-    ogmdvd_stream_unref (OGMDVD_STREAM (player->priv->sstream));
+    g_object_unref (player->priv->sstream);
   player->priv->sstream = stream;
 
   if (player->priv->sfile)
@@ -383,7 +398,7 @@ ogmrip_player_set_subp_file (OGMRipPlayer *player, OGMRipFile *file)
     ogmrip_file_ref (file);
 
   if (player->priv->sstream)
-    ogmdvd_stream_unref (OGMDVD_STREAM (player->priv->sstream));
+    g_object_unref (player->priv->sstream);
   player->priv->sstream = NULL;
 
   if (player->priv->sfile)

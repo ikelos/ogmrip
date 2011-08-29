@@ -31,19 +31,19 @@ static void
 ogmrip_source_chooser_default_init (OGMRipSourceChooserInterface *iface)
 {
   g_object_interface_install_property (iface,
-      g_param_spec_pointer ("title", "Title property", "The DVD title",
-        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+      g_param_spec_object ("title", "Title property", "The DVD title",
+        OGMRIP_TYPE_TITLE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 }
 
 /**
  * ogmrip_source_chooser_set_title:
  * @chooser: An #OGMRipSourceChooser
- * @title: An #OGMDvdTitle
+ * @title: An #OGMRipTitle
  *
- * Sets the #OGMDvdTitle from which to select the source.
+ * Sets the #OGMRipTitle from which to select the source.
  */
 void
-ogmrip_source_chooser_set_title (OGMRipSourceChooser *chooser, OGMDvdTitle *title)
+ogmrip_source_chooser_set_title (OGMRipSourceChooser *chooser, OGMRipTitle *title)
 {
   g_return_if_fail (OGMRIP_IS_SOURCE_CHOOSER (chooser));
 
@@ -54,18 +54,21 @@ ogmrip_source_chooser_set_title (OGMRipSourceChooser *chooser, OGMDvdTitle *titl
  * ogmrip_source_chooser_get_title:
  * @chooser: An #OGMRipSourceChooser
  *
- * Returns the OGMDvdTitle which was passed to ogmrip_source_chooser_set_title().
+ * Returns the OGMRipTitle which was passed to ogmrip_source_chooser_set_title().
  *
- * Returns: The current #OGMDvdTitle
+ * Returns: The current #OGMRipTitle
  */
-OGMDvdTitle *
+OGMRipTitle *
 ogmrip_source_chooser_get_title (OGMRipSourceChooser *chooser)
 {
-  OGMDvdTitle *title;
+  OGMRipTitle *title;
 
   g_return_val_if_fail (OGMRIP_IS_SOURCE_CHOOSER (chooser), NULL);
 
   g_object_get (chooser, "title", &title, NULL);
+
+  if (title)
+    g_object_unref (title);
 
   return title;
 }

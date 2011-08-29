@@ -20,7 +20,9 @@
 #include "config.h"
 #endif
 
+#include "ogmdvd.h"
 #include "ogmjob.h"
+#include "ogmdvd-gtk.h"
 #include "ogmrip-gtk.h"
 #include "ogmrip-settings.h"
 
@@ -49,7 +51,7 @@
 
 typedef struct
 {
-  OGMDvdDisc *disc;
+  OGMRipMedia *media;
 
   GtkWidget *window;
 
@@ -256,8 +258,8 @@ ogmrip_main_dbus_uninhibit (OGMRipData *data, guint cookie)
 static void
 ogmrip_main_load (OGMRipData *data, const gchar *path)
 {
-  OGMDvdDisc *disc;
   GError *error = NULL;
+  OGMRipMedia *disc;
 
   disc = ogmdvd_disc_new (path, &error);
   if (!disc)
@@ -270,15 +272,15 @@ ogmrip_main_load (OGMRipData *data, const gchar *path)
     const gchar *label = NULL;
     gint nvid;
 
-    if (data->disc)
-      ogmdvd_disc_unref (data->disc);
-    data->disc = disc;
+    if (data->media)
+      g_object_unref (data->media);
+    data->media = disc;
 
     ogmdvd_title_chooser_set_disc (OGMDVD_TITLE_CHOOSER (data->title_chooser), disc);
 
-    nvid = ogmdvd_disc_get_n_titles (disc);
+    nvid = ogmrip_media_get_n_titles (disc);
     if (nvid > 0)
-      label = ogmdvd_disc_get_label (disc);
+      label = ogmrip_media_get_label (disc);
 
     gtk_entry_set_text (GTK_ENTRY (data->title_entry), label ? label : "");
   }
@@ -343,12 +345,15 @@ ogmrip_main_clean (OGMRipData *data, OGMRipEncoding *encoding, gboolean error)
 
     if (after == OGMRIP_AFTER_ENC_REMOVE)
     {
-      OGMDvdTitle *title;
-      const gchar *path;
+      OGMRipTitle *title;
+      const gchar *uri;
 
       title = ogmrip_encoding_get_title (encoding);
-      path = ogmdvd_disc_get_device (ogmdvd_title_get_disc (title));
-      ogmrip_fs_rmdir (path, TRUE, NULL);
+      uri = ogmrip_media_get_uri (ogmrip_title_get_media (title));
+      if (!g_str_has_prefix (uri, "dvd://"))
+        g_warning ("Unknown scheme for '%s'", uri);
+      else
+        ogmrip_fs_rmdir (uri + 6, TRUE, NULL);
     }
   }
 }
@@ -422,7 +427,7 @@ ogmrip_main_display_error (OGMRipData *data, OGMRipEncoding *encoding, GError *e
 static void
 ogmrip_main_encoding_spawn_run (OGMRipEncoding *encoding, OGMJobSpawn *spawn, OGMRipProgressDialog *dialog)
 {
-  OGMDvdStream *stream;
+  OGMRipStream *stream;
   gchar *message;
 
   if (spawn)
@@ -442,14 +447,16 @@ ogmrip_main_encoding_spawn_run (OGMRipEncoding *encoding, OGMJobSpawn *spawn, OG
     else if (OGMRIP_IS_AUDIO_CODEC (spawn))
     {
       stream = ogmrip_codec_get_input (OGMRIP_CODEC (spawn));
-      message = g_strdup_printf (_("Extracting audio stream %d"), ogmdvd_stream_get_nr (stream) + 1);
+      message = g_strdup_printf (_("Extracting audio stream %d"),
+          ogmrip_audio_stream_get_nr (OGMRIP_AUDIO_STREAM (stream)) + 1);
       ogmrip_progress_dialog_set_message (dialog, message);
       g_free (message);
     }
     else if (OGMRIP_IS_SUBP_CODEC (spawn))
     {
       stream = ogmrip_codec_get_input (OGMRIP_CODEC (spawn));
-      message = g_strdup_printf (_("Extracting subtitle stream %d"), ogmdvd_stream_get_nr (stream) + 1);
+      message = g_strdup_printf (_("Extracting subtitle stream %d"),
+          ogmrip_subp_stream_get_nr (OGMRIP_SUBP_STREAM (stream)) + 1);
       ogmrip_progress_dialog_set_message (dialog, message);
       g_free (message);
     }
@@ -534,7 +541,7 @@ ogmrip_main_encode (OGMRipData *data, OGMRipEncoding *encoding)
     if (cookie >= 0)
       ogmrip_main_dbus_uninhibit (data, cookie);
 
-    ogmdvd_title_close (ogmrip_encoding_get_title (encoding));
+    ogmrip_title_close (ogmrip_encoding_get_title (encoding));
 
     if (result == OGMJOB_RESULT_ERROR || error != NULL)
     {
@@ -655,14 +662,14 @@ ogmrip_main_export_simple_chapters (OGMRipData *data, const gchar *filename)
   if (ogmrip_chapter_list_get_selected (OGMRIP_CHAPTER_LIST (data->chapter_list), &start_chap, &end_chap))
   {
     GError *error = NULL;
-    OGMDvdTitle *title;
+    OGMRipTitle *title;
     OGMRipCodec *chapters;
     gchar *label;
     guint i;
 
     title = ogmdvd_title_chooser_get_active (OGMDVD_TITLE_CHOOSER (data->title_chooser));
 
-    chapters = ogmrip_chapters_new (ogmdvd_title_get_video_stream (title));
+    chapters = ogmrip_chapters_new (ogmrip_title_get_video_stream (title));
     ogmrip_codec_set_chapters (OGMRIP_CODEC (chapters), start_chap, end_chap);
 
     for (i = 0; ; i++)
@@ -692,7 +699,7 @@ static void
 ogmrip_main_add_audio_chooser (OGMRipData *data)
 {
   GtkWidget *chooser;
-  OGMDvdTitle *title;
+  OGMRipTitle *title;
 
   title = ogmdvd_title_chooser_get_active (OGMDVD_TITLE_CHOOSER (data->title_chooser));
 
@@ -708,10 +715,10 @@ ogmrip_main_add_audio_chooser (OGMRipData *data)
 
     if (!ogmrip_source_chooser_get_active (OGMRIP_SOURCE_CHOOSER (chooser), NULL))
     {
-      OGMDvdAudioStream *stream = NULL;
+      OGMRipAudioStream *stream = NULL;
 
-      if (ogmdvd_title_get_n_audio_streams (title) > 0)
-        stream = ogmdvd_title_get_nth_audio_stream (title, 0);
+      if (ogmrip_title_get_n_audio_streams (title) > 0)
+        stream = ogmrip_title_get_nth_audio_stream (title, 0);
 
       ogmrip_source_chooser_set_active (OGMRIP_SOURCE_CHOOSER (chooser), (OGMRipSource *) stream);
     }
@@ -730,7 +737,7 @@ static void
 ogmrip_main_add_subp_chooser (OGMRipData *data)
 {
   GtkWidget *chooser;
-  OGMDvdTitle *title;
+  OGMRipTitle *title;
 
   title = ogmdvd_title_chooser_get_active (OGMDVD_TITLE_CHOOSER (data->title_chooser));
 
@@ -796,7 +803,7 @@ ogmrip_main_create_container (OGMRipData *data, OGMRipProfile *profile)
  */
 static OGMRipCodec *
 ogmrip_main_create_video_codec (OGMRipData *data, OGMRipProfile *profile,
-    OGMDvdVideoStream *stream, guint start_chap, gint end_chap)
+    OGMRipVideoStream *stream, guint start_chap, gint end_chap)
 {
   OGMRipCodec *codec;
   GSettings *settings;
@@ -977,7 +984,7 @@ ogmrip_main_create_subp_codec (OGMRipData *data, OGMRipProfile *profile,
  * Creates a chapters codec
  */
 static OGMRipCodec *
-ogmrip_main_create_chapters_codec (OGMRipData *data, OGMDvdVideoStream *stream, guint start_chap, gint end_chap)
+ogmrip_main_create_chapters_codec (OGMRipData *data, OGMRipVideoStream *stream, guint start_chap, gint end_chap)
 {
   OGMRipCodec *codec;
   guint last_chap, chap;
@@ -1101,17 +1108,22 @@ ogmrip_main_encoding_completed (OGMRipData *data, OGMJobSpawn *spawn, guint resu
 static void
 ogmrip_main_eject_activated (OGMRipData *data, GtkWidget *dialog)
 {
-  if (data->disc)
+  if (data->media)
   {
     gchar *device;
 
     device = ogmdvd_drive_chooser_get_device (OGMDVD_DRIVE_CHOOSER (dialog), NULL);
     if (device)
     {
-      if (g_str_equal (device, ogmdvd_disc_get_device (data->disc)))
+      const gchar *uri;
+
+      uri = ogmrip_media_get_uri (data->media);
+      if (!g_str_has_prefix (uri, "dvd://"))
+        g_warning ("Unknown scheme for '%s'", uri);
+      else if (g_str_equal (device, uri + 6))
       {
-        ogmdvd_disc_unref (data->disc);
-        data->disc = NULL;
+        g_object_unref (data->media);
+        data->media = NULL;
 
         ogmdvd_title_chooser_set_disc (OGMDVD_TITLE_CHOOSER (data->title_chooser), NULL);
         gtk_entry_set_text (GTK_ENTRY (data->title_entry), "");
@@ -1158,7 +1170,7 @@ static void
 ogmrip_main_extract_activated (OGMRipData *data)
 {
   GtkWidget *dialog;
-  OGMDvdTitle *title;
+  OGMRipTitle *title;
 
   OGMRipEncoding *encoding;
   OGMRipProfile *profile;
@@ -1203,7 +1215,7 @@ ogmrip_main_extract_activated (OGMRipData *data)
   ogmrip_chapter_list_get_selected (OGMRIP_CHAPTER_LIST (data->chapter_list), &start_chap, &end_chap);
 
   codec = ogmrip_main_create_video_codec (data, profile,
-      ogmdvd_title_get_video_stream (title), start_chap, end_chap);
+      ogmrip_title_get_video_stream (title), start_chap, end_chap);
 
   if (codec)
   {
@@ -1277,7 +1289,7 @@ ogmrip_main_extract_activated (OGMRipData *data)
   g_list_free (list);
 
   codec = ogmrip_main_create_chapters_codec (data,
-      ogmdvd_title_get_video_stream (title), start_chap, end_chap);
+      ogmrip_title_get_video_stream (title), start_chap, end_chap);
 
   if (codec)
   {
@@ -1291,11 +1303,11 @@ ogmrip_main_extract_activated (OGMRipData *data)
     codec = ogmrip_encoding_get_nth_audio_codec (encoding, 0);
     if (codec)
     {
-      list = ogmdvd_title_get_subp_streams (ogmrip_encoding_get_title (encoding));
+      list = ogmrip_title_get_subp_streams (ogmrip_encoding_get_title (encoding));
       for (link = list; link; link = link->next)
       {
         if (ogmrip_audio_codec_get_language (OGMRIP_AUDIO_CODEC (codec)) ==
-            ogmdvd_subp_stream_get_language (link->data))
+            ogmrip_subp_stream_get_language (link->data))
         {
           codec = ogmrip_encoding_get_video_codec (encoding);
           ogmrip_video_codec_set_hard_subp (OGMRIP_VIDEO_CODEC (codec), link->data, TRUE);
@@ -1328,7 +1340,7 @@ ogmrip_main_play_activated (OGMRipData *data, GtkWidget *button)
 {
   GError *error = NULL;
 
-  OGMDvdTitle *title;
+  OGMRipTitle *title;
   OGMRipSource *source;
   OGMRipSourceType type;
   GList *list, *link;
@@ -1354,7 +1366,7 @@ ogmrip_main_play_activated (OGMRipData *data, GtkWidget *button)
     source = ogmrip_source_chooser_get_active (link->data, &type);
     if (type == OGMRIP_SOURCE_STREAM)
     {
-      ogmrip_player_set_audio_stream (data->player, OGMDVD_AUDIO_STREAM (source));
+      ogmrip_player_set_audio_stream (data->player, OGMRIP_AUDIO_STREAM (source));
       break;
     }
   }
@@ -1366,7 +1378,7 @@ ogmrip_main_play_activated (OGMRipData *data, GtkWidget *button)
     source = ogmrip_source_chooser_get_active (link->data, &type);
     if (type == OGMRIP_SOURCE_STREAM)
     {
-      ogmrip_player_set_subp_stream (data->player, OGMDVD_SUBP_STREAM (source));
+      ogmrip_player_set_subp_stream (data->player, OGMRIP_SUBP_STREAM (source));
       break;
     }
   }
@@ -1534,7 +1546,7 @@ ogmrip_main_about_activated (OGMRipData *data)
 static void
 ogmrip_main_title_chooser_changed (OGMRipData *data)
 {
-  OGMDvdTitle *title;
+  OGMRipTitle *title;
   gint angles;
 
   title = ogmdvd_title_chooser_get_active (OGMDVD_TITLE_CHOOSER (data->title_chooser));
@@ -1549,7 +1561,7 @@ ogmrip_main_title_chooser_changed (OGMRipData *data)
   ogmdvd_chapter_list_set_title (OGMDVD_CHAPTER_LIST (data->chapter_list), title);
   ogmrip_chapter_list_select_all (OGMRIP_CHAPTER_LIST (data->chapter_list));
 
-  angles = title ? ogmdvd_title_get_n_angles (title) : 1;
+  angles = title ? ogmrip_title_get_n_angles (title) : 1;
   gtk_spin_button_set_value (GTK_SPIN_BUTTON (data->angle_spin), 1);
   gtk_spin_button_set_range (GTK_SPIN_BUTTON (data->angle_spin), 1, angles);
   gtk_widget_set_visible (data->angle_spin, angles > 1);
@@ -1570,11 +1582,11 @@ ogmrip_main_chapter_selection_changed (OGMRipData *data)
     gtk_label_set_text (GTK_LABEL (data->length_label), "");
   else
   {
-    OGMDvdTitle *title;
+    OGMRipTitle *title;
     OGMRipTime time_;
 
     title = ogmdvd_title_chooser_get_active (OGMDVD_TITLE_CHOOSER (data->title_chooser));
-    if (ogmdvd_title_get_chapters_length (title, start_chap, end_chap, &time_) > 0)
+    if (ogmrip_title_get_chapters_length (title, start_chap, end_chap, &time_) > 0)
     {
       gchar *str;
 
@@ -1603,10 +1615,10 @@ ogmrip_main_delete_event (OGMRipData *data)
 static void
 ogmrip_main_destroyed (OGMRipData *data)
 {
-  if (data->disc)
+  if (data->media)
   {
-    ogmdvd_disc_unref (data->disc);
-    data->disc = NULL;
+    g_object_unref (data->media);
+    data->media = NULL;
   }
 
   if (data->player)

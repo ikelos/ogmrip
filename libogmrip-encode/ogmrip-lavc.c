@@ -138,7 +138,7 @@ ogmrip_lavc_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   static const gint strict[] = { 0, 1, -1, -2 };
 
   OGMRipLavc *lavc;
-  OGMDvdStream *stream;
+  OGMRipStream *stream;
   GPtrArray *argv;
   GString *options;
 
@@ -244,7 +244,7 @@ ogmrip_lavc_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   g_ptr_array_add (argv, g_strdup ("-lavcopts"));
   g_ptr_array_add (argv, g_string_free (options, FALSE));
 
-  vid = ogmdvd_title_get_nr (ogmdvd_stream_get_title (stream));
+  vid = ogmrip_title_get_nr (ogmrip_stream_get_title (stream));
 
   if (MPLAYER_CHECK_VERSION (1,0,0,1))
     g_ptr_array_add (argv, g_strdup_printf ("dvd://%d", vid + 1));
@@ -662,7 +662,7 @@ ogmrip_init_lavc_plugin (void)
 
 /**
  * ogmrip_lavc_new:
- * @title: An #OGMDvdTitle
+ * @title: An #OGMRipTitle
  * @output: The output file
  *
  * Creates a new #OGMRipLavc
@@ -670,7 +670,7 @@ ogmrip_init_lavc_plugin (void)
  * Returns: The new #OGMRipLavc
  */
 OGMJobSpawn *
-ogmrip_lavc_new (OGMDvdTitle *title, const gchar *output)
+ogmrip_lavc_new (OGMRipTitle *title, const gchar *output)
 {
   g_return_val_if_fail (title != NULL, NULL);
   g_return_val_if_fail (output && *output, NULL);

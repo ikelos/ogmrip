@@ -21,7 +21,7 @@
 
 #include <gtk/gtk.h>
 
-#include <ogmdvd.h>
+#include <ogmrip-media.h>
 
 G_BEGIN_DECLS
 
@@ -49,8 +49,8 @@ struct _OGMDvdChapterListClass
 GType         ogmdvd_chapter_list_get_type  (void);
 GtkWidget *   ogmdvd_chapter_list_new       (void);
 void          ogmdvd_chapter_list_set_title (OGMDvdChapterList *list,
-                                             OGMDvdTitle       *title);
-OGMDvdTitle * ogmdvd_chapter_list_get_title (OGMDvdChapterList *list);
+                                             OGMRipTitle       *title);
+OGMRipTitle * ogmdvd_chapter_list_get_title (OGMDvdChapterList *list);
 gchar *       ogmdvd_chapter_list_get_label (OGMDvdChapterList *list,
                                              guint             chapter);
 void          ogmdvd_chapter_list_set_label (OGMDvdChapterList *list,

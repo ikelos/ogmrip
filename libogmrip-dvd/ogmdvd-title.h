@@ -19,52 +19,34 @@
 #ifndef __OGMDVD_TITLE_H__
 #define __OGMDVD_TITLE_H__
 
-#include <ogmdvd-types.h>
+#include <ogmrip-media.h>
 
 G_BEGIN_DECLS
 
-typedef void (* OGMDvdTitleCallback) (OGMDvdTitle *title,
-                                      gdouble     percent,
-                                      gpointer    user_data);
+#define OGMDVD_TYPE_TITLE             (ogmdvd_title_get_type ())
+#define OGMDVD_TITLE(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMDVD_TYPE_TITLE, OGMDvdTitle))
+#define OGMDVD_IS_TITLE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), OGMDVD_TYPE_TITLE))
+#define OGMDVD_TITLE_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), OGMDVD_TYPE_TITLE, OGMDvdTitleClass))
+#define OGMDVD_IS_TITLE_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMDVD_TYPE_TITLE))
+#define OGMDVD_TITLE_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), OGMDVD_TYPE_TITLE, OGMDvdTitleClass))
 
-void                ogmdvd_title_ref                  (OGMDvdTitle         *title);
-void                ogmdvd_title_unref                (OGMDvdTitle         *title);
+typedef struct _OGMDvdTitle      OGMDvdTitle;
+typedef struct _OGMDvdTitleClass OGMDvdTitleClass;
+typedef struct _OGMDvdTitlePriv  OGMDvdTitlePriv;
 
-gboolean            ogmdvd_title_open                 (OGMDvdTitle         *title,
-                                                       GError              **error);
-void                ogmdvd_title_close                (OGMDvdTitle         *title);
-gboolean            ogmdvd_title_is_open              (OGMDvdTitle         *title);
+struct _OGMDvdTitle
+{
+  GObject parent_instance;
 
-OGMDvdDisc *        ogmdvd_title_get_disc             (OGMDvdTitle         *title);
-gint64              ogmdvd_title_get_vts_size         (OGMDvdTitle         *title);
-gint                ogmdvd_title_get_nr               (OGMDvdTitle         *title);
-gint                ogmdvd_title_get_ts_nr            (OGMDvdTitle         *title);
-gboolean            ogmdvd_title_get_progressive      (OGMDvdTitle         *title);
-gboolean            ogmdvd_title_get_telecine         (OGMDvdTitle         *title);
-gboolean            ogmdvd_title_get_interlaced       (OGMDvdTitle         *title);
-gdouble             ogmdvd_title_get_length           (OGMDvdTitle         *title,
-                                                       OGMRipTime          *length);
-gdouble             ogmdvd_title_get_chapters_length  (OGMDvdTitle         *title, 
-                                                       guint               start,
-                                                       gint                end,
-                                                       OGMRipTime          *length);
-const guint *       ogmdvd_title_get_palette          (OGMDvdTitle         *title);
-gint                ogmdvd_title_get_n_angles         (OGMDvdTitle         *title);
-gint                ogmdvd_title_get_n_chapters       (OGMDvdTitle         *title);
-OGMDvdVideoStream * ogmdvd_title_get_video_stream     (OGMDvdTitle         *title);
-gint                ogmdvd_title_get_n_audio_streams  (OGMDvdTitle         *title);
-OGMDvdAudioStream * ogmdvd_title_get_nth_audio_stream (OGMDvdTitle         *title,
-                                                       guint               nr);
-GList *             ogmdvd_title_get_audio_streams    (OGMDvdTitle         *title);
-gint                ogmdvd_title_get_n_subp_streams   (OGMDvdTitle         *title);
-OGMDvdSubpStream *  ogmdvd_title_get_nth_subp_stream  (OGMDvdTitle         *title,
-                                                       guint               nr);
-GList *             ogmdvd_title_get_subp_streams     (OGMDvdTitle         *title);
-gboolean            ogmdvd_title_analyze              (OGMDvdTitle         *title,
-                                                       GCancellable        *cancellable,
-                                                       OGMDvdTitleCallback callback,
-                                                       gpointer            user_data,
-                                                       GError              **error);
+  OGMDvdTitlePriv *priv;
+};
+
+struct _OGMDvdTitleClass
+{
+  GObjectClass parent_class;
+};
+
+GType ogmdvd_title_get_type (void);
 
 G_END_DECLS
 

@@ -51,7 +51,7 @@ enum
 
 struct _OGMDvdChapterListPriv
 {
-  OGMDvdTitle *title;
+  OGMRipTitle *title;
 };
 
 static void ogmdvd_chapter_list_dispose      (GObject      *object);
@@ -78,8 +78,8 @@ ogmdvd_chapter_list_class_init (OGMDvdChapterListClass *klass)
   object_class->set_property = ogmdvd_chapter_list_set_property;
 
   g_object_class_install_property (object_class, PROP_TITLE, 
-        g_param_spec_pointer ("title", "Title property", "The DVD title",
-          G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+        g_param_spec_object ("title", "Title property", "The DVD title",
+          OGMRIP_TYPE_TITLE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMDvdChapterListPriv));
 }
@@ -134,7 +134,7 @@ ogmdvd_chapter_list_dispose (GObject *object)
 
   if (list->priv->title)
   {
-    ogmdvd_title_unref (list->priv->title);
+    g_object_unref (list->priv->title);
     list->priv->title = NULL;
   }
 
@@ -147,7 +147,7 @@ ogmdvd_chapter_list_get_property (GObject *gobject, guint property_id, GValue *v
   switch (property_id) 
   {
     case PROP_TITLE:
-      g_value_set_pointer (value, OGMDVD_CHAPTER_LIST (gobject)->priv->title);
+      g_value_set_object (value, OGMDVD_CHAPTER_LIST (gobject)->priv->title);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -161,7 +161,7 @@ ogmdvd_chapter_list_set_property (GObject *gobject, guint property_id, const GVa
   switch (property_id) 
   {
     case PROP_TITLE:
-      ogmdvd_chapter_list_set_title (OGMDVD_CHAPTER_LIST (gobject), g_value_get_pointer (value));
+      ogmdvd_chapter_list_set_title (OGMDVD_CHAPTER_LIST (gobject), g_value_get_object (value));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -186,11 +186,11 @@ ogmdvd_chapter_list_new (void)
  * ogmdvd_chapter_list_get_title:
  * @list: An #OGMDvdChapterList
  *
- * Returns the #OGMDvdTitle which was passed to ogmdvd_chapter_list_set_title().
+ * Returns the #OGMRipTitle which was passed to ogmdvd_chapter_list_set_title().
  *
- * Returns: An #OGMDvdTitle
+ * Returns: An #OGMRipTitle
  */
-OGMDvdTitle *
+OGMRipTitle *
 ogmdvd_chapter_list_get_title (OGMDvdChapterList *list)
 {
   g_return_val_if_fail (OGMDVD_IS_CHAPTER_LIST (list), NULL);
@@ -201,12 +201,12 @@ ogmdvd_chapter_list_get_title (OGMDvdChapterList *list)
 /**
  * ogmdvd_chapter_list_set_title:
  * @list: An #OGMDvdChapterList
- * @title: An #OGMDvdTitle
+ * @title: An #OGMRipTitle
  *
- * Adds to the list the chapters of the given #OGMDvdTitle.
+ * Adds to the list the chapters of the given #OGMRipTitle.
  */
 void
-ogmdvd_chapter_list_set_title (OGMDvdChapterList *list, OGMDvdTitle *title)
+ogmdvd_chapter_list_set_title (OGMDvdChapterList *list, OGMRipTitle *title)
 {
   GtkTreeModel *model;
   GtkTreeIter iter;
@@ -217,11 +217,12 @@ ogmdvd_chapter_list_set_title (OGMDvdChapterList *list, OGMDvdTitle *title)
   gchar *str;
 
   g_return_if_fail (OGMDVD_IS_CHAPTER_LIST (list));
+  g_return_if_fail (title == NULL || OGMRIP_IS_TITLE (title));
 
   if (title)
-    ogmdvd_title_ref (title);
+    g_object_ref (title);
   if (list->priv->title)
-    ogmdvd_title_unref (list->priv->title);
+    g_object_unref (list->priv->title);
   list->priv->title = title;
 
   model = gtk_tree_view_get_model (GTK_TREE_VIEW (list));
@@ -229,7 +230,7 @@ ogmdvd_chapter_list_set_title (OGMDvdChapterList *list, OGMDvdTitle *title)
 
   if (title)
   {
-    nchap = ogmdvd_title_get_n_chapters (title);
+    nchap = ogmrip_title_get_n_chapters (title);
     for (chap = 0; chap < nchap; chap++)
     {
       gtk_list_store_append (GTK_LIST_STORE (model), &iter);
@@ -238,7 +239,7 @@ ogmdvd_chapter_list_set_title (OGMDvdChapterList *list, OGMDvdTitle *title)
       gtk_list_store_set (GTK_LIST_STORE (model), &iter, COL_CHAPTER, chap + 1, COL_LABEL, str, -1);
       g_free (str);
 
-      if ((seconds = ogmdvd_title_get_chapters_length (title, chap, chap, &time_)) > 0)
+      if ((seconds = ogmrip_title_get_chapters_length (title, chap, chap, &time_)) > 0)
       {
         str = g_strdup_printf ("%02lu:%02lu:%02lu", time_.hour, time_.min, time_.sec);
         gtk_list_store_set (GTK_LIST_STORE (model), &iter, COL_LENGTH, str, /*COL_SECONDS, seconds,*/ -1);

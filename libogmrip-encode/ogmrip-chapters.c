@@ -87,11 +87,11 @@ static void
 ogmrip_chapters_constructed (GObject *gobject)
 {
   OGMRipChapters *chapters = OGMRIP_CHAPTERS (gobject);
-  OGMDvdStream *stream;
+  OGMRipStream *stream;
 
   stream = ogmrip_codec_get_input (OGMRIP_CODEC (chapters));
 
-  chapters->priv->nchapters = ogmdvd_title_get_n_chapters (ogmdvd_stream_get_title (stream));
+  chapters->priv->nchapters = ogmrip_title_get_n_chapters (ogmrip_stream_get_title (stream));
   if (chapters->priv->nchapters > 0)
     chapters->priv->labels = g_new0 (gchar *, chapters->priv->nchapters + 1);
 
@@ -168,7 +168,7 @@ static gint
 ogmrip_chapters_run (OGMJobSpawn *spawn)
 {
   GIOChannel *channel;
-  OGMDvdStream *stream;
+  OGMRipStream *stream;
 
   const gchar *output;
   guint start_chapter, end_chapter;
@@ -189,7 +189,7 @@ ogmrip_chapters_run (OGMJobSpawn *spawn)
     length += seconds;
 
     if (i < end_chapter)
-      seconds = ogmdvd_title_get_chapters_length (ogmdvd_stream_get_title (stream), i, i, NULL);
+      seconds = ogmrip_title_get_chapters_length (ogmrip_stream_get_title (stream), i, i, NULL);
 
     ogmrip_chapters_save (OGMRIP_CHAPTERS (spawn), 
         channel, i - start_chapter + 1, OGMRIP_CHAPTERS (spawn)->priv->labels[i], length * 1000);
@@ -203,14 +203,14 @@ ogmrip_chapters_run (OGMJobSpawn *spawn)
 
 /**
  * ogmrip_chapters_new:
- * @stream: An #OGMDvdVideoStream
+ * @stream: An #OGMRipVideoStream
  *
  * Creates a new #OGMRipChapters.
  *
  * Returns: The new #OGMRipChapters
  */
 OGMRipCodec *
-ogmrip_chapters_new (OGMDvdVideoStream *stream)
+ogmrip_chapters_new (OGMRipVideoStream *stream)
 {
   g_return_val_if_fail (stream != NULL, NULL);
 

@@ -36,5 +36,5 @@ const gchar * ogmrip_language_get_iso639_2        (gint code);
 
 G_END_DECLS
 
-#endif /* __OGMDVD_LABELS_H__ */
+#endif /* __OGMRIP_MEDIA_LABELS_H__ */
 

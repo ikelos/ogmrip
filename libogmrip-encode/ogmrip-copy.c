@@ -30,14 +30,14 @@
 
 struct _OGMRipCopyPriv
 {
-  OGMDvdDisc *disc;
+  OGMRipMedia *media;
   gchar *path;
 };
 
 enum
 {
   PROP_0,
-  PROP_DISC,
+  PROP_MEDIA,
   PROP_PATH
 };
 
@@ -72,9 +72,9 @@ ogmrip_copy_class_init (OGMRipCopyClass *klass)
   spawn_class = OGMJOB_SPAWN_CLASS (klass);
   spawn_class->run = ogmrip_copy_run;
 
-  g_object_class_install_property (gobject_class, PROP_DISC, 
-        g_param_spec_pointer ("disc", "Disc property", "Set disc", 
-           G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+  g_object_class_install_property (gobject_class, PROP_MEDIA, 
+        g_param_spec_object ("media", "Media property", "Set media", 
+           OGMRIP_TYPE_MEDIA, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_PATH, 
         g_param_spec_string ("path", "Path property", "Set path", 
@@ -105,10 +105,10 @@ ogmrip_copy_dispose (GObject *gobject)
 {
   OGMRipCopy *copy = OGMRIP_COPY (gobject);
 
-  if (copy->priv->disc)
+  if (copy->priv->media)
   {
-    ogmdvd_disc_unref (copy->priv->disc);
-    copy->priv->disc = NULL;
+    g_object_unref (copy->priv->media);
+    copy->priv->media = NULL;
   }
 
   G_OBJECT_CLASS (ogmrip_copy_parent_class)->dispose (gobject);
@@ -131,9 +131,8 @@ ogmrip_copy_set_property (GObject *gobject, guint property_id, const GValue *val
 
   switch (property_id) 
   {
-    case PROP_DISC:
-      copy->priv->disc = g_value_get_pointer (value);
-      ogmdvd_disc_ref (copy->priv->disc);
+    case PROP_MEDIA:
+      copy->priv->media = g_value_dup_object (value);
       break;
     case PROP_PATH:
       g_free (copy->priv->path);
@@ -152,8 +151,8 @@ ogmrip_copy_get_property (GObject *gobject, guint property_id, GValue *value, GP
 
   switch (property_id) 
   {
-    case PROP_DISC:
-      g_value_set_pointer (value, copy->priv->disc);
+    case PROP_MEDIA:
+      g_value_set_object (value, copy->priv->media);
       break;
     case PROP_PATH:
       g_value_set_string (value, copy->priv->path);
@@ -165,7 +164,7 @@ ogmrip_copy_get_property (GObject *gobject, guint property_id, GValue *value, GP
 }
 
 static void
-ogmrip_copy_progress (OGMDvdDisc *disc, gdouble percent, gpointer spawn)
+ogmrip_copy_progress (OGMRipMedia *media, gdouble percent, gpointer spawn)
 {
   g_signal_emit_by_name (spawn, "progress", percent);
 }
@@ -179,7 +178,7 @@ ogmrip_copy_run (OGMJobSpawn *spawn)
 
   cancellable = g_cancellable_new ();
 
-  if (ogmdvd_disc_copy (copy->priv->disc, copy->priv->path, cancellable, ogmrip_copy_progress, spawn, NULL))
+  if (ogmrip_media_copy (copy->priv->media, copy->priv->path, cancellable, ogmrip_copy_progress, spawn, NULL))
     retval = OGMJOB_RESULT_SUCCESS;
   else if (g_cancellable_is_cancelled (cancellable))
     retval = OGMJOB_RESULT_CANCEL;
@@ -193,7 +192,7 @@ ogmrip_copy_run (OGMJobSpawn *spawn)
 
 /**
  * ogmrip_copy_new:
- * @title: An #OGMDvdTitle
+ * @title: An #OGMRipMedia
  * @path: The output path
  *
  * Creates a new #OGMRipCopy.
@@ -201,11 +200,11 @@ ogmrip_copy_run (OGMJobSpawn *spawn)
  * Returns: The new #OGMRipCopy
  */
 OGMJobSpawn *
-ogmrip_copy_new (OGMDvdDisc *disc, const gchar *path)
+ogmrip_copy_new (OGMRipMedia *media, const gchar *path)
 {
-  g_return_val_if_fail (disc != NULL, NULL);
+  g_return_val_if_fail (OGMRIP_IS_MEDIA (media), NULL);
   g_return_val_if_fail (path && *path, NULL);
 
-  return g_object_new (OGMRIP_TYPE_COPY, "disc", disc, "path", path, NULL);
+  return g_object_new (OGMRIP_TYPE_COPY, "media", media, "path", path, NULL);
 }
 

@@ -30,7 +30,6 @@
 
 struct _OGMRipSubpCodecPriv
 {
-  OGMDvdSubpStream *stream;
   gboolean forced_only;
 
   gchar *label;

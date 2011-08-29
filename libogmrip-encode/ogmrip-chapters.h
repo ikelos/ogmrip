@@ -47,7 +47,7 @@ struct _OGMRipChaptersClass
 };
 
 GType         ogmrip_chapters_get_type     (void);
-OGMRipCodec * ogmrip_chapters_new          (OGMDvdVideoStream *stream);
+OGMRipCodec * ogmrip_chapters_new          (OGMRipVideoStream *stream);
 const gchar * ogmrip_chapters_get_label    (OGMRipChapters    *chapters, 
                                             guint             n);
 void          ogmrip_chapters_set_label    (OGMRipChapters    *chapters, 

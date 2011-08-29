@@ -63,14 +63,14 @@ static gint ogmrip_audio_copy_run          (OGMJobSpawn *spawn);
 static gchar **
 ogmrip_audio_copy_command (OGMRipAudioCodec *audio, const gchar *input, const gchar *output)
 {
-  OGMDvdTitle *title;
+  OGMRipTitle *title;
   GPtrArray *argv;
   gint vid;
 
   if (!output)
     output = ogmrip_codec_get_output (OGMRIP_CODEC (audio));
 
-  title = ogmdvd_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (audio)));
+  title = ogmrip_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (audio)));
 
   argv = ogmrip_mencoder_audio_command (audio, output);
 
@@ -87,7 +87,7 @@ ogmrip_audio_copy_command (OGMRipAudioCodec *audio, const gchar *input, const gc
   g_ptr_array_add (argv, g_strdup ("-oac"));
   g_ptr_array_add (argv, g_strdup ("copy"));
 
-  vid = ogmdvd_title_get_nr (title);
+  vid = ogmrip_title_get_nr (title);
 
   if (MPLAYER_CHECK_VERSION (1,0,0,1))
     g_ptr_array_add (argv, g_strdup_printf ("dvd://%d", vid + 1));

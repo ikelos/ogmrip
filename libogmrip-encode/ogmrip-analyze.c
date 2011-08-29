@@ -30,7 +30,7 @@
 
 struct _OGMRipAnalyzePriv
 {
-  OGMDvdTitle *title;
+  OGMRipTitle *title;
   gchar *path;
 };
 
@@ -68,8 +68,8 @@ ogmrip_analyze_class_init (OGMRipAnalyzeClass *klass)
   spawn_class->run = ogmrip_analyze_run;
 
   g_object_class_install_property (gobject_class, PROP_TITLE, 
-        g_param_spec_pointer ("title", "Title property", "Set title", 
-           G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+        g_param_spec_object ("title", "Title property", "Set title", 
+           OGMRIP_TYPE_TITLE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipAnalyzePriv));
 }
@@ -87,7 +87,7 @@ ogmrip_analyze_dispose (GObject *gobject)
 
   if (analyze->priv->title)
   {
-    ogmdvd_title_unref (analyze->priv->title);
+    g_object_unref (analyze->priv->title);
     analyze->priv->title = NULL;
   }
 
@@ -102,8 +102,7 @@ ogmrip_analyze_set_property (GObject *gobject, guint property_id, const GValue *
   switch (property_id) 
   {
     case PROP_TITLE:
-      analyze->priv->title = g_value_get_pointer (value);
-      ogmdvd_title_ref (analyze->priv->title);
+      analyze->priv->title = g_value_dup_object (value);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -119,7 +118,7 @@ ogmrip_analyze_get_property (GObject *gobject, guint property_id, GValue *value,
   switch (property_id) 
   {
     case PROP_TITLE:
-      g_value_set_pointer (value, analyze->priv->title);
+      g_value_set_object (value, analyze->priv->title);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -128,7 +127,7 @@ ogmrip_analyze_get_property (GObject *gobject, guint property_id, GValue *value,
 }
 
 static void
-ogmrip_analyze_progress (OGMDvdTitle *title, gdouble percent, gpointer spawn)
+ogmrip_analyze_progress (OGMRipTitle *title, gdouble percent, gpointer spawn)
 {
   g_signal_emit_by_name (spawn, "progress", percent);
 }
@@ -142,7 +141,7 @@ ogmrip_analyze_run (OGMJobSpawn *spawn)
 
   cancellable = g_cancellable_new ();
 
-  if (ogmdvd_title_analyze (analyze->priv->title, cancellable, ogmrip_analyze_progress, spawn, NULL))
+  if (ogmrip_title_analyze (analyze->priv->title, cancellable, ogmrip_analyze_progress, spawn, NULL))
     retval = OGMJOB_RESULT_SUCCESS;
   else if (g_cancellable_is_cancelled (cancellable))
     retval = OGMJOB_RESULT_CANCEL;
@@ -156,7 +155,7 @@ ogmrip_analyze_run (OGMJobSpawn *spawn)
 
 /**
  * ogmrip_analyze_new:
- * @title: An #OGMDvdTitle
+ * @title: An #OGMRipTitle
  * @path: The output path
  *
  * Creates a new #OGMRipAnalyze.
@@ -164,9 +163,9 @@ ogmrip_analyze_run (OGMJobSpawn *spawn)
  * Returns: The new #OGMRipAnalyze
  */
 OGMJobSpawn *
-ogmrip_analyze_new (OGMDvdTitle *title)
+ogmrip_analyze_new (OGMRipTitle *title)
 {
-  g_return_val_if_fail (title != NULL, NULL);
+  g_return_val_if_fail (OGMRIP_IS_TITLE (title), NULL);
 
   return g_object_new (OGMRIP_TYPE_ANALYZE, "title", title, NULL);
 }

@@ -1,4 +1,4 @@
-/* OGMDvd - A wrapper library around libdvdread
+/* OGMRipMedia - A media library for OGMRip
  * Copyright (C) 2004-2010 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -16,20 +16,28 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef __OGMDVD_STREAM_H__
-#define __OGMDVD_STREAM_H__
+#ifndef __OGMRIP_MEDIA_TYPES_H__
+#define __OGMRIP_MEDIA_TYPES_H__
 
-#include <ogmdvd-types.h>
+#include <gio/gio.h>
 
 G_BEGIN_DECLS
 
-void          ogmdvd_stream_ref       (OGMDvdStream *stream);
-void          ogmdvd_stream_unref     (OGMDvdStream *stream);
-OGMDvdTitle * ogmdvd_stream_get_title (OGMDvdStream *stream);
-gint          ogmdvd_stream_get_nr    (OGMDvdStream *stream);
-gint          ogmdvd_stream_get_id    (OGMDvdStream *stream);
+typedef struct _OGMRipMedia       OGMRipMedia;
+typedef struct _OGMRipTitle       OGMRipTitle;
+typedef struct _OGMRipStream      OGMRipStream;
+typedef struct _OGMRipVideoStream OGMRipVideoStream;
+typedef struct _OGMRipAudioStream OGMRipAudioStream;
+typedef struct _OGMRipSubpStream  OGMRipSubpStream;
+
+typedef void (* OGMRipMediaCallback) (OGMRipMedia *media,
+                                      gdouble     percent,
+                                      gpointer    user_data);
+typedef void (* OGMRipTitleCallback) (OGMRipTitle *title,
+                                      gdouble     percent,
+                                      gpointer    user_data);
 
 G_END_DECLS
 
-#endif /* __OGMDVD_H__ */
+#endif /* __OGMRIP_MEDIA_TYPES_H__ */
 

@@ -322,13 +322,13 @@ ogmrip_audio_codec_get_normalize (OGMRipAudioCodec *audio)
 void
 ogmrip_audio_codec_set_channels (OGMRipAudioCodec *audio, OGMRipAudioChannels channels)
 {
-  OGMDvdStream *stream;
+  OGMRipStream *stream;
   gint max_channels;
 
   g_return_if_fail (OGMRIP_IS_AUDIO_CODEC (audio));
   
   stream = ogmrip_codec_get_input (OGMRIP_CODEC (audio));
-  max_channels = ogmdvd_audio_stream_get_channels (OGMDVD_AUDIO_STREAM (stream));
+  max_channels = ogmrip_audio_stream_get_channels (OGMRIP_AUDIO_STREAM (stream));
   audio->priv->channels = MIN (channels, max_channels);
 
   g_object_notify (G_OBJECT (audio), "channels");
@@ -340,7 +340,7 @@ ogmrip_audio_codec_set_channels (OGMRipAudioCodec *audio, OGMRipAudioChannels ch
  *
  * Gets the number of channels of the output file.
  *
- * Returns: an #OGMDvdAudioChannels, or -1
+ * Returns: an #OGMRipAudioChannels, or -1
  */
 gint
 ogmrip_audio_codec_get_channels (OGMRipAudioCodec *audio)

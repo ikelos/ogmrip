@@ -21,7 +21,7 @@
 
 #include <glib-object.h>
 
-#include <ogmdvd.h>
+#include <ogmrip-media.h>
 #include <ogmrip-file.h>
 
 G_BEGIN_DECLS
@@ -55,13 +55,13 @@ GType          ogmrip_player_get_type         (void);
 OGMRipPlayer * ogmrip_player_new              (void);
 
 void           ogmrip_player_set_title        (OGMRipPlayer      *player,
-                                               OGMDvdTitle       *title);
+                                               OGMRipTitle       *title);
 void           ogmrip_player_set_audio_stream (OGMRipPlayer      *player,
-                                               OGMDvdAudioStream *stream);
+                                               OGMRipAudioStream *stream);
 void           ogmrip_player_set_audio_file   (OGMRipPlayer      *player,
                                                OGMRipFile        *file);
 void           ogmrip_player_set_subp_stream  (OGMRipPlayer      *player,
-                                               OGMDvdSubpStream  *stream);
+                                               OGMRipSubpStream  *stream);
 void           ogmrip_player_set_subp_file    (OGMRipPlayer      *player,
                                                OGMRipFile        *file);
 void           ogmrip_player_set_chapters     (OGMRipPlayer      *player,

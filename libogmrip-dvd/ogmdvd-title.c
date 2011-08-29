@@ -27,80 +27,263 @@
  * @short_description: Structure describing a DVD title
  */
 
+#include "ogmdvd-audio.h"
 #include "ogmdvd-disc.h"
-#include "ogmdvd-title.h"
-#include "ogmdvd-stream.h"
-#include "ogmdvd-video.h"
 #include "ogmdvd-priv.h"
-
-#include "ogmdvd-reader.h"
-#include "ogmdvd-parser.h"
+#include "ogmdvd-subp.h"
+#include "ogmdvd-title.h"
 
 #include <ogmjob.h>
 
-#include <glib/gi18n-lib.h>
 #include <glib/gstdio.h>
+#include <glib/gi18n-lib.h>
+
+static void ogmdvd_stream_iface_init       (OGMRipStreamInterface      *iface);
+static void ogmdvd_video_stream_iface_init (OGMRipVideoStreamInterface *iface);
+static void ogmdvd_title_iface_init        (OGMRipTitleInterface       *iface);
+static void ogmdvd_title_dispose           (GObject                    *gobject);
+static void ogmdvd_title_finalize          (GObject                    *gobject);
+static void ogmdvd_title_close             (OGMRipTitle                *title);
+
+G_DEFINE_TYPE_WITH_CODE (OGMDvdTitle, ogmdvd_title, G_TYPE_OBJECT,
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_TITLE, ogmdvd_title_iface_init)
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_STREAM, ogmdvd_stream_iface_init)
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_VIDEO_STREAM, ogmdvd_video_stream_iface_init));
+
+static void
+ogmdvd_title_init (OGMDvdTitle *title)
+{
+  title->priv = G_TYPE_INSTANCE_GET_PRIVATE (title, OGMDVD_TYPE_TITLE, OGMDvdTitlePriv);
+}
+
+static void
+ogmdvd_title_class_init (OGMDvdTitleClass *klass)
+{
+  GObjectClass *gobject_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->dispose = ogmdvd_title_dispose;
+  gobject_class->finalize = ogmdvd_title_finalize;
+
+  g_type_class_add_private (klass, sizeof (OGMDvdTitlePriv));
+}
+
+static void
+ogmdvd_title_dispose (GObject *gobject)
+{
+  OGMDvdTitle *title = OGMDVD_TITLE (gobject);
+
+  if (title->priv->audio_streams)
+  {
+    g_list_foreach (title->priv->audio_streams, (GFunc) g_object_unref, NULL);
+    g_list_free (title->priv->audio_streams);
+    title->priv->audio_streams = NULL;
+  }
+
+  if (title->priv->subp_streams)
+  {
+    g_list_foreach (title->priv->subp_streams, (GFunc) g_object_unref, NULL);
+    g_list_free (title->priv->subp_streams);
+    title->priv->subp_streams = NULL;
+  }
+
+  G_OBJECT_CLASS (ogmdvd_title_parent_class)->dispose (gobject);
+}
+
+static void
+ogmdvd_title_finalize (GObject *gobject)
+{
+  OGMDvdTitle *title = OGMDVD_TITLE (gobject);
+
+  ogmdvd_title_close (OGMRIP_TITLE (title));
+
+  if (title->priv->bitrates)
+  {
+    g_free (title->priv->bitrates);
+    title->priv->bitrates = NULL;
+  }
+
+  if (title->priv->length_of_chapters)
+  {
+    g_free (title->priv->length_of_chapters);
+    title->priv->length_of_chapters = NULL;
+  }
+
+  title->priv->disc = NULL;
+
+  G_OBJECT_CLASS (ogmdvd_title_parent_class)->dispose (gobject);
+}
+
+static gint
+ogmdvd_title_get_format (OGMRipStream *stream)
+{
+  return OGMRIP_FORMAT_MPEG2;
+}
+
+static OGMRipTitle *
+ogmdvd_title_get_title  (OGMRipStream *stream)
+{
+  return OGMRIP_TITLE (stream);
+}
+
+
+static void
+ogmdvd_stream_iface_init (OGMRipStreamInterface *iface)
+{
+  iface->get_format = ogmdvd_title_get_format;
+  iface->get_title  = ogmdvd_title_get_title;
+}
+
+static void
+ogmdvd_video_stream_get_framerate (OGMRipVideoStream *video, guint *numerator, guint *denominator)
+{
+  switch ((OGMDVD_TITLE (video)->priv->playback_time.frame_u & 0xc0) >> 6)
+  {
+    case 1:
+      *numerator = 25;
+      *denominator = 1;
+      break;
+    case 3:
+      *numerator = 30000;
+      *denominator = 1001;
+      break;
+    default:
+      g_assert_not_reached ();
+      break;
+  }
+}
+
+static void
+ogmdvd_video_stream_get_resolution (OGMRipVideoStream *video, guint *width, guint *height)
+{
+  OGMDvdTitle *title = OGMDVD_TITLE (video);
+  guint w, h;
+
+  w = 0;
+  h = 480;
+  if (title->priv->video_format != 0)
+    h = 576;
+
+  switch (title->priv->picture_size)
+  {
+    case 0:
+      w = 720;
+      break;
+    case 1:
+      w = 704;
+      break;
+    case 2:
+      w = 352;
+      break;
+    case 3:
+      w = 352;
+      w /= 2;
+      break;
+    default:
+      g_assert_not_reached ();
+      break;
+  }
+
+  if (width)
+    *width = w;
+
+  if (height)
+    *height = h;
+}
+
+static void
+ogmdvd_video_stream_get_crop_size (OGMRipVideoStream *video, guint *x, guint *y, guint *width, guint *height)
+{
+  OGMDvdTitle *title = OGMDVD_TITLE (video);
+
+  if (x)
+    *x = title->priv->crop_x;
+
+  if (y)
+    *y = title->priv->crop_y;
+
+  if (width)
+    *width = title->priv->crop_w;
+
+  if (height)
+    *height = title->priv->crop_h;
+}
+
+static void
+ogmdvd_video_stream_get_aspect_ratio  (OGMRipVideoStream *video, guint *numerator, guint *denominator)
+{
+  OGMDvdTitle *title = OGMDVD_TITLE (video);
+
+  switch (title->priv->display_aspect_ratio)
+  {
+    case 0:
+      *numerator = 4;
+      *denominator = 3;
+      break;
+    case 1:
+    case 3:
+      *numerator = 16;
+      *denominator = 9;
+      break;
+    default:
+      g_assert_not_reached ();
+      break;
+  }
+}
+
+static gint
+ogmdvd_video_stream_get_display_aspect (OGMRipVideoStream *video)
+{
+  switch (OGMDVD_TITLE (video)->priv->display_aspect_ratio)
+  {
+    case 0:
+      return OGMRIP_DISPLAY_ASPECT_4_3;
+    case 1:
+    case 3:
+      return OGMRIP_DISPLAY_ASPECT_16_9;
+    default:
+      return OGMRIP_DISPLAY_ASPECT_UNDEFINED;
+  }
+}
+
+static gint
+ogmdvd_video_stream_get_display_format (OGMRipVideoStream *video)
+{
+  return OGMDVD_TITLE (video)->priv->video_format;
+}
+
+static void
+ogmdvd_video_stream_iface_init (OGMRipVideoStreamInterface *iface)
+{
+  iface->get_framerate      = ogmdvd_video_stream_get_framerate;
+  iface->get_resolution     = ogmdvd_video_stream_get_resolution;
+  iface->get_crop_size      = ogmdvd_video_stream_get_crop_size;
+  iface->get_aspect_ratio   = ogmdvd_video_stream_get_aspect_ratio;
+  iface->get_display_aspect = ogmdvd_video_stream_get_display_aspect;
+  iface->get_display_format = ogmdvd_video_stream_get_display_format;
+}
 
 typedef struct
 {
-  OGMDvdTitle *title;
-  OGMDvdTitleCallback callback;
+  OGMRipTitle *title;
+  OGMRipTitleCallback callback;
   gpointer user_data;
 } OGMDvdProgress;
 
-/**
- * ogmdvd_title_ref:
- * @title: An #OGMDvdTitle
- *
- * Increments the reference count of an #OGMDvdTitle.
- */
-void
-ogmdvd_title_ref (OGMDvdTitle *title)
+static gboolean
+ogmdvd_title_open (OGMRipTitle *title, GError **error)
 {
-  g_return_if_fail (title != NULL);
+  OGMDvdTitle *dtitle = OGMDVD_TITLE (title);
 
-  ogmdvd_disc_ref (title->disc);
-}
+  dtitle->priv->close_disc = !ogmrip_media_is_open (OGMRIP_MEDIA (dtitle->priv->disc));
 
-/**
- * ogmdvd_title_unref:
- * @title: An #OGMDvdTitle
- *
- * Decrements the reference count of an #OGMDvdTitle.
- */
-void
-ogmdvd_title_unref (OGMDvdTitle *title)
-{
-  g_return_if_fail (title != NULL);
-
-  ogmdvd_disc_unref (title->disc);
-}
-
-/**
- * ogmdvd_title_open:
- * @title: An #OGMDvdTitle
- * @error: Location to store the error occuring, or NULL to ignore errors.
- *
- * Opens @title, opening the disc if needed.
- *
- * Returns: #TRUE on success
- *
- */
-gboolean
-ogmdvd_title_open (OGMDvdTitle *title, GError **error)
-{
-  g_return_val_if_fail (title != NULL, FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-
-  title->close_disc = !ogmdvd_disc_is_open (title->disc);
-
-  if (!ogmdvd_disc_open (title->disc, error))
+  if (!ogmrip_media_open (OGMRIP_MEDIA (dtitle->priv->disc), error))
     return FALSE;
 
-  title->vts_file = ifoOpen (title->disc->reader, title->title_set_nr);
-  if (!title->vts_file)
+  dtitle->priv->vts_file = ifoOpen (OGMDVD_DISC (dtitle->priv->disc)->priv->reader, dtitle->priv->title_set_nr);
+  if (!dtitle->priv->vts_file)
   {
-    ogmdvd_disc_close (title->disc);
+    ogmrip_media_close (OGMRIP_MEDIA (dtitle->priv->disc));
     g_set_error (error, OGMDVD_DISC_ERROR, OGMDVD_DISC_ERROR_VTS, _("Cannot open video titleset"));
     return FALSE;
   }
@@ -108,151 +291,76 @@ ogmdvd_title_open (OGMDvdTitle *title, GError **error)
   return TRUE;
 }
 
-/**
- * ogmdvd_title_close:
- * @title: A #OGMDvdTitle
- *
- * Closes @title.
- */
-void
-ogmdvd_title_close (OGMDvdTitle *title)
+static void
+ogmdvd_title_close (OGMRipTitle *title)
 {
-  g_return_if_fail (title != NULL);
+  OGMDvdTitle *dtitle = OGMDVD_TITLE (title);
 
-  if (title->vts_file)
+  if (dtitle->priv->vts_file)
   {
-    ifoClose (title->vts_file);
-    title->vts_file = NULL;
+    ifoClose (dtitle->priv->vts_file);
+    dtitle->priv->vts_file = NULL;
   }
 
-  if (title->close_disc)
+  if (dtitle->priv->close_disc)
   {
-    ogmdvd_disc_close (title->disc);
-    title->close_disc = FALSE;
+    ogmrip_media_close (OGMRIP_MEDIA (dtitle->priv->disc));
+    dtitle->priv->close_disc = FALSE;
   }
 }
 
-/**
- * ogmdvd_title_is_open:
- * @title: An #OGMDvdTitle
- *
- * Returns whether the title is open or not.
- *
- * Returns: TRUE if the title is open
- */
-gboolean
-ogmdvd_title_is_open (OGMDvdTitle *title)
+static gboolean
+ogmdvd_title_is_open (OGMRipTitle *title)
 {
-  g_return_val_if_fail (title != NULL, FALSE);
-
-  return title->vts_file != NULL;
+  return OGMDVD_TITLE (title)->priv->vts_file != NULL;
 }
 
-/**
- * ogmdvd_title_get_disc:
- * @title: An #OGMDvdTitle
- *
- * Returns the disc the #OGMDvdTitle was open from.
- *
- * Returns: The #OGMDvdDisc, or NULL
- */
-OGMDvdDisc *
-ogmdvd_title_get_disc (OGMDvdTitle *title)
+static OGMRipMedia *
+ogmdvd_title_get_media (OGMRipTitle *title)
 {
-  g_return_val_if_fail (title != NULL, NULL);
-
-  return title->disc;
+  return OGMRIP_MEDIA (OGMDVD_TITLE (title)->priv->disc);
 }
 
-/**
- * ogmdvd_title_get_nr:
- * @title: An #OGMDvdTitle
- *
- * Returns the title number.
- *
- * Returns: The title number, or -1
- */
-gint
-ogmdvd_title_get_nr (OGMDvdTitle *title)
+static gint
+ogmdvd_title_get_nr (OGMRipTitle *title)
 {
-  g_return_val_if_fail (title != NULL, -1);
-
-  return title->nr;
+  return OGMDVD_TITLE (title)->priv->nr;
 }
 
-/**
- * ogmdvd_title_get_ts_nr:
- * @title: An #OGMDvdTitle
- *
- * Returns the titleset number.
- *
- * Returns: The titleset number, or -1
- */
-gint
-ogmdvd_title_get_ts_nr (OGMDvdTitle *title)
+static gint
+ogmdvd_title_get_ts_nr (OGMRipTitle *title)
 {
-  g_return_val_if_fail (title != NULL, -1);
-
-  return title->title_set_nr;
+  return OGMDVD_TITLE (title)->priv->title_set_nr;
 }
 
-gboolean
-ogmdvd_title_get_progressive (OGMDvdTitle *title)
+static gboolean
+ogmdvd_title_get_progressive (OGMRipTitle *title)
 {
-  g_return_val_if_fail (title != NULL, FALSE);
-
-  return title->progressive;
+  return OGMDVD_TITLE (title)->priv->progressive;
 }
 
-gboolean
-ogmdvd_title_get_telecine (OGMDvdTitle *title)
+static gboolean
+ogmdvd_title_get_telecine (OGMRipTitle *title)
 {
-  g_return_val_if_fail (title != NULL, FALSE);
-
-  return title->telecine;
+  return OGMDVD_TITLE (title)->priv->telecine;
 }
 
-gboolean
-ogmdvd_title_get_interlaced (OGMDvdTitle *title)
+static gboolean
+ogmdvd_title_get_interlaced (OGMRipTitle *title)
 {
-  g_return_val_if_fail (title != NULL, FALSE);
-
-  return title->interlaced;
+  return OGMDVD_TITLE (title)->priv->interlaced;
 }
 
-/**
- * ogmdvd_title_get_vts_size:
- * @title: An #OGMDvdTitle
- *
- * Returns the size of the video title set in bytes.
- *
- * Returns: The size in bytes, or -1
- */
-gint64
-ogmdvd_title_get_vts_size (OGMDvdTitle *title)
+static gint64
+ogmdvd_title_get_vts_size (OGMRipTitle *title)
 {
-  g_return_val_if_fail (title != NULL, -1);
-
-  return title->vts_size;
+  return OGMDVD_TITLE (title)->priv->vts_size;
 }
 
-/**
- * ogmdvd_title_get_length:
- * @title: An #OGMDvdTitle
- * @length: A pointer to set the #OGMRipTime, or NULL
- *
- * Returns the title length in seconds. If @length is not NULL, the data
- * structure will be filled with the length in hours, minutes seconds and
- * frames.
- *
- * Returns: The length in seconds, or -1.0
- */
-gdouble
-ogmdvd_title_get_length (OGMDvdTitle *title, OGMRipTime  *length)
+static gdouble
+ogmdvd_title_get_length (OGMRipTitle *title, OGMRipTime  *length)
 {
-  dvd_time_t *dtime = &title->playback_time;
-
-  g_return_val_if_fail (title != NULL, -1.0);
+  dvd_time_t *dtime = &OGMDVD_TITLE (title)->priv->playback_time;
 
   if (length)
   {
@@ -281,36 +389,20 @@ ogmdvd_title_get_length (OGMDvdTitle *title, OGMRipTime  *length)
   return ogmdvd_time_to_msec (dtime) / 1000.0;
 }
 
-/**
- * ogmdvd_title_get_chapters_length:
- * @title: An #OGMDvdTitle
- * @start: The start chapter
- * @end: The end chapter
- * @length: A pointer to set the #OGMDvdTime, or NULL
- *
- * Returns the length in seconds between start and end chapters. If @length is
- * not NULL, the data structure will be filled with the length in hours, minutes
- * seconds and frames.
- *
- * Returns: The length in seconds, or -1.0
- */
-gdouble
-ogmdvd_title_get_chapters_length (OGMDvdTitle *title, guint start, gint end, OGMRipTime *length)
+static gdouble
+ogmdvd_title_get_chapters_length (OGMRipTitle *title, guint start, gint end, OGMRipTime *length)
 {
+  OGMDvdTitle *dtitle = OGMDVD_TITLE (title);
   gulong total;
 
-  g_return_val_if_fail (title != NULL, -1.0);
-  g_return_val_if_fail (start < title->nr_of_chapters, -1.0);
-  g_return_val_if_fail (end < 0 || start <= end, -1.0);
-
   if (end < 0)
-    end = title->nr_of_chapters - 1;
+    end = dtitle->priv->nr_of_chapters - 1;
 
-  if (start == 0 && end + 1 == title->nr_of_chapters)
+  if (start == 0 && end + 1 == dtitle->priv->nr_of_chapters)
     return ogmdvd_title_get_length (title, length);
 
   for (total = 0; start <= end; start ++)
-    total += title->length_of_chapters[start];
+    total += dtitle->priv->length_of_chapters[start];
 
   if (length)
     ogmrip_msec_to_time (total, length);
@@ -318,186 +410,78 @@ ogmdvd_title_get_chapters_length (OGMDvdTitle *title, guint start, gint end, OGM
   return total / 1000.0;
 }
 
-/**
- * ogmdvd_title_get_palette:
- * @title: An #OGMDvdTitle
- *
- * Returns the palette of the movie.
- *
- * Returns: a constant array of 16 integers, or NULL
- */
-const guint *
-ogmdvd_title_get_palette (OGMDvdTitle *title)
+static const guint *
+ogmdvd_title_get_palette (OGMRipTitle *title)
 {
-  g_return_val_if_fail (title != NULL, NULL);
-
-  return title->palette;
-}
-
-/**
- * ogmdvd_title_get_n_angles:
- * @title: An #OGMDvdTitle
- *
- * Returns the number of angles of the video title.
- *
- * Returns: The number of angles, or -1
- */
-gint
-ogmdvd_title_get_n_angles (OGMDvdTitle *title)
-{
-  g_return_val_if_fail (title != NULL, -1);
-
-  return title->nr_of_angles;
-}
-
-/**
- * ogmdvd_title_get_n_chapters:
- * @title: An #OGMDvdTitle
- *
- * Returns the number of chapters of the video title.
- *
- * Returns: The number of chapters, or -1
- */
-gint
-ogmdvd_title_get_n_chapters (OGMDvdTitle *title)
-{
-  g_return_val_if_fail (title != NULL, -1);
-
-  return title->nr_of_chapters;
-}
-
-/**
- * ogmdvd_title_get_video_stream:
- * @title: An #OGMDvdTitle
- *
- * Returns the video stream.
- *
- * Returns: The #OGMDvdVideoStream, or NULL
- */
-OGMDvdVideoStream *
-ogmdvd_title_get_video_stream (OGMDvdTitle *title)
-{
-  g_return_val_if_fail (title != NULL, NULL);
-
-  return title->video_stream;
-}
-
-/**
- * ogmdvd_title_get_n_audio_streams:
- * @title: An #OGMDvdTitle
- *
- * Returns the number of audio streams of the video title.
- *
- * Returns: The number of audio streams, or -1
- */
-gint
-ogmdvd_title_get_n_audio_streams (OGMDvdTitle *title)
-{
-  g_return_val_if_fail (title != NULL, -1);
-
-  return title->nr_of_audio_streams;
+  return OGMDVD_TITLE (title)->priv->palette;
 }
 
 static gint
-ogmdvd_stream_find_by_nr (OGMDvdStream *stream, guint nr)
+ogmdvd_title_get_n_angles (OGMRipTitle *title)
 {
-  return stream->nr - nr;
+  return OGMDVD_TITLE (title)->priv->nr_of_angles;
 }
 
-/**
- * ogmdvd_title_get_nth_audio_stream:
- * @title: An #OGMDvdTitle
- * @nr: The audio stream number
- *
- * Returns the audio stream at position nr. The first nr is 0.
- *
- * Returns: The #OGMDvdAudioStream, or NULL
- */
-OGMDvdAudioStream *
-ogmdvd_title_get_nth_audio_stream (OGMDvdTitle *title, guint nr)
+static gint
+ogmdvd_title_get_n_chapters (OGMRipTitle *title)
+{
+  return OGMDVD_TITLE (title)->priv->nr_of_chapters;
+}
+
+static OGMRipVideoStream *
+ogmdvd_title_get_video_stream (OGMRipTitle *title)
+{
+  return OGMRIP_VIDEO_STREAM (title);
+}
+
+static gint
+ogmdvd_title_get_n_audio_streams (OGMRipTitle *title)
+{
+  return OGMDVD_TITLE (title)->priv->nr_of_audio_streams;
+}
+
+static gint
+ogmdvd_audio_stream_find_by_nr (OGMDvdAudioStream *audio, guint nr)
+{
+  return audio->priv->nr - nr;
+}
+
+static OGMRipAudioStream *
+ogmdvd_title_get_nth_audio_stream (OGMRipTitle *title, guint nr)
 {
   GList *link;
 
-  g_return_val_if_fail (title != NULL, NULL);
-  g_return_val_if_fail (nr < title->nr_of_audio_streams, NULL);
-
-  link = g_list_find_custom (title->audio_streams, GUINT_TO_POINTER (nr), (GCompareFunc) ogmdvd_stream_find_by_nr);
+  link = g_list_find_custom (OGMDVD_TITLE (title)->priv->audio_streams,
+      GUINT_TO_POINTER (nr), (GCompareFunc) ogmdvd_audio_stream_find_by_nr);
   if (!link)
     return NULL;
 
   return link->data;
 }
 
-/**
- * ogmdvd_title_get_audio_streams:
- * @title: An #OGMDvdTitle
- *
- * Returns a list of audio stream.
- *
- * Returns: The #GList, or NULL
- */
-GList *
-ogmdvd_title_get_audio_streams (OGMDvdTitle *title)
+static gint
+ogmdvd_title_get_n_subp_streams (OGMRipTitle *title)
 {
-  g_return_val_if_fail (title != NULL, NULL);
-
-  return g_list_copy (title->audio_streams);;
+  return OGMDVD_TITLE (title)->priv->nr_of_subp_streams;
 }
 
-/**
- * ogmdvd_title_get_n_subp_streams:
- * @title: An #OGMDvdTitle
- *
- * Returns the number of subtitles streams of the video title.
- *
- * Returns: The number of subtitles streams, or -1
- */
-gint
-ogmdvd_title_get_n_subp_streams (OGMDvdTitle *title)
+static gint
+ogmdvd_subp_stream_find_by_nr (OGMDvdSubpStream *audio, guint nr)
 {
-  g_return_val_if_fail (title != NULL, -1);
-
-  return title->nr_of_subp_streams;
+  return audio->priv->nr - nr;
 }
 
-/**
- * ogmdvd_title_get_nth_subp_stream:
- * @title: An #OGMDvdTitle
- * @nr: The subtitles stream number
- *
- * Returns the subtitles stream at position nr. The first nr is 0.
- *
- * Returns: The #OGMDvdSubpStream, or NULL
- */
-OGMDvdSubpStream *
-ogmdvd_title_get_nth_subp_stream (OGMDvdTitle *title, guint nr)
+static OGMRipSubpStream *
+ogmdvd_title_get_nth_subp_stream (OGMRipTitle *title, guint nr)
 {
   GList *link;
 
-  g_return_val_if_fail (title != NULL, NULL);
-  g_return_val_if_fail (nr < title->nr_of_subp_streams, NULL);
-
-  link = g_list_find_custom (title->subp_streams, GUINT_TO_POINTER (nr), (GCompareFunc) ogmdvd_stream_find_by_nr);
+  link = g_list_find_custom (OGMDVD_TITLE (title)->priv->subp_streams,
+      GUINT_TO_POINTER (nr), (GCompareFunc) ogmdvd_subp_stream_find_by_nr);
   if (!link)
     return NULL;
 
   return link->data;
-}
-
-/**
- * ogmdvd_title_get_subp_streams:
- * @title: An #OGMDvdTitle
- *
- * Returns a list of subp stream.
- *
- * Returns: The #GList, or NULL
- */
-GList *
-ogmdvd_title_get_subp_streams (OGMDvdTitle *title)
-{
-  g_return_val_if_fail (title != NULL, NULL);
-
-  return g_list_copy (title->subp_streams);
 }
 
 /**
@@ -629,11 +613,11 @@ ogmdvd_title_analyze_command (OGMDvdTitle *title, gulong nframes)
   g_ptr_array_add (argv, g_strdup ("-frames"));
   g_ptr_array_add (argv, g_strdup_printf ("%lu", nframes));
 
-  device = ogmdvd_disc_get_device (ogmdvd_title_get_disc (title));
+  device = OGMDVD_DISC (OGMDVD_TITLE (title)->priv->disc)->priv->device;
   g_ptr_array_add (argv, g_strdup ("-dvd-device"));
   g_ptr_array_add (argv, g_strdup (device));
 
-  vid = ogmdvd_title_get_nr (title);
+  vid = ogmdvd_title_get_nr (OGMRIP_TITLE (title));
   g_ptr_array_add (argv, g_strdup_printf ("dvd://%d", vid + 1));
 
   g_ptr_array_add (argv, NULL);
@@ -733,7 +717,7 @@ ogmdvd_title_crop_command (OGMDvdTitle *title, gdouble start, gulong nframes)
 
   filter = g_string_new (NULL);
 
-  if (ogmdvd_title_get_interlaced (title))
+  if (OGMDVD_TITLE (title)->priv->interlaced)
     g_string_append (filter, "yadif=0");
 
   if (filter->len > 0)
@@ -749,11 +733,11 @@ ogmdvd_title_crop_command (OGMDvdTitle *title, gdouble start, gulong nframes)
   g_ptr_array_add (argv, g_strdup ("-frames"));
   g_ptr_array_add (argv, g_strdup_printf ("%lu", nframes));
 
-  device = ogmdvd_disc_get_device (ogmdvd_title_get_disc (title));
+  device = OGMDVD_DISC (OGMDVD_TITLE (title)->priv->disc)->priv->device;
   g_ptr_array_add (argv, g_strdup ("-dvd-device"));
   g_ptr_array_add (argv, g_strdup (device));
 
-  vid = ogmdvd_title_get_nr (title);
+  vid = OGMDVD_TITLE (title)->priv->nr;
   g_ptr_array_add (argv, g_strdup_printf ("dvd://%d", vid + 1));
 
   g_ptr_array_add (argv, NULL);
@@ -828,9 +812,10 @@ ogmdvd_title_analyze_cancel_cb (GCancellable *cancellable, OGMJobSpawn *spawn)
   ogmjob_spawn_cancel (spawn);
 }
 
-gboolean
-ogmdvd_title_analyze (OGMDvdTitle *title, GCancellable *cancellable, OGMDvdTitleCallback callback, gpointer user_data, GError **error)
+static gboolean
+ogmdvd_title_analyze (OGMRipTitle *title, GCancellable *cancellable, OGMRipTitleCallback callback, gpointer user_data, GError **error)
 {
+  OGMDvdTitle *dtitle = OGMDVD_TITLE (title);
   OGMJobSpawn *spawn, *queue;
   OGMDvdProgress progress;
   OGMDvdAnalyze analyze;
@@ -842,14 +827,10 @@ ogmdvd_title_analyze (OGMDvdTitle *title, GCancellable *cancellable, OGMDvdTitle
   gchar **argv;
   gint result;
 
-  g_return_val_if_fail (title != NULL, FALSE);
-  g_return_val_if_fail (cancellable == NULL || G_IS_CANCELLABLE (cancellable), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
 
-  if (title->analyzed)
+  if (dtitle->priv->analyzed)
     return TRUE;
 
   is_open = ogmdvd_title_is_open (title);
@@ -863,7 +844,7 @@ ogmdvd_title_analyze (OGMDvdTitle *title, GCancellable *cancellable, OGMDvdTitle
   memset (&analyze, 0, sizeof (OGMDvdAnalyze));
   analyze.nframes = 500;
 
-  argv = ogmdvd_title_analyze_command (title, analyze.nframes);
+  argv = ogmdvd_title_analyze_command (dtitle, analyze.nframes);
 
   spawn = ogmjob_exec_newv (argv);
   ogmjob_exec_add_watch_full (OGMJOB_EXEC (spawn),
@@ -896,36 +877,36 @@ ogmdvd_title_analyze (OGMDvdTitle *title, GCancellable *cancellable, OGMDvdTitle
      */
     if (analyze.cur_section == SECTION_24000_1001 && analyze.nsections == 1)
     {
-      title->progressive = TRUE;
-      title->telecine = FALSE;
-      title->interlaced = FALSE;
+      dtitle->priv->progressive = TRUE;
+      dtitle->priv->telecine = FALSE;
+      dtitle->priv->interlaced = FALSE;
     }
     else if (analyze.nsections > 1)
     {
-      title->progressive = TRUE;
+      dtitle->priv->progressive = TRUE;
       if (analyze.npatterns > 0 && analyze.naffinities > 0)
       {
         /*
          * Mixed progressive and telecine
          */
-        title->telecine = TRUE;
-        title->interlaced = FALSE;
+        dtitle->priv->telecine = TRUE;
+        dtitle->priv->interlaced = FALSE;
       }
       else
       {
         /*
          * Mixed progressive and interlaced
          */
-        title->telecine = FALSE;
-        title->interlaced = TRUE;
+        dtitle->priv->telecine = FALSE;
+        dtitle->priv->interlaced = TRUE;
       }
     }
   }
   else
   {
-    title->telecine = FALSE;
-    title->progressive = FALSE;
-    title->interlaced = FALSE;
+    dtitle->priv->telecine = FALSE;
+    dtitle->priv->progressive = FALSE;
+    dtitle->priv->interlaced = FALSE;
   }
 
   g_free (analyze.prev_affinity);
@@ -948,7 +929,7 @@ ogmdvd_title_analyze (OGMDvdTitle *title, GCancellable *cancellable, OGMDvdTitle
 
   for (start = step; start < length; start += step)
   {
-    argv = ogmdvd_title_crop_command (title, start, crop.nframes);
+    argv = ogmdvd_title_crop_command (dtitle, start, crop.nframes);
 
     spawn = ogmjob_exec_newv (argv);
     ogmjob_exec_add_watch_full (OGMJOB_EXEC (spawn),
@@ -971,29 +952,55 @@ ogmdvd_title_analyze (OGMDvdTitle *title, GCancellable *cancellable, OGMDvdTitle
     return FALSE;
   }
 
-  title->video_stream->crop_x = g_ulist_get_most_frequent (crop.x);
+  dtitle->priv->crop_x = g_ulist_get_most_frequent (crop.x);
   g_ulist_free (crop.x);
 
-  title->video_stream->crop_y = g_ulist_get_most_frequent (crop.y);
+  dtitle->priv->crop_y = g_ulist_get_most_frequent (crop.y);
   g_ulist_free (crop.y);
 
-  title->video_stream->crop_w = g_ulist_get_most_frequent (crop.w);
+  dtitle->priv->crop_w = g_ulist_get_most_frequent (crop.w);
   g_ulist_free (crop.w);
 
-  title->video_stream->crop_h = g_ulist_get_most_frequent (crop.h);
+  dtitle->priv->crop_h = g_ulist_get_most_frequent (crop.h);
   g_ulist_free (crop.h);
 
-  if (!title->video_stream->crop_w)
-    ogmdvd_video_stream_get_resolution (title->video_stream, &title->video_stream->crop_w, NULL);
+  if (!dtitle->priv->crop_w)
+    ogmdvd_video_stream_get_resolution (OGMRIP_VIDEO_STREAM (title), &dtitle->priv->crop_w, NULL);
 
-  if (!title->video_stream->crop_h)
-    ogmdvd_video_stream_get_resolution (title->video_stream, NULL, &title->video_stream->crop_h);
+  if (!dtitle->priv->crop_h)
+    ogmdvd_video_stream_get_resolution (OGMRIP_VIDEO_STREAM (title), NULL, &dtitle->priv->crop_h);
 
   if (!is_open)
     ogmdvd_title_close (title);
 
-  title->analyzed = TRUE;
+  dtitle->priv->analyzed = TRUE;
 
   return TRUE;
+}
+
+static void
+ogmdvd_title_iface_init (OGMRipTitleInterface *iface)
+{
+  iface->open                 = ogmdvd_title_open;
+  iface->close                = ogmdvd_title_close;
+  iface->is_open              = ogmdvd_title_is_open;
+  iface->get_media            = ogmdvd_title_get_media;
+  iface->get_nr               = ogmdvd_title_get_nr;
+  iface->get_ts_nr            = ogmdvd_title_get_ts_nr;
+  iface->get_size             = ogmdvd_title_get_vts_size;
+  iface->get_length           = ogmdvd_title_get_length;
+  iface->get_chapters_length  = ogmdvd_title_get_chapters_length;
+  iface->get_palette          = ogmdvd_title_get_palette;
+  iface->get_n_angles         = ogmdvd_title_get_n_angles;
+  iface->get_n_chapters       = ogmdvd_title_get_n_chapters;
+  iface->get_video_stream     = ogmdvd_title_get_video_stream;
+  iface->get_n_audio_streams  = ogmdvd_title_get_n_audio_streams;
+  iface->get_nth_audio_stream = ogmdvd_title_get_nth_audio_stream;
+  iface->get_n_subp_streams   = ogmdvd_title_get_n_subp_streams;
+  iface->get_nth_subp_stream  = ogmdvd_title_get_nth_subp_stream;
+  iface->get_progressive      = ogmdvd_title_get_progressive;
+  iface->get_telecine         = ogmdvd_title_get_telecine;
+  iface->get_interlaced       = ogmdvd_title_get_interlaced;
+  iface->analyze              = ogmdvd_title_analyze;
 }
 

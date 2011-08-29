@@ -780,7 +780,7 @@ ogmrip_audio_file_get_samples_per_frame (OGMRipAudioFile *audio)
  *
  * Gets the number of channels of an audio file.
  *
- * Returns: an #OGMDvdAudioChannels, or -1
+ * Returns: an #OGMRipAudioChannels, or -1
  */
 gint
 ogmrip_audio_file_get_channels (OGMRipAudioFile *audio)

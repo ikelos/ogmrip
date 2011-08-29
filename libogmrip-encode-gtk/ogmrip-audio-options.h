@@ -19,7 +19,7 @@
 #ifndef __OGMRIP_AUDIO_OPTIONS_H__
 #define __OGMRIP_AUDIO_OPTIONS_H__
 
-#include <ogmdvd.h>
+#include <ogmrip-media.h>
 #include <gtk/gtk.h>
 
 G_BEGIN_DECLS

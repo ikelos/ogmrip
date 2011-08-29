@@ -19,7 +19,7 @@
 #ifndef __OGMDVD_PARSER_H__
 #define __OGMDVD_PARSER_H__
 
-#include <ogmdvd-types.h>
+#include <ogmdvd-title.h>
 
 G_BEGIN_DECLS
 
@@ -37,6 +37,8 @@ typedef enum
   OGMDVD_PARSER_STATUS_BITRATES,
   OGMDVD_PARSER_STATUS_MAX_FRAMES
 } OGMDvdParserStatus;
+
+typedef struct _OGMDvdParser OGMDvdParser;
 
 OGMDvdParser * ogmdvd_parser_new               (OGMDvdTitle  *title);
 void           ogmdvd_parser_ref               (OGMDvdParser *parser);

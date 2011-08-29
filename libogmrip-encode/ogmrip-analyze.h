@@ -20,7 +20,7 @@
 #define __OGMRIP_ANALYZE_H__
 
 #include <ogmjob.h>
-#include <ogmdvd.h>
+#include <ogmrip-media.h>
 
 G_BEGIN_DECLS
 
@@ -47,7 +47,7 @@ struct _OGMRipAnalyzeClass
 };
 
 GType         ogmrip_analyze_get_type (void);
-OGMJobSpawn * ogmrip_analyze_new      (OGMDvdTitle *title);
+OGMJobSpawn * ogmrip_analyze_new      (OGMRipTitle *title);
 
 G_END_DECLS
 

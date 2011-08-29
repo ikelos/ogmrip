@@ -37,7 +37,7 @@
 
 struct _OGMRipCropDialogPriv
 {
-  OGMDvdTitle *title;
+  OGMRipTitle *title;
 
   GtkWidget *left_spin;
   GtkWidget *right_spin;
@@ -90,7 +90,7 @@ static gchar **
 ogmrip_crop_dialog_grab_command (OGMRipCropDialog *dialog, gulong frame)
 {
   GPtrArray *argv;
-  const gchar *device;
+  const gchar *uri;
   gint vid, time_;
 
   argv = g_ptr_array_new ();
@@ -142,11 +142,16 @@ ogmrip_crop_dialog_grab_command (OGMRipCropDialog *dialog, gulong frame)
   g_ptr_array_add (argv, g_strdup ("-ss"));
   g_ptr_array_add (argv, g_strdup_printf ("%u", time_));
 
-  device = ogmdvd_disc_get_device (ogmdvd_title_get_disc (dialog->priv->title));
-  g_ptr_array_add (argv, g_strdup ("-dvd-device"));
-  g_ptr_array_add (argv, g_strdup (device));
+  uri = ogmrip_media_get_uri (ogmrip_title_get_media (dialog->priv->title));
+  if (!g_str_has_prefix (uri, "dvd://"))
+    g_warning ("Unknown scheme for '%s'", uri);
+  else
+  {
+    g_ptr_array_add (argv, g_strdup ("-dvd-device"));
+    g_ptr_array_add (argv, g_strdup (uri + 6));
+  }
 
-  vid = ogmdvd_title_get_nr (dialog->priv->title);
+  vid = ogmrip_title_get_nr (dialog->priv->title);
 
   if (MPLAYER_CHECK_VERSION (1,0,0,1))
     g_ptr_array_add (argv, g_strdup_printf ("dvd://%d", vid + 1));
@@ -301,18 +306,22 @@ ogmrip_crop_dialog_dispose (GObject *gobject)
   OGMRipCropDialog *dialog = OGMRIP_CROP_DIALOG (gobject);
 
   if (dialog->priv->title)
-    ogmdvd_title_unref (dialog->priv->title);
-  dialog->priv->title = NULL;
+  {
+    g_object_unref (dialog->priv->title);
+    dialog->priv->title = NULL;
+  }
 
   if (dialog->priv->pixbuf)
+  {
     g_object_unref (dialog->priv->pixbuf);
-  dialog->priv->pixbuf = NULL;
+    dialog->priv->pixbuf = NULL;
+  }
 
   G_OBJECT_CLASS (ogmrip_crop_dialog_parent_class)->dispose (gobject);
 }
 
 GtkWidget *
-ogmrip_crop_dialog_new (OGMDvdTitle *title, guint left, guint top, guint right, guint bottom)
+ogmrip_crop_dialog_new (OGMRipTitle *title, guint left, guint top, guint right, guint bottom)
 {
   OGMRipCropDialog *dialog;
   gdouble framerate;
@@ -320,18 +329,18 @@ ogmrip_crop_dialog_new (OGMDvdTitle *title, guint left, guint top, guint right, 
 
   dialog = g_object_new (OGMRIP_TYPE_CROP_DIALOG, NULL);
 
-  ogmdvd_title_ref (title);
+  g_object_ref (title);
   if (dialog->priv->title)
-    ogmdvd_title_unref (dialog->priv->title);
+    g_object_unref (dialog->priv->title);
   dialog->priv->title = title;
 
-  ogmdvd_video_stream_get_resolution (ogmdvd_title_get_video_stream (title),
+  ogmrip_video_stream_get_resolution (ogmrip_title_get_video_stream (title),
       &dialog->priv->raw_width, &dialog->priv->raw_height);
-  ogmdvd_video_stream_get_framerate (ogmdvd_title_get_video_stream (title),
+  ogmrip_video_stream_get_framerate (ogmrip_title_get_video_stream (title),
       &dialog->priv->rate_numerator, &dialog->priv->rate_denominator);
 
   framerate = dialog->priv->rate_numerator / (gdouble) dialog->priv->rate_denominator;
-  dialog->priv->length = ogmdvd_title_get_length (title, NULL) * framerate;
+  dialog->priv->length = ogmrip_title_get_length (title, NULL) * framerate;
 
   gtk_spin_button_set_range (GTK_SPIN_BUTTON (dialog->priv->left_spin), 0.0, (gdouble) dialog->priv->raw_width);
   gtk_spin_button_set_value (GTK_SPIN_BUTTON (dialog->priv->left_spin), (gdouble) left);

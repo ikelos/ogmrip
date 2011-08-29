@@ -30,51 +30,74 @@
 #include "ogmdvd-subp.h"
 #include "ogmdvd-priv.h"
 
-/**
- * ogmdvd_subp_stream_get_content:
- * @subp: An #OGMDvdSubpStream
- *
- * Returns the content of the subtitles stream.
- *
- * Returns: #OGMDvdSubpContent, or -1
- */
-gint
-ogmdvd_subp_stream_get_content (OGMDvdSubpStream *subp)
-{
-  g_return_val_if_fail (subp != NULL, -1);
+static void ogmrip_stream_iface_init      (OGMRipStreamInterface     *iface);
+static void ogmrip_subp_stream_iface_init (OGMRipSubpStreamInterface *iface);
 
-  return subp->lang_extension - 1;
+G_DEFINE_TYPE_WITH_CODE (OGMDvdSubpStream, ogmdvd_subp_stream, G_TYPE_OBJECT,
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_STREAM, ogmrip_stream_iface_init)
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_SUBP_STREAM, ogmrip_subp_stream_iface_init));
+
+static void
+ogmdvd_subp_stream_init (OGMDvdSubpStream *stream)
+{
+  stream->priv = G_TYPE_INSTANCE_GET_PRIVATE (stream, OGMDVD_TYPE_SUBP_STREAM, OGMDvdSubpStreamPriv);
 }
 
-/**
- * ogmdvd_subp_stream_get_language:
- * @subp: An #OGMDvdSubpStream
- *
- * Returns the language of the subtitles stream.
- *
- * Returns: The language code, or -1
- */
-gint
-ogmdvd_subp_stream_get_language (OGMDvdSubpStream *subp)
+static void
+ogmdvd_subp_stream_class_init (OGMDvdSubpStreamClass *klass)
 {
-  g_return_val_if_fail (subp != NULL, -1);
-
-  return subp->lang_code;
+  g_type_class_add_private (klass, sizeof (OGMDvdSubpStreamPriv));
 }
 
-/**
- * ogmdvd_subp_stream_get_label:
- * @subp: An #OGMDvdSubpStream
- *
- * Returns the label of the subp stream.
- *
- * Returns: the label, or NULL
- */
-const gchar *
-ogmdvd_subp_stream_get_label (OGMDvdSubpStream *subp)
+static gint
+ogmdvd_subp_stream_get_format (OGMRipStream *stream)
 {
-  g_return_val_if_fail (subp != NULL, NULL);
+  return OGMRIP_FORMAT_VOBSUB;
+}
 
-  return NULL;
+static gint
+ogmdvd_subp_stream_get_id (OGMRipStream *stream)
+{
+  return OGMDVD_SUBP_STREAM (stream)->priv->id;
+}
+
+OGMRipTitle *
+ogmdvd_subp_stream_get_title (OGMRipStream *stream)
+{
+  return OGMDVD_SUBP_STREAM (stream)->priv->title;
+}
+
+static void
+ogmrip_stream_iface_init (OGMRipStreamInterface *iface)
+{
+  iface->get_format = ogmdvd_subp_stream_get_format;
+  iface->get_id     = ogmdvd_subp_stream_get_id;
+  iface->get_title  = ogmdvd_subp_stream_get_title;
+}
+
+static gint
+ogmdvd_subp_stream_get_content (OGMRipSubpStream *subp)
+{
+  return OGMDVD_SUBP_STREAM (subp)->priv->lang_extension - 1;
+}
+
+static gint
+ogmdvd_subp_stream_get_language (OGMRipSubpStream *subp)
+{
+  return OGMDVD_SUBP_STREAM (subp)->priv->lang_code;
+}
+
+static gint
+ogmdvd_subp_stream_get_nr (OGMRipSubpStream *stream)
+{
+  return OGMDVD_SUBP_STREAM (stream)->priv->nr;
+}
+
+static void
+ogmrip_subp_stream_iface_init (OGMRipSubpStreamInterface *iface)
+{
+  iface->get_content  = ogmdvd_subp_stream_get_content;
+  iface->get_language = ogmdvd_subp_stream_get_language;
+  iface->get_nr       = ogmdvd_subp_stream_get_nr;
 }
 

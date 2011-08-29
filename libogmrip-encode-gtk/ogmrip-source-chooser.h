@@ -19,7 +19,7 @@
 #ifndef __OGMRIP_SOURCE_CHOOSER_H__
 #define __OGMRIP_SOURCE_CHOOSER_H__
 
-#include <ogmdvd.h>
+#include <ogmrip-media.h>
 #include <ogmrip.h>
 
 #include <gtk/gtk.h>
@@ -45,7 +45,7 @@ typedef enum
 
 typedef union
 {
-  OGMDvdStream *stream;
+  OGMRipStream *stream;
   OGMRipFile *file;
 } OGMRipSource;
 
@@ -71,8 +71,8 @@ struct _OGMRipSourceChooserInterface
 
 GType          ogmrip_source_chooser_get_type        (void);
 void           ogmrip_source_chooser_set_title       (OGMRipSourceChooser *chooser,
-                                                      OGMDvdTitle         *title);
-OGMDvdTitle *  ogmrip_source_chooser_get_title       (OGMRipSourceChooser *chooser);
+                                                      OGMRipTitle         *title);
+OGMRipTitle *  ogmrip_source_chooser_get_title       (OGMRipSourceChooser *chooser);
 OGMRipSource * ogmrip_source_chooser_get_active      (OGMRipSourceChooser *chooser,
                                                       OGMRipSourceType    *type);
 void           ogmrip_source_chooser_set_active      (OGMRipSourceChooser *chooser,

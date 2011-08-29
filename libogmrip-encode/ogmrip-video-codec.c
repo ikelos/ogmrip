@@ -65,8 +65,8 @@ struct _OGMRipVideoCodecPriv
   gboolean turbo;
   gboolean expand;
 
-  OGMDvdAudioStream *astream;
-  OGMDvdSubpStream *sstream;
+  OGMRipAudioStream *astream;
+  OGMRipSubpStream *sstream;
   OGMRipQualityType quality;
   OGMRipScalerType scaler;
   OGMRipDeintType deint;
@@ -259,12 +259,16 @@ ogmrip_video_codec_dispose (GObject *gobject)
   OGMRipVideoCodec *video = OGMRIP_VIDEO_CODEC (gobject);
 
   if (video->priv->astream)
-    ogmdvd_stream_unref (OGMDVD_STREAM (video->priv->astream));
-  video->priv->astream = NULL;
+  {
+    g_object_unref (video->priv->astream);
+    video->priv->astream = NULL;
+  }
 
   if (video->priv->sstream)
-    ogmdvd_stream_unref (OGMDVD_STREAM (video->priv->sstream));
-  video->priv->sstream = NULL;
+  {
+    g_object_unref (video->priv->sstream);
+    video->priv->sstream = NULL;
+  }
 
   G_OBJECT_CLASS (ogmrip_video_codec_parent_class)->dispose (gobject);
 }
@@ -504,9 +508,9 @@ ogmrip_video_codec_autosize (OGMRipVideoCodec *video)
  * Gets the audio stream that will be encoded along with the video to ensure
  * the A/V synchronization.
  *
- * Returns: the #OGMDvdAudioStream, or NULL
+ * Returns: the #OGMRipAudioStream, or NULL
  */
-OGMDvdAudioStream * 
+OGMRipAudioStream * 
 ogmrip_video_codec_get_ensure_sync (OGMRipVideoCodec *video)
 {
   g_return_val_if_fail (OGMRIP_IS_VIDEO_CODEC (video), NULL);
@@ -517,23 +521,23 @@ ogmrip_video_codec_get_ensure_sync (OGMRipVideoCodec *video)
 /**
  * ogmrip_video_codec_set_ensure_sync:
  * @video: an #OGMRipVideoCodec
- * @stream: an #OGMDvdAudioStream
+ * @stream: an #OGMRipAudioStream
  *
  * Sets the audio stream that will be encoded along with the video to ensure
  * the A/V synchronization.
  */
 void
-ogmrip_video_codec_set_ensure_sync (OGMRipVideoCodec *video, OGMDvdAudioStream *stream)
+ogmrip_video_codec_set_ensure_sync (OGMRipVideoCodec *video, OGMRipAudioStream *stream)
 {
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
 
   if (video->priv->astream != stream)
   {
     if (stream)
-      ogmdvd_stream_ref (OGMDVD_STREAM (stream));
+      g_object_ref (stream);
 
     if (video->priv->astream)
-      ogmdvd_stream_unref (OGMDVD_STREAM (video->priv->astream));
+      g_object_unref (video->priv->astream);
 
     video->priv->astream = stream;
   }
@@ -549,13 +553,13 @@ ogmrip_video_codec_set_ensure_sync (OGMRipVideoCodec *video, OGMDvdAudioStream *
 void
 ogmrip_video_codec_set_angle (OGMRipVideoCodec *video, guint angle)
 {
-  OGMDvdTitle *title;
+  OGMRipTitle *title;
 
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
 
-  title = ogmdvd_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video)));
+  title = ogmrip_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video)));
 
-  g_return_if_fail (angle > 0 && angle <= ogmdvd_title_get_n_angles (title));
+  g_return_if_fail (angle > 0 && angle <= ogmrip_title_get_n_angles (title));
 
   video->priv->angle = angle;
 
@@ -1035,13 +1039,13 @@ ogmrip_video_codec_get_start_delay (OGMRipVideoCodec *video)
 void
 ogmrip_video_codec_get_raw_size (OGMRipVideoCodec *video, guint *width, guint *height)
 {
-  OGMDvdStream *stream;
+  OGMRipStream *stream;
   guint w, h;
 
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
 
   stream = ogmrip_codec_get_input (OGMRIP_CODEC (video));
-  ogmdvd_video_stream_get_resolution (OGMDVD_VIDEO_STREAM (stream), &w, &h);
+  ogmrip_video_stream_get_resolution (OGMRIP_VIDEO_STREAM (stream), &w, &h);
 
   if (width)
     *width = w;
@@ -1304,10 +1308,10 @@ ogmrip_video_codec_get_aspect_ratio (OGMRipVideoCodec *video, guint *num, guint 
 
   if (!video->priv->aspect_num || !video->priv->aspect_denom)
   {
-    OGMDvdStream *stream;
+    OGMRipStream *stream;
 
     stream = ogmrip_codec_get_input (OGMRIP_CODEC (video));
-    ogmdvd_video_stream_get_aspect_ratio (OGMDVD_VIDEO_STREAM (stream),
+    ogmrip_video_stream_get_aspect_ratio (OGMRIP_VIDEO_STREAM (stream),
         &video->priv->aspect_num, &video->priv->aspect_denom);
   }
 
@@ -1338,17 +1342,17 @@ ogmrip_video_codec_set_aspect_ratio (OGMRipVideoCodec *video, guint num, guint d
 void
 ogmrip_video_codec_get_framerate (OGMRipVideoCodec *video, guint *num, guint *denom)
 {
-  OGMDvdStream *stream;
+  OGMRipStream *stream;
 
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
   g_return_if_fail (num != NULL);
   g_return_if_fail (denom != NULL);
 
   stream = ogmrip_codec_get_input (OGMRIP_CODEC (video));
-  ogmdvd_video_stream_get_framerate (OGMDVD_VIDEO_STREAM (stream), num, denom);
+  ogmrip_video_stream_get_framerate (OGMRIP_VIDEO_STREAM (stream), num, denom);
 
-  if (ogmdvd_title_get_telecine (ogmdvd_stream_get_title (stream)) ||
-      ogmdvd_title_get_progressive (ogmdvd_stream_get_title (stream)))
+  if (ogmrip_title_get_telecine (ogmrip_stream_get_title (stream)) ||
+      ogmrip_title_get_progressive (ogmrip_stream_get_title (stream)))
   {
     *num = 24000;
     *denom = 1001;
@@ -1364,7 +1368,7 @@ ogmrip_video_codec_get_framerate (OGMRipVideoCodec *video, guint *num, guint *de
 void
 ogmrip_video_codec_autoscale (OGMRipVideoCodec *video)
 {
-  OGMDvdStream *stream;
+  OGMRipStream *stream;
   guint anumerator, adenominator;
   guint rnumerator, rdenominator;
   guint scale_width, scale_height;
@@ -1381,7 +1385,7 @@ ogmrip_video_codec_autoscale (OGMRipVideoCodec *video)
   crop_height = video->priv->crop_height > 0 ? video->priv->crop_height : raw_height;
 
   stream = ogmrip_codec_get_input (OGMRIP_CODEC (video));
-  ogmdvd_video_stream_get_framerate (OGMDVD_VIDEO_STREAM (stream), &rnumerator, &rdenominator);
+  ogmrip_video_stream_get_framerate (OGMRIP_VIDEO_STREAM (stream), &rnumerator, &rdenominator);
 
   ratio = crop_width / (gdouble) crop_height * raw_height / raw_width * anumerator / adenominator;
 
@@ -1439,9 +1443,9 @@ ogmrip_video_codec_autobitrate (OGMRipVideoCodec *video, guint64 nonvideo_size, 
  *
  * Gets the subp stream that will be hardcoded in the video.
  *
- * Returns: the #OGMDvdSubpStream, or NULL
+ * Returns: the #OGMRipSubpStream, or NULL
  */
-OGMDvdSubpStream *
+OGMRipSubpStream *
 ogmrip_video_codec_get_hard_subp (OGMRipVideoCodec *video, gboolean *forced)
 {
   g_return_val_if_fail (OGMRIP_IS_VIDEO_CODEC (video), NULL);
@@ -1455,23 +1459,23 @@ ogmrip_video_codec_get_hard_subp (OGMRipVideoCodec *video, gboolean *forced)
 /**
  * ogmrip_video_codec_set_hard_subp:
  * @video: an #OGMRipVideoCodec
- * @stream: an #OGMDvdSubpStream
+ * @stream: an #OGMRipSubpStream
  * @forced: whether to hardcode forced subs only
  *
  * Sets the subp stream that will be hardcoded in the video.
  */
 void
-ogmrip_video_codec_set_hard_subp (OGMRipVideoCodec *video, OGMDvdSubpStream *stream, gboolean forced)
+ogmrip_video_codec_set_hard_subp (OGMRipVideoCodec *video, OGMRipSubpStream *stream, gboolean forced)
 {
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
 
   if (video->priv->sstream != stream)
   {
     if (stream)
-      ogmdvd_stream_ref (OGMDVD_STREAM (stream));
+      g_object_ref (stream);
 
     if (video->priv->sstream)
-      ogmdvd_stream_unref (OGMDVD_STREAM (video->priv->sstream));
+      g_object_unref (video->priv->sstream);
 
     video->priv->sstream = stream;
     video->priv->forced_subs = forced;

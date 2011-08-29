@@ -19,9 +19,16 @@
 #ifndef __OGMRIP_MEDIA_H__
 #define __OGMRIP_MEDIA_H__
 
+#include <ogmrip-media-audio.h>
 #include <ogmrip-media-enums.h>
 #include <ogmrip-media-labels.h>
+#include <ogmrip-media-object.h>
+#include <ogmrip-media-stream.h>
+#include <ogmrip-media-subp.h>
 #include <ogmrip-media-time.h>
+#include <ogmrip-media-title.h>
+#include <ogmrip-media-types.h>
+#include <ogmrip-media-video.h>
 
 #endif /* __OGMRIP_MEDIA_H__ */
 

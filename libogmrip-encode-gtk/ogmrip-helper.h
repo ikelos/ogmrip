@@ -19,7 +19,7 @@
 #ifndef __OGMRIP_HELPER_H__
 #define __OGMRIP_HELPER_H__
 
-#include <ogmdvd.h>
+#include <ogmrip-media.h>
 #include <ogmrip.h>
 
 #include <gtk/gtk.h>
@@ -41,7 +41,7 @@ guint    g_settings_get_uint     (GSettings    *settings,
                                   const gchar  *key);
 void     gtk_container_clear     (GtkContainer *container);
 gboolean ogmrip_open_title       (GtkWindow    *parent,
-                                  OGMDvdTitle  *title);
+                                  OGMRipTitle  *title);
 
 /*
  * Containers and Codecs

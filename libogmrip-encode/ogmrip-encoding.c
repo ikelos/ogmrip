@@ -38,6 +38,8 @@
 #include "ogmrip-test.h"
 #include "ogmrip-fs.h"
 
+#include <ogmdvd.h>
+
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
 
@@ -49,7 +51,7 @@
 
 struct _OGMRipEncodingPriv
 {
-  OGMDvdTitle *title;
+  OGMRipTitle *title;
 
   OGMRipEncodingMethod method;
   OGMRipProfile *profile;
@@ -200,8 +202,8 @@ ogmrip_encoding_class_init (OGMRipEncodingClass *klass)
            TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_TITLE, 
-        g_param_spec_pointer ("title", "Title property", "Set title", 
-           G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+        g_param_spec_object ("title", "Title property", "Set title", 
+           OGMRIP_TYPE_TITLE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_VIDEO_CODEC, 
         g_param_spec_object ("video-codec", "Video codec property", "Set video codec", 
@@ -283,7 +285,7 @@ ogmrip_encoding_dispose (GObject *gobject)
 
   if (encoding->priv->title)
   {
-    ogmdvd_title_unref (encoding->priv->title);
+    g_object_unref (encoding->priv->title);
     encoding->priv->title = NULL;
   }
 
@@ -346,7 +348,7 @@ ogmrip_encoding_get_property (GObject *gobject, guint property_id, GValue *value
       g_value_set_boolean (value, encoding->priv->test);
       break;
     case PROP_TITLE:
-      g_value_set_pointer (value, encoding->priv->title);
+      g_value_set_object (value, encoding->priv->title);
       break;
     case PROP_VIDEO_CODEC:
       g_value_set_object (value, encoding->priv->video_codec);
@@ -405,9 +407,7 @@ ogmrip_encoding_set_property (GObject *gobject, guint property_id, const GValue 
       encoding->priv->test = g_value_get_boolean (value);
       break;
     case PROP_TITLE:
-      encoding->priv->title = g_value_get_pointer (value);
-      if (encoding->priv->title)
-        ogmdvd_title_ref (encoding->priv->title);
+      encoding->priv->title = g_value_dup_object (value);
       break;
     case PROP_VIDEO_CODEC:
       ogmrip_encoding_set_video_codec (encoding, g_value_get_object (value));
@@ -434,12 +434,12 @@ ogmrip_encoding_complete (OGMRipEncoding *encoding, OGMJobSpawn *spawn, guint re
  * ogmrip_encoding_new:
  *
  * Creates a new #OGMRipEncoding.
- * @title: An #OGMDvdTitle
+ * @title: An #OGMRipTitle
  *
  * Returns: The newly created #OGMRipEncoding, or NULL
  */
 OGMRipEncoding *
-ogmrip_encoding_new (OGMDvdTitle *title)
+ogmrip_encoding_new (OGMRipTitle *title)
 {
   return g_object_new (OGMRIP_TYPE_ENCODING, "title", title, NULL);
 }
@@ -448,13 +448,13 @@ static OGMRipEncoding *
 ogmrip_encoding_new_from_xml (OGMRipXML *xml, GError **error)
 {
   OGMRipEncoding *encoding = NULL;
-  OGMDvdDisc *disc;
+  OGMRipMedia *media;
   gchar *str, *utf8;
 
   if (!g_str_equal (ogmrip_xml_get_name (xml), "encoding"))
     return NULL;
 
-  utf8 = ogmrip_xml_get_string (xml, "device");
+  utf8 = ogmrip_xml_get_string (xml, "uri");
   if (!utf8)
     return NULL;
 
@@ -464,29 +464,35 @@ ogmrip_encoding_new_from_xml (OGMRipXML *xml, GError **error)
   if (!str)
     return NULL;
 
-  disc = ogmdvd_disc_new (str, error);
+  if (!g_str_has_prefix (str, "dvd://"))
+  {
+    g_free (str);
+    return NULL;
+  }
+
+  media = ogmdvd_disc_new (str, error);
   g_free (str);
 
-  if (!disc)
+  if (!media)
     return NULL;
 
   str = ogmrip_xml_get_string (xml, "id");
   if (str)
   {
-    if (!g_str_equal (str, ogmdvd_disc_get_id (disc)))
+    if (!g_str_equal (str, ogmrip_media_get_id (media)))
     {
       g_set_error (error, OGMDVD_DISC_ERROR, OGMDVD_DISC_ERROR_ID,
           _("Device does not contain the expected DVD"));
-      ogmdvd_disc_unref (disc);
+      g_object_unref (media);
     }
     else
     {
-      OGMDvdTitle *title;
+      OGMRipTitle *title;
       guint nr;
 
       nr = ogmrip_xml_get_uint (xml, "title");
 
-      title = ogmdvd_disc_get_nth_title (disc, nr);
+      title = ogmrip_media_get_nth_title (media, nr);
       if (title)
       {
         encoding = ogmrip_encoding_new (title);
@@ -496,7 +502,11 @@ ogmrip_encoding_new_from_xml (OGMRipXML *xml, GError **error)
     }
   }
 
-  ogmdvd_disc_unref (disc);
+  /*
+   * TODO unref ?
+   */
+
+  // g_object_unref (media);
 
   return encoding;
 }
@@ -746,14 +756,19 @@ ogmrip_encoding_set_copy (OGMRipEncoding *encoding, gboolean copy)
 
   if (copy)
   {
-    OGMDvdDisc *disc;
+    const gchar *uri;
     struct stat buf;
 
-    disc = ogmdvd_title_get_disc (encoding->priv->title);
-
     copy = FALSE;
-    if (g_stat (ogmdvd_disc_get_device (disc), &buf) == 0)
-      copy = S_ISBLK (buf.st_mode);
+
+    uri = ogmrip_media_get_uri (ogmrip_title_get_media (encoding->priv->title));
+    if (!g_str_has_prefix (uri, "dvd://"))
+      g_warning ("Unknown scheme for '%s'", uri);
+    else
+    {
+      if (g_stat (uri + 6, &buf) == 0)
+        copy = S_ISBLK (buf.st_mode);
+    }
   }
 
   encoding->priv->copy = copy;
@@ -862,7 +877,7 @@ ogmrip_encoding_set_test (OGMRipEncoding *encoding, gboolean test)
   g_object_notify (G_OBJECT (encoding), "test");
 }
 
-OGMDvdTitle *
+OGMRipTitle *
 ogmrip_encoding_get_title (OGMRipEncoding *encoding)
 {
   g_return_val_if_fail (OGMRIP_IS_ENCODING (encoding), NULL);
@@ -925,12 +940,12 @@ ogmrip_encoding_get_rip_size (OGMRipEncoding *encoding)
 
     if (encoding->priv->relative)
     {
-      OGMDvdStream *stream;
+      OGMRipStream *stream;
       gdouble full_len;
 
       stream = ogmrip_codec_get_input (OGMRIP_CODEC (encoding->priv->video_codec));
 
-      full_len = ogmdvd_title_get_length (ogmdvd_stream_get_title (stream), NULL);
+      full_len = ogmrip_title_get_length (ogmrip_stream_get_title (stream), NULL);
       if (full_len < 0)
         return -1;
 
@@ -986,7 +1001,7 @@ ogmrip_encoding_get_nonvideo_size (OGMRipEncoding *encoding)
 static gint64
 ogmrip_encoding_get_video_overhead (OGMRipEncoding *encoding)
 {
-  OGMDvdStream *stream;
+  OGMRipStream *stream;
   gdouble framerate, length, frames;
   guint num, denom;
   gint overhead;
@@ -995,7 +1010,7 @@ ogmrip_encoding_get_video_overhead (OGMRipEncoding *encoding)
     return 0;
 
   stream = ogmrip_codec_get_input (OGMRIP_CODEC (encoding->priv->video_codec));
-  ogmdvd_video_stream_get_framerate (OGMDVD_VIDEO_STREAM (stream), &num, &denom);
+  ogmrip_video_stream_get_framerate (OGMRIP_VIDEO_STREAM (stream), &num, &denom);
   framerate = num / (gdouble) denom;
 
   length = ogmrip_codec_get_length (OGMRIP_CODEC (encoding->priv->video_codec), NULL);
@@ -1020,11 +1035,11 @@ ogmrip_encoding_get_audio_overhead (OGMRipEncoding *encoding, OGMRipAudioCodec *
 
   if (ogmrip_plugin_get_audio_codec_format (G_OBJECT_TYPE (codec)) == OGMRIP_FORMAT_COPY)
   {
-    OGMDvdStream *stream;
+    OGMRipStream *stream;
 
     stream = ogmrip_codec_get_input (OGMRIP_CODEC (codec));
-    sample_rate = ogmdvd_audio_stream_get_sample_rate (OGMDVD_AUDIO_STREAM (stream));
-    channels = ogmdvd_audio_stream_get_channels (OGMDVD_AUDIO_STREAM (stream));
+    sample_rate = ogmrip_audio_stream_get_sample_rate (OGMRIP_AUDIO_STREAM (stream));
+    channels = ogmrip_audio_stream_get_channels (OGMRIP_AUDIO_STREAM (stream));
   }
   else
   {
@@ -1111,7 +1126,7 @@ ogmrip_encoding_autobitrate (OGMRipEncoding *encoding)
 void
 ogmrip_encoding_autoscale (OGMRipEncoding *encoding, gdouble bpp, guint *width, guint *height)
 {
-  OGMDvdStream *stream;
+  OGMRipStream *stream;
   guint an, ad, rn, rd, cw, ch, rw, rh;
   gdouble ratio, rbpp;
   gint br;
@@ -1122,8 +1137,8 @@ ogmrip_encoding_autoscale (OGMRipEncoding *encoding, gdouble bpp, guint *width, 
 
   stream = ogmrip_codec_get_input (OGMRIP_CODEC (encoding->priv->video_codec));
 
-  ogmdvd_video_stream_get_resolution (OGMDVD_VIDEO_STREAM (stream), &rw, &rh);
-  ogmdvd_video_stream_get_framerate (OGMDVD_VIDEO_STREAM (stream), &rn, &rd);
+  ogmrip_video_stream_get_resolution (OGMRIP_VIDEO_STREAM (stream), &rw, &rh);
+  ogmrip_video_stream_get_framerate (OGMRIP_VIDEO_STREAM (stream), &rn, &rd);
 
   ogmrip_video_codec_get_crop_size (encoding->priv->video_codec, NULL, NULL, &cw, &ch);
   ogmrip_video_codec_get_aspect_ratio (encoding->priv->video_codec, &an, &ad);
@@ -1244,18 +1259,18 @@ ogmrip_encoding_task_progressed (OGMRipEncoding *encoding, gdouble fraction, OGM
 static gint
 ogmrip_encoding_copy (OGMRipEncoding *encoding, GError **error)
 {
-  OGMDvdDisc *disc;
+  OGMRipMedia *media;
   OGMJobSpawn *spawn;
   gboolean result;
   gchar *output;
 
-  disc = ogmdvd_title_get_disc (encoding->priv->title);
+  media = ogmrip_title_get_media (encoding->priv->title);
 
   output = ogmrip_fs_mktemp ("ogmrip.XXXXXX", error);
   if (!output)
     return OGMJOB_RESULT_ERROR;
 
-  spawn = ogmrip_copy_new (disc, output);
+  spawn = ogmrip_copy_new (media, output);
   g_signal_connect_swapped (spawn, "progress",
       G_CALLBACK (ogmrip_encoding_task_progressed), encoding);
 
@@ -1352,10 +1367,10 @@ ogmrip_encoding_run_codec (OGMRipEncoding *encoding, OGMRipCodec *codec, GError 
     format = ogmrip_plugin_get_audio_codec_format (G_OBJECT_TYPE (codec));
     if (format == OGMRIP_FORMAT_COPY)
     {
-      OGMDvdStream *stream;
+      OGMRipStream *stream;
 
       stream = ogmrip_codec_get_input (codec);
-      format = ogmdvd_audio_stream_get_format (OGMDVD_AUDIO_STREAM (stream));
+      format = ogmrip_stream_get_format (stream);
     }
     label = ogmrip_audio_codec_get_label (OGMRIP_AUDIO_CODEC (codec));
     lang = ogmrip_audio_codec_get_language (OGMRIP_AUDIO_CODEC (codec));
@@ -1405,7 +1420,7 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GError **error)
 
   g_return_val_if_fail (OGMRIP_IS_ENCODING (encoding), OGMJOB_RESULT_ERROR);
   g_return_val_if_fail (error == NULL || *error == NULL, OGMJOB_RESULT_ERROR);
-  g_return_val_if_fail (ogmdvd_title_is_open (encoding->priv->title), OGMJOB_RESULT_ERROR);
+  g_return_val_if_fail (ogmrip_title_is_open (encoding->priv->title), OGMJOB_RESULT_ERROR);
 
   if (!ogmrip_encoding_check_space (encoding, 0, 0, error))
     return FALSE;
@@ -1491,11 +1506,11 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GError **error)
     if (encoding->priv->autocrop &&
         ogmrip_video_codec_get_can_crop (encoding->priv->video_codec))
     {
-      OGMDvdStream *stream;
+      OGMRipStream *stream;
       guint x, y, w, h;
 
       stream = ogmrip_codec_get_input (OGMRIP_CODEC (encoding->priv->video_codec));
-      ogmdvd_video_stream_get_crop_size (OGMDVD_VIDEO_STREAM (stream), &x, &y, &w, &h);
+      ogmrip_video_stream_get_crop_size (OGMRIP_VIDEO_STREAM (stream), &x, &y, &w, &h);
       ogmrip_video_codec_set_crop_size (encoding->priv->video_codec, x, y, w, h);
     }
 
@@ -1518,10 +1533,10 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GError **error)
      */
     if (encoding->priv->audio_codecs && encoding->priv->ensure_sync)
     {
-      OGMDvdStream *stream;
+      OGMRipStream *stream;
 
       stream = ogmrip_codec_get_input (OGMRIP_CODEC (encoding->priv->audio_codecs->data));
-      ogmrip_video_codec_set_ensure_sync (encoding->priv->video_codec, OGMDVD_AUDIO_STREAM (stream));
+      ogmrip_video_codec_set_ensure_sync (encoding->priv->video_codec, OGMRIP_AUDIO_STREAM (stream));
     }
 
     /*

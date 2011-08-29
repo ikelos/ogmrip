@@ -1,0 +1,73 @@
+/* OGMRipMedia - A media library for OGMRip
+ * Copyright (C) 2010 Olivier Rolland <billl@users.sourceforge.net>
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
+#include "ogmrip-media-stream.h"
+#include "ogmrip-media-title.h"
+
+G_DEFINE_INTERFACE (OGMRipStream, ogmrip_stream, G_TYPE_OBJECT)
+
+static void
+ogmrip_stream_default_init (OGMRipStreamInterface *iface)
+{
+}
+
+OGMRipTitle * 
+ogmrip_stream_get_title (OGMRipStream *stream)
+{
+  OGMRipStreamInterface *iface;
+
+  g_return_val_if_fail (OGMRIP_IS_STREAM (stream), NULL);
+
+  iface = OGMRIP_STREAM_GET_IFACE (stream);
+
+  if (!iface->get_title)
+    return NULL;
+
+  return iface->get_title (stream);
+}
+
+gint 
+ogmrip_stream_get_id (OGMRipStream *stream)
+{
+  OGMRipStreamInterface *iface;
+
+  g_return_val_if_fail (OGMRIP_IS_STREAM (stream), -1);
+
+  iface = OGMRIP_STREAM_GET_IFACE (stream);
+
+  if (!iface->get_id)
+    return 0;
+
+  return iface->get_id (stream);
+}
+
+gint
+ogmrip_stream_get_format (OGMRipStream *stream)
+{
+  OGMRipStreamInterface *iface;
+
+  g_return_val_if_fail (OGMRIP_IS_STREAM (stream), -1);
+
+  iface = OGMRIP_STREAM_GET_IFACE (stream);
+
+  if (!iface->get_format)
+    return -1;
+
+  return iface->get_format (stream);
+}
+

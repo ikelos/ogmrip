@@ -28,6 +28,7 @@
  */
 
 #include "ogmdvd-audio.h"
+#include "ogmdvd-title.h"
 #include "ogmdvd-priv.h"
 
 enum
@@ -40,21 +41,29 @@ enum
   OGMDVD_AUDIO_FORMAT_DTS      = 6
 };
 
+static void ogmrip_stream_iface_init       (OGMRipStreamInterface      *iface);
+static void ogmrip_audio_stream_iface_init (OGMRipAudioStreamInterface *iface);
 
-/**
- * ogmdvd_audio_stream_get_format:
- * @audio: An #OGMDvdAudioStream
- *
- * Returns the format of the audio stream.
- *
- * Returns: #OGMDvdAudioFormat, or -1
- */
-gint
-ogmdvd_audio_stream_get_format (OGMDvdAudioStream *audio)
+G_DEFINE_TYPE_WITH_CODE (OGMDvdAudioStream, ogmdvd_audio_stream, G_TYPE_OBJECT,
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_STREAM, ogmrip_stream_iface_init)
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_AUDIO_STREAM, ogmrip_audio_stream_iface_init));
+
+static void
+ogmdvd_audio_stream_init (OGMDvdAudioStream *stream)
 {
-  g_return_val_if_fail (audio != NULL, -1);
+  stream->priv = G_TYPE_INSTANCE_GET_PRIVATE (stream, OGMDVD_TYPE_AUDIO_STREAM, OGMDvdAudioStreamPriv);
+}
 
-  switch (audio->format)
+static void
+ogmdvd_audio_stream_class_init (OGMDvdAudioStreamClass *klass)
+{
+  g_type_class_add_private (klass, sizeof (OGMDvdAudioStreamPriv));
+}
+
+static gint
+ogmdvd_audio_stream_get_format (OGMRipStream *stream)
+{
+  switch (OGMDVD_AUDIO_STREAM (stream)->priv->format)
   {
     case OGMDVD_AUDIO_FORMAT_AC3:
       return OGMRIP_FORMAT_AC3;
@@ -67,20 +76,46 @@ ogmdvd_audio_stream_get_format (OGMDvdAudioStream *audio)
   }
 }
 
-/**
- * ogmdvd_audio_stream_get_channels:
- * @audio: An #OGMDvdAudioStream
- *
- * Returns the number of channels of the audio stream.
- *
- * Returns: #OGMDvdAudioChannels, or -1
- */
-gint
-ogmdvd_audio_stream_get_channels (OGMDvdAudioStream *audio)
+static gint
+ogmdvd_audio_stream_get_id (OGMRipStream *stream)
 {
-  g_return_val_if_fail (audio != NULL, -1);
+  return OGMDVD_AUDIO_STREAM (stream)->priv->id;
+}
 
-  switch (audio->channels)
+OGMRipTitle *
+ogmdvd_audio_stream_get_title (OGMRipStream *stream)
+{
+  return OGMDVD_AUDIO_STREAM (stream)->priv->title;
+}
+
+static void
+ogmrip_stream_iface_init (OGMRipStreamInterface *iface)
+{
+  iface->get_format = ogmdvd_audio_stream_get_format;
+  iface->get_id     = ogmdvd_audio_stream_get_id;
+  iface->get_title  = ogmdvd_audio_stream_get_title;
+}
+
+static gint
+ogmdvd_audio_stream_get_bitrate (OGMRipAudioStream *audio)
+{
+  OGMDvdAudioStream *stream = OGMDVD_AUDIO_STREAM (audio);
+
+  if (stream->priv->title)
+  {
+    OGMDvdTitle *title = OGMDVD_TITLE (stream->priv->title);
+
+    if (title->priv->bitrates)
+      return title->priv->bitrates[stream->priv->nr];
+  }
+
+  return 0;
+}
+
+static gint
+ogmdvd_audio_stream_get_channels (OGMRipAudioStream *audio)
+{
+  switch (OGMDVD_AUDIO_STREAM (audio)->priv->channels)
   {
     case 0:
       return OGMRIP_AUDIO_CHANNELS_MONO;
@@ -95,98 +130,45 @@ ogmdvd_audio_stream_get_channels (OGMDvdAudioStream *audio)
   }
 }
 
-/**
- * ogmdvd_audio_stream_get_quantization:
- * @audio: An #OGMDvdAudioStream
- *
- * Returns the quantization of the audio stream.
- *
- * Returns: #OGMDvdAudioQuantization, or -1
- */
-gint
-ogmdvd_audio_stream_get_quantization (OGMDvdAudioStream *audio)
+static gint
+ogmdvd_audio_stream_get_content (OGMRipAudioStream *audio)
 {
-  g_return_val_if_fail (audio != NULL, -1);
-
-  return audio->quantization;
+  return OGMDVD_AUDIO_STREAM (audio)->priv->code_extension - 1;
 }
 
-/**
- * ogmdvd_audio_stream_get_content:
- * @audio: An #OGMDvdAudioStream
- *
- * Returns the content of the audio stream.
- *
- * Returns: #OGMDvdAudioContent, or -1
- */
-gint
-ogmdvd_audio_stream_get_content (OGMDvdAudioStream *audio)
+static gint
+ogmdvd_audio_stream_get_language (OGMRipAudioStream *audio)
 {
-  g_return_val_if_fail (audio != NULL, -1);
-
-  return audio->code_extension - 1;
+  return OGMDVD_AUDIO_STREAM (audio)->priv->lang_code;
 }
 
-/**
- * ogmdvd_audio_stream_get_language:
- * @audio: An #OGMDvdAudioStream
- *
- * Returns the language of the audio stream.
- *
- * Returns: the language code, or -1
- */
-gint
-ogmdvd_audio_stream_get_language (OGMDvdAudioStream *audio)
+static gint
+ogmdvd_audio_stream_get_nr (OGMRipAudioStream *stream)
 {
-  g_return_val_if_fail (audio != NULL, -1);
-
-  return audio->lang_code;
+  return OGMDVD_AUDIO_STREAM (stream)->priv->nr;
 }
 
-/**
- * ogmdvd_audio_stream_get_bitrate:
- * @audio: An #OGMDvdAudioStream
- *
- * Returns the bitrate of the audio stream in bps.
- *
- * Returns: the bitrate, or -1
- */
-gint
-ogmdvd_audio_stream_get_bitrate (OGMDvdAudioStream *audio)
+static gint
+ogmdvd_audio_stream_get_quantization (OGMRipAudioStream *audio)
 {
-  OGMDvdStream *stream;
-
-  g_return_val_if_fail (audio != NULL, -1);
-
-  stream = OGMDVD_STREAM (audio);
-
-  if (stream->title && stream->title->bitrates)
-    return stream->title->bitrates[stream->nr];
-
-  return 0;
+  return OGMDVD_AUDIO_STREAM (audio)->priv->quantization;
 }
 
-/**
- * ogmdvd_audio_stream_get_label:
- * @audio: An #OGMDvdAudioStream
- *
- * Returns the label of the audio stream.
- *
- * Returns: the label, or NULL
- */
-const gchar *
-ogmdvd_audio_stream_get_label (OGMDvdAudioStream *audio)
+static gint
+ogmdvd_audio_stream_get_sample_rate (OGMRipAudioStream *audio)
 {
-  g_return_val_if_fail (audio != NULL, NULL);
-
-  return NULL;
-}
-
-gint
-ogmdvd_audio_stream_get_sample_rate (OGMDvdAudioStream *audio)
-{
-  g_return_val_if_fail (audio != NULL, -1);
-
   return 48000;
+}
+
+static void
+ogmrip_audio_stream_iface_init (OGMRipAudioStreamInterface *iface)
+{
+  iface->get_bitrate      = ogmdvd_audio_stream_get_bitrate;
+  iface->get_channels     = ogmdvd_audio_stream_get_channels;
+  iface->get_content      = ogmdvd_audio_stream_get_content;
+  iface->get_language     = ogmdvd_audio_stream_get_language;
+  iface->get_nr           = ogmdvd_audio_stream_get_nr;
+  iface->get_quantization = ogmdvd_audio_stream_get_quantization;
+  iface->get_sample_rate  = ogmdvd_audio_stream_get_sample_rate;
 }
 

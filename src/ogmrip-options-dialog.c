@@ -84,7 +84,7 @@ struct _OGMRipOptionsDialogPriv
   GtkWidget *autocrop_button;
 
   OGMRipEncoding *encoding;
-  OGMDvdTitle *title;
+  OGMRipTitle *title;
 };
 
 static void ogmrip_options_dialog_constructed  (GObject      *gobject);
@@ -200,10 +200,10 @@ ogmrip_options_dialog_get_crop_full (OGMRipOptionsDialog *dialog, guint *x, guin
 
   ogmrip_options_dialog_get_crop (dialog, x, y, &r, &b);
 
-  ogmdvd_video_stream_get_resolution (ogmdvd_title_get_video_stream (dialog->priv->title), &rw, &rh);
+  ogmrip_video_stream_get_resolution (ogmrip_title_get_video_stream (dialog->priv->title), &rw, &rh);
   crop_to_size (rw, rh, *x, *y, r, b, w, h);
 
-  ogmdvd_video_stream_get_aspect_ratio (ogmdvd_title_get_video_stream (dialog->priv->title), &n, &d);
+  ogmrip_video_stream_get_aspect_ratio (ogmrip_title_get_video_stream (dialog->priv->title), &n, &d);
 
   return get_ratio (rw, rh, *w, *h, n, d);
 }
@@ -247,7 +247,7 @@ ogmrip_options_dialog_update_scale_combo (OGMRipOptionsDialog *dialog)
     {
       if (i == OGMRIP_SCALE_NONE)
       {
-        ogmdvd_video_stream_get_resolution (ogmdvd_title_get_video_stream (dialog->priv->title), &rw, &rh);
+        ogmrip_video_stream_get_resolution (ogmrip_title_get_video_stream (dialog->priv->title), &rw, &rh);
 
         str = g_strdup_printf ("%u x %u", rw, rh);
       }
@@ -455,7 +455,7 @@ ogmrip_options_dialog_crop_button_clicked (OGMRipOptionsDialog *parent)
     }
     gtk_widget_destroy (dialog);
 
-    ogmdvd_title_close (parent->priv->title);
+    ogmrip_title_close (parent->priv->title);
   }
 }
 
@@ -477,7 +477,7 @@ ogmrip_options_dialog_crop_and_test (OGMRipOptionsDialog *parent, gboolean crop,
     dialog = ogmrip_progress_dialog_new (GTK_WINDOW (parent), 
         GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT, FALSE);
     ogmrip_progress_dialog_set_title (OGMRIP_PROGRESS_DIALOG (dialog),
-        ogmdvd_disc_get_label (ogmdvd_title_get_disc (parent->priv->title)));
+        ogmrip_media_get_label (ogmrip_title_get_media (parent->priv->title)));
     gtk_window_present (GTK_WINDOW (dialog));
 
     result = OGMJOB_RESULT_SUCCESS;
@@ -494,11 +494,11 @@ ogmrip_options_dialog_crop_and_test (OGMRipOptionsDialog *parent, gboolean crop,
 
       if (result == OGMJOB_RESULT_SUCCESS)
       {
-        OGMDvdVideoStream *stream;
+        OGMRipVideoStream *stream;
         guint x, y, w, h;
 
-        stream = ogmdvd_title_get_video_stream (parent->priv->title);
-        ogmdvd_video_stream_get_crop_size (stream, &x, &y, &w, &h);
+        stream = ogmrip_title_get_video_stream (parent->priv->title);
+        ogmrip_video_stream_get_crop_size (stream, &x, &y, &w, &h);
 
         ogmrip_options_dialog_set_crop (parent, x, y, w, h);
         ogmrip_options_dialog_update_scale_combo (parent);
@@ -534,7 +534,7 @@ ogmrip_options_dialog_crop_and_test (OGMRipOptionsDialog *parent, gboolean crop,
 
     gtk_widget_destroy (dialog);
 
-    ogmdvd_title_close (parent->priv->title);
+    ogmrip_title_close (parent->priv->title);
   }
 }
 
@@ -559,7 +559,7 @@ ogmrip_options_dialog_autoscale_button_clicked (OGMRipOptionsDialog *dialog)
 
   encoding = ogmrip_encoding_new (dialog->priv->title);
 
-  spawn = g_object_new (codec, "input", ogmdvd_title_get_video_stream (dialog->priv->title), NULL);
+  spawn = g_object_new (codec, "input", ogmrip_title_get_video_stream (dialog->priv->title), NULL);
   ogmrip_encoding_set_video_codec (encoding, OGMRIP_VIDEO_CODEC (spawn));
   g_object_unref (spawn);
 

@@ -172,7 +172,7 @@ static gchar **
 ogmrip_xvid_command (OGMRipVideoCodec *video, guint pass, guint passes, const gchar *log_file)
 {
   OGMRipXvid *xvid;
-  OGMDvdTitle *title;
+  OGMRipTitle *title;
   GPtrArray *argv;
   GString *options;
 
@@ -212,7 +212,7 @@ ogmrip_xvid_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   };
 
   output = ogmrip_codec_get_output (OGMRIP_CODEC (video));
-  title = ogmdvd_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video)));
+  title = ogmrip_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video)));
 
   xvid = OGMRIP_XVID (video);
 
@@ -244,7 +244,7 @@ ogmrip_xvid_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
     else
       g_string_append (options, ":nogmc");
 
-    interlaced = ogmdvd_title_get_interlaced (title);
+    interlaced = ogmrip_title_get_interlaced (title);
     if (interlaced > 0 && ogmrip_video_codec_get_deinterlacer (video) != OGMRIP_DEINT_NONE)
       interlaced = 0;
 
@@ -354,7 +354,7 @@ ogmrip_xvid_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   g_ptr_array_add (argv, g_strdup ("-xvidencopts"));
   g_ptr_array_add (argv, g_string_free (options, FALSE));
 
-  vid = ogmdvd_title_get_nr (title);
+  vid = ogmrip_title_get_nr (title);
 
   if (MPLAYER_CHECK_VERSION (1,0,0,1))
     g_ptr_array_add (argv, g_strdup_printf ("dvd://%d", vid + 1));

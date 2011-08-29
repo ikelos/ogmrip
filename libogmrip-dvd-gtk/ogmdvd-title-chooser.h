@@ -21,7 +21,7 @@
 
 #include <gtk/gtk.h>
 
-#include <ogmdvd.h>
+#include <ogmrip-media.h>
 
 G_BEGIN_DECLS
 
@@ -38,19 +38,19 @@ struct _OGMDvdTitleChooserInterface
   GTypeInterface base_iface;
 
   void          (* set_active) (OGMDvdTitleChooser *chooser,
-                                OGMDvdTitle        *title);
-  OGMDvdTitle * (* get_active) (OGMDvdTitleChooser *chooser);
+                                OGMRipTitle        *title);
+  OGMRipTitle * (* get_active) (OGMDvdTitleChooser *chooser);
 };
 
 
 GType         ogmdvd_title_chooser_get_type   (void) G_GNUC_CONST;
 
 void          ogmdvd_title_chooser_set_disc   (OGMDvdTitleChooser *chooser,
-                                               OGMDvdDisc         *disc);
-OGMDvdDisc *  ogmdvd_title_chooser_get_disc   (OGMDvdTitleChooser *chooser);
+                                               OGMRipMedia        *media);
+OGMRipMedia * ogmdvd_title_chooser_get_disc   (OGMDvdTitleChooser *chooser);
 void          ogmdvd_title_chooser_set_active (OGMDvdTitleChooser *chooser,
-                                               OGMDvdTitle        *title);
-OGMDvdTitle * ogmdvd_title_chooser_get_active (OGMDvdTitleChooser *chooser);
+                                               OGMRipTitle        *title);
+OGMRipTitle * ogmdvd_title_chooser_get_active (OGMDvdTitleChooser *chooser);
 
 G_END_DECLS
 

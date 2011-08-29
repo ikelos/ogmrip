@@ -19,7 +19,7 @@
 #ifndef __OGMDVD_PRIV_H__
 #define __OGMDVD_PRIV_H__
 
-#include "ogmdvd-types.h"
+#include <ogmrip-media.h>
 
 #if defined(HAVE_INTTYPES_H)
 #include <inttypes.h>
@@ -39,9 +39,9 @@ G_BEGIN_DECLS
  *
  * An opaque structure representing a DVD disc
  */
-struct _OGMDvdDisc
+struct _OGMDvdDiscPriv
 {
-  guint ref;
+  gchar *uri;
   gchar *device;
   gchar *orig_device;
   gchar *label;
@@ -63,13 +63,11 @@ struct _OGMDvdDisc
  *
  * An opaque structure representing a DVD title
  */
-struct _OGMDvdTitle
+struct _OGMDvdTitlePriv
 {
   guint nr;
 
   guint8 nr_of_angles;
-
-  OGMDvdVideoStream *video_stream;
 
   guint8 nr_of_audio_streams;
   GList *audio_streams;
@@ -84,20 +82,30 @@ struct _OGMDvdTitle
 
   uint32_t palette[16];
 
+  guint video_format;
+  guint picture_size;
+  guint display_aspect_ratio;
+  guint permitted_df;
+
+  gboolean analyzed;
+  gboolean interlaced;
+  gboolean progressive;
+  gboolean telecine;
+
+  guint crop_x;
+  guint crop_y;
+  guint crop_w;
+  guint crop_h;
+
   dvd_time_t playback_time;
 
-  OGMDvdDisc *disc;
+  OGMRipMedia *disc;
   gboolean close_disc;
 
   guint8 ttn;
 
   guint8 title_set_nr;
   ifo_handle_t *vts_file;
-
-  gboolean analyzed;
-  gboolean interlaced;
-  gboolean progressive;
-  gboolean telecine;
 
   gint *bitrates;
 /*
@@ -111,49 +119,20 @@ struct _OGMDvdTitle
 };
 
 /**
- * OGMDvdStream:
- *
- * An opaque structure representing a DVD stream
- */
-struct _OGMDvdStream
-{
-  OGMDvdTitle *title;
-  guint16 id;
-  guint nr;
-};
-
-/**
- * OGMDvdVideoStream:
- *
- * An opaque structure representing a DVD video stream
- */
-struct _OGMDvdVideoStream
-{
-  OGMDvdStream stream;
-  guint video_format : 2;
-  guint picture_size : 2;
-  guint display_aspect_ratio : 2;
-  guint permitted_df : 2;
-
-  guint crop_x;
-  guint crop_y;
-  guint crop_w;
-  guint crop_h;
-};
-
-/**
  * OGMDvdAudioStream:
  *
  * An opaque structure representing a DVD audio stream
  */
-struct _OGMDvdAudioStream
+struct _OGMDvdAudioStreamPriv
 {
-  OGMDvdStream stream;
-  guint   format       : 3;
-  guint   channels     : 3;
-  guint   quantization : 2;
-  guint8  code_extension;
-  guint16 lang_code;
+  OGMRipTitle *title;
+  guint id;
+  guint nr;
+  guint format;
+  guint channels;
+  guint quantization;
+  guint code_extension;
+  guint lang_code;
 };
 
 /**
@@ -161,11 +140,13 @@ struct _OGMDvdAudioStream
  *
  * An opaque structure representing a DVD subtitle stream
  */
-struct _OGMDvdSubpStream
+struct _OGMDvdSubpStreamPriv
 {
-  OGMDvdStream stream;
-  guint8 lang_extension;
-  guint16 lang_code;
+  OGMRipTitle *title;
+  guint id;
+  guint nr;
+  guint lang_extension;
+  guint lang_code;
 };
 
 /**

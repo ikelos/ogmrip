@@ -93,29 +93,29 @@ ogmrip_subp_chooser_widget_combo_changed (OGMRipSubpChooserWidget *widget)
   if (source != NULL && type == OGMRIP_SOURCE_STREAM)
   {
     ogmrip_subp_options_dialog_set_label (OGMRIP_SUBP_OPTIONS_DIALOG (widget->priv->dialog),
-        ogmdvd_subp_stream_get_label (OGMDVD_SUBP_STREAM (source)));
+        ogmrip_subp_stream_get_label (OGMRIP_SUBP_STREAM (source)));
     ogmrip_subp_options_dialog_set_language (OGMRIP_SUBP_OPTIONS_DIALOG (widget->priv->dialog),
-        ogmdvd_subp_stream_get_language (OGMDVD_SUBP_STREAM (source)));
+        ogmrip_subp_stream_get_language (OGMRIP_SUBP_STREAM (source)));
   }
 }
 
 static void
 ogmrip_subp_chooser_widget_combo_title_notified (OGMRipSubpChooserWidget *widget)
 {
-  OGMDvdTitle *title;
+  OGMRipTitle *title;
 
   ogmrip_source_chooser_widget_add_subp_stream (OGMRIP_SOURCE_CHOOSER_WIDGET (widget->priv->chooser), NULL);
 
   title = ogmrip_source_chooser_get_title (OGMRIP_SOURCE_CHOOSER (widget->priv->chooser));
   if (title)
   {
-    OGMDvdSubpStream *stream;
+    OGMRipSubpStream *stream;
     gint i, n;
 
-    n = ogmdvd_title_get_n_subp_streams (title);
+    n = ogmrip_title_get_n_subp_streams (title);
     for (i = 0; i < n; i ++)
     {
-      stream = ogmdvd_title_get_nth_subp_stream (title, i);
+      stream = ogmrip_title_get_nth_subp_stream (title, i);
       if (stream)
         ogmrip_source_chooser_widget_add_subp_stream (OGMRIP_SOURCE_CHOOSER_WIDGET (widget->priv->chooser), stream);
     }
@@ -218,7 +218,7 @@ ogmrip_subp_chooser_widget_get_property (GObject *gobject, guint property_id, GV
   switch (property_id) 
   {
     case PROP_TITLE:
-      g_value_set_pointer (value,
+      g_value_set_object (value,
           ogmrip_source_chooser_get_title (OGMRIP_SOURCE_CHOOSER (widget->priv->chooser)));
       break;
     default:
@@ -235,7 +235,7 @@ ogmrip_subp_chooser_widget_set_property (GObject *gobject, guint property_id, co
   switch (property_id) 
   {
     case PROP_TITLE:
-      ogmrip_source_chooser_set_title (OGMRIP_SOURCE_CHOOSER (widget->priv->chooser), g_value_get_pointer (value));
+      ogmrip_source_chooser_set_title (OGMRIP_SOURCE_CHOOSER (widget->priv->chooser), g_value_get_object (value));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);

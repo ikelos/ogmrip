@@ -33,8 +33,8 @@
 
 struct _OGMRipCodecPriv
 {
-  OGMDvdTitle *title;
-  OGMDvdStream *input;
+  OGMRipTitle *title;
+  OGMRipStream *input;
   gchar *output;
 
   guint start_chap;
@@ -69,18 +69,15 @@ static void ogmrip_codec_get_property (GObject      *gobject,
 static gint ogmrip_codec_run          (OGMJobSpawn  *spawn);
 
 static void
-ogmrip_codec_set_input (OGMRipCodec *codec, OGMDvdStream *input)
+ogmrip_codec_set_input (OGMRipCodec *codec, OGMRipStream *input)
 {
-  g_return_if_fail (OGMRIP_IS_CODEC (codec));
-  g_return_if_fail (input != NULL);
-
-  ogmdvd_stream_ref (input);
+  g_object_ref (input);
 
   if (codec->priv->input)
-    ogmdvd_stream_unref (codec->priv->input);
+    g_object_unref (codec->priv->input);
 
   codec->priv->input = input;
-  codec->priv->title = ogmdvd_stream_get_title (input);
+  codec->priv->title = ogmrip_stream_get_title (input);
 
   codec->priv->start_chap = 0;
   codec->priv->end_chap = -1;
@@ -105,8 +102,8 @@ ogmrip_codec_class_init (OGMRipCodecClass *klass)
   spawn_class->run = ogmrip_codec_run;
 
   g_object_class_install_property (gobject_class, PROP_INPUT, 
-        g_param_spec_pointer ("input", "Input property", "Set input title", 
-           G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+        g_param_spec_object ("input", "Input property", "Set input title", 
+           OGMRIP_TYPE_STREAM, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_OUTPUT, 
         g_param_spec_string ("output", "Output property", "Set output file", 
@@ -158,7 +155,7 @@ ogmrip_codec_dispose (GObject *gobject)
 
   if (codec->priv->input)
   {
-    ogmdvd_stream_unref (codec->priv->input);
+    g_object_unref (codec->priv->input);
     codec->priv->input = NULL;
   }
 
@@ -187,7 +184,7 @@ ogmrip_codec_set_property (GObject *gobject, guint property_id, const GValue *va
   switch (property_id) 
   {
     case PROP_INPUT:
-      ogmrip_codec_set_input (codec, g_value_get_pointer (value));
+      ogmrip_codec_set_input (codec, g_value_get_object (value));
       break;
     case PROP_OUTPUT:
       ogmrip_codec_set_output (codec, g_value_get_string (value));
@@ -218,7 +215,7 @@ ogmrip_codec_get_property (GObject *gobject, guint property_id, GValue *value, G
   switch (property_id) 
   {
     case PROP_INPUT:
-      g_value_set_pointer (value, codec->priv->input);
+      g_value_set_object (value, codec->priv->input);
       break;
     case PROP_OUTPUT:
       g_value_set_string (value, codec->priv->output);
@@ -244,10 +241,10 @@ ogmrip_codec_get_property (GObject *gobject, guint property_id, GValue *value, G
 static gint
 ogmrip_codec_run (OGMJobSpawn *spawn)
 {
-  OGMDvdTitle *title = OGMRIP_CODEC (spawn)->priv->title;
+  OGMRipTitle *title = OGMRIP_CODEC (spawn)->priv->title;
 
   g_return_val_if_fail (title != NULL, OGMJOB_RESULT_ERROR);
-  g_return_val_if_fail (ogmdvd_title_is_open (title), OGMJOB_RESULT_ERROR);
+  g_return_val_if_fail (ogmrip_title_is_open (title), OGMJOB_RESULT_ERROR);
 
   return OGMJOB_SPAWN_CLASS (ogmrip_codec_parent_class)->run (spawn);
 }
@@ -292,9 +289,9 @@ ogmrip_codec_set_output (OGMRipCodec *codec, const gchar *output)
  *
  * Gets the input DVD title.
  *
- * Returns: an #OGMDvdTitle, or NULL
+ * Returns: an #OGMRipStream, or NULL
  */
-OGMDvdStream *
+OGMRipStream *
 ogmrip_codec_get_input (OGMRipCodec *codec)
 {
   g_return_val_if_fail (OGMRIP_IS_CODEC (codec), NULL);
@@ -317,7 +314,7 @@ ogmrip_codec_set_chapters (OGMRipCodec *codec, guint start, gint end)
 
   g_return_if_fail (OGMRIP_IS_CODEC (codec));
 
-  nchap = ogmdvd_title_get_n_chapters (codec->priv->title);
+  nchap = ogmrip_title_get_n_chapters (codec->priv->title);
 
   if (end < 0)
     end = nchap - 1;
@@ -344,7 +341,7 @@ ogmrip_codec_get_chapters (OGMRipCodec *codec, guint *start, guint *end)
   *start = codec->priv->start_chap;
 
   if (codec->priv->end_chap < 0)
-    *end = ogmdvd_title_get_n_chapters (codec->priv->title) - 1;
+    *end = ogmrip_title_get_n_chapters (codec->priv->title) - 1;
   else
     *end = codec->priv->end_chap;
 }
@@ -377,14 +374,14 @@ ogmrip_codec_get_length (OGMRipCodec *codec, OGMRipTime *time_)
     return codec->priv->play_length;
   }
 
-  nchap = ogmdvd_title_get_n_chapters (codec->priv->title);
+  nchap = ogmrip_title_get_n_chapters (codec->priv->title);
 
   if (codec->priv->start_chap == 0 &&
       (codec->priv->end_chap == -1 ||
        codec->priv->end_chap == nchap - 1))
-    return ogmdvd_title_get_length (codec->priv->title, time_);
+    return ogmrip_title_get_length (codec->priv->title, time_);
 
-  return ogmdvd_title_get_chapters_length (codec->priv->title,
+  return ogmrip_title_get_chapters_length (codec->priv->title,
       codec->priv->start_chap, codec->priv->end_chap, time_);
 }
 

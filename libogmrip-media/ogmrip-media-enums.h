@@ -172,6 +172,38 @@ typedef enum
 } OGMRipSubpContent;
 
 /**
+ * OGMRipCharset:
+ * @OGMRIP_CHARSET_UTF8: UTF-8 charset
+ * @OGMRIP_CHARSET_ISO8859_1: ISO8859-1 charset
+ * @OGMRIP_CHARSET_ASCII: ASCII
+ *
+ * Available character sets.
+ */
+typedef enum
+{
+  OGMRIP_CHARSET_UNDEFINED = -1,
+  OGMRIP_CHARSET_UTF8,
+  OGMRIP_CHARSET_ISO8859_1,
+  OGMRIP_CHARSET_ASCII
+} OGMRipCharset;
+
+/**
+ * OGMRipNewline:
+ * @OGMRIP_NEWLINE_LF: Line feed only
+ * @OGMRIP_NEWLINE_CR_LF: Carriage return + line feed
+ * @OGMRIP_NEWLINE_CR: Carriage return only
+ *
+ * Available end-of-line styles.
+ */
+typedef enum
+{
+  OGMRIP_NEWLINE_UNDEFINED = -1,
+  OGMRIP_NEWLINE_LF,
+  OGMRIP_NEWLINE_CR_LF,
+  OGMRIP_NEWLINE_CR
+} OGMRipNewline;
+
+/**
  * OGMRipFormatType:
  * @OGMRIP_FORMAT_UNDEFINED: The format is undefined
  * @OGMRIP_FORMAT_MPEG1: The Mpeg-1 video format
@@ -299,5 +331,5 @@ enum
 
 G_END_DECLS
 
-#endif /* __OGMRIP_ENUMS_H__ */
+#endif /* __OGMRIP_MEDIA_ENUMS_H__ */
 

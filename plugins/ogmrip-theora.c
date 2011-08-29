@@ -55,7 +55,7 @@ static gint ogmrip_theora_run (OGMJobSpawn *spawn);
 static gchar **
 ogmrip_yuv4mpeg_command (OGMRipVideoCodec *video, const gchar *input, const gchar *output, const gchar *logf)
 {
-  OGMDvdTitle *title;
+  OGMRipTitle *title;
   GPtrArray *argv;
   gint vid;
 
@@ -70,8 +70,8 @@ ogmrip_yuv4mpeg_command (OGMRipVideoCodec *video, const gchar *input, const gcha
   else
     g_ptr_array_add (argv, g_strdup ("yuv4mpeg"));
 
-  title = ogmdvd_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video)));
-  vid = ogmdvd_title_get_nr (title);
+  title = ogmrip_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video)));
+  vid = ogmrip_title_get_nr (title);
 
   if (MPLAYER_CHECK_VERSION (1,0,0,1))
     g_ptr_array_add (argv, g_strdup_printf ("dvd://%d", vid + 1));

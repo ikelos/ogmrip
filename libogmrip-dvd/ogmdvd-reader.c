@@ -22,6 +22,7 @@
 
 #include "ogmdvd-reader.h"
 #include "ogmdvd-priv.h"
+#include "ogmdvd-disc.h"
 
 #include <dvdread/nav_read.h>
 
@@ -46,6 +47,7 @@
 OGMDvdReader *
 ogmdvd_reader_new (OGMDvdTitle *title, guint start_chap, gint end_chap, guint angle)
 {
+  OGMDvdDisc *disc = OGMDVD_DISC (title->priv->disc);
   OGMDvdReader *reader;
 
   guint8 vts;
@@ -56,8 +58,8 @@ ogmdvd_reader_new (OGMDvdTitle *title, guint start_chap, gint end_chap, guint an
   g_return_val_if_fail (title != NULL, NULL);
   g_return_val_if_fail (end_chap < 0 || start_chap <= end_chap, NULL);
 
-  vts = title->disc->vmg_file ? title->disc->vmg_file->tt_srpt->title[title->nr].title_set_nr : 1;
-  file = DVDOpenFile (title->disc->reader, vts, DVD_READ_TITLE_VOBS);
+  vts = disc->priv->vmg_file ? disc->priv->vmg_file->tt_srpt->title[title->priv->nr].title_set_nr : 1;
+  file = DVDOpenFile (disc->priv->reader, vts, DVD_READ_TITLE_VOBS);
 
   g_return_val_if_fail (file != NULL, NULL);
 
@@ -65,18 +67,18 @@ ogmdvd_reader_new (OGMDvdTitle *title, guint start_chap, gint end_chap, guint an
   reader->file = file;
   reader->ref = 1;
 
-  pgcn = title->vts_file->vts_ptt_srpt->title[title->ttn - 1].ptt[start_chap].pgcn;
-  pgn  = title->vts_file->vts_ptt_srpt->title[title->ttn - 1].ptt[start_chap].pgn;
+  pgcn = title->priv->vts_file->vts_ptt_srpt->title[title->priv->ttn - 1].ptt[start_chap].pgcn;
+  pgn  = title->priv->vts_file->vts_ptt_srpt->title[title->priv->ttn - 1].ptt[start_chap].pgn;
 
   reader->angle = angle;
-  reader->pgc = title->vts_file->vts_pgcit->pgci_srp[pgcn - 1].pgc;
+  reader->pgc = title->priv->vts_file->vts_pgcit->pgci_srp[pgcn - 1].pgc;
 
   reader->first_cell = reader->pgc->program_map[pgn - 1] - 1;
 
   reader->last_cell = reader->pgc->nr_of_cells;
   if (end_chap > -1 && end_chap < reader->pgc->nr_of_programs - 1)
   {
-    pgn = title->vts_file->vts_ptt_srpt->title[title->ttn - 1].ptt[end_chap + 1].pgn;
+    pgn = title->priv->vts_file->vts_ptt_srpt->title[title->priv->ttn - 1].ptt[end_chap + 1].pgn;
     reader->last_cell = reader->pgc->program_map[pgn - 1] - 1;
   }
 
@@ -100,6 +102,7 @@ ogmdvd_reader_new (OGMDvdTitle *title, guint start_chap, gint end_chap, guint an
 OGMDvdReader *
 ogmdvd_reader_new_by_cells (OGMDvdTitle *title, guint start_cell, gint end_cell, guint angle)
 {
+  OGMDvdDisc *disc = OGMDVD_DISC (title->priv->disc);
   OGMDvdReader *reader;
   pgc_t *pgc;
 
@@ -111,15 +114,15 @@ ogmdvd_reader_new_by_cells (OGMDvdTitle *title, guint start_cell, gint end_cell,
   g_return_val_if_fail (title != NULL, NULL);
   g_return_val_if_fail (end_cell < 0 || start_cell <= end_cell, NULL);
 
-  pgcn = title->vts_file->vts_ptt_srpt->title[title->ttn - 1].ptt[0].pgcn;
-  pgn  = title->vts_file->vts_ptt_srpt->title[title->ttn - 1].ptt[0].pgn;
+  pgcn = title->priv->vts_file->vts_ptt_srpt->title[title->priv->ttn - 1].ptt[0].pgcn;
+  pgn  = title->priv->vts_file->vts_ptt_srpt->title[title->priv->ttn - 1].ptt[0].pgn;
 
-  pgc = title->vts_file->vts_pgcit->pgci_srp[pgcn - 1].pgc;
+  pgc = title->priv->vts_file->vts_pgcit->pgci_srp[pgcn - 1].pgc;
 
   g_return_val_if_fail (start_cell < pgc->nr_of_cells && end_cell <= pgc->nr_of_cells, NULL);
 
-  vts = title->disc->vmg_file ? title->disc->vmg_file->tt_srpt->title[title->nr].title_set_nr : 1;
-  file = DVDOpenFile (title->disc->reader, vts, DVD_READ_TITLE_VOBS);
+  vts = disc->priv->vmg_file ? disc->priv->vmg_file->tt_srpt->title[title->priv->nr].title_set_nr : 1;
+  file = DVDOpenFile (disc->priv->reader, vts, DVD_READ_TITLE_VOBS);
 
   g_return_val_if_fail (file != NULL, NULL);
 

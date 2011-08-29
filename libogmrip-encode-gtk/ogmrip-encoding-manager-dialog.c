@@ -121,7 +121,7 @@ ogmrip_encoding_manager_dialog_add_encoding (OGMRipEncodingManagerDialog *dialog
   gtk_list_store_append (dialog->priv->store, &iter);
   gtk_list_store_set (dialog->priv->store, &iter,
       COL_NAME, ogmrip_container_get_label (ogmrip_encoding_get_container (encoding)),
-      COL_TITLE, ogmdvd_title_get_nr (ogmrip_encoding_get_title (encoding)) + 1,
+      COL_TITLE, ogmrip_title_get_nr (ogmrip_encoding_get_title (encoding)) + 1,
       COL_PROFILE, str, COL_ENCODING, encoding, -1);
 
   g_free (str);

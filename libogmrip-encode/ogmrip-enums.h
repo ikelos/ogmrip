@@ -101,36 +101,6 @@ typedef enum
 } OGMRipQualityType;
 
 /**
- * OGMRipCharset:
- * @OGMRIP_CHARSET_UTF8: UTF-8 charset
- * @OGMRIP_CHARSET_ISO8859_1: ISO8859-1 charset
- * @OGMRIP_CHARSET_ASCII: ASCII
- *
- * Available character sets.
- */
-typedef enum
-{
-  OGMRIP_CHARSET_UTF8,
-  OGMRIP_CHARSET_ISO8859_1,
-  OGMRIP_CHARSET_ASCII
-} OGMRipCharset;
-
-/**
- * OGMRipNewline:
- * @OGMRIP_NEWLINE_LF: Line feed only
- * @OGMRIP_NEWLINE_CR_LF: Carriage return + line feed
- * @OGMRIP_NEWLINE_CR: Carriage return only
- *
- * Available end-of-line styles.
- */
-typedef enum
-{
-  OGMRIP_NEWLINE_LF,
-  OGMRIP_NEWLINE_CR_LF,
-  OGMRIP_NEWLINE_CR
-} OGMRipNewline;
-
-/**
  * OGMRipAudioDemuxer:
  * @OGMRIP_AUDIO_DEMUXER_AUTO: The demuxer is autodetected
  * @OGMRIP_AUDIO_DEMUXER_AC3: The AC3 demuxer must be used

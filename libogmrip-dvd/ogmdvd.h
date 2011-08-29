@@ -25,11 +25,8 @@
 #include <ogmdvd-monitor.h>
 #include <ogmdvd-parser.h>
 #include <ogmdvd-reader.h>
-#include <ogmdvd-stream.h>
 #include <ogmdvd-subp.h>
 #include <ogmdvd-title.h>
-#include <ogmdvd-types.h>
-#include <ogmdvd-video.h>
 
 #endif /* __OGMDVD_H__ */
 

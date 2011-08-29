@@ -46,7 +46,7 @@ struct _OGMRipCropDialogClass
 };
 
 GType       ogmrip_crop_dialog_get_type         (void);
-GtkWidget * ogmrip_crop_dialog_new              (OGMDvdTitle      *title,
+GtkWidget * ogmrip_crop_dialog_new              (OGMRipTitle      *title,
                                                  guint            left,
                                                  guint            top,
                                                  guint            right,

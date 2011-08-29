@@ -19,13 +19,34 @@
 #ifndef __OGMDVD_SUBP_H__
 #define __OGMDVD_SUBP_H__
 
-#include <ogmdvd-types.h>
+#include <ogmrip-media.h>
 
 G_BEGIN_DECLS
 
-gint          ogmdvd_subp_stream_get_content  (OGMDvdSubpStream *subp);
-const gchar * ogmdvd_subp_stream_get_label    (OGMDvdSubpStream *subp);
-gint          ogmdvd_subp_stream_get_language (OGMDvdSubpStream *subp);
+#define OGMDVD_TYPE_SUBP_STREAM             (ogmdvd_subp_stream_get_type ())
+#define OGMDVD_SUBP_STREAM(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMDVD_TYPE_SUBP_STREAM, OGMDvdSubpStream))
+#define OGMDVD_IS_SUBP_STREAM(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), OGMDVD_TYPE_SUBP_STREAM))
+#define OGMDVD_SUBP_STREAM_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), OGMDVD_TYPE_SUBP_STREAM, OGMDvdSubpStreamClass))
+#define OGMDVD_IS_SUBP_STREAM_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMDVD_TYPE_SUBP_STREAM))
+#define OGMDVD_SUBP_STREAM_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), OGMDVD_TYPE_SUBP_STREAM, OGMDvdSubpStreamClass))
+
+typedef struct _OGMDvdSubpStream      OGMDvdSubpStream;
+typedef struct _OGMDvdSubpStreamClass OGMDvdSubpStreamClass;
+typedef struct _OGMDvdSubpStreamPriv  OGMDvdSubpStreamPriv;
+
+struct _OGMDvdSubpStream
+{
+  GObject parent_instance;
+
+  OGMDvdSubpStreamPriv *priv;
+};
+
+struct _OGMDvdSubpStreamClass
+{
+  GObjectClass parent_class;
+};
+
+GType ogmdvd_subp_stream_get_type (void);
 
 G_END_DECLS
 

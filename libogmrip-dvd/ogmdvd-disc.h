@@ -19,7 +19,7 @@
 #ifndef __OGMDVD_DISC_H__
 #define __OGMDVD_DISC_H__
 
-#include <ogmdvd-types.h>
+#include <ogmrip-media.h>
 
 G_BEGIN_DECLS
 
@@ -54,37 +54,34 @@ typedef enum
   OGMDVD_DISC_ERROR_UNKNOWN /* Unknown error */
 } OGMDvdDiscError;
 
-typedef void (* OGMDvdDiscCallback) (OGMDvdDisc *disc,
-                                     gdouble    percent,
-                                     gpointer   user_data);
+#define OGMDVD_TYPE_DISC             (ogmdvd_disc_get_type ())
+#define OGMDVD_DISC(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMDVD_TYPE_DISC, OGMDvdDisc))
+#define OGMDVD_IS_DISC(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), OGMDVD_TYPE_DISC))
+#define OGMDVD_DISC_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), OGMDVD_TYPE_DISC, OGMDvdDiscClass))
+#define OGMDVD_IS_DISC_CLASS(klass)  (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMDVD_TYPE_DISC))
+#define OGMDVD_DISC_GET_CLASS(obj)   (G_TYPE_INSTANCE_GET_CLASS ((obj), OGMDVD_TYPE_DISC, OGMDvdDiscClass))
 
-GQuark        ogmdvd_error_quark        (void);
+typedef struct _OGMDvdDisc      OGMDvdDisc;
+typedef struct _OGMDvdDiscClass OGMDvdDiscClass;
+typedef struct _OGMDvdDiscPriv  OGMDvdDiscPriv;
 
-OGMDvdDisc *  ogmdvd_disc_new           (const gchar        *device,
-                                         GError             **error);
+struct _OGMDvdDisc
+{
+  GObject parent_instance;
 
-gboolean      ogmdvd_disc_open          (OGMDvdDisc         *disc,
-                                         GError             **error);
-void          ogmdvd_disc_close         (OGMDvdDisc         *disc);
+  OGMDvdDiscPriv *priv;
+};
 
-gboolean      ogmdvd_disc_is_open       (OGMDvdDisc         *disc);
+struct _OGMDvdDiscClass
+{
+  GObjectClass parent_class;
+};
 
-void          ogmdvd_disc_ref           (OGMDvdDisc         *disc);
-void          ogmdvd_disc_unref         (OGMDvdDisc         *disc);
-const gchar * ogmdvd_disc_get_label     (OGMDvdDisc         *disc);
-const gchar * ogmdvd_disc_get_id        (OGMDvdDisc         *disc);
-const gchar * ogmdvd_disc_get_device    (OGMDvdDisc         *disc);
-gint64        ogmdvd_disc_get_vmg_size  (OGMDvdDisc         *disc);
-gint          ogmdvd_disc_get_n_titles  (OGMDvdDisc         *disc);
-OGMDvdTitle * ogmdvd_disc_get_nth_title (OGMDvdDisc         *disc,
-                                         guint              nr);
-GList *       ogmdvd_disc_get_titles    (OGMDvdDisc         *disc);
-gboolean      ogmdvd_disc_copy          (OGMDvdDisc         *disc,
-                                         const gchar        *path,
-                                         GCancellable       *cancellable,
-                                         OGMDvdDiscCallback callback,
-                                         gpointer           user_data,
-                                         GError             **error);
+GQuark       ogmdvd_error_quark   (void);
+
+GType         ogmdvd_disc_get_type (void);
+OGMRipMedia * ogmdvd_disc_new      (const gchar *device,
+                                    GError      **error);
 
 G_END_DECLS
 

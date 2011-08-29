@@ -200,7 +200,7 @@ static gchar **
 ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gchar *log_file)
 {
   OGMRipX264 *x264;
-  OGMDvdTitle *title;
+  OGMRipTitle *title;
   GPtrArray *argv;
   GString *options;
 
@@ -351,8 +351,8 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   g_ptr_array_add (argv, g_strdup ("-x264encopts"));
   g_ptr_array_add (argv, g_string_free (options, FALSE));
 
-  title = ogmdvd_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video)));
-  vid = ogmdvd_title_get_nr (title);
+  title = ogmrip_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video)));
+  vid = ogmrip_title_get_nr (title);
 
   if (MPLAYER_CHECK_VERSION (1,0,0,1))
     g_ptr_array_add (argv, g_strdup_printf ("dvd://%d", vid + 1));

@@ -137,13 +137,13 @@ ogmrip_encoding_parse_video_codec (OGMRipEncoding *encoding, OGMRipXML *xml)
     type = ogmrip_plugin_get_video_codec_by_name (name);
     if (type != G_TYPE_NONE)
     {
-      OGMDvdTitle *title;
+      OGMRipTitle *title;
       OGMRipVideoCodec *codec;
       OGMRipVideoCodecClass *klass;
 
       title = ogmrip_encoding_get_title (encoding);
 
-      codec = g_object_new (type, "input", ogmdvd_title_get_video_stream (title), NULL);
+      codec = g_object_new (type, "input", ogmrip_title_get_video_stream (title), NULL);
       ogmrip_encoding_set_video_codec (encoding, OGMRIP_VIDEO_CODEC (codec));
       g_object_unref (codec);
 
@@ -168,12 +168,12 @@ ogmrip_encoding_parse_audio_codec (OGMRipEncoding *encoding, OGMRipXML *xml)
     type = ogmrip_plugin_get_audio_codec_by_name (name);
     if (type != G_TYPE_NONE)
     {
-      OGMDvdAudioStream *stream;
+      OGMRipAudioStream *stream;
       guint nr;
 
       nr = ogmrip_xml_get_uint (xml, "stream");
 
-      stream = ogmdvd_title_get_nth_audio_stream (ogmrip_encoding_get_title (encoding), nr);
+      stream = ogmrip_title_get_nth_audio_stream (ogmrip_encoding_get_title (encoding), nr);
       if (stream)
       {
         OGMRipAudioCodec *codec;
@@ -222,12 +222,12 @@ ogmrip_encoding_parse_subp_codec (OGMRipEncoding *encoding, OGMRipXML *xml)
     type = ogmrip_plugin_get_subp_codec_by_name (name);
     if (type != G_TYPE_NONE)
     {
-      OGMDvdSubpStream *stream;
+      OGMRipSubpStream *stream;
       guint nr;
 
       nr = ogmrip_xml_get_uint (xml, "stream");
 
-      stream = ogmdvd_title_get_nth_subp_stream (ogmrip_encoding_get_title (encoding), nr);
+      stream = ogmrip_title_get_nth_subp_stream (ogmrip_encoding_get_title (encoding), nr);
       if (stream)
       {
         OGMRipSubpCodec *codec;
@@ -268,7 +268,7 @@ ogmrip_encoding_parse_chapter (OGMRipEncoding *encoding, OGMRipXML *xml)
   OGMRipCodec *chapters;
   OGMRipChaptersClass *klass;
 
-  chapters = ogmrip_chapters_new (ogmdvd_title_get_video_stream (ogmrip_encoding_get_title (encoding)));
+  chapters = ogmrip_chapters_new (ogmrip_title_get_video_stream (ogmrip_encoding_get_title (encoding)));
   ogmrip_encoding_add_chapters (encoding, OGMRIP_CHAPTERS (chapters));
   g_object_unref (chapters);
 
@@ -499,6 +499,7 @@ static void
 ogmrip_encoding_dump_audio_codec (OGMRipXML *xml, OGMRipCodec *codec)
 {
   OGMRipAudioCodecClass *klass;
+  OGMRipStream *stream;
 
   if (!codec)
     return;
@@ -507,8 +508,10 @@ ogmrip_encoding_dump_audio_codec (OGMRipXML *xml, OGMRipCodec *codec)
 
   ogmrip_xml_set_string (xml, "type",
       ogmrip_plugin_get_audio_codec_name (G_OBJECT_TYPE (codec)));
+
+  stream = ogmrip_codec_get_input (codec);
   ogmrip_xml_set_uint (xml, "stream",
-      ogmdvd_stream_get_nr (ogmrip_codec_get_input (codec)));
+      ogmrip_audio_stream_get_nr (OGMRIP_AUDIO_STREAM (stream)));
 
   klass = OGMRIP_AUDIO_CODEC_GET_CLASS (codec);
 
@@ -529,6 +532,7 @@ static void
 ogmrip_encoding_dump_subp_codec (OGMRipXML *xml, OGMRipCodec *codec)
 {
   OGMRipSubpCodecClass *klass;
+  OGMRipStream *stream;
 
   if (!codec)
     return;
@@ -537,8 +541,10 @@ ogmrip_encoding_dump_subp_codec (OGMRipXML *xml, OGMRipCodec *codec)
 
   ogmrip_xml_set_string (xml, "type",
       ogmrip_plugin_get_subp_codec_name (G_OBJECT_TYPE (codec)));
+
+  stream = ogmrip_codec_get_input (codec);
   ogmrip_xml_set_uint (xml, "stream",
-      ogmdvd_stream_get_nr (ogmrip_codec_get_input (codec)));
+      ogmrip_subp_stream_get_nr (OGMRIP_SUBP_STREAM (stream)));
 
   klass = OGMRIP_SUBP_CODEC_GET_CLASS (codec);
 
@@ -618,7 +624,7 @@ ogmrip_encoding_dump (OGMRipEncoding *encoding, OGMRipXML *xml, GError **error)
 {
   OGMRipEncodingClass *klass;
   OGMRipProfile *profile;
-  OGMDvdTitle *title;
+  OGMRipTitle *title;
   GList *list, *link;
   const gchar *log;
   gchar *utf8;
@@ -631,14 +637,14 @@ ogmrip_encoding_dump (OGMRipEncoding *encoding, OGMRipXML *xml, GError **error)
 
   title = ogmrip_encoding_get_title (encoding);
 
-  utf8 = g_filename_to_utf8 (ogmdvd_disc_get_device (ogmdvd_title_get_disc (title)), -1, NULL, NULL, NULL);
-  ogmrip_xml_set_string (xml, "device", utf8);
+  utf8 = g_filename_to_utf8 (ogmrip_media_get_uri (ogmrip_title_get_media (title)), -1, NULL, NULL, NULL);
+  ogmrip_xml_set_string (xml, "uri", utf8);
   g_free (utf8);
 
   ogmrip_xml_set_string (xml, "id",
-      ogmdvd_disc_get_id (ogmdvd_title_get_disc (title)));
+      ogmrip_media_get_id (ogmrip_title_get_media (title)));
   ogmrip_xml_set_int (xml, "title",
-      ogmdvd_title_get_nr (title));
+      ogmrip_title_get_nr (title));
 
   profile = ogmrip_encoding_get_profile (encoding);
   if (profile)

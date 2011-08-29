@@ -20,7 +20,7 @@
 #define __OGMRIP_COPY_H__
 
 #include <ogmjob.h>
-#include <ogmdvd.h>
+#include <ogmrip-media.h>
 
 G_BEGIN_DECLS
 
@@ -47,7 +47,7 @@ struct _OGMRipCopyClass
 };
 
 GType         ogmrip_copy_get_type (void);
-OGMJobSpawn * ogmrip_copy_new      (OGMDvdDisc  *disc,
+OGMJobSpawn * ogmrip_copy_new      (OGMRipMedia *media,
                                     const gchar *path);
 
 G_END_DECLS

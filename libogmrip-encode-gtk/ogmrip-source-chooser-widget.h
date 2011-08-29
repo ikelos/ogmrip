@@ -50,9 +50,9 @@ GType       ogmrip_source_chooser_widget_get_type         (void);
 GtkWidget * ogmrip_source_chooser_widget_new              (void);
 GtkWidget * ogmrip_source_chooser_widget_new_with_dialog  (OGMRipFileChooserDialog   *dialog);
 void        ogmrip_source_chooser_widget_add_audio_stream (OGMRipSourceChooserWidget *chooser,
-                                                           OGMDvdAudioStream         *stream);
+                                                           OGMRipAudioStream         *stream);
 void        ogmrip_source_chooser_widget_add_subp_stream  (OGMRipSourceChooserWidget *chooser,
-                                                           OGMDvdSubpStream          *stream);
+                                                           OGMRipSubpStream          *stream);
 
 G_END_DECLS
 

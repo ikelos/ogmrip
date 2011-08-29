@@ -63,7 +63,7 @@ enum
 
 struct _OGMRipSourceChooserWidgetPriv
 {
-  OGMDvdTitle *title;
+  OGMRipTitle *title;
   GtkWidget *dialog;
   GtkWidget *options;
 
@@ -116,7 +116,7 @@ ogmrip_source_chooser_widget_clear (OGMRipSourceChooserWidget *chooser)
       if (type == OGMRIP_SOURCE_FILE)
         ogmrip_file_unref (OGMRIP_FILE (source)); 
       else if (type == OGMRIP_SOURCE_STREAM)
-        ogmdvd_stream_unref (OGMDVD_STREAM (source));
+        g_object_unref (source);
     }
     while (gtk_list_store_remove (chooser->priv->store, &iter));
   }
@@ -136,14 +136,14 @@ ogmrip_source_chooser_widget_clear (OGMRipSourceChooserWidget *chooser)
 }
 
 static void
-ogmrip_source_chooser_widget_set_title (OGMRipSourceChooserWidget *chooser, OGMDvdTitle *title)
+ogmrip_source_chooser_widget_set_title (OGMRipSourceChooserWidget *chooser, OGMRipTitle *title)
 {
   if (chooser->priv->title != title)
   {
     if (title)
-      ogmdvd_title_ref (title);
+      g_object_ref (title);
     if (chooser->priv->title)
-      ogmdvd_title_unref (chooser->priv->title);
+      g_object_unref (chooser->priv->title);
     chooser->priv->title = title;
 
     ogmrip_source_chooser_widget_clear (chooser);
@@ -380,7 +380,7 @@ ogmrip_source_chooser_widget_dispose (GObject *gobject)
 
   if (chooser->priv->title)
   {
-    ogmdvd_title_unref (chooser->priv->title);
+    g_object_unref (chooser->priv->title);
     chooser->priv->title = NULL;
   }
 
@@ -407,7 +407,7 @@ ogmrip_source_chooser_widget_get_property (GObject *gobject, guint property_id, 
   switch (property_id) 
   {
     case PROP_TITLE:
-      g_value_set_pointer (value, chooser->priv->title);
+      g_value_set_object (value, chooser->priv->title);
       break;
     case PROP_DIALOG:
       g_value_set_object (value, chooser->priv->dialog);
@@ -426,7 +426,7 @@ ogmrip_source_chooser_widget_set_property (GObject *gobject, guint property_id, 
   switch (property_id) 
   {
     case PROP_TITLE:
-      ogmrip_source_chooser_widget_set_title (chooser, g_value_get_pointer (value));
+      ogmrip_source_chooser_widget_set_title (chooser, g_value_get_object (value));
       break;
     case PROP_DIALOG:
       chooser->priv->dialog = g_value_get_object (value);
@@ -571,7 +571,7 @@ ogmrip_source_chooser_widget_new_with_dialog (OGMRipFileChooserDialog *dialog)
 }
 
 void
-ogmrip_source_chooser_widget_add_audio_stream (OGMRipSourceChooserWidget *chooser, OGMDvdAudioStream *stream)
+ogmrip_source_chooser_widget_add_audio_stream (OGMRipSourceChooserWidget *chooser, OGMRipAudioStream *stream)
 {
   GtkTreeIter iter;
 
@@ -588,14 +588,14 @@ ogmrip_source_chooser_widget_add_audio_stream (OGMRipSourceChooserWidget *choose
     gint aid, channels, format, lang, content, bitrate;
     gchar *str;
 
-    ogmdvd_stream_ref (OGMDVD_STREAM (stream));
+    g_object_ref (stream);
 
-    aid = ogmdvd_stream_get_nr (OGMDVD_STREAM (stream));
-    bitrate = ogmdvd_audio_stream_get_bitrate (stream);
-    channels = ogmdvd_audio_stream_get_channels (stream);
-    content = ogmdvd_audio_stream_get_content (stream);
-    format = ogmdvd_audio_stream_get_format (stream);
-    lang = ogmdvd_audio_stream_get_language (stream);
+    aid = ogmrip_audio_stream_get_nr (stream);
+    bitrate = ogmrip_audio_stream_get_bitrate (stream);
+    channels = ogmrip_audio_stream_get_channels (stream);
+    content = ogmrip_audio_stream_get_content (stream);
+    lang = ogmrip_audio_stream_get_language (stream);
+    format = ogmrip_stream_get_format (OGMRIP_STREAM (stream));
 
     if (content > 0)
     {
@@ -630,7 +630,7 @@ ogmrip_source_chooser_widget_add_audio_stream (OGMRipSourceChooserWidget *choose
 }
 
 void
-ogmrip_source_chooser_widget_add_subp_stream (OGMRipSourceChooserWidget *chooser, OGMDvdSubpStream *stream)
+ogmrip_source_chooser_widget_add_subp_stream (OGMRipSourceChooserWidget *chooser, OGMRipSubpStream *stream)
 {
   GtkTreeIter iter;
 
@@ -647,11 +647,11 @@ ogmrip_source_chooser_widget_add_subp_stream (OGMRipSourceChooserWidget *chooser
     gint sid, lang, content;
     gchar *str;
 
-    ogmdvd_stream_ref (OGMDVD_STREAM (stream));
+    g_object_ref (stream);
 
-    sid = ogmdvd_stream_get_nr (OGMDVD_STREAM (stream));
-    lang = ogmdvd_subp_stream_get_language (stream);
-    content = ogmdvd_subp_stream_get_content (stream);
+    sid = ogmrip_subp_stream_get_nr (stream);
+    lang = ogmrip_subp_stream_get_language (stream);
+    content = ogmrip_subp_stream_get_content (stream);
 
     if (content > 0)
       str = g_strdup_printf ("%s %02d: %s (%s)", _("Subtitle"), sid + 1, 

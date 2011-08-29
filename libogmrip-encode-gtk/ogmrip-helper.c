@@ -35,6 +35,8 @@
 #include <stdlib.h>
 #include <locale.h>
 
+#include <ogmdvd.h>
+
 extern const gchar *ogmdvd_languages[][3];
 extern const guint  ogmdvd_nlanguages;
 
@@ -370,25 +372,27 @@ ogmrip_drive_eject_idle (OGMDvdDrive *drive)
 }
 
 gboolean
-ogmrip_open_title (GtkWindow *parent, OGMDvdTitle *title)
+ogmrip_open_title (GtkWindow *parent, OGMRipTitle *title)
 {
   GError *error = NULL;
   OGMDvdMonitor *monitor;
   OGMDvdDrive *drive;
   GtkWidget *dialog;
+  const gchar *uri;
 
   g_return_val_if_fail (parent == NULL || GTK_IS_WINDOW (parent), FALSE);
-  g_return_val_if_fail (title != NULL, FALSE);
+  g_return_val_if_fail (OGMRIP_IS_TITLE (title), FALSE);
 
-  if (ogmdvd_title_is_open (title))
+  if (ogmrip_title_is_open (title))
     return TRUE;
 
-  if (ogmdvd_title_open (title, &error))
+  if (ogmrip_title_open (title, &error))
     return TRUE;
+
+  uri = ogmrip_media_get_uri (ogmrip_title_get_media (title));
 
   monitor = ogmdvd_monitor_get_default ();
-  drive = ogmdvd_monitor_get_drive (monitor,
-      ogmdvd_disc_get_device (ogmdvd_title_get_disc (title)));
+  drive = ogmdvd_monitor_get_drive (monitor, uri + 6);
   g_object_unref (monitor);
 
   if (!drive)
@@ -397,7 +401,7 @@ ogmrip_open_title (GtkWindow *parent, OGMDvdTitle *title)
   dialog = gtk_message_dialog_new_with_markup (parent,
       GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
       GTK_MESSAGE_INFO, GTK_BUTTONS_CANCEL, "<b>%s</b>\n\n%s",
-      ogmdvd_disc_get_label (ogmdvd_title_get_disc (title)),
+      ogmrip_media_get_label (ogmrip_title_get_media (title)),
       _("Please insert the DVD required to encode this title."));
 
   g_signal_connect (dialog, "delete-event",
@@ -408,7 +412,7 @@ ogmrip_open_title (GtkWindow *parent, OGMDvdTitle *title)
   do
   {
     g_clear_error (&error);
-    if (ogmdvd_title_open (title, &error))
+    if (ogmrip_title_open (title, &error))
       break;
 
     if (error && error->code != OGMDVD_DISC_ERROR_ID)
@@ -425,6 +429,6 @@ ogmrip_open_title (GtkWindow *parent, OGMDvdTitle *title)
   gtk_widget_destroy (dialog);
   g_clear_error (&error);
 
-  return ogmdvd_title_is_open (title);
+  return ogmrip_title_is_open (title);
 }
 

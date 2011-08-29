@@ -27,6 +27,8 @@ G_BEGIN_DECLS
 #define DVD_VIDEO_LB_LEN 2048
 #endif
 
+typedef struct _OGMDvdReader OGMDvdReader;
+
 OGMDvdReader * ogmdvd_reader_new          (OGMDvdTitle  *title,
                                            guint        start_chap,
                                            gint         end_chap,
@@ -37,7 +39,6 @@ OGMDvdReader * ogmdvd_reader_new_by_cells (OGMDvdTitle  *title,
                                            guint        angle);
 void           ogmdvd_reader_ref          (OGMDvdReader *reader);
 void           ogmdvd_reader_unref        (OGMDvdReader *reader);
-
 gint           ogmdvd_reader_get_block    (OGMDvdReader *reader,
                                            gsize        len,
                                            guchar       *buffer);
