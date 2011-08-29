@@ -24,6 +24,7 @@
 #include "ogmrip-dvd.h"
 #include "ogmrip-dvd-gtk.h"
 #include "ogmrip-encode-gtk.h"
+#include "ogmrip-media-gtk.h"
 #include "ogmrip-settings.h"
 
 #include "ogmrip-options-dialog.h"
@@ -276,7 +277,7 @@ ogmrip_main_load (OGMRipData *data, const gchar *path)
       g_object_unref (data->media);
     data->media = disc;
 
-    ogmdvd_title_chooser_set_disc (OGMDVD_TITLE_CHOOSER (data->title_chooser), disc);
+    ogmrip_title_chooser_set_media (OGMRIP_TITLE_CHOOSER (data->title_chooser), disc);
 
     nvid = ogmrip_media_get_n_titles (disc);
     if (nvid > 0)
@@ -667,7 +668,7 @@ ogmrip_main_export_simple_chapters (OGMRipData *data, const gchar *filename)
     gchar *label;
     guint i;
 
-    title = ogmdvd_title_chooser_get_active (OGMDVD_TITLE_CHOOSER (data->title_chooser));
+    title = ogmrip_title_chooser_get_active (OGMRIP_TITLE_CHOOSER (data->title_chooser));
 
     chapters = ogmrip_chapters_new (ogmrip_title_get_video_stream (title));
     ogmrip_codec_set_chapters (OGMRIP_CODEC (chapters), start_chap, end_chap);
@@ -701,7 +702,7 @@ ogmrip_main_add_audio_chooser (OGMRipData *data)
   GtkWidget *chooser;
   OGMRipTitle *title;
 
-  title = ogmdvd_title_chooser_get_active (OGMDVD_TITLE_CHOOSER (data->title_chooser));
+  title = ogmrip_title_chooser_get_active (OGMRIP_TITLE_CHOOSER (data->title_chooser));
 
   chooser = ogmrip_audio_chooser_widget_new ();
   ogmrip_source_chooser_set_title (OGMRIP_SOURCE_CHOOSER (chooser), title);
@@ -739,7 +740,7 @@ ogmrip_main_add_subp_chooser (OGMRipData *data)
   GtkWidget *chooser;
   OGMRipTitle *title;
 
-  title = ogmdvd_title_chooser_get_active (OGMDVD_TITLE_CHOOSER (data->title_chooser));
+  title = ogmrip_title_chooser_get_active (OGMRIP_TITLE_CHOOSER (data->title_chooser));
 
   chooser = ogmrip_subp_chooser_widget_new ();
   ogmrip_source_chooser_set_title (OGMRIP_SOURCE_CHOOSER (chooser), title);
@@ -1125,7 +1126,7 @@ ogmrip_main_eject_activated (OGMRipData *data, GtkWidget *dialog)
         g_object_unref (data->media);
         data->media = NULL;
 
-        ogmdvd_title_chooser_set_disc (OGMDVD_TITLE_CHOOSER (data->title_chooser), NULL);
+        ogmrip_title_chooser_set_media (OGMRIP_TITLE_CHOOSER (data->title_chooser), NULL);
         gtk_entry_set_text (GTK_ENTRY (data->title_entry), "");
       }
       g_free (device);
@@ -1184,7 +1185,7 @@ ogmrip_main_extract_activated (OGMRipData *data)
 
   GList *list, *link;
 
-  title = ogmdvd_title_chooser_get_active (OGMDVD_TITLE_CHOOSER (data->title_chooser));
+  title = ogmrip_title_chooser_get_active (OGMRIP_TITLE_CHOOSER (data->title_chooser));
 
   encoding = ogmrip_encoding_new (title);
   ogmrip_encoding_set_relative (encoding,
@@ -1354,7 +1355,7 @@ ogmrip_main_play_activated (OGMRipData *data, GtkWidget *button)
     return;
   }
 
-  title = ogmdvd_title_chooser_get_active (OGMDVD_TITLE_CHOOSER (data->title_chooser));
+  title = ogmrip_title_chooser_get_active (OGMRIP_TITLE_CHOOSER (data->title_chooser));
   ogmrip_player_set_title (data->player, title);
 
   ogmrip_chapter_list_get_selected (OGMRIP_CHAPTER_LIST (data->chapter_list), &start_chap, &end_chap);
@@ -1549,7 +1550,7 @@ ogmrip_main_title_chooser_changed (OGMRipData *data)
   OGMRipTitle *title;
   gint angles;
 
-  title = ogmdvd_title_chooser_get_active (OGMDVD_TITLE_CHOOSER (data->title_chooser));
+  title = ogmrip_title_chooser_get_active (OGMRIP_TITLE_CHOOSER (data->title_chooser));
   gtk_widget_set_sensitive (data->title_chooser, title != NULL);
 
   gtk_container_clear (GTK_CONTAINER (data->audio_list));
@@ -1585,7 +1586,7 @@ ogmrip_main_chapter_selection_changed (OGMRipData *data)
     OGMRipTitle *title;
     OGMRipTime time_;
 
-    title = ogmdvd_title_chooser_get_active (OGMDVD_TITLE_CHOOSER (data->title_chooser));
+    title = ogmrip_title_chooser_get_active (OGMRIP_TITLE_CHOOSER (data->title_chooser));
     if (ogmrip_title_get_chapters_length (title, start_chap, end_chap, &time_) > 0)
     {
       gchar *str;
@@ -1820,7 +1821,7 @@ ogmrip_main_new (void)
 
   widget = gtk_builder_get_widget (builder, "hbox");
 
-  data->title_chooser = ogmdvd_title_chooser_widget_new ();
+  data->title_chooser = ogmrip_title_chooser_widget_new ();
   gtk_box_pack_start (GTK_BOX (widget), data->title_chooser, TRUE, TRUE, 0);
   gtk_widget_show (data->title_chooser);
 

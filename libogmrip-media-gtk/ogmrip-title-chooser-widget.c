@@ -1,4 +1,4 @@
-/* OGMDvd - A wrapper library around libdvdread
+/* OGMRipMedia - A media library for OGMRip
  * Copyright (C) 2004-2010 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -21,18 +21,18 @@
 #endif
 
 /**
- * SECTION:ogmdvd-title-chooser-widget
- * @title: OGMDvdTitleChooserWidget
- * @include: ogmdvd-title-chooser-widget.h
+ * SECTION:ogmrip-title-chooser-widget
+ * @title: OGMRipTitleChooserWidget
+ * @include: ogmrip-title-chooser-widget.h
  * @short_description: DVD title chooser widget that can be embedded in other widgets
  */
 
-#include "ogmdvd-title-chooser-widget.h"
+#include "ogmrip-title-chooser-widget.h"
 
 #include <glib/gi18n-lib.h>
 
-#define OGMDVD_TITLE_CHOOSER_WIDGET_GET_PRIVATE(o) \
-    (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMDVD_TYPE_TITLE_CHOOSER_WIDGET, OGMDvdTitleChooserWidgetPriv))
+#define OGMRIP_TITLE_CHOOSER_WIDGET_GET_PRIVATE(o) \
+    (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_TITLE_CHOOSER_WIDGET, OGMRipTitleChooserWidgetPriv))
 
 enum
 {
@@ -47,25 +47,25 @@ enum
   NUM_COLUMNS
 };
 
-struct _OGMDvdTitleChooserWidgetPriv
+struct _OGMRipTitleChooserWidgetPriv
 {
   OGMRipMedia *media;
 };
 
-static void ogmdvd_title_chooser_init                (OGMDvdTitleChooserInterface *iface);
-static void ogmdvd_title_chooser_widget_dispose      (GObject                     *object);
-static void ogmdvd_title_chooser_widget_get_property (GObject                     *gobject,
+static void ogmrip_title_chooser_init                (OGMRipTitleChooserInterface *iface);
+static void ogmrip_title_chooser_widget_dispose      (GObject                     *object);
+static void ogmrip_title_chooser_widget_get_property (GObject                     *gobject,
                                                       guint                       property_id,
                                                       GValue                      *value,
                                                       GParamSpec                  *pspec);
-static void ogmdvd_title_chooser_widget_set_property (GObject                     *gobject,
+static void ogmrip_title_chooser_widget_set_property (GObject                     *gobject,
                                                       guint                       property_id,
                                                       const GValue                *value,
                                                       GParamSpec                  *pspec);
 
 
 static void
-ogmdvd_title_chooser_widget_set_disc (OGMDvdTitleChooserWidget *chooser, OGMRipMedia *media)
+ogmrip_title_chooser_widget_set_disc (OGMRipTitleChooserWidget *chooser, OGMRipMedia *media)
 {
   GtkTreeModel *model;
   GtkTreeIter iter;
@@ -131,9 +131,9 @@ ogmdvd_title_chooser_widget_set_disc (OGMDvdTitleChooserWidget *chooser, OGMRipM
 }
 
 static OGMRipTitle *
-ogmdvd_title_chooser_widget_get_active (OGMDvdTitleChooser *chooser)
+ogmrip_title_chooser_widget_get_active (OGMRipTitleChooser *chooser)
 {
-  OGMDvdTitleChooserWidget *widget = OGMDVD_TITLE_CHOOSER_WIDGET (chooser);
+  OGMRipTitleChooserWidget *widget = OGMRIP_TITLE_CHOOSER_WIDGET (chooser);
   GtkTreeModel *model;
   GtkTreeIter iter;
   gint nr;
@@ -151,9 +151,9 @@ ogmdvd_title_chooser_widget_get_active (OGMDvdTitleChooser *chooser)
 }
 
 static void
-ogmdvd_title_chooser_widget_set_active (OGMDvdTitleChooser *chooser, OGMRipTitle *title)
+ogmrip_title_chooser_widget_set_active (OGMRipTitleChooser *chooser, OGMRipTitle *title)
 {
-  OGMDvdTitleChooserWidget *widget = OGMDVD_TITLE_CHOOSER_WIDGET (chooser);
+  OGMRipTitleChooserWidget *widget = OGMRIP_TITLE_CHOOSER_WIDGET (chooser);
   GtkTreeModel *model;
   GtkTreeIter iter;
   gint nr1, nr2;
@@ -174,38 +174,38 @@ ogmdvd_title_chooser_widget_set_active (OGMDvdTitleChooser *chooser, OGMRipTitle
   }
 }
 
-G_DEFINE_TYPE_WITH_CODE (OGMDvdTitleChooserWidget, ogmdvd_title_chooser_widget, GTK_TYPE_COMBO_BOX,
-    G_IMPLEMENT_INTERFACE (OGMDVD_TYPE_TITLE_CHOOSER, ogmdvd_title_chooser_init))
+G_DEFINE_TYPE_WITH_CODE (OGMRipTitleChooserWidget, ogmrip_title_chooser_widget, GTK_TYPE_COMBO_BOX,
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_TITLE_CHOOSER, ogmrip_title_chooser_init))
 
 static void
-ogmdvd_title_chooser_widget_class_init (OGMDvdTitleChooserWidgetClass *klass)
+ogmrip_title_chooser_widget_class_init (OGMRipTitleChooserWidgetClass *klass)
 {
   GObjectClass *object_class;
 
   object_class = (GObjectClass *) klass;
-  object_class->dispose = ogmdvd_title_chooser_widget_dispose;
-  object_class->get_property = ogmdvd_title_chooser_widget_get_property;
-  object_class->set_property = ogmdvd_title_chooser_widget_set_property;
+  object_class->dispose = ogmrip_title_chooser_widget_dispose;
+  object_class->get_property = ogmrip_title_chooser_widget_get_property;
+  object_class->set_property = ogmrip_title_chooser_widget_set_property;
 
   g_object_class_override_property (object_class, PROP_MEDIA, "media");
 
-  g_type_class_add_private (klass, sizeof (OGMDvdTitleChooserWidgetPriv));
+  g_type_class_add_private (klass, sizeof (OGMRipTitleChooserWidgetPriv));
 }
 
 static void
-ogmdvd_title_chooser_init (OGMDvdTitleChooserInterface *iface)
+ogmrip_title_chooser_init (OGMRipTitleChooserInterface *iface)
 {
-  iface->get_active = ogmdvd_title_chooser_widget_get_active;
-  iface->set_active = ogmdvd_title_chooser_widget_set_active;
+  iface->get_active = ogmrip_title_chooser_widget_get_active;
+  iface->set_active = ogmrip_title_chooser_widget_set_active;
 }
 
 static void
-ogmdvd_title_chooser_widget_init (OGMDvdTitleChooserWidget *chooser)
+ogmrip_title_chooser_widget_init (OGMRipTitleChooserWidget *chooser)
 {
   GtkCellRenderer *cell;
   GtkListStore *store;
 
-  chooser->priv = OGMDVD_TITLE_CHOOSER_WIDGET_GET_PRIVATE (chooser);
+  chooser->priv = OGMRIP_TITLE_CHOOSER_WIDGET_GET_PRIVATE (chooser);
 
   store = gtk_list_store_new (NUM_COLUMNS, G_TYPE_STRING, G_TYPE_INT);
   gtk_combo_box_set_model (GTK_COMBO_BOX (chooser), GTK_TREE_MODEL (store));
@@ -217,11 +217,11 @@ ogmdvd_title_chooser_widget_init (OGMDvdTitleChooserWidget *chooser)
 }
 
 static void
-ogmdvd_title_chooser_widget_dispose (GObject *object)
+ogmrip_title_chooser_widget_dispose (GObject *object)
 {
-  OGMDvdTitleChooserWidget *chooser;
+  OGMRipTitleChooserWidget *chooser;
 
-  chooser = OGMDVD_TITLE_CHOOSER_WIDGET (object);
+  chooser = OGMRIP_TITLE_CHOOSER_WIDGET (object);
 
   if (chooser->priv->media)
   {
@@ -229,13 +229,13 @@ ogmdvd_title_chooser_widget_dispose (GObject *object)
     chooser->priv->media = NULL;
   }
 
-  (*G_OBJECT_CLASS (ogmdvd_title_chooser_widget_parent_class)->dispose) (object);
+  (*G_OBJECT_CLASS (ogmrip_title_chooser_widget_parent_class)->dispose) (object);
 }
 
 static void
-ogmdvd_title_chooser_widget_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
+ogmrip_title_chooser_widget_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
 {
-  OGMDvdTitleChooserWidget *chooser = OGMDVD_TITLE_CHOOSER_WIDGET (gobject);
+  OGMRipTitleChooserWidget *chooser = OGMRIP_TITLE_CHOOSER_WIDGET (gobject);
 
   switch (property_id) 
   {
@@ -249,14 +249,14 @@ ogmdvd_title_chooser_widget_get_property (GObject *gobject, guint property_id, G
 }
 
 static void
-ogmdvd_title_chooser_widget_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
+ogmrip_title_chooser_widget_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
 {
-  OGMDvdTitleChooserWidget *chooser = OGMDVD_TITLE_CHOOSER_WIDGET (gobject);
+  OGMRipTitleChooserWidget *chooser = OGMRIP_TITLE_CHOOSER_WIDGET (gobject);
 
   switch (property_id) 
   {
     case PROP_MEDIA:
-      ogmdvd_title_chooser_widget_set_disc (chooser, g_value_get_object (value));
+      ogmrip_title_chooser_widget_set_disc (chooser, g_value_get_object (value));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -265,15 +265,15 @@ ogmdvd_title_chooser_widget_set_property (GObject *gobject, guint property_id, c
 }
 
 /**
- * ogmdvd_title_chooser_widget_new:
+ * ogmrip_title_chooser_widget_new:
  *
- * Creates a new #OGMDvdTitleChooserWidget.
+ * Creates a new #OGMRipTitleChooserWidget.
  *
- * Returns: The new #OGMDvdTitleChooserWidget
+ * Returns: The new #OGMRipTitleChooserWidget
  */
 GtkWidget *
-ogmdvd_title_chooser_widget_new (void)
+ogmrip_title_chooser_widget_new (void)
 {
-  return g_object_new (OGMDVD_TYPE_TITLE_CHOOSER_WIDGET, NULL);
+  return g_object_new (OGMRIP_TYPE_TITLE_CHOOSER_WIDGET, NULL);
 }
 

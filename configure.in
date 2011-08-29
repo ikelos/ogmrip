@@ -443,6 +443,7 @@ dvdcpy/Makefile
 theoraenc/Makefile
 libogmrip-job/Makefile
 libogmrip-media/Makefile
+libogmrip-media-gtk/Makefile
 libogmrip-dvd/Makefile
 libogmrip-dvd-gtk/Makefile
 libogmrip-encode/Makefile
@@ -451,6 +452,7 @@ libogmrip-encode-gtk/Makefile
 plugins/Makefile
 data/Makefile
 data/ogmrip-media.pc
+data/ogmrip-media-gtk.pc
 data/ogmrip-dvd.pc
 data/ogmrip-dvd-gtk.pc
 data/ogmrip-job.pc

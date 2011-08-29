@@ -10,9 +10,7 @@ libogmrip_dvd_gtk_la_SOURCES =    \
   ogmdvd-drive-chooser.c          \
   ogmdvd-drive-chooser-widget.c   \
   ogmdvd-drive-chooser-dialog.c   \
-  ogmdvd-marshal.c                \
-  ogmdvd-title-chooser.c          \
-  ogmdvd-title-chooser-widget.c
+  ogmdvd-marshal.c
 
 libogmrip_dvd_gtk_ladir = \
   $(includedir)/ogmrip-dvd
@@ -23,8 +21,6 @@ libogmrip_dvd_gtk_la_HEADERS =    \
   ogmdvd-drive-chooser-widget.h   \
   ogmdvd-drive-chooser-dialog.h   \
   ogmdvd-marshal.h                \
-  ogmdvd-title-chooser.h          \
-  ogmdvd-title-chooser-widget.h   \
   ogmrip-dvd-gtk.h
 
 libogmrip_dvd_gtk_la_LDFLAGS = \

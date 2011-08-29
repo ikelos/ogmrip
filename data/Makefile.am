@@ -21,6 +21,7 @@ gsettings_SCHEMAS = org.ogmrip.preferences.gschema.xml \
 if HAVE_GTK_SUPPORT
 
 pkgconfig_DATA += ogmrip-encode-gtk.pc \
+                  ogmrip-media-gtk.pc  \
                   ogmrip-dvd-gtk.pc
 
 uidir = $(datadir)/ogmrip/ui
