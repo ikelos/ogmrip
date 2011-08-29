@@ -19,7 +19,7 @@
 #ifndef __OGMRIP_LAVC_MPEG4_H__
 #define __OGMRIP_LAVC_MPEG4_H__
 
-#include <ogmrip.h>
+#include <ogmrip-encode.h>
 
 G_BEGIN_DECLS
 

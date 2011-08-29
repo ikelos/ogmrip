@@ -33,7 +33,7 @@
 #include "ogmdvd-subp.h"
 #include "ogmdvd-title.h"
 
-#include <ogmjob.h>
+#include <ogmrip-job.h>
 
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>

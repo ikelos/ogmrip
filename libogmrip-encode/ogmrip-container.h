@@ -19,8 +19,7 @@
 #ifndef __OGMRIP_CONTAINER_H__
 #define __OGMRIP_CONTAINER_H__
 
-#include <ogmjob.h>
-
+#include <ogmrip-job.h>
 #include <ogmrip-profile.h>
 #include <ogmrip-chapters.h>
 #include <ogmrip-video-codec.h>

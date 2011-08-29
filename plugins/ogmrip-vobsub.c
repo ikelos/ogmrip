@@ -20,8 +20,8 @@
 #include "config.h"
 #endif
 
-#include <ogmjob.h>
-#include <ogmrip.h>
+#include <ogmrip-job.h>
+#include <ogmrip-encode.h>
 #include <ogmrip-mplayer.h>
 
 #include <errno.h>

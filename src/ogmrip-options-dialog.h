@@ -19,7 +19,7 @@
 #ifndef __OGMRIP_OPTIONS_DIALOG_H__
 #define __OGMRIP_OPTIONS_DIALOG_H__
 
-#include <ogmrip-gtk.h>
+#include <ogmrip-encode-gtk.h>
 
 G_BEGIN_DECLS
 

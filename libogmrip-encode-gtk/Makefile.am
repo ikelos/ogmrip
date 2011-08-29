@@ -53,7 +53,7 @@ libogmrip_encode_gtk_la_HEADERS =    \
   ogmrip-subp-file-chooser-dialog.h  \
   ogmrip-subp-options.h              \
   ogmrip-subp-options-dialog.h       \
-  ogmrip-gtk.h
+  ogmrip-encode-gtk.h
 
 libogmrip_encode_gtk_la_LDFLAGS = \
   -version-info $(OGMRIP_GTK_LT_VERSION)

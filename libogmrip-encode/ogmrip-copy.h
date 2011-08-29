@@ -19,7 +19,7 @@
 #ifndef __OGMRIP_COPY_H__
 #define __OGMRIP_COPY_H__
 
-#include <ogmjob.h>
+#include <ogmrip-job.h>
 #include <ogmrip-media.h>
 
 G_BEGIN_DECLS

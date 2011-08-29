@@ -19,7 +19,7 @@
 #ifndef __OGMRIP_OPTIONS_PLUGIN_H__
 #define __OGMRIP_OPTIONS_PLUGIN_H__
 
-#include <ogmrip.h>
+#include <ogmrip-encode.h>
 
 #include <gmodule.h>
 #include <gtk/gtk.h>

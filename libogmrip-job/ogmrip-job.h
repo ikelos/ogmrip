@@ -16,8 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef __OGMJOB_H__
-#define __OGMJOB_H__
+#ifndef __OGMRIP_JOB_H__
+#define __OGMRIP_JOB_H__
 
 #include <ogmjob-bin.h>
 #include <ogmjob-container.h>
@@ -28,5 +28,5 @@
 #include <ogmjob-queue.h>
 #include <ogmjob-spawn.h>
 
-#endif /* __OGMJOB_H__ */
+#endif /* __OGMRIP_JOB_H__ */
 

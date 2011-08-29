@@ -25,7 +25,7 @@ libogmrip_dvd_gtk_la_HEADERS =    \
   ogmdvd-marshal.h                \
   ogmdvd-title-chooser.h          \
   ogmdvd-title-chooser-widget.h   \
-  ogmdvd-gtk.h
+  ogmrip-dvd-gtk.h
 
 libogmrip_dvd_gtk_la_LDFLAGS = \
   -version-info $(OGMDVD_GTK_LT_VERSION)

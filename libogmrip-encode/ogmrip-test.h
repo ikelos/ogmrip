@@ -19,7 +19,7 @@
 #ifndef __OGMRIP_TEST_H__
 #define __OGMRIP_TEST_H__
 
-#include <ogmjob.h>
+#include <ogmrip-job.h>
 #include <ogmrip-encoding.h>
 
 G_BEGIN_DECLS

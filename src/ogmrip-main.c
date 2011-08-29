@@ -20,10 +20,10 @@
 #include "config.h"
 #endif
 
-#include "ogmdvd.h"
-#include "ogmjob.h"
-#include "ogmdvd-gtk.h"
-#include "ogmrip-gtk.h"
+#include "ogmrip-job.h"
+#include "ogmrip-dvd.h"
+#include "ogmrip-dvd-gtk.h"
+#include "ogmrip-encode-gtk.h"
 #include "ogmrip-settings.h"
 
 #include "ogmrip-options-dialog.h"

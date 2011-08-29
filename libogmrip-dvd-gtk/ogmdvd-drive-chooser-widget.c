@@ -29,7 +29,8 @@
 
 #include "ogmdvd-drive-chooser-widget.h"
 
-#include <ogmdvd.h>
+#include <ogmrip-dvd.h>
+
 #include <glib/gi18n-lib.h>
 
 #define OGMDVD_DRIVE_CHOOSER_WIDGET_GET_PRIVATE(o) \

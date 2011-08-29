@@ -63,7 +63,7 @@ libogmrip_encode_la_HEADERS = \
   ogmrip-version.h          \
   ogmrip-video-codec.h      \
   ogmrip-xml.h              \
-  ogmrip.h
+  ogmrip-encode.h
 
 libogmrip_encode_la_LDFLAGS = \
   -version-info $(OGMRIP_LT_VERSION)

@@ -24,7 +24,7 @@ libogmrip_dvd_la_HEADERS = \
   ogmdvd-reader.h  \
   ogmdvd-subp.h    \
   ogmdvd-title.h   \
-  ogmdvd.h
+  ogmrip-dvd.h
 
 libogmrip_dvd_la_LDFLAGS = \
   -version-info $(OGMDVD_LT_VERSION)

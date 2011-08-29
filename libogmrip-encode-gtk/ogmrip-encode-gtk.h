@@ -1,4 +1,4 @@
-/* OGMDvd - A wrapper library around libdvdread
+/* OGMDvd - A wrapper library around libripread
  * Copyright (C) 2004-2010 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -16,17 +16,25 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef __OGMDVD_H__
-#define __OGMDVD_H__
+#ifndef __OGMRIP_ENCODE_GTK_H__
+#define __OGMRIP_ENCODE_GTK_H__
 
-#include <ogmdvd-audio.h>
-#include <ogmdvd-disc.h>
-#include <ogmdvd-drive.h>
-#include <ogmdvd-monitor.h>
-#include <ogmdvd-parser.h>
-#include <ogmdvd-reader.h>
-#include <ogmdvd-subp.h>
-#include <ogmdvd-title.h>
+#include <ogmrip-encode.h>
+#include <ogmrip-audio-chooser-widget.h>
+#include <ogmrip-audio-file-chooser-dialog.h>
+#include <ogmrip-chapter-list.h>
+#include <ogmrip-encoding-manager-dialog.h>
+#include <ogmrip-error-dialog.h>
+#include <ogmrip-helper.h>
+#include <ogmrip-language-chooser-widget.h>
+#include <ogmrip-list-item.h>
+#include <ogmrip-options-plugin.h>
+#include <ogmrip-profile-editor-dialog.h>
+#include <ogmrip-profile-manager-dialog.h>
+#include <ogmrip-profile-store.h>
+#include <ogmrip-progress-dialog.h>
+#include <ogmrip-subp-chooser-widget.h>
+#include <ogmrip-subp-file-chooser-dialog.h>
 
-#endif /* __OGMDVD_H__ */
+#endif /* __OGMRIP_ENCODE_GTK_H__ */
 

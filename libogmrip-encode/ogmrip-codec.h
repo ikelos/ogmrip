@@ -19,7 +19,7 @@
 #ifndef __OGMRIP_CODEC_H__
 #define __OGMRIP_CODEC_H__
 
-#include <ogmjob.h>
+#include <ogmrip-job.h>
 #include <ogmrip-media.h>
 #include <ogmrip-profile.h>
 

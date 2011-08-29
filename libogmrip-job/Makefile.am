@@ -29,7 +29,7 @@ libogmrip_job_la_HEADERS =  \
   ogmjob-pipeline.h    \
   ogmjob-queue.h       \
   ogmjob-spawn.h       \
-  ogmjob.h
+  ogmrip-job.h
 
 libogmrip_job_la_LDFLAGS = \
   -version-info $(OGMJOB_LT_VERSION)

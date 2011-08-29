@@ -1,4 +1,4 @@
-/* OGMRip - A library for DVD ripping and encoding
+/* OGMDvd - A wrapper library around libdvdread
  * Copyright (C) 2004-2010 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -16,29 +16,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef __OGMRIP_H__
-#define __OGMRIP_H__
+#ifndef __OGMRIP_DVD_GTK_H__
+#define __OGMRIP_DVD_GTK_H__
 
-#include <ogmrip-analyze.h>
-#include <ogmrip-audio-codec.h>
-#include <ogmrip-chapters.h>
-#include <ogmrip-container.h>
-#include <ogmrip-copy.h>
-#include <ogmrip-encoding.h>
-#include <ogmrip-encoding-manager.h>
-#include <ogmrip-enums.h>
-#include <ogmrip-file.h>
-#include <ogmrip-fs.h>
-#include <ogmrip-hardsub.h>
-#include <ogmrip-marshal.h>
-#include <ogmrip-player.h>
-#include <ogmrip-plugin.h>
-#include <ogmrip-profile-engine.h>
-#include <ogmrip-profile-keys.h>
-#include <ogmrip-subp-codec.h>
-#include <ogmrip-test.h>
-#include <ogmrip-version.h>
-#include <ogmrip-video-codec.h>
-#include <ogmrip-xml.h>
+#include <ogmdvd-chapter-list.h>
+#include <ogmdvd-drive-chooser-widget.h>
+#include <ogmdvd-drive-chooser-dialog.h>
+#include <ogmdvd-title-chooser-widget.h>
 
-#endif /* __OGMRIP_H__ */
+#endif /* __OGMRIP_DVD_GTK_H__ */
+

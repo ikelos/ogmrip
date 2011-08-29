@@ -19,7 +19,7 @@
 #ifndef __OGMRIP_CHAPTER_LIST_H__
 #define __OGMRIP_CHAPTER_LIST_H__
 
-#include <ogmdvd-gtk.h>
+#include <ogmrip-dvd-gtk.h>
 
 G_BEGIN_DECLS
 

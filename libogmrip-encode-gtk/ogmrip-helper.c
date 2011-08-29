@@ -35,7 +35,7 @@
 #include <stdlib.h>
 #include <locale.h>
 
-#include <ogmdvd.h>
+#include <ogmrip-dvd.h>
 
 extern const gchar *ogmdvd_languages[][3];
 extern const guint  ogmdvd_nlanguages;

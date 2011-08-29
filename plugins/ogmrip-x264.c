@@ -22,7 +22,7 @@
 
 #include "ogmrip-x264.h"
 
-#include <ogmjob.h>
+#include <ogmrip-job.h>
 #include <ogmrip-mplayer.h>
 
 #include <math.h>

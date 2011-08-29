@@ -27,7 +27,7 @@
 
 #include "ogmrip-helper.h"
 
-#include <ogmrip.h>
+#include <ogmrip-encode.h>
 
 #include <glib/gi18n-lib.h>
 

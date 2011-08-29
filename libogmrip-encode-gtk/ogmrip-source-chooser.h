@@ -20,7 +20,7 @@
 #define __OGMRIP_SOURCE_CHOOSER_H__
 
 #include <ogmrip-media.h>
-#include <ogmrip.h>
+#include <ogmrip-encode.h>
 
 #include <gtk/gtk.h>
 

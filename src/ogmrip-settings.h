@@ -19,7 +19,7 @@
 #ifndef __OGMRIP_GCONF_H__
 #define __OGMRIP_GCONF_H__
 
-#include <ogmrip.h>
+#include <ogmrip-encode.h>
 
 G_BEGIN_DECLS
 

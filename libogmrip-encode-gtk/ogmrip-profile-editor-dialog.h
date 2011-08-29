@@ -19,7 +19,7 @@
 #ifndef __OGMRIP_PROFILE_EDITOR_DIALOG_H__
 #define __OGMRIP_PROFILE_EDITOR_DIALOG_H__
 
-#include <ogmrip.h>
+#include <ogmrip-encode.h>
 #include <gtk/gtk.h>
 
 G_BEGIN_DECLS

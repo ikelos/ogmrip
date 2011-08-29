@@ -23,8 +23,7 @@
 #include "config.h"
 #endif
 
-#include <ogmjob.h>
-
+#include <ogmrip-job.h>
 #include <ogmrip-container.h>
 #include <ogmrip-video-codec.h>
 #include <ogmrip-audio-codec.h>

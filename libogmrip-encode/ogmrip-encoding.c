@@ -38,7 +38,7 @@
 #include "ogmrip-test.h"
 #include "ogmrip-fs.h"
 
-#include <ogmdvd.h>
+#include <ogmrip-dvd.h>
 
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
