@@ -24,14 +24,15 @@ OGMRip
 Requirements
 ------------
 
-    glib        >= 2.28.0: http://www.gtk.org
-    dvdread     >= 0.9.4:  http://www.dtek.chalmers.se/groups/dvd
-    mplayer     >= 0.92:   http://www.mplayerhq.hu
-    mencoder    >= 0.92:   http://www.mplayerhq.hu
-    intltool    >= 0.35:   http://www.gnome.org
-    pkgconfig   >= 0.12:   http://www.freedesktop.org/software/pkgconfig
-    libxml2     >= 2.0:    http://www.xmlsoft.org
-    enca        >= 1.9:    http://trific.ath.cx/software/enca
+    glib         >= 2.28.0: http://www.gtk.org
+    dvdread      >= 0.9.4:  http://www.dtek.chalmers.se/groups/dvd
+    mplayer      >= 0.92:   http://www.mplayerhq.hu
+    mencoder     >= 0.92:   http://www.mplayerhq.hu
+    intltool     >= 0.35:   http://www.gnome.org
+    pkgconfig    >= 0.12:   http://www.freedesktop.org/software/pkgconfig
+    libxml2      >= 2.0:    http://www.xmlsoft.org
+    libmediainfo >= 0.7:    http://mediainfo.sourceforge.net
+    enca         >= 1.9:    http://trific.ath.cx/software/enca
 
 Optional
 --------
