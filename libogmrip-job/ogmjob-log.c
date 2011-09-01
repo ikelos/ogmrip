@@ -27,10 +27,6 @@
 
 #include <string.h>
 
-/*
- * TODO encoding ?
- */
-
 static GIOChannel *channel     = NULL;
 static gboolean   print_stdout = FALSE;
 static gboolean   print_stderr = FALSE;
