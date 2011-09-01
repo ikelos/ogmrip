@@ -369,7 +369,8 @@ ogmrip_codec_get_length (OGMRipCodec *codec, OGMRipTime *time_)
 
   if (codec->priv->play_length > 0.0)
   {
-    ogmrip_msec_to_time (codec->priv->play_length * 1000, time_);
+    if (time_)
+      ogmrip_msec_to_time (codec->priv->play_length * 1000, time_);
 
     return codec->priv->play_length;
   }
