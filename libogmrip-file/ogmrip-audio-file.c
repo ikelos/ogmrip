@@ -49,6 +49,9 @@ ogmrip_media_info_get_audio_format (OGMRipMediaInfo *info)
     return OGMRIP_FORMAT_UNDEFINED;
   }
 
+  if (g_str_equal (str, "FLAC"))
+    return OGMRIP_FORMAT_FLAC;
+
   return OGMRIP_FORMAT_UNDEFINED;
 }
 
