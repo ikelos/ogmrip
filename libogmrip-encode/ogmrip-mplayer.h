@@ -38,7 +38,7 @@ G_BEGIN_DECLS
 GPtrArray * ogmrip_mplayer_wav_command        (OGMRipAudioCodec *audio,
                                                gboolean         header,
                                                const gchar      *output);
-gdouble  ogmrip_mplayer_wav_watch             (OGMJobExec       *exec,
+gdouble     ogmrip_mplayer_wav_watch          (OGMJobExec       *exec,
                                                const gchar      *buffer,
                                                OGMRipAudioCodec *audio);
 
