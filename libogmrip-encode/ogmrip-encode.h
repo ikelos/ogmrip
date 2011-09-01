@@ -27,7 +27,6 @@
 #include <ogmrip-encoding.h>
 #include <ogmrip-encoding-manager.h>
 #include <ogmrip-enums.h>
-#include <ogmrip-file.h>
 #include <ogmrip-fs.h>
 #include <ogmrip-hardsub.h>
 #include <ogmrip-marshal.h>
