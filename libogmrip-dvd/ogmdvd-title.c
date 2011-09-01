@@ -232,22 +232,22 @@ ogmdvd_video_stream_get_aspect_ratio  (OGMRipVideoStream *video, guint *numerato
 }
 
 static gint
-ogmdvd_video_stream_get_display_aspect (OGMRipVideoStream *video)
+ogmdvd_video_stream_get_aspect (OGMRipVideoStream *video)
 {
   switch (OGMDVD_TITLE (video)->priv->display_aspect_ratio)
   {
     case 0:
-      return OGMRIP_DISPLAY_ASPECT_4_3;
+      return OGMRIP_ASPECT_4_3;
     case 1:
     case 3:
-      return OGMRIP_DISPLAY_ASPECT_16_9;
+      return OGMRIP_ASPECT_16_9;
     default:
-      return OGMRIP_DISPLAY_ASPECT_UNDEFINED;
+      return OGMRIP_ASPECT_UNDEFINED;
   }
 }
 
 static gint
-ogmdvd_video_stream_get_display_format (OGMRipVideoStream *video)
+ogmdvd_video_stream_get_standard (OGMRipVideoStream *video)
 {
   return OGMDVD_TITLE (video)->priv->video_format;
 }
@@ -255,12 +255,12 @@ ogmdvd_video_stream_get_display_format (OGMRipVideoStream *video)
 static void
 ogmdvd_video_stream_iface_init (OGMRipVideoStreamInterface *iface)
 {
-  iface->get_framerate      = ogmdvd_video_stream_get_framerate;
-  iface->get_resolution     = ogmdvd_video_stream_get_resolution;
-  iface->get_crop_size      = ogmdvd_video_stream_get_crop_size;
-  iface->get_aspect_ratio   = ogmdvd_video_stream_get_aspect_ratio;
-  iface->get_display_aspect = ogmdvd_video_stream_get_display_aspect;
-  iface->get_display_format = ogmdvd_video_stream_get_display_format;
+  iface->get_framerate    = ogmdvd_video_stream_get_framerate;
+  iface->get_resolution   = ogmdvd_video_stream_get_resolution;
+  iface->get_crop_size    = ogmdvd_video_stream_get_crop_size;
+  iface->get_aspect_ratio = ogmdvd_video_stream_get_aspect_ratio;
+  iface->get_aspect       = ogmdvd_video_stream_get_aspect;
+  iface->get_standard     = ogmdvd_video_stream_get_standard;
 }
 
 typedef struct

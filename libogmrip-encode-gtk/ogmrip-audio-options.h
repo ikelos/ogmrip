@@ -40,7 +40,7 @@ struct _OGMRipAudioOptionsInterface
 GType    ogmrip_audio_options_get_type        (void);
 guint    ogmrip_audio_options_get_channels    (OGMRipAudioOptions  *options);
 void     ogmrip_audio_options_set_channels    (OGMRipAudioOptions  *options,
-                                               OGMRipAudioChannels channels);
+                                               OGMRipChannels      channels);
 GType    ogmrip_audio_options_get_codec       (OGMRipAudioOptions  *options);
 void     ogmrip_audio_options_set_codec       (OGMRipAudioOptions  *options,
                                                GType               codec);

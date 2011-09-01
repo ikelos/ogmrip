@@ -288,7 +288,7 @@ ogmrip_matroska_append_chapters_file (OGMRipContainer *matroska, const gchar *fi
 
 static void
 ogmrip_matroska_foreach_file (OGMRipContainer *matroska, const gchar *filename,
-    OGMRipFormatType format, const gchar *name, guint language, GPtrArray *argv)
+    OGMRipFormat format, const gchar *name, guint language, GPtrArray *argv)
 {
   if (OGMRIP_IS_VIDEO_FORMAT (format))
     ogmrip_matroska_append_video_file (matroska, filename, argv);

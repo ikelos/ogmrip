@@ -225,7 +225,7 @@ const gchar *ogmdvd_languages[][3] =
 const guint ogmdvd_nlanguages = G_N_ELEMENTS (ogmdvd_languages) - 1;
 
 const gchar *
-ogmrip_format_type_get_label (OGMRipFormatType format)
+ogmrip_format_get_label (OGMRipFormat format)
 {
   static const gchar *format_type[] = 
   {
@@ -271,15 +271,15 @@ ogmrip_format_type_get_label (OGMRipFormatType format)
 }
 
 /**
- * ogmrip_video_format_get_label:
- * @format: The video format
+ * ogmrip_standard_get_label:
+ * @format: The standard
  *
- * Returns a human readable video format.
+ * Returns a human readable standard.
  *
  * Returns: A constant string, or NULL
  */
 const gchar *
-ogmrip_video_format_get_label (OGMRipVideoFormat format)
+ogmrip_standard_get_label (OGMRipStandard standard)
 {
   static const gchar *video_format[] = 
   {
@@ -288,19 +288,19 @@ ogmrip_video_format_get_label (OGMRipVideoFormat format)
     "PAL"
   };
 
-  return video_format[format + 1];
+  return video_format[standard + 1];
 }
 
 /**
- * ogmrip_display_aspect_get_label:
- * @aspect: The display aspect
+ * ogmrip_aspect_get_label:
+ * @aspect: The aspect
  *
- * Returns a human readable display aspect.
+ * Returns a human readable aspect.
  *
  * Returns: A constant string, or NULL
  */
 const gchar *
-ogmrip_display_aspect_get_label (OGMRipDisplayAspect aspect)
+ogmrip_aspect_get_label (OGMRipAspect aspect)
 {
   static const gchar *display_aspect[] =
   {
@@ -313,7 +313,7 @@ ogmrip_display_aspect_get_label (OGMRipDisplayAspect aspect)
 }
 
 /**
- * ogmrip_audio_channels_get_label:
+ * ogmrip_channels_get_label:
  * @channels: The number of channels
  *
  * Returns a human readable number of channels.
@@ -321,7 +321,7 @@ ogmrip_display_aspect_get_label (OGMRipDisplayAspect aspect)
  * Returns: A constant string, or NULL
  */
 const gchar *
-ogmrip_audio_channels_get_label (OGMRipAudioChannels channels)
+ogmrip_channels_get_label (OGMRipChannels channels)
 {
   static const gchar *audio_channels[] =
   {
@@ -338,7 +338,7 @@ ogmrip_audio_channels_get_label (OGMRipAudioChannels channels)
 }
 
 /**
- * ogmrip_audio_quantization_get_label:
+ * ogmrip_quantization_get_label:
  * @quantization: The quantization
  *
  * Returns a human readable quantization.
@@ -346,7 +346,7 @@ ogmrip_audio_channels_get_label (OGMRipAudioChannels channels)
  * Returns: A constant string, or NULL
  */
 const gchar *
-ogmrip_audio_quantization_get_label (OGMRipAudioQuantization quantization)
+ogmrip_quantization_get_label (OGMRipQuantization quantization)
 {
   static const gchar *audio_quantization[] = 
   {

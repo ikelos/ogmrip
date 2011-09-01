@@ -48,7 +48,7 @@ struct _OGMRipAudioCodecClass
 
 GType         ogmrip_audio_codec_get_type              (void);
 void          ogmrip_audio_codec_set_channels          (OGMRipAudioCodec    *audio,
-                                                        OGMRipAudioChannels channels);
+                                                        OGMRipChannels      channels);
 gint          ogmrip_audio_codec_get_channels          (OGMRipAudioCodec    *audio);
 void          ogmrip_audio_codec_set_fast              (OGMRipAudioCodec    *audio,
                                                         gboolean            fast);

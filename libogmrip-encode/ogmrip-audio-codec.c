@@ -42,7 +42,7 @@ struct _OGMRipAudioCodecPriv
   gchar *label;
   guint language;
 
-  OGMRipAudioChannels channels;
+  OGMRipChannels channels;
 };
 
 enum 
@@ -90,8 +90,8 @@ ogmrip_audio_codec_class_init (OGMRipAudioCodecClass *klass)
            FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_CHANNELS, 
-        g_param_spec_uint ("channels", "Channels property", "Set channels", 
-           OGMRIP_AUDIO_CHANNELS_UNDEFINED, OGMRIP_AUDIO_CHANNELS_7_1, OGMRIP_AUDIO_CHANNELS_STEREO,
+        g_param_spec_int ("channels", "Channels property", "Set channels", 
+           OGMRIP_CHANNELS_UNDEFINED, OGMRIP_CHANNELS_7_1, OGMRIP_CHANNELS_STEREO,
            G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_SRATE, 
@@ -121,7 +121,7 @@ static void
 ogmrip_audio_codec_init (OGMRipAudioCodec *audio)
 {
   audio->priv = OGMRIP_AUDIO_CODEC_GET_PRIVATE (audio);
-  audio->priv->channels = OGMRIP_AUDIO_CHANNELS_STEREO;
+  audio->priv->channels = OGMRIP_CHANNELS_STEREO;
 
   audio->priv->srate = 48000;
   audio->priv->quality = 3;
@@ -155,7 +155,7 @@ ogmrip_audio_codec_set_property (GObject *gobject, guint property_id, const GVal
       ogmrip_audio_codec_set_normalize (audio, g_value_get_boolean (value));
       break;
     case PROP_CHANNELS: 
-      ogmrip_audio_codec_set_channels (audio, g_value_get_uint (value));
+      ogmrip_audio_codec_set_channels (audio, g_value_get_int (value));
       break;
     case PROP_SRATE:
       ogmrip_audio_codec_set_sample_rate (audio, g_value_get_uint (value));
@@ -190,7 +190,7 @@ ogmrip_audio_codec_get_property (GObject *gobject, guint property_id, GValue *va
       g_value_set_boolean (value, audio->priv->normalize);
       break;
     case PROP_CHANNELS:
-      g_value_set_uint (value, audio->priv->channels);
+      g_value_set_int (value, audio->priv->channels);
       break;
     case PROP_SRATE:
       g_value_set_uint (value, audio->priv->srate);
@@ -315,12 +315,12 @@ ogmrip_audio_codec_get_normalize (OGMRipAudioCodec *audio)
 /**
  * ogmrip_audio_codec_set_channels:
  * @audio: an #OGMRipAudioCodec
- * @channels: an #OGMRipAudioChannels
+ * @channels: an #OGMRipChannels
  *
  * Sets the number of channels of the output file.
  */
 void
-ogmrip_audio_codec_set_channels (OGMRipAudioCodec *audio, OGMRipAudioChannels channels)
+ogmrip_audio_codec_set_channels (OGMRipAudioCodec *audio, OGMRipChannels channels)
 {
   OGMRipStream *stream;
   gint max_channels;

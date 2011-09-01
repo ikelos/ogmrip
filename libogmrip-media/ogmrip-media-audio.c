@@ -53,7 +53,7 @@ ogmrip_audio_stream_get_channels (OGMRipAudioStream *audio)
   iface = OGMRIP_AUDIO_STREAM_GET_IFACE (audio);
 
   if (!iface->get_channels)
-    return -1;
+    return OGMRIP_CHANNELS_UNDEFINED;
 
   return iface->get_channels (audio);
 }
@@ -128,7 +128,7 @@ ogmrip_audio_stream_get_quantization (OGMRipAudioStream *audio)
   iface = OGMRIP_AUDIO_STREAM_GET_IFACE (audio);
 
   if (!iface->get_quantization)
-    return OGMRIP_AUDIO_QUANTIZATION_UNDEFINED;
+    return OGMRIP_QUANTIZATION_UNDEFINED;
 
   return iface->get_quantization (audio);
 }
@@ -146,5 +146,23 @@ ogmrip_audio_stream_get_sample_rate (OGMRipAudioStream *audio)
     return -1;
 
   return iface->get_sample_rate (audio);
+}
+
+gint
+ogmrip_audio_stream_get_samples_per_frame (OGMRipAudioStream *audio)
+{
+  gint format;
+
+  g_return_val_if_fail (OGMRIP_IS_AUDIO_STREAM (audio), -1);
+
+  format = ogmrip_stream_get_format (OGMRIP_STREAM (audio));
+
+  if (format == OGMRIP_FORMAT_MP3)
+    return 1152;
+
+  if (format == OGMRIP_FORMAT_AC3 || format == OGMRIP_FORMAT_DTS)
+    return 1536;
+
+  return 1024;
 }
 

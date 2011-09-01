@@ -73,7 +73,7 @@ ogmrip_title_chooser_widget_set_disc (OGMRipTitleChooserWidget *chooser, OGMRipM
   OGMRipTitle *title;
   OGMRipTime time_;
 
-  gint vid, nvid, format, aspect;
+  gint vid, nvid, standard, aspect;
   glong length, longest;
   gchar *str, *str_time;
 
@@ -100,8 +100,8 @@ ogmrip_title_chooser_widget_set_disc (OGMRipTitleChooserWidget *chooser, OGMRipM
       {
         stream = ogmrip_title_get_video_stream (title);
 
-        format = ogmrip_video_stream_get_display_format (stream);
-        aspect = ogmrip_video_stream_get_display_aspect (stream);
+        standard = ogmrip_video_stream_get_standard (stream);
+        aspect = ogmrip_video_stream_get_aspect (stream);
         length = ogmrip_title_get_length (title, &time_);
 
         if (time_.hour > 0)
@@ -112,8 +112,8 @@ ogmrip_title_chooser_widget_set_disc (OGMRipTitleChooserWidget *chooser, OGMRipM
           str_time = g_strdup_printf ("%02lu %s", time_.sec, _("seconds"));
 
         str = g_strdup_printf ("%s %02d (%s, %s, %s)", _("Title"), vid + 1, str_time,
-            ogmrip_video_format_get_label (format), 
-            ogmrip_display_aspect_get_label (aspect)); 
+            ogmrip_standard_get_label (standard), 
+            ogmrip_aspect_get_label (aspect)); 
         g_free (str_time);
 
         gtk_list_store_append (GTK_LIST_STORE (model), &iter);

@@ -195,7 +195,7 @@ ogmrip_mplayer_set_deint (OGMRipVideoCodec *video, GPtrArray *argv, GString *opt
 }
 
 static gint
-ogmrip_mplayer_audio_file_get_demuxer (OGMRipFormatType format)
+ogmrip_mplayer_audio_file_get_demuxer (OGMRipFormat format)
 {
   gint demuxer;
 
@@ -1200,7 +1200,7 @@ ogmrip_mencoder_container_append_audio_file (OGMRipContainer *container,
 
 static void
 ogmrip_mencoder_container_foreach_file (OGMRipContainer *container,
-    const gchar *filename, OGMRipFormatType format, const gchar *name, guint lang, GPtrArray *argv)
+    const gchar *filename, OGMRipFormat format, const gchar *name, guint lang, GPtrArray *argv)
 {
   if (OGMRIP_IS_AUDIO_FORMAT (format))
   {

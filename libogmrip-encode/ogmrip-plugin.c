@@ -1142,14 +1142,14 @@ ogmrip_plugin_get_subp_codec_module (GType codec)
 /**
  * ogmrip_plugin_can_contain_format:
  * @container: A container type
- * @format: An #OGMRipFormatType
+ * @format: An #OGMRipFormat
  *
  * Returns whether @container supports the given format.
  *
  * Returns: %TRUE if @container supports @format
  */
 gboolean
-ogmrip_plugin_can_contain_format (GType container, OGMRipFormatType format)
+ogmrip_plugin_can_contain_format (GType container, OGMRipFormat format)
 {
   OGMRipContainerPlugin *plugin;
   gint i;

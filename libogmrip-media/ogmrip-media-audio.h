@@ -44,15 +44,16 @@ struct _OGMRipAudioStreamInterface
   gint          (* get_sample_rate)  (OGMRipAudioStream *audio);
 };
 
-GType         ogmrip_audio_stream_get_type         (void) G_GNUC_CONST;
-gint          ogmrip_audio_stream_get_bitrate      (OGMRipAudioStream *audio);
-gint          ogmrip_audio_stream_get_channels     (OGMRipAudioStream *audio);
-gint          ogmrip_audio_stream_get_content      (OGMRipAudioStream *audio);
-const gchar * ogmrip_audio_stream_get_label        (OGMRipAudioStream *audio);
-gint          ogmrip_audio_stream_get_language     (OGMRipAudioStream *audio);
-gint          ogmrip_audio_stream_get_nr           (OGMRipAudioStream *audio);
-gint          ogmrip_audio_stream_get_quantization (OGMRipAudioStream *audio);
-gint          ogmrip_audio_stream_get_sample_rate  (OGMRipAudioStream *audio);
+GType         ogmrip_audio_stream_get_type              (void) G_GNUC_CONST;
+gint          ogmrip_audio_stream_get_bitrate           (OGMRipAudioStream *audio);
+gint          ogmrip_audio_stream_get_channels          (OGMRipAudioStream *audio);
+gint          ogmrip_audio_stream_get_content           (OGMRipAudioStream *audio);
+const gchar * ogmrip_audio_stream_get_label             (OGMRipAudioStream *audio);
+gint          ogmrip_audio_stream_get_language          (OGMRipAudioStream *audio);
+gint          ogmrip_audio_stream_get_nr                (OGMRipAudioStream *audio);
+gint          ogmrip_audio_stream_get_quantization      (OGMRipAudioStream *audio);
+gint          ogmrip_audio_stream_get_sample_rate       (OGMRipAudioStream *audio);
+gint          ogmrip_audio_stream_get_samples_per_frame (OGMRipAudioStream *audio);
 
 G_END_DECLS
 

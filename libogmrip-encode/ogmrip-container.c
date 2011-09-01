@@ -52,7 +52,7 @@ typedef struct
 {
   gchar *filename;
   gchar *label;
-  OGMRipFormatType format;
+  OGMRipFormat format;
   guint lang;
 } OGMRipContainerFile;
 
@@ -79,7 +79,7 @@ static void ogmrip_container_get_property (GObject      *gobject,
                                            GParamSpec   *pspec);
 
 static OGMRipContainerFile *
-ogmrip_container_file_new (const gchar *filename, OGMRipFormatType format, const gchar *label, guint language)
+ogmrip_container_file_new (const gchar *filename, OGMRipFormat format, const gchar *label, guint language)
 {
   OGMRipContainerFile *file;
 
@@ -412,7 +412,7 @@ ogmrip_container_get_overhead (OGMRipContainer *container)
  */
 void
 ogmrip_container_add_file (OGMRipContainer *container,
-    const gchar *filename, OGMRipFormatType format, const gchar *label, guint language)
+    const gchar *filename, OGMRipFormat format, const gchar *label, guint language)
 {
   g_return_if_fail (OGMRIP_IS_CONTAINER (container));
   g_return_if_fail (filename != NULL);

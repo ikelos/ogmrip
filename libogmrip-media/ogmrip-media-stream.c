@@ -18,12 +18,21 @@
 
 #include "ogmrip-media-stream.h"
 #include "ogmrip-media-title.h"
+#include "ogmrip-media-object.h"
 
 G_DEFINE_INTERFACE (OGMRipStream, ogmrip_stream, G_TYPE_OBJECT)
 
 static void
 ogmrip_stream_default_init (OGMRipStreamInterface *iface)
 {
+}
+
+const gchar *
+ogmrip_stream_get_uri (OGMRipStream *stream)
+{
+  g_return_val_if_fail (OGMRIP_IS_STREAM (stream), NULL);
+
+  return ogmrip_media_get_uri (ogmrip_title_get_media (ogmrip_stream_get_title (stream)));
 }
 
 OGMRipTitle * 

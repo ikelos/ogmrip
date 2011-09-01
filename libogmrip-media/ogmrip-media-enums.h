@@ -24,92 +24,75 @@
 G_BEGIN_DECLS
 
 /**
- * OGMRipVideoFormat:
- * @OGMRIP_VIDEO_FORMAT_UNDEFINED: The video format is undefined
- * @OGMRIP_VIDEO_FORMAT_NTSC: The title is NTSC
- * @OGMRIP_VIDEO_FORMAT_PAL: The title is PAL
+ * OGMRipStandard:
+ * @OGMRIP_STANDARD_UNDEFINED: The video standard is undefined
+ * @OGMRIP_STANDARD_NTSC: The title is NTSC
+ * @OGMRIP_STANDARD_PAL: The title is PAL
  *
- * The video format of the DVD title
+ * The standard of the title
  */
 typedef enum
 {
-  OGMRIP_VIDEO_FORMAT_UNDEFINED = -1,
-  OGMRIP_VIDEO_FORMAT_NTSC,
-  OGMRIP_VIDEO_FORMAT_PAL
-} OGMRipVideoFormat;
+  OGMRIP_STANDARD_UNDEFINED = -1,
+  OGMRIP_STANDARD_NTSC,
+  OGMRIP_STANDARD_PAL
+} OGMRipStandard;
 
 /**
- * OGMRipDisplayAspect:
- * @OGMRIP_DISPLAY_ASPECT_UNDEFINED: The display aspect is undefined
- * @OGMRIP_DISPLAY_ASPECT_4_3: The title is 4/3
- * @OGMRIP_DISPLAY_ASPECT_16_9: The title is 16/9
+ * OGMRipAspect:
+ * @OGMRIP_ASPECT_UNDEFINED: The display aspect is undefined
+ * @OGMRIP_ASPECT_4_3: The title is 4/3
+ * @OGMRIP_ASPECT_16_9: The title is 16/9
  *
- * The display aspect of the DVD title
+ * The aspect of the title
  */
 typedef enum
 {
-  OGMRIP_DISPLAY_ASPECT_UNDEFINED = -1,
-  OGMRIP_DISPLAY_ASPECT_4_3,
-  OGMRIP_DISPLAY_ASPECT_16_9
-} OGMRipDisplayAspect;
+  OGMRIP_ASPECT_UNDEFINED = -1,
+  OGMRIP_ASPECT_4_3,
+  OGMRIP_ASPECT_16_9
+} OGMRipAspect;
 
 /**
- * OGMRipDisplayFormat:
- * @OGMRIP_DISPLAY_FORMAT_UNDEFINED: The display format is undefined
- * @OGMRIP_DISPLAY_FORMAT_PS_LETTER: The title is pan & scan letter
- * @OGMRIP_DISPLAY_FORMAT_PAN_SCAN: The title is is pan & scan
- * @OGMRIP_DISPLAY_FORMAT_LETTERBOX: The title is letterbox
- *
- * The display format of the DVD title
- */
-typedef enum
-{
-  OGMRIP_DISPLAY_FORMAT_UNDEFINED = -1,
-  OGMRIP_DISPLAY_FORMAT_PS_LETTER,
-  OGMRIP_DISPLAY_FORMAT_PAN_SCAN,
-  OGMRIP_DISPLAY_FORMAT_LETTERBOX
-} OGMRipDisplayFormat;
-
-/**
- * OGMRipAudioChannels:
- * @OGMRIP_AUDIO_CHANNELS_UNDEFINED: Undefined number of channels
- * @OGMRIP_AUDIO_CHANNELS_MONO: The stream is mono
- * @OGMRIP_AUDIO_CHANNELS_STEREO: The stream is stereo
- * @OGMRIP_AUDIO_CHANNELS_SURROUND: The stream is surround
- * @OGMRIP_AUDIO_CHANNELS_5_1: The stream is 5.1
- * @OGMRIP_AUDIO_CHANNELS_6_1: The stream is 6.1
- * @OGMRIP_AUDIO_CHANNELS_7_1: The stream is 7.1
+ * OGMRipChannels:
+ * @OGMRIP_CHANNELS_UNDEFINED: Undefined number of channels
+ * @OGMRIP_CHANNELS_MONO: The stream is mono
+ * @OGMRIP_CHANNELS_STEREO: The stream is stereo
+ * @OGMRIP_CHANNELS_SURROUND: The stream is surround
+ * @OGMRIP_CHANNELS_5_1: The stream is 5.1
+ * @OGMRIP_CHANNELS_6_1: The stream is 6.1
+ * @OGMRIP_CHANNELS_7_1: The stream is 7.1
  *
  * The number of channels of the audio stream
  */
 typedef enum
 {
-  OGMRIP_AUDIO_CHANNELS_UNDEFINED = -1,
-  OGMRIP_AUDIO_CHANNELS_MONO,
-  OGMRIP_AUDIO_CHANNELS_STEREO,
-  OGMRIP_AUDIO_CHANNELS_SURROUND,
-  OGMRIP_AUDIO_CHANNELS_5_1,
-  OGMRIP_AUDIO_CHANNELS_6_1,
-  OGMRIP_AUDIO_CHANNELS_7_1
-} OGMRipAudioChannels;
+  OGMRIP_CHANNELS_UNDEFINED = -1,
+  OGMRIP_CHANNELS_MONO,
+  OGMRIP_CHANNELS_STEREO,
+  OGMRIP_CHANNELS_SURROUND,
+  OGMRIP_CHANNELS_5_1,
+  OGMRIP_CHANNELS_6_1,
+  OGMRIP_CHANNELS_7_1
+} OGMRipChannels;
 
 /**
- * OGMRipAudioQuantization:
- * @OGMRIP_AUDIO_QUANTIZATION_16: The stream is quantized in 16 bits
- * @OGMRIP_AUDIO_QUANTIZATION_20: The stream is quantized in 20 bits
- * @OGMRIP_AUDIO_QUANTIZATION_24: The stream is quantized in 24 bits
- * @OGMRIP_AUDIO_QUANTIZATION_DRC: The stream is quantized in DRC
+ * OGMRipQuantization:
+ * @OGMRIP_QUANTIZATION_16: The stream is quantized in 16 bits
+ * @OGMRIP_QUANTIZATION_20: The stream is quantized in 20 bits
+ * @OGMRIP_QUANTIZATION_24: The stream is quantized in 24 bits
+ * @OGMRIP_QUANTIZATION_DRC: The stream is quantized in DRC
  *
  * The quantization of the audio stream
  */
 typedef enum
 {
-  OGMRIP_AUDIO_QUANTIZATION_UNDEFINED = -1,
-  OGMRIP_AUDIO_QUANTIZATION_16,
-  OGMRIP_AUDIO_QUANTIZATION_20,
-  OGMRIP_AUDIO_QUANTIZATION_24,
-  OGMRIP_AUDIO_QUANTIZATION_DRC
-} OGMRipAudioQuantization;
+  OGMRIP_QUANTIZATION_UNDEFINED = -1,
+  OGMRIP_QUANTIZATION_16,
+  OGMRIP_QUANTIZATION_20,
+  OGMRIP_QUANTIZATION_24,
+  OGMRIP_QUANTIZATION_DRC
+} OGMRipQuantization;
 
 /**
  * OGMRipAudioContent:
@@ -204,7 +187,7 @@ typedef enum
 } OGMRipNewline;
 
 /**
- * OGMRipFormatType:
+ * OGMRipFormat:
  * @OGMRIP_FORMAT_UNDEFINED: The format is undefined
  * @OGMRIP_FORMAT_MPEG1: The Mpeg-1 video format
  * @OGMRIP_FORMAT_MPEG2: The Mpeg-2 video format
@@ -236,7 +219,7 @@ typedef enum
  * @OGMRIP_FORMAT_COPY: A format for internal use only
  * @OGMRIP_FORMAT_LPCM: The LPCM audio format
  * @OGMRIP_FORMAT_BPCM: The BPCM audio format
- * @OGMRIP_FORMAT_MP12: The MP12 video format
+ * @OGMRIP_FORMAT_MP2: The MP2 video format
  * @OGMRIP_FORMAT_MJPEG: The MJPEG video format
  * @OGMRIP_FORMAT_FLAC: The Flac audio format
  * @OGMRIP_FORMAT_VP8: The VP8 video format
@@ -277,12 +260,13 @@ typedef enum
   OGMRIP_FORMAT_COPY,
   OGMRIP_FORMAT_LPCM,
   OGMRIP_FORMAT_BPCM,
-  OGMRIP_FORMAT_MP12,
+  OGMRIP_FORMAT_MP2,
   OGMRIP_FORMAT_MJPEG,
   OGMRIP_FORMAT_FLAC,
   OGMRIP_FORMAT_VP8,
   OGMRIP_FORMAT_CHAPTERS,
-} OGMRipFormatType;
+  OGMRIP_FORMAT_LAST
+} OGMRipFormat;
 
 #define OGMRIP_IS_VIDEO_FORMAT(format)    ((format) == OGMRIP_FORMAT_MPEG1  || \
                                            (format) == OGMRIP_FORMAT_MPEG2  || \
@@ -291,10 +275,10 @@ typedef enum
                                            (format) == OGMRIP_FORMAT_THEORA || \
                                            (format) == OGMRIP_FORMAT_DIRAC  || \
                                            (format) == OGMRIP_FORMAT_MJPEG  || \
-                                           (format) == OGMRIP_FORMAT_MP12   || \
                                            (format) == OGMRIP_FORMAT_VP8)
 
 #define OGMRIP_IS_AUDIO_FORMAT(format)    ((format) == OGMRIP_FORMAT_PCM    || \
+                                           (format) == OGMRIP_FORMAT_MP2    || \
                                            (format) == OGMRIP_FORMAT_MP3    || \
                                            (format) == OGMRIP_FORMAT_AC3    || \
                                            (format) == OGMRIP_FORMAT_DTS    || \

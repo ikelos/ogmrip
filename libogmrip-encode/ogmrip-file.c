@@ -490,7 +490,7 @@ OGMRipFileConfig audio_config[] =
   { "vrbs", 0x566f,  OGMRIP_FORMAT_VORBIS },
   { "dnet", 0,       OGMRIP_FORMAT_AC3    },
   { "PCM ", 0x01,    OGMRIP_FORMAT_PCM    },
-  { "MP12", 0x50,    OGMRIP_FORMAT_MP12   },
+  { "MP12", 0x50,    OGMRIP_FORMAT_MP2    },
   { "AC-3", 0x2000,  OGMRIP_FORMAT_AC3    },
   { "ac-3", 0,       OGMRIP_FORMAT_AC3    },
   { "DTS ", 0x2001,  OGMRIP_FORMAT_DTS    },

@@ -20,6 +20,11 @@
 #define __OGMRIP_ENCODING_H__
 
 #include <ogmrip-container.h>
+#include <ogmrip-video-codec.h>
+#include <ogmrip-audio-codec.h>
+#include <ogmrip-subp-codec.h>
+#include <ogmrip-chapters.h>
+#include <ogmrip-file.h>
 
 G_BEGIN_DECLS
 

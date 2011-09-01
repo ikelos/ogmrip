@@ -20,12 +20,9 @@
 #define __OGMRIP_CONTAINER_H__
 
 #include <ogmrip-job.h>
-#include <ogmrip-profile.h>
-#include <ogmrip-chapters.h>
-#include <ogmrip-video-codec.h>
-#include <ogmrip-audio-codec.h>
-#include <ogmrip-subp-codec.h>
 #include <ogmrip-file.h>
+#include <ogmrip-media.h>
+#include <ogmrip-profile.h>
 
 G_BEGIN_DECLS
 
@@ -54,7 +51,7 @@ struct _OGMRipContainerClass
 
 typedef void (* OGMRipContainerFunc) (OGMRipContainer  *container,
                                       const gchar      *filename,
-                                      OGMRipFormatType format,
+                                      OGMRipFormat     format,
                                       const gchar      *name,
                                       guint            language,
                                       gpointer         data);
@@ -75,7 +72,7 @@ void          ogmrip_container_set_start_delay (OGMRipContainer     *container,
 gint          ogmrip_container_get_overhead    (OGMRipContainer     *container);
 void          ogmrip_container_add_file        (OGMRipContainer     *container,
                                                 const gchar         *filename,
-                                                OGMRipFormatType    format,
+                                                OGMRipFormat        format,
                                                 const gchar         *label,
                                                 guint               language);
 void          ogmrip_container_remove_file     (OGMRipContainer     *container,

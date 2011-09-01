@@ -118,15 +118,15 @@ ogmdvd_audio_stream_get_channels (OGMRipAudioStream *audio)
   switch (OGMDVD_AUDIO_STREAM (audio)->priv->channels)
   {
     case 0:
-      return OGMRIP_AUDIO_CHANNELS_MONO;
+      return OGMRIP_CHANNELS_MONO;
     case 1:
-      return OGMRIP_AUDIO_CHANNELS_STEREO;
+      return OGMRIP_CHANNELS_STEREO;
     case 3:
-      return OGMRIP_AUDIO_CHANNELS_SURROUND;
+      return OGMRIP_CHANNELS_SURROUND;
     case 5:
-      return OGMRIP_AUDIO_CHANNELS_5_1;
+      return OGMRIP_CHANNELS_5_1;
     default:
-      return OGMRIP_AUDIO_CHANNELS_UNDEFINED;
+      return OGMRIP_CHANNELS_UNDEFINED;
   }
 }
 

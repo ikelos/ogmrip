@@ -43,6 +43,7 @@ GType          ogmrip_stream_get_type   (void) G_GNUC_CONST;
 gint           ogmrip_stream_get_format (OGMRipStream *stream);
 gint           ogmrip_stream_get_id     (OGMRipStream *stream);
 OGMRipTitle *  ogmrip_stream_get_title  (OGMRipStream *stream);
+const gchar *  ogmrip_stream_get_uri    (OGMRipStream *stream);
 
 G_END_DECLS
 

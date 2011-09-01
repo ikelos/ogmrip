@@ -95,7 +95,7 @@ struct _OGMRipVideoPlugin
   GType type;
   gchar *name;
   gchar *description;
-  OGMRipFormatType format;
+  OGMRipFormat format;
   gint passes;
   gint threads;
 };
@@ -120,7 +120,7 @@ struct _OGMRipAudioPlugin
   GType type;
   gchar *name;
   gchar *description;
-  OGMRipFormatType format;
+  OGMRipFormat format;
 };
 
 /**
@@ -144,7 +144,7 @@ struct _OGMRipSubpPlugin
   GType type;
   gchar *name;
   gchar *description;
-  OGMRipFormatType format;
+  OGMRipFormat format;
   gboolean text;
 };
 
@@ -158,7 +158,7 @@ struct _OGMRipSubpPlugin
  * @bframes: Whether the container supports B-frames
  * @max_audio: The maximum number of audio streams that can be embedded in the container
  * @max_subp: The maximum number of subtitle streams that can be embedded in the container
- * @formats: A NULL terminated array of #OGMRipFormatType supported by the container
+ * @formats: A NULL terminated array of #OGMRipFormat supported by the container
  *
  * A structure describing a container plugin
  */
@@ -260,19 +260,19 @@ GModule *     ogmrip_plugin_get_subp_codec_module  (GType codec);
  * Compatibility functions
  */
 
-gboolean ogmrip_plugin_can_contain_format  (GType            container,
-                                            OGMRipFormatType format);
-gboolean ogmrip_plugin_can_contain_video   (GType            container,
-                                            GType            codec);
-gboolean ogmrip_plugin_can_contain_audio   (GType            container,
-                                            GType            codec);
-gboolean ogmrip_plugin_can_contain_subp    (GType            container,
-                                            GType            codec);
+gboolean ogmrip_plugin_can_contain_format  (GType        container,
+                                            OGMRipFormat format);
+gboolean ogmrip_plugin_can_contain_video   (GType        container,
+                                            GType        codec);
+gboolean ogmrip_plugin_can_contain_audio   (GType        container,
+                                            GType        codec);
+gboolean ogmrip_plugin_can_contain_subp    (GType        container,
+                                            GType        codec);
 
-gboolean ogmrip_plugin_can_contain_n_audio (GType            container,
-                                            guint            ncodec);
-gboolean ogmrip_plugin_can_contain_n_subp  (GType            container,
-                                            guint            ncodec);
+gboolean ogmrip_plugin_can_contain_n_audio (GType        container,
+                                            guint        ncodec);
+gboolean ogmrip_plugin_can_contain_n_subp  (GType        container,
+                                            guint        ncodec);
 
 G_END_DECLS
 

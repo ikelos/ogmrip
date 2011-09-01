@@ -602,23 +602,23 @@ ogmrip_source_chooser_widget_add_audio_stream (OGMRipSourceChooserWidget *choose
       if (bitrate > 0)
         str = g_strdup_printf ("%s %02d: %s (%s, %s, %s, %d kbps)", _("Track"), aid + 1, 
             ogmrip_audio_content_get_label (content), ogmrip_language_get_label (lang), 
-            ogmrip_format_type_get_label (format), ogmrip_audio_channels_get_label (channels),
+            ogmrip_format_get_label (format), ogmrip_channels_get_label (channels),
             bitrate / 1000);
       else
         str = g_strdup_printf ("%s %02d: %s (%s, %s, %s)", _("Track"), aid + 1, 
             ogmrip_audio_content_get_label (content), ogmrip_language_get_label (lang), 
-            ogmrip_format_type_get_label (format), ogmrip_audio_channels_get_label (channels));
+            ogmrip_format_get_label (format), ogmrip_channels_get_label (channels));
     }
     else
     {
       if (bitrate > 0)
         str = g_strdup_printf ("%s %02d (%s, %s, %s, %d kbps)", _("Track"), aid + 1, 
-            ogmrip_language_get_label (lang), ogmrip_format_type_get_label (format), 
-            ogmrip_audio_channels_get_label (channels), bitrate / 1000);
+            ogmrip_language_get_label (lang), ogmrip_format_get_label (format), 
+            ogmrip_channels_get_label (channels), bitrate / 1000);
       else
         str = g_strdup_printf ("%s %02d (%s, %s, %s)", _("Track"), aid + 1, 
-            ogmrip_language_get_label (lang), ogmrip_format_type_get_label (format), 
-            ogmrip_audio_channels_get_label (channels));
+            ogmrip_language_get_label (lang), ogmrip_format_get_label (format), 
+            ogmrip_channels_get_label (channels));
     }
 
     ogmrip_source_chooser_widget_get_stream_iter (chooser, &iter);

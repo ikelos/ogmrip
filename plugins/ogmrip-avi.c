@@ -64,7 +64,7 @@ static gint ogmrip_avi_run          (OGMJobSpawn *spawn);
 
 static void
 ogmrip_avi_foreach_file (OGMRipContainer *avi, const gchar *filename,
-    OGMRipFormatType format, const gchar *name, guint language, GPtrArray *argv)
+    OGMRipFormat format, const gchar *name, guint language, GPtrArray *argv)
 {
   if (OGMRIP_IS_VIDEO_FORMAT (format) || OGMRIP_IS_AUDIO_FORMAT (format))
   {
@@ -191,7 +191,7 @@ ogmrip_avi_get_property (GObject *gobject, guint property_id, GValue *value, GPa
 
 static void
 ogmrip_avi_foreach_subp (OGMRipContainer *avi, const gchar *filename,
-    OGMRipFormatType format, const gchar *name, guint language, OGMJobSpawn *queue)
+    OGMRipFormat format, const gchar *name, guint language, OGMJobSpawn *queue)
 {
   OGMJobSpawn *child;
   gchar *input, **argv;

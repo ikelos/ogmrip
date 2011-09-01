@@ -165,7 +165,7 @@ ogmrip_mp4_append_chapters_file (OGMRipContainer *mp4, const gchar *filename, GP
 }
 
 static void
-ogmrip_mp4_append_file (OGMRipContainer *mp4, const gchar *filename, OGMRipFormatType format, const gchar *name, guint language, GPtrArray *argv)
+ogmrip_mp4_append_file (OGMRipContainer *mp4, const gchar *filename, OGMRipFormat format, const gchar *name, guint language, GPtrArray *argv)
 {
   if (OGMRIP_IS_AUDIO_FORMAT (format))
     ogmrip_mp4_append_audio_file (mp4, filename, format, language, argv);
@@ -423,7 +423,7 @@ ogmrip_mp4_get_h264_filename (const gchar *input)
 }
 
 static void
-ogmrip_mp4_get_info (OGMRipMp4 *mp4, const gchar *filename, OGMRipFormatType format, const gchar *name, guint language)
+ogmrip_mp4_get_info (OGMRipMp4 *mp4, const gchar *filename, OGMRipFormat format, const gchar *name, guint language)
 {
   if (OGMRIP_IS_VIDEO_FORMAT (format))
   {

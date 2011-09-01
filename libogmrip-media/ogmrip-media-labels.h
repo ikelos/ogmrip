@@ -23,16 +23,16 @@
 
 G_BEGIN_DECLS
 
-const gchar * ogmrip_format_type_get_label        (OGMRipFormatType        format);
-const gchar * ogmrip_video_format_get_label       (OGMRipVideoFormat       format);
-const gchar * ogmrip_display_aspect_get_label     (OGMRipDisplayAspect     aspect);
-const gchar * ogmrip_audio_channels_get_label     (OGMRipAudioChannels     channels);
-const gchar * ogmrip_audio_quantization_get_label (OGMRipAudioQuantization quantization);
-const gchar * ogmrip_audio_content_get_label      (OGMRipAudioContent      content);
-const gchar * ogmrip_subp_content_get_label       (OGMRipSubpContent       content);
-const gchar * ogmrip_language_get_label           (gint code);
-const gchar * ogmrip_language_get_iso639_1        (gint code);
-const gchar * ogmrip_language_get_iso639_2        (gint code);
+const gchar * ogmrip_format_get_label        (OGMRipFormat       format);
+const gchar * ogmrip_standard_get_label      (OGMRipStandard     standard);
+const gchar * ogmrip_aspect_get_label        (OGMRipAspect       aspect);
+const gchar * ogmrip_channels_get_label      (OGMRipChannels     channels);
+const gchar * ogmrip_quantization_get_label  (OGMRipQuantization quantization);
+const gchar * ogmrip_audio_content_get_label (OGMRipAudioContent content);
+const gchar * ogmrip_subp_content_get_label  (OGMRipSubpContent  content);
+const gchar * ogmrip_language_get_label      (gint code);
+const gchar * ogmrip_language_get_iso639_1   (gint code);
+const gchar * ogmrip_language_get_iso639_2   (gint code);
 
 G_END_DECLS
 

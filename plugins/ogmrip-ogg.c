@@ -194,7 +194,7 @@ ogmrip_ogg_merge_append_chapters_file (OGMRipContainer *ogg,
 
 static void
 ogmrip_ogg_merge_foreach_file (OGMRipContainer *ogg, const gchar *filename,
-    OGMRipFormatType format, const gchar *name, guint language, GPtrArray *argv)
+    OGMRipFormat format, const gchar *name, guint language, GPtrArray *argv)
 {
   if (OGMRIP_IS_VIDEO_FORMAT (format))
   {

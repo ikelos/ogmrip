@@ -89,7 +89,7 @@ ogmrip_video_stream_get_crop_size (OGMRipVideoStream *video, guint *x, guint *y,
 }
 
 gint 
-ogmrip_video_stream_get_display_format (OGMRipVideoStream *video)
+ogmrip_video_stream_get_standard (OGMRipVideoStream *video)
 {
   OGMRipVideoStreamInterface *iface;
 
@@ -97,14 +97,14 @@ ogmrip_video_stream_get_display_format (OGMRipVideoStream *video)
 
   iface = OGMRIP_VIDEO_STREAM_GET_IFACE (video);
 
-  if (!iface->get_display_format)
-    return OGMRIP_VIDEO_FORMAT_UNDEFINED;
+  if (!iface->get_standard)
+    return OGMRIP_STANDARD_UNDEFINED;
 
-  return iface->get_display_format (video);
+  return iface->get_standard (video);
 }
 
 gint 
-ogmrip_video_stream_get_display_aspect (OGMRipVideoStream *video)
+ogmrip_video_stream_get_aspect (OGMRipVideoStream *video)
 {
   OGMRipVideoStreamInterface *iface;
 
@@ -112,10 +112,10 @@ ogmrip_video_stream_get_display_aspect (OGMRipVideoStream *video)
 
   iface = OGMRIP_VIDEO_STREAM_GET_IFACE (video);
 
-  if (!iface->get_display_aspect)
-    return OGMRIP_DISPLAY_ASPECT_UNDEFINED;
+  if (!iface->get_aspect)
+    return OGMRIP_ASPECT_UNDEFINED;
 
-  return iface->get_display_aspect (video);
+  return iface->get_aspect (video);
 }
 
 void 
