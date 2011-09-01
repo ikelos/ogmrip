@@ -400,11 +400,7 @@ ogmdvd_drive_chooser_widget_medium_added (OGMDvdDriveChooserWidget *chooser, OGM
         DEVICE_COLUMN, ogmdvd_drive_get_device (drive), DRIVE_COLUMN, drive, -1);
     g_free (text);
 
-    /*
-     * TODO unref ?
-     */
-
-    // g_object_unref (disc);
+    g_object_unref (disc);
 
     if (gtk_combo_box_get_active (GTK_COMBO_BOX (chooser)) == -1)
       gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), 0);
