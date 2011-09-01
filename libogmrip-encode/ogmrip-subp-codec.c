@@ -77,12 +77,14 @@ ogmrip_subp_codec_class_init (OGMRipSubpCodecClass *klass)
            FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_CHARSET,
-      g_param_spec_uint ("character-set", "Charset property", "Set charset",
-        0, OGMRIP_CHARSET_ASCII, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+      g_param_spec_int ("character-set", "Charset property", "Set charset",
+        OGMRIP_CHARSET_UNDEFINED, OGMRIP_CHARSET_ASCII, OGMRIP_CHARSET_UNDEFINED,
+        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_NEWLINE,
-      g_param_spec_uint ("newline-style", "Newline property", "Set newline",
-        0, OGMRIP_NEWLINE_CR_LF, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+      g_param_spec_int ("newline-style", "Newline property", "Set newline",
+        OGMRIP_NEWLINE_UNDEFINED, OGMRIP_NEWLINE_CR_LF, OGMRIP_NEWLINE_UNDEFINED,
+        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_LABEL, 
         g_param_spec_string ("label", "Label property", "Set label", 
@@ -126,10 +128,10 @@ ogmrip_subp_codec_set_property (GObject *gobject, guint property_id, const GValu
       subp->priv->forced_only = g_value_get_boolean (value);
       break;
     case PROP_CHARSET:
-      subp->priv->charset = g_value_get_uint (value);
+      subp->priv->charset = g_value_get_int (value);
       break;
     case PROP_NEWLINE: 
-      subp->priv->newline = g_value_get_uint (value);
+      subp->priv->newline = g_value_get_int (value);
       break;
     case PROP_LABEL: 
       g_free (subp->priv->label);
