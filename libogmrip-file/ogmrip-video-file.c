@@ -34,6 +34,9 @@ static void
 ogmrip_video_file_init (OGMRipVideoFile *stream)
 {
   stream->priv = G_TYPE_INSTANCE_GET_PRIVATE (stream, OGMRIP_TYPE_VIDEO_FILE, OGMRipVideoFilePriv);
+
+  stream->priv->bitrate = -1;
+  stream->priv->standard = OGMRIP_STANDARD_UNDEFINED;
 }
 
 static void

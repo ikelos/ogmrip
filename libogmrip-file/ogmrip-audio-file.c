@@ -62,6 +62,9 @@ static void
 ogmrip_audio_file_init (OGMRipAudioFile *stream)
 {
   stream->priv = G_TYPE_INSTANCE_GET_PRIVATE (stream, OGMRIP_TYPE_AUDIO_FILE, OGMRipAudioFilePriv);
+
+  stream->priv->bitrate = -1;
+  stream->priv->channels = OGMRIP_CHANNELS_UNDEFINED;
 }
 
 static void

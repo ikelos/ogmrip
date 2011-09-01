@@ -22,10 +22,6 @@
 enum
 {
   PROP_0,
-  PROP_FORMAT,
-  PROP_LABEL,
-  PROP_LENGTH,
-  PROP_SIZE,
   PROP_URI
 };
 
@@ -51,6 +47,9 @@ static void
 ogmrip_file_init (OGMRipFile *stream)
 {
   stream->priv = G_TYPE_INSTANCE_GET_PRIVATE (stream, OGMRIP_TYPE_FILE, OGMRipFilePriv);
+
+  stream->priv->length = -1.0;
+  stream->priv->format = OGMRIP_FORMAT_UNDEFINED;
 }
 
 static void
@@ -64,23 +63,6 @@ ogmrip_file_class_init (OGMRipFileClass *klass)
   gobject_class->set_property = ogmrip_file_set_property;
 
   g_object_class_override_property (gobject_class, PROP_URI, "uri");
-
-  g_object_class_install_property (gobject_class, PROP_FORMAT,
-      g_param_spec_int ("format", "Format property", "Set format",
-        OGMRIP_FORMAT_UNDEFINED, OGMRIP_FORMAT_LAST - 1, OGMRIP_FORMAT_UNDEFINED,
-        G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_LABEL,
-      g_param_spec_string ("label", "Label property", "Set label",
-        NULL, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_LENGTH,
-      g_param_spec_double ("length", "Length property", "Set length",
-        -1.0, G_MAXDOUBLE, -1.0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_SIZE,
-      g_param_spec_int64 ("size", "Size property", "Set size",
-        -1, G_MAXINT64, -1, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipFilePriv));
 }
@@ -104,18 +86,6 @@ ogmrip_file_get_property (GObject *gobject, guint property_id, GValue *value, GP
 
   switch (property_id)
   {
-    case PROP_FORMAT:
-      g_value_set_int (value, file->priv->format);
-      break;
-    case PROP_LABEL:
-      g_value_set_static_string (value, file->priv->label);
-      break;
-    case PROP_LENGTH:
-      g_value_set_double (value, file->priv->length);
-      break;
-    case PROP_SIZE:
-      g_value_set_int64 (value, file->priv->size);
-      break;
     case PROP_URI:
       g_value_set_string (value, file->priv->uri);
       break;
@@ -145,11 +115,7 @@ ogmrip_file_set_property (GObject *gobject, guint property_id, const GValue *val
 static const gchar *
 ogmrip_file_get_media_label (OGMRipMedia *media)
 {
-  gchar *label;
-
-  g_object_get (media, "label", &label, NULL);
-
-  return label;
+  return OGMRIP_FILE (media)->priv->label;
 }
 
 static const gchar *
@@ -161,11 +127,7 @@ ogmrip_file_get_uri (OGMRipMedia *media)
 static gint64
 ogmrip_file_get_media_size (OGMRipMedia *media)
 {
-  gint64 size;
-
-  g_object_get (media, "size", &size, NULL);
-
-  return size;
+  return OGMRIP_FILE (media)->priv->size;
 }
 
 static gint
@@ -206,24 +168,19 @@ ogmrip_file_get_media (OGMRipTitle *title)
 static gint64
 ogmrip_file_get_title_size (OGMRipTitle *title)
 {
-  gint64 size;
-
-  g_object_get (title, "size", &size, NULL);
-
-  return size;
+  return OGMRIP_FILE (title)->priv->size;
 }
 
 static gdouble
-ogmrip_file_get_length (OGMRipTitle *title, OGMRipTime *length)
+ogmrip_file_get_length (OGMRipTitle *title, OGMRipTime *time_)
 {
-  gdouble duration;
+  gdouble length;
 
-  g_object_get (title, "length", &duration, NULL);
+  length = OGMRIP_FILE (title)->priv->length;
+  if (time_ != NULL && length >= 0.0)
+    ogmrip_msec_to_time (length, time_);
 
-  if (length)
-    ogmrip_msec_to_time (duration, length);
-
-  return duration;
+  return length;
 }
 
 static void
