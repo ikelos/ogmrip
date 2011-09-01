@@ -784,7 +784,6 @@ main (int argc, char *argv[])
         strncpy (output_file, optarg, FILENAME_MAX);
         break;
       default:
-        /* TODO */
         return EXIT_FAILURE;
     }
   }
