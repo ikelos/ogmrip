@@ -61,6 +61,7 @@ gchar *       ogmrip_fs_get_mount_point  (const gchar  *filename,
                                           GError       **error);
 
 
+void          ogmrip_fs_unlink           (const gchar  *filename);
 void          ogmrip_fs_unref            (gchar        *filename,
                                           gboolean     do_unlink);
 

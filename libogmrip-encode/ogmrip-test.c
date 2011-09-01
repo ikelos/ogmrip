@@ -25,6 +25,7 @@
 
 #include "ogmrip-test.h"
 #include "ogmrip-profile-keys.h"
+#include "ogmrip-fs.h"
 
 #define SAMPLE_LENGTH  10.0
 #define SAMPLE_PERCENT 0.05
@@ -266,7 +267,8 @@ ogmrip_test_encode_video (OGMRipTest *test, gdouble start_position, gdouble play
 
   OGMRipCodec *codec;
   OGMRipCodecInfo info;
-  OGMRipFile *file;
+  OGMRipMedia *file;
+  gchar *output;
   gint result;
 
   codec = ogmrip_encoding_get_video_codec (test->priv->encoding);
@@ -290,13 +292,17 @@ ogmrip_test_encode_video (OGMRipTest *test, gdouble start_position, gdouble play
   test->priv->fraction += test->priv->step;
   g_signal_emit_by_name (test, "progress", test->priv->fraction);
 
-  file = ogmrip_video_file_new (ogmrip_codec_get_output (codec), NULL /*error*/);
+  output = g_filename_to_uri (ogmrip_codec_get_output (codec), NULL, NULL);
+  file = ogmrip_video_file_new (output);
+  g_free (output);
+
   if (!file)
     return OGMJOB_RESULT_ERROR;
 
-  ogmrip_file_set_unlink_on_unref (file, TRUE);
-  *bitrate = ogmrip_video_file_get_bitrate (OGMRIP_VIDEO_FILE (file));
-  ogmrip_file_unref (file);
+  *bitrate = ogmrip_video_stream_get_bitrate (OGMRIP_VIDEO_STREAM (file));
+
+  ogmrip_fs_unlink (ogmrip_file_get_path (OGMRIP_FILE (file)));
+  g_object_unref (file);
 
   return OGMJOB_RESULT_SUCCESS;
 }

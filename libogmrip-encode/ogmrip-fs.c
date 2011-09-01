@@ -551,6 +551,13 @@ done:
   return mp;
 }
 
+void
+ogmrip_fs_unlink (const gchar *filename)
+{
+  if (g_file_test (filename, G_FILE_TEST_IS_DIR))
+    g_unlink (filename);
+}
+
 /**
  * ogmrip_fs_unref:
  * @filename: A path to a filename

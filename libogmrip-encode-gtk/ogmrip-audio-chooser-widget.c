@@ -57,20 +57,20 @@ static void ogmrip_audio_chooser_widget_destroy      (GtkWidget      *widget);
 static void ogmrip_audio_chooser_widget_destroy      (GtkObject      *object);
 #endif
 
-static OGMRipSource *
-ogmrip_audio_chooser_widget_get_active (OGMRipSourceChooser *chooser, OGMRipSourceType *type)
+static OGMRipStream *
+ogmrip_audio_chooser_widget_get_active (OGMRipSourceChooser *chooser)
 {
   OGMRipAudioChooserWidget *widget = OGMRIP_AUDIO_CHOOSER_WIDGET (chooser);
 
-  return ogmrip_source_chooser_get_active (OGMRIP_SOURCE_CHOOSER (widget->priv->chooser), type);
+  return ogmrip_source_chooser_get_active (OGMRIP_SOURCE_CHOOSER (widget->priv->chooser));
 }
 
 static void
-ogmrip_audio_chooser_widget_set_active (OGMRipSourceChooser *chooser, OGMRipSource *source)
+ogmrip_audio_chooser_widget_set_active (OGMRipSourceChooser *chooser, OGMRipStream *stream)
 {
   OGMRipAudioChooserWidget *widget = OGMRIP_AUDIO_CHOOSER_WIDGET (chooser);
 
-  ogmrip_source_chooser_set_active (OGMRIP_SOURCE_CHOOSER (widget->priv->chooser), source);
+  ogmrip_source_chooser_set_active (OGMRIP_SOURCE_CHOOSER (widget->priv->chooser), stream);
 }
 
 static void
@@ -84,18 +84,17 @@ ogmrip_audio_chooser_widget_select_language (OGMRipSourceChooser *chooser, gint 
 static void
 ogmrip_audio_chooser_widget_combo_changed (OGMRipAudioChooserWidget *widget)
 {
-  OGMRipSource *source;
-  OGMRipSourceType type;
+  OGMRipStream *stream;
 
-  source = ogmrip_source_chooser_get_active (OGMRIP_SOURCE_CHOOSER (widget->priv->chooser), &type);
-  gtk_widget_set_sensitive (widget->priv->button, source != NULL && type == OGMRIP_SOURCE_STREAM);
+  stream = ogmrip_source_chooser_get_active (OGMRIP_SOURCE_CHOOSER (widget->priv->chooser));
+  gtk_widget_set_sensitive (widget->priv->button, stream && !OGMRIP_IS_FILE (stream));
 
-  if (source != NULL && type == OGMRIP_SOURCE_STREAM)
+  if (stream && !OGMRIP_IS_FILE (stream))
   {
     ogmrip_audio_options_dialog_set_label (OGMRIP_AUDIO_OPTIONS_DIALOG (widget->priv->dialog),
-        ogmrip_audio_stream_get_label (OGMRIP_AUDIO_STREAM (source)));
+        ogmrip_audio_stream_get_label (OGMRIP_AUDIO_STREAM (stream)));
     ogmrip_audio_options_dialog_set_language (OGMRIP_AUDIO_OPTIONS_DIALOG (widget->priv->dialog),
-        ogmrip_audio_stream_get_language (OGMRIP_AUDIO_STREAM (source)));
+        ogmrip_audio_stream_get_language (OGMRIP_AUDIO_STREAM (stream)));
   }
 }
 

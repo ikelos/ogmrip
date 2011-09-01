@@ -10,7 +10,7 @@ profilesdir=@datadir@/ogmrip/profiles
 
 Name: ogmrip-encode
 Description: ogmrip-encode is a library for ripping and encoding DVD.
-Requires: ogmrip-job ogmrip-media ogmrip-dvd enca gmodule-2.0
+Requires: ogmrip-job ogmrip-media ogmrip-file ogmrip-dvd enca gmodule-2.0
 Version: @VERSION@
 Libs: -L${libdir} -logmrip-encode -logmrip-mplayer -logmrip-lavc
 Cflags: -I${includedir}/ogmrip-encode

@@ -26,29 +26,6 @@
 
 G_BEGIN_DECLS
 
-/**
- * OGMRipSourceType:
- * @OGMRIP_SOURCE_INVALID: This is not a valid source
- * @OGMRIP_SOURCE_NONE: No source is selected
- * @OGMRIP_SOURCE_STREAM: The source is a DVD stream
- * @OGMRIP_SOURCE_FILE: The source is a file
- *
- * The type of a source
- */
-typedef enum
-{
-  OGMRIP_SOURCE_INVALID = -1,
-  OGMRIP_SOURCE_NONE,
-  OGMRIP_SOURCE_STREAM,
-  OGMRIP_SOURCE_FILE
-} OGMRipSourceType;
-
-typedef union
-{
-  OGMRipStream *stream;
-  OGMRipFile *file;
-} OGMRipSource;
-
 #define OGMRIP_TYPE_SOURCE_CHOOSER            (ogmrip_source_chooser_get_type ())
 #define OGMRIP_SOURCE_CHOOSER(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_SOURCE_CHOOSER, OGMRipSourceChooser))
 #define OGMRIP_IS_SOURCE_CHOOSER(obj)         (G_TYPE_CHECK_INSTANCE_TYPE (obj, OGMRIP_TYPE_SOURCE_CHOOSER))
@@ -61,10 +38,9 @@ struct _OGMRipSourceChooserInterface
 {
   GTypeInterface base_iface;
 
-  OGMRipSource * (* get_active)      (OGMRipSourceChooser *chooser,
-                                      OGMRipSourceType    *type);
+  OGMRipStream * (* get_active)      (OGMRipSourceChooser *chooser);
   void           (* set_active)      (OGMRipSourceChooser *chooser,
-                                      OGMRipSource        *source);
+                                      OGMRipStream        *stream);
   void           (* select_language) (OGMRipSourceChooser *chooser,
                                       gint                language);
 };
@@ -73,10 +49,9 @@ GType          ogmrip_source_chooser_get_type        (void);
 void           ogmrip_source_chooser_set_title       (OGMRipSourceChooser *chooser,
                                                       OGMRipTitle         *title);
 OGMRipTitle *  ogmrip_source_chooser_get_title       (OGMRipSourceChooser *chooser);
-OGMRipSource * ogmrip_source_chooser_get_active      (OGMRipSourceChooser *chooser,
-                                                      OGMRipSourceType    *type);
+OGMRipStream * ogmrip_source_chooser_get_active      (OGMRipSourceChooser *chooser);
 void           ogmrip_source_chooser_set_active      (OGMRipSourceChooser *chooser,
-                                                      OGMRipSource        *source);
+                                                      OGMRipStream        *stream);
 void           ogmrip_source_chooser_select_language (OGMRipSourceChooser *chooser,
                                                       gint                language);
 

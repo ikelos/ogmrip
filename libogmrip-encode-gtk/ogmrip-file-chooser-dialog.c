@@ -94,6 +94,7 @@ ogmrip_file_chooser_dialog_get_file (OGMRipFileChooserDialog *chooser, GError **
 {
   OGMRipFileChooserDialogClass *klass;
   OGMRipFile *file;
+  gint lang;
 
   g_return_val_if_fail (OGMRIP_IS_FILE_CHOOSER_DIALOG (chooser), NULL);
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
@@ -107,8 +108,12 @@ ogmrip_file_chooser_dialog_get_file (OGMRipFileChooserDialog *chooser, GError **
   if (!file)
     return NULL;
 
-  ogmrip_file_set_language (file,
-      ogmrip_language_chooser_widget_get_active (OGMRIP_LANGUAGE_CHOOSER_WIDGET (chooser->priv->lang_chooser)));
+  lang = ogmrip_language_chooser_widget_get_active (OGMRIP_LANGUAGE_CHOOSER_WIDGET (chooser->priv->lang_chooser));
+
+  if (OGMRIP_IS_AUDIO_FILE (file))
+    ogmrip_audio_file_set_language (OGMRIP_AUDIO_FILE (file), lang);
+  else
+    ogmrip_subp_file_set_language (OGMRIP_SUBP_FILE (file), lang);
 
   return file;
 }

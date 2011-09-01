@@ -58,12 +58,8 @@ void           ogmrip_player_set_title        (OGMRipPlayer      *player,
                                                OGMRipTitle       *title);
 void           ogmrip_player_set_audio_stream (OGMRipPlayer      *player,
                                                OGMRipAudioStream *stream);
-void           ogmrip_player_set_audio_file   (OGMRipPlayer      *player,
-                                               OGMRipFile        *file);
 void           ogmrip_player_set_subp_stream  (OGMRipPlayer      *player,
                                                OGMRipSubpStream  *stream);
-void           ogmrip_player_set_subp_file    (OGMRipPlayer      *player,
-                                               OGMRipFile        *file);
 void           ogmrip_player_set_chapters     (OGMRipPlayer      *player,
                                                guint             start,
                                                gint              end);

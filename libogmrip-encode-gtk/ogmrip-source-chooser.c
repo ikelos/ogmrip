@@ -76,19 +76,18 @@ ogmrip_source_chooser_get_title (OGMRipSourceChooser *chooser)
 /**
  * ogmrip_source_chooser_get_active:
  * @chooser: An #OGMRipSourceChooser
- * @type: A pointer to store the type of the chooser
  *
- * Returns the active source and its type.
+ * Returns the active stream.
  *
- * Returns: The active #OGMRipSource
+ * Returns: The active #OGMRipStream
  */
-OGMRipSource *
-ogmrip_source_chooser_get_active (OGMRipSourceChooser *chooser, OGMRipSourceType *type)
+OGMRipStream *
+ogmrip_source_chooser_get_active (OGMRipSourceChooser *chooser)
 {
   g_return_val_if_fail (OGMRIP_IS_SOURCE_CHOOSER (chooser), NULL);
 
   if (OGMRIP_SOURCE_CHOOSER_GET_IFACE (chooser)->get_active)
-    return OGMRIP_SOURCE_CHOOSER_GET_IFACE (chooser)->get_active (chooser, type);
+    return OGMRIP_SOURCE_CHOOSER_GET_IFACE (chooser)->get_active (chooser);
 
   return NULL;
 }
@@ -96,17 +95,17 @@ ogmrip_source_chooser_get_active (OGMRipSourceChooser *chooser, OGMRipSourceType
 /**
  * ogmrip_source_chooser_set_active:
  * @chooser: An #OGMRipSourceChooser
- * @source: An #OGMRipSource
+ * @stream: An #OGMRipStream
  *
- * Set the current active source.
+ * Set the current active stream.
  */
 void
-ogmrip_source_chooser_set_active (OGMRipSourceChooser *chooser, OGMRipSource *source)
+ogmrip_source_chooser_set_active (OGMRipSourceChooser *chooser, OGMRipStream *stream)
 {
   g_return_if_fail (OGMRIP_IS_SOURCE_CHOOSER (chooser));
 
   if (OGMRIP_SOURCE_CHOOSER_GET_IFACE (chooser)->set_active)
-    OGMRIP_SOURCE_CHOOSER_GET_IFACE (chooser)->set_active (chooser, source);
+    OGMRIP_SOURCE_CHOOSER_GET_IFACE (chooser)->set_active (chooser, stream);
 }
 
 /**
@@ -114,7 +113,7 @@ ogmrip_source_chooser_set_active (OGMRipSourceChooser *chooser, OGMRipSource *so
  * @chooser: An #OGMRipSourceChooser
  * @language: The language to select
  *
- * Select the first source entry of the chosen language.
+ * Select the first stream entry of the chosen language.
  */
 void
 ogmrip_source_chooser_select_language (OGMRipSourceChooser *chooser, gint language)

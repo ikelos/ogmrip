@@ -715,14 +715,14 @@ ogmrip_main_add_audio_chooser (OGMRipData *data)
     ogmrip_source_chooser_select_language (OGMRIP_SOURCE_CHOOSER (chooser),
         g_settings_get_uint (settings, OGMRIP_SETTINGS_PREF_AUDIO));
 
-    if (!ogmrip_source_chooser_get_active (OGMRIP_SOURCE_CHOOSER (chooser), NULL))
+    if (!ogmrip_source_chooser_get_active (OGMRIP_SOURCE_CHOOSER (chooser)))
     {
       OGMRipAudioStream *stream = NULL;
 
       if (ogmrip_title_get_n_audio_streams (title) > 0)
         stream = ogmrip_title_get_nth_audio_stream (title, 0);
 
-      ogmrip_source_chooser_set_active (OGMRIP_SOURCE_CHOOSER (chooser), (OGMRipSource *) stream);
+      ogmrip_source_chooser_set_active (OGMRIP_SOURCE_CHOOSER (chooser), stream ? OGMRIP_STREAM (stream) : NULL);
     }
   }
 
@@ -753,7 +753,7 @@ ogmrip_main_add_subp_chooser (OGMRipData *data)
     ogmrip_source_chooser_select_language (OGMRIP_SOURCE_CHOOSER (chooser),
         g_settings_get_uint (settings, OGMRIP_SETTINGS_PREF_SUBP));
 
-    if (!ogmrip_source_chooser_get_active (OGMRIP_SOURCE_CHOOSER (chooser), NULL))
+    if (!ogmrip_source_chooser_get_active (OGMRIP_SOURCE_CHOOSER (chooser)))
       ogmrip_source_chooser_set_active (OGMRIP_SOURCE_CHOOSER (chooser), NULL);
   }
 
@@ -1178,8 +1178,7 @@ ogmrip_main_extract_activated (OGMRipData *data)
   OGMRipProfile *profile;
   OGMRipContainer *container;
   OGMRipCodec *codec;
-  OGMRipSource *source;
-  OGMRipSourceType type;
+  OGMRipStream *stream;
 
   guint start_chap;
   gint end_chap, response;
@@ -1253,18 +1252,21 @@ ogmrip_main_extract_activated (OGMRipData *data)
   list = gtk_container_get_children (GTK_CONTAINER (data->audio_list));
   for (link = list; link; link = link->next)
   {
-    source = ogmrip_source_chooser_get_active (link->data, &type);
-    if (type == OGMRIP_SOURCE_FILE)
-      ogmrip_encoding_add_file (encoding, OGMRIP_FILE (source));
-    else if (type == OGMRIP_SOURCE_STREAM)
+    stream = ogmrip_source_chooser_get_active (link->data);
+    if (stream)
     {
-      codec = ogmrip_main_create_audio_codec (data, profile,
-          OGMRIP_SOURCE_CHOOSER (link->data), OGMRIP_AUDIO_STREAM (source), start_chap, end_chap);
-
-      if (codec)
+      if (OGMRIP_IS_FILE (stream))
+        ogmrip_encoding_add_file (encoding, OGMRIP_FILE (stream));
+      else
       {
-        ogmrip_encoding_add_audio_codec (encoding, OGMRIP_AUDIO_CODEC (codec));
-        g_object_unref (codec);
+        codec = ogmrip_main_create_audio_codec (data, profile,
+            OGMRIP_SOURCE_CHOOSER (link->data), OGMRIP_AUDIO_STREAM (stream), start_chap, end_chap);
+
+        if (codec)
+        {
+          ogmrip_encoding_add_audio_codec (encoding, OGMRIP_AUDIO_CODEC (codec));
+          g_object_unref (codec);
+        }
       }
     }
   }
@@ -1273,18 +1275,21 @@ ogmrip_main_extract_activated (OGMRipData *data)
   list = gtk_container_get_children (GTK_CONTAINER (data->subp_list));
   for (link = list; link; link = link->next)
   {
-    source = ogmrip_source_chooser_get_active (link->data, &type);
-    if (type == OGMRIP_SOURCE_FILE)
-      ogmrip_encoding_add_file (encoding, OGMRIP_FILE (source));
-    else if (type == OGMRIP_SOURCE_STREAM)
+    stream = ogmrip_source_chooser_get_active (link->data);
+    if (stream)
     {
-      codec = ogmrip_main_create_subp_codec (data, profile,
-          OGMRIP_SOURCE_CHOOSER (link->data), OGMRIP_SUBP_STREAM (source), start_chap, end_chap);
-
-      if (codec)
+      if (OGMRIP_IS_FILE (stream))
+        ogmrip_encoding_add_file (encoding, OGMRIP_FILE (stream));
+      else
       {
-        ogmrip_encoding_add_subp_codec (encoding, OGMRIP_SUBP_CODEC (codec));
-        g_object_unref (codec);
+        codec = ogmrip_main_create_subp_codec (data, profile,
+            OGMRIP_SOURCE_CHOOSER (link->data), OGMRIP_SUBP_STREAM (stream), start_chap, end_chap);
+
+        if (codec)
+        {
+          ogmrip_encoding_add_subp_codec (encoding, OGMRIP_SUBP_CODEC (codec));
+          g_object_unref (codec);
+        }
       }
     }
   }
@@ -1343,8 +1348,7 @@ ogmrip_main_play_activated (OGMRipData *data, GtkWidget *button)
   GError *error = NULL;
 
   OGMRipTitle *title;
-  OGMRipSource *source;
-  OGMRipSourceType type;
+  OGMRipStream *stream;
   GList *list, *link;
 
   guint start_chap;
@@ -1365,10 +1369,10 @@ ogmrip_main_play_activated (OGMRipData *data, GtkWidget *button)
   list = gtk_container_get_children (GTK_CONTAINER (data->audio_list));
   for (link = list; link; link = link->next)
   {
-    source = ogmrip_source_chooser_get_active (link->data, &type);
-    if (type == OGMRIP_SOURCE_STREAM)
+    stream = ogmrip_source_chooser_get_active (link->data);
+    if (stream)
     {
-      ogmrip_player_set_audio_stream (data->player, OGMRIP_AUDIO_STREAM (source));
+      ogmrip_player_set_audio_stream (data->player, OGMRIP_AUDIO_STREAM (stream));
       break;
     }
   }
@@ -1377,10 +1381,10 @@ ogmrip_main_play_activated (OGMRipData *data, GtkWidget *button)
   list = gtk_container_get_children (GTK_CONTAINER (data->subp_list));
   for (link = list; link; link = link->next)
   {
-    source = ogmrip_source_chooser_get_active (link->data, &type);
-    if (type == OGMRIP_SOURCE_STREAM)
+    stream = ogmrip_source_chooser_get_active (link->data);
+    if (stream)
     {
-      ogmrip_player_set_subp_stream (data->player, OGMRIP_SUBP_STREAM (source));
+      ogmrip_player_set_subp_stream (data->player, OGMRIP_SUBP_STREAM (stream));
       break;
     }
   }

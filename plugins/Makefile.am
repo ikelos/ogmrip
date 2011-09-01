@@ -389,6 +389,7 @@ endif
 INCLUDES = \
   -I$(top_srcdir)/libogmrip-job \
   -I$(top_srcdir)/libogmrip-media \
+  -I$(top_srcdir)/libogmrip-file \
   -I$(top_srcdir)/libogmrip-dvd \
   -I$(top_srcdir)/libogmrip-encode \
   -DOGMRIP_LIB_DIR=\""$(libdir)"\" \

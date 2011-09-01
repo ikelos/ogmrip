@@ -22,6 +22,8 @@
 
 #include "ogmrip-audio-file-chooser-dialog.h"
 
+#include <ogmrip-file.h>
+
 #include <glib/gi18n-lib.h>
 
 static void ogmrip_audio_file_chooser_dialog_constructed (GObject *gobject);
@@ -29,14 +31,20 @@ static void ogmrip_audio_file_chooser_dialog_constructed (GObject *gobject);
 static OGMRipFile *
 ogmrip_audio_file_chooser_dialog_get_file (OGMRipFileChooserDialog *dialog, GError **error)
 {
-  OGMRipFile *file;
-  gchar *filename;
+  OGMRipMedia *file;
+  gchar *uri;
 
-  filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
-  file = ogmrip_audio_file_new (filename, error);
-  g_free (filename);
+  uri = gtk_file_chooser_get_uri (GTK_FILE_CHOOSER (dialog));
+  file = ogmrip_audio_file_new (uri);
+  g_free (uri);
 
-  return file;
+  if (!file)
+  {
+    g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Could not open '%s'"), uri);
+    return NULL;
+  }
+
+  return OGMRIP_FILE (file);
 }
 
 G_DEFINE_TYPE (OGMRipAudioFileChooserDialog, ogmrip_audio_file_chooser_dialog, OGMRIP_TYPE_FILE_CHOOSER_DIALOG);

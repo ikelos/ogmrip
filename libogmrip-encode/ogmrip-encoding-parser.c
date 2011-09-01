@@ -321,36 +321,36 @@ ogmrip_encoding_parse_files (OGMRipEncoding *encoding, OGMRipXML *xml)
 {
   if (ogmrip_xml_children (xml))
   {
-    OGMRipFile *file;
-    gchar *utf8, *filename;
-    guint type;
+    OGMRipMedia *file;
+    gchar *utf8, *type, *uri;
 
     do
     {
       if (g_str_equal (ogmrip_xml_get_name (xml), "file"))
       {
         utf8 = ogmrip_xml_get_string (xml, NULL);
-        filename = utf8 ? g_filename_from_utf8 (utf8, -1, NULL, NULL, NULL) : NULL;
+        uri = utf8 ? g_filename_from_utf8 (utf8, -1, NULL, NULL, NULL) : NULL;
         g_free (utf8);
 
-        if (filename)
+        if (uri)
         {
-          type = ogmrip_xml_get_uint (xml, "type");
+          type = ogmrip_xml_get_string (xml, "type");
 
-          if (type == OGMRIP_FILE_TYPE_AUDIO)
-            file = ogmrip_audio_file_new (filename, NULL);
-          else if (type == OGMRIP_FILE_TYPE_SUBP)
-            file = ogmrip_subp_file_new (filename, NULL);
+          if (type && g_str_equal (type, "audio"))
+            file = ogmrip_audio_file_new (uri);
+          else if (type && g_str_equal (type, "subp"))
+            file = ogmrip_subp_file_new (uri);
           else
             file = NULL;
 
           if (file)
           {
-            ogmrip_encoding_add_file (encoding, file);
-            ogmrip_file_unref (file);
+            ogmrip_encoding_add_file (encoding, OGMRIP_FILE (file));
+            g_object_unref (file);
           }
 
-          g_free (filename);
+          g_free (type);
+          g_free (uri);
         }
       }
     }
@@ -597,26 +597,26 @@ ogmrip_encoding_dump_chapters (OGMRipXML *xml, OGMRipChapters *chapters)
 static void
 ogmrip_encoding_dump_file (OGMRipXML *xml, OGMRipFile *file)
 {
-  gint type;
-
   if (!file)
     return;
 
-  type = ogmrip_file_get_type (file);
-  if (type == OGMRIP_FILE_TYPE_AUDIO || type == OGMRIP_FILE_TYPE_SUBP)
+  if (OGMRIP_IS_AUDIO_FILE (file) || OGMRIP_IS_SUBP_FILE (file))
   {
     gchar *utf8;
 
     ogmrip_xml_append (xml, "file");
 
-    ogmrip_xml_set_uint (xml, "type", type);
+    if (OGMRIP_IS_AUDIO_FILE (file))
+      ogmrip_xml_set_string (xml, "type", "audio");
+    else
+      ogmrip_xml_set_string (xml, "type", "subp");
 
-    utf8 = g_filename_to_utf8 (ogmrip_file_get_filename (file), -1, NULL, NULL, NULL);
+    utf8 = g_filename_to_utf8 (ogmrip_file_get_path (file), -1, NULL, NULL, NULL);
     ogmrip_xml_set_string (xml, NULL, utf8);
     g_free (utf8);
-  }
 
-  ogmrip_xml_parent (xml);
+    ogmrip_xml_parent (xml);
+  }
 }
 
 gboolean

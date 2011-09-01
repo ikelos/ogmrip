@@ -17,7 +17,6 @@ libogmrip_encode_la_SOURCES = \
   ogmrip-encoding.c         \
   ogmrip-encoding-manager.c \
   ogmrip-encoding-parser.c  \
-  ogmrip-file.c             \
   ogmrip-fs.c               \
   ogmrip-hardsub.c          \
   ogmrip-marshal.c          \
@@ -47,7 +46,6 @@ libogmrip_encode_la_HEADERS = \
   ogmrip-encoding-manager.h \
   ogmrip-encoding-parser.h  \
   ogmrip-enums.h            \
-  ogmrip-file.h             \
   ogmrip-fs.h               \
   ogmrip-hardsub.h          \
   ogmrip-marshal.h          \
@@ -70,6 +68,7 @@ libogmrip_encode_la_LDFLAGS = \
 
 libogmrip_encode_la_LIBADD = \
   $(top_builddir)/libogmrip-media/libogmrip-media.la \
+  $(top_builddir)/libogmrip-file/libogmrip-file.la \
   $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la \
   $(top_builddir)/libogmrip-job/libogmrip-job.la
 
@@ -126,6 +125,7 @@ EXTRA_DIST = \
 INCLUDES = \
   -I$(top_srcdir)/libogmrip-job    \
   -I$(top_srcdir)/libogmrip-media  \
+  -I$(top_srcdir)/libogmrip-file   \
   -I$(top_srcdir)/libogmrip-dvd    \
   -DOGMRIP_LIB_DIR=\""$(libdir)"\" \
   -DOGMRIP_DATA_DIR=\""$(datadir)"\"

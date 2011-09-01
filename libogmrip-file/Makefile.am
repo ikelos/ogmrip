@@ -1,0 +1,32 @@
+lib_LTLIBRARIES = \
+  libogmrip-file.la
+
+libogmrip_file_la_SOURCES = \
+  ogmrip-audio-file.c  \
+  ogmrip-file-object.c \
+  ogmrip-media-info.c  \
+  ogmrip-subp-file.c   \
+  ogmrip-video-file.c
+
+libogmrip_file_la_HEADERS = \
+  ogmrip-audio-file.h  \
+  ogmrip-file-object.h \
+  ogmrip-media-info.h  \
+  ogmrip-subp-file.h   \
+  ogmrip-video-file.h  \
+  ogmrip-file.h
+
+libogmrip_file_la_LDFLAGS = \
+  -version-info $(OGMDVD_LT_VERSION)
+
+libogmrip_file_la_LIBADD = \
+  $(top_builddir)/libogmrip-media/libogmrip-media.la
+
+libogmrip_file_ladir = \
+  $(includedir)/ogmrip-file
+
+INCLUDES = \
+  -I$(top_srcdir)/libogmrip-media
+
+EXTRA_DIST = \
+  ogmrip-file-priv.h

@@ -41,10 +41,7 @@ struct _OGMRipPlayerPriv
   OGMRipTitle *title;
 
   OGMRipAudioStream *astream;
-  OGMRipFile *afile;
-
   OGMRipSubpStream *sstream;
-  OGMRipFile *sfile;
 
   guint start_chap;
   gint end_chap;
@@ -132,11 +129,6 @@ ogmrip_mplayer_play_command (OGMRipPlayer *player)
     g_ptr_array_add (argv, g_strdup ("-aid"));
     g_ptr_array_add (argv, g_strdup_printf ("%d",
           ogmrip_mplayer_map_audio_id (OGMRIP_STREAM (player->priv->astream))));
-  }
-  else if (player->priv->afile)
-  {
-    g_ptr_array_add (argv, g_strdup ("-audiofile"));
-    g_ptr_array_add (argv, g_strdup (ogmrip_file_get_filename (player->priv->afile)));
   }
   else
     g_ptr_array_add (argv, g_strdup ("-nosound"));
@@ -251,22 +243,10 @@ ogmrip_player_dispose (GObject *gobject)
     player->priv->astream = NULL;
   }
 
-  if (player->priv->afile)
-  {
-    ogmrip_file_unref (player->priv->afile);
-    player->priv->afile = NULL;
-  }
-
   if (player->priv->sstream)
   {
     g_object_unref (player->priv->sstream);
     player->priv->sstream = NULL;
-  }
-
-  if (player->priv->sfile)
-  {
-    ogmrip_file_unref (player->priv->sfile);
-    player->priv->sfile = NULL;
   }
 
   G_OBJECT_CLASS (ogmrip_player_parent_class)->dispose (gobject);
@@ -317,7 +297,7 @@ void
 ogmrip_player_set_audio_stream (OGMRipPlayer *player, OGMRipAudioStream *stream)
 {
   g_return_if_fail (OGMRIP_IS_PLAYER (player));
-  g_return_if_fail (stream != NULL);
+  g_return_if_fail (OGMRIP_IS_AUDIO_STREAM (stream));
 
   if (stream)
     g_object_ref (stream);
@@ -325,35 +305,6 @@ ogmrip_player_set_audio_stream (OGMRipPlayer *player, OGMRipAudioStream *stream)
   if (player->priv->astream)
     g_object_unref (player->priv->astream);
   player->priv->astream = stream;
-
-  if (player->priv->afile)
-    ogmrip_file_unref (player->priv->afile);
-  player->priv->afile = NULL;
-}
-
-/**
- * ogmrip_player_set_audio_file:
- * @player: an #OGMRipPlayer
- * @file: an #OGMRipFile
- *
- * Sets the audio file to play
- */
-void
-ogmrip_player_set_audio_file (OGMRipPlayer *player, OGMRipFile *file)
-{
-  g_return_if_fail (OGMRIP_IS_PLAYER (player));
-  g_return_if_fail (file != NULL);
-
-  if (file)
-    ogmrip_file_ref (file);
-
-  if (player->priv->astream)
-    g_object_unref (player->priv->astream);
-  player->priv->astream = NULL;
-
-  if (player->priv->afile)
-    ogmrip_file_unref (player->priv->afile);
-  player->priv->afile = file;
 }
 
 /**
@@ -367,7 +318,7 @@ void
 ogmrip_player_set_subp_stream (OGMRipPlayer *player, OGMRipSubpStream *stream)
 {
   g_return_if_fail (OGMRIP_IS_PLAYER (player));
-  g_return_if_fail (stream != NULL);
+  g_return_if_fail (OGMRIP_IS_SUBP_STREAM (stream));
 
   if (stream)
     g_object_ref (stream);
@@ -375,35 +326,6 @@ ogmrip_player_set_subp_stream (OGMRipPlayer *player, OGMRipSubpStream *stream)
   if (player->priv->sstream)
     g_object_unref (player->priv->sstream);
   player->priv->sstream = stream;
-
-  if (player->priv->sfile)
-    ogmrip_file_unref (player->priv->sfile);
-  player->priv->sfile = NULL;
-}
-
-/**
- * ogmrip_player_set_subp_file:
- * @player: an #OGMRipPlayer
- * @file: an #OGMRipFile
- *
- * Sets the subtitle file to play
- */
-void
-ogmrip_player_set_subp_file (OGMRipPlayer *player, OGMRipFile *file)
-{
-  g_return_if_fail (OGMRIP_IS_PLAYER (player));
-  g_return_if_fail (file != NULL);
-
-  if (file)
-    ogmrip_file_ref (file);
-
-  if (player->priv->sstream)
-    g_object_unref (player->priv->sstream);
-  player->priv->sstream = NULL;
-
-  if (player->priv->sfile)
-    ogmrip_file_unref (player->priv->sfile);
-  player->priv->sfile = file;
 }
 
 /**

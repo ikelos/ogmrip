@@ -672,7 +672,7 @@ ogmrip_encoding_add_file (OGMRipEncoding *encoding, OGMRipFile *file)
   g_return_if_fail (OGMRIP_IS_ENCODING (encoding));
   g_return_if_fail (file != NULL);
 
-  encoding->priv->files = g_list_append (encoding->priv->files, ogmrip_file_ref (file));
+  encoding->priv->files = g_list_append (encoding->priv->files, g_object_ref (file));
 }
 
 GList *
@@ -993,7 +993,7 @@ ogmrip_encoding_get_nonvideo_size (OGMRipEncoding *encoding)
     nonvideo += ogmrip_encoding_get_file_size (link->data);
 
   for (link = encoding->priv->files; link; link = link->next)
-    nonvideo += ogmrip_file_get_size (link->data);
+    nonvideo += ogmrip_title_get_size (OGMRIP_TITLE (link->data));
 
   return nonvideo;
 }
@@ -1066,16 +1066,16 @@ ogmrip_encoding_get_file_overhead (OGMRipEncoding *encoding, OGMRipFile *file)
   glong length, audio_frames;
   gint samples_per_frame, sample_rate, channels, overhead;
 
-  if (ogmrip_file_get_type (file) == OGMRIP_FILE_TYPE_SUBP)
+  if (!OGMRIP_IS_AUDIO_STREAM (file))
     return 0;
 
-  length = ogmrip_audio_file_get_length (OGMRIP_AUDIO_FILE (file));
-  sample_rate = ogmrip_audio_file_get_sample_rate (OGMRIP_AUDIO_FILE (file));
-  samples_per_frame = ogmrip_audio_file_get_samples_per_frame (OGMRIP_AUDIO_FILE (file));
+  length = ogmrip_title_get_length (OGMRIP_TITLE (file), NULL);
+  sample_rate = ogmrip_audio_stream_get_sample_rate (OGMRIP_AUDIO_STREAM (file));
+  samples_per_frame = ogmrip_audio_stream_get_samples_per_frame (OGMRIP_AUDIO_STREAM (file));
 
   channels = 1;
-  if (ogmrip_file_get_format (file) != OGMRIP_FORMAT_COPY)
-    channels = ogmrip_audio_file_get_channels (OGMRIP_AUDIO_FILE (file));
+  if (ogmrip_stream_get_format (OGMRIP_STREAM (file)) != OGMRIP_FORMAT_COPY)
+    channels = ogmrip_audio_stream_get_channels (OGMRIP_AUDIO_STREAM (file));
 
   audio_frames = length * sample_rate * (channels + 1) / samples_per_frame;
 
