@@ -29,7 +29,7 @@ typedef enum
 {
   OGMRIP_CHAPTER_STORE_CHAPTER_COLUMN,
   OGMRIP_CHAPTER_STORE_LABEL_COLUMN,
-  OGMRIP_CHAPTER_STORE_LENGTH_COLUMN,
+  OGMRIP_CHAPTER_STORE_DURATION_COLUMN,
   OGMRIP_CHAPTER_STORE_SELECTED_COLUMN,
   OGMRIP_CHAPTER_STORE_N_COLUMNS
 } OGMRipChapterStoreColumns;
@@ -54,18 +54,30 @@ struct _OGMRipChapterStore
 struct _OGMRipChapterStoreClass
 {
   GtkListStoreClass parent_class;
+
+  void (* selection_changed) (OGMRipChapterStore *store);
 };
 
-GType                ogmrip_chapter_store_get_type  (void);
-OGMRipChapterStore * ogmrip_chapter_store_new       (OGMRipTitle        *title);
-void                 ogmrip_chapter_store_set_title (OGMRipChapterStore *store,
-                                                     OGMRipTitle        *title);
-OGMRipTitle *        ogmrip_chapter_store_get_title (OGMRipChapterStore *store);
-gchar *              ogmrip_chapter_store_get_label (OGMRipChapterStore *store,
-                                                     guint              chapter);
-void                 ogmrip_chapter_store_set_label (OGMRipChapterStore *store,
-                                                     guint              chapter,
-                                                     const gchar        *label);
+GType                ogmrip_chapter_store_get_type      (void);
+OGMRipChapterStore * ogmrip_chapter_store_new           (void);
+void                 ogmrip_chapter_store_set_title     (OGMRipChapterStore *store,
+                                                         OGMRipTitle        *title);
+OGMRipTitle *        ogmrip_chapter_store_get_title     (OGMRipChapterStore *store);
+gchar *              ogmrip_chapter_store_get_label     (OGMRipChapterStore *store,
+                                                         guint              chapter);
+void                 ogmrip_chapter_store_set_label     (OGMRipChapterStore *store,
+                                                         guint              chapter,
+                                                         const gchar        *label);
+gboolean             ogmrip_chapter_store_get_selected  (OGMRipChapterStore *store,
+                                                         GtkTreeIter        *iter);
+void                 ogmrip_chapter_store_set_selected  (OGMRipChapterStore *store,
+                                                         GtkTreeIter        *iter,
+                                                         gboolean           selected);
+void                 ogmrip_chapter_store_select_all    (OGMRipChapterStore *store);
+void                 ogmrip_chapter_store_deselect_all  (OGMRipChapterStore *store);
+gboolean             ogmrip_chapter_store_get_selection (OGMRipChapterStore *store,
+                                                         guint              *start_chapter,
+                                                         gint               *end_chapter);
 
 G_END_DECLS
 

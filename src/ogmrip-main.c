@@ -62,12 +62,13 @@ typedef struct
 
   GtkWidget *audio_list;
   GtkWidget *subp_list;
-  GtkWidget *chapter_list;
 
   GtkWidget *relative_check;
   GtkWidget *angle_spin;
 
   GtkAction *extract_action;
+
+  GtkTreeModel *chapter_store;
 
   OGMRipEncodingManager *manager;
   OGMRipPlayer *player;
@@ -573,7 +574,7 @@ ogmrip_main_import_simple_chapters (OGMRipData *data, const gchar *filename)
       if (sscanf (buf, "CHAPTER%02dNAME=", &chap) == 1 && chap > 0)
       {
         str = g_strstrip (strchr (buf, '='));
-        ogmdvd_chapter_list_set_label (OGMDVD_CHAPTER_LIST (data->chapter_list), chap - 1, str + 1);
+        ogmrip_chapter_store_set_label (OGMRIP_CHAPTER_STORE (data->chapter_store), chap - 1, str + 1);
       }
     }
   }
@@ -639,7 +640,7 @@ ogmrip_main_import_matroska_chapters (OGMRipData *data, const gchar *filename)
         if (child)
         {
           str = xmlNodeGetContent (child);
-          ogmdvd_chapter_list_set_label (OGMDVD_CHAPTER_LIST (data->chapter_list), chap, (gchar *) str);
+          ogmrip_chapter_store_set_label (OGMRIP_CHAPTER_STORE (data->chapter_store), chap, (gchar *) str);
           chap ++;
         }
       }
@@ -660,7 +661,7 @@ ogmrip_main_export_simple_chapters (OGMRipData *data, const gchar *filename)
   guint start_chap;
   gint end_chap;
 
-  if (ogmrip_chapter_list_get_selected (OGMRIP_CHAPTER_LIST (data->chapter_list), &start_chap, &end_chap))
+  if (ogmrip_chapter_store_get_selection (OGMRIP_CHAPTER_STORE (data->chapter_store), &start_chap, &end_chap))
   {
     GError *error = NULL;
     OGMRipTitle *title;
@@ -675,7 +676,7 @@ ogmrip_main_export_simple_chapters (OGMRipData *data, const gchar *filename)
 
     for (i = 0; ; i++)
     {
-      label = ogmdvd_chapter_list_get_label (OGMDVD_CHAPTER_LIST (data->chapter_list), i);
+      label = ogmrip_chapter_store_get_label (OGMRIP_CHAPTER_STORE (data->chapter_store), i);
       if (!label)
         break;
       ogmrip_chapters_set_label (OGMRIP_CHAPTERS (chapters), i, label);
@@ -871,7 +872,7 @@ ogmrip_main_create_video_codec (OGMRipData *data, OGMRipProfile *profile,
  */
 static OGMRipCodec *
 ogmrip_main_create_audio_codec (OGMRipData *data, OGMRipProfile *profile,
-    OGMRipSourceChooser *chooser, OGMDvdAudioStream *stream, guint start_chap, gint end_chap)
+    OGMRipSourceChooser *chooser, OGMRipAudioStream *stream, guint start_chap, gint end_chap)
 {
   OGMRipAudioOptions *options;
   OGMRipCodec *codec;
@@ -931,7 +932,7 @@ ogmrip_main_create_audio_codec (OGMRipData *data, OGMRipProfile *profile,
  */
 static OGMRipCodec *
 ogmrip_main_create_subp_codec (OGMRipData *data, OGMRipProfile *profile,
-    OGMRipSourceChooser *chooser, OGMDvdSubpStream *stream, guint start_chap, gint end_chap)
+    OGMRipSourceChooser *chooser, OGMRipSubpStream *stream, guint start_chap, gint end_chap)
 {
   OGMRipSubpOptions *options;
   OGMRipCodec *codec;
@@ -1003,7 +1004,7 @@ ogmrip_main_create_chapters_codec (OGMRipData *data, OGMRipVideoStream *stream, 
   ogmrip_codec_get_chapters (codec, &start_chap, &last_chap);
   for (chap = start_chap; chap <= last_chap; chap ++)
   {
-    label = ogmdvd_chapter_list_get_label (OGMDVD_CHAPTER_LIST (data->chapter_list), chap);
+    label = ogmrip_chapter_store_get_label (OGMRIP_CHAPTER_STORE (data->chapter_store), chap);
     if (!label)
       break;
 
@@ -1213,7 +1214,7 @@ ogmrip_main_extract_activated (OGMRipData *data)
   ogmrip_encoding_set_container (encoding, container);
   g_object_unref (container);
 
-  ogmrip_chapter_list_get_selected (OGMRIP_CHAPTER_LIST (data->chapter_list), &start_chap, &end_chap);
+  ogmrip_chapter_store_get_selection (OGMRIP_CHAPTER_STORE (data->chapter_store), &start_chap, &end_chap);
 
   codec = ogmrip_main_create_video_codec (data, profile,
       ogmrip_title_get_video_stream (title), start_chap, end_chap);
@@ -1258,7 +1259,7 @@ ogmrip_main_extract_activated (OGMRipData *data)
     else if (type == OGMRIP_SOURCE_STREAM)
     {
       codec = ogmrip_main_create_audio_codec (data, profile,
-          OGMRIP_SOURCE_CHOOSER (link->data), OGMDVD_AUDIO_STREAM (source), start_chap, end_chap);
+          OGMRIP_SOURCE_CHOOSER (link->data), OGMRIP_AUDIO_STREAM (source), start_chap, end_chap);
 
       if (codec)
       {
@@ -1278,7 +1279,7 @@ ogmrip_main_extract_activated (OGMRipData *data)
     else if (type == OGMRIP_SOURCE_STREAM)
     {
       codec = ogmrip_main_create_subp_codec (data, profile,
-          OGMRIP_SOURCE_CHOOSER (link->data), OGMDVD_SUBP_STREAM (source), start_chap, end_chap);
+          OGMRIP_SOURCE_CHOOSER (link->data), OGMRIP_SUBP_STREAM (source), start_chap, end_chap);
 
       if (codec)
       {
@@ -1358,7 +1359,7 @@ ogmrip_main_play_activated (OGMRipData *data, GtkWidget *button)
   title = ogmrip_title_chooser_get_active (OGMRIP_TITLE_CHOOSER (data->title_chooser));
   ogmrip_player_set_title (data->player, title);
 
-  ogmrip_chapter_list_get_selected (OGMRIP_CHAPTER_LIST (data->chapter_list), &start_chap, &end_chap);
+  ogmrip_chapter_store_get_selection (OGMRIP_CHAPTER_STORE (data->chapter_store), &start_chap, &end_chap);
   ogmrip_player_set_chapters (data->player, start_chap, end_chap);
 
   list = gtk_container_get_children (GTK_CONTAINER (data->audio_list));
@@ -1559,8 +1560,8 @@ ogmrip_main_title_chooser_changed (OGMRipData *data)
   gtk_container_clear (GTK_CONTAINER (data->subp_list));
   ogmrip_main_add_subp_chooser (data);
 
-  ogmdvd_chapter_list_set_title (OGMDVD_CHAPTER_LIST (data->chapter_list), title);
-  ogmrip_chapter_list_select_all (OGMRIP_CHAPTER_LIST (data->chapter_list));
+  ogmrip_chapter_store_set_title (OGMRIP_CHAPTER_STORE (data->chapter_store), title);
+  ogmrip_chapter_store_select_all (OGMRIP_CHAPTER_STORE (data->chapter_store));
 
   angles = title ? ogmrip_title_get_n_angles (title) : 1;
   gtk_spin_button_set_value (GTK_SPIN_BUTTON (data->angle_spin), 1);
@@ -1578,7 +1579,7 @@ ogmrip_main_chapter_selection_changed (OGMRipData *data)
   guint start_chap;
   gint end_chap;
 
-  sensitive = ogmrip_chapter_list_get_selected (OGMRIP_CHAPTER_LIST (data->chapter_list), &start_chap, &end_chap);
+  sensitive = ogmrip_chapter_store_get_selection (OGMRIP_CHAPTER_STORE (data->chapter_store), &start_chap, &end_chap);
   if (!sensitive)
     gtk_label_set_text (GTK_LABEL (data->length_label), "");
   else
@@ -1898,13 +1899,16 @@ ogmrip_main_new (void)
 
   widget = gtk_builder_get_widget (builder, "scrolledwindow");
 
-  data->chapter_list = ogmrip_chapter_list_new ();
-  gtk_container_add (GTK_CONTAINER (widget), data->chapter_list);
-  gtk_widget_show (data->chapter_list);
+  widget = ogmrip_chapter_view_new ();
+  gtk_container_add (GTK_CONTAINER (widget), widget);
+  gtk_widget_show (widget);
 
   g_object_bind_property (data->title_chooser, "sensitive",
-      data->chapter_list, "sensitive", G_BINDING_SYNC_CREATE);
-  g_signal_connect_swapped (data->chapter_list, "selection-changed", 
+      widget, "sensitive", G_BINDING_SYNC_CREATE);
+
+  data->chapter_store = gtk_tree_view_get_model (GTK_TREE_VIEW (widget));
+
+  g_signal_connect_swapped (data->chapter_store, "selection-changed", 
       G_CALLBACK (ogmrip_main_chapter_selection_changed), data);
 
   action = gtk_action_group_get_action (action_group, "SelectAll");
@@ -1912,14 +1916,14 @@ ogmrip_main_new (void)
       action, "sensitive", G_BINDING_SYNC_CREATE);
 
   g_signal_connect_swapped (action, "activate",
-      G_CALLBACK (ogmrip_chapter_list_select_all), data->chapter_list);
+      G_CALLBACK (ogmrip_chapter_store_select_all), data->chapter_store);
 
   action = gtk_action_group_get_action (action_group, "DeselectAll");
   g_object_bind_property (data->title_chooser, "sensitive",
       action, "sensitive", G_BINDING_SYNC_CREATE);
 
   g_signal_connect_swapped (action, "activate",
-      G_CALLBACK (ogmrip_chapter_list_deselect_all), data->chapter_list);
+      G_CALLBACK (ogmrip_chapter_store_deselect_all), data->chapter_store);
 
   data->relative_check = gtk_builder_get_widget (builder, "relative-check");
   data->angle_spin = gtk_builder_get_widget (builder, "angle-spin");

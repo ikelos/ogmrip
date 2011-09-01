@@ -5,22 +5,20 @@ BUILT_SOURCES = \
   ogmdvd-marshal.c \
   ogmdvd-marshal.h
 
-libogmrip_dvd_gtk_la_SOURCES =    \
-  ogmdvd-chapter-list.c           \
-  ogmdvd-drive-chooser.c          \
-  ogmdvd-drive-chooser-widget.c   \
-  ogmdvd-drive-chooser-dialog.c   \
+libogmrip_dvd_gtk_la_SOURCES =  \
+  ogmdvd-drive-chooser.c        \
+  ogmdvd-drive-chooser-widget.c \
+  ogmdvd-drive-chooser-dialog.c \
   ogmdvd-marshal.c
 
 libogmrip_dvd_gtk_ladir = \
   $(includedir)/ogmrip-dvd
 
-libogmrip_dvd_gtk_la_HEADERS =    \
-  ogmdvd-chapter-list.h           \
-  ogmdvd-drive-chooser.h          \
-  ogmdvd-drive-chooser-widget.h   \
-  ogmdvd-drive-chooser-dialog.h   \
-  ogmdvd-marshal.h                \
+libogmrip_dvd_gtk_la_HEADERS =  \
+  ogmdvd-drive-chooser.h        \
+  ogmdvd-drive-chooser-widget.h \
+  ogmdvd-drive-chooser-dialog.h \
+  ogmdvd-marshal.h              \
   ogmrip-dvd-gtk.h
 
 libogmrip_dvd_gtk_la_LDFLAGS = \

@@ -6,7 +6,6 @@ libogmrip_encode_gtk_la_SOURCES =    \
   ogmrip-audio-file-chooser-dialog.c \
   ogmrip-audio-options.c             \
   ogmrip-audio-options-dialog.c      \
-  ogmrip-chapter-list.c              \
   ogmrip-encoding-manager-dialog.c   \
   ogmrip-error-dialog.c              \
   ogmrip-file-chooser-dialog.c       \
@@ -34,7 +33,6 @@ libogmrip_encode_gtk_la_HEADERS =    \
   ogmrip-audio-file-chooser-dialog.h \
   ogmrip-audio-options.h             \
   ogmrip-audio-options-dialog.h      \
-  ogmrip-chapter-list.h              \
   ogmrip-encoding-manager-dialog.h   \
   ogmrip-error-dialog.h              \
   ogmrip-file-chooser-dialog.h       \

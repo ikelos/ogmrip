@@ -19,7 +19,7 @@
 #ifndef __OGMRIP_MEDIA_GTK_H__
 #define __OGMRIP_MEDIA_GTK_H__
 
-#include <ogmrip-chapter-store.h>
+#include <ogmrip-chapter-view.h>
 #include <ogmrip-title-chooser-widget.h>
 
 #endif /* __OGMRIP_MEDIA_GTK_H__ */

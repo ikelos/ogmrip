@@ -3,6 +3,7 @@ lib_LTLIBRARIES = \
 
 libogmrip_media_gtk_la_SOURCES = \
   ogmrip-chapter-store.c         \
+  ogmrip-chapter-view.c          \
   ogmrip-title-chooser.c         \
   ogmrip-title-chooser-widget.c
 
@@ -11,6 +12,7 @@ libogmrip_media_gtk_ladir = \
 
 libogmrip_media_gtk_la_HEADERS = \
   ogmrip-chapter-store.h         \
+  ogmrip-chapter-view.h          \
   ogmrip-title-chooser.h         \
   ogmrip-title-chooser-widget.h  \
   ogmrip-media-gtk.h
