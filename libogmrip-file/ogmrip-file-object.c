@@ -150,13 +150,6 @@ ogmrip_media_iface_init (OGMRipMediaInterface *iface)
   iface->get_size = ogmrip_file_get_media_size;
   iface->get_n_titles = ogmrip_file_get_n_titles;
   iface->get_nth_title = ogmrip_file_get_nth_title;
-/*
-  iface->get_n_audio_streams = ogmrip_audio_file_get_n_audio_streams;
-  iface->get_nth_audio_stream = ogmrip_audio_file_get_nth_audio_stream;
-  iface->get_n_subp_streams = ogmrip_subp_file_get_n_subp_streams;
-  iface->get_nth_subp_stream = ogmrip_subp_file_get_nth_subp_stream;
-  iface->get_video_stream = ogmrip_video_file_get_video_stream;
-*/
 }
 
 static OGMRipMedia *
@@ -183,12 +176,72 @@ ogmrip_file_get_length (OGMRipTitle *title, OGMRipTime *time_)
   return length;
 }
 
+static OGMRipVideoStream *
+ogmrip_file_get_video_stream (OGMRipTitle *title)
+{
+  OGMRipFile *file = OGMRIP_FILE (title);
+
+  if (!OGMRIP_IS_VIDEO_STREAM (file))
+    return NULL;
+
+  return OGMRIP_VIDEO_STREAM (file);
+}
+
+static gint
+ogmrip_file_get_n_audio_streams (OGMRipTitle *title)
+{
+  OGMRipFile *file = OGMRIP_FILE (title);
+
+  if (!OGMRIP_IS_AUDIO_STREAM (file))
+    return 0;
+
+  return 1;
+}
+
+static OGMRipAudioStream *
+ogmrip_file_get_nth_audio_stream (OGMRipTitle *title, guint nr)
+{
+  OGMRipFile *file = OGMRIP_FILE (title);
+
+  if (!OGMRIP_IS_AUDIO_STREAM (file))
+    return NULL;
+
+  return OGMRIP_AUDIO_STREAM (file);
+}
+
+static gint
+ogmrip_file_get_n_subp_streams (OGMRipTitle *title)
+{
+  OGMRipFile *file = OGMRIP_FILE (title);
+
+  if (!OGMRIP_IS_SUBP_STREAM (file))
+    return 0;
+
+  return 1;
+}
+
+static OGMRipSubpStream *
+ogmrip_file_get_nth_subp_stream (OGMRipTitle *title, guint nr)
+{
+  OGMRipFile *file = OGMRIP_FILE (title);
+
+  if (!OGMRIP_IS_SUBP_STREAM (file))
+    return NULL;
+
+  return OGMRIP_SUBP_STREAM (file);
+}
+
 static void
 ogmrip_title_iface_init (OGMRipTitleInterface *iface)
 {
   iface->get_media = ogmrip_file_get_media;
   iface->get_size = ogmrip_file_get_title_size;
   iface->get_length = ogmrip_file_get_length;
+  iface->get_video_stream = ogmrip_file_get_video_stream;
+  iface->get_n_audio_streams = ogmrip_file_get_n_audio_streams;
+  iface->get_nth_audio_stream = ogmrip_file_get_nth_audio_stream;
+  iface->get_n_subp_streams = ogmrip_file_get_n_subp_streams;
+  iface->get_nth_subp_stream = ogmrip_file_get_nth_subp_stream;
 }
 
 static gint
