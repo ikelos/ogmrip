@@ -26,6 +26,7 @@ libogmrip_encode_la_SOURCES = \
   ogmrip-profile.c          \
   ogmrip-profile-engine.c   \
   ogmrip-profile-parser.c   \
+  ogmrip-stub.c             \
   ogmrip-subp-codec.c       \
   ogmrip-test.c             \
   ogmrip-version.c          \
@@ -120,6 +121,7 @@ libogmrip_lavc_la_HEADERS = \
 
 EXTRA_DIST = \
   ogmrip-marshal.list \
+  ogmrip-stub.h       \
   ogmrip-version.h.in
 
 INCLUDES = \

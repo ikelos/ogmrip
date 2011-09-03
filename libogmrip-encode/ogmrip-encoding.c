@@ -670,7 +670,7 @@ void
 ogmrip_encoding_add_file (OGMRipEncoding *encoding, OGMRipFile *file)
 {
   g_return_if_fail (OGMRIP_IS_ENCODING (encoding));
-  g_return_if_fail (file != NULL);
+  g_return_if_fail (OGMRIP_IS_FILE (file));
 
   encoding->priv->files = g_list_append (encoding->priv->files, g_object_ref (file));
 }
@@ -969,7 +969,7 @@ ogmrip_encoding_get_file_size (OGMRipCodec *codec)
   const gchar *filename;
   guint64 size = 0;
 
-  filename = ogmrip_codec_get_output (codec);
+  filename = ogmrip_file_get_path (ogmrip_codec_get_output (codec));
   if (filename && g_file_test (filename, G_FILE_TEST_IS_REGULAR))
     if (g_stat (filename, &buf) == 0)
       size = (guint64) buf.st_size;
@@ -993,7 +993,7 @@ ogmrip_encoding_get_nonvideo_size (OGMRipEncoding *encoding)
     nonvideo += ogmrip_encoding_get_file_size (link->data);
 
   for (link = encoding->priv->files; link; link = link->next)
-    nonvideo += ogmrip_title_get_size (OGMRIP_TITLE (link->data));
+    nonvideo += ogmrip_title_get_size (link->data);
 
   return nonvideo;
 }
@@ -1324,24 +1324,7 @@ ogmrip_encoding_test (OGMRipEncoding *encoding, GError **error)
 static gint
 ogmrip_encoding_run_codec (OGMRipEncoding *encoding, OGMRipCodec *codec, GError **error)
 {
-  const gchar *label = NULL;
-  gint result, format = -1, lang = -1;
-  gchar *output = NULL;
-
-  if (OGMRIP_IS_VIDEO_CODEC (codec))
-    output = ogmrip_fs_mktemp ("video.XXXXXX", error);
-  else if (OGMRIP_IS_AUDIO_CODEC (codec))
-    output = ogmrip_fs_mktemp ("audio.XXXXXX", error);
-  else if (OGMRIP_IS_SUBP_CODEC (codec))
-    output = ogmrip_fs_mktemp ("subp.XXXXXX", error);
-  else if (OGMRIP_IS_CHAPTERS (codec))
-    output = ogmrip_fs_mktemp ("chapters.XXXXXX", error);
-
-  if (!output)
-    return OGMJOB_RESULT_ERROR;
-
-  ogmrip_codec_set_output (codec, output);
-  g_free (output);
+  gint result;
 
   g_signal_connect_swapped (codec, "progress",
       G_CALLBACK (ogmrip_encoding_task_progressed), encoding);
@@ -1356,40 +1339,7 @@ ogmrip_encoding_run_codec (OGMRipEncoding *encoding, OGMRipCodec *codec, GError 
   if (result != OGMJOB_RESULT_SUCCESS)
     return result;
 
-  if (OGMRIP_IS_VIDEO_CODEC (codec))
-  {
-    format = ogmrip_plugin_get_video_codec_format (G_OBJECT_TYPE (codec));
-    if (format == OGMRIP_FORMAT_COPY)
-      format = OGMRIP_FORMAT_MPEG2;
-  }
-  else if (OGMRIP_IS_AUDIO_CODEC (codec))
-  {
-    format = ogmrip_plugin_get_audio_codec_format (G_OBJECT_TYPE (codec));
-    if (format == OGMRIP_FORMAT_COPY)
-    {
-      OGMRipStream *stream;
-
-      stream = ogmrip_codec_get_input (codec);
-      format = ogmrip_stream_get_format (stream);
-    }
-    label = ogmrip_audio_codec_get_label (OGMRIP_AUDIO_CODEC (codec));
-    lang = ogmrip_audio_codec_get_language (OGMRIP_AUDIO_CODEC (codec));
-  }
-  else if (OGMRIP_IS_SUBP_CODEC (codec))
-  {
-    format = ogmrip_plugin_get_subp_codec_format (G_OBJECT_TYPE (codec));
-    if (format == OGMRIP_FORMAT_COPY)
-      format = OGMRIP_FORMAT_VOBSUB;
-    label = ogmrip_subp_codec_get_label (OGMRIP_SUBP_CODEC (codec));
-    lang = ogmrip_subp_codec_get_language (OGMRIP_SUBP_CODEC (codec));
-  }
-  else if (OGMRIP_IS_CHAPTERS (codec))
-  {
-    format = OGMRIP_FORMAT_CHAPTERS;
-    lang = ogmrip_chapters_get_language (OGMRIP_CHAPTERS (codec));
-  }
-
-  ogmrip_container_add_file (encoding->priv->container, output, format, label, lang);
+  ogmrip_container_add_file (encoding->priv->container, ogmrip_codec_get_output (codec));
 
   return OGMJOB_RESULT_SUCCESS;
 }

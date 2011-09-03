@@ -101,34 +101,6 @@ typedef enum
 } OGMRipQualityType;
 
 /**
- * OGMRipAudioDemuxer:
- * @OGMRIP_AUDIO_DEMUXER_AUTO: The demuxer is autodetected
- * @OGMRIP_AUDIO_DEMUXER_AC3: The AC3 demuxer must be used
- * @OGMRIP_AUDIO_DEMUXER_DTS: The DTS demuxer must be used
- *
- * The audio demuxer to be used when embedding the stream.
- */
-typedef enum
-{
-  OGMRIP_AUDIO_DEMUXER_AUTO = 0,
-  OGMRIP_AUDIO_DEMUXER_AC3  = 0x2000,
-  OGMRIP_AUDIO_DEMUXER_DTS  = 0x2001
-} OGMRipAudioDemuxer;
-
-/**
- * OGMRipSubpDemuxer:
- * @OGMRIP_SUBP_DEMUXER_AUTO: The demuxer is autodetected
- * @OGMRIP_SUBP_DEMUXER_VOBSUB: The VobSub demuxer must be used
- *
- * The subtitle demuxer to be used when embedding the stream.
- */
-typedef enum
-{
-  OGMRIP_SUBP_DEMUXER_AUTO,
-  OGMRIP_SUBP_DEMUXER_VOBSUB
-} OGMRipSubpDemuxer;
-
-/**
  * OGMRipVideoPreset:
  * @OGMRIP_VIDEO_QUALITY_EXTREME: Extreme preset
  * @OGMRIP_VIDEO_QUALITY_HIGH: High preset

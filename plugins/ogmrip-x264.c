@@ -208,7 +208,7 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   gint quality, bitrate, vid, threads;
   gboolean cartoon;
 
-  output = ogmrip_codec_get_output (OGMRIP_CODEC (video));
+  output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (video)));
 
   cartoon = FALSE;
 

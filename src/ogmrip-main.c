@@ -300,21 +300,21 @@ ogmrip_main_clean (OGMRipData *data, OGMRipEncoding *encoding, gboolean error)
     GList *list, *link;
 
     codec = ogmrip_encoding_get_video_codec (encoding);
-    g_unlink (ogmrip_codec_get_output (codec));
+    g_unlink (ogmrip_file_get_path (ogmrip_codec_get_output (codec)));
 
     list = ogmrip_encoding_get_audio_codecs (encoding);
     for (link = list; link; link = link->next)
-      g_unlink (ogmrip_codec_get_output (link->data));
+      g_unlink (ogmrip_file_get_path (ogmrip_codec_get_output (link->data)));
     g_list_free (list);
 
     list = ogmrip_encoding_get_subp_codecs (encoding);
     for (link = list; link; link = link->next)
-      g_unlink (ogmrip_codec_get_output (link->data));
+      g_unlink (ogmrip_file_get_path (ogmrip_codec_get_output (link->data)));
     g_list_free (list);
 
     list = ogmrip_encoding_get_chapters (encoding);
     for (link = list; link; link = link->next)
-      g_unlink (ogmrip_codec_get_output (link->data));
+      g_unlink (ogmrip_file_get_path (ogmrip_codec_get_output (link->data)));
     g_list_free (list);
   }
 
@@ -1096,7 +1096,7 @@ ogmrip_main_encoding_completed (OGMRipData *data, OGMJobSpawn *spawn, guint resu
 
         if (spell_check)
           ogmrip_main_spell_check (data,
-              ogmrip_codec_get_output (OGMRIP_CODEC (spawn)),
+              ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (spawn))),
               ogmrip_subp_codec_get_language (OGMRIP_SUBP_CODEC (spawn)));
       }
 #endif

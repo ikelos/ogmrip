@@ -64,7 +64,7 @@ static void ogmrip_mp3_get_property (GObject     *gobject,
 static gint ogmrip_mp3_run          (OGMJobSpawn *spawn);
 
 static gchar **
-ogmrip_mp3_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input, const gchar *output)
+ogmrip_mp3_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input)
 {
   static gchar *presets[][2] =
   {
@@ -82,10 +82,8 @@ ogmrip_mp3_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input
   };
 
   GPtrArray *argv;
+  const gchar *output;
   gint quality;
-
-  if (!output)
-    output = ogmrip_codec_get_output (OGMRIP_CODEC (audio));
 
   quality = ogmrip_audio_codec_get_quality (audio);
 
@@ -107,14 +105,17 @@ ogmrip_mp3_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input
   if (presets[quality][1])
     g_ptr_array_add (argv, g_strdup (presets[quality][1]));
   g_ptr_array_add (argv, g_strdup (input));
+
+  output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (audio)));
   g_ptr_array_add (argv, g_strdup (output));
+
   g_ptr_array_add (argv, NULL);
 
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
 static gchar **
-ogmrip_wav_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input, const gchar *output)
+ogmrip_wav_command (OGMRipAudioCodec *audio, gboolean header, const gchar *output)
 {
   GPtrArray *argv;
 
@@ -183,7 +184,7 @@ ogmrip_mp3_run (OGMJobSpawn *spawn)
   ogmjob_container_add (OGMJOB_CONTAINER (spawn), pipeline);
   g_object_unref (pipeline);
 
-  argv = ogmrip_wav_command (OGMRIP_AUDIO_CODEC (spawn), FALSE, NULL, fifo);
+  argv = ogmrip_wav_command (OGMRIP_AUDIO_CODEC (spawn), FALSE, fifo);
   if (argv)
   {
     child = ogmjob_exec_newv (argv);
@@ -192,7 +193,7 @@ ogmrip_mp3_run (OGMJobSpawn *spawn)
     ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
     g_object_unref (child);
 
-    argv = ogmrip_mp3_command (OGMRIP_AUDIO_CODEC (spawn), FALSE, fifo, NULL);
+    argv = ogmrip_mp3_command (OGMRIP_AUDIO_CODEC (spawn), FALSE, fifo);
     if (argv)
     {
       child = ogmjob_exec_newv (argv);

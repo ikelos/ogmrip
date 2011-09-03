@@ -66,20 +66,21 @@ struct _OGMRipMp4Class
   OGMRipContainerClass parent_class;
 };
 
-GType ogmrip_mp4_get_type (void);
-static gint ogmrip_mp4_run (OGMJobSpawn *spawn);
+GType       ogmrip_mp4_get_type (void);
+static gint ogmrip_mp4_run      (OGMJobSpawn *spawn);
 
 static void
-ogmrip_mp4_append_audio_file (OGMRipContainer *mp4, const gchar *filename,
-    gint format, gint language, GPtrArray *argv)
+ogmrip_mp4_append_audio_file (OGMRipContainer *mp4, OGMRipFile *file, GPtrArray *argv)
 {
+  const gchar *filename;
   struct stat buf;
 
+  filename = ogmrip_file_get_path (file);
   if (g_stat (filename, &buf) == 0 && buf.st_size > 0)
   {
     const gchar *fmt;
 
-    switch (format)
+    switch (ogmrip_stream_get_format (OGMRIP_STREAM (file)))
     {
       case OGMRIP_FORMAT_AAC:
         fmt = "aac";
@@ -101,9 +102,12 @@ ogmrip_mp4_append_audio_file (OGMRipContainer *mp4, const gchar *filename,
 
     if (fmt)
     {
+      gint language;
       const gchar *iso639_2 = NULL;
 
       g_ptr_array_add (argv, g_strdup ("-add"));
+
+      language = ogmrip_audio_stream_get_language (OGMRIP_AUDIO_STREAM (file));
       if (language > -1)
         iso639_2 = ogmrip_language_get_iso639_2 (language);
       if (iso639_2)
@@ -115,16 +119,17 @@ ogmrip_mp4_append_audio_file (OGMRipContainer *mp4, const gchar *filename,
 }
 
 static void
-ogmrip_mp4_append_subp_file (OGMRipContainer *mp4, const gchar *filename,
-    gint format, gint language, GPtrArray *argv)
+ogmrip_mp4_append_subp_file (OGMRipContainer *mp4, OGMRipFile *file, GPtrArray *argv)
 {
+  const gchar *filename;
   struct stat buf;
 
+  filename = ogmrip_file_get_path (file);
   if (g_stat (filename, &buf) == 0 && buf.st_size > 0)
   {
     const gchar *fmt;
 
-    switch (format)
+    switch (ogmrip_stream_get_format (OGMRIP_STREAM (file)))
     {
       case OGMRIP_FORMAT_SRT:
         fmt = "srt";
@@ -139,9 +144,12 @@ ogmrip_mp4_append_subp_file (OGMRipContainer *mp4, const gchar *filename,
 
     if (fmt)
     {
+      gint language;
       const gchar *iso639_2 = NULL;
 
       g_ptr_array_add (argv, g_strdup ("-add"));
+
+      language = ogmrip_subp_stream_get_language (OGMRIP_SUBP_STREAM (file));
       if (language > -1)
         iso639_2 = ogmrip_language_get_iso639_2 (language);
       if (iso639_2)
@@ -151,9 +159,9 @@ ogmrip_mp4_append_subp_file (OGMRipContainer *mp4, const gchar *filename,
     }
   }
 }
-
+/*
 static void
-ogmrip_mp4_append_chapters_file (OGMRipContainer *mp4, const gchar *filename, GPtrArray *argv)
+ogmrip_mp4_append_chapters_file (OGMRipContainer *mp4, OGMRipFile *file, GPtrArray *argv)
 {
   struct stat buf;
 
@@ -163,16 +171,18 @@ ogmrip_mp4_append_chapters_file (OGMRipContainer *mp4, const gchar *filename, GP
     g_ptr_array_add (argv, g_strdup (filename));
   }
 }
-
+*/
 static void
-ogmrip_mp4_append_file (OGMRipContainer *mp4, const gchar *filename, OGMRipFormat format, const gchar *name, guint language, GPtrArray *argv)
+ogmrip_mp4_append_file (OGMRipContainer *mp4, OGMRipFile *file, GPtrArray *argv)
 {
-  if (OGMRIP_IS_AUDIO_FORMAT (format))
-    ogmrip_mp4_append_audio_file (mp4, filename, format, language, argv);
-  else if (OGMRIP_IS_SUBP_FORMAT (format))
-    ogmrip_mp4_append_subp_file (mp4, filename, format, language, argv);
+  if (OGMRIP_IS_AUDIO_STREAM (file))
+    ogmrip_mp4_append_audio_file (mp4, file, argv);
+  else if (OGMRIP_IS_SUBP_STREAM (file))
+    ogmrip_mp4_append_subp_file (mp4, file, argv);
+/*
   else if (OGMRIP_IS_CHAPTERS_FORMAT (format))
-    ogmrip_mp4_append_chapters_file (mp4, filename, argv);
+    ogmrip_mp4_append_chapters_file (mp4, file, argv);
+*/
 }
 /*
 static gdouble
@@ -423,21 +433,21 @@ ogmrip_mp4_get_h264_filename (const gchar *input)
 }
 
 static void
-ogmrip_mp4_get_info (OGMRipMp4 *mp4, const gchar *filename, OGMRipFormat format, const gchar *name, guint language)
+ogmrip_mp4_get_info (OGMRipMp4 *mp4, OGMRipFile *file)
 {
-  if (OGMRIP_IS_VIDEO_FORMAT (format))
+  if (OGMRIP_IS_VIDEO_STREAM (file))
   {
-    mp4->video_format = format;
+    mp4->video_format = ogmrip_stream_get_format (OGMRIP_STREAM (file));
     if (mp4->filename)
       g_free (mp4->filename);
-    mp4->filename = g_strdup (filename);
+    mp4->filename = g_strdup (ogmrip_file_get_path (file));
   }
-  else if (OGMRIP_IS_AUDIO_FORMAT (format))
+  else if (OGMRIP_IS_AUDIO_STREAM (file))
     mp4->naudio ++;
-  else if (OGMRIP_IS_SUBP_FORMAT (format))
+  else if (OGMRIP_IS_SUBP_STREAM (file))
   {
     mp4->nsubp ++;
-    if (format == OGMRIP_FORMAT_VOBSUB)
+    if (ogmrip_stream_get_format (OGMRIP_STREAM (file)) == OGMRIP_FORMAT_VOBSUB)
       mp4->nvobsub ++;
   }
 }

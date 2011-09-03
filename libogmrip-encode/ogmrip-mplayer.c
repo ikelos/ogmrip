@@ -194,27 +194,6 @@ ogmrip_mplayer_set_deint (OGMRipVideoCodec *video, GPtrArray *argv, GString *opt
   }
 }
 
-static gint
-ogmrip_mplayer_audio_file_get_demuxer (OGMRipFormat format)
-{
-  gint demuxer;
-
-  switch (format)
-  {
-    case OGMRIP_FORMAT_AC3:
-      demuxer = OGMRIP_AUDIO_DEMUXER_AC3;
-      break;
-    case OGMRIP_FORMAT_DTS:
-      demuxer = OGMRIP_AUDIO_DEMUXER_DTS;
-      break;
-    default:
-      demuxer = OGMRIP_AUDIO_DEMUXER_AUTO;
-      break;
-  }
-
-  return demuxer;
-}
-
 /**
  * ogmrip_mencoder_codec_watch:
  * @exec: An #OGMJobExec
@@ -290,9 +269,7 @@ ogmrip_mplayer_wav_command (OGMRipAudioCodec *audio, gboolean header, const gcha
   gint vid;
 
   g_return_val_if_fail (OGMRIP_IS_AUDIO_CODEC (audio), NULL);
-
-  if (!output)
-    output = ogmrip_codec_get_output (OGMRIP_CODEC (audio));
+  g_return_val_if_fail (output != NULL, NULL);
 
   argv = g_ptr_array_new ();
   g_ptr_array_add (argv, g_strdup ("mplayer"));
@@ -835,9 +812,6 @@ ogmrip_mplayer_video_command (OGMRipVideoCodec *video, const gchar *output)
   gchar *chap;
 
   g_return_val_if_fail (OGMRIP_IS_VIDEO_CODEC (video), NULL);
-
-  if (!output)
-    output = ogmrip_codec_get_output (OGMRIP_CODEC (video));
   g_return_val_if_fail (output != NULL, NULL);
 
   stream = ogmrip_codec_get_input (OGMRIP_CODEC (video));
@@ -1057,9 +1031,7 @@ ogmrip_mencoder_vobsub_command (OGMRipSubpCodec *subp, const gchar *output)
   gint vid, sid;
 
   g_return_val_if_fail (OGMRIP_IS_SUBP_CODEC (subp), NULL);
-
-  if (!output)
-    output = ogmrip_codec_get_output (OGMRIP_CODEC (subp));
+  g_return_val_if_fail (output != NULL, NULL);
 
   argv = g_ptr_array_new ();
   g_ptr_array_add (argv, g_strdup ("mencoder"));
@@ -1154,7 +1126,7 @@ ogmrip_mencoder_vobsub_command (OGMRipSubpCodec *subp, const gchar *output)
 
 static void
 ogmrip_mencoder_container_append_audio_file (OGMRipContainer *container, 
-    const gchar *filename, guint demuxer, gint format, gint language, GPtrArray *argv)
+    const gchar *filename, gint format, GPtrArray *argv)
 {
   if (filename)
   {
@@ -1162,12 +1134,14 @@ ogmrip_mencoder_container_append_audio_file (OGMRipContainer *container,
 
     if (g_stat (filename, &buf) == 0 && buf.st_size > 0)
     {
+      gint format;
+
       if (format == OGMRIP_FORMAT_AAC)
       {
         g_ptr_array_add (argv, g_strdup ("-fafmttag"));
         g_ptr_array_add (argv, g_strdup ("0x706D"));
       }
-      else if (demuxer == OGMRIP_AUDIO_DEMUXER_AUTO)
+      else if (format != OGMRIP_FORMAT_AC3 && format != OGMRIP_FORMAT_DTS)
       {
         g_ptr_array_add (argv, g_strdup ("-audio-demuxer"));
         if (MPLAYER_CHECK_VERSION (1,0,1,0))
@@ -1181,15 +1155,18 @@ ogmrip_mencoder_container_append_audio_file (OGMRipContainer *container,
         g_ptr_array_add (argv, g_strdup ("-audiofile"));
         g_ptr_array_add (argv, g_strdup (filename));
 
-        if (demuxer != OGMRIP_AUDIO_DEMUXER_AUTO)
+        if (format == OGMRIP_FORMAT_AC3 || format == OGMRIP_FORMAT_DTS)
         {
           g_ptr_array_add (argv, g_strdup ("-audio-demuxer"));
           g_ptr_array_add (argv, g_strdup ("rawaudio"));
           g_ptr_array_add (argv, g_strdup ("-rawaudio"));
-          g_ptr_array_add (argv, g_strdup_printf ("format=0x%x", demuxer));
+          if (format == OGMRIP_FORMAT_AC3)
+            g_ptr_array_add (argv, g_strdup ("format=0x2000"));
+          else
+            g_ptr_array_add (argv, g_strdup ("format=0x2001"));
         }
       }
-      else if (demuxer == OGMRIP_AUDIO_DEMUXER_AUTO)
+      else if (format != OGMRIP_FORMAT_AC3 && format != OGMRIP_FORMAT_DTS)
       {
         g_ptr_array_add (argv, g_strdup ("-audiofile"));
         g_ptr_array_add (argv, g_strdup (filename));
@@ -1199,14 +1176,15 @@ ogmrip_mencoder_container_append_audio_file (OGMRipContainer *container,
 }
 
 static void
-ogmrip_mencoder_container_foreach_file (OGMRipContainer *container,
-    const gchar *filename, OGMRipFormat format, const gchar *name, guint lang, GPtrArray *argv)
+ogmrip_mencoder_container_foreach_file (OGMRipContainer *container, OGMRipFile *file, GPtrArray *argv)
 {
-  if (OGMRIP_IS_AUDIO_FORMAT (format))
+  if (OGMRIP_IS_AUDIO_STREAM (file))
   {
-    gint demuxer;
+    gint format;
+    gchar *filename;
 
-    demuxer = ogmrip_mplayer_audio_file_get_demuxer (format);
+    format = ogmrip_stream_get_format (OGMRIP_STREAM (file));
+    filename = g_strdup (ogmrip_file_get_path (file));
 
     if (format == OGMRIP_FORMAT_AAC && !g_str_has_suffix (filename, ".aac"))
     {
@@ -1220,12 +1198,16 @@ ogmrip_mencoder_container_foreach_file (OGMRipContainer *container,
       g_free (s2);
 
       if (symlink (filename, s1) < 0)
-        ogmrip_mencoder_container_append_audio_file (container, filename, demuxer, format, lang, argv);
+        g_free (s1);
       else
-        ogmrip_mencoder_container_append_audio_file (container, s1, demuxer, format, lang, argv);
-
-      g_free (s1);
+      {
+        g_free (filename);
+        filename = s1;
+      }
     }
+
+    ogmrip_mencoder_container_append_audio_file (container, filename, format, argv);
+    g_free (filename);
   }
 }
 

@@ -24,6 +24,8 @@
  */
 
 #include "ogmrip-codec.h"
+#include "ogmrip-stub.h"
+#include "ogmrip-fs.h"
 
 #include <unistd.h>
 #include <glib/gstdio.h>
@@ -35,7 +37,7 @@ struct _OGMRipCodecPriv
 {
   OGMRipTitle *title;
   OGMRipStream *input;
-  gchar *output;
+  OGMRipFile *output;
 
   guint start_chap;
   gint end_chap;
@@ -57,7 +59,6 @@ enum
 
 static void ogmrip_codec_constructed  (GObject      *gobject);
 static void ogmrip_codec_dispose      (GObject      *gobject);
-static void ogmrip_codec_finalize     (GObject      *gobject);
 static void ogmrip_codec_set_property (GObject      *gobject,
                                        guint        property_id,
                                        const GValue *value,
@@ -94,7 +95,6 @@ ogmrip_codec_class_init (OGMRipCodecClass *klass)
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->constructed = ogmrip_codec_constructed;
   gobject_class->dispose = ogmrip_codec_dispose;
-  gobject_class->finalize = ogmrip_codec_finalize;
   gobject_class->set_property = ogmrip_codec_set_property;
   gobject_class->get_property = ogmrip_codec_get_property;
 
@@ -106,8 +106,8 @@ ogmrip_codec_class_init (OGMRipCodecClass *klass)
            OGMRIP_TYPE_STREAM, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_OUTPUT, 
-        g_param_spec_string ("output", "Output property", "Set output file", 
-           NULL, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+        g_param_spec_object ("output", "Output property", "Set output file", 
+           OGMRIP_TYPE_FILE, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_START_CHAPTER, 
         g_param_spec_int ("start-chapter", "Start chapter property", "Set start chapter", 
@@ -141,9 +141,14 @@ static void
 ogmrip_codec_constructed (GObject *gobject)
 {
   OGMRipCodec *codec = OGMRIP_CODEC (gobject);
+  gchar *filename, *uri;
 
-  if (!codec->priv->output)
-    codec->priv->output = g_strdup ("/dev/null");
+  filename = ogmrip_fs_mktemp ("ogmrip.XXXXXX", NULL);
+  uri = g_filename_to_uri (filename, NULL, NULL);
+  g_free (filename);
+
+  codec->priv->output = ogmrip_stub_new (codec, uri);
+  g_free (uri);
 
   G_OBJECT_CLASS (ogmrip_codec_parent_class)->constructed (gobject);
 }
@@ -159,21 +164,13 @@ ogmrip_codec_dispose (GObject *gobject)
     codec->priv->input = NULL;
   }
 
-  G_OBJECT_CLASS (ogmrip_codec_parent_class)->dispose (gobject);
-}
-
-static void
-ogmrip_codec_finalize (GObject *gobject)
-{
-  OGMRipCodec *codec = OGMRIP_CODEC (gobject);
-
   if (codec->priv->output)
   {
-    g_free (codec->priv->output);
+    g_object_unref (codec->priv->output);
     codec->priv->output = NULL;
   }
 
-  G_OBJECT_CLASS (ogmrip_codec_parent_class)->finalize (gobject);
+  G_OBJECT_CLASS (ogmrip_codec_parent_class)->dispose (gobject);
 }
 
 static void
@@ -185,9 +182,6 @@ ogmrip_codec_set_property (GObject *gobject, guint property_id, const GValue *va
   {
     case PROP_INPUT:
       ogmrip_codec_set_input (codec, g_value_get_object (value));
-      break;
-    case PROP_OUTPUT:
-      ogmrip_codec_set_output (codec, g_value_get_string (value));
       break;
     case PROP_START_CHAPTER: 
       ogmrip_codec_set_chapters (codec, g_value_get_int (value), codec->priv->end_chap);
@@ -218,7 +212,7 @@ ogmrip_codec_get_property (GObject *gobject, guint property_id, GValue *value, G
       g_value_set_object (value, codec->priv->input);
       break;
     case PROP_OUTPUT:
-      g_value_set_string (value, codec->priv->output);
+      g_value_set_object (value, codec->priv->output);
       break;
     case PROP_START_CHAPTER: 
       g_value_set_int (value, codec->priv->start_chap);
@@ -253,11 +247,11 @@ ogmrip_codec_run (OGMJobSpawn *spawn)
  * ogmrip_codec_get_output:
  * @codec: an #OGMRipCodec
  *
- * Gets the name of the output file.
+ * Gets the output file.
  *
- * Returns: the filename, or NULL
+ * Returns: an #OGMRipFile, or NULL
  */
-const gchar *
+OGMRipFile *
 ogmrip_codec_get_output (OGMRipCodec *codec)
 {
   g_return_val_if_fail (OGMRIP_IS_CODEC (codec), NULL);
@@ -266,28 +260,10 @@ ogmrip_codec_get_output (OGMRipCodec *codec)
 }
 
 /**
- * ogmrip_codec_set_output:
- * @codec: an #OGMRipCodec
- * @output: the name of the output file
- *
- * Sets the name of the output file.
- */
-void
-ogmrip_codec_set_output (OGMRipCodec *codec, const gchar *output)
-{
-  g_return_if_fail (OGMRIP_IS_CODEC (codec));
-
-  g_free (codec->priv->output);
-  codec->priv->output = g_strdup (output);
-
-  g_object_notify (G_OBJECT (codec), "output");
-}
-
-/**
  * ogmrip_codec_get_input:
  * @codec: an #OGMRipCodec
  *
- * Gets the input DVD title.
+ * Gets the input stream.
  *
  * Returns: an #OGMRipStream, or NULL
  */

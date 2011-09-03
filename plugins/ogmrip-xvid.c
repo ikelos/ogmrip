@@ -211,7 +211,7 @@ ogmrip_xvid_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
     "ext"
   };
 
-  output = ogmrip_codec_get_output (OGMRIP_CODEC (video));
+  output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (video)));
   title = ogmrip_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video)));
 
   xvid = OGMRIP_XVID (video);

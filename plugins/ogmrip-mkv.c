@@ -58,7 +58,6 @@ enum
   PROP_OVERHEAD
 };
 
-GType ogmrip_matroska_get_type (void);
 static void ogmrip_matroska_get_property (GObject     *gobject,
                                           guint       property_id,
                                           GValue      *value,
@@ -115,7 +114,7 @@ ogmrip_matroska_get_sync (OGMRipContainer *container)
 }
 
 static void
-ogmrip_matroska_append_video_file (OGMRipContainer *matroska, const gchar *filename, GPtrArray *argv)
+ogmrip_matroska_append_video_file (OGMRipContainer *matroska, OGMRipFile *file, GPtrArray *argv)
 {
   g_ptr_array_add (argv, g_strdup ("--command-line-charset"));
   g_ptr_array_add (argv, g_strdup ("UTF-8"));
@@ -124,19 +123,23 @@ ogmrip_matroska_append_video_file (OGMRipContainer *matroska, const gchar *filen
   g_ptr_array_add (argv, g_strdup ("0"));
   g_ptr_array_add (argv, g_strdup ("-A"));
   g_ptr_array_add (argv, g_strdup ("-S"));
-  g_ptr_array_add (argv, g_strdup (filename));
+  g_ptr_array_add (argv, g_strdup (ogmrip_file_get_path (file)));
 }
 
 static void
-ogmrip_matroska_append_audio_file (OGMRipContainer *matroska, const gchar *filename,
-    const gchar *label, gint language, GPtrArray *argv)
+ogmrip_matroska_append_audio_file (OGMRipContainer *matroska, OGMRipFile *file, GPtrArray *argv)
 {
+  const gchar *filename;
   struct stat buf;
 
+  filename = ogmrip_file_get_path (file);
   if (g_stat (filename, &buf) == 0 && buf.st_size > 0)
   {
+    gint language;
+    const gchar *label;
     gchar *sync;
 
+    language = ogmrip_audio_stream_get_language (OGMRIP_AUDIO_STREAM (file));
     if (language > -1)
     {
       const gchar *iso639_2;
@@ -149,6 +152,7 @@ ogmrip_matroska_append_audio_file (OGMRipContainer *matroska, const gchar *filen
       }
     }
 
+    label = ogmrip_audio_stream_get_label (OGMRIP_AUDIO_STREAM (file));
     if (label)
     {
       g_ptr_array_add (argv, g_strdup ("--track-name"));
@@ -171,12 +175,16 @@ ogmrip_matroska_append_audio_file (OGMRipContainer *matroska, const gchar *filen
 }
 
 static void
-ogmrip_matroska_append_subp_file (OGMRipContainer *matroska, const gchar *filename,
-    const gchar *label, gint format, gint language, GPtrArray *argv)
+ogmrip_matroska_append_subp_file (OGMRipContainer *matroska, OGMRipFile *file, GPtrArray *argv)
 {
+  gint format;
+  const gchar *filename;
   gchar *real_filename;
   gboolean do_merge;
   struct stat buf;
+
+  filename = ogmrip_file_get_path (file);
+  format = ogmrip_stream_get_format (OGMRIP_STREAM (file));
 
   if (format == OGMRIP_FORMAT_VOBSUB)
   {
@@ -215,6 +223,10 @@ ogmrip_matroska_append_subp_file (OGMRipContainer *matroska, const gchar *filena
     g_free (real_filename);
   else
   {
+    const gchar *label;
+    gint language;
+
+    language = ogmrip_subp_stream_get_language (OGMRIP_SUBP_STREAM (file));
     if (language > -1)
     {
       const gchar *iso639_2;
@@ -227,13 +239,14 @@ ogmrip_matroska_append_subp_file (OGMRipContainer *matroska, const gchar *filena
       }
     }
 
+    label = ogmrip_subp_stream_get_label (OGMRIP_SUBP_STREAM (file));
     if (label)
     {
       g_ptr_array_add (argv, g_strdup ("--track-name"));
       g_ptr_array_add (argv, g_strconcat ("0:", label, NULL));
     }
-/*
-    switch (charset)
+
+    switch (ogmrip_subp_stream_get_charset (OGMRIP_SUBP_STREAM (file)))
     {
       case OGMRIP_CHARSET_UTF8:
         g_ptr_array_add (argv, g_strdup ("--sub-charset"));
@@ -247,8 +260,10 @@ ogmrip_matroska_append_subp_file (OGMRipContainer *matroska, const gchar *filena
         g_ptr_array_add (argv, g_strdup ("--sub-charset"));
         g_ptr_array_add (argv, g_strdup ("0:ASCII"));
         break;
+      default:
+        break;
     }
-*/
+
     g_ptr_array_add (argv, g_strdup ("-s"));
     g_ptr_array_add (argv, g_strdup ("0"));
     g_ptr_array_add (argv, g_strdup ("-D"));
@@ -257,15 +272,19 @@ ogmrip_matroska_append_subp_file (OGMRipContainer *matroska, const gchar *filena
     g_ptr_array_add (argv, real_filename);
   }
 }
-
+/*
 static void
-ogmrip_matroska_append_chapters_file (OGMRipContainer *matroska, const gchar *filename,
-    const gchar *label, gint format, gint language, GPtrArray *argv)
+ogmrip_matroska_append_chapters_file (OGMRipContainer *matroska, OGMRipFile *file, GPtrArray *argv)
 {
+  const gchar *filename;
   struct stat buf;
 
+  filename = ogmrip_file_get_path (file);
   if (g_stat (filename, &buf) == 0 && buf.st_size > 0)
   {
+    gint language;
+
+    language = ogmrip_chapter_stream_get_language (OGMRIP_CHAPTER_STREAM (file));
     if (language > -1)
     {
       const gchar *iso639_2;
@@ -285,19 +304,20 @@ ogmrip_matroska_append_chapters_file (OGMRipContainer *matroska, const gchar *fi
     g_ptr_array_add (argv, g_strdup (filename));
   }
 }
-
+*/
 static void
-ogmrip_matroska_foreach_file (OGMRipContainer *matroska, const gchar *filename,
-    OGMRipFormat format, const gchar *name, guint language, GPtrArray *argv)
+ogmrip_matroska_foreach_file (OGMRipContainer *matroska, OGMRipFile *file, GPtrArray *argv)
 {
-  if (OGMRIP_IS_VIDEO_FORMAT (format))
-    ogmrip_matroska_append_video_file (matroska, filename, argv);
-  else if (OGMRIP_IS_AUDIO_FORMAT (format))
-    ogmrip_matroska_append_audio_file (matroska, filename, name, language, argv);
-  else if (OGMRIP_IS_SUBP_FORMAT (format))
-    ogmrip_matroska_append_subp_file (matroska, filename, name, format, language, argv);
-  else if (OGMRIP_IS_CHAPTERS_FORMAT (format))
-    ogmrip_matroska_append_chapters_file (matroska, filename, name, format, language, argv);
+  if (OGMRIP_IS_VIDEO_STREAM (file))
+    ogmrip_matroska_append_video_file (matroska, file, argv);
+  else if (OGMRIP_IS_AUDIO_STREAM (file))
+    ogmrip_matroska_append_audio_file (matroska, file, argv);
+  else if (OGMRIP_IS_SUBP_STREAM (file))
+    ogmrip_matroska_append_subp_file (matroska, file, argv);
+/*
+  else if (OGMRIP_IS_CHAPTER_STREAM (file))
+    ogmrip_matroska_append_chapters_file (matroska, file, argv);
+*/
 }
 
 gchar **

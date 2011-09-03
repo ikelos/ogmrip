@@ -53,11 +53,12 @@ static gint ogmrip_wav_run (OGMJobSpawn *spawn);
 G_DEFINE_TYPE (OGMRipWav, ogmrip_wav, OGMRIP_TYPE_AUDIO_CODEC)
 
 static gchar **
-ogmrip_wav_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input, const gchar *output)
+ogmrip_wav_command (OGMRipAudioCodec *audio, gboolean header)
 {
   GPtrArray *argv;
 
-  argv = ogmrip_mplayer_wav_command (audio, TRUE, output);
+  argv = ogmrip_mplayer_wav_command (audio, TRUE,
+      ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (audio))));
 
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
@@ -85,8 +86,7 @@ ogmrip_wav_run (OGMJobSpawn *spawn)
   gchar **argv;
   gint result;
 
-  argv = ogmrip_wav_command (OGMRIP_AUDIO_CODEC (spawn), 
-      OGMRIP_WAV (spawn)->header, NULL, NULL);
+  argv = ogmrip_wav_command (OGMRIP_AUDIO_CODEC (spawn), OGMRIP_WAV (spawn)->header);
   if (!argv)
     return OGMJOB_RESULT_ERROR;
 

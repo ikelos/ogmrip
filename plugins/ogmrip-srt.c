@@ -244,12 +244,12 @@ ogmrip_tesseract_command (OGMRipSubpCodec *subp, const gchar *input, gboolean la
 }
 
 static gchar **
-ogmrip_srt_command (OGMRipSubpCodec *subp, const gchar *input, const gchar *output)
+ogmrip_srt_command (OGMRipSubpCodec *subp, const gchar *input)
 {
   GPtrArray *argv;
+  const gchar *output;
 
-  if (!output)
-    output = ogmrip_codec_get_output (OGMRIP_CODEC (subp));
+  output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (subp)));
 
   argv = g_ptr_array_new ();
   g_ptr_array_add (argv, g_strdup ("subptools"));
@@ -286,7 +286,7 @@ ogmrip_srt_command (OGMRipSubpCodec *subp, const gchar *input, const gchar *outp
 }
 
 static gchar **
-ogmrip_vobsub_command (OGMRipSubpCodec *subp, const gchar *input, const gchar *output)
+ogmrip_vobsub_command (OGMRipSubpCodec *subp, const gchar *output)
 {
   GPtrArray *argv;
 
@@ -367,7 +367,7 @@ ogmrip_srt_run (OGMJobSpawn *spawn)
 
   xml_file = g_strconcat (tmp_file, ".xml", NULL);
 
-  argv = ogmrip_vobsub_command (OGMRIP_SUBP_CODEC (spawn), NULL, tmp_file);
+  argv = ogmrip_vobsub_command (OGMRIP_SUBP_CODEC (spawn), tmp_file);
   if (argv)
   {
     child = ogmjob_exec_newv (argv);
@@ -455,7 +455,7 @@ ogmrip_srt_run (OGMJobSpawn *spawn)
     {
       result = OGMJOB_RESULT_ERROR;
 
-      argv = ogmrip_srt_command (OGMRIP_SUBP_CODEC (spawn), xml_file, NULL);
+      argv = ogmrip_srt_command (OGMRIP_SUBP_CODEC (spawn), xml_file);
       if (argv)
       {
         child = ogmjob_exec_newv (argv);

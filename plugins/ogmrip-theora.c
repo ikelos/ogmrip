@@ -49,18 +49,14 @@ struct _OGMRipTheoraClass
   OGMRipVideoCodecClass parent_class;
 };
 
-GType ogmrip_theora_get_type (void);
 static gint ogmrip_theora_run (OGMJobSpawn *spawn);
 
 static gchar **
-ogmrip_yuv4mpeg_command (OGMRipVideoCodec *video, const gchar *input, const gchar *output, const gchar *logf)
+ogmrip_yuv4mpeg_command (OGMRipVideoCodec *video, const gchar *output, const gchar *logf)
 {
   OGMRipTitle *title;
   GPtrArray *argv;
   gint vid;
-
-  if (!output)
-    output = ogmrip_codec_get_output (OGMRIP_CODEC (video));
 
   argv = ogmrip_mplayer_video_command (video, output);
 
@@ -87,13 +83,13 @@ ogmrip_yuv4mpeg_command (OGMRipVideoCodec *video, const gchar *input, const gcha
 }
 
 static gchar **
-ogmrip_theora_command (OGMRipVideoCodec *video, const gchar *input, const gchar *output, const gchar *logf)
+ogmrip_theora_command (OGMRipVideoCodec *video, const gchar *input)
 {
   GPtrArray *argv;
+  const gchar *output;
   gint bitrate;
 
-  if (!output)
-    output = ogmrip_codec_get_output (OGMRIP_CODEC (video));
+  output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (video)));
 
   argv = g_ptr_array_new ();
 
@@ -164,7 +160,7 @@ ogmrip_theora_run (OGMJobSpawn *spawn)
   ogmjob_container_add (OGMJOB_CONTAINER (spawn), pipeline);
   g_object_unref (pipeline);
 
-  argv = ogmrip_yuv4mpeg_command (OGMRIP_VIDEO_CODEC (spawn), NULL, fifo, NULL);
+  argv = ogmrip_yuv4mpeg_command (OGMRIP_VIDEO_CODEC (spawn), fifo, NULL);
   if (argv)
   {
     child = ogmjob_exec_newv (argv);
@@ -172,7 +168,7 @@ ogmrip_theora_run (OGMJobSpawn *spawn)
     ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
     g_object_unref (child);
 
-    argv = ogmrip_theora_command (OGMRIP_VIDEO_CODEC (spawn), fifo, NULL, NULL);
+    argv = ogmrip_theora_command (OGMRIP_VIDEO_CODEC (spawn), fifo);
     if (argv)
     {
       child = ogmjob_exec_newv (argv);

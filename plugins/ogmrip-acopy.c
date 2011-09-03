@@ -61,18 +61,15 @@ static void ogmrip_audio_copy_get_property (GObject     *gobject,
 static gint ogmrip_audio_copy_run          (OGMJobSpawn *spawn);
 
 static gchar **
-ogmrip_audio_copy_command (OGMRipAudioCodec *audio, const gchar *input, const gchar *output)
+ogmrip_audio_copy_command (OGMRipAudioCodec *audio)
 {
   OGMRipTitle *title;
+  OGMRipFile *output;
   GPtrArray *argv;
   gint vid;
 
-  if (!output)
-    output = ogmrip_codec_get_output (OGMRIP_CODEC (audio));
-
-  title = ogmrip_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (audio)));
-
-  argv = ogmrip_mencoder_audio_command (audio, output);
+  output = ogmrip_codec_get_output (OGMRIP_CODEC (audio));
+  argv = ogmrip_mencoder_audio_command (audio, ogmrip_file_get_path (output));
 
   g_ptr_array_add (argv, g_strdup ("-ovc"));
   if (MPLAYER_CHECK_VERSION (1,0,0,8))
@@ -87,6 +84,7 @@ ogmrip_audio_copy_command (OGMRipAudioCodec *audio, const gchar *input, const gc
   g_ptr_array_add (argv, g_strdup ("-oac"));
   g_ptr_array_add (argv, g_strdup ("copy"));
 
+  title = ogmrip_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (audio)));
   vid = ogmrip_title_get_nr (title);
 
   if (MPLAYER_CHECK_VERSION (1,0,0,1))
@@ -147,7 +145,7 @@ ogmrip_audio_copy_run (OGMJobSpawn *spawn)
   gchar **argv;
   gint result;
 
-  argv = ogmrip_audio_copy_command (OGMRIP_AUDIO_CODEC (spawn), NULL, NULL);
+  argv = ogmrip_audio_copy_command (OGMRIP_AUDIO_CODEC (spawn));
   if (!argv)
     return OGMJOB_RESULT_ERROR;
 

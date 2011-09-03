@@ -89,7 +89,7 @@ ogmrip_vobsub_finalize (GObject *gobject)
 {
   const gchar *output;
 
-  output = ogmrip_codec_get_output (OGMRIP_CODEC (gobject));
+  output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (gobject)));
   if (output)
   {
 /*
@@ -234,7 +234,7 @@ ogmrip_vobsub_run (OGMJobSpawn *spawn)
     const gchar *basename;
     gchar *idxname, *subname;
 
-    basename = ogmrip_codec_get_output (OGMRIP_CODEC (spawn));
+    basename = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (spawn)));
     idxname = g_strconcat (basename, ".idx", NULL);
     subname = g_strconcat (basename, ".sub", NULL);
 

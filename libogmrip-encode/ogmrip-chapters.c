@@ -175,7 +175,7 @@ ogmrip_chapters_run (OGMJobSpawn *spawn)
   gdouble seconds, length;
   gint i;
 
-  output = ogmrip_codec_get_output (OGMRIP_CODEC (spawn));
+  output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (spawn)));
   channel = g_io_channel_new_file (output, "w", NULL);
   if (!channel)
     return OGMJOB_RESULT_ERROR;
@@ -212,7 +212,7 @@ ogmrip_chapters_run (OGMJobSpawn *spawn)
 OGMRipCodec *
 ogmrip_chapters_new (OGMRipVideoStream *stream)
 {
-  g_return_val_if_fail (stream != NULL, NULL);
+  g_return_val_if_fail (OGMRIP_IS_VIDEO_STREAM (stream), NULL);
 
   return g_object_new (OGMRIP_TYPE_CHAPTERS, "input", stream, NULL);
 }

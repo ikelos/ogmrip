@@ -48,14 +48,6 @@ struct _OGMRipContainerPriv
   GList *files;
 };
 
-typedef struct
-{
-  gchar *filename;
-  gchar *label;
-  OGMRipFormat format;
-  guint lang;
-} OGMRipContainerFile;
-
 enum 
 {
   PROP_0,
@@ -77,31 +69,6 @@ static void ogmrip_container_get_property (GObject      *gobject,
                                            guint        property_id,
                                            GValue       *value,
                                            GParamSpec   *pspec);
-
-static OGMRipContainerFile *
-ogmrip_container_file_new (const gchar *filename, OGMRipFormat format, const gchar *label, guint language)
-{
-  OGMRipContainerFile *file;
-
-  file = g_new0 (OGMRipContainerFile, 1);
-
-  file->filename = g_strdup (filename);
-  file->format = format;
-  file->lang = language;
-
-  if (label)
-    file->label = g_strdup (label);
-
-  return file;
-}
-
-static void
-ogmrip_container_file_free (OGMRipContainerFile *file)
-{
-  g_free (file->filename);
-  g_free (file->label);
-  g_free (file);
-}
 
 G_DEFINE_ABSTRACT_TYPE (OGMRipContainer, ogmrip_container, OGMJOB_TYPE_BIN)
 
@@ -159,7 +126,7 @@ ogmrip_container_finalize (GObject *gobject)
 {
   OGMRipContainer *container = OGMRIP_CONTAINER (gobject);
 
-  g_list_foreach (container->priv->files, (GFunc) ogmrip_container_file_free, NULL);
+  g_list_foreach (container->priv->files, (GFunc) g_object_unref, NULL);
   g_list_free (container->priv->files);
 
   g_free (container->priv->label);
@@ -403,52 +370,42 @@ ogmrip_container_get_overhead (OGMRipContainer *container)
 /**
  * ogmrip_container_add_file:
  * @container: An #OGMRipContainer
- * @filename: A filename
- * @format: The format of the file
- * @label: The label of the file
- * @language: The language of the file
+ * @file: An #OGMRipFile
  *
- * Adds a file to the rip.
+ * Adds @file to the rip.
  */
 void
-ogmrip_container_add_file (OGMRipContainer *container,
-    const gchar *filename, OGMRipFormat format, const gchar *label, guint language)
+ogmrip_container_add_file (OGMRipContainer *container, OGMRipFile *file)
 {
   g_return_if_fail (OGMRIP_IS_CONTAINER (container));
-  g_return_if_fail (filename != NULL);
+  g_return_if_fail (OGMRIP_IS_FILE (file));
 
-  container->priv->files = g_list_append (container->priv->files,
-      ogmrip_container_file_new (filename, format, label, language));
+  container->priv->files = g_list_append (container->priv->files, g_object_ref (file));
 }
 
 /**
  * ogmrip_container_remove_file:
  * @container: An #OGMRipContainer
- * @filename: A filename
+ * @file: An #OGMRipFile
  *
- * Removes the file from the rip.
+ * Removes @file from the rip.
  */
 void
-ogmrip_container_remove_file (OGMRipContainer *container, const gchar *filename)
+ogmrip_container_remove_file (OGMRipContainer *container, OGMRipFile *file)
 {
   GList *link;
-  OGMRipContainerFile *file;
 
   g_return_if_fail (OGMRIP_IS_CONTAINER (container));
-  g_return_if_fail (filename != NULL);
+  g_return_if_fail (OGMRIP_IS_FILE (file));
 
   for (link = container->priv->files; link; link = link->next)
-  {
-    file = link->data;
-
-    if (g_str_equal (file->filename, filename))
+    if (link->data == file)
       break;
-  }
 
   if (link)
   {
     container->priv->files = g_list_remove_link (container->priv->files, link);
-    ogmrip_container_file_free (link->data);
+    g_object_unref (link->data);
     g_list_free (link);
   }
 }
@@ -464,16 +421,9 @@ ogmrip_container_remove_file (OGMRipContainer *container, const gchar *filename)
 GList *
 ogmrip_container_get_files (OGMRipContainer *container)
 {
-  GList *link, *list = NULL;
-  OGMRipContainerFile *file;
+  g_return_val_if_fail (OGMRIP_IS_CONTAINER (container), NULL);
 
-  for (link = container->priv->files; link; link = link->next)
-  {
-    file = link->data;
-    list = g_list_append (list, g_strdup (file->filename));
-  }
-  
-  return list;
+  return g_list_copy (container->priv->files);
 }
 
 /**
@@ -488,7 +438,7 @@ ogmrip_container_get_files (OGMRipContainer *container)
 OGMRipFile *
 ogmrip_container_get_nth_file (OGMRipContainer *container, gint n)
 {
-  void *file;
+  GList *file;
 
   g_return_val_if_fail (OGMRIP_IS_CONTAINER (container), NULL);
 
@@ -497,7 +447,7 @@ ogmrip_container_get_nth_file (OGMRipContainer *container, gint n)
   else
     file = g_list_nth (container->priv->files, n);
 
-  return file;
+  return file->data;
 }
 
 /**
@@ -528,7 +478,6 @@ void
 ogmrip_container_foreach_file (OGMRipContainer *container, OGMRipContainerFunc func, gpointer data)
 {
   GList *link, *next;
-  OGMRipContainerFile *file;
 
   g_return_if_fail (OGMRIP_IS_CONTAINER (container));
   g_return_if_fail (func != NULL);
@@ -537,10 +486,7 @@ ogmrip_container_foreach_file (OGMRipContainer *container, OGMRipContainerFunc f
   while (link)
   {
     next = link->next;
-
-    file = link->data;
-    (* func) (container, file->filename, file->format, file->label, file->lang, data);
-
+    (* func) (container, link->data, data);
     link = next;
   }
 }

@@ -20,7 +20,7 @@
 #define __OGMRIP_CODEC_H__
 
 #include <ogmrip-job.h>
-#include <ogmrip-media.h>
+#include <ogmrip-file.h>
 #include <ogmrip-profile.h>
 
 G_BEGIN_DECLS
@@ -50,9 +50,7 @@ struct _OGMRipCodecClass
 
 GType          ogmrip_codec_get_type           (void);
 OGMRipStream * ogmrip_codec_get_input          (OGMRipCodec   *codec);
-const gchar *  ogmrip_codec_get_output         (OGMRipCodec   *codec);
-void           ogmrip_codec_set_output         (OGMRipCodec   *codec,
-                                                const gchar   *output);
+OGMRipFile *   ogmrip_codec_get_output         (OGMRipCodec   *codec);
 gdouble        ogmrip_codec_get_length         (OGMRipCodec   *codec,
                                                 OGMRipTime    *time_);
 void           ogmrip_codec_get_chapters       (OGMRipCodec   *codec,

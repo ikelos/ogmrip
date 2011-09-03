@@ -55,7 +55,6 @@ enum
   PROP_OVERHEAD
 };
 
-GType ogmrip_avi_get_type (void);
 static void ogmrip_avi_get_property (GObject     *gobject,
                                      guint       property_id,
                                      GValue      *value,
@@ -63,21 +62,25 @@ static void ogmrip_avi_get_property (GObject     *gobject,
 static gint ogmrip_avi_run          (OGMJobSpawn *spawn);
 
 static void
-ogmrip_avi_foreach_file (OGMRipContainer *avi, const gchar *filename,
-    OGMRipFormat format, const gchar *name, guint language, GPtrArray *argv)
+ogmrip_avi_foreach_file (OGMRipContainer *avi, OGMRipFile *file, GPtrArray *argv)
 {
-  if (OGMRIP_IS_VIDEO_FORMAT (format) || OGMRIP_IS_AUDIO_FORMAT (format))
+  if (OGMRIP_IS_VIDEO_STREAM (file) || OGMRIP_IS_AUDIO_STREAM (file))
   {
+    const gchar *filename;
     struct stat buf;
 
-    if (OGMRIP_IS_VIDEO_FORMAT (format))
-    {
-      g_ptr_array_add (argv, g_strdup ("-n"));
-      g_ptr_array_add (argv, g_strdup ("-i"));
-    }
+    filename = ogmrip_file_get_path (file);
 
     if (g_stat (filename, &buf) == 0 && buf.st_size > 0)
+    {
+      if (OGMRIP_IS_VIDEO_STREAM (file))
+      {
+        g_ptr_array_add (argv, g_strdup ("-n"));
+        g_ptr_array_add (argv, g_strdup ("-i"));
+      }
+
       g_ptr_array_add (argv, g_strdup (filename));
+    }
   }
 }
 
@@ -190,11 +193,15 @@ ogmrip_avi_get_property (GObject *gobject, guint property_id, GValue *value, GPa
 }
 
 static void
-ogmrip_avi_foreach_subp (OGMRipContainer *avi, const gchar *filename,
-    OGMRipFormat format, const gchar *name, guint language, OGMJobSpawn *queue)
+ogmrip_avi_foreach_subp (OGMRipContainer *avi, OGMRipFile *file, OGMJobSpawn *queue)
 {
   OGMJobSpawn *child;
+  const gchar *filename;
   gchar *input, **argv;
+  gint format;
+
+  filename = ogmrip_file_get_path (file);
+  format = ogmrip_stream_get_format (OGMRIP_STREAM (file));
 
   if (format == OGMRIP_FORMAT_SRT)
   {

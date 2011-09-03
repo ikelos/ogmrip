@@ -47,7 +47,6 @@ struct _OGMRipOggClass
   OGMRipContainerClass parent_class;
 };
 
-GType ogmrip_ogg_get_type (void);
 static gint ogmrip_ogg_run (OGMJobSpawn *spawn);
 
 static gdouble
@@ -115,15 +114,25 @@ ogmrip_ogg_get_sync (OGMRipContainer *container)
 }
 
 static void
-ogmrip_ogg_merge_append_audio_file (OGMRipContainer *ogg, 
-    const char *filename, gint language, GPtrArray *argv)
+ogmrip_ogg_merge_append_video_file (OGMRipContainer *ogg, OGMRipFile *file, GPtrArray *argv)
 {
+  g_ptr_array_add (argv, g_strdup ("--noaudio"));
+  g_ptr_array_add (argv, g_strdup (ogmrip_file_get_path (file)));
+}
+
+static void
+ogmrip_ogg_merge_append_audio_file (OGMRipContainer *ogg, OGMRipFile *file, GPtrArray *argv)
+{
+  const gchar *filename;
   struct stat buf;
 
+  filename = ogmrip_file_get_path (file);
   if (g_stat (filename, &buf) == 0 && buf.st_size > 0)
   {
+    gint language;
     gchar *sync;
 
+    language = ogmrip_audio_stream_get_language (OGMRIP_AUDIO_STREAM (file));
     if (language > -1)
     {
       g_ptr_array_add (argv, g_strdup ("-c"));
@@ -147,13 +156,17 @@ ogmrip_ogg_merge_append_audio_file (OGMRipContainer *ogg,
 }
 
 static void
-ogmrip_ogg_merge_append_subp_file (OGMRipContainer *ogg, 
-    const gchar *filename, gint language, GPtrArray *argv)
+ogmrip_ogg_merge_append_subp_file (OGMRipContainer *ogg, OGMRipFile *file, GPtrArray *argv)
 {
+  const gchar *filename;
   struct stat buf;
 
+  filename = ogmrip_file_get_path (file);
   if (g_stat (filename, &buf) == 0 && buf.st_size > 0)
   {
+    gint language;
+
+    language = ogmrip_subp_stream_get_language (OGMRIP_SUBP_STREAM (file));
     if (language > -1)
     {
       g_ptr_array_add (argv, g_strdup ("-c"));
@@ -169,14 +182,19 @@ ogmrip_ogg_merge_append_subp_file (OGMRipContainer *ogg,
 }
 
 #if (defined(GLIB_SIZEOF_SIZE_T) && GLIB_SIZEOF_SIZE_T == 4)
+/*
 static void
-ogmrip_ogg_merge_append_chapters_file (OGMRipContainer *ogg, 
-    const gchar *filename, gint language, GPtrArray *argv)
+ogmrip_ogg_merge_append_chapter_file (OGMRipContainer *ogg, OGMRipFile *file, GPtrArray *argv)
 {
+  const gchar *filename;
   struct stat buf;
 
+  filename = ogmrip_file_get_path (file);
   if (g_stat (filename, &buf) == 0 && buf.st_size > 0)
   {
+    gint language;
+
+    language = ogmrip_chapter_stream_get_language (OGMRIP_CHAPTER_STREAM (file));
     if (language > -1)
     {
       g_ptr_array_add (argv, g_strdup ("-c"));
@@ -190,27 +208,26 @@ ogmrip_ogg_merge_append_chapters_file (OGMRipContainer *ogg,
     g_ptr_array_add (argv, g_strdup (filename));
   }
 }
+*/
 #endif
 
 static void
-ogmrip_ogg_merge_foreach_file (OGMRipContainer *ogg, const gchar *filename,
-    OGMRipFormat format, const gchar *name, guint language, GPtrArray *argv)
+ogmrip_ogg_merge_foreach_file (OGMRipContainer *ogg, OGMRipFile *file, GPtrArray *argv)
 {
-  if (OGMRIP_IS_VIDEO_FORMAT (format))
-  {
-    g_ptr_array_add (argv, g_strdup ("--noaudio"));
-    g_ptr_array_add (argv, g_strdup (filename));
-  }
-  else if (OGMRIP_IS_AUDIO_FORMAT (format))
-    ogmrip_ogg_merge_append_audio_file (ogg, filename, language, argv);
-  else if (OGMRIP_IS_SUBP_FORMAT (format))
-    ogmrip_ogg_merge_append_subp_file (ogg, filename, language, argv);
+  if (OGMRIP_IS_VIDEO_STREAM (file))
+    ogmrip_ogg_merge_append_video_file (ogg, file, argv);
+  else if (OGMRIP_IS_AUDIO_STREAM (file))
+    ogmrip_ogg_merge_append_audio_file (ogg, file, argv);
+  else if (OGMRIP_IS_SUBP_STREAM (file))
+    ogmrip_ogg_merge_append_subp_file (ogg, file, argv);
 #if (defined(GLIB_SIZEOF_SIZE_T) && GLIB_SIZEOF_SIZE_T == 4)
   /*
    * ogmmerge segfaults when merging chapters on platforms other than 32-bit
    */
-  else if (OGMRIP_IS_CHAPTERS_FORMAT (format))
-    ogmrip_ogg_merge_append_chapters_file (ogg,  filename, language, argv);
+/*
+  else if (OGMRIP_IS_CHAPTER_STREAM (file))
+    ogmrip_ogg_merge_append_chapter_file (ogg, file, argv);
+*/
 #endif
 
 }
