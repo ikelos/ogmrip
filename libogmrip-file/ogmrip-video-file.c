@@ -28,6 +28,24 @@ static GObject * ogmrip_video_file_constructor  (GType type,
                                                  guint n_properties,
                                                  GObjectConstructParam *properties);
 
+static gint
+ogmrip_media_info_get_video_format (OGMRipMediaInfo *info)
+{
+  const gchar *str;
+
+  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "Format");
+  if (!str)
+    return OGMRIP_FORMAT_UNDEFINED;
+
+  if (g_str_equal (str, "MPEG-4 Visual"))
+    return OGMRIP_FORMAT_MPEG4;
+
+  if (g_str_equal (str, "AVC"))
+    return OGMRIP_FORMAT_H264;
+
+  return OGMRIP_FORMAT_UNDEFINED;
+}
+
 G_DEFINE_TYPE_WITH_CODE (OGMRipVideoFile, ogmrip_video_file, G_TYPE_OBJECT,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_VIDEO_STREAM, ogmrip_video_iface_init));
 
@@ -76,6 +94,14 @@ ogmrip_video_file_constructor (GType type, guint n_properties, GObjectConstructP
 
     str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "VideoCount");
     if (!str || !g_str_equal (str, "1"))
+    {
+      g_object_unref (info);
+      g_object_unref (gobject);
+      return NULL;
+    }
+
+    OGMRIP_FILE (gobject)->priv->format = ogmrip_media_info_get_video_format (info);
+    if (OGMRIP_FILE (gobject)->priv->format < 0)
     {
       g_object_unref (info);
       g_object_unref (gobject);
