@@ -20,6 +20,7 @@
 #include "ogmrip-media-info.h"
 #include "ogmrip-file-priv.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
 static void ogmrip_video_iface_init  (OGMRipVideoStreamInterface *iface);
@@ -36,7 +37,9 @@ ogmrip_video_file_init (OGMRipVideoFile *stream)
   stream->priv = G_TYPE_INSTANCE_GET_PRIVATE (stream, OGMRIP_TYPE_VIDEO_FILE, OGMRipVideoFilePriv);
 
   stream->priv->bitrate = -1;
+  stream->priv->framerate_denom = 1;
   stream->priv->standard = OGMRIP_STANDARD_UNDEFINED;
+  stream->priv->aspect = OGMRIP_ASPECT_UNDEFINED;
 }
 
 static void
@@ -68,6 +71,7 @@ ogmrip_video_file_constructor (GType type, guint n_properties, GObjectConstructP
   if (g_file_test (OGMRIP_FILE (gobject)->priv->path, G_FILE_TEST_EXISTS) &&
       ogmrip_media_info_open (info, OGMRIP_FILE (gobject)->priv->path))
   {
+    OGMRipVideoFile *video = OGMRIP_VIDEO_FILE (gobject);
     const gchar *str;
 
     str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "VideoCount");
@@ -88,30 +92,90 @@ ogmrip_video_file_constructor (GType type, guint n_properties, GObjectConstructP
     OGMRIP_FILE (gobject)->priv->label = str ? g_strdup (str) : NULL;
 
     str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "BitRate");
-    OGMRIP_VIDEO_FILE (gobject)->priv->bitrate = str ? atoi (str) : -1;
+    video->priv->bitrate = str ? atoi (str) : -1;
 
     str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "Width");
-    OGMRIP_VIDEO_FILE (gobject)->priv->width = str ? atoi (str) : 0;
+    video->priv->width = str ? atoi (str) : 0;
 
     str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "Height");
-    OGMRIP_VIDEO_FILE (gobject)->priv->height = str ? atoi (str) : 0;
+    video->priv->height = str ? atoi (str) : 0;
 
     str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "Standard");
-    if (!str)
-      OGMRIP_VIDEO_FILE (gobject)->priv->standard = -1;
-    else if (g_str_equal (str, "PAL"))
-      OGMRIP_VIDEO_FILE (gobject)->priv->standard = OGMRIP_STANDARD_PAL;
-    else if (g_str_equal (str, "NTSC"))
-      OGMRIP_VIDEO_FILE (gobject)->priv->standard = OGMRIP_STANDARD_NTSC;
+    if (str)
+    {
+      if (g_str_equal (str, "PAL"))
+        video->priv->standard = OGMRIP_STANDARD_PAL;
+      else if (g_str_equal (str, "NTSC"))
+        video->priv->standard = OGMRIP_STANDARD_NTSC;
+    }
+
+    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "FrameRate");
+    if (str)
+    {
+      if (g_str_equal (str, "25.000"))
+        video->priv->framerate_num = 25;
+      else if (g_str_equal (str, "23.976"))
+      {
+        video->priv->framerate_num = 24000;
+        video->priv->framerate_num = 1001;
+      }
+      else if (g_str_equal (str, "29.970"))
+      {
+        video->priv->framerate_num = 30000;
+        video->priv->framerate_num = 1001;
+      }
+      else
+      {
+        gdouble framerate;
+        
+        framerate = strtod (str, NULL);
+        video->priv->framerate_num = framerate * 1000;
+        video->priv->framerate_num = 1000;
+      }
+    }
+
+    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "DisplayAspectRatio");
+    if (str)
+    {
+      if (sscanf (str, "%u:%u", &video->priv->aspect_num, &video->priv->aspect_denom) != 2)
+      {
+        gdouble aspect;
+
+        aspect = strtod (str, NULL);
+        video->priv->aspect_num = aspect * 1000;
+        video->priv->aspect_denom = 1000;
+      }
+
+      if (video->priv->aspect_num == 16 && video->priv->aspect_denom == 9)
+        video->priv->aspect = OGMRIP_ASPECT_16_9;
+      else if (video->priv->aspect_num == 16 && video->priv->aspect_denom == 9)
+        video->priv->aspect = OGMRIP_ASPECT_4_3;
+    }
 
     /*
-     * TODO framerate, aspect, aspect ratio, delay
+     * TODO delay
      */
 
     ogmrip_media_info_close (info);
   }
 
   return gobject;
+}
+
+static gint
+ogmrip_video_file_get_aspect (OGMRipVideoStream *video)
+{
+  return OGMRIP_VIDEO_FILE (video)->priv->aspect;
+}
+
+static void
+ogmrip_video_file_get_aspect_ratio (OGMRipVideoStream *video, guint *num, guint *denom)
+{
+  if (num)
+    *num = OGMRIP_VIDEO_FILE (video)->priv->aspect_num;
+
+  if (denom)
+    *denom = OGMRIP_VIDEO_FILE (video)->priv->aspect_denom;
 }
 
 static gint
@@ -136,6 +200,16 @@ ogmrip_video_file_get_crop_size (OGMRipVideoStream *video, guint *x, guint *y, g
     *h = OGMRIP_VIDEO_FILE (video)->priv->height;
 }
 
+static void
+ogmrip_video_file_get_framerate (OGMRipVideoStream *video, guint *n, guint *d)
+{
+  if (n)
+    *n = OGMRIP_VIDEO_FILE (video)->priv->framerate_num;
+
+  if (d)
+    *d = OGMRIP_VIDEO_FILE (video)->priv->framerate_denom;
+}
+
 static gint
 ogmrip_video_file_get_standard (OGMRipVideoStream *video)
 {
@@ -155,8 +229,11 @@ ogmrip_video_file_get_resolution (OGMRipVideoStream *video, guint *w, guint *h)
 static void
 ogmrip_video_iface_init (OGMRipVideoStreamInterface *iface)
 {
+  iface->get_aspect = ogmrip_video_file_get_aspect;
+  iface->get_aspect_ratio = ogmrip_video_file_get_aspect_ratio;
   iface->get_bitrate = ogmrip_video_file_get_bitrate;
   iface->get_crop_size = ogmrip_video_file_get_crop_size;
+  iface->get_framerate = ogmrip_video_file_get_framerate;
   iface->get_standard = ogmrip_video_file_get_standard;
   iface->get_resolution = ogmrip_video_file_get_resolution;
 }

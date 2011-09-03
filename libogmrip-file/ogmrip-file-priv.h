@@ -31,10 +31,15 @@ struct _OGMRipFilePriv
 
 struct _OGMRipVideoFilePriv
 {
+  gint aspect;
   gint bitrate;
   gint standard;
   guint width;
   guint height;
+  guint framerate_num;
+  guint framerate_denom;
+  guint aspect_num;
+  guint aspect_denom;
 };
 
 struct _OGMRipAudioFilePriv
