@@ -18,6 +18,7 @@
 
 #include "ogmrip-media-info.h"
 
+#define MEDIAINFO_GLIBC
 #include <MediaInfoDLL/MediaInfoDLL.h>
 
 struct _OGMRipMediaInfoPriv
