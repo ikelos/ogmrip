@@ -43,7 +43,6 @@ struct _OGMRipContainerPriv
 
   guint tsize;
   guint tnumber;
-  guint start_delay;
 
   GList *files;
 };
@@ -56,8 +55,7 @@ enum
   PROP_FOURCC,
   PROP_TSIZE,
   PROP_TNUMBER,
-  PROP_OVERHEAD,
-  PROP_START_DELAY
+  PROP_OVERHEAD
 };
 
 static void ogmrip_container_finalize     (GObject      *gobject);
@@ -105,10 +103,6 @@ ogmrip_container_class_init (OGMRipContainerClass *klass)
   g_object_class_install_property (gobject_class, PROP_OVERHEAD, 
         g_param_spec_uint ("overhead", "Overhead property", "Get overhead", 
            0, G_MAXUINT, 6, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_START_DELAY, 
-        g_param_spec_uint ("start-delay", "Start delay property", "Set start delay", 
-           0, G_MAXINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipContainerPriv));
 }
@@ -158,9 +152,6 @@ ogmrip_container_set_property (GObject *gobject, guint property_id, const GValue
     case PROP_TNUMBER: 
       container->priv->tnumber = g_value_get_uint (value);
       break;
-    case PROP_START_DELAY: 
-      container->priv->start_delay = g_value_get_uint (value);
-      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
@@ -191,9 +182,6 @@ ogmrip_container_get_property (GObject *gobject, guint property_id, GValue *valu
       break;
     case PROP_OVERHEAD:
       g_value_set_uint (value, 6);
-      break;
-    case PROP_START_DELAY:
-      g_value_set_uint (value, container->priv->start_delay);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -312,39 +300,6 @@ ogmrip_container_set_fourcc (OGMRipContainer *container, const gchar *fourcc)
   }
 
   g_object_notify (G_OBJECT (container), "fourcc");
-}
-
-/**
- * ogmrip_container_get_start_delay:
- * @container: An #OGMRipContainer
- *
- * Gets the start delay of the audio tracks.
- *
- * Returns: The start delay, or -1
- */
-gint
-ogmrip_container_get_start_delay (OGMRipContainer *container)
-{
-  g_return_val_if_fail (OGMRIP_IS_CONTAINER (container), -1);
-
-  return container->priv->start_delay;
-}
-
-/**
- * ogmrip_container_set_start_delay:
- * @container: An #OGMRipContainer
- * @start_delay: the start delay
- *
- * Sets the start delay of the audio tracks
- */
-void
-ogmrip_container_set_start_delay (OGMRipContainer *container, guint start_delay)
-{
-  g_return_if_fail (OGMRIP_IS_CONTAINER (container));
-
-  container->priv->start_delay = start_delay;
-
-  g_object_notify (G_OBJECT (container), "start-delay");
 }
 
 /**
@@ -529,5 +484,33 @@ ogmrip_container_get_split (OGMRipContainer *container, guint *number, guint *si
 
   if (size)
     *size = container->priv->tsize;
+}
+
+/**
+ * ogmrip_container_get_sync:
+ * @container: an #OGMRipContainer
+ *
+ * Gets the delay of the audio streams in ms.
+ *
+ * Returns: The delay
+ */
+glong
+ogmrip_container_get_sync (OGMRipContainer *container)
+{
+  GList *link;
+  guint num, denom;
+  gint start_delay;
+
+  for (link = container->priv->files; link; link = link->next)
+    if (OGMRIP_IS_VIDEO_STREAM (link->data))
+      break;
+
+  if (!link)
+    return 0;
+
+  ogmrip_video_stream_get_framerate (link->data, &num, &denom);
+  start_delay = ogmrip_video_stream_get_start_delay (link->data);
+
+  return (start_delay * denom * 1000) / (gdouble) num;
 }
 

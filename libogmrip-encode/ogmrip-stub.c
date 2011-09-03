@@ -149,6 +149,14 @@ ogmrip_video_stub_get_resolution (OGMRipVideoStream *video, guint *w, guint *h)
   ogmrip_video_codec_get_scale_size (OGMRIP_VIDEO_CODEC (stub->priv->codec), w, h);
 }
 
+static gint
+ogmrip_video_stub_get_start_delay (OGMRipVideoStream *video)
+{
+  OGMRipVideoStub *stub = OGMRIP_VIDEO_STUB (video);
+
+  return ogmrip_video_codec_get_start_delay (OGMRIP_VIDEO_CODEC (stub->priv->codec));
+}
+
 static void
 ogmrip_video_iface_init (OGMRipVideoStreamInterface *iface)
 {
@@ -157,6 +165,7 @@ ogmrip_video_iface_init (OGMRipVideoStreamInterface *iface)
   iface->get_crop_size = ogmrip_video_stub_get_crop_size;
   iface->get_framerate = ogmrip_video_stub_get_framerate;
   iface->get_resolution = ogmrip_video_stub_get_resolution;
+  iface->get_start_delay = ogmrip_video_stub_get_start_delay;
 }
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipVideoStub, ogmrip_video_stub, OGMRIP_TYPE_VIDEO_FILE,

@@ -78,41 +78,6 @@ ogmrip_ogg_split_watch (OGMJobExec *exec, const gchar *buffer, OGMRipContainer *
   return -1.0;
 }
 
-static gchar *
-ogmrip_ogg_get_sync (OGMRipContainer *container)
-{
-/*
-  OGMDvdTitle *title;
-  guint num, denom;
-  gint start_delay;
-  gchar *buf;
-
-  start_delay = ogmrip_container_get_start_delay (container);
-  if (start_delay <= 0)
-    return NULL;
-
-  title = NULL;
-  if (ogmdvd_title_get_telecine (title) || ogmdvd_title_get_progressive (title))
-  {
-    num = 24000;
-    denom = 1001;
-  }
-  else
-  {
-    OGMDvdVideoStream *stream;
-
-    stream = ogmdvd_title_get_video_stream (title);
-    ogmdvd_video_stream_get_framerate (OGMDVD_VIDEO_STREAM (stream), &num, &denom);
-  }
-
-  buf = g_new0 (gchar, G_ASCII_DTOSTR_BUF_SIZE);
-  g_ascii_formatd (buf, G_ASCII_DTOSTR_BUF_SIZE, "%.0f", (start_delay * denom * 1000) / (gdouble) num);
-
-  return buf;
-*/
-  return NULL;
-}
-
 static void
 ogmrip_ogg_merge_append_video_file (OGMRipContainer *ogg, OGMRipFile *file, GPtrArray *argv)
 {
@@ -130,7 +95,7 @@ ogmrip_ogg_merge_append_audio_file (OGMRipContainer *ogg, OGMRipFile *file, GPtr
   if (g_stat (filename, &buf) == 0 && buf.st_size > 0)
   {
     gint language;
-    gchar *sync;
+    glong sync;
 
     language = ogmrip_audio_stream_get_language (OGMRIP_AUDIO_STREAM (file));
     if (language > -1)
@@ -140,12 +105,11 @@ ogmrip_ogg_merge_append_audio_file (OGMRipContainer *ogg, OGMRipFile *file, GPtr
             g_strdup (ogmrip_language_get_label (language))));
     }
 
-    sync = ogmrip_ogg_get_sync (ogg);
+    sync = ogmrip_container_get_sync (ogg);
     if (sync)
     {
       g_ptr_array_add (argv, g_strdup ("--sync"));
-      g_ptr_array_add (argv, g_strdup (sync));
-      g_free (sync);
+      g_ptr_array_add (argv, g_strdup_printf ("%ld", sync));
     }
 
     g_ptr_array_add (argv, g_strdup ("--novideo"));

@@ -1233,9 +1233,6 @@ ogmrip_main_extract_activated (OGMRipData *data)
     d = ogmrip_options_dialog_get_deinterlacer (OGMRIP_OPTIONS_DIALOG (dialog));
     ogmrip_video_codec_set_deinterlacer (OGMRIP_VIDEO_CODEC (codec), d);
 
-    d = ogmrip_video_codec_get_start_delay (OGMRIP_VIDEO_CODEC (codec));
-    ogmrip_container_set_start_delay (container, d);
-
     ogmrip_encoding_set_video_codec (encoding, OGMRIP_VIDEO_CODEC (codec));
     g_object_unref (codec);
 

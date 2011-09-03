@@ -34,43 +34,45 @@ struct _OGMRipVideoStreamInterface
 {
   GTypeInterface base_iface;
 
+  gint         (* get_aspect)       (OGMRipVideoStream   *video);
+  void         (* get_aspect_ratio) (OGMRipVideoStream   *video,
+                                     guint               *numerator,
+                                     guint               *denominator);
   gint         (* get_bitrate)      (OGMRipVideoStream   *video);
+  void         (* get_crop_size)    (OGMRipVideoStream   *video,
+                                     guint               *x,
+                                     guint               *y,
+                                     guint               *width,
+                                     guint               *height);
   void         (* get_framerate)    (OGMRipVideoStream   *video,
                                      guint               *numerator,
                                      guint               *denominator);
   void         (* get_resolution)   (OGMRipVideoStream   *video,
                                      guint               *width,
                                      guint               *height);
-  void         (* get_crop_size)    (OGMRipVideoStream   *video,
-                                     guint               *x,
-                                     guint               *y,
-                                     guint               *width,
-                                     guint               *height);
   gint         (* get_standard)     (OGMRipVideoStream   *video);
-  gint         (* get_aspect)       (OGMRipVideoStream   *video);
-  void         (* get_aspect_ratio) (OGMRipVideoStream   *video,
-                                     guint               *numerator,
-                                     guint               *denominator);
+  gint         (* get_start_delay)  (OGMRipVideoStream   *video);
 };
 
 GType        ogmrip_video_stream_get_type         (void) G_GNUC_CONST;
+gint         ogmrip_video_stream_get_aspect       (OGMRipVideoStream   *video);
+void         ogmrip_video_stream_get_aspect_ratio (OGMRipVideoStream   *video,
+                                                   guint               *numerator,
+                                                   guint               *denominator);
 gint         ogmrip_video_stream_get_bitrate      (OGMRipVideoStream   *video);
+void         ogmrip_video_stream_get_crop_size    (OGMRipVideoStream   *video,
+                                                   guint               *x,
+                                                   guint               *y,
+                                                   guint               *width,
+                                                   guint               *height);
 void         ogmrip_video_stream_get_framerate    (OGMRipVideoStream   *video,
                                                    guint               *numerator,
                                                    guint               *denominator);
 void         ogmrip_video_stream_get_resolution   (OGMRipVideoStream   *video,
                                                    guint               *width,
                                                    guint               *height);
-void         ogmrip_video_stream_get_crop_size    (OGMRipVideoStream   *video,
-                                                   guint               *x,
-                                                   guint               *y,
-                                                   guint               *width,
-                                                   guint               *height);
 gint         ogmrip_video_stream_get_standard     (OGMRipVideoStream   *video);
-gint         ogmrip_video_stream_get_aspect       (OGMRipVideoStream   *video);
-void         ogmrip_video_stream_get_aspect_ratio (OGMRipVideoStream   *video,
-                                                   guint               *numerator,
-                                                   guint               *denominator);
+gint         ogmrip_video_stream_get_start_delay  (OGMRipVideoStream   *video);
 
 G_END_DECLS
 

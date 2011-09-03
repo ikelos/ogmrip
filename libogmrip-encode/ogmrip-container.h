@@ -52,37 +52,35 @@ typedef void (* OGMRipContainerFunc) (OGMRipContainer  *container,
                                       OGMRipFile       *file,
                                       gpointer         data);
 
-GType         ogmrip_container_get_type        (void);
-const gchar * ogmrip_container_get_output      (OGMRipContainer     *container);
-void          ogmrip_container_set_output      (OGMRipContainer     *container,
-                                                const gchar         *filename);
-const gchar * ogmrip_container_get_label       (OGMRipContainer     *container);
-void          ogmrip_container_set_label       (OGMRipContainer     *container,
-                                                const gchar         *label);
-const gchar * ogmrip_container_get_fourcc      (OGMRipContainer     *container);
-void          ogmrip_container_set_fourcc      (OGMRipContainer     *container,
-                                                const gchar         *fourcc);
-gint          ogmrip_container_get_start_delay (OGMRipContainer     *container);
-void          ogmrip_container_set_start_delay (OGMRipContainer     *container,
-                                                guint               start_delay);
-gint          ogmrip_container_get_overhead    (OGMRipContainer     *container);
-void          ogmrip_container_add_file        (OGMRipContainer     *container,
-                                                OGMRipFile          *file);
-void          ogmrip_container_remove_file     (OGMRipContainer     *container,
-                                                OGMRipFile          *file);
-GList *       ogmrip_container_get_files       (OGMRipContainer     *container);
-OGMRipFile *  ogmrip_container_get_nth_file    (OGMRipContainer     *container,
-                                                gint                n);
-gint          ogmrip_container_get_n_files     (OGMRipContainer     *container);
-void          ogmrip_container_foreach_file    (OGMRipContainer     *container,
-                                                OGMRipContainerFunc func,
-                                                gpointer            data);
-void          ogmrip_container_set_split       (OGMRipContainer     *container,
-                                                guint               number,
-                                                guint               size);
-void          ogmrip_container_get_split       (OGMRipContainer     *container,
-                                                guint               *number,
-                                                guint               *size);
+GType         ogmrip_container_get_type     (void);
+const gchar * ogmrip_container_get_output   (OGMRipContainer     *container);
+void          ogmrip_container_set_output   (OGMRipContainer     *container,
+                                             const gchar         *filename);
+const gchar * ogmrip_container_get_label    (OGMRipContainer     *container);
+void          ogmrip_container_set_label    (OGMRipContainer     *container,
+                                             const gchar         *label);
+const gchar * ogmrip_container_get_fourcc   (OGMRipContainer     *container);
+void          ogmrip_container_set_fourcc   (OGMRipContainer     *container,
+                                             const gchar         *fourcc);
+gint          ogmrip_container_get_overhead (OGMRipContainer     *container);
+void          ogmrip_container_add_file     (OGMRipContainer     *container,
+                                             OGMRipFile          *file);
+void          ogmrip_container_remove_file  (OGMRipContainer     *container,
+                                             OGMRipFile          *file);
+GList *       ogmrip_container_get_files    (OGMRipContainer     *container);
+OGMRipFile *  ogmrip_container_get_nth_file (OGMRipContainer     *container,
+                                             gint                n);
+gint          ogmrip_container_get_n_files  (OGMRipContainer     *container);
+void          ogmrip_container_foreach_file (OGMRipContainer     *container,
+                                             OGMRipContainerFunc func,
+                                             gpointer            data);
+void          ogmrip_container_set_split    (OGMRipContainer     *container,
+                                             guint               number,
+                                             guint               size);
+void          ogmrip_container_get_split    (OGMRipContainer     *container,
+                                             guint               *number,
+                                             guint               *size);
+glong         ogmrip_container_get_sync     (OGMRipContainer     *container);
 
 G_END_DECLS
 
