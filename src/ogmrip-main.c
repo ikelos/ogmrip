@@ -1,5 +1,5 @@
 /* OGMRip - A DVD Encoder for GNOME
- * Copyright (C) 2004-2010 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2011 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -1537,7 +1537,7 @@ ogmrip_main_about_activated (OGMRipData *data)
       "name", PACKAGE_NAME,
       "version", PACKAGE_VERSION,
       "comments", _("A DVD Encoder for GNOME"),
-      "copyright", "(c) 2004-2010 Olivier Rolland",
+      "copyright", "(c) 2004-2011 Olivier Rolland",
       "website", "http://ogmrip.sourceforge.net",
       "translator-credits", translator_credits,
       "documenters", documenters,

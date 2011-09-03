@@ -1,5 +1,5 @@
 /* OGMDvd - A wrapper library around libdvdread
- * Copyright (C) 2009-2010 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2009-2011 Olivier Rolland <billl@users.sourceforge.net>
  *
  * Code from libbrasero-media
  * Copyright (C) Philippe Rouquier 2005-2009 <bonfire-app@wanadoo.fr>
