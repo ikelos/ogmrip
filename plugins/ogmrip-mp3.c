@@ -29,7 +29,6 @@
 #include <glib/gi18n-lib.h>
 
 #define PROGRAM "lame"
-#define MP3_SPF 1152
 
 #define OGMRIP_TYPE_MP3          (ogmrip_mp3_get_type ())
 #define OGMRIP_MP3(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_MP3, OGMRipMp3))
@@ -50,18 +49,7 @@ struct _OGMRipMp3Class
   OGMRipAudioCodecClass parent_class;
 };
 
-enum
-{
-  PROP_0,
-  PROP_SPF
-};
-
-GType ogmrip_mp3_get_type (void);
-static void ogmrip_mp3_get_property (GObject     *gobject,
-                                     guint       property_id,
-                                     GValue      *value,
-                                     GParamSpec  *pspec);
-static gint ogmrip_mp3_run          (OGMJobSpawn *spawn);
+static gint ogmrip_mp3_run (OGMJobSpawn *spawn);
 
 static gchar **
 ogmrip_mp3_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input)
@@ -129,37 +117,15 @@ G_DEFINE_TYPE (OGMRipMp3, ogmrip_mp3, OGMRIP_TYPE_AUDIO_CODEC)
 static void
 ogmrip_mp3_class_init (OGMRipMp3Class *klass)
 {
-  GObjectClass *gobject_class;
   OGMJobSpawnClass *spawn_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->get_property = ogmrip_mp3_get_property;
 
   spawn_class = OGMJOB_SPAWN_CLASS (klass);
   spawn_class->run = ogmrip_mp3_run;
-
-  g_object_class_install_property (gobject_class, PROP_SPF,
-      g_param_spec_uint ("samples-per-frame", "Samples per frame property", "Set samples per frame",
-        0, G_MAXUINT, MP3_SPF, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 }
 
 static void
 ogmrip_mp3_init (OGMRipMp3 *mp3)
 {
-}
-
-static void
-ogmrip_mp3_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
-{
-  switch (property_id)
-  {
-    case PROP_SPF:
-      g_value_set_uint (value, MP3_SPF);
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
-      break;
-  }
 }
 
 static gint

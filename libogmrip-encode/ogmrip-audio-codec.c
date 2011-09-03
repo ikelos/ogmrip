@@ -52,7 +52,6 @@ enum
   PROP_NORMALIZE,
   PROP_CHANNELS,
   PROP_SRATE,
-  PROP_SPF,
   PROP_FAST,
   PROP_LABEL,
   PROP_LANGUAGE
@@ -97,10 +96,6 @@ ogmrip_audio_codec_class_init (OGMRipAudioCodecClass *klass)
   g_object_class_install_property (gobject_class, PROP_SRATE, 
         g_param_spec_uint ("sample-rate", "Sample rate property", "Set sample rate", 
            0, G_MAXUINT, 48000, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_SPF, 
-        g_param_spec_uint ("samples-per-frame", "Samples per frame property", "Set samples per frame", 
-           0, G_MAXUINT, DEFAULT_SPF, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_FAST, 
         g_param_spec_boolean ("fast", "Fast property", "Set fast", 
@@ -194,9 +189,6 @@ ogmrip_audio_codec_get_property (GObject *gobject, guint property_id, GValue *va
       break;
     case PROP_SRATE:
       g_value_set_uint (value, audio->priv->srate);
-      break;
-    case PROP_SPF:
-      g_value_set_uint (value, DEFAULT_SPF);
       break;
     case PROP_FAST:
       g_value_set_boolean (value, audio->priv->fast);
@@ -348,26 +340,6 @@ ogmrip_audio_codec_get_channels (OGMRipAudioCodec *audio)
   g_return_val_if_fail (OGMRIP_IS_AUDIO_CODEC (audio), -1);
 
   return audio->priv->channels;
-}
-
-/**
- * ogmrip_audio_codec_get_samples_per_frame:
- * @audio: an #OGMRipAudioCodec
- *
- * Gets the number of samples per frame.
- *
- * Returns: the number of samples per frame, or -1
- */
-gint
-ogmrip_audio_codec_get_samples_per_frame (OGMRipAudioCodec *audio)
-{
-  gint spf;
-
-  g_return_val_if_fail (OGMRIP_IS_AUDIO_CODEC (audio), -1);
-
-  g_object_get (audio, "samples-per-frame", &spf, NULL);
-
-  return spf;
 }
 
 /**

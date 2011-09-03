@@ -48,17 +48,7 @@ struct _OGMRipAudioCopyClass
   OGMRipAudioCodecClass parent_class;
 };
 
-enum
-{
-  PROP_0,
-  PROP_SPF
-};
-
-static void ogmrip_audio_copy_get_property (GObject     *gobject,
-                                            guint       property_id,
-                                            GValue      *value,
-                                            GParamSpec  *pspec);
-static gint ogmrip_audio_copy_run          (OGMJobSpawn *spawn);
+static gint ogmrip_audio_copy_run (OGMJobSpawn *spawn);
 
 static gchar **
 ogmrip_audio_copy_command (OGMRipAudioCodec *audio)
@@ -105,37 +95,15 @@ G_DEFINE_TYPE (OGMRipAudioCopy, ogmrip_audio_copy, OGMRIP_TYPE_AUDIO_CODEC)
 static void
 ogmrip_audio_copy_class_init (OGMRipAudioCopyClass *klass)
 {
-  GObjectClass *gobject_class;
   OGMJobSpawnClass *spawn_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->get_property = ogmrip_audio_copy_get_property;
 
   spawn_class = OGMJOB_SPAWN_CLASS (klass);
   spawn_class->run = ogmrip_audio_copy_run;
-
-  g_object_class_install_property (gobject_class, PROP_SPF,
-      g_param_spec_uint ("samples-per-frame", "Samples per frame property", "Set samples per frame",
-        0, G_MAXUINT, ACOPY_SPF, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 }
 
 static void
 ogmrip_audio_copy_init (OGMRipAudioCopy *audio_copy)
 {
-}
-
-static void
-ogmrip_audio_copy_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
-{
-  switch (property_id)
-  {
-    case PROP_SPF:
-      g_value_set_uint (value, ACOPY_SPF);
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
-      break;
-  }
 }
 
 static gint

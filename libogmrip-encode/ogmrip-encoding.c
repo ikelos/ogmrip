@@ -1024,11 +1024,14 @@ ogmrip_encoding_get_video_overhead (OGMRipEncoding *encoding)
 static gint64
 ogmrip_encoding_get_audio_overhead (OGMRipEncoding *encoding, OGMRipAudioCodec *codec)
 {
+  OGMRipFile *output;
   gdouble length, audio_frames;
   gint samples_per_frame, sample_rate, channels, overhead;
 
   length = ogmrip_codec_get_length (OGMRIP_CODEC (codec), NULL);
-  samples_per_frame = ogmrip_audio_codec_get_samples_per_frame (codec);
+
+  output = ogmrip_codec_get_output (OGMRIP_CODEC (codec));
+  samples_per_frame = ogmrip_audio_stream_get_samples_per_frame (OGMRIP_AUDIO_STREAM (output));
 
   sample_rate = 48000;
   channels = 1;
