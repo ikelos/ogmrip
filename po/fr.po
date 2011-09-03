@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OGMRip\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-08-17 01:40+0200\n"
+"POT-Creation-Date: 2011-09-02 16:32+0200\n"
 "PO-Revision-Date: 2008-01-11 21:30+0100\n"
 "Last-Translator: Olivier Rolland <billl@users.sourceforge.net>\n"
 "Language-Team: French <fr@li.org>\n"
@@ -103,7 +103,7 @@ msgstr "Fonction de _comparaison pour l'estimation de mouvement full pel (cmp)"
 msgid "_Diamond type and size for motion estimation (dia)"
 msgstr "Type et taille de _diamant pour l'estimation de mouvement (dia)"
 
-#: ../data/ogmrip-lavc.glade.h:17 ../data/ogmrip-pref.glade.h:18
+#: ../data/ogmrip-lavc.glade.h:17 ../data/ogmrip-pref.glade.h:15
 #: ../data/ogmrip-profile-editor.glade.h:37
 msgid "_General"
 msgstr "_Générales"
@@ -152,16 +152,16 @@ msgstr "<b>Piste _video :</b>"
 msgid "Angle:"
 msgstr "Angle :"
 
-#: ../data/ogmrip-main.glade.h:7 ../src/ogmrip-main.c:1644
-#: ../src/ogmrip-options-dialog.c:548
+#: ../data/ogmrip-main.glade.h:7 ../src/ogmrip-main.c:1733
+#: ../src/ogmrip-options-dialog.c:680
 msgid "E_xtract"
 msgstr "E_xtraire"
 
-#: ../data/ogmrip-main.glade.h:8 ../src/ogmrip-main.c:1644
+#: ../data/ogmrip-main.glade.h:8 ../src/ogmrip-main.c:1733
 msgid "Extract selected streams"
 msgstr "Extrait les pistes sélectionnées"
 
-#: ../data/ogmrip-main.glade.h:9 ../src/ogmrip-main.c:1643
+#: ../data/ogmrip-main.glade.h:9 ../src/ogmrip-main.c:1732
 msgid "Load a DVD disk, an ISO file, or a DVD structure"
 msgstr "Charger un DVD, une image ISO ou une structure DVD"
 
@@ -174,8 +174,8 @@ msgid "Open a DVD structure"
 msgstr "Sélectionner une structure de DVD"
 
 #: ../data/ogmrip-main.glade.h:12
-#: ../libogmdvd-gtk/ogmdvd-drive-chooser-dialog.c:126
-#: ../src/ogmrip-main.c:1643
+#: ../libogmrip-dvd-gtk/ogmdvd-drive-chooser-dialog.c:127
+#: ../src/ogmrip-main.c:1732
 msgid "_Load"
 msgstr "_Charger"
 
@@ -256,66 +256,54 @@ msgid "Do _not remove temporary files"
 msgstr "Ne pas supprimer les fichiers temporaires"
 
 #: ../data/ogmrip-pref.glade.h:6
-msgid "No chapters language"
-msgstr "Aucune"
-
-#: ../data/ogmrip-pref.glade.h:7
-msgid "No favorite audio language"
-msgstr "Pas de langue préférée pour l'audio"
-
-#: ../data/ogmrip-pref.glade.h:8
-msgid "No favorite subtitle language"
-msgstr "Pas de langue préférée pour les sous-titres"
-
-#: ../data/ogmrip-pref.glade.h:9
 msgid "Select the output directory"
 msgstr "Sélectionner le répertoire destination"
 
-#: ../data/ogmrip-pref.glade.h:10
+#: ../data/ogmrip-pref.glade.h:7
 msgid "Select the temporary directory"
 msgstr "Sélectionner le répertoire temporaire"
 
-#: ../data/ogmrip-pref.glade.h:11
+#: ../data/ogmrip-pref.glade.h:8
 msgid "_Advanced"
 msgstr "_Avancées"
 
-#: ../data/ogmrip-pref.glade.h:12
+#: ../data/ogmrip-pref.glade.h:9
 msgid "_After the encoding:"
 msgstr "_Après l'encodage :"
 
-#: ../data/ogmrip-pref.glade.h:13
+#: ../data/ogmrip-pref.glade.h:10
 msgid "_Audio:"
 msgstr "_Audio :"
 
-#: ../data/ogmrip-pref.glade.h:14
+#: ../data/ogmrip-pref.glade.h:11
 msgid "_Chapters:"
 msgstr "_Chapitres :"
 
-#: ../data/ogmrip-pref.glade.h:15
+#: ../data/ogmrip-pref.glade.h:12
 msgid "_Copy DVD on hard drive before encoding"
 msgstr "_Copier le DVD sur le disque dur avant l'encodage"
 
-#: ../data/ogmrip-pref.glade.h:16
+#: ../data/ogmrip-pref.glade.h:13
 msgid "_Create a log file"
 msgstr "_Créer un fichier de log"
 
-#: ../data/ogmrip-pref.glade.h:17
+#: ../data/ogmrip-pref.glade.h:14
 msgid "_File Name:"
 msgstr "Nom du _fichier"
 
-#: ../data/ogmrip-pref.glade.h:19
+#: ../data/ogmrip-pref.glade.h:16
 msgid "_Output Path:"
 msgstr "Dossier de _destination :"
 
-#: ../data/ogmrip-pref.glade.h:20
+#: ../data/ogmrip-pref.glade.h:17
 msgid "_Subtitles:"
 msgstr "_Sous-titres :"
 
-#: ../data/ogmrip-pref.glade.h:21
+#: ../data/ogmrip-pref.glade.h:18
 msgid "_Temporary Path:"
 msgstr "Dossier _temporaire :"
 
-#: ../data/ogmrip-pref.glade.h:22
+#: ../data/ogmrip-pref.glade.h:19
 msgid "_Threads:"
 msgstr "_Threads :"
 
@@ -463,7 +451,7 @@ msgstr "_Codec :"
 msgid "_Crop image"
 msgstr "_Découpage de l'image"
 
-#: ../data/ogmrip-profile-editor.glade.h:34 ../src/ogmrip-main.c:1648
+#: ../data/ogmrip-profile-editor.glade.h:34 ../src/ogmrip-main.c:1737
 msgid "_Edit"
 msgstr "_Éditer"
 
@@ -524,12 +512,12 @@ msgid "video"
 msgstr "vidéo"
 
 #: ../data/ogmrip-profiles.glade.h:1
-#: ../libogmrip-gtk/ogmrip-encoding-manager-dialog.c:75
+#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:76
 msgid "_Export"
 msgstr "_Exporter"
 
 #: ../data/ogmrip-profiles.glade.h:2
-#: ../libogmrip-gtk/ogmrip-encoding-manager-dialog.c:74
+#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:75
 msgid "_Import"
 msgstr "_Importer"
 
@@ -601,11 +589,11 @@ msgstr ""
 "<b><big>Des mises à jour des profils sont disponibles</big></b>\n"
 "Sélectionner les profils que vous souhaiter mettre à jour"
 
-#: ../data/ogmrip-update.glade.h:3 ../src/ogmrip-main.c:1649
+#: ../data/ogmrip-update.glade.h:3 ../src/ogmrip-main.c:1738
 msgid "Select _All"
 msgstr "Séléctionner _tout"
 
-#: ../data/ogmrip-update.glade.h:4 ../src/ogmrip-main.c:1650
+#: ../data/ogmrip-update.glade.h:4 ../src/ogmrip-main.c:1739
 msgid "_Deselect All"
 msgstr "_Déselectionner tout"
 
@@ -888,90 +876,219 @@ msgstr "Mode VHQ (vhq):"
 msgid "Width x height:"
 msgstr "Largeur x hauteur:"
 
-#: ../libogmdvd/ogmdvd-disc.c:124
+#: ../libogmrip-dvd/ogmdvd-disc.c:145
 #, c-format
 msgid "No such file or directory"
 msgstr "Fichier ou répertoire inéxistant"
 
-#: ../libogmdvd/ogmdvd-disc.c:128
+#: ../libogmrip-dvd/ogmdvd-disc.c:149
 #, c-format
 msgid "Permission denied to access device"
 msgstr "Permission non accordée pour accéder au périphérique"
 
-#: ../libogmdvd/ogmdvd-disc.c:134
+#: ../libogmrip-dvd/ogmdvd-disc.c:155
 #, c-format
 msgid "Tray seems to be open"
 msgstr "Le tiroir semble ouvert"
 
-#: ../libogmdvd/ogmdvd-disc.c:136
+#: ../libogmrip-dvd/ogmdvd-disc.c:157
 #, c-format
 msgid "Device does not contain a valid DVD video"
 msgstr "Le périphérique ne contient pas un DVD vidéo valide"
 
-#: ../libogmdvd/ogmdvd-disc.c:139
+#: ../libogmrip-dvd/ogmdvd-disc.c:160
 #, c-format
 msgid "Path does not contain a valid DVD structure"
 msgstr "Le dossier ne contient pas une structure de DVD valide"
 
-#: ../libogmdvd/ogmdvd-disc.c:141
+#: ../libogmrip-dvd/ogmdvd-disc.c:162
 #, c-format
 msgid "No such directory, block device or iso file"
 msgstr "Répertoire, périphérique ou fichier iso inéxistant"
 
-#: ../libogmdvd/ogmdvd-disc.c:670
-#, c-format
-msgid "Cannot open video manager"
-msgstr "Impossible d'ouvrir gestionnaire vidéo"
-
-#: ../libogmdvd/ogmdvd-disc.c:733
+#: ../libogmrip-dvd/ogmdvd-disc.c:753
+#: ../libogmrip-encode/ogmrip-encoding.c:485
 #, c-format
 msgid "Device does not contain the expected DVD"
 msgstr "Le périphérique ne contient pas le DVD attendu"
 
-#: ../libogmdvd/ogmdvd-title.c:105
+#: ../libogmrip-dvd/ogmdvd-title.c:287
 #, c-format
 msgid "Cannot open video titleset"
 msgstr "Impossible d'ouvrir le titleset vidéo"
 
-#: ../libogmdvd-gtk/ogmdvd-chapter-list.c:114
-#: ../libogmdvd-gtk/ogmdvd-chapter-list.c:237
+#: ../libogmrip-encode/ogmrip-encoding.c:533
+#: ../libogmrip-encode/ogmrip-profile.c:362
+#, c-format
+msgid "'%s' does not contain a valid encoding"
+msgstr "'%s' ne contient pas un encodage valide"
+
+#: ../libogmrip-encode/ogmrip-encoding.c:1223
+#, c-format
+msgid "Not enough space to store output and temporary files (%s needed)."
+msgstr ""
+"Pas assez d'espace pour stocker le fichier de sortie et les fichiers "
+"temporaires (%sMo nécessaires)."
+
+#: ../libogmrip-encode/ogmrip-encoding.c:1234
+#, c-format
+msgid "Not enough space to store the output file (%s needed)."
+msgstr ""
+"Pas assez d'espace pour stocker le fichier de sortie (%sMo nécessaires)."
+
+#: ../libogmrip-encode/ogmrip-encoding.c:1244
+#, c-format
+msgid "Not enough space to store the temporary files (%s needed)."
+msgstr ""
+"Pas assez d'espace pour stocker les fichiers temporaires (%sMo nécessaires)."
+
+#: ../libogmrip-encode/ogmrip-fs.c:103 ../libogmrip-encode/ogmrip-fs.c:297
+#, c-format
+msgid "Failed to create directory '%s': %s"
+msgstr "Impossible de créer le répertoire '%s': %s"
+
+#: ../libogmrip-encode/ogmrip-fs.c:160
+#, c-format
+msgid "Failed to unlink file '%s': %s"
+msgstr "Impossible de supprimer le lien '%s': %s"
+
+#: ../libogmrip-encode/ogmrip-fs.c:174
+#, c-format
+msgid "Failed to remove directory '%s': %s"
+msgstr "Impossible de supprimer le répertoire '%s': %s"
+
+#: ../libogmrip-encode/ogmrip-fs.c:205 ../libogmrip-encode/ogmrip-fs.c:407
+#, c-format
+msgid "Failed to create file '%s': %s"
+msgstr "Impossible de créer le fichier '%s': %s"
+
+#: ../libogmrip-encode/ogmrip-fs.c:249
+#, c-format
+msgid "Failed to create fifo '%s': %s"
+msgstr "Impossible de créer la fifo '%s': %s"
+
+#: ../libogmrip-encode/ogmrip-fs.c:349
+#, c-format
+msgid "Failed to link '%s': %s"
+msgstr "Impossible de créer un lien sur '%s': %s"
+
+#: ../libogmrip-encode/ogmrip-fs.c:385
+#, c-format
+msgid "Template '%s' doesn't end with XXXXXX"
+msgstr "Le gabarit '%s' ne se termine pas par XXXXXX"
+
+#: ../libogmrip-encode/ogmrip-fs.c:396
+#, c-format
+msgid "Template '%s' invalid, should not contain a '/'"
+msgstr "Gabarit '%s' invalide, ne peut contenir de '/'"
+
+#: ../libogmrip-encode/ogmrip-fs.c:465
+#, c-format
+msgid "Failed to stat the file system containing '%s': %s"
+msgstr "Impossible d'évaluer le système de fichiers contenant '%s': %s"
+
+#: ../libogmrip-encode/ogmrip-fs.c:508
+#, c-format
+msgid "Failed to stat '%s': %s"
+msgstr "Impossible d'évaluer '%s': %s"
+
+#: ../libogmrip-encode/ogmrip-fs.c:515
+#, c-format
+msgid "Failed to change to directory '%s': %s"
+msgstr "Impossible de changer vers le répertoire '%s': %s"
+
+#: ../libogmrip-encode/ogmrip-fs.c:524
+#, c-format
+msgid "Failed to stat '..': %s"
+msgstr "Impossible d'évaluer '..': %s"
+
+#: ../libogmrip-encode/ogmrip-fs.c:534
+#, c-format
+msgid "Failed to change to directory '..': %s"
+msgstr "Impossible de changer vers le répertoire '..': %s"
+
+#: ../libogmrip-encode/ogmrip-hardsub.c:44
+msgid "Hardcoded subtitle"
+msgstr "Sous-titres incrustés"
+
+#: ../libogmrip-encode/ogmrip-novideo.c:32
+msgid "No Video"
+msgstr "Pas de vidéo"
+
+#: ../libogmrip-encode/ogmrip-plugin.c:152
+#, c-format
+msgid "Plugin %s disabled"
+msgstr "Greffon %s désactivé"
+
+#: ../libogmrip-encode/ogmrip-plugin.c:154
+msgid "some requirements are not available"
+msgstr "des prérequis sont manquants"
+
+#: ../libogmrip-encode/ogmrip-xml.c:109
+#, c-format
+msgid "'%s' is not a valid XML file"
+msgstr "'%s' n'est pas un fichier XML valide"
+
+#: ../libogmrip-media-gtk/ogmrip-chapter-store.c:198
+#: ../libogmrip-media-gtk/ogmrip-chapter-view.c:133
 msgid "Chapter"
 msgstr "Chapitre"
 
-#: ../libogmdvd-gtk/ogmdvd-chapter-list.c:118
+#: ../libogmrip-media-gtk/ogmrip-chapter-view.c:124
+msgid "Extract?"
+msgstr "Extraire?"
+
+#: ../libogmrip-media-gtk/ogmrip-chapter-view.c:138
 msgid "Duration"
 msgstr "Durée"
 
-#: ../libogmdvd-gtk/ogmdvd-chapter-list.c:122
+#: ../libogmrip-media-gtk/ogmrip-chapter-view.c:143
 msgid "Label"
 msgstr "Nom"
 
-#: ../libogmdvd-gtk/ogmdvd-drive-chooser-dialog.c:109
+#: ../libogmrip-media-gtk/ogmrip-title-chooser-widget.c:108
+msgid "hours"
+msgstr "heures"
+
+#: ../libogmrip-media-gtk/ogmrip-title-chooser-widget.c:110
+msgid "minutes"
+msgstr "minutes"
+
+#: ../libogmrip-media-gtk/ogmrip-title-chooser-widget.c:112
+msgid "seconds"
+msgstr "secondes"
+
+#: ../libogmrip-media-gtk/ogmrip-title-chooser-widget.c:114
+#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:532
+msgid "Title"
+msgstr "Titre"
+
+#: ../libogmrip-dvd-gtk/ogmdvd-drive-chooser-dialog.c:110
 msgid "Open DVD Disk"
 msgstr "Ouvre un DVD"
 
-#: ../libogmdvd-gtk/ogmdvd-drive-chooser-dialog.c:117
+#: ../libogmrip-dvd-gtk/ogmdvd-drive-chooser-dialog.c:118
 msgid "_Eject"
 msgstr "_Éjecter"
 
-#: ../libogmdvd-gtk/ogmdvd-drive-chooser-dialog.c:140
+#: ../libogmrip-dvd-gtk/ogmdvd-drive-chooser-dialog.c:141
 msgid "<b>Select _DVD Drive:</b>"
 msgstr "<b>Sélectionner le lecteur de _DVD:</b>"
 
-#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:178
+#: ../libogmrip-dvd-gtk/ogmdvd-drive-chooser-widget.c:179
 msgid "Select an ISO file"
 msgstr "Sélectionner une image ISO"
 
-#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:178
+#: ../libogmrip-dvd-gtk/ogmdvd-drive-chooser-widget.c:179
 msgid "Select a DVD structure"
 msgstr "Sélectionner une structure de DVD"
 
-#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:207
+#: ../libogmrip-dvd-gtk/ogmdvd-drive-chooser-widget.c:208
 msgid "ISO images"
 msgstr "Images ISO"
 
-#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:345
-#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:496
+#: ../libogmrip-dvd-gtk/ogmdvd-drive-chooser-widget.c:346
+#: ../libogmrip-dvd-gtk/ogmdvd-drive-chooser-widget.c:497
 msgid ""
 "<b>No DVD</b>\n"
 "No device"
@@ -979,507 +1096,413 @@ msgstr ""
 "<b>Aucun DVD</b>\n"
 "Aucun périphérique"
 
-#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:369
+#: ../libogmrip-dvd-gtk/ogmdvd-drive-chooser-widget.c:370
 msgid "Unknown Drive"
 msgstr "Lecteur inconnu"
 
-#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:505
+#: ../libogmrip-dvd-gtk/ogmdvd-drive-chooser-widget.c:506
 msgid "Select a DVD structure..."
 msgstr "Sélectionner une structure de DVD..."
 
-#: ../libogmdvd-gtk/ogmdvd-drive-chooser-widget.c:509
+#: ../libogmrip-dvd-gtk/ogmdvd-drive-chooser-widget.c:510
 msgid "Select an ISO file..."
 msgstr "Sélectionner une image ISO..."
 
-#: ../libogmdvd-gtk/ogmdvd-title-chooser-widget.c:108
-msgid "hours"
-msgstr "heures"
-
-#: ../libogmdvd-gtk/ogmdvd-title-chooser-widget.c:110
-msgid "minutes"
-msgstr "minutes"
-
-#: ../libogmdvd-gtk/ogmdvd-title-chooser-widget.c:112
-msgid "seconds"
-msgstr "secondes"
-
-#: ../libogmdvd-gtk/ogmdvd-title-chooser-widget.c:114
-#: ../libogmrip-gtk/ogmrip-encoding-manager-dialog.c:449
-msgid "Title"
-msgstr "Titre"
-
-#: ../libogmrip/ogmrip-file.c:547 ../libogmrip/ogmrip-file.c:830
-#: ../libogmrip/ogmrip-file.c:900 ../libogmrip/ogmrip-file.c:1079
+#: ../libogmrip-encode-gtk/ogmrip-audio-file-chooser-dialog.c:43
+#: ../libogmrip-encode-gtk/ogmrip-subp-file-chooser-dialog.c:41
 #, c-format
-msgid "Unknown error while identifying '%s'"
-msgstr "Erreur indéterminée lors de l'identification de '%s'"
+msgid "Could not open '%s'"
+msgstr "Impossible d'ouvrir '%s'"
 
-#: ../libogmrip/ogmrip-file.c:598 ../libogmrip/ogmrip-file.c:1114
-#, c-format
-msgid "Cannot identify file '%s': %s"
-msgstr "Impossible d'identifier le fichier '%s': %s"
-
-#: ../libogmrip/ogmrip-file.c:610 ../libogmrip/ogmrip-file.c:1126
-#, c-format
-msgid "Cannot get bitrate of file '%s'"
-msgstr "Impossible de déterminer le taux d'échantillonage du fichier '%s'"
-
-#: ../libogmrip/ogmrip-file.c:617
-#, c-format
-msgid "Cannot get rate of file '%s'"
-msgstr "Impossible de déterminer le taux d'échantillongage du fichier '%s'"
-
-#: ../libogmrip/ogmrip-file.c:624 ../libogmrip/ogmrip-file.c:1133
-#, c-format
-msgid "Cannot get length of file '%s'"
-msgstr "Impossible de déterminer la longueur du fichier '%s'"
-
-#: ../libogmrip/ogmrip-file.c:631 ../libogmrip/ogmrip-file.c:850
-#: ../libogmrip/ogmrip-file.c:920 ../libogmrip/ogmrip-file.c:1140
-#, c-format
-msgid "Cannot get format of file '%s'"
-msgstr "Impossible de déterminer le format du fichier '%s'"
-
-#: ../libogmrip/ogmrip-file.c:638
-#, c-format
-msgid "Cannot get number of channels of file '%s'"
-msgstr "Impossible de déterminer le nombre de canaux du fichier '%s'"
-
-#: ../libogmrip/ogmrip-file.c:645
-#, c-format
-msgid "File '%s' contains video tracks"
-msgstr "Le fichier '%s' contient des pistes vidéo"
-
-#: ../libogmrip/ogmrip-file.c:653
-#, c-format
-msgid "Format of file '%s' is not supported"
-msgstr "Le format du fichier '%s' n'est pas supporté"
-
-#: ../libogmrip/ogmrip-file.c:664 ../libogmrip/ogmrip-file.c:862
-#: ../libogmrip/ogmrip-file.c:932 ../libogmrip/ogmrip-file.c:1179
-#, c-format
-msgid "Unknown error while opening '%s': %s"
-msgstr "Erreur indéterminée lors de l'ouverture de '%s': %s"
-
-#: ../libogmrip/ogmrip-file.c:1147
-#, c-format
-msgid "Cannot get width of video file '%s'"
-msgstr "Impossible de déterminer la largeur de '%s'"
-
-#: ../libogmrip/ogmrip-file.c:1154
-#, c-format
-msgid "Cannot get height of video file '%s'"
-msgstr "Impossible de déterminer la hauteur de '%s'"
-
-#: ../libogmrip/ogmrip-file.c:1161
-#, c-format
-msgid "Cannot get aspect ratio of video file '%s'"
-msgstr "Impossible de déterminer le rapport hauteur/largeur de '%s'"
-
-#: ../libogmrip/ogmrip-file.c:1168
-#, c-format
-msgid "Cannot get frame rate of video file '%s'"
-msgstr "Impossible de déterminer le nombre de trames/sec de '%s'"
-
-#: ../libogmrip/ogmrip-fs.c:103 ../libogmrip/ogmrip-fs.c:297
-#, c-format
-msgid "Failed to create directory '%s': %s"
-msgstr "Impossible de créer le répertoire '%s': %s"
-
-#: ../libogmrip/ogmrip-fs.c:160
-#, c-format
-msgid "Failed to unlink file '%s': %s"
-msgstr "Impossible de supprimer le lien '%s': %s"
-
-#: ../libogmrip/ogmrip-fs.c:174
-#, c-format
-msgid "Failed to remove directory '%s': %s"
-msgstr "Impossible de supprimer le répertoire '%s': %s"
-
-#: ../libogmrip/ogmrip-fs.c:205 ../libogmrip/ogmrip-fs.c:407
-#, c-format
-msgid "Failed to create file '%s': %s"
-msgstr "Impossible de créer le fichier '%s': %s"
-
-#: ../libogmrip/ogmrip-fs.c:249
-#, c-format
-msgid "Failed to create fifo '%s': %s"
-msgstr "Impossible de créer la fifo '%s': %s"
-
-#: ../libogmrip/ogmrip-fs.c:349
-#, c-format
-msgid "Failed to link '%s': %s"
-msgstr "Impossible de créer un lien sur '%s': %s"
-
-#: ../libogmrip/ogmrip-fs.c:385
-#, c-format
-msgid "Template '%s' doesn't end with XXXXXX"
-msgstr "Le gabarit '%s' ne se termine pas par XXXXXX"
-
-#: ../libogmrip/ogmrip-fs.c:396
-#, c-format
-msgid "Template '%s' invalid, should not contain a '/'"
-msgstr "Gabarit '%s' invalide, ne peut contenir de '/'"
-
-#: ../libogmrip/ogmrip-fs.c:465
-#, c-format
-msgid "Failed to stat the file system containing '%s': %s"
-msgstr "Impossible d'évaluer le système de fichiers contenant '%s': %s"
-
-#: ../libogmrip/ogmrip-fs.c:508
-#, c-format
-msgid "Failed to stat '%s': %s"
-msgstr "Impossible d'évaluer '%s': %s"
-
-#: ../libogmrip/ogmrip-fs.c:515
-#, c-format
-msgid "Failed to change to directory '%s': %s"
-msgstr "Impossible de changer vers le répertoire '%s': %s"
-
-#: ../libogmrip/ogmrip-fs.c:524
-#, c-format
-msgid "Failed to stat '..': %s"
-msgstr "Impossible d'évaluer '..': %s"
-
-#: ../libogmrip/ogmrip-fs.c:534
-#, c-format
-msgid "Failed to change to directory '..': %s"
-msgstr "Impossible de changer vers le répertoire '..': %s"
-
-#: ../libogmrip/ogmrip-hardsub.c:44
-msgid "Hardcoded subtitle"
-msgstr "Sous-titres incrustés"
-
-#: ../libogmrip/ogmrip-novideo.c:32
-msgid "No Video"
-msgstr "Pas de vidéo"
-
-#: ../libogmrip/ogmrip-plugin.c:152
-#, c-format
-msgid "Plugin %s disabled"
-msgstr "Greffon %s désactivé"
-
-#: ../libogmrip/ogmrip-plugin.c:154
-msgid "some requirements are not available"
-msgstr "des prérequis sont manquants"
-
-#: ../libogmrip/ogmrip-profile.c:401 ../libogmrip/ogmrip-profile.c:415
-#, c-format
-msgid "'%s' does not contain a valid profile"
-msgstr "'%s' ne contient pas un profil valide"
-
-#: ../libogmrip-gtk/ogmrip-audio-file-chooser-dialog.c:74
+#: ../libogmrip-encode-gtk/ogmrip-audio-file-chooser-dialog.c:82
 msgid "Select an audio file"
 msgstr "Sélectionner un fichier audio"
 
-#: ../libogmrip-gtk/ogmrip-audio-options-dialog.c:228
+#: ../libogmrip-encode-gtk/ogmrip-audio-options-dialog.c:229
 msgid "Audio Track Options"
 msgstr "Options de la piste audio"
 
-#: ../libogmrip-gtk/ogmrip-audio-options-dialog.c:246
-#: ../libogmrip-gtk/ogmrip-subp-options-dialog.c:223
+#: ../libogmrip-encode-gtk/ogmrip-audio-options-dialog.c:246
+#: ../libogmrip-encode-gtk/ogmrip-subp-options-dialog.c:223
 msgid "<b>Track</b>"
 msgstr "<b>Piste</b>"
 
-#: ../libogmrip-gtk/ogmrip-audio-options-dialog.c:263
-#: ../libogmrip-gtk/ogmrip-subp-options-dialog.c:240
+#: ../libogmrip-encode-gtk/ogmrip-audio-options-dialog.c:263
+#: ../libogmrip-encode-gtk/ogmrip-subp-options-dialog.c:240
 msgid "_Name:"
 msgstr "_Nom :"
 
-#: ../libogmrip-gtk/ogmrip-audio-options-dialog.c:275
-#: ../libogmrip-gtk/ogmrip-file-chooser-dialog.c:75
-#: ../libogmrip-gtk/ogmrip-subp-options-dialog.c:252
+#: ../libogmrip-encode-gtk/ogmrip-audio-options-dialog.c:275
+#: ../libogmrip-encode-gtk/ogmrip-file-chooser-dialog.c:75
+#: ../libogmrip-encode-gtk/ogmrip-subp-options-dialog.c:252
 msgid "_Language:"
 msgstr "_Langue :"
 
-#: ../libogmrip-gtk/ogmrip-audio-options-dialog.c:287
-#: ../libogmrip-gtk/ogmrip-file-chooser-dialog.c:86
-#: ../libogmrip-gtk/ogmrip-subp-options-dialog.c:264
-#: ../src/ogmrip-options-dialog.c:512
+#: ../libogmrip-encode-gtk/ogmrip-audio-options-dialog.c:288
+#: ../libogmrip-encode-gtk/ogmrip-file-chooser-dialog.c:86
+#: ../libogmrip-encode-gtk/ogmrip-subp-options-dialog.c:265
+#: ../src/ogmrip-options-dialog.c:644
 msgid "None"
 msgstr "Aucun"
 
-#: ../libogmrip-gtk/ogmrip-audio-options-dialog.c:293
-#: ../libogmrip-gtk/ogmrip-subp-options-dialog.c:270
+#: ../libogmrip-encode-gtk/ogmrip-audio-options-dialog.c:291
+#: ../libogmrip-encode-gtk/ogmrip-subp-options-dialog.c:268
 msgid "Use _profile settings"
 msgstr "Utiliser les _paramètres du profil"
 
-#: ../libogmrip-gtk/ogmrip-chapter-list.c:109
-msgid "Extract?"
-msgstr "Extraire?"
+#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:334
+msgid "Import Encoding"
+msgstr "Importer un encodage"
 
-#: ../libogmrip-gtk/ogmrip-encoding-manager-dialog.c:409
+#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:357
+#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:390
+msgid "Could not export the encoding"
+msgstr "Impossible d'exporter l'encodage"
+
+#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:375
+msgid "Export Encoding"
+msgstr "Exporter l'encodage"
+
+#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:487
 msgid "Encoding Manager"
 msgstr "Gestionnaire d'encodages"
 
-#: ../libogmrip-gtk/ogmrip-encoding-manager-dialog.c:440
+#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:523
 msgid "Run"
 msgstr ""
 
-#: ../libogmrip-gtk/ogmrip-encoding-manager-dialog.c:445
+#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:528
 msgid "Name"
 msgstr "Nom"
 
-#: ../libogmrip-gtk/ogmrip-encoding-manager-dialog.c:453
+#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:536
 msgid "Profile"
 msgstr "Profil"
 
-#: ../libogmrip-gtk/ogmrip-helper.c:795
+#: ../libogmrip-encode-gtk/ogmrip-helper.c:405
 msgid "Please insert the DVD required to encode this title."
 msgstr "Veuillez insérer le DVD requis pour encoder ce titre."
 
-#: ../libogmrip-gtk/ogmrip-list-item.c:140
+#: ../libogmrip-encode-gtk/ogmrip-list-item.c:140
 msgid "Add an item"
 msgstr "Ajouter un élément"
 
-#: ../libogmrip-gtk/ogmrip-list-item.c:143
+#: ../libogmrip-encode-gtk/ogmrip-list-item.c:143
 msgid "Remove the item"
 msgstr "Supprimer l'élément"
 
-#: ../libogmrip-gtk/ogmrip-profile-editor-dialog.c:576
+#: ../libogmrip-encode-gtk/ogmrip-profile-editor-dialog.c:608
 msgid "User"
 msgstr "Utilisateur"
 
-#: ../libogmrip-gtk/ogmrip-profile-editor-dialog.c:780
+#: ../libogmrip-encode-gtk/ogmrip-profile-editor-dialog.c:812
 #, c-format
 msgid "Editing profile \"%s\""
 msgstr "Édition du profil «%s»"
 
-#: ../libogmrip-gtk/ogmrip-profile-manager-dialog.c:69
+#: ../libogmrip-encode-gtk/ogmrip-profile-manager-dialog.c:72
 msgid "Rename profile"
 msgstr "Renommer le profil"
 
-#: ../libogmrip-gtk/ogmrip-profile-manager-dialog.c:69
+#: ../libogmrip-encode-gtk/ogmrip-profile-manager-dialog.c:72
 msgid "New profile"
 msgstr "Nouveau profil"
 
-#: ../libogmrip-gtk/ogmrip-profile-manager-dialog.c:86
+#: ../libogmrip-encode-gtk/ogmrip-profile-manager-dialog.c:89
 msgid "_Profile name:"
 msgstr "Nom du _profil :"
 
-#: ../libogmrip-gtk/ogmrip-profile-manager-dialog.c:188
+#: ../libogmrip-encode-gtk/ogmrip-profile-manager-dialog.c:160
 msgid "Copy of"
 msgstr "Copie de"
 
-#: ../libogmrip-gtk/ogmrip-profile-manager-dialog.c:240
-#: ../libogmrip-gtk/ogmrip-profile-manager-dialog.c:241
+#: ../libogmrip-encode-gtk/ogmrip-profile-manager-dialog.c:211
+#: ../libogmrip-encode-gtk/ogmrip-profile-manager-dialog.c:212
 msgid "Delete profile ?"
 msgstr "Supprimer le profil ?"
 
-#: ../libogmrip-gtk/ogmrip-profile-manager-dialog.c:290
-msgid "Export profile as"
-msgstr "Exporter le profil sous"
+#: ../libogmrip-encode-gtk/ogmrip-profile-manager-dialog.c:266
+msgid "Export Profile"
+msgstr "Exporter le profil"
 
-#: ../libogmrip-gtk/ogmrip-profile-manager-dialog.c:319
+#: ../libogmrip-encode-gtk/ogmrip-profile-manager-dialog.c:281
+msgid "Could not export the profile"
+msgstr "Impossible d'exporter le profil"
+
+#: ../libogmrip-encode-gtk/ogmrip-profile-manager-dialog.c:296
 msgid "Select profile to import"
 msgstr "Sélectionner le profil à importer"
 
-#: ../libogmrip-gtk/ogmrip-profile-manager-dialog.c:346
+#: ../libogmrip-encode-gtk/ogmrip-profile-manager-dialog.c:323
 msgid "Cannot load profile"
 msgstr "Impossible de charger le profil"
 
-#: ../libogmrip-gtk/ogmrip-profile-manager-dialog.c:348
-#: ../src/ogmrip-main.c:383
+#: ../libogmrip-encode-gtk/ogmrip-profile-manager-dialog.c:325
+#: ../src/ogmrip-main.c:379
 msgid "Unknown error"
 msgstr "Erreur indéterminée"
 
-#: ../libogmrip-gtk/ogmrip-profile-manager-dialog.c:402
+#: ../libogmrip-encode-gtk/ogmrip-profile-manager-dialog.c:380
 msgid "Edit Profiles"
 msgstr "Éditer les profils"
 
-#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:125
+#: ../libogmrip-encode-gtk/ogmrip-progress-dialog.c:62
+#: ../libogmrip-encode-gtk/ogmrip-progress-dialog.c:232
+msgid "Suspend"
+msgstr "Suspendre"
+
+#: ../libogmrip-encode-gtk/ogmrip-progress-dialog.c:63
+#: ../libogmrip-encode-gtk/ogmrip-progress-dialog.c:221
+msgid "Resume"
+msgstr "Continuer"
+
+#: ../libogmrip-encode-gtk/ogmrip-progress-dialog.c:193
+msgid "Progress"
+msgstr "Progression"
+
+#: ../libogmrip-encode-gtk/ogmrip-source-chooser-widget.c:116
 msgid "No stream"
 msgstr "Aucune piste"
 
-#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:133
+#: ../libogmrip-encode-gtk/ogmrip-source-chooser-widget.c:124
 msgid "Other..."
 msgstr "Autre..."
 
-#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:269
+#: ../libogmrip-encode-gtk/ogmrip-source-chooser-widget.c:262
 msgid "Cannot open file"
 msgstr "Impossible d'ouvrir le fichier"
 
-#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:585
+#: ../libogmrip-encode-gtk/ogmrip-source-chooser-widget.c:571
 msgid "No audio"
 msgstr "Aucun"
 
-#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:604
-#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:609
-#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:616
-#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:620
+#: ../libogmrip-encode-gtk/ogmrip-source-chooser-widget.c:590
+#: ../libogmrip-encode-gtk/ogmrip-source-chooser-widget.c:595
+#: ../libogmrip-encode-gtk/ogmrip-source-chooser-widget.c:602
+#: ../libogmrip-encode-gtk/ogmrip-source-chooser-widget.c:606
 msgid "Track"
 msgstr "Piste"
 
-#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:644
+#: ../libogmrip-encode-gtk/ogmrip-source-chooser-widget.c:630
 msgid "No subp"
 msgstr "Aucun sous-titres"
 
-#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:658
-#: ../libogmrip-gtk/ogmrip-source-chooser-widget.c:661
+#: ../libogmrip-encode-gtk/ogmrip-source-chooser-widget.c:644
+#: ../libogmrip-encode-gtk/ogmrip-source-chooser-widget.c:647
 msgid "Subtitle"
 msgstr "Sous-titres"
 
-#: ../libogmrip-gtk/ogmrip-subp-file-chooser-dialog.c:74
+#: ../libogmrip-encode-gtk/ogmrip-subp-file-chooser-dialog.c:80
 msgid "Select a subtitles file"
 msgstr "Sélectionner un fichier de sous-titres"
 
-#: ../libogmrip-gtk/ogmrip-subp-options-dialog.c:205
+#: ../libogmrip-encode-gtk/ogmrip-subp-options-dialog.c:206
 msgid "Subtitles Options"
 msgstr "Options des sous-titres"
 
-#: ../src/ogmrip-crop-dialog.c:221
+#: ../src/ogmrip-crop-dialog.c:228
 #, c-format
 msgid "Frame %lu of %lu"
 msgstr "Image %lu sur %lu"
 
-#: ../src/ogmrip-crop-dialog.c:261
+#: ../src/ogmrip-crop-dialog.c:269
 msgid "Cropping"
 msgstr "Découpage"
 
-#: ../src/ogmrip-main.c:113
+#: ../src/ogmrip-main.c:111
 msgid "Could not create dictionary"
 msgstr "Impossible de créer le dictionnaire"
 
-#: ../src/ogmrip-main.c:113
+#: ../src/ogmrip-main.c:111
 msgid "Spell will not be checked."
 msgstr "La vérification orthographique ne sera pas effectuée."
 
-#: ../src/ogmrip-main.c:349
+#: ../src/ogmrip-main.c:342
 msgid "Do you want to remove the copy of the DVD ?"
 msgstr "Voulez-vous supprimer la copie du DVD ?"
 
-#: ../src/ogmrip-main.c:378
+#: ../src/ogmrip-main.c:374
 msgid "Encoding failed"
 msgstr "L'encodage a échoué"
 
-#: ../src/ogmrip-main.c:1312
+#: ../src/ogmrip-main.c:438
+msgid "Encoding video title"
+msgstr "Encodage du titre vidéo"
+
+#: ../src/ogmrip-main.c:440
+msgid "Extracting chapters information"
+msgstr "Extraction du chapitrage"
+
+#: ../src/ogmrip-main.c:442
+msgid "Merging audio and video streams"
+msgstr "Fusion des pistes audio et vidéo"
+
+#: ../src/ogmrip-main.c:444
+msgid "DVD backup"
+msgstr "Copie du DVD"
+
+#: ../src/ogmrip-main.c:446 ../src/ogmrip-options-dialog.c:487
+msgid "Analyzing video stream"
+msgstr "Analyse du flux vidéo"
+
+#: ../src/ogmrip-main.c:448 ../src/ogmrip-options-dialog.c:512
+msgid "Running the compressibility test"
+msgstr "Test de la compressibilité"
+
+#: ../src/ogmrip-main.c:452
+#, c-format
+msgid "Extracting audio stream %d"
+msgstr "Extraction de la piste audio %d"
+
+#: ../src/ogmrip-main.c:460
+#, c-format
+msgid "Extracting subtitle stream %d"
+msgstr "Extraction du sous-titre %d"
+
+#: ../src/ogmrip-main.c:493
+msgid "Are you sure you want to cancel the encoding process?"
+msgstr "Etes-vous sûr de vouloir interrompre l'encodage ?"
+
+#: ../src/ogmrip-main.c:1392
 msgid "Can't play DVD title"
 msgstr "Impossible de jouer le DVD"
 
-#: ../src/ogmrip-main.c:1326
+#: ../src/ogmrip-main.c:1406
 msgid "Select a chapters file"
 msgstr "Sélectionner un fichier de chapitrage"
 
-#: ../src/ogmrip-main.c:1344
+#: ../src/ogmrip-main.c:1424
 #, c-format
 msgid "Could not open the chapters file '%s'"
 msgstr "Impossible d'ouvrir le fichier de chapitrage '%s'"
 
-#: ../src/ogmrip-main.c:1359
+#: ../src/ogmrip-main.c:1439
 msgid "Select a file"
 msgstr "Sélectionner un fichier"
 
-#: ../src/ogmrip-main.c:1436
+#: ../src/ogmrip-main.c:1519
 msgid "translator-credits"
 msgstr "Olivier Rolland <billl@users.sourceforge.net>"
 
-#: ../src/ogmrip-main.c:1453
+#: ../src/ogmrip-main.c:1536
 msgid "A DVD Encoder for GNOME"
 msgstr "Un encodeur de DVD pour GNOME"
 
-#: ../src/ogmrip-main.c:1642
+#: ../src/ogmrip-main.c:1731
 msgid "_File"
 msgstr "_Fichier"
 
-#: ../src/ogmrip-main.c:1645
+#: ../src/ogmrip-main.c:1734
 msgid "_Import Chapters..."
 msgstr "_Importer le chapitrage..."
 
-#: ../src/ogmrip-main.c:1645
+#: ../src/ogmrip-main.c:1734
 msgid "Import chapter information"
 msgstr "Importe un fichier de chapitrage"
 
-#: ../src/ogmrip-main.c:1646
+#: ../src/ogmrip-main.c:1735
 msgid "_Export Chapters..."
 msgstr "_Exporter le chapitrage..."
 
-#: ../src/ogmrip-main.c:1646
+#: ../src/ogmrip-main.c:1735
 msgid "Export chapter information"
 msgstr "Exporte le chapitrage"
 
-#: ../src/ogmrip-main.c:1647
+#: ../src/ogmrip-main.c:1736
 msgid "Exit OGMRip"
 msgstr "Quitte OGMRip"
 
-#: ../src/ogmrip-main.c:1649
+#: ../src/ogmrip-main.c:1738
 msgid "Select all chapters"
 msgstr "Sélectionne tous les chapitres"
 
-#: ../src/ogmrip-main.c:1650
+#: ../src/ogmrip-main.c:1739
 msgid "Deselect all chapters"
 msgstr "Désélectionne tous les chapitres"
 
-#: ../src/ogmrip-main.c:1651
+#: ../src/ogmrip-main.c:1740
 msgid "Pro_files"
 msgstr "Pro_fils"
 
-#: ../src/ogmrip-main.c:1651
+#: ../src/ogmrip-main.c:1740
 msgid "Edit the profiles"
 msgstr "Éditer les profils"
 
-#: ../src/ogmrip-main.c:1652
+#: ../src/ogmrip-main.c:1741
 msgid "Edit the preferences"
 msgstr "Edite les préférences"
 
-#: ../src/ogmrip-main.c:1653
+#: ../src/ogmrip-main.c:1742
 msgid "_Encodings"
 msgstr "_Encodages"
 
-#: ../src/ogmrip-main.c:1653
+#: ../src/ogmrip-main.c:1742
 msgid "Edit the encodings"
 msgstr "Édite les encodages"
 
-#: ../src/ogmrip-main.c:1654
+#: ../src/ogmrip-main.c:1743
 msgid "_Help"
 msgstr "_Aide"
 
-#: ../src/ogmrip-main.c:1655
+#: ../src/ogmrip-main.c:1744
 msgid "_About"
 msgstr "À _propos"
 
-#: ../src/ogmrip-main.c:1655
+#: ../src/ogmrip-main.c:1744
 msgid "About OGMRip"
 msgstr "À propos de OGMRip"
 
-#: ../src/ogmrip-options-dialog.c:512
+#: ../src/ogmrip-options-dialog.c:644
 msgid "Extra Small"
 msgstr "Très petit"
 
-#: ../src/ogmrip-options-dialog.c:512
+#: ../src/ogmrip-options-dialog.c:644
 msgid "Small"
 msgstr "Petit"
 
-#: ../src/ogmrip-options-dialog.c:512
+#: ../src/ogmrip-options-dialog.c:644
 msgid "Medium"
 msgstr "Moyen"
 
-#: ../src/ogmrip-options-dialog.c:513
+#: ../src/ogmrip-options-dialog.c:645
 msgid "Large"
 msgstr "Grand"
 
-#: ../src/ogmrip-options-dialog.c:513
+#: ../src/ogmrip-options-dialog.c:645
 msgid "Extra Large"
 msgstr "Très grand"
 
-#: ../src/ogmrip-options-dialog.c:513
+#: ../src/ogmrip-options-dialog.c:645
 msgid "Full"
 msgstr "Complet"
 
-#: ../src/ogmrip-options-dialog.c:513
+#: ../src/ogmrip-options-dialog.c:645
 msgid "User Defined"
 msgstr "Personnalisé"
 
-#: ../src/ogmrip-options-dialog.c:528
+#: ../src/ogmrip-options-dialog.c:660
 msgid "Options"
 msgstr "Options"
 
-#: ../src/ogmrip-options-dialog.c:540
+#: ../src/ogmrip-options-dialog.c:671
 msgid "En_queue"
 msgstr ""
 
-#: ../src/ogmrip-pref-dialog.c:126
+#: ../src/ogmrip-pref-dialog.c:129
 msgid "Preferences"
 msgstr "Préférences"
+
+#: ../src/ogmrip-pref-dialog.c:165
+msgid "No favorite audio language"
+msgstr "Pas de langue préférée pour l'audio"
+
+#: ../src/ogmrip-pref-dialog.c:182
+msgid "No favorite subtitle language"
+msgstr "Pas de langue préférée pour les sous-titres"
+
+#: ../src/ogmrip-pref-dialog.c:199
+msgid "No chapters language"
+msgstr "Aucune"
 
 #: ../src/ogmrip-profiles.c:119
 #, c-format
@@ -1501,19 +1524,7 @@ msgstr "Le codec audio '%s' n'est pas disponible"
 msgid "The subtitles codec '%s' is not available"
 msgstr "Le codec de sous-titres '%s' n'est pas disponible"
 
-#: ../src/ogmrip-progress-dialog.c:87 ../src/ogmrip-progress-dialog.c:260
-msgid "Suspend"
-msgstr "Suspendre"
-
-#: ../src/ogmrip-progress-dialog.c:88 ../src/ogmrip-progress-dialog.c:250
-msgid "Resume"
-msgstr "Continuer"
-
-#: ../src/ogmrip-progress-dialog.c:221
-msgid "Progress"
-msgstr "Progression"
-
-#: ../src/ogmrip-spell-dialog.c:203
+#: ../src/ogmrip-spell-dialog.c:204
 msgid "Spell Checking"
 msgstr "Vérification orthographique"
 
@@ -1521,31 +1532,31 @@ msgstr "Vérification orthographique"
 msgid "Update profiles"
 msgstr "Mise à jour des profiles"
 
-#: ../plugins/ogmrip-aac.c:174
+#: ../plugins/ogmrip-aac.c:175
 msgid "Advanced Audio Coding (AAC)"
 msgstr "Advanced Audio Coding (AAC)"
 
-#: ../plugins/ogmrip-aac.c:198
+#: ../plugins/ogmrip-aac.c:199
 #, c-format
 msgid "MPlayer and FAAC are missing"
 msgstr "MPlayer et FAAC sont manquants"
 
-#: ../plugins/ogmrip-aac.c:200 ../plugins/ogmrip-mp3.c:246
+#: ../plugins/ogmrip-aac.c:201 ../plugins/ogmrip-mp3.c:213
 #: ../plugins/ogmrip-vorbis.c:198 ../plugins/ogmrip-wav.c:121
 #, c-format
 msgid "MPlayer is missing"
 msgstr "MPlayer est manquant"
 
-#: ../plugins/ogmrip-aac.c:202
+#: ../plugins/ogmrip-aac.c:203
 #, c-format
 msgid "FAAC is missing"
 msgstr "FAAC est manquant"
 
-#: ../plugins/ogmrip-acopy.c:171
+#: ../plugins/ogmrip-acopy.c:137
 msgid "Copy (for AC3 or DTS)"
 msgstr "Copie (pour l'AC3 ou le DTS)"
 
-#: ../plugins/ogmrip-avi.c:276
+#: ../plugins/ogmrip-avi.c:283
 msgid "Audio-Video Interlace (AVI)"
 msgstr "Audio-Video Interlace (AVI)"
 
@@ -1557,53 +1568,53 @@ msgstr "Lavc Mpeg-4"
 msgid "Lavc Options"
 msgstr "Lavc Options"
 
-#: ../plugins/ogmrip-mkv.c:421
+#: ../plugins/ogmrip-mkv.c:398
 msgid "Matroska Media (MKV)"
 msgstr "Matroska Media (MKV)"
 
-#: ../plugins/ogmrip-mkv.c:462
+#: ../plugins/ogmrip-mkv.c:439
 #, c-format
 msgid "mkvmerge is missing"
 msgstr "mkvmerge est manquant"
 
-#: ../plugins/ogmrip-mp3.c:220
+#: ../plugins/ogmrip-mp3.c:187
 msgid "MPEG-1 layer III (MP3)"
 msgstr "MPEG-1 layer III (MP3)"
 
-#: ../plugins/ogmrip-mp3.c:244
+#: ../plugins/ogmrip-mp3.c:211
 #, c-format
 msgid "MPlayer and LAME are missing"
 msgstr "MPlayer et LAME sont manquants"
 
-#: ../plugins/ogmrip-mp3.c:248
+#: ../plugins/ogmrip-mp3.c:215
 #, c-format
 msgid "LAME is missing"
 msgstr "LAME est manquant"
 
-#: ../plugins/ogmrip-mp4.c:667
+#: ../plugins/ogmrip-mp4.c:583
 msgid "Mpeg-4 Media (MP4)"
 msgstr "Mpeg-4 Media (MP4)"
 
-#: ../plugins/ogmrip-mp4.c:701
+#: ../plugins/ogmrip-mp4.c:617
 #, c-format
 msgid "MP4Box is missing"
 msgstr "MP4Box est manquant"
 
-#: ../plugins/ogmrip-ogg.c:374
+#: ../plugins/ogmrip-ogg.c:346
 msgid "Ogg Media (OGM)"
 msgstr "Ogg Media (OGM)"
 
-#: ../plugins/ogmrip-ogg.c:418
+#: ../plugins/ogmrip-ogg.c:390
 #, c-format
 msgid "ogmmerge and ogmsplit are missing"
 msgstr "ogmmerge et ogmsplit sont manquants"
 
-#: ../plugins/ogmrip-ogg.c:420
+#: ../plugins/ogmrip-ogg.c:392
 #, c-format
 msgid "ogmmerge is missing"
 msgstr "ogmmerge est manquant"
 
-#: ../plugins/ogmrip-ogg.c:422
+#: ../plugins/ogmrip-ogg.c:394
 #, c-format
 msgid "ogmsplit is missing"
 msgstr "ogmsplit est manquant"
@@ -1623,7 +1634,7 @@ msgstr "MEncoder est manquant"
 msgid "GOCR, Ocrad and Tesseract are missing"
 msgstr "GOCR, Ocrad et Tesseract sont manquants"
 
-#: ../plugins/ogmrip-theora.c:200
+#: ../plugins/ogmrip-theora.c:196
 msgid "Ogg Theora"
 msgstr "Ogg Theora"
 
@@ -1686,6 +1697,51 @@ msgstr "Un encodeur de DVD"
 #: ../data/ogmrip.desktop.in.h:2
 msgid "DVD Encoder OGMRip"
 msgstr "Encodeur de DVD OGMRip"
+
+#~ msgid "Cannot open video manager"
+#~ msgstr "Impossible d'ouvrir gestionnaire vidéo"
+
+#~ msgid "Unknown error while identifying '%s'"
+#~ msgstr "Erreur indéterminée lors de l'identification de '%s'"
+
+#~ msgid "Cannot identify file '%s': %s"
+#~ msgstr "Impossible d'identifier le fichier '%s': %s"
+
+#~ msgid "Cannot get bitrate of file '%s'"
+#~ msgstr "Impossible de déterminer le taux d'échantillonage du fichier '%s'"
+
+#~ msgid "Cannot get rate of file '%s'"
+#~ msgstr "Impossible de déterminer le taux d'échantillongage du fichier '%s'"
+
+#~ msgid "Cannot get length of file '%s'"
+#~ msgstr "Impossible de déterminer la longueur du fichier '%s'"
+
+#~ msgid "Cannot get format of file '%s'"
+#~ msgstr "Impossible de déterminer le format du fichier '%s'"
+
+#~ msgid "Cannot get number of channels of file '%s'"
+#~ msgstr "Impossible de déterminer le nombre de canaux du fichier '%s'"
+
+#~ msgid "File '%s' contains video tracks"
+#~ msgstr "Le fichier '%s' contient des pistes vidéo"
+
+#~ msgid "Format of file '%s' is not supported"
+#~ msgstr "Le format du fichier '%s' n'est pas supporté"
+
+#~ msgid "Unknown error while opening '%s': %s"
+#~ msgstr "Erreur indéterminée lors de l'ouverture de '%s': %s"
+
+#~ msgid "Cannot get width of video file '%s'"
+#~ msgstr "Impossible de déterminer la largeur de '%s'"
+
+#~ msgid "Cannot get height of video file '%s'"
+#~ msgstr "Impossible de déterminer la hauteur de '%s'"
+
+#~ msgid "Cannot get aspect ratio of video file '%s'"
+#~ msgstr "Impossible de déterminer le rapport hauteur/largeur de '%s'"
+
+#~ msgid "Cannot get frame rate of video file '%s'"
+#~ msgstr "Impossible de déterminer le nombre de trames/sec de '%s'"
 
 #~ msgid "..."
 #~ msgstr "..."
@@ -2002,20 +2058,6 @@ msgstr "Encodeur de DVD OGMRip"
 #~ msgid "Failed to get mount point of '%s'"
 #~ msgstr "Impossible de déterminer le point de montage de '%s'"
 
-#~ msgid "Not enough space to store output and temporary files (%sMB needed)."
-#~ msgstr ""
-#~ "Pas assez d'espace pour stocker le fichier de sortie et les fichiers "
-#~ "temporaires (%sMo nécessaires)."
-
-#~ msgid "Not enough space to store the temporary files (%sMB needed)."
-#~ msgstr ""
-#~ "Pas assez d'espace pour stocker les fichiers temporaires (%sMo "
-#~ "nécessaires)."
-
-#~ msgid "Not enough space to store the output file (%sMB needed)."
-#~ msgstr ""
-#~ "Pas assez d'espace pour stocker le fichier de sortie (%sMo nécessaires)."
-
 #~ msgid "The file %s does not seem to contain a valid encoding"
 #~ msgstr "Le fichier '%s' ne semble pas contenir un profil valide"
 
@@ -2144,9 +2186,6 @@ msgstr "Encodeur de DVD OGMRip"
 #~ msgid "The DVD has been successfully encoded, but..."
 #~ msgstr "Le DVD a été encodé avec succès, mais ..."
 
-#~ msgid "Are you sure you want to cancel the encoding process?"
-#~ msgstr "Etes-vous sûr de vouloir interrompre l'encodage ?"
-
 #~ msgid "Detecting cropping parameters"
 #~ msgstr "Détection des paramètres de découpage"
 
@@ -2155,30 +2194,6 @@ msgstr "Encodeur de DVD OGMRip"
 
 #~ msgid "_Reset"
 #~ msgstr "_Réіnitialiser"
-
-#~ msgid "Analyzing video stream"
-#~ msgstr "Analyse du flux vidéo"
-
-#~ msgid "Extracting chapters information"
-#~ msgstr "Extraction du chapitrage"
-
-#~ msgid "Encoding video title"
-#~ msgstr "Encodage du titre vidéo"
-
-#~ msgid "Extracting audio stream %d"
-#~ msgstr "Extraction de la piste audio %d"
-
-#~ msgid "Extracting subtitle stream %d"
-#~ msgstr "Extraction du sous-titre %d"
-
-#~ msgid "Merging audio and video streams"
-#~ msgstr "Fusion des pistes audio et vidéo"
-
-#~ msgid "DVD backup"
-#~ msgstr "Copie du DVD"
-
-#~ msgid "Compressibility Test"
-#~ msgstr "Test de Compressibilité"
 
 #~ msgid "%s: %02.0lf%% done"
 #~ msgstr "%s: %02.0lf%% effectué"
@@ -2351,6 +2366,3 @@ msgstr "Encodeur de DVD OGMRip"
 
 #~ msgid "UTF-8"
 #~ msgstr "UTF-8"
-
-#~ msgid "Failed to open '%s'"
-#~ msgstr "Impossible d'ouvrir '%s'"
