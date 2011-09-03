@@ -7,10 +7,6 @@ ogmrip-options-dialog.c
 ogmrip-encoding-manager.c
 - comment connaitre les encodages non faits ?
 
-ogmrip-container.c
-- comment ajouter le charset pour les sous-titres ?
-- comment ajouter le delay pour les pistes audio ?
-
 ogmrip-mp4.c
 - comment savoir si la vidéo a été encodée avec global_header ?
 
@@ -24,4 +20,4 @@ ogmrip-x264.glade
 - ajouter trellis, partitions, b frames
 
 all
-- corriger les entêtes
+- ajouter un stream/fichier pour les chapitres
