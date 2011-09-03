@@ -25,7 +25,7 @@ static void
 ogmrip_subp_options_default_init (OGMRipSubpOptionsInterface *iface)
 {
   g_object_interface_install_property (iface,
-      g_param_spec_uint ("character-set", "Character set property", "Set character set",
+      g_param_spec_uint ("charset", "Character set property", "Set character set",
         OGMRIP_CHARSET_UTF8, OGMRIP_CHARSET_ASCII, OGMRIP_CHARSET_UTF8,
         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
@@ -38,7 +38,7 @@ ogmrip_subp_options_default_init (OGMRipSubpOptionsInterface *iface)
         FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_interface_install_property (iface,
-      g_param_spec_uint ("newline-style", "Newline style property", "Set newline style",
+      g_param_spec_uint ("newline", "Newline style property", "Set newline style",
         OGMRIP_NEWLINE_LF, OGMRIP_NEWLINE_CR, OGMRIP_NEWLINE_LF,
         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
@@ -48,23 +48,23 @@ ogmrip_subp_options_default_init (OGMRipSubpOptionsInterface *iface)
 }
 
 OGMRipCharset
-ogmrip_subp_options_get_character_set (OGMRipSubpOptions *options)
+ogmrip_subp_options_get_charset (OGMRipSubpOptions *options)
 {
   OGMRipCharset charset;
 
   g_return_val_if_fail (OGMRIP_IS_SUBP_OPTIONS (options), 0);
 
-  g_object_get (options, "character-set", &charset, NULL);
+  g_object_get (options, "charset", &charset, NULL);
 
   return charset;
 }
 
 void
-ogmrip_subp_options_set_character_set (OGMRipSubpOptions *options, OGMRipCharset charset)
+ogmrip_subp_options_set_charset (OGMRipSubpOptions *options, OGMRipCharset charset)
 {
   g_return_if_fail (OGMRIP_IS_SUBP_OPTIONS (options));
 
-  g_object_set (options, "character-set", charset, NULL);
+  g_object_set (options, "charset", charset, NULL);
 }
 
 GType
@@ -109,23 +109,23 @@ ogmrip_subp_options_set_forced_only (OGMRipSubpOptions *options, gboolean forced
 }
 
 OGMRipNewline
-ogmrip_subp_options_get_newline_style (OGMRipSubpOptions *options)
+ogmrip_subp_options_get_newline (OGMRipSubpOptions *options)
 {
   gboolean newline;
 
   g_return_val_if_fail (OGMRIP_IS_SUBP_OPTIONS (options), 0);
 
-  g_object_get (options, "newline-style", &newline, NULL);
+  g_object_get (options, "newline", &newline, NULL);
 
   return newline;
 }
 
 void
-ogmrip_subp_options_set_newline_stype (OGMRipSubpOptions *options, OGMRipNewline newline)
+ogmrip_subp_options_set_newline (OGMRipSubpOptions *options, OGMRipNewline newline)
 {
   g_return_if_fail (OGMRIP_IS_SUBP_OPTIONS (options));
 
-  g_object_set (options, "newline-style", newline, NULL);
+  g_object_set (options, "newline", newline, NULL);
 }
 
 gboolean

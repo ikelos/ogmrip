@@ -55,8 +55,8 @@ struct _OGMRipSrtClass
   OGMRipSubpCodecClass parent_class;
 };
 
-GType ogmrip_srt_get_type (void);
-static gint ogmrip_srt_run (OGMJobSpawn *spawn);
+GType       ogmrip_srt_get_type (void);
+static gint ogmrip_srt_run      (OGMJobSpawn *spawn);
 
 static gboolean use_gocr      = FALSE;
 static gboolean use_ocrad     = FALSE;
@@ -149,7 +149,7 @@ ogmrip_gocr_command (OGMRipSubpCodec *subp, const gchar *input)
   g_ptr_array_add (argv, g_strdup ("1"));
   g_ptr_array_add (argv, g_strdup ("-f"));
 
-  switch (ogmrip_subp_codec_get_character_set (subp))
+  switch (ogmrip_subp_codec_get_charset (subp))
   {
     case OGMRIP_CHARSET_UTF8:
       g_ptr_array_add (argv, g_strdup ("UTF8"));
@@ -185,7 +185,7 @@ ogmrip_ocrad_command (OGMRipSubpCodec *subp, const gchar *input)
   g_ptr_array_add (argv, g_strdup ("-f"));
   g_ptr_array_add (argv, g_strdup ("-F"));
 
-  switch (ogmrip_subp_codec_get_character_set (subp))
+  switch (ogmrip_subp_codec_get_charset (subp))
   {
     case OGMRIP_CHARSET_UTF8:
       g_ptr_array_add (argv, g_strdup ("utf8"));
@@ -258,7 +258,7 @@ ogmrip_srt_command (OGMRipSubpCodec *subp, const gchar *input, const gchar *outp
   g_ptr_array_add (argv, g_strdup ("-t"));
   g_ptr_array_add (argv, g_strdup ("srt"));
 
-  switch (ogmrip_subp_codec_get_newline_style (OGMRIP_SUBP_CODEC (subp)))
+  switch (ogmrip_subp_codec_get_newline (OGMRIP_SUBP_CODEC (subp)))
   {
     case OGMRIP_NEWLINE_LF:
       g_ptr_array_add (argv, g_strdup ("-n"));

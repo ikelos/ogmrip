@@ -962,18 +962,18 @@ ogmrip_main_create_subp_codec (OGMRipData *data, OGMRipProfile *profile,
 
   if (options)
   {
-    ogmrip_subp_codec_set_character_set (OGMRIP_SUBP_CODEC (codec),
-        ogmrip_subp_options_get_character_set (options));
-    ogmrip_subp_codec_set_newline_style (OGMRIP_SUBP_CODEC (codec),
-        ogmrip_subp_options_get_newline_style (options));
+    ogmrip_subp_codec_set_charset (OGMRIP_SUBP_CODEC (codec),
+        ogmrip_subp_options_get_charset (options));
+    ogmrip_subp_codec_set_newline (OGMRIP_SUBP_CODEC (codec),
+        ogmrip_subp_options_get_newline (options));
     ogmrip_subp_codec_set_forced_only (OGMRIP_SUBP_CODEC (codec),
         ogmrip_subp_options_get_forced_only (options));
   }
   else
   {
-    ogmrip_subp_codec_set_character_set (OGMRIP_SUBP_CODEC (codec),
+    ogmrip_subp_codec_set_charset (OGMRIP_SUBP_CODEC (codec),
         g_settings_get_uint (settings, OGMRIP_PROFILE_CHARACTER_SET));
-    ogmrip_subp_codec_set_newline_style (OGMRIP_SUBP_CODEC (codec),
+    ogmrip_subp_codec_set_newline (OGMRIP_SUBP_CODEC (codec),
         g_settings_get_uint (settings, OGMRIP_PROFILE_NEWLINE_STYLE));
     ogmrip_subp_codec_set_forced_only (OGMRIP_SUBP_CODEC (codec),
         g_settings_get_boolean (settings, OGMRIP_PROFILE_FORCED_ONLY));

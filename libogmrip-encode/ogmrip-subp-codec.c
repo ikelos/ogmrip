@@ -77,12 +77,12 @@ ogmrip_subp_codec_class_init (OGMRipSubpCodecClass *klass)
            FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_CHARSET,
-      g_param_spec_int ("character-set", "Charset property", "Set charset",
+      g_param_spec_int ("charset", "Charset property", "Set charset",
         OGMRIP_CHARSET_UNDEFINED, OGMRIP_CHARSET_ASCII, OGMRIP_CHARSET_UNDEFINED,
         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_NEWLINE,
-      g_param_spec_int ("newline-style", "Newline property", "Set newline",
+      g_param_spec_int ("newline", "Newline property", "Set newline",
         OGMRIP_NEWLINE_UNDEFINED, OGMRIP_NEWLINE_CR_LF, OGMRIP_NEWLINE_UNDEFINED,
         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
@@ -208,20 +208,20 @@ ogmrip_subp_codec_get_forced_only (OGMRipSubpCodec *subp)
 }
 
 /**
- * ogmrip_subp_codec_set_character_set:
+ * ogmrip_subp_codec_set_charset:
  * @subp: an #OGMRipSubpCodec
  * @charset: the #OGMRipCharset
  *
  * Sets the character set of text subtitles
  */
 void
-ogmrip_subp_codec_set_character_set (OGMRipSubpCodec *subp, OGMRipCharset charset)
+ogmrip_subp_codec_set_charset (OGMRipSubpCodec *subp, OGMRipCharset charset)
 {
   g_return_if_fail (OGMRIP_IS_SUBP_CODEC (subp));
 
   subp->priv->charset = charset;
 
-  g_object_notify (G_OBJECT (subp), "character-set");
+  g_object_notify (G_OBJECT (subp), "charset");
 }
 
 /**
@@ -233,7 +233,7 @@ ogmrip_subp_codec_set_character_set (OGMRipSubpCodec *subp, OGMRipCharset charse
  * Returns: an #OGMRipCharset, or -1
  */
 gint
-ogmrip_subp_codec_get_character_set (OGMRipSubpCodec *subp)
+ogmrip_subp_codec_get_charset (OGMRipSubpCodec *subp)
 { 
   g_return_val_if_fail (OGMRIP_IS_SUBP_CODEC (subp), -1);
       
@@ -241,24 +241,24 @@ ogmrip_subp_codec_get_character_set (OGMRipSubpCodec *subp)
 } 
     
 /**
- * ogmrip_subp_codec_set_newline_style:
+ * ogmrip_subp_codec_set_newline:
  * @subp: an #OGMRipSubpCodec
  * @newline: the #OGMRipNewline
  *
  * Sets the end-of-line characters of text subtitles
  */
 void
-ogmrip_subp_codec_set_newline_style (OGMRipSubpCodec *subp, OGMRipNewline newline)
+ogmrip_subp_codec_set_newline (OGMRipSubpCodec *subp, OGMRipNewline newline)
 { 
   g_return_if_fail (OGMRIP_IS_SUBP_CODEC (subp));
 
   subp->priv->newline = newline;
 
-  g_object_notify (G_OBJECT (subp), "newline-style");
+  g_object_notify (G_OBJECT (subp), "newline");
 }
 
 /**
- * ogmrip_subp_codec_get_newline_style:
+ * ogmrip_subp_codec_get_newline:
  * @subp: an #OGMRipSubpCodec
  *
  * Gets the end-of-line characters of text subtitles
@@ -266,7 +266,7 @@ ogmrip_subp_codec_set_newline_style (OGMRipSubpCodec *subp, OGMRipNewline newlin
  * Returns: the #OGMRipNewline, or -1
  */
 gint
-ogmrip_subp_codec_get_newline_style (OGMRipSubpCodec *subp) 
+ogmrip_subp_codec_get_newline (OGMRipSubpCodec *subp) 
 {
   g_return_val_if_fail (OGMRIP_IS_SUBP_CODEC (subp), -1);
 

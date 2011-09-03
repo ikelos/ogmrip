@@ -550,11 +550,11 @@ ogmrip_encoding_dump_subp_codec (OGMRipXML *xml, OGMRipCodec *codec)
 
   ogmrip_encoding_dump_property (xml, codec, klass, "start-chapter");
   ogmrip_encoding_dump_property (xml, codec, klass, "end-chapter");
-  ogmrip_encoding_dump_property (xml, codec, klass, "character-set");
+  ogmrip_encoding_dump_property (xml, codec, klass, "charset");
   ogmrip_encoding_dump_property (xml, codec, klass, "forced-only");
   ogmrip_encoding_dump_property (xml, codec, klass, "label");
   ogmrip_encoding_dump_property (xml, codec, klass, "language");
-  ogmrip_encoding_dump_property (xml, codec, klass, "newline-style");
+  ogmrip_encoding_dump_property (xml, codec, klass, "newline");
 
   ogmrip_xml_parent (xml);
 }

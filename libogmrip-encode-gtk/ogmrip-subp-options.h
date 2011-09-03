@@ -37,22 +37,22 @@ struct _OGMRipSubpOptionsInterface
   GTypeInterface base_iface;
 };
 
-GType         ogmrip_subp_options_get_type          (void);
-OGMRipCharset ogmrip_subp_options_get_character_set (OGMRipSubpOptions *options);
-void          ogmrip_subp_options_set_character_set (OGMRipSubpOptions *options,
-                                                     OGMRipCharset     charset);
-GType         ogmrip_subp_options_get_codec         (OGMRipSubpOptions *dialog);
-void          ogmrip_subp_options_set_codec         (OGMRipSubpOptions *dialog,
-                                                     GType             type);
-gboolean      ogmrip_subp_options_get_forced_only   (OGMRipSubpOptions *options);
-void          ogmrip_subp_options_set_forced_only   (OGMRipSubpOptions *options,
-                                                     gboolean          forced_only);
-OGMRipNewline ogmrip_subp_options_get_newline_style (OGMRipSubpOptions *options);
-void          ogmrip_subp_options_set_newline_stype (OGMRipSubpOptions *options,
-                                                     OGMRipNewline     newline);
-gboolean      ogmrip_subp_options_get_spell_check   (OGMRipSubpOptions *dialog);
-void          ogmrip_subp_options_set_spell_check   (OGMRipSubpOptions *dialog,
-                                                     gboolean          spell_check);
+GType         ogmrip_subp_options_get_type        (void);
+OGMRipCharset ogmrip_subp_options_get_charset     (OGMRipSubpOptions *options);
+void          ogmrip_subp_options_set_charset     (OGMRipSubpOptions *options,
+                                                   OGMRipCharset     charset);
+GType         ogmrip_subp_options_get_codec       (OGMRipSubpOptions *dialog);
+void          ogmrip_subp_options_set_codec       (OGMRipSubpOptions *dialog,
+                                                   GType             type);
+gboolean      ogmrip_subp_options_get_forced_only (OGMRipSubpOptions *options);
+void          ogmrip_subp_options_set_forced_only (OGMRipSubpOptions *options,
+                                                   gboolean          forced_only);
+OGMRipNewline ogmrip_subp_options_get_newline     (OGMRipSubpOptions *options);
+void          ogmrip_subp_options_set_newline     (OGMRipSubpOptions *options,
+                                                   OGMRipNewline     newline);
+gboolean      ogmrip_subp_options_get_spell_check (OGMRipSubpOptions *dialog);
+void          ogmrip_subp_options_set_spell_check (OGMRipSubpOptions *dialog,
+                                                   gboolean          spell_check);
 
 G_END_DECLS
 

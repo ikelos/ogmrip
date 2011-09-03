@@ -155,10 +155,10 @@ ogmrip_subp_options_dialog_class_init (OGMRipSubpOptionsDialogClass *klass)
   gobject_class->get_property = ogmrip_subp_options_dialog_get_property;
   gobject_class->set_property = ogmrip_subp_options_dialog_set_property;
 
-  g_object_class_override_property (gobject_class, PROP_CHARSET, "character-set");
+  g_object_class_override_property (gobject_class, PROP_CHARSET, "charset");
   g_object_class_override_property (gobject_class, PROP_CODEC, "codec");
   g_object_class_override_property (gobject_class, PROP_FORCED_ONLY, "forced-only");
-  g_object_class_override_property (gobject_class, PROP_NEWLINE, "newline-style");
+  g_object_class_override_property (gobject_class, PROP_NEWLINE, "newline");
   g_object_class_override_property (gobject_class, PROP_SPELL_CHECK, "spell-check");
 
   g_object_class_install_property (gobject_class, PROP_LABEL,
