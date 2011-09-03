@@ -55,58 +55,61 @@ ogmrip_video_file_constructor (GType type, guint n_properties, GObjectConstructP
 {
   GObject *gobject;
   OGMRipMediaInfo *info;
-  const gchar *str;
 
   gobject = G_OBJECT_CLASS (ogmrip_video_file_parent_class)->constructor (type, n_properties, properties);
 
   info = ogmrip_media_info_get_default ();
-
-  if (!info || !OGMRIP_FILE (gobject)->priv->path ||
-      !ogmrip_media_info_open (info, OGMRIP_FILE (gobject)->priv->uri))
+  if (!info || !OGMRIP_FILE (gobject)->priv->path)
   {
     g_object_unref (gobject);
     return NULL;
   }
 
-  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "VideoCount");
-  if (!str || !g_str_equal (str, "1"))
+  if (g_file_test (OGMRIP_FILE (gobject)->priv->path, G_FILE_TEST_EXISTS) &&
+      ogmrip_media_info_open (info, OGMRIP_FILE (gobject)->priv->path))
   {
-    g_object_unref (info);
-    g_object_unref (gobject);
-    return NULL;
+    const gchar *str;
+
+    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "VideoCount");
+    if (!str || !g_str_equal (str, "1"))
+    {
+      g_object_unref (info);
+      g_object_unref (gobject);
+      return NULL;
+    }
+
+    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "Duration");
+    OGMRIP_FILE (gobject)->priv->length = str ? atoi (str) / 1000. : -1.0;
+
+    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "StreamSize");
+    OGMRIP_FILE (gobject)->priv->size = str ? atoll (str) : -1;
+
+    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "Title");
+    OGMRIP_FILE (gobject)->priv->label = str ? g_strdup (str) : NULL;
+
+    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "BitRate");
+    OGMRIP_VIDEO_FILE (gobject)->priv->bitrate = str ? atoi (str) : -1;
+
+    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "Width");
+    OGMRIP_VIDEO_FILE (gobject)->priv->width = str ? atoi (str) : 0;
+
+    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "Height");
+    OGMRIP_VIDEO_FILE (gobject)->priv->height = str ? atoi (str) : 0;
+
+    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "Standard");
+    if (!str)
+      OGMRIP_VIDEO_FILE (gobject)->priv->standard = -1;
+    else if (g_str_equal (str, "PAL"))
+      OGMRIP_VIDEO_FILE (gobject)->priv->standard = OGMRIP_STANDARD_PAL;
+    else if (g_str_equal (str, "NTSC"))
+      OGMRIP_VIDEO_FILE (gobject)->priv->standard = OGMRIP_STANDARD_NTSC;
+
+    /*
+     * TODO framerate, aspect, aspect ratio, delay
+     */
+
+    ogmrip_media_info_close (info);
   }
-
-  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "Duration");
-  OGMRIP_FILE (gobject)->priv->length = str ? atoi (str) / 1000. : -1.0;
-
-  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "StreamSize");
-  OGMRIP_FILE (gobject)->priv->size = str ? atoll (str) : -1;
-
-  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "Title");
-  OGMRIP_FILE (gobject)->priv->label = str ? g_strdup (str) : NULL;
-
-  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "BitRate");
-  OGMRIP_VIDEO_FILE (gobject)->priv->bitrate = str ? atoi (str) : -1;
-
-  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "Width");
-  OGMRIP_VIDEO_FILE (gobject)->priv->width = str ? atoi (str) : 0;
-
-  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "Height");
-  OGMRIP_VIDEO_FILE (gobject)->priv->height = str ? atoi (str) : 0;
-
-  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "Standard");
-  if (!str)
-    OGMRIP_VIDEO_FILE (gobject)->priv->standard = -1;
-  else if (g_str_equal (str, "PAL"))
-    OGMRIP_VIDEO_FILE (gobject)->priv->standard = OGMRIP_STANDARD_PAL;
-  else if (g_str_equal (str, "NTSC"))
-    OGMRIP_VIDEO_FILE (gobject)->priv->standard = OGMRIP_STANDARD_NTSC;
-
-  /*
-   * TODO framerate, aspect, aspect ratio
-   */
-
-  ogmrip_media_info_close (info);
 
   return gobject;
 }

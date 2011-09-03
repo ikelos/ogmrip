@@ -52,40 +52,43 @@ ogmrip_subp_file_constructor (GType type, guint n_properties, GObjectConstructPa
 {
   GObject *gobject;
   OGMRipMediaInfo *info;
-  const gchar *str;
 
   gobject = G_OBJECT_CLASS (ogmrip_subp_file_parent_class)->constructor (type, n_properties, properties);
 
   info = ogmrip_media_info_get_default ();
-
-  if (!info || !OGMRIP_FILE (gobject)->priv->path ||
-      !ogmrip_media_info_open (info, OGMRIP_FILE (gobject)->priv->path))
+  if (!info || !OGMRIP_FILE (gobject)->priv->path)
   {
     g_object_unref (gobject);
     return NULL;
   }
 
-  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "TextCount");
-  if (!str || !g_str_equal (str, "1"))
+  if (g_file_test (OGMRIP_FILE (gobject)->priv->path, G_FILE_TEST_EXISTS) &&
+      ogmrip_media_info_open (info, OGMRIP_FILE (gobject)->priv->path))
   {
-    g_object_unref (info);
-    g_object_unref (gobject);
-    return NULL;
+    const gchar *str;
+
+    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "TextCount");
+    if (!str || !g_str_equal (str, "1"))
+    {
+      g_object_unref (info);
+      g_object_unref (gobject);
+      return NULL;
+    }
+
+    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_TEXT, 0, "Duration");
+    OGMRIP_FILE (gobject)->priv->length = str ? atoi (str) / 1000. : -1.0;
+
+    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_TEXT, 0, "StreamSize");
+    OGMRIP_FILE (gobject)->priv->size = str ? atoll (str) : -1;
+
+    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "Title");
+    OGMRIP_FILE (gobject)->priv->label = str ? g_strdup (str) : NULL;
+
+    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_TEXT, 0, "Language/String2");
+    OGMRIP_SUBP_FILE (gobject)->priv->language = str ? (str[0] << 8) | str[1] : 0;
+
+    ogmrip_media_info_close (info);
   }
-
-  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_TEXT, 0, "Duration");
-  OGMRIP_FILE (gobject)->priv->length = str ? atoi (str) / 1000. : -1.0;
-
-  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_TEXT, 0, "StreamSize");
-  OGMRIP_FILE (gobject)->priv->size = str ? atoll (str) : -1;
-
-  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "Title");
-  OGMRIP_FILE (gobject)->priv->label = str ? g_strdup (str) : NULL;
-
-  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_TEXT, 0, "Language/String2");
-  OGMRIP_SUBP_FILE (gobject)->priv->language = str ? (str[0] << 8) | str[1] : 0;
-
-  ogmrip_media_info_close (info);
 
   return gobject;
 }
