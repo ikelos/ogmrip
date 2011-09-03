@@ -52,6 +52,12 @@ ogmrip_media_info_get_audio_format (OGMRipMediaInfo *info)
   if (g_str_equal (str, "FLAC"))
     return OGMRIP_FORMAT_FLAC;
 
+  if (g_str_equal (str, "DTS"))
+    return OGMRIP_FORMAT_DTS;
+
+  if (g_str_equal (str, "AC-3"))
+    return OGMRIP_FORMAT_AC3;
+
   return OGMRIP_FORMAT_UNDEFINED;
 }
 
