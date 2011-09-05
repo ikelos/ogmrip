@@ -66,6 +66,7 @@ struct _OGMRipEncodingPriv
 
   OGMJobSpawn *spawn;
 
+  gboolean log_open;
   gboolean ensure_sync;
   gboolean relative;
   gboolean autocrop;
@@ -119,6 +120,26 @@ static void   ogmrip_encoding_complete      (OGMRipEncoding *encoding,
                                              guint          result);
 
 guint signals[LAST_SIGNAL] = { 0 };
+
+static void
+ogmrip_encoding_open_log (OGMRipEncoding *encoding)
+{
+  if (!encoding->priv->log_open)
+  {
+    ogmjob_log_open (encoding->priv->log_file, NULL);
+    encoding->priv->log_open = TRUE;
+  }
+}
+
+static void
+ogmrip_encoding_close_log (OGMRipEncoding *encoding)
+{
+  if (encoding->priv->log_open)
+  {
+    ogmjob_log_close (NULL);
+    encoding->priv->log_open = FALSE;
+  }
+}
 
 G_DEFINE_TYPE (OGMRipEncoding, ogmrip_encoding, G_TYPE_OBJECT)
 
@@ -295,7 +316,10 @@ ogmrip_encoding_dispose (GObject *gobject)
 static void
 ogmrip_encoding_finalize (GObject *gobject)
 {
-  g_free (OGMRIP_ENCODING (gobject)->priv->log_file);
+  OGMRipEncoding *encoding = OGMRIP_ENCODING (gobject);
+
+  ogmrip_encoding_close_log (encoding);
+  g_free (encoding->priv->log_file);
 
   (*G_OBJECT_CLASS (ogmrip_encoding_parent_class)->finalize) (gobject);
 }
@@ -1269,11 +1293,12 @@ ogmrip_encoding_copy (OGMRipEncoding *encoding, GError **error)
 
   media = ogmrip_title_get_media (encoding->priv->title);
 
-  output = ogmrip_fs_mktemp ("ogmrip.XXXXXX", error);
-  if (!output)
-    return OGMJOB_RESULT_ERROR;
+  ogmjob_log_printf ("Copying %s\n\n", ogmrip_media_get_label (media));
 
+  output = g_build_filename (ogmrip_fs_get_tmp_dir (), ogmrip_media_get_id (media), NULL);
   spawn = ogmrip_copy_new (media, output);
+  g_free (output);
+
   g_signal_connect_swapped (spawn, "progress",
       G_CALLBACK (ogmrip_encoding_task_progressed), encoding);
 
@@ -1292,6 +1317,9 @@ ogmrip_encoding_analyze (OGMRipEncoding *encoding, GError **error)
   OGMJobSpawn *spawn;
   gboolean result;
 
+  ogmjob_log_printf ("\nAnalyzing video title %d\n", ogmrip_title_get_nr (encoding->priv->title) + 1);
+  ogmjob_log_printf ("-----------------------\n\n");
+
   spawn = ogmrip_analyze_new (encoding->priv->title);
   g_signal_connect_swapped (spawn, "progress",
       G_CALLBACK (ogmrip_encoding_task_progressed), encoding);
@@ -1301,6 +1329,16 @@ ogmrip_encoding_analyze (OGMRipEncoding *encoding, GError **error)
   g_signal_emit (encoding, signals[COMPLETE], 0, spawn, result);
 
   g_object_unref (spawn);
+
+  if (result == OGMJOB_RESULT_SUCCESS)
+  {
+    ogmjob_log_printf ("\nTelecine: %s\n",
+        ogmrip_title_get_telecine (encoding->priv->title) ? "true" : "false");
+    ogmjob_log_printf ("Progressive: %s\n\n",
+        ogmrip_title_get_progressive (encoding->priv->title) ? "true" : "false");
+    ogmjob_log_printf ("Interlaced: %s\n\n",
+        ogmrip_title_get_interlaced (encoding->priv->title) ? "true" : "false");
+  }
 
   return result;
 }
@@ -1327,7 +1365,27 @@ ogmrip_encoding_test (OGMRipEncoding *encoding, GError **error)
 static gint
 ogmrip_encoding_run_codec (OGMRipEncoding *encoding, OGMRipCodec *codec, GError **error)
 {
+  OGMRipStream *stream;
   gint result;
+
+  stream = ogmrip_codec_get_input (codec);
+  if (OGMRIP_IS_SUBP_STREAM (stream))
+  {
+    ogmjob_log_printf ("\nEncoding subp stream %02d\n",
+        ogmrip_subp_stream_get_nr (OGMRIP_SUBP_STREAM (stream)) + 1);
+    ogmjob_log_printf ("-----------------------\n\n");
+  }
+  else if (OGMRIP_IS_AUDIO_STREAM (stream))
+  {
+    ogmjob_log_printf ("\nEncoding audio stream %02d\n",
+        ogmrip_audio_stream_get_nr (OGMRIP_AUDIO_STREAM (stream)) + 1);
+    ogmjob_log_printf ("------------------------\n\n");
+  }
+  else if (OGMRIP_IS_VIDEO_STREAM (stream))
+  {
+    ogmjob_log_printf ("\nEncoding video stream\n");
+    ogmjob_log_printf ("---------------------\n\n");
+  }
 
   g_signal_connect_swapped (codec, "progress",
       G_CALLBACK (ogmrip_encoding_task_progressed), encoding);
@@ -1352,6 +1410,9 @@ ogmrip_encoding_merge (OGMRipEncoding *encoding, GError **error)
 {
   gint result;
 
+  ogmjob_log_printf ("\nMerging\n");
+  ogmjob_log_printf ("-------\n\n");
+
   g_signal_connect_swapped (encoding->priv->container, "progress",
       G_CALLBACK (ogmrip_encoding_task_progressed), encoding);
 
@@ -1375,10 +1436,14 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GError **error)
   g_return_val_if_fail (error == NULL || *error == NULL, OGMJOB_RESULT_ERROR);
   g_return_val_if_fail (ogmrip_title_is_open (encoding->priv->title), OGMJOB_RESULT_ERROR);
 
+  ogmrip_encoding_open_log (encoding);
+/*
+  ogmjob_log_printf ("ENCODING: %s\n\n", ogmrip_encoding_get_label (encoding));
+*/
+  g_signal_emit (encoding, signals[RUN], 0, NULL);
+
   if (!ogmrip_encoding_check_space (encoding, 0, 0, error))
     return FALSE;
-
-  g_signal_emit (encoding, signals[RUN], 0, NULL);
 
   /*
    * Copy the media
@@ -1446,12 +1511,29 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GError **error)
 
   if (encoding->priv->video_codec)
   {
+    ogmjob_log_printf ("\nSetting video parameters");
+    ogmjob_log_printf ("\n------------------------\n");
+
     /*
      * Compute bitrate if encoding by size
      */
-    if (encoding->priv->method == OGMRIP_ENCODING_SIZE)
-      ogmrip_video_codec_set_bitrate (encoding->priv->video_codec,
-          ogmrip_encoding_autobitrate (encoding));
+    switch (encoding->priv->method)
+    {
+      case OGMRIP_ENCODING_SIZE:
+        ogmrip_video_codec_set_bitrate (encoding->priv->video_codec,
+            ogmrip_encoding_autobitrate (encoding));
+        ogmjob_log_printf ("Automatic bitrate: %d bps\n\n",
+            ogmrip_video_codec_get_bitrate (encoding->priv->video_codec));
+        break;
+      case OGMRIP_ENCODING_BITRATE:
+        ogmjob_log_printf ("Constant bitrate: %d bps\n\n",
+            ogmrip_video_codec_get_bitrate (encoding->priv->video_codec));
+        break;
+      case OGMRIP_ENCODING_QUANTIZER:
+        ogmjob_log_printf ("Constant quantizer: %lf\n\n",
+            ogmrip_video_codec_get_quantizer (encoding->priv->video_codec));
+        break;
+    }
 
     /*
      * Get cropping parameters
@@ -1514,6 +1596,8 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GError **error)
 
 encode_cleanup:
   g_signal_emit (encoding, signals[COMPLETE], 0, NULL, result);
+
+  ogmrip_encoding_close_log (encoding);
 
   return result;
 }
