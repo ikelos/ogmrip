@@ -1900,14 +1900,14 @@ ogmrip_main_new (void)
 
   widget = gtk_builder_get_widget (builder, "scrolledwindow");
 
-  widget = ogmrip_chapter_view_new ();
-  gtk_container_add (GTK_CONTAINER (widget), widget);
-  gtk_widget_show (widget);
+  child = ogmrip_chapter_view_new ();
+  gtk_container_add (GTK_CONTAINER (widget), child);
+  gtk_widget_show (child);
 
   g_object_bind_property (data->title_chooser, "sensitive",
-      widget, "sensitive", G_BINDING_SYNC_CREATE);
+      child, "sensitive", G_BINDING_SYNC_CREATE);
 
-  data->chapter_store = gtk_tree_view_get_model (GTK_TREE_VIEW (widget));
+  data->chapter_store = gtk_tree_view_get_model (GTK_TREE_VIEW (child));
 
   g_signal_connect_swapped (data->chapter_store, "selection-changed", 
       G_CALLBACK (ogmrip_main_chapter_selection_changed), data);
