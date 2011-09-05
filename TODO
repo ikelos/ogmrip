@@ -7,9 +7,14 @@ ogmrip-options-dialog.c
 ogmrip-encoding-manager.c
 - comment connaitre les encodages non faits ?
 
-ogmrip-*-file.c
-- format
-- progressive (ScanType)
+ogmrip-codec.c
+- ajouter set_profile
+
+ogmrip-copy.c
+- vérifier si une copie existe déjà
+
+ogmrip-main.c
+- ajouter fichier de log
 
 ogmrip-mp4.c
 - comment savoir si la vidéo a été encodée avec global_header ?
@@ -22,6 +27,3 @@ ogmrip-lavc.glade
 
 ogmrip-x264.glade
 - ajouter trellis, partitions, b frames
-
-all
-- ajouter un stream/fichier pour les chapitres
