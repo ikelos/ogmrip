@@ -452,6 +452,60 @@ ogmrip_subp_stub_class_init (OGMRipSubpStubClass *klass)
 }
 
 /*
+ * Chapters
+ */
+
+static const gchar *
+ogmrip_chapters_stub_get_label (OGMRipChaptersStream *chapters, guint nr)
+{
+  OGMRipStub *stub = OGMRIP_STUB (chapters);
+
+  return ogmrip_chapters_get_label (OGMRIP_CHAPTERS (stub->priv->codec), nr);
+}
+
+static gint
+ogmrip_chapters_stub_get_language (OGMRipChaptersStream *chapters)
+{
+  OGMRipStub *stub = OGMRIP_STUB (chapters);
+
+  return ogmrip_chapters_get_language (OGMRIP_CHAPTERS (stub->priv->codec));
+}
+
+static void
+ogmrip_chapters_iface_init (OGMRipChaptersStreamInterface *iface)
+{
+  iface->get_label = ogmrip_chapters_stub_get_label;
+  iface->get_language = ogmrip_chapters_stub_get_language;
+}
+
+G_DEFINE_TYPE_WITH_CODE (OGMRipChaptersStub, ogmrip_chapters_stub, OGMRIP_TYPE_FILE,
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_CHAPTERS_STREAM, ogmrip_chapters_iface_init));
+
+static void
+ogmrip_chapters_stub_init (OGMRipChaptersStub *stub)
+{
+}
+
+static void
+ogmrip_chapters_stub_constructed (GObject *gobject)
+{
+  OGMRipStub *stub = OGMRIP_STUB (gobject);
+
+  stub->priv->format = OGMRIP_FORMAT_CHAPTERS;
+
+  G_OBJECT_CLASS (ogmrip_subp_stub_parent_class)->constructed (gobject);
+}
+
+static void
+ogmrip_chapters_stub_class_init (OGMRipChaptersStubClass *klass)
+{
+  GObjectClass *gobject_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->constructed = ogmrip_chapters_stub_constructed;
+}
+
+/*
  * Common
  */
 
@@ -469,6 +523,9 @@ ogmrip_stub_new (OGMRipCodec *codec, const gchar *uri)
 
   if (OGMRIP_IS_SUBP_CODEC (codec))
     return g_object_new (OGMRIP_TYPE_SUBP_STUB, "codec", codec, "uri", uri, NULL);
+
+  if (OGMRIP_IS_CHAPTERS (codec))
+    return g_object_new (OGMRIP_TYPE_CHAPTERS_STUB, "codec", codec, "uri", uri, NULL);
 
   g_assert_not_reached ();
 

@@ -46,8 +46,7 @@ struct _OGMRipMp4
 {
   OGMRipContainer parent_instance;
 
-  gchar *filename;
-  gint video_format;
+  OGMRipFile *video;
   gint nvobsub;
   gint naudio;
   gint nsubp;
@@ -159,19 +158,21 @@ ogmrip_mp4_append_subp_file (OGMRipContainer *mp4, OGMRipFile *file, GPtrArray *
     }
   }
 }
-/*
+
 static void
 ogmrip_mp4_append_chapters_file (OGMRipContainer *mp4, OGMRipFile *file, GPtrArray *argv)
 {
+  const gchar *filename;
   struct stat buf;
 
+  filename = ogmrip_file_get_path (file);
   if (g_stat (filename, &buf) == 0 && buf.st_size > 0)
   {
     g_ptr_array_add (argv, g_strdup ("-chap"));
     g_ptr_array_add (argv, g_strdup (filename));
   }
 }
-*/
+
 static void
 ogmrip_mp4_append_file (OGMRipContainer *mp4, OGMRipFile *file, GPtrArray *argv)
 {
@@ -179,34 +180,10 @@ ogmrip_mp4_append_file (OGMRipContainer *mp4, OGMRipFile *file, GPtrArray *argv)
     ogmrip_mp4_append_audio_file (mp4, file, argv);
   else if (OGMRIP_IS_SUBP_STREAM (file))
     ogmrip_mp4_append_subp_file (mp4, file, argv);
-/*
-  else if (OGMRIP_IS_CHAPTERS_FORMAT (format))
+  else if (OGMRIP_IS_CHAPTERS_STREAM (file))
     ogmrip_mp4_append_chapters_file (mp4, file, argv);
-*/
 }
-/*
-static gdouble
-ogmrip_mp4_get_output_fps (OGMRipCodec *codec)
-{
-  guint output_rate_numerator, output_rate_denominator;
 
-  if (ogmrip_codec_get_telecine (codec) || ogmrip_codec_get_progressive (codec))
-  {
-    output_rate_numerator = 24000;
-    output_rate_denominator = 1001;
-  }
-  else
-  {
-    OGMDvdStream *stream;
-
-    stream = ogmrip_codec_get_input (codec);
-    ogmdvd_video_stream_get_framerate (OGMDVD_VIDEO_STREAM (stream),
-        &output_rate_numerator, &output_rate_denominator);
-  }
-
-  return output_rate_numerator / (gdouble) output_rate_denominator;
-}
-*/
 static gchar **
 ogmrip_mp4box_extract_command (const gchar *input)
 {
@@ -279,9 +256,9 @@ ogmrip_mp4_create_command (OGMRipContainer *mp4, const gchar *input, const gchar
 {
   GPtrArray *argv;
   const gchar *label, *fmt = NULL;
-//  gchar fps[8];
+  gchar fps[8];
 
-  switch (OGMRIP_MP4 (mp4)->video_format)
+  switch (ogmrip_stream_get_format (OGMRIP_STREAM (OGMRIP_MP4 (mp4)->video)))
   {
     case OGMRIP_FORMAT_MPEG4:
       fmt = "mpeg4-video";
@@ -327,17 +304,16 @@ ogmrip_mp4_create_command (OGMRipContainer *mp4, const gchar *input, const gchar
 
   if (fmt)
   {
+    guint num, denom;
+
     if (!input)
-      input = OGMRIP_MP4 (mp4)->filename;
-/*
-    g_ascii_formatd (fps, 8, "%.3f",
-        ogmrip_mp4_get_output_fps (OGMRIP_CODEC (video)));
-*/
+      input = ogmrip_file_get_path (OGMRIP_MP4 (mp4)->video);
+
+    ogmrip_video_stream_get_framerate (OGMRIP_VIDEO_STREAM (OGMRIP_MP4 (mp4)->video), &num, &denom);
+    g_ascii_formatd (fps, 8, "%.3f", num / (gdouble) denom);
+
     g_ptr_array_add (argv, g_strdup ("-add"));
-/*
     g_ptr_array_add (argv, g_strdup_printf ("%s:fmt=%s:fps=%s#video", input, fmt, fps));
-*/
-    g_ptr_array_add (argv, g_strdup_printf ("%s:fmt=%s#video", input, fmt));
   }
 
   ogmrip_container_foreach_file (mp4, 
@@ -436,12 +412,7 @@ static void
 ogmrip_mp4_get_info (OGMRipMp4 *mp4, OGMRipFile *file)
 {
   if (OGMRIP_IS_VIDEO_STREAM (file))
-  {
-    mp4->video_format = ogmrip_stream_get_format (OGMRIP_STREAM (file));
-    if (mp4->filename)
-      g_free (mp4->filename);
-    mp4->filename = g_strdup (ogmrip_file_get_path (file));
-  }
+    mp4->video = file;
   else if (OGMRIP_IS_AUDIO_STREAM (file))
     mp4->naudio ++;
   else if (OGMRIP_IS_SUBP_STREAM (file))
@@ -497,7 +468,7 @@ ogmrip_mp4_run (OGMJobSpawn *spawn)
   ogmjob_container_add (OGMJOB_CONTAINER (spawn), queue);
   g_object_unref (queue);
 
-  if (mp4->video_format == OGMRIP_FORMAT_H264)
+  if (ogmrip_stream_get_format (OGMRIP_STREAM (mp4->video)) == OGMRIP_FORMAT_H264)
   {
     gboolean global_header = FALSE;
 /*
@@ -508,7 +479,7 @@ ogmrip_mp4_run (OGMJobSpawn *spawn)
     {
       filename = ogmrip_fs_mktemp ("video.XXXXXX", NULL);
 
-      argv = ogmrip_mencoder_extract_command (mp4->filename, filename);
+      argv = ogmrip_mencoder_extract_command (ogmrip_file_get_path (mp4->video), filename);
       if (!argv)
       {
         g_free (filename);
@@ -520,14 +491,14 @@ ogmrip_mp4_run (OGMJobSpawn *spawn)
     }
     else
     {
-      argv = ogmrip_mp4box_extract_command (mp4->filename);
+      argv = ogmrip_mp4box_extract_command (ogmrip_file_get_path (mp4->video));
       if (!argv)
         return OGMJOB_RESULT_ERROR;
 
       child = ogmjob_exec_newv (argv);
       ogmjob_exec_add_watch_full (OGMJOB_EXEC (child), (OGMJobWatch) ogmrip_mp4box_extract_watch, spawn, TRUE, FALSE, FALSE);
 
-      filename = ogmrip_mp4_get_h264_filename (mp4->filename);
+      filename = ogmrip_mp4_get_h264_filename (ogmrip_file_get_path (mp4->video));
     }
 
     ogmjob_container_add (OGMJOB_CONTAINER (queue), child);

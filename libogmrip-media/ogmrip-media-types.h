@@ -23,12 +23,13 @@
 
 G_BEGIN_DECLS
 
-typedef struct _OGMRipMedia       OGMRipMedia;
-typedef struct _OGMRipTitle       OGMRipTitle;
-typedef struct _OGMRipStream      OGMRipStream;
-typedef struct _OGMRipVideoStream OGMRipVideoStream;
-typedef struct _OGMRipAudioStream OGMRipAudioStream;
-typedef struct _OGMRipSubpStream  OGMRipSubpStream;
+typedef struct _OGMRipMedia           OGMRipMedia;
+typedef struct _OGMRipTitle           OGMRipTitle;
+typedef struct _OGMRipStream          OGMRipStream;
+typedef struct _OGMRipVideoStream     OGMRipVideoStream;
+typedef struct _OGMRipAudioStream     OGMRipAudioStream;
+typedef struct _OGMRipSubpStream      OGMRipSubpStream;
+typedef struct _OGMRipChaptersStream  OGMRipChaptersStream;
 
 typedef void (* OGMRipMediaCallback) (OGMRipMedia *media,
                                       gdouble     percent,

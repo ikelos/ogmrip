@@ -236,7 +236,7 @@ ogmrip_matroska_append_subp_file (OGMRipContainer *matroska, OGMRipFile *file, G
     g_ptr_array_add (argv, real_filename);
   }
 }
-/*
+
 static void
 ogmrip_matroska_append_chapters_file (OGMRipContainer *matroska, OGMRipFile *file, GPtrArray *argv)
 {
@@ -248,7 +248,7 @@ ogmrip_matroska_append_chapters_file (OGMRipContainer *matroska, OGMRipFile *fil
   {
     gint language;
 
-    language = ogmrip_chapter_stream_get_language (OGMRIP_CHAPTER_STREAM (file));
+    language = ogmrip_chapters_stream_get_language (OGMRIP_CHAPTERS_STREAM (file));
     if (language > -1)
     {
       const gchar *iso639_2;
@@ -268,7 +268,7 @@ ogmrip_matroska_append_chapters_file (OGMRipContainer *matroska, OGMRipFile *fil
     g_ptr_array_add (argv, g_strdup (filename));
   }
 }
-*/
+
 static void
 ogmrip_matroska_foreach_file (OGMRipContainer *matroska, OGMRipFile *file, GPtrArray *argv)
 {
@@ -278,10 +278,8 @@ ogmrip_matroska_foreach_file (OGMRipContainer *matroska, OGMRipFile *file, GPtrA
     ogmrip_matroska_append_audio_file (matroska, file, argv);
   else if (OGMRIP_IS_SUBP_STREAM (file))
     ogmrip_matroska_append_subp_file (matroska, file, argv);
-/*
-  else if (OGMRIP_IS_CHAPTER_STREAM (file))
+  else if (OGMRIP_IS_CHAPTERS_STREAM (file))
     ogmrip_matroska_append_chapters_file (matroska, file, argv);
-*/
 }
 
 gchar **

@@ -146,7 +146,6 @@ ogmrip_ogg_merge_append_subp_file (OGMRipContainer *ogg, OGMRipFile *file, GPtrA
 }
 
 #if (defined(GLIB_SIZEOF_SIZE_T) && GLIB_SIZEOF_SIZE_T == 4)
-/*
 static void
 ogmrip_ogg_merge_append_chapter_file (OGMRipContainer *ogg, OGMRipFile *file, GPtrArray *argv)
 {
@@ -158,7 +157,7 @@ ogmrip_ogg_merge_append_chapter_file (OGMRipContainer *ogg, OGMRipFile *file, GP
   {
     gint language;
 
-    language = ogmrip_chapter_stream_get_language (OGMRIP_CHAPTER_STREAM (file));
+    language = ogmrip_chapters_stream_get_language (OGMRIP_CHAPTERS_STREAM (file));
     if (language > -1)
     {
       g_ptr_array_add (argv, g_strdup ("-c"));
@@ -172,7 +171,6 @@ ogmrip_ogg_merge_append_chapter_file (OGMRipContainer *ogg, OGMRipFile *file, GP
     g_ptr_array_add (argv, g_strdup (filename));
   }
 }
-*/
 #endif
 
 static void
@@ -188,10 +186,8 @@ ogmrip_ogg_merge_foreach_file (OGMRipContainer *ogg, OGMRipFile *file, GPtrArray
   /*
    * ogmmerge segfaults when merging chapters on platforms other than 32-bit
    */
-/*
-  else if (OGMRIP_IS_CHAPTER_STREAM (file))
+  else if (OGMRIP_IS_CHAPTERS_STREAM (file))
     ogmrip_ogg_merge_append_chapter_file (ogg, file, argv);
-*/
 #endif
 
 }

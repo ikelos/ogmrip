@@ -20,6 +20,7 @@
 #define __OGMRIP_MEDIA_H__
 
 #include <ogmrip-media-audio.h>
+#include <ogmrip-media-chapters.h>
 #include <ogmrip-media-enums.h>
 #include <ogmrip-media-labels.h>
 #include <ogmrip-media-object.h>

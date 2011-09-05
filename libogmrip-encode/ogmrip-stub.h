@@ -111,6 +111,27 @@ struct _OGMRipSubpStubClass
 
 GType ogmrip_subp_stub_get_type (void) G_GNUC_CONST;
 
+#define OGMRIP_TYPE_CHAPTERS_STUB          (ogmrip_chapters_stub_get_type ())
+#define OGMRIP_CHAPTERS_STUB(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_CHAPTERS_STUB, OGMRipChaptersStub))
+#define OGMRIP_CHAPTERS_STUB_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_CHAPTERS_STUB, OGMRipChaptersStubClass))
+#define OGMRIP_IS_CHAPTERS_STUB(obj)       (G_TYPE_CHECK_INSTANCE_TYPE ((obj), OGMRIP_TYPE_CHAPTERS_STUB))
+#define OGMRIP_IS_CHAPTERS_STUB_CLASS(obj) (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_CHAPTERS_STUB))
+
+typedef struct _OGMRipChaptersStub      OGMRipChaptersStub;
+typedef struct _OGMRipChaptersStubClass OGMRipChaptersStubClass;
+
+struct _OGMRipChaptersStub
+{
+  OGMRipStub parent_instance;
+};
+
+struct _OGMRipChaptersStubClass
+{
+  OGMRipStubClass parent_class;
+};
+
+GType ogmrip_chapters_stub_get_type (void) G_GNUC_CONST;
+
 OGMRipFile * ogmrip_stub_new (OGMRipCodec *codec,
                               const gchar *uri);
 
