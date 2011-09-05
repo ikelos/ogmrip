@@ -109,11 +109,13 @@ ogmdvd_drive_chooser_widget_init (OGMDvdDriveChooserWidget *chooser)
   ogmdvd_drive_chooser_widget_fill (chooser);
 }
 
-static void
+static gboolean
 ogmdvd_drive_chooser_widget_add_device (GtkComboBox *combo_box, const gchar *device, gboolean file)
 {
+  OGMRipMedia *disc;
   GtkTreeModel *model;
   GtkTreeIter sibling, iter;
+  gchar *title, *text;
   gint type;
 
   model = gtk_combo_box_get_model (combo_box);
@@ -146,26 +148,24 @@ ogmdvd_drive_chooser_widget_add_device (GtkComboBox *combo_box, const gchar *dev
     }
   }
 
-  if (gtk_list_store_iter_is_valid (GTK_LIST_STORE (model), &iter))
-  {
-    OGMRipMedia *disc;
+  if (!gtk_list_store_iter_is_valid (GTK_LIST_STORE (model), &iter))
+    return FALSE;
 
-    disc = ogmdvd_disc_new (device, NULL);
-    if (disc)
-    {
-      gchar *title, *text;
+  disc = ogmdvd_disc_new (device, NULL);
+  if (!disc)
+    return FALSE;
 
-      title = g_markup_escape_text (ogmrip_media_get_label (disc), -1);
-      text = g_strdup_printf ("<b>%s</b>\n%s", title, device);
-      g_free (title);
+  title = g_markup_escape_text (ogmrip_media_get_label (disc), -1);
+  text = g_strdup_printf ("<b>%s</b>\n%s", title, device);
+  g_free (title);
 
-      gtk_list_store_set (GTK_LIST_STORE (model), &iter, TEXT_COLUMN, text,
-          TYPE_COLUMN, file ? OGMDVD_DEVICE_FILE : OGMDVD_DEVICE_DIR, DEVICE_COLUMN, device, DRIVE_COLUMN, NULL, -1);
-      g_free (text);
+  gtk_list_store_set (GTK_LIST_STORE (model), &iter, TEXT_COLUMN, text,
+      TYPE_COLUMN, file ? OGMDVD_DEVICE_FILE : OGMDVD_DEVICE_DIR, DEVICE_COLUMN, device, DRIVE_COLUMN, NULL, -1);
+  g_free (text);
 
-      gtk_combo_box_set_active_iter (combo_box, &iter);
-    }
-  }
+  gtk_combo_box_set_active_iter (combo_box, &iter);
+
+  return TRUE;
 }
 
 static gchar *
@@ -263,9 +263,7 @@ ogmdvd_drive_chooser_widget_changed (GtkComboBox *combo_box)
       case FILE_SEL_ROW:
       case DIR_SEL_ROW:
         device = ogmdvd_drive_chooser_widget_select_file (combo_box, type == FILE_SEL_ROW);
-        if (device)
-          ogmdvd_drive_chooser_widget_add_device (combo_box, device, type == FILE_SEL_ROW);
-        else
+        if (!device || !ogmdvd_drive_chooser_widget_add_device (combo_box, device, type == FILE_SEL_ROW))
         {
           if (!chooser->priv->last_row)
             gtk_combo_box_set_active (combo_box, 0);
