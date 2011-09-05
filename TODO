@@ -7,6 +7,10 @@ ogmrip-options-dialog.c
 ogmrip-encoding-manager.c
 - comment connaitre les encodages non faits ?
 
+ogmrip-*-file.c
+- format
+- progressive (ScanType)
+
 ogmrip-mp4.c
 - comment savoir si la vidéo a été encodée avec global_header ?
 

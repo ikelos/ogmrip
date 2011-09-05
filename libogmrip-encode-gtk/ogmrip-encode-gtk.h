@@ -21,11 +21,8 @@
 
 #include <ogmrip-encode.h>
 #include <ogmrip-audio-chooser-widget.h>
-#include <ogmrip-audio-file-chooser-dialog.h>
 #include <ogmrip-encoding-manager-dialog.h>
-#include <ogmrip-error-dialog.h>
 #include <ogmrip-helper.h>
-#include <ogmrip-language-chooser-widget.h>
 #include <ogmrip-list-item.h>
 #include <ogmrip-options-plugin.h>
 #include <ogmrip-profile-editor-dialog.h>
@@ -33,7 +30,6 @@
 #include <ogmrip-profile-store.h>
 #include <ogmrip-progress-dialog.h>
 #include <ogmrip-subp-chooser-widget.h>
-#include <ogmrip-subp-file-chooser-dialog.h>
 
 #endif /* __OGMRIP_ENCODE_GTK_H__ */
 

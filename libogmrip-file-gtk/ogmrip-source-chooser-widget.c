@@ -1,4 +1,4 @@
-/* OGMRip - A library for DVD ripping and encoding
+/* OGMRipFile - A file library for OGMRip
  * Copyright (C) 2004-2011 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -30,8 +30,6 @@
 #include "ogmrip-source-chooser-widget.h"
 #include "ogmrip-file-chooser-dialog.h"
 #include "ogmrip-error-dialog.h"
-
-#include "ogmrip-helper.h"
 
 #include <glib/gi18n-lib.h>
 

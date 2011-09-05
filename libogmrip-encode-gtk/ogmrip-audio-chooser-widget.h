@@ -19,9 +19,9 @@
 #ifndef __OGMRIP_AUDIO_CHOOSER_WIDGET_H__
 #define __OGMRIP_AUDIO_CHOOSER_WIDGET_H__
 
+#include <ogmrip-file-gtk.h>
 #include <ogmrip-list-item.h>
 #include <ogmrip-audio-options.h>
-#include <ogmrip-source-chooser-widget.h>
 
 G_BEGIN_DECLS
 

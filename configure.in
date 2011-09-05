@@ -449,6 +449,7 @@ libogmrip-job/Makefile
 libogmrip-media/Makefile
 libogmrip-media-gtk/Makefile
 libogmrip-file/Makefile
+libogmrip-file-gtk/Makefile
 libogmrip-dvd/Makefile
 libogmrip-dvd-gtk/Makefile
 libogmrip-encode/Makefile
@@ -460,6 +461,7 @@ data/ogmrip-job.pc
 data/ogmrip-media.pc
 data/ogmrip-media-gtk.pc
 data/ogmrip-file.pc
+data/ogmrip-file-gtk.pc
 data/ogmrip-dvd.pc
 data/ogmrip-dvd-gtk.pc
 data/ogmrip-encode.pc

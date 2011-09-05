@@ -21,8 +21,9 @@
 #endif
 
 #include "ogmrip-audio-options-dialog.h"
-#include "ogmrip-language-chooser-widget.h"
 #include "ogmrip-helper.h"
+
+#include <ogmrip-media-gtk.h>
 
 #include <glib/gi18n-lib.h>
 

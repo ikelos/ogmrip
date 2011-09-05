@@ -24,6 +24,7 @@ ogmrip_LDADD = \
   $(top_builddir)/libogmrip-media/libogmrip-media.la     \
   $(top_builddir)/libogmrip-media-gtk/libogmrip-media-gtk.la \
   $(top_builddir)/libogmrip-file/libogmrip-file.la       \
+  $(top_builddir)/libogmrip-file-gtk/libogmrip-file-gtk.la \
   $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la         \
   $(top_builddir)/libogmrip-dvd-gtk/libogmrip-dvd-gtk.la \
   $(top_builddir)/libogmrip-job/libogmrip-job.la         \
@@ -34,6 +35,7 @@ INCLUDES = \
   -I$(top_srcdir)/libogmrip-media      \
   -I$(top_srcdir)/libogmrip-media-gtk  \
   -I$(top_srcdir)/libogmrip-file       \
+  -I$(top_srcdir)/libogmrip-file-gtk   \
   -I$(top_srcdir)/libogmrip-dvd        \
   -I$(top_srcdir)/libogmrip-dvd-gtk    \
   -I$(top_srcdir)/libogmrip-job        \

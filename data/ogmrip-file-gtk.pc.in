@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: ogmrip-file-gtk
+Description: ogmrip-file-gtk is a collection of widgets to display media informations.
+Requires: gtk+-2.0 ogmrip-media ogmrip-file
+Version: @VERSION@
+Libs: -L${libdir} -logmrip-file-gtk
+Cflags: -I${includedir}/ogmrip-file
+

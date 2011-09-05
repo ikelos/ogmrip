@@ -1,4 +1,4 @@
-/* OGMRip - A library for DVD ripping and encoding
+/* OGMRipFile - A file library for OGMRip
  * Copyright (C) 2004-2011 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,22 +20,20 @@
 #include "config.h"
 #endif
 
-#include "ogmrip-audio-file-chooser-dialog.h"
-
-#include <ogmrip-file.h>
+#include "ogmrip-subp-file-chooser-dialog.h"
 
 #include <glib/gi18n-lib.h>
 
-static void ogmrip_audio_file_chooser_dialog_constructed (GObject *gobject);
+static void ogmrip_subp_file_chooser_dialog_constructed (GObject *gobject);
 
 static OGMRipFile *
-ogmrip_audio_file_chooser_dialog_get_file (OGMRipFileChooserDialog *dialog, GError **error)
+ogmrip_subp_file_chooser_dialog_get_file (OGMRipFileChooserDialog *dialog, GError **error)
 {
   OGMRipMedia *file;
   gchar *uri;
 
   uri = gtk_file_chooser_get_uri (GTK_FILE_CHOOSER (dialog));
-  file = ogmrip_audio_file_new (uri);
+  file = ogmrip_subp_file_new (uri);
   g_free (uri);
 
   if (!file)
@@ -47,30 +45,30 @@ ogmrip_audio_file_chooser_dialog_get_file (OGMRipFileChooserDialog *dialog, GErr
   return OGMRIP_FILE (file);
 }
 
-G_DEFINE_TYPE (OGMRipAudioFileChooserDialog, ogmrip_audio_file_chooser_dialog, OGMRIP_TYPE_FILE_CHOOSER_DIALOG);
+G_DEFINE_TYPE (OGMRipSubpFileChooserDialog, ogmrip_subp_file_chooser_dialog, OGMRIP_TYPE_FILE_CHOOSER_DIALOG);
 
 static void
-ogmrip_audio_file_chooser_dialog_class_init (OGMRipAudioFileChooserDialogClass *klass)
+ogmrip_subp_file_chooser_dialog_class_init (OGMRipSubpFileChooserDialogClass *klass)
 {
   GObjectClass *gobject_class;
   OGMRipFileChooserDialogClass *dialog_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->constructed = ogmrip_audio_file_chooser_dialog_constructed;
+  gobject_class->constructed = ogmrip_subp_file_chooser_dialog_constructed;
 
   dialog_class = OGMRIP_FILE_CHOOSER_DIALOG_CLASS (klass);
-  dialog_class->get_file = ogmrip_audio_file_chooser_dialog_get_file;
+  dialog_class->get_file = ogmrip_subp_file_chooser_dialog_get_file;
 }
 
 static void
-ogmrip_audio_file_chooser_dialog_init (OGMRipAudioFileChooserDialog *dialog)
+ogmrip_subp_file_chooser_dialog_init (OGMRipSubpFileChooserDialog *dialog)
 {
 }
 
 static void
-ogmrip_audio_file_chooser_dialog_constructed (GObject *gobject)
+ogmrip_subp_file_chooser_dialog_constructed (GObject *gobject)
 {
-  OGMRipAudioFileChooserDialog *dialog = OGMRIP_AUDIO_FILE_CHOOSER_DIALOG (gobject);
+  OGMRipSubpFileChooserDialog *dialog = OGMRIP_SUBP_FILE_CHOOSER_DIALOG (gobject);
   GtkFileFilter *filter;
 
   gtk_file_chooser_set_action (GTK_FILE_CHOOSER (dialog), GTK_FILE_CHOOSER_ACTION_OPEN);
@@ -79,19 +77,18 @@ ogmrip_audio_file_chooser_dialog_constructed (GObject *gobject)
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
   gtk_dialog_set_alternative_button_order (GTK_DIALOG (dialog),
       GTK_RESPONSE_ACCEPT, GTK_RESPONSE_REJECT, -1);
-  gtk_window_set_title (GTK_WINDOW (dialog), _("Select an audio file"));
+  gtk_window_set_title (GTK_WINDOW (dialog), _("Select a subtitles file"));
 
   filter = gtk_file_filter_new ();
-  gtk_file_filter_add_mime_type (filter, "audio/?*");
-  gtk_file_filter_add_mime_type (filter, "application/ogg");
+  gtk_file_filter_add_mime_type (filter, "text/?*");
   gtk_file_chooser_set_filter (GTK_FILE_CHOOSER (dialog), filter);
 
-  G_OBJECT_CLASS (ogmrip_audio_file_chooser_dialog_parent_class)->constructed (gobject);
+  G_OBJECT_CLASS (ogmrip_subp_file_chooser_dialog_parent_class)->constructed (gobject);
 }
 
 GtkWidget *
-ogmrip_audio_file_chooser_dialog_new (void)
+ogmrip_subp_file_chooser_dialog_new (void)
 {
-  return g_object_new (OGMRIP_TYPE_AUDIO_FILE_CHOOSER_DIALOG, NULL);
+  return g_object_new (OGMRIP_TYPE_SUBP_FILE_CHOOSER_DIALOG, NULL);
 }
 

@@ -19,9 +19,9 @@
 #ifndef __OGMRIP_SUBP_CHOOSER_WIDGET_H__
 #define __OGMRIP_SUBP_CHOOSER_WIDGET_H__
 
+#include <ogmrip-file-gtk.h>
 #include <ogmrip-list-item.h>
 #include <ogmrip-subp-options.h>
-#include <ogmrip-source-chooser-widget.h>
 
 G_BEGIN_DECLS
 

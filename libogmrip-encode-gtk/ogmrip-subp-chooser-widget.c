@@ -21,8 +21,9 @@
 #endif
 
 #include "ogmrip-subp-chooser-widget.h"
-#include "ogmrip-subp-file-chooser-dialog.h"
 #include "ogmrip-subp-options-dialog.h"
+
+#include <ogmrip-file-gtk.h>
 
 #include <glib/gi18n-lib.h>
 
