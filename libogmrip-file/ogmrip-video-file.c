@@ -37,11 +37,37 @@ ogmrip_media_info_get_video_format (OGMRipMediaInfo *info)
   if (!str)
     return OGMRIP_FORMAT_UNDEFINED;
 
+  if (g_str_equal (str, "MPEG Video"))
+  {
+    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "Format_Version");
+
+    if (str && g_str_equal (str, "Version 1"))
+      return OGMRIP_FORMAT_MPEG1;
+
+    if (str && g_str_equal (str, "Version 2"))
+      return OGMRIP_FORMAT_MPEG2;
+
+    return OGMRIP_FORMAT_UNDEFINED;
+  }
+
   if (g_str_equal (str, "MPEG-4 Visual"))
     return OGMRIP_FORMAT_MPEG4;
 
   if (g_str_equal (str, "AVC"))
     return OGMRIP_FORMAT_H264;
+
+  if (g_str_equal (str, "Dirac"))
+    return OGMRIP_FORMAT_DIRAC;
+
+  if (g_str_equal (str, "Theora"))
+    return OGMRIP_FORMAT_THEORA;
+
+  if (g_str_equal (str, "VP8"))
+    return OGMRIP_FORMAT_VP8;
+
+  /*
+   * TODO MJPEG
+   */
 
   return OGMRIP_FORMAT_UNDEFINED;
 }
