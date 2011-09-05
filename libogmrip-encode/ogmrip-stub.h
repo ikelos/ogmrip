@@ -24,6 +24,30 @@
 
 G_BEGIN_DECLS
 
+#define OGMRIP_TYPE_STUB          (ogmrip_stub_get_type ())
+#define OGMRIP_STUB(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_STUB, OGMRipStub))
+#define OGMRIP_STUB_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_STUB, OGMRipStubClass))
+#define OGMRIP_IS_STUB(obj)       (G_TYPE_CHECK_INSTANCE_TYPE ((obj), OGMRIP_TYPE_STUB))
+#define OGMRIP_IS_STUB_CLASS(obj) (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_STUB))
+
+typedef struct _OGMRipStub      OGMRipStub;
+typedef struct _OGMRipStubClass OGMRipStubClass;
+typedef struct _OGMRipStubPriv       OGMRipStubPriv;
+
+struct _OGMRipStub
+{
+  OGMRipFile parent_instance;
+
+  OGMRipStubPriv *priv;
+};
+
+struct _OGMRipStubClass
+{
+  OGMRipVideoFileClass parent_class;
+};
+
+GType ogmrip_stub_get_type (void) G_GNUC_CONST;
+
 #define OGMRIP_TYPE_VIDEO_STUB          (ogmrip_video_stub_get_type ())
 #define OGMRIP_VIDEO_STUB(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_VIDEO_STUB, OGMRipVideoStub))
 #define OGMRIP_VIDEO_STUB_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_VIDEO_STUB, OGMRipVideoStubClass))
@@ -32,18 +56,15 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipVideoStub      OGMRipVideoStub;
 typedef struct _OGMRipVideoStubClass OGMRipVideoStubClass;
-typedef struct _OGMRipStubPriv       OGMRipStubPriv;
 
 struct _OGMRipVideoStub
 {
-  OGMRipVideoFile parent_instance;
-
-  OGMRipStubPriv *priv;
+  OGMRipStub parent_instance;
 };
 
 struct _OGMRipVideoStubClass
 {
-  OGMRipVideoFileClass parent_class;
+  OGMRipStubClass parent_class;
 };
 
 GType ogmrip_video_stub_get_type (void) G_GNUC_CONST;
@@ -59,14 +80,12 @@ typedef struct _OGMRipAudioStubClass OGMRipAudioStubClass;
 
 struct _OGMRipAudioStub
 {
-  OGMRipAudioFile parent_instance;
-
-  OGMRipStubPriv *priv;
+  OGMRipStub parent_instance;
 };
 
 struct _OGMRipAudioStubClass
 {
-  OGMRipAudioFileClass parent_class;
+  OGMRipStubClass parent_class;
 };
 
 GType ogmrip_audio_stub_get_type (void) G_GNUC_CONST;
@@ -82,14 +101,12 @@ typedef struct _OGMRipSubpStubClass OGMRipSubpStubClass;
 
 struct _OGMRipSubpStub
 {
-  OGMRipSubpFile parent_instance;
-
-  OGMRipStubPriv *priv;
+  OGMRipStub parent_instance;
 };
 
 struct _OGMRipSubpStubClass
 {
-  OGMRipSubpFileClass parent_class;
+  OGMRipStubClass parent_class;
 };
 
 GType ogmrip_subp_stub_get_type (void) G_GNUC_CONST;
