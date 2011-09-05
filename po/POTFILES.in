@@ -29,20 +29,21 @@ libogmrip-media-gtk/ogmrip-chapter-store.c
 libogmrip-media-gtk/ogmrip-chapter-view.c
 libogmrip-media-gtk/ogmrip-title-chooser-widget.c
 
+libogmrip-file-gtk/ogmrip-audio-file-chooser-dialog.c
+libogmrip-file-gtk/ogmrip-file-chooser-dialog.c
+libogmrip-file-gtk/ogmrip-source-chooser-widget.c
+libogmrip-file-gtk/ogmrip-subp-file-chooser-dialog.c
+
 libogmrip-dvd-gtk/ogmdvd-drive-chooser-dialog.c
 libogmrip-dvd-gtk/ogmdvd-drive-chooser-widget.c
 
-libogmrip-encode-gtk/ogmrip-audio-file-chooser-dialog.c
 libogmrip-encode-gtk/ogmrip-audio-options-dialog.c
 libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c
-libogmrip-encode-gtk/ogmrip-file-chooser-dialog.c
 libogmrip-encode-gtk/ogmrip-helper.c
 libogmrip-encode-gtk/ogmrip-list-item.c
 libogmrip-encode-gtk/ogmrip-profile-editor-dialog.c
 libogmrip-encode-gtk/ogmrip-profile-manager-dialog.c
 libogmrip-encode-gtk/ogmrip-progress-dialog.c
-libogmrip-encode-gtk/ogmrip-source-chooser-widget.c
-libogmrip-encode-gtk/ogmrip-subp-file-chooser-dialog.c
 libogmrip-encode-gtk/ogmrip-subp-options-dialog.c
 
 src/ogmrip-crop-dialog.c
