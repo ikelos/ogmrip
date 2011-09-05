@@ -150,7 +150,7 @@ ogmrip_stream_iface_init (OGMRipStreamInterface *iface)
 static void
 ogmrip_stub_init (OGMRipStub *stub)
 {
-  stub->priv = G_TYPE_INSTANCE_GET_PRIVATE (stub, OGMRIP_TYPE_VIDEO_STUB, OGMRipStubPriv);
+  stub->priv = G_TYPE_INSTANCE_GET_PRIVATE (stub, OGMRIP_TYPE_STUB, OGMRipStubPriv);
 }
 
 static void
@@ -162,6 +162,10 @@ ogmrip_stub_class_init (OGMRipStubClass *klass)
   gobject_class->dispose = ogmrip_stub_dispose;
   gobject_class->get_property = ogmrip_stub_get_property;
   gobject_class->set_property = ogmrip_stub_set_property;
+
+  g_object_class_install_property (gobject_class, PROP_CODEC,
+      g_param_spec_object ("codec", "Codec property", "Set codec",
+        OGMRIP_TYPE_CODEC, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipStubPriv));
 }
@@ -424,7 +428,7 @@ ogmrip_subp_iface_init (OGMRipSubpStreamInterface *iface)
   iface->get_newline = ogmrip_subp_stub_get_newline;
 }
 
-G_DEFINE_TYPE_WITH_CODE (OGMRipSubpStub, ogmrip_subp_stub, OGMRIP_TYPE_SUBP_FILE,
+G_DEFINE_TYPE_WITH_CODE (OGMRipSubpStub, ogmrip_subp_stub, OGMRIP_TYPE_STUB,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_SUBP_STREAM, ogmrip_subp_iface_init));
 
 static void
@@ -478,7 +482,7 @@ ogmrip_chapters_iface_init (OGMRipChaptersStreamInterface *iface)
   iface->get_language = ogmrip_chapters_stub_get_language;
 }
 
-G_DEFINE_TYPE_WITH_CODE (OGMRipChaptersStub, ogmrip_chapters_stub, OGMRIP_TYPE_FILE,
+G_DEFINE_TYPE_WITH_CODE (OGMRipChaptersStub, ogmrip_chapters_stub, OGMRIP_TYPE_STUB,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_CHAPTERS_STREAM, ogmrip_chapters_iface_init));
 
 static void
