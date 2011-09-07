@@ -63,6 +63,7 @@ void
 ogmrip_subp_options_set_charset (OGMRipSubpOptions *options, OGMRipCharset charset)
 {
   g_return_if_fail (OGMRIP_IS_SUBP_OPTIONS (options));
+  g_return_if_fail (charset > OGMRIP_CHARSET_UNDEFINED);
 
   g_object_set (options, "charset", charset, NULL);
 }
@@ -124,6 +125,7 @@ void
 ogmrip_subp_options_set_newline (OGMRipSubpOptions *options, OGMRipNewline newline)
 {
   g_return_if_fail (OGMRIP_IS_SUBP_OPTIONS (options));
+  g_return_if_fail (newline > OGMRIP_NEWLINE_UNDEFINED);
 
   g_object_set (options, "newline", newline, NULL);
 }
