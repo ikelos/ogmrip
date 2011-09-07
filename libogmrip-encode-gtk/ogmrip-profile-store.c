@@ -51,7 +51,7 @@ static void ogmrip_profile_store_set_property (GObject      *gobject,
                                                guint        property_id,
                                                const GValue *value,
                                                GParamSpec   *pspec);
-/*
+
 static void
 ogmrip_profile_store_name_changed (OGMRipProfileStore *store, gchar *key, OGMRipProfile *profile)
 {
@@ -66,7 +66,7 @@ ogmrip_profile_store_name_changed (OGMRipProfileStore *store, gchar *key, OGMRip
     g_free (name);
   }
 }
-*/
+
 static void
 ogmrip_profile_store_add (OGMRipProfileStore *store, OGMRipProfile *profile)
 {
@@ -80,13 +80,9 @@ ogmrip_profile_store_add (OGMRipProfileStore *store, OGMRipProfile *profile)
       OGMRIP_PROFILE_STORE_NAME_COLUMN,    name,
       OGMRIP_PROFILE_STORE_PROFILE_COLUMN, profile,
       -1);
-  /*
-   * TODO Handle renaming of profiles
-   */
-/*
+
   g_signal_connect_swapped (profile, "changed::" OGMRIP_PROFILE_NAME,
       G_CALLBACK (ogmrip_profile_store_name_changed), store);
-*/
 }
 
 static void
@@ -97,10 +93,29 @@ ogmrip_profile_store_remove (OGMRipProfileStore *store, OGMRipProfile *profile)
   if (ogmrip_profile_store_get_iter (store, &iter, profile))
   {
     gtk_list_store_remove (GTK_LIST_STORE (store), &iter);
-/*
     g_signal_handlers_disconnect_by_func (profile,
-        ogmrip_profile_store_name_setting_changed, store);
-*/
+        ogmrip_profile_store_name_changed, store);
+  }
+}
+
+static void
+ogmrip_profile_store_clear (OGMRipProfileStore *store)
+{
+  GtkTreeIter iter;
+
+  if (gtk_tree_model_get_iter_first (GTK_TREE_MODEL (store), &iter))
+  {
+    OGMRipProfile *profile;
+
+    do
+    {
+      gtk_tree_model_get (GTK_TREE_MODEL (store), &iter,
+          OGMRIP_PROFILE_STORE_PROFILE_COLUMN, &profile, -1);
+      if (profile)
+        g_signal_handlers_disconnect_by_func (profile,
+            ogmrip_profile_store_name_changed, store);
+    }
+    while (gtk_list_store_remove (GTK_LIST_STORE (store), &iter));
   }
 }
 
@@ -181,6 +196,8 @@ ogmrip_profile_store_dispose (GObject *gobject)
 {
   OGMRipProfileStore *store = OGMRIP_PROFILE_STORE (gobject);
 
+  ogmrip_profile_store_clear (store);
+
   if (store->priv->engine)
   {
     g_signal_handlers_disconnect_by_func (store->priv->engine,
@@ -242,7 +259,7 @@ ogmrip_profile_store_reload (OGMRipProfileStore *store)
 
   g_return_if_fail (OGMRIP_IS_PROFILE_STORE (store));
 
-  gtk_list_store_clear (GTK_LIST_STORE (store));
+  ogmrip_profile_store_clear (store);
 
   list = ogmrip_profile_engine_get_list (store->priv->engine);
   for (link = list; link; link = link->next)
