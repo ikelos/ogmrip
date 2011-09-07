@@ -53,7 +53,7 @@ ogmrip_mplayer_map_audio_id (OGMRipStream *astream)
     case OGMRIP_FORMAT_DTS:
       aid += 136;
       break;
-    case OGMRIP_FORMAT_LPCM:
+    case OGMRIP_FORMAT_PCM:
       aid += 160;
       break;
     default:

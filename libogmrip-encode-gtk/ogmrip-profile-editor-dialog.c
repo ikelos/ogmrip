@@ -307,12 +307,7 @@ ogmrip_profile_editor_set_quality_options_sensitivity (GBinding *binding, const 
   type = ogmrip_codec_chooser_get_active_type (GTK_COMBO_BOX (chooser));
   format = type != G_TYPE_NONE ? ogmrip_plugin_get_audio_codec_format (type) : -1;
 
-  g_value_set_boolean (target_value,
-      format != -1 &&
-      format != OGMRIP_FORMAT_COPY &&
-      format != OGMRIP_FORMAT_PCM  &&
-      format != OGMRIP_FORMAT_BPCM &&
-      format != OGMRIP_FORMAT_LPCM);
+  g_value_set_boolean (target_value, format != -1 && format != OGMRIP_FORMAT_COPY && format != OGMRIP_FORMAT_PCM);
 
   return TRUE;
 }

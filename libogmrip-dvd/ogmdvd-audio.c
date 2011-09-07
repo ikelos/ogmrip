@@ -68,7 +68,7 @@ ogmdvd_audio_stream_get_format (OGMRipStream *stream)
     case OGMDVD_AUDIO_FORMAT_AC3:
       return OGMRIP_FORMAT_AC3;
     case OGMDVD_AUDIO_FORMAT_LPCM:
-      return OGMRIP_FORMAT_LPCM;
+      return OGMRIP_FORMAT_PCM;
     case OGMDVD_AUDIO_FORMAT_DTS:
       return OGMRIP_FORMAT_DTS;
     default:

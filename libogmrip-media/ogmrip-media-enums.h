@@ -217,8 +217,6 @@ typedef enum
  * @OGMRIP_FORMAT_MPL_2: The MPlayer version subtitle format
  * @OGMRIP_FORMAT_VOBSUB: The VobSub subtitle format
  * @OGMRIP_FORMAT_COPY: A format for internal use only
- * @OGMRIP_FORMAT_LPCM: The LPCM audio format
- * @OGMRIP_FORMAT_BPCM: The BPCM audio format
  * @OGMRIP_FORMAT_MP2: The MP2 video format
  * @OGMRIP_FORMAT_MJPEG: The MJPEG video format
  * @OGMRIP_FORMAT_FLAC: The Flac audio format
@@ -258,8 +256,6 @@ typedef enum
   OGMRIP_FORMAT_MPL_2,
   OGMRIP_FORMAT_VOBSUB,
   OGMRIP_FORMAT_COPY,
-  OGMRIP_FORMAT_LPCM,
-  OGMRIP_FORMAT_BPCM,
   OGMRIP_FORMAT_MP2,
   OGMRIP_FORMAT_MJPEG,
   OGMRIP_FORMAT_FLAC,
@@ -284,8 +280,6 @@ typedef enum
                                            (format) == OGMRIP_FORMAT_DTS    || \
                                            (format) == OGMRIP_FORMAT_AAC    || \
                                            (format) == OGMRIP_FORMAT_VORBIS || \
-                                           (format) == OGMRIP_FORMAT_LPCM   || \
-                                           (format) == OGMRIP_FORMAT_BPCM   || \
                                            (format) == OGMRIP_FORMAT_FLAC)
 
 #define OGMRIP_IS_SUBP_FORMAT(format)     ((format) == OGMRIP_FORMAT_MICRODVD   || \

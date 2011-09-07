@@ -62,11 +62,7 @@ ogmrip_media_info_get_audio_format (OGMRipMediaInfo *info)
     return OGMRIP_FORMAT_VORBIS;
 
   if (g_str_equal (str, "PCM"))
-    return OGMRIP_FORMAT_VORBIS;
-
-  /*
-   * TODO LPCM, BPCM
-   */
+    return OGMRIP_FORMAT_PCM;
 
   return OGMRIP_FORMAT_UNDEFINED;
 }
