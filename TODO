@@ -1,5 +1,5 @@
 ogmrip-main.c
-- hardsub
+- mise à jour des profils
 
 ogmrip-options-dialog.c
 - test de compressibilité
@@ -7,17 +7,14 @@ ogmrip-options-dialog.c
 ogmrip-encoding-manager.c
 - comment connaitre les encodages non faits ?
 
-ogmrip-codec.c
-- ajouter set_profile
-
 ogmrip-copy.c
 - vérifier si une copie existe déjà
 
-ogmrip-main.c
-- ajouter fichier de log
-
 ogmrip-mp4.c
 - comment savoir si la vidéo a été encodée avec global_header ?
+
+ogmrip-video-file.c
+- ajouter delai
 
 ogmrip-xvid.glade
 - ajouter trellis, qpel, grayscale, cartoon, b frames
@@ -27,3 +24,6 @@ ogmrip-lavc.glade
 
 ogmrip-x264.glade
 - ajouter trellis, partitions, b frames
+
+modules
+- utiliser giomodule et extension points ?
