@@ -267,7 +267,10 @@ ogmrip_profile_copy_section (OGMRipProfile *profile1, OGMRipProfile *profile2, c
 
   dst = ogmrip_profile_get_child (profile2, name);
   if (!dst)
+  {
+    g_object_unref (src);
     return;
+  }
 
   keys = g_settings_list_keys (src);
   for (i = 0; keys[i]; i ++)
@@ -278,6 +281,9 @@ ogmrip_profile_copy_section (OGMRipProfile *profile1, OGMRipProfile *profile2, c
     g_free (keys[i]);
   }
   g_free (keys);
+
+  g_object_unref (src);
+  g_object_unref (dst);
 }
 
 OGMRipProfile *
@@ -401,6 +407,7 @@ ogmrip_profile_get (OGMRipProfile *profile, const gchar *section, const gchar *k
   g_assert (settings != NULL);
 
   value = g_settings_get_value (settings, key);
+  g_object_unref (settings);
 
   va_start (ap, format);
   g_variant_get_va (value, format, NULL, &ap);
@@ -414,6 +421,7 @@ ogmrip_profile_set (OGMRipProfile *profile, const gchar *section, const gchar *k
 {
   GSettings *settings;
   GVariant *value;
+  gboolean retval;
   va_list ap;
 
   g_return_val_if_fail (OGMRIP_IS_PROFILE (profile), FALSE);
@@ -425,7 +433,10 @@ ogmrip_profile_set (OGMRipProfile *profile, const gchar *section, const gchar *k
   settings = ogmrip_profile_get_child (profile, section);
   g_assert (settings != NULL);
 
-  return g_settings_set_value (settings, key, value);
+  retval = g_settings_set_value (settings, key, value);
+  g_object_unref (settings);
+
+  return retval;
 }
 
 static GSettings *
@@ -452,16 +463,16 @@ GSettings *
 ogmrip_profile_get_child (OGMRipProfile *profile, const gchar *name)
 {
   if (g_str_equal (name, OGMRIP_PROFILE_GENERAL))
-    return profile->priv->general_settings;
+    return g_object_ref (profile->priv->general_settings);
 
   if (g_str_equal (name, OGMRIP_PROFILE_VIDEO))
-    return profile->priv->video_settings;
+    return g_object_ref (profile->priv->video_settings);
 
   if (g_str_equal (name, OGMRIP_PROFILE_AUDIO))
-    return profile->priv->audio_settings;
+    return g_object_ref (profile->priv->audio_settings);
 
   if (g_str_equal (name, OGMRIP_PROFILE_SUBP))
-    return profile->priv->subp_settings;
+    return g_object_ref (profile->priv->subp_settings);
 
   if (g_str_equal (name, profile->priv->container))
     return ogmrip_profile_get_child_for_codec (profile, name);

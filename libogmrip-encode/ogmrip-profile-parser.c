@@ -63,6 +63,8 @@ ogmrip_profile_parse_section (OGMRipProfile *profile, OGMRipXML *xml)
 
     ogmrip_xml_parent (xml);
   }
+
+  g_object_unref (settings);
 }
 
 gboolean
@@ -138,6 +140,8 @@ ogmrip_profile_dump_section (OGMRipProfile *profile, OGMRipXML *xml, const gchar
     g_free (keys);
 
     ogmrip_xml_parent (xml);
+
+    g_object_unref (settings);
   }
 }
 

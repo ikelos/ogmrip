@@ -570,6 +570,8 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
   misc = gtk_builder_get_widget (builder, "quantizer-hbox");
   g_object_bind_property (widget, "sensitive", misc, "sensitive", G_BINDING_SYNC_CREATE);
 
+  g_object_unref (settings);
+
   /*
    * Video
    */
@@ -675,6 +677,8 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
   g_settings_bind_with_mapping (settings, OGMRIP_PROFILE_MAX_HEIGHT, widget, "sensitive", G_SETTINGS_BIND_GET,
       ogmrip_profile_editor_set_expand_sensitivity, NULL, settings, NULL);
 
+  g_object_unref (settings);
+
   /*
    * Audio
    */
@@ -727,6 +731,8 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
   misc = gtk_builder_get_widget (builder, "audio-options-table");
   g_object_bind_property (widget, "sensitive", misc, "sensitive", G_BINDING_SYNC_CREATE);
 
+  g_object_unref (settings);
+
   /*
    * Subp
    */
@@ -772,6 +778,8 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
 
   misc = gtk_builder_get_widget (builder, "subp-options-table");
   g_object_bind_property (widget, "sensitive", misc, "sensitive", G_BINDING_SYNC_CREATE);
+
+  g_object_unref (settings);
 
   g_object_unref (builder);
 

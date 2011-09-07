@@ -797,6 +797,8 @@ ogmrip_main_create_container (OGMRipData *data, OGMRipProfile *profile)
       g_settings_get_uint (settings, OGMRIP_PROFILE_TARGET_NUMBER),
       g_settings_get_uint (settings, OGMRIP_PROFILE_TARGET_SIZE));
 
+  g_object_unref (settings);
+
   return container;
 }
 
@@ -860,9 +862,7 @@ ogmrip_main_create_video_codec (OGMRipData *data, OGMRipProfile *profile,
     ogmrip_video_codec_set_quantizer (OGMRIP_VIDEO_CODEC (codec),
         g_settings_get_double (settings, OGMRIP_PROFILE_QUANTIZER));
 
-  /*
-   * TODO hardsub
-   */
+  g_object_unref (settings);
 
   return codec;
 }
@@ -941,7 +941,6 @@ ogmrip_main_create_subp_codec (OGMRipData *data, OGMRipProfile *profile,
 {
   OGMRipSubpOptions *options;
   OGMRipCodec *codec;
-  GSettings *settings;
   GType type;
 
   options = ogmrip_subp_chooser_widget_get_options (OGMRIP_SUBP_CHOOSER_WIDGET (chooser));
@@ -956,8 +955,6 @@ ogmrip_main_create_subp_codec (OGMRipData *data, OGMRipProfile *profile,
   codec = g_object_new (type, "input", stream, NULL);
   if (!codec)
     return NULL;
-
-  settings = ogmrip_profile_get_child (profile, OGMRIP_PROFILE_SUBP);
 
   ogmrip_codec_set_chapters (codec, start_chap, end_chap);
   ogmrip_subp_codec_set_label (OGMRIP_SUBP_CODEC (codec),
@@ -976,12 +973,18 @@ ogmrip_main_create_subp_codec (OGMRipData *data, OGMRipProfile *profile,
   }
   else
   {
+    GSettings *settings;
+
+    settings = ogmrip_profile_get_child (profile, OGMRIP_PROFILE_SUBP);
+
     ogmrip_subp_codec_set_charset (OGMRIP_SUBP_CODEC (codec),
         g_settings_get_uint (settings, OGMRIP_PROFILE_CHARACTER_SET));
     ogmrip_subp_codec_set_newline (OGMRIP_SUBP_CODEC (codec),
         g_settings_get_uint (settings, OGMRIP_PROFILE_NEWLINE_STYLE));
     ogmrip_subp_codec_set_forced_only (OGMRIP_SUBP_CODEC (codec),
         g_settings_get_boolean (settings, OGMRIP_PROFILE_FORCED_ONLY));
+
+    g_object_unref (settings);
   }
 
   return codec;

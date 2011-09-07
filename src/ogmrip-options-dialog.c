@@ -285,8 +285,11 @@ ogmrip_options_dialog_set_sensitivity (OGMRipOptionsDialog *dialog, OGMRipProfil
     scaler = g_settings_get_uint (settings, OGMRIP_PROFILE_SCALER);
     can_crop = g_settings_get_boolean (settings, OGMRIP_PROFILE_CAN_CROP);
 
+    g_object_unref (settings); 
+
     settings = ogmrip_profile_get_child (profile, OGMRIP_PROFILE_GENERAL);
     method = g_settings_get_uint (settings, OGMRIP_PROFILE_ENCODING_METHOD);
+    g_object_unref (settings); 
   }
 
   sensitive = gtk_widget_is_sensitive (dialog->priv->crop_check);
@@ -511,9 +514,6 @@ ogmrip_options_dialog_crop_and_test (OGMRipOptionsDialog *parent, gboolean crop,
     {
       ogmrip_progress_dialog_set_message (OGMRIP_PROGRESS_DIALOG (dialog), _("Running the compressibility test"));
 
-      /*
-       * TODO Compressibility test
-       */
       spawn = ogmrip_test_new (NULL);
       g_signal_connect (dialog, "response", G_CALLBACK (ogmrip_progress_dialog_response_cb), spawn);
 
