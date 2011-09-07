@@ -37,6 +37,20 @@ struct _OGMRipAudioOptionsInterface
   GTypeInterface base_iface;
 };
 
+typedef enum
+{
+  OGMRIP_SAMPLE_RATE_UNDEFINED = -1,
+  OGMRIP_SAMPLE_RATE_48000,
+  OGMRIP_SAMPLE_RATE_44100,
+  OGMRIP_SAMPLE_RATE_32000,
+  OGMRIP_SAMPLE_RATE_24000,
+  OGMRIP_SAMPLE_RATE_22050,
+  OGMRIP_SAMPLE_RATE_16000,
+  OGMRIP_SAMPLE_RATE_12000,
+  OGMRIP_SAMPLE_RATE_11025,
+  OGMRIP_SAMPLE_RATE_8000
+} OGMRipSampleRate;
+
 GType    ogmrip_audio_options_get_type        (void);
 guint    ogmrip_audio_options_get_channels    (OGMRipAudioOptions  *options);
 void     ogmrip_audio_options_set_channels    (OGMRipAudioOptions  *options,
@@ -52,7 +66,7 @@ void     ogmrip_audio_options_set_quality     (OGMRipAudioOptions  *options,
                                                guint               quality);
 guint    ogmrip_audio_options_get_sample_rate (OGMRipAudioOptions  *options);
 void     ogmrip_audio_options_set_sample_rate (OGMRipAudioOptions  *options,
-                                               guint               srate);
+                                               OGMRipSampleRate    srate);
 
 G_END_DECLS
 

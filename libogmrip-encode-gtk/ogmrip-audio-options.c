@@ -43,7 +43,8 @@ ogmrip_audio_options_default_init (OGMRipAudioOptionsInterface *iface)
 
   g_object_interface_install_property (iface,
       g_param_spec_uint ("sample-rate", "Sample rate property", "Set sample rate",
-        0, G_MAXUINT, 48000, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+        OGMRIP_SAMPLE_RATE_48000, OGMRIP_SAMPLE_RATE_8000, OGMRIP_SAMPLE_RATE_48000,
+        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 }
 
 guint
@@ -62,6 +63,7 @@ void
 ogmrip_audio_options_set_channels (OGMRipAudioOptions *options, OGMRipChannels channels)
 {
   g_return_if_fail (OGMRIP_IS_AUDIO_OPTIONS (options));
+  g_return_if_fail (channels > OGMRIP_CHANNELS_UNDEFINED);
 
   g_object_set (options, "channels", channels, NULL);
 }
@@ -140,9 +142,10 @@ ogmrip_audio_options_get_sample_rate (OGMRipAudioOptions *options)
 }
 
 void
-ogmrip_audio_options_set_sample_rate (OGMRipAudioOptions *options, guint srate)
+ogmrip_audio_options_set_sample_rate (OGMRipAudioOptions *options, OGMRipSampleRate srate)
 {
   g_return_if_fail (OGMRIP_IS_AUDIO_OPTIONS (options));
+  g_return_if_fail (srate > OGMRIP_SAMPLE_RATE_UNDEFINED);
 
   g_object_set (options, "sample-rate", srate, NULL);
 }

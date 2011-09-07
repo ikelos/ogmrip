@@ -867,6 +867,9 @@ ogmrip_main_create_video_codec (OGMRipData *data, OGMRipProfile *profile,
   return codec;
 }
 
+static const gint sample_rate[] =
+{ 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000 };
+
 /*
  * Creates an audio codec
  */
@@ -906,7 +909,7 @@ ogmrip_main_create_audio_codec (OGMRipData *data, OGMRipProfile *profile,
     ogmrip_audio_codec_set_quality (OGMRIP_AUDIO_CODEC (codec),
         ogmrip_audio_options_get_quality (options));
     ogmrip_audio_codec_set_sample_rate (OGMRIP_AUDIO_CODEC (codec),
-        ogmrip_audio_options_get_sample_rate (options));
+        sample_rate[ogmrip_audio_options_get_sample_rate (options)]);
   }
   else
   {
@@ -921,7 +924,9 @@ ogmrip_main_create_audio_codec (OGMRipData *data, OGMRipProfile *profile,
     ogmrip_audio_codec_set_quality (OGMRIP_AUDIO_CODEC (codec),
         g_settings_get_uint (settings, OGMRIP_PROFILE_QUALITY));
     ogmrip_audio_codec_set_sample_rate (OGMRIP_AUDIO_CODEC (codec),
-        g_settings_get_uint (settings, OGMRIP_PROFILE_SAMPLERATE));
+        sample_rate[g_settings_get_uint (settings, OGMRIP_PROFILE_SAMPLERATE)]);
+
+    g_object_unref (settings);
   }
 
   return codec;
