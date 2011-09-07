@@ -50,6 +50,16 @@ ogmrip_media_info_get_video_format (OGMRipMediaInfo *info)
     return OGMRIP_FORMAT_UNDEFINED;
   }
 
+  if (g_str_equal (str, "JPEG"))
+  {
+    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "CodecID");
+
+    if (str && g_str_equal (str, "MJPG"))
+      return OGMRIP_FORMAT_MJPEG;
+
+    return OGMRIP_FORMAT_UNDEFINED;
+  }
+
   if (g_str_equal (str, "MPEG-4 Visual"))
     return OGMRIP_FORMAT_MPEG4;
 
@@ -64,10 +74,6 @@ ogmrip_media_info_get_video_format (OGMRipMediaInfo *info)
 
   if (g_str_equal (str, "VP8"))
     return OGMRIP_FORMAT_VP8;
-
-  /*
-   * TODO MJPEG
-   */
 
   return OGMRIP_FORMAT_UNDEFINED;
 }
@@ -203,10 +209,6 @@ ogmrip_video_file_constructor (GType type, guint n_properties, GObjectConstructP
       else if (video->priv->aspect_num == 16 && video->priv->aspect_denom == 9)
         video->priv->aspect = OGMRIP_ASPECT_4_3;
     }
-
-    /*
-     * TODO delay
-     */
 
     ogmrip_media_info_close (info);
   }
