@@ -192,15 +192,15 @@ ogmrip_x264_dialog_constructed (GObject *gobject)
     return;
   }
 
-  settings = ogmrip_profile_get_child (profile, "lavc");
-  g_assert (settings != NULL);
-
   builder = gtk_builder_new ();
   if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))
   {
     g_critical ("Couldn't load builder file: %s", error->message);
     return;
   }
+
+  settings = ogmrip_profile_get_child (profile, "x264");
+  g_assert (settings != NULL);
 
   misc = gtk_dialog_get_content_area (GTK_DIALOG (gobject));
 
@@ -223,7 +223,7 @@ ogmrip_x264_dialog_constructed (GObject *gobject)
       G_CALLBACK (ogmrip_x264_dialog_profile_changed), dialog);
 */
   widget = gtk_builder_get_widget (builder, "bframes-spin");
-  g_settings_bind (settings, OGMRIP_X264_PROP_MAX_BFRAMES,
+  g_settings_bind (settings, OGMRIP_X264_PROP_B_FRAMES,
       widget, "value", G_SETTINGS_BIND_DEFAULT);
 /*
   g_signal_connect_swapped (widget, "value-changed",
@@ -355,6 +355,7 @@ ogmrip_x264_dialog_constructed (GObject *gobject)
   g_settings_bind (settings, OGMRIP_X264_PROP_RC_LOOKAHEAD,
       widget, "value", G_SETTINGS_BIND_DEFAULT);
 
+  g_object_unref (settings);
   g_object_unref (builder);
 }
 

@@ -88,15 +88,15 @@ ogmrip_xvid_dialog_constructed (GObject *gobject)
     return;
   }
 
-  settings = ogmrip_profile_get_child (profile, "xvid");
-  g_assert (settings != NULL);
-
   builder = gtk_builder_new ();
   if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))
   {
     g_critical ("Couldn't load builder file: %s", error->message);
     return;
   }
+
+  settings = ogmrip_profile_get_child (profile, "xvid");
+  g_assert (settings != NULL);
 
   misc = gtk_dialog_get_content_area (GTK_DIALOG (gobject));
 
@@ -129,7 +129,7 @@ ogmrip_xvid_dialog_constructed (GObject *gobject)
       widget, "active", G_SETTINGS_BIND_DEFAULT);
 
   widget = gtk_builder_get_widget (builder, "max_bframes-spin");
-  g_settings_bind (settings, OGMRIP_XVID_PROP_BFRAMES,
+  g_settings_bind (settings, OGMRIP_XVID_PROP_MAX_BFRAMES,
       widget, "value", G_SETTINGS_BIND_DEFAULT);
 
   g_object_bind_property (misc, "active", widget, "sensitive",
@@ -215,6 +215,7 @@ ogmrip_xvid_dialog_constructed (GObject *gobject)
   g_object_bind_property_full (misc, "active", widget, "sensitive", G_BINDING_SYNC_CREATE,
       ogmrip_xvid_dialog_set_par_sensitivity, NULL, NULL, NULL);
 
+  g_object_unref (settings);
   g_object_unref (builder);
 }
 

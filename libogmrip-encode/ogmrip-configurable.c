@@ -1,5 +1,5 @@
 /* OGMRip - A library for DVD ripping and encoding
- * Copyright (C) 2004-2011 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2010-2011 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,29 +16,27 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef __OGMRIP_ENCODE_H__
-#define __OGMRIP_ENCODE_H__
+#include "ogmrip-configurable.h"
+#include "ogmrip-codec.h"
 
-#include <ogmrip-analyze.h>
-#include <ogmrip-audio-codec.h>
-#include <ogmrip-chapters.h>
-#include <ogmrip-configurable.h>
-#include <ogmrip-container.h>
-#include <ogmrip-copy.h>
-#include <ogmrip-encoding.h>
-#include <ogmrip-encoding-manager.h>
-#include <ogmrip-enums.h>
-#include <ogmrip-fs.h>
-#include <ogmrip-hardsub.h>
-#include <ogmrip-marshal.h>
-#include <ogmrip-player.h>
-#include <ogmrip-plugin.h>
-#include <ogmrip-profile-engine.h>
-#include <ogmrip-profile-keys.h>
-#include <ogmrip-subp-codec.h>
-#include <ogmrip-test.h>
-#include <ogmrip-version.h>
-#include <ogmrip-video-codec.h>
-#include <ogmrip-xml.h>
+G_DEFINE_INTERFACE (OGMRipConfigurable, ogmrip_configurable, OGMRIP_TYPE_CODEC);
 
-#endif /* __OGMRIP_ENCODE_H__ */
+static void
+ogmrip_configurable_default_init (OGMRipConfigurableInterface *iface)
+{
+}
+
+void
+ogmrip_configurable_configure (OGMRipConfigurable *configurable, OGMRipProfile *profile)
+{
+  OGMRipConfigurableInterface *iface;
+
+  g_return_if_fail (OGMRIP_IS_CONFIGURABLE (configurable));
+  g_return_if_fail (OGMRIP_IS_PROFILE (profile));
+
+  iface = OGMRIP_CONFIGURABLE_GET_IFACE (configurable);
+
+  if (iface->configure)
+    return iface->configure (configurable, profile);
+}
+

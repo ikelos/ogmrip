@@ -17,7 +17,12 @@
     <key name="b-pyramid" type="u">
       <range min="0" max="2"/>
       <default>2</default>
-      <summary>Adaptative B-frames</summary>
+      <summary>Allow the use of B-frames as references for other frames</summary>
+    </key>
+    <key name="b-frames" type="u">
+      <range min="0" max="16"/>
+      <default>3</default>
+      <summary>Maximum number of concurrent B-frames</summary>
     </key>
     <key name="brdo" type="b">
       <default>false</default>
@@ -37,7 +42,7 @@
       <default>3</default>
       <summary>Type of motion prediction used for direct macroblocks in B-frames</summary>
     </key>
-    <key name="framref" type="u">
+    <key name="frameref" type="u">
       <range min="1" max="16"/>
       <default>3</default>
       <summary>Number of previous frames used as predictors in B- and  P-frames</summary>

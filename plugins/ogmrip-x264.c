@@ -44,13 +44,13 @@ struct _OGMRipX264
 {
   OGMRipVideoCodec parent_instance;
 
+  guint b_frames;
   guint b_pyramid;
   guint cqm;
   guint direct;
   guint frameref;
   guint keyint;
   guint level_idc;
-  guint max_bframes;
   guint me;
   guint merange;
   guint rc_lookahead;
@@ -83,6 +83,7 @@ enum
   PROP_8X8DCT,
   PROP_AUD,
   PROP_B_ADAPT,
+  PROP_B_FRAMES,
   PROP_B_PYRAMID,
   PROP_BRDO,
   PROP_CABAC,
@@ -92,7 +93,6 @@ enum
   PROP_GLOBAL_HEADER,
   PROP_KEYINT,
   PROP_LEVEL_IDC,
-  PROP_MAX_BFRAMES,
   PROP_ME,
   PROP_MERANGE,
   PROP_MIXED_REFS,
@@ -248,7 +248,7 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   if (x264_have_lookahead)
     g_string_append_printf (options, ":rc_lookahead=%u", x264->rc_lookahead);
 
-  g_string_append_printf (options, ":bframes=%d", cartoon ? x264->max_bframes + 2 : x264->max_bframes);
+  g_string_append_printf (options, ":bframes=%d", cartoon ? x264->b_frames + 2 : x264->b_frames);
 
   if (pass != passes)
   {
@@ -300,7 +300,7 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
     if (x264_have_partitions && x264->partitions)
       g_string_append_printf (options, ":partitions=%s", x264->partitions);
 
-    if (x264_have_bime && x264->max_bframes > 0)
+    if (x264_have_bime && x264->b_frames > 0)
       g_string_append (options, ":bime");
 
     if (x264_have_psy && x264->subq >= 6)
@@ -367,7 +367,109 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
-G_DEFINE_TYPE (OGMRipX264, ogmrip_x264, OGMRIP_TYPE_VIDEO_CODEC)
+static gboolean
+ogmrip_x264_get_partitions (GValue *value, GVariant *variant, gpointer user_data)
+{
+  GVariantIter *iter;
+  GString *partitions;
+  gchar *str;
+
+  partitions = g_string_new (NULL);
+
+  g_variant_get (variant, "as", &iter);
+  while (g_variant_iter_loop (iter, "s", &str))
+  {
+    if (partitions->len > 0)
+      g_string_append_c (partitions, ',');
+    g_string_append (partitions, str);
+  }
+  g_variant_iter_free (iter);
+
+  g_value_take_string (value, g_string_free (partitions, FALSE));
+
+  return TRUE;
+}
+
+static void
+ogmrip_x264_configure (OGMRipConfigurable *configurable, OGMRipProfile *profile)
+{
+  GSettings *settings;
+
+  settings = ogmrip_profile_get_child (profile, "x264");
+  if (settings)
+  {
+    g_settings_bind (settings, "dct8x8", configurable, OGMRIP_X264_PROP_8X8DCT,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "aud", configurable, OGMRIP_X264_PROP_AUD,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "b-adapt", configurable, OGMRIP_X264_PROP_B_ADAPT,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "b-frames", configurable, OGMRIP_X264_PROP_B_FRAMES,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    /*
+     * TODO x264_have_b_pyramid
+     */
+    g_settings_bind (settings, "b-pyramid", configurable, OGMRIP_X264_PROP_B_PYRAMID,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "brdo", configurable, OGMRIP_X264_PROP_BRDO,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "cabac", configurable, OGMRIP_X264_PROP_CABAC,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "cqm", configurable, OGMRIP_X264_PROP_CQM,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "direct", configurable, OGMRIP_X264_PROP_DIRECT,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "frameref", configurable, OGMRIP_X264_PROP_FRAMEREF,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "global-header", configurable, OGMRIP_X264_PROP_GLOBAL_HEADER,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "keyint", configurable, OGMRIP_X264_PROP_KEYINT,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "level-idc", configurable, OGMRIP_X264_PROP_LEVEL_IDC,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    /*
+     * TODO x264_have_me_tesa
+     */
+    g_settings_bind (settings, "me", configurable, OGMRIP_X264_PROP_ME,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "merange", configurable, OGMRIP_X264_PROP_MERANGE,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "mixed-refs", configurable, OGMRIP_X264_PROP_MIXED_REFS,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "psy-rd", configurable, OGMRIP_X264_PROP_PSY_RD,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "psy-trellis", configurable, OGMRIP_X264_PROP_PSY_TRELLIS,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "rc-lookahead", configurable, OGMRIP_X264_PROP_RC_LOOKAHEAD,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "subq", configurable, OGMRIP_X264_PROP_SUBQ,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "trellis", configurable, OGMRIP_X264_PROP_TRELLIS,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "vbv-bufsize", configurable, OGMRIP_X264_PROP_VBV_BUFSIZE,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "vbv-maxrate", configurable, OGMRIP_X264_PROP_VBV_MAXRATE,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "weight-b", configurable, OGMRIP_X264_PROP_WEIGHT_B,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "weight-p", configurable, OGMRIP_X264_PROP_WEIGHT_P,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind_with_mapping (settings, "partitions", configurable, OGMRIP_X264_PROP_PARTITIONS,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES,
+        ogmrip_x264_get_partitions, NULL, NULL, NULL);
+
+    g_object_unref (settings);
+  }
+}
+
+static void
+ogmrip_configurable_iface_init (OGMRipConfigurableInterface *iface)
+{
+  iface->configure = ogmrip_x264_configure;
+}
+
+G_DEFINE_TYPE_WITH_CODE (OGMRipX264, ogmrip_x264, OGMRIP_TYPE_VIDEO_CODEC,
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_CONFIGURABLE, ogmrip_configurable_iface_init))
 
 static void
 ogmrip_x264_class_init (OGMRipX264Class *klass)
@@ -437,9 +539,9 @@ ogmrip_x264_class_init (OGMRipX264Class *klass)
       g_param_spec_uint (OGMRIP_X264_PROP_LEVEL_IDC, "Level IDC property", "Set level IDC",
         0, 51, OGMRIP_X264_DEFAULT_LEVEL_IDC, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
-  g_object_class_install_property (gobject_class, PROP_MAX_BFRAMES,
-      g_param_spec_uint (OGMRIP_X264_PROP_MAX_BFRAMES, "B-frames property", "Set B-frames",
-        0, 16, OGMRIP_X264_DEFAULT_MAX_BFRAMES, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+  g_object_class_install_property (gobject_class, PROP_B_FRAMES,
+      g_param_spec_uint (OGMRIP_X264_PROP_B_FRAMES, "B-frames property", "Set B-frames",
+        0, 16, OGMRIP_X264_DEFAULT_B_FRAMES, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_ME,
       g_param_spec_uint (OGMRIP_X264_PROP_ME, "Motion estimation property", "Set motion estimation",
@@ -459,11 +561,11 @@ ogmrip_x264_class_init (OGMRipX264Class *klass)
 
   g_object_class_install_property (gobject_class, PROP_PSY_RD,
       g_param_spec_double (OGMRIP_X264_PROP_PSY_RD, "Psy RD property", "Set psy-rd",
-        0.0, G_MAXDOUBLE, OGMRIP_X264_DEFAULT_PSY_RD, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+        0.0, 10.0, OGMRIP_X264_DEFAULT_PSY_RD, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_PSY_TRELLIS,
       g_param_spec_double (OGMRIP_X264_PROP_PSY_TRELLIS, "Psy trellis property", "Set psy-trellis",
-        0.0, G_MAXDOUBLE, OGMRIP_X264_DEFAULT_PSY_TRELLIS, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+        0.0, 10.0, OGMRIP_X264_DEFAULT_PSY_TRELLIS, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_RC_LOOKAHEAD,
       g_param_spec_uint (OGMRIP_X264_PROP_RC_LOOKAHEAD, "RC look ahead property", "Set rc lookahead",
@@ -503,6 +605,7 @@ ogmrip_x264_init (OGMRipX264 *x264)
 {
   x264->aud = OGMRIP_X264_DEFAULT_AUD;
   x264->b_adapt = OGMRIP_X264_DEFAULT_B_ADAPT;
+  x264->b_frames = OGMRIP_X264_DEFAULT_B_FRAMES;
   x264->b_pyramid = OGMRIP_X264_DEFAULT_B_PYRAMID;
   x264->brdo = OGMRIP_X264_DEFAULT_BRDO;
   x264->cabac = OGMRIP_X264_DEFAULT_CABAC;
@@ -512,7 +615,6 @@ ogmrip_x264_init (OGMRipX264 *x264)
   x264->global_header = OGMRIP_X264_DEFAULT_GLOBAL_HEADER;
   x264->keyint = OGMRIP_X264_DEFAULT_KEYINT;
   x264->level_idc = OGMRIP_X264_DEFAULT_LEVEL_IDC;
-  x264->max_bframes = OGMRIP_X264_DEFAULT_MAX_BFRAMES;
   x264->me = OGMRIP_X264_DEFAULT_ME;
   x264->merange = OGMRIP_X264_DEFAULT_MERANGE;
   x264->mixed_refs = OGMRIP_X264_DEFAULT_MIXED_REFS;
@@ -551,10 +653,10 @@ ogmrip_x264_notify (GObject *gobject, GParamSpec *pspec)
     {
       case OGMRIP_QUALITY_EXTREME:
         x264->b_adapt = 2;
+        x264->b_frames = 8;
         x264->brdo = TRUE;
         x264->direct = DIRECT_AUTO;
         x264->frameref = 16;
-        x264->max_bframes = 8;
         x264->me = ME_UMH;
         x264->merange = 24;
         x264->rc_lookahead = 60;
@@ -590,6 +692,9 @@ ogmrip_x264_get_property (GObject *gobject, guint property_id, GValue *value, GP
     case PROP_B_ADAPT:
       g_value_set_uint (value, x264->b_adapt);
       break;
+    case PROP_B_FRAMES:
+      g_value_set_uint (value, x264->b_frames);
+      break;
     case PROP_B_PYRAMID:
       g_value_set_uint (value, x264->b_pyramid);
       break;
@@ -616,9 +721,6 @@ ogmrip_x264_get_property (GObject *gobject, guint property_id, GValue *value, GP
       break;
     case PROP_LEVEL_IDC:
       g_value_set_uint (value, x264->level_idc);
-      break;
-    case PROP_MAX_BFRAMES:
-      g_value_set_uint (value, x264->max_bframes);
       break;
     case PROP_ME:
       g_value_set_uint (value, x264->me);
@@ -660,7 +762,7 @@ ogmrip_x264_get_property (GObject *gobject, guint property_id, GValue *value, GP
       g_value_set_uint (value, x264->weight_p);
       break;
     case PROP_DELAY:
-      g_value_set_uint (value, x264->max_bframes > 0 ? 2 : 1);
+      g_value_set_uint (value, x264->b_frames > 0 ? 2 : 1);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -683,6 +785,9 @@ ogmrip_x264_set_property (GObject *gobject, guint property_id, const GValue *val
       break;
     case PROP_B_ADAPT:
       x264->b_adapt = g_value_get_uint (value);
+      break;
+    case PROP_B_FRAMES:
+      x264->b_frames = g_value_get_uint (value);
       break;
     case PROP_B_PYRAMID:
       x264->b_pyramid = g_value_get_uint (value);
@@ -710,9 +815,6 @@ ogmrip_x264_set_property (GObject *gobject, guint property_id, const GValue *val
       break;
     case PROP_LEVEL_IDC:
       x264->level_idc = g_value_get_uint (value);
-      break;
-    case PROP_MAX_BFRAMES:
-      x264->max_bframes = g_value_get_uint (value);
       break;
     case PROP_ME:
       x264->me = g_value_get_uint (value);
@@ -869,27 +971,7 @@ ogmrip_x264_check_option (const gchar *option)
 
   return status == 0;
 }
-/*
-static void
-ogmrip_x264_set_profile (OGMRipCodec *codec, OGMRipProfile *profile)
-{
-  OGMRipSettings *settings;
 
-  settings = ogmrip_settings_get_default ();
-  if (settings)
-  {
-    gchar *key;
-    guint i;
-
-    for (i = 0; properties[i]; i++)
-    {
-      key = ogmrip_settings_build_section (settings, OGMRIP_X264_SECTION, properties[i], NULL);
-      ogmrip_settings_set_property_from_key (settings, G_OBJECT (codec), properties[i], section, key);
-      g_free (key);
-    }
-  }
-}
-*/
 OGMRipVideoPlugin *
 ogmrip_init_plugin (GError **error)
 {

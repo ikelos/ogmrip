@@ -53,8 +53,6 @@ G_BEGIN_DECLS
 #define OGMRIP_XVID_PROP_TRELLIS             "trellis"
 #define OGMRIP_XVID_PROP_VHQ                 "vhq"
 
-#define OGMRIP_XVID_PROP_BFRAMES             "bframes"
-
 #define OGMRIP_XVID_DEFAULT_BQUANT_OFFSET    100
 #define OGMRIP_XVID_DEFAULT_BQUANT_RATIO     150
 #define OGMRIP_XVID_DEFAULT_BVHQ             1
@@ -84,9 +82,6 @@ G_BEGIN_DECLS
 #define OGMRIP_XVID_DEFAULT_QPEL             FALSE
 #define OGMRIP_XVID_DEFAULT_TRELLIS          TRUE
 #define OGMRIP_XVID_DEFAULT_VHQ              1
-
-#define OGMRIP_XVID_DEFAULT_4MV              TRUE
-#define OGMRIP_XVID_DEFAULT_BFRAMES          2
 
 #define OGMRIP_TYPE_XVID (ogmrip_xvid_get_type ())
 

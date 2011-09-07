@@ -26,6 +26,7 @@ G_BEGIN_DECLS
 #define OGMRIP_X264_PROP_8X8DCT           "dct8x8"
 #define OGMRIP_X264_PROP_AUD              "aud"
 #define OGMRIP_X264_PROP_B_ADAPT          "b-adapt"
+#define OGMRIP_X264_PROP_B_FRAMES         "b_frames"
 #define OGMRIP_X264_PROP_B_PYRAMID        "b-pyramid"
 #define OGMRIP_X264_PROP_BRDO             "brdo"
 #define OGMRIP_X264_PROP_CABAC            "cabac"
@@ -35,7 +36,6 @@ G_BEGIN_DECLS
 #define OGMRIP_X264_PROP_GLOBAL_HEADER    "global-header"
 #define OGMRIP_X264_PROP_KEYINT           "keyint"
 #define OGMRIP_X264_PROP_LEVEL_IDC        "level-idc"
-#define OGMRIP_X264_PROP_MAX_BFRAMES      "max-bframes"
 #define OGMRIP_X264_PROP_ME               "me"
 #define OGMRIP_X264_PROP_MERANGE          "merange"
 #define OGMRIP_X264_PROP_MIXED_REFS       "mixed-refs"
@@ -53,6 +53,7 @@ G_BEGIN_DECLS
 #define OGMRIP_X264_DEFAULT_8X8DCT        TRUE
 #define OGMRIP_X264_DEFAULT_AUD           FALSE
 #define OGMRIP_X264_DEFAULT_B_ADAPT       1
+#define OGMRIP_X264_DEFAULT_B_FRAMES      3
 #define OGMRIP_X264_DEFAULT_B_PYRAMID     2
 #define OGMRIP_X264_DEFAULT_BRDO          FALSE
 #define OGMRIP_X264_DEFAULT_CABAC         TRUE
@@ -62,11 +63,10 @@ G_BEGIN_DECLS
 #define OGMRIP_X264_DEFAULT_GLOBAL_HEADER FALSE
 #define OGMRIP_X264_DEFAULT_KEYINT        250
 #define OGMRIP_X264_DEFAULT_LEVEL_IDC     51
-#define OGMRIP_X264_DEFAULT_MAX_BFRAMES   3
 #define OGMRIP_X264_DEFAULT_ME            2
 #define OGMRIP_X264_DEFAULT_MERANGE       16
 #define OGMRIP_X264_DEFAULT_MIXED_REFS    TRUE
-#define OGMRIP_X264_DEFAULT_PARTITIONS    "'p8x8,b8x8,i8x8,i4x4"
+#define OGMRIP_X264_DEFAULT_PARTITIONS    "p8x8,b8x8,i8x8,i4x4"
 #define OGMRIP_X264_DEFAULT_PSY_RD        1
 #define OGMRIP_X264_DEFAULT_PSY_TRELLIS   0.15
 #define OGMRIP_X264_DEFAULT_RC_LOOKAHEAD  40

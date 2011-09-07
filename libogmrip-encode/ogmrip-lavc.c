@@ -32,9 +32,9 @@
 #include "ogmrip-version.h"
 #include "ogmrip-mplayer.h"
 #include "ogmrip-plugin.h"
+#include "ogmrip-configurable.h"
 
-#include "ogmjob-exec.h"
-#include "ogmjob-queue.h"
+#include <ogmrip-job.h>
 
 #include <stdio.h>
 #include <glib/gstdio.h>
@@ -259,7 +259,81 @@ ogmrip_lavc_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
-G_DEFINE_ABSTRACT_TYPE (OGMRipLavc, ogmrip_lavc, OGMRIP_TYPE_VIDEO_CODEC)
+static void
+ogmrip_lavc_configure (OGMRipConfigurable *configurable, OGMRipProfile *profile)
+{
+  GSettings *settings;
+
+  settings = ogmrip_profile_get_child (profile, "lavc");
+  if (settings)
+  {
+    g_settings_bind (settings, "header", configurable, OGMRIP_LAVC_PROP_HEADER,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "cmp", configurable, OGMRIP_LAVC_PROP_CMP,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "precmp", configurable, OGMRIP_LAVC_PROP_PRECMP,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "subcmp", configurable, OGMRIP_LAVC_PROP_SUBCMP,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "dia", configurable, OGMRIP_LAVC_PROP_DIA,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "predia", configurable, OGMRIP_LAVC_PROP_PREDIA,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    /*
+     * TODO min = 1
+     */
+    g_settings_bind (settings, "keyint", configurable, OGMRIP_LAVC_PROP_KEYINT,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "buf-size", configurable, OGMRIP_LAVC_PROP_BUF_SIZE,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    /*
+     * TODO min = 1
+     */
+    g_settings_bind (settings, "dc", configurable, OGMRIP_LAVC_PROP_DC,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "mbd", configurable, OGMRIP_LAVC_PROP_MBD,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "qns", configurable, OGMRIP_LAVC_PROP_QNS,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "vb-strategy", configurable, OGMRIP_LAVC_PROP_VB_STRATEGY,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "last-pred", configurable, OGMRIP_LAVC_PROP_LAST_PRED,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "preme", configurable, OGMRIP_LAVC_PROP_PREME,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "vqcomp", configurable, OGMRIP_LAVC_PROP_VQCOMP,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "mv0", configurable, OGMRIP_LAVC_PROP_MV0,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "grayscale", configurable, OGMRIP_LAVC_PROP_GRAYSCALE,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "qpel", configurable, OGMRIP_LAVC_PROP_QPEL,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "trellis", configurable, OGMRIP_LAVC_PROP_TRELLIS,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "v4mv", configurable, OGMRIP_LAVC_PROP_V4MV,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "max-bframes", configurable, OGMRIP_LAVC_PROP_MAX_BFRAMES,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "strict", configurable, OGMRIP_LAVC_PROP_STRICT,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "max-rate", configurable, OGMRIP_LAVC_PROP_MAX_RATE,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "min-rate", configurable, OGMRIP_LAVC_PROP_MIN_RATE,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+
+    g_object_unref (settings);
+  }
+}
+
+static void
+ogmrip_configurable_iface_init (OGMRipConfigurableInterface *iface)
+{
+  iface->configure = ogmrip_lavc_configure;
+}
+
+G_DEFINE_ABSTRACT_TYPE_WITH_CODE (OGMRipLavc, ogmrip_lavc, OGMRIP_TYPE_VIDEO_CODEC,
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_CONFIGURABLE, ogmrip_configurable_iface_init))
 
 static void
 ogmrip_lavc_class_init (OGMRipLavcClass *klass)

@@ -12,6 +12,7 @@ libogmrip_encode_la_SOURCES = \
   ogmrip-audio-codec.c      \
   ogmrip-chapters.c         \
   ogmrip-codec.c            \
+  ogmrip-configurable.c     \
   ogmrip-container.c        \
   ogmrip-copy.c             \
   ogmrip-encoding.c         \
@@ -41,6 +42,7 @@ libogmrip_encode_la_HEADERS = \
   ogmrip-audio-codec.h      \
   ogmrip-chapters.h         \
   ogmrip-codec.h            \
+  ogmrip-configurable.h     \
   ogmrip-container.h        \
   ogmrip-copy.h             \
   ogmrip-encoding.h         \

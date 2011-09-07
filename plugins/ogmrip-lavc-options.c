@@ -72,15 +72,15 @@ ogmrip_lavc_dialog_constructed (GObject *gobject)
     return;
   }
 
-  settings = ogmrip_profile_get_child (profile, "lavc");
-  g_assert (settings != NULL);
-
   builder = gtk_builder_new ();
   if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))
   {
     g_critical ("Couldn't load builder file: %s", error->message);
     return;
   }
+
+  settings = ogmrip_profile_get_child (profile, "lavc");
+  g_assert (settings != NULL);
 
   misc = gtk_dialog_get_content_area (GTK_DIALOG (gobject));
 
@@ -164,6 +164,7 @@ ogmrip_lavc_dialog_constructed (GObject *gobject)
   g_settings_bind (settings, OGMRIP_LAVC_PROP_MAX_RATE,
       widget, "value", G_SETTINGS_BIND_DEFAULT);
 
+  g_object_unref (settings);
   g_object_unref (builder);
 }
 

@@ -106,5 +106,10 @@
       <default>true</default>
       <summary>Header</summary>
     </key>
+    <key name="max-bframes" type="u">
+      <range min="0" max="4"/>
+      <default>0</default>
+      <summary>Maximum number of B-frames between non-B-frames</summary>
+    </key>
   </schema>
 </schemalist>

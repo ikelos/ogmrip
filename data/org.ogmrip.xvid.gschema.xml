@@ -130,5 +130,10 @@
       <default>false</default>
       <summary>Encode anime/cartoon</summary>
     </key>
+    <key name="max-bframes" type="u">
+      <range min="0" max="4"/>
+      <default>2</default>
+      <summary>Maximum number of B-frames between I/P-frames</summary>
+    </key>
   </schema>
 </schemalist>

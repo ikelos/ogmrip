@@ -30,6 +30,7 @@
 #include "ogmrip-encoding.h"
 #include "ogmrip-encoding-parser.h"
 #include "ogmrip-profile-keys.h"
+#include "ogmrip-configurable.h"
 #include "ogmrip-hardsub.h"
 #include "ogmrip-marshal.h"
 #include "ogmrip-plugin.h"
@@ -468,6 +469,12 @@ ogmrip_encoding_new (OGMRipTitle *title)
   return g_object_new (OGMRIP_TYPE_ENCODING, "title", title, NULL);
 }
 
+static void
+weak_notify (gpointer media, GObject *where_the_object_was)
+{
+  g_object_unref (media);
+}
+
 static OGMRipEncoding *
 ogmrip_encoding_new_from_xml (OGMRipXML *xml, GError **error)
 {
@@ -521,16 +528,15 @@ ogmrip_encoding_new_from_xml (OGMRipXML *xml, GError **error)
       {
         encoding = ogmrip_encoding_new (title);
         if (encoding)
+        {
+          g_object_weak_ref (G_OBJECT (encoding), weak_notify, g_object_ref (media));
           ogmrip_encoding_parse (encoding, xml, NULL);
+        }
       }
     }
   }
 
-  /*
-   * TODO unref ?
-   */
-
-  // g_object_unref (media);
+  g_object_unref (media);
 
   return encoding;
 }
@@ -1386,6 +1392,10 @@ ogmrip_encoding_run_codec (OGMRipEncoding *encoding, OGMRipCodec *codec, GError 
     ogmjob_log_printf ("\nEncoding video stream\n");
     ogmjob_log_printf ("---------------------\n\n");
   }
+
+  if (OGMRIP_IS_CONFIGURABLE (codec) &&
+      ogmrip_video_codec_get_quality (OGMRIP_VIDEO_CODEC (codec)) == OGMRIP_QUALITY_USER)
+    ogmrip_configurable_configure (OGMRIP_CONFIGURABLE (codec), encoding->priv->profile);
 
   g_signal_connect_swapped (codec, "progress",
       G_CALLBACK (ogmrip_encoding_task_progressed), encoding);
