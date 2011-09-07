@@ -949,7 +949,7 @@ ogmrip_main_create_subp_codec (OGMRipData *data, OGMRipProfile *profile,
   else
     type = ogmrip_profile_get_subp_codec_type (profile, NULL);
 
-  if (type == G_TYPE_NONE || type == OGMRIP_TYPE_HARDSUB)
+  if (type == G_TYPE_NONE)
     return NULL;
 
   codec = g_object_new (type, "input", stream, NULL);
@@ -1185,7 +1185,7 @@ ogmrip_main_extract_activated (OGMRipData *data)
   OGMRipEncoding *encoding;
   OGMRipProfile *profile;
   OGMRipContainer *container;
-  OGMRipCodec *codec;
+  OGMRipCodec *vcodec, *codec;
   OGMRipStream *stream;
 
   guint start_chap;
@@ -1223,33 +1223,33 @@ ogmrip_main_extract_activated (OGMRipData *data)
 
   ogmrip_chapter_store_get_selection (OGMRIP_CHAPTER_STORE (data->chapter_store), &start_chap, &end_chap);
 
-  codec = ogmrip_main_create_video_codec (data, profile,
+  vcodec = ogmrip_main_create_video_codec (data, profile,
       ogmrip_title_get_video_stream (title), start_chap, end_chap);
 
-  if (codec)
+  if (vcodec)
   {
     guint x, y, w, h;
     glong t;
     gint d;
 
     ogmrip_options_dialog_get_crop_size (OGMRIP_OPTIONS_DIALOG (dialog), &x, &y, &w, &h);
-    ogmrip_video_codec_set_crop_size (OGMRIP_VIDEO_CODEC (codec), x, y, w, h);
+    ogmrip_video_codec_set_crop_size (OGMRIP_VIDEO_CODEC (vcodec), x, y, w, h);
 
     ogmrip_options_dialog_get_scale_size (OGMRIP_OPTIONS_DIALOG (dialog), &w, &h);
-    ogmrip_video_codec_set_scale_size (OGMRIP_VIDEO_CODEC (codec), w, h);
+    ogmrip_video_codec_set_scale_size (OGMRIP_VIDEO_CODEC (vcodec), w, h);
 
     d = ogmrip_options_dialog_get_deinterlacer (OGMRIP_OPTIONS_DIALOG (dialog));
-    ogmrip_video_codec_set_deinterlacer (OGMRIP_VIDEO_CODEC (codec), d);
+    ogmrip_video_codec_set_deinterlacer (OGMRIP_VIDEO_CODEC (vcodec), d);
 
-    ogmrip_encoding_set_video_codec (encoding, OGMRIP_VIDEO_CODEC (codec));
-    g_object_unref (codec);
+    ogmrip_encoding_set_video_codec (encoding, OGMRIP_VIDEO_CODEC (vcodec));
+    g_object_unref (vcodec);
 
     t = g_settings_get_uint (settings, OGMRIP_SETTINGS_THREADS);
 #ifdef HAVE_SYSCONF_NPROC
     if (!t)
       t = sysconf (_SC_NPROCESSORS_ONLN);
 #endif
-    ogmrip_video_codec_set_threads (OGMRIP_VIDEO_CODEC (codec), t ? t : 1);
+    ogmrip_video_codec_set_threads (OGMRIP_VIDEO_CODEC (vcodec), t ? t : 1);
   }
 
   gtk_widget_destroy (dialog);
@@ -1292,7 +1292,11 @@ ogmrip_main_extract_activated (OGMRipData *data)
 
         if (codec)
         {
-          ogmrip_encoding_add_subp_codec (encoding, OGMRIP_SUBP_CODEC (codec));
+          if (G_OBJECT_TYPE (codec) != OGMRIP_TYPE_HARDSUB)
+            ogmrip_encoding_add_subp_codec (encoding, OGMRIP_SUBP_CODEC (codec));
+          else if (vcodec)
+            ogmrip_video_codec_set_hard_subp (OGMRIP_VIDEO_CODEC (vcodec), OGMRIP_SUBP_STREAM (stream),
+                ogmrip_subp_codec_get_forced_only (OGMRIP_SUBP_CODEC (codec)));
           g_object_unref (codec);
         }
       }
