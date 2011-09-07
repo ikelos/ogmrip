@@ -259,6 +259,17 @@ ogmrip_lavc_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
+static gboolean
+ogmrip_lavc_get_dc_keyint (GValue *value, GVariant *variant, gpointer user_data)
+{
+  guint val;
+
+  g_variant_get (variant, "u", &val);
+  g_value_set_uint (value, MAX (val, 1));
+
+  return TRUE;
+}
+
 static void
 ogmrip_lavc_configure (OGMRipConfigurable *configurable, OGMRipProfile *profile)
 {
@@ -279,18 +290,14 @@ ogmrip_lavc_configure (OGMRipConfigurable *configurable, OGMRipProfile *profile)
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
     g_settings_bind (settings, "predia", configurable, OGMRIP_LAVC_PROP_PREDIA,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    /*
-     * TODO min = 1
-     */
-    g_settings_bind (settings, "keyint", configurable, OGMRIP_LAVC_PROP_KEYINT,
-        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind_with_mapping (settings, "keyint", configurable, OGMRIP_LAVC_PROP_KEYINT,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES,
+        ogmrip_lavc_get_dc_keyint, NULL, NULL, NULL);
     g_settings_bind (settings, "buf-size", configurable, OGMRIP_LAVC_PROP_BUF_SIZE,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    /*
-     * TODO min = 1
-     */
-    g_settings_bind (settings, "dc", configurable, OGMRIP_LAVC_PROP_DC,
-        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind_with_mapping (settings, "dc", configurable, OGMRIP_LAVC_PROP_DC,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES,
+        ogmrip_lavc_get_dc_keyint, NULL, NULL, NULL);
     g_settings_bind (settings, "mbd", configurable, OGMRIP_LAVC_PROP_MBD,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
     g_settings_bind (settings, "qns", configurable, OGMRIP_LAVC_PROP_QNS,

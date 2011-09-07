@@ -368,6 +368,42 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
 }
 
 static gboolean
+ogmrip_x264_get_b_pyramid (GValue *value, GVariant *variant, gpointer user_data)
+{
+  guint b_pyramid;
+
+  g_variant_get (variant, "u", &b_pyramid);
+  if (x264_have_b_pyramid)
+    g_value_set_uint (value, b_pyramid);
+  else
+    g_value_set_boolean (value, b_pyramid != 0);
+
+  return TRUE;
+}
+
+static gboolean
+ogmrip_x264_get_me (GValue *value, GVariant *variant, gpointer user_data)
+{
+  guint me;
+
+  g_variant_get (variant, "u", &me);
+  g_value_set_uint (value, x264_have_me_tesa ? me : MIN (me, ME_ESA));
+
+  return TRUE;
+}
+
+static gboolean
+ogmrip_x264_get_merange (GValue *value, GVariant *variant, gpointer user_data)
+{
+  guint merange;
+
+  g_variant_get (variant, "u", &merange);
+  g_value_set_uint (value, MAX (merange, 4));
+
+  return TRUE;
+}
+
+static gboolean
 ogmrip_x264_get_partitions (GValue *value, GVariant *variant, gpointer user_data)
 {
   GVariantIter *iter;
@@ -406,11 +442,9 @@ ogmrip_x264_configure (OGMRipConfigurable *configurable, OGMRipProfile *profile)
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
     g_settings_bind (settings, "b-frames", configurable, OGMRIP_X264_PROP_B_FRAMES,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    /*
-     * TODO x264_have_b_pyramid
-     */
-    g_settings_bind (settings, "b-pyramid", configurable, OGMRIP_X264_PROP_B_PYRAMID,
-        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind_with_mapping (settings, "b-pyramid", configurable, OGMRIP_X264_PROP_B_PYRAMID,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES,
+        ogmrip_x264_get_b_pyramid, NULL, NULL, NULL);
     g_settings_bind (settings, "brdo", configurable, OGMRIP_X264_PROP_BRDO,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
     g_settings_bind (settings, "cabac", configurable, OGMRIP_X264_PROP_CABAC,
@@ -427,13 +461,12 @@ ogmrip_x264_configure (OGMRipConfigurable *configurable, OGMRipProfile *profile)
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
     g_settings_bind (settings, "level-idc", configurable, OGMRIP_X264_PROP_LEVEL_IDC,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    /*
-     * TODO x264_have_me_tesa
-     */
-    g_settings_bind (settings, "me", configurable, OGMRIP_X264_PROP_ME,
-        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    g_settings_bind (settings, "merange", configurable, OGMRIP_X264_PROP_MERANGE,
-        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind_with_mapping (settings, "me", configurable, OGMRIP_X264_PROP_ME,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES,
+        ogmrip_x264_get_me, NULL, NULL, NULL);
+    g_settings_bind_with_mapping (settings, "merange", configurable, OGMRIP_X264_PROP_MERANGE,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES,
+        ogmrip_x264_get_merange, NULL, NULL, NULL);
     g_settings_bind (settings, "mixed-refs", configurable, OGMRIP_X264_PROP_MIXED_REFS,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
     g_settings_bind (settings, "psy-rd", configurable, OGMRIP_X264_PROP_PSY_RD,
@@ -504,8 +537,8 @@ ogmrip_x264_class_init (OGMRipX264Class *klass)
           B_PYRAMID_NONE, B_PYRAMID_NORMAL, OGMRIP_X264_DEFAULT_B_PYRAMID, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
   else
     g_object_class_install_property (gobject_class, PROP_B_PYRAMID,
-        g_param_spec_uint (OGMRIP_X264_PROP_B_PYRAMID, "B pyramid property", "Set b pyramid",
-          B_PYRAMID_NONE, B_PYRAMID_STRICT, x264_have_b_pyramid ? OGMRIP_X264_DEFAULT_B_PYRAMID : TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+        g_param_spec_boolean (OGMRIP_X264_PROP_B_PYRAMID, "B pyramid property", "Set b pyramid",
+          TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_BRDO,
       g_param_spec_boolean (OGMRIP_X264_PROP_BRDO, "Brdo property", "Set brdo",
