@@ -76,9 +76,6 @@ ogmrip_stub_get_media_size (OGMRipMedia *media)
 static void
 ogmrip_media_iface_init (OGMRipMediaInterface *iface)
 {
-  /*
-   * TODO iface->get_label = NULL;
-   */
   iface->get_size = ogmrip_stub_get_media_size;
 }
 
@@ -126,9 +123,6 @@ ogmrip_stub_get_title_size (OGMRipTitle *title)
 static void
 ogmrip_title_iface_init (OGMRipTitleInterface *iface)
 {
-  /*
-   * TODO get_progressive, get_telecine, get_interlaced
-   */
   iface->get_chapters_length = ogmrip_stub_get_chapters_length;
   iface->get_length = ogmrip_stub_get_length;
   iface->get_n_chapters = ogmrip_stub_get_n_chapters;
