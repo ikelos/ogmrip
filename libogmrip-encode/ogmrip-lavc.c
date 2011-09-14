@@ -731,17 +731,6 @@ ogmrip_lavc_run (OGMJobSpawn *spawn)
 }
 
 /**
- * ogmrip_init_lavc_plugin:
- *
- * Initialises the LAVC plugin. This function should be called
- * when initialising a plugin of the LAVC family.
- */
-void
-ogmrip_init_lavc_plugin (void)
-{
-}
-
-/**
  * ogmrip_lavc_new:
  * @title: An #OGMRipTitle
  * @output: The output file

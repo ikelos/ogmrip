@@ -82,8 +82,6 @@ ogmrip_init_plugin (void)
   if (!match)
     return NULL;
 
-  ogmrip_init_lavc_plugin ();
-
   lavc_mpeg4_plugin.type = OGMRIP_TYPE_LAVC_MPEG4;
 
   return &lavc_mpeg4_plugin;

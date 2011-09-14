@@ -91,8 +91,6 @@ typedef enum
   OGMRIP_LAVC_HEADER_COMBINE
 } OGMRipLavcHeaderType;
 
-void          ogmrip_init_lavc_plugin     (void);
-
 GType         ogmrip_lavc_get_type        (void);
 
 void          ogmrip_lavc_set_cmp         (OGMRipLavc           *lavc,
