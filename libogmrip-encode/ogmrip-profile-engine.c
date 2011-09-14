@@ -138,6 +138,22 @@ ogmrip_profile_engine_check (OGMRipProfileEngine *engine, OGMRipProfile *profile
 
 G_DEFINE_TYPE (OGMRipProfileEngine, ogmrip_profile_engine, G_TYPE_OBJECT)
 
+static GObject *
+ogmrip_profile_engine_constructor (GType type, guint n_params, GObjectConstructParam *params)
+{
+  GObject *gobject;
+
+  gobject = G_OBJECT_CLASS (ogmrip_profile_engine_parent_class)->constructor (type, n_params, params);
+
+  if (!default_engine)
+  {
+    default_engine = OGMRIP_PROFILE_ENGINE (gobject);
+    g_object_add_weak_pointer (gobject, (gpointer *) &default_engine);
+  }
+
+  return gobject;
+}
+
 static void
 ogmrip_profile_engine_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
 {
@@ -245,6 +261,7 @@ ogmrip_profile_engine_class_init (OGMRipProfileEngineClass *klass)
   GObjectClass *gobject_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->constructor = ogmrip_profile_engine_constructor;
   gobject_class->get_property = ogmrip_profile_engine_get_property;
   gobject_class->set_property = ogmrip_profile_engine_set_property;
   gobject_class->dispose = ogmrip_profile_engine_dispose;
@@ -274,11 +291,7 @@ OGMRipProfileEngine *
 ogmrip_profile_engine_get_default (void)
 {
   if (!default_engine)
-  {
-    default_engine = g_object_new (OGMRIP_TYPE_PROFILE_ENGINE, NULL);
-    g_settings_bind (default_engine->priv->settings, "profiles",
-        default_engine, "profiles", G_SETTINGS_BIND_DEFAULT);
-  }
+    return g_object_new (OGMRIP_TYPE_PROFILE_ENGINE, NULL);
 
   return default_engine;
 }
