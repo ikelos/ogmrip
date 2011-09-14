@@ -19,6 +19,7 @@
 #ifndef __OGMRIP_DVD_GTK_H__
 #define __OGMRIP_DVD_GTK_H__
 
+#include <ogmrip-dvd.h>
 #include <ogmdvd-drive-chooser-widget.h>
 #include <ogmdvd-drive-chooser-dialog.h>
 
