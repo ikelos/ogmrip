@@ -46,7 +46,8 @@ ogmrip_xvid_la_LIBTOOLFLAGS = \
 ogmrip_xvid_la_LIBADD = \
   $(top_builddir)/libogmrip-job/libogmrip-job.la \
   $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
-  $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
+  $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la
 
 video_codecs_HEADERS += \
   ogmrip-xvid.h
@@ -389,9 +390,13 @@ endif
 INCLUDES = \
   -I$(top_srcdir)/libogmrip-job \
   -I$(top_srcdir)/libogmrip-media \
+  -I$(top_srcdir)/libogmrip-media-gtk \
   -I$(top_srcdir)/libogmrip-file \
+  -I$(top_srcdir)/libogmrip-file \
+  -I$(top_srcdir)/libogmrip-file-gtk \
   -I$(top_srcdir)/libogmrip-dvd \
   -I$(top_srcdir)/libogmrip-encode \
+  -I$(top_srcdir)/libogmrip-module \
   -DOGMRIP_LIB_DIR=\""$(libdir)"\" \
   -DOGMRIP_DATA_DIR=\""$(datadir)"\"
 

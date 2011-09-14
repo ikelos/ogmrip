@@ -338,20 +338,7 @@ ogmrip_ogg_run (OGMJobSpawn *spawn)
   return result;
 }
 
-static OGMRipContainerPlugin ogg_plugin =
-{
-  NULL,
-  G_TYPE_NONE,
-  "ogm",
-  N_("Ogg Media (OGM)"),
-  FALSE,
-  TRUE,
-  G_MAXINT,
-  G_MAXINT,
-  NULL
-};
-
-static gint formats[] =
+static OGMRipFormat formats[] =
 {
   OGMRIP_FORMAT_MPEG4,
   OGMRIP_FORMAT_H264,
@@ -364,13 +351,11 @@ static gint formats[] =
   -1
 };
 
-OGMRipContainerPlugin *
+gboolean
 ogmrip_init_plugin (GError **error)
 {
   gboolean have_ogmmerge, have_ogmsplit;
   gchar *fullname;
-
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
   fullname = g_find_program_in_path ("ogmmerge");
   have_ogmmerge = fullname != NULL;
@@ -380,19 +365,27 @@ ogmrip_init_plugin (GError **error)
   have_ogmsplit = fullname != NULL;
   g_free (fullname);
 
-  ogg_plugin.type = OGMRIP_TYPE_OGG;
-  ogg_plugin.formats = formats;
-
-  if (have_ogmmerge && have_ogmsplit)
-    return &ogg_plugin;
-
   if (!have_ogmmerge && !have_ogmsplit)
-    g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("ogmmerge and ogmsplit are missing"));
-  else if (!have_ogmmerge)
-    g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("ogmmerge is missing"));
-  else if (!have_ogmsplit)
-    g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("ogmsplit is missing"));
+  {
+    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("ogmmerge and ogmsplit are missing"));
+    return FALSE;
+  }
 
-  return NULL;
+  if (!have_ogmmerge)
+  {
+    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("ogmmerge is missing"));
+    return FALSE;
+  }
+
+  if (!have_ogmsplit)
+  {
+    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("ogmsplit is missing"));
+    return FALSE;
+  }
+
+  ogmrip_type_register_container (NULL, OGMRIP_TYPE_OGG,
+      "ogm", N_("Ogg Media (OGM)"), formats);
+
+  return TRUE;
 }
 

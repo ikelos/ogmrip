@@ -24,6 +24,7 @@
 
 #include <ogmrip-job.h>
 #include <ogmrip-mplayer.h>
+#include <ogmrip-module.h>
 
 #include <stdio.h>
 #include <unistd.h>
@@ -314,8 +315,9 @@ ogmrip_xvid_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
     guint height;
 
     ogmrip_video_codec_get_scale_size (video, NULL, &height);
-    g_string_append_printf (options, ":threads=%u", CLAMP (threads, 1, height / 16));
+    threads = CLAMP (threads, 1, height / 16);
   }
+  g_string_append_printf (options, ":threads=%u", threads);
 
   g_ptr_array_add (argv, g_strdup ("-xvidencopts"));
   g_ptr_array_add (argv, g_string_free (options, FALSE));
@@ -412,8 +414,8 @@ ogmrip_configurable_iface_init (OGMRipConfigurableInterface *iface)
   iface->configure = ogmrip_xvid_configure;
 }
 
-G_DEFINE_TYPE_WITH_CODE (OGMRipXvid, ogmrip_xvid, OGMRIP_TYPE_VIDEO_CODEC,
-    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_CONFIGURABLE, ogmrip_configurable_iface_init))
+G_DEFINE_DYNAMIC_TYPE_EXTENDED (OGMRipXvid, ogmrip_xvid, OGMRIP_TYPE_VIDEO_CODEC, 0,
+    G_IMPLEMENT_INTERFACE_DYNAMIC (OGMRIP_TYPE_CONFIGURABLE, ogmrip_configurable_iface_init))
 
 static void
 ogmrip_xvid_class_init (OGMRipXvidClass *klass)
@@ -544,6 +546,11 @@ ogmrip_xvid_class_init (OGMRipXvidClass *klass)
   g_object_class_install_property (gobject_class, PROP_TRELLIS,
       g_param_spec_boolean (OGMRIP_XVID_PROP_TRELLIS, NULL, NULL,
         OGMRIP_XVID_DEFAULT_TRELLIS, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+}
+
+static void
+ogmrip_xvid_class_finalize (OGMRipXvidClass *klass)
+{
 }
 
 static void
@@ -847,7 +854,7 @@ ogmrip_xvid_run (OGMJobSpawn *spawn)
     }
   }
 
-  for (pass = 0; pass < passes; pass ++)
+  for (pass = 0; pass < MIN (passes, 2); pass ++)
   {
     argv = ogmrip_xvid_command (OGMRIP_VIDEO_CODEC (spawn), pass + 1, passes, log_file);
     if (!argv)
@@ -887,45 +894,35 @@ ogmrip_xvid_run (OGMJobSpawn *spawn)
   return result;
 }
 
-static OGMRipVideoPlugin xvid_plugin =
-{
-  NULL,
-  G_TYPE_NONE,
-  "xvid",
-  N_("XviD"),
-  OGMRIP_FORMAT_MPEG4,
-  2,
-  G_MAXINT
-};
-
-OGMRipVideoPlugin *
-ogmrip_init_plugin (GError **error)
+gboolean
+ogmrip_init_plugin (OGMRipModule *module, GError **error)
 {
   gboolean match;
   gchar *output;
 
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
-
   if (!ogmrip_check_mencoder ())
   {
-    g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MEncoder is missing"));
-    return NULL;
+    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MEncoder is missing"));
+    return FALSE;
   }
 
   if (!g_spawn_command_line_sync ("mencoder -ovc help", &output, NULL, NULL, NULL))
-    return NULL;
+    return FALSE;
 
   match = g_regex_match_simple ("^ *xvid *- .*$", output, G_REGEX_MULTILINE, 0);
   g_free (output);
 
   if (!match)
   {
-    g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MEncoder is built without XviD support"));
-    return NULL;
+    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MEncoder is built without XviD support"));
+    return FALSE;
   }
 
-  xvid_plugin.type = OGMRIP_TYPE_XVID;
+  ogmrip_xvid_register_type (G_TYPE_MODULE (module));
 
-  return &xvid_plugin;
+  ogmrip_type_register_codec (NULL, OGMRIP_TYPE_XVID,
+      "xvid", N_("XviD"), OGMRIP_FORMAT_MPEG4);
+
+  return TRUE;
 }
 

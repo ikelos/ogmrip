@@ -275,20 +275,7 @@ ogmrip_avi_run (OGMJobSpawn *spawn)
   return result;
 }
 
-static OGMRipContainerPlugin avi_plugin =
-{
-  NULL,
-  G_TYPE_NONE,
-  "avi",
-  N_("Audio-Video Interlace (AVI)"),
-  TRUE,
-  TRUE,
-  8,
-  1,
-  NULL
-};
-
-static gint formats[] = 
+static OGMRipFormat formats[] = 
 {
   OGMRIP_FORMAT_MPEG1,
   OGMRIP_FORMAT_MPEG2,
@@ -303,24 +290,22 @@ static gint formats[] =
   -1
 };
 
-OGMRipContainerPlugin *
+gboolean
 ogmrip_init_plugin (GError **error)
 {
   gboolean have_avibox = FALSE;
   gchar *fullname;
-
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
   fullname = g_find_program_in_path ("avibox");
   have_avibox = fullname != NULL;
   g_free (fullname);
 
   if (!have_avibox)
-    return NULL;
+    return FALSE;
 
-  avi_plugin.type = OGMRIP_TYPE_AVI;
-  avi_plugin.formats = formats;
+  ogmrip_type_register_container (NULL, OGMRIP_TYPE_AVI,
+      "avi", N_("Audio-Video Interlace (AVI)"), formats);
 
-  return &avi_plugin;
+  return TRUE;
 }
 

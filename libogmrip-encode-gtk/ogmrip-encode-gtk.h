@@ -24,7 +24,7 @@
 #include <ogmrip-encoding-manager-dialog.h>
 #include <ogmrip-helper.h>
 #include <ogmrip-list-item.h>
-#include <ogmrip-options-plugin.h>
+#include <ogmrip-options-editable.h>
 #include <ogmrip-profile-editor-dialog.h>
 #include <ogmrip-profile-manager-dialog.h>
 #include <ogmrip-profile-store.h>

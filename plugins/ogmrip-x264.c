@@ -939,17 +939,6 @@ ogmrip_x264_run (OGMJobSpawn *spawn)
   return result;
 }
 
-static OGMRipVideoPlugin x264_plugin =
-{
-  NULL,
-  G_TYPE_NONE,
-  "x264",
-  N_("X264"),
-  OGMRIP_FORMAT_H264,
-  G_MAXINT,
-  16
-};
-
 static gboolean
 ogmrip_x264_check_option (const gchar *option)
 {
@@ -1005,30 +994,28 @@ ogmrip_x264_check_option (const gchar *option)
   return status == 0;
 }
 
-OGMRipVideoPlugin *
+gboolean
 ogmrip_init_plugin (GError **error)
 {
   gboolean match;
   gchar *output;
 
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
-
   if (!ogmrip_check_mencoder ())
   {
-    g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MEncoder is missing"));
-    return NULL;
+    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MEncoder is missing"));
+    return FALSE;
   }
 
   if (!g_spawn_command_line_sync ("mencoder -ovc help", &output, NULL, NULL, NULL))
-    return NULL;
+    return FALSE;
 
   match = g_regex_match_simple ("^ *x264 *- .*$", output, G_REGEX_MULTILINE, 0);
   g_free (output);
 
   if (!match)
   {
-    g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MEncoder is build without X264 support"));
-    return NULL;
+    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MEncoder is build without X264 support"));
+    return FALSE;
   }
 
   x264_have_8x8dct         = ogmrip_x264_check_option ("8x8dct");
@@ -1047,8 +1034,9 @@ ogmrip_init_plugin (GError **error)
   x264_have_slow_firstpass = ogmrip_x264_check_option ("slow_firstpass");
   x264_have_nombtree       = ogmrip_x264_check_option ("nombtree");
 
-  x264_plugin.type = OGMRIP_TYPE_X264;
+  ogmrip_type_register_codec (NULL, OGMRIP_TYPE_X264,
+      "x264", N_("X264"), OGMRIP_FORMAT_H264);
 
-  return &x264_plugin;
+  return TRUE;
 }
 

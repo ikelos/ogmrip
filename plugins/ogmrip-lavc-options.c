@@ -20,16 +20,18 @@
 #include "config.h"
 #endif
 
-#include "ogmrip-lavc-mpeg4.h"
+#include <ogmrip-encode-gtk.h>
 
 #include "ogmrip-lavc.h"
-#include "ogmrip-helper.h"
-#include "ogmrip-options-plugin.h"
+#include "ogmrip-lavc-mpeg4.h"
 
 #include <glib/gi18n.h>
 
 #define OGMRIP_GLADE_FILE "ogmrip/ogmrip-lavc.glade"
 #define OGMRIP_GLADE_ROOT "root"
+
+#define gtk_builder_get_widget(builder, name) \
+    (GtkWidget *) gtk_builder_get_object ((builder), (name))
 
 #define OGMRIP_TYPE_LAVC_DIALOG          (ogmrip_lavc_dialog_get_type ())
 #define OGMRIP_LAVC_DIALOG(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_LAVC_DIALOG, OGMRipLavcDialog))
@@ -42,130 +44,127 @@ typedef struct _OGMRipLavcDialogClass OGMRipLavcDialogClass;
 
 struct _OGMRipLavcDialog
 {
-  OGMRipPluginDialog parent_instance;
+  GtkDialog parent_instance;
+
+  OGMRipProfile *profile;
+
+  GtkWidget *mv0_check;
+  GtkWidget *v4mv_check;
+  GtkWidget *mbd_combo;
+  GtkWidget *strict_combo;
+  GtkWidget *vb_strategy_combo;
+  GtkWidget *qns_combo;
+  GtkWidget *keyint_spin;
+  GtkWidget *last_pred_spin;
+  GtkWidget *vqcomp_spin;
+  GtkWidget *dc_spin;
+  GtkWidget *preme_combo;
+  GtkWidget *cmp_spin;
+  GtkWidget *precmp_spin;
+  GtkWidget *subcmp_spin;
+  GtkWidget *dia_spin;
+  GtkWidget *predia_spin;
+  GtkWidget *buf_size_spin;
+  GtkWidget *min_rate_spin;
+  GtkWidget *max_rate_spin;
 };
 
 struct _OGMRipLavcDialogClass
 {
-  OGMRipPluginDialogClass parent_class;
+  GtkDialogClass parent_class;
 };
 
-G_DEFINE_TYPE (OGMRipLavcDialog, ogmrip_lavc_dialog, OGMRIP_TYPE_PLUGIN_DIALOG)
+enum
+{
+  PROP_0,
+  PROP_PROFILE
+};
+
+static void ogmrip_options_editable_init (OGMRipOptionsEditableInterface *iface);
+
+G_DEFINE_TYPE_WITH_CODE (OGMRipLavcDialog, ogmrip_lavc_dialog, GTK_TYPE_DIALOG,
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_OPTIONS_EDITABLE, ogmrip_options_editable_init));
 
 static void
-ogmrip_lavc_dialog_constructed (GObject *gobject)
+ogmrip_lavc_dialog_set_profile (OGMRipLavcDialog *dialog, OGMRipProfile *profile)
 {
-  GError *error = NULL;
-
-  OGMRipProfile *profile;
   GSettings *settings;
 
-  GtkWidget *misc, *widget;
-  GtkBuilder *builder;
-
-  G_OBJECT_CLASS (ogmrip_lavc_dialog_parent_class)->constructed (gobject);
-
-  profile = ogmrip_plugin_dialog_get_profile (OGMRIP_PLUGIN_DIALOG (gobject));
-  if (!profile)
-  {
-    g_critical ("No profile has been specified");
-    return;
-  }
-
-  builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))
-  {
-    g_critical ("Couldn't load builder file: %s", error->message);
-    return;
-  }
+  if (dialog->profile)
+    g_object_unref (dialog->profile);
+  dialog->profile = g_object_ref (profile);
 
   settings = ogmrip_profile_get_child (profile, "lavc");
   g_assert (settings != NULL);
 
-  misc = gtk_dialog_get_content_area (GTK_DIALOG (gobject));
-
-  widget = gtk_builder_get_widget (builder, OGMRIP_GLADE_ROOT);
-  gtk_container_add (GTK_CONTAINER (misc), widget);
-  gtk_widget_show (widget);
-
-  widget = gtk_builder_get_widget (builder, "mv0-check");
   g_settings_bind (settings, OGMRIP_LAVC_PROP_MV0,
-      widget, "active", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "v4mv-check");
+      dialog->mv0_check, "active", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_LAVC_PROP_V4MV,
-      widget, "active", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "mbd-combo");
+      dialog->v4mv_check, "active", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_LAVC_PROP_MBD,
-      widget, "active", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "strict-combo");
+      dialog->mbd_combo, "active", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_LAVC_PROP_STRICT,
-      widget, "active", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "vb_strategy-combo");
+      dialog->strict_combo, "active", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_LAVC_PROP_VB_STRATEGY,
-      widget, "active", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "qns-combo");
+      dialog->vb_strategy_combo, "active", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_LAVC_PROP_QNS,
-      widget, "active", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "keyint-spin");
+      dialog->qns_combo, "active", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_LAVC_PROP_KEYINT,
-      widget, "value", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "last_pred-spin");
+      dialog->keyint_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_LAVC_PROP_LAST_PRED,
-      widget, "value", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "vqcomp-spin");
+      dialog->last_pred_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_LAVC_PROP_VQCOMP,
-      widget, "value", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "dc-spin");
+      dialog->vqcomp_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_LAVC_PROP_DC,
-      widget, "value", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "preme-combo");
+      dialog->dc_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_LAVC_PROP_PREME,
-      widget, "active", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "cmp-spin");
+      dialog->preme_combo, "active", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_LAVC_PROP_CMP,
-      widget, "value", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "precmp-spin");
+      dialog->cmp_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_LAVC_PROP_PRECMP,
-      widget, "value", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "subcmp-spin");
+      dialog->precmp_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_LAVC_PROP_SUBCMP,
-      widget, "value", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "dia-spin");
+      dialog->subcmp_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_LAVC_PROP_DIA,
-      widget, "value", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "predia-spin");
+      dialog->dia_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_LAVC_PROP_PREDIA,
-      widget, "value", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "buf_size-spin");
+      dialog->predia_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_LAVC_PROP_BUF_SIZE,
-      widget, "value", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "min_rate-spin");
+      dialog->buf_size_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_LAVC_PROP_MIN_RATE,
-      widget, "value", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "max_rate-spin");
+      dialog->min_rate_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_LAVC_PROP_MAX_RATE,
-      widget, "value", G_SETTINGS_BIND_DEFAULT);
+      dialog->max_rate_spin, "value", G_SETTINGS_BIND_DEFAULT);
 
   g_object_unref (settings);
-  g_object_unref (builder);
+}
+
+static void
+ogmrip_lavc_dialog_get_property (GObject *gobject, guint prop_id, GValue *value, GParamSpec *pspec)
+{
+  switch (prop_id)
+  {
+    case PROP_PROFILE:
+      g_value_set_object (value, OGMRIP_LAVC_DIALOG (gobject)->profile);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
+      break;
+  }
+}
+
+static void
+ogmrip_lavc_dialog_set_property (GObject *gobject, guint prop_id, const GValue *value, GParamSpec *pspec)
+{
+  switch (prop_id)
+  {
+    case PROP_PROFILE:
+      ogmrip_lavc_dialog_set_profile (OGMRIP_LAVC_DIALOG (gobject), g_value_get_object (value));
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
+      break;
+  }
 }
 
 static void
@@ -174,33 +173,70 @@ ogmrip_lavc_dialog_class_init (OGMRipLavcDialogClass *klass)
   GObjectClass *gobject_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->constructed = ogmrip_lavc_dialog_constructed;
+  gobject_class->get_property = ogmrip_lavc_dialog_get_property;
+  gobject_class->set_property = ogmrip_lavc_dialog_set_property;
+
+  g_object_class_override_property (gobject_class, PROP_PROFILE, "profile");
 }
 
 static void
 ogmrip_lavc_dialog_init (OGMRipLavcDialog *dialog)
 {
+  GError *error = NULL;
+
+  GtkBuilder *builder;
+  GtkWidget *misc, *widget;
+
   gtk_dialog_add_buttons (GTK_DIALOG (dialog),
       GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
       NULL);
   gtk_window_set_title (GTK_WINDOW (dialog), _("Lavc Options"));
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
+
+  builder = gtk_builder_new ();
+  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))
+    g_error ("Couldn't load builder file: %s", error->message);
+
+  misc = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+
+  widget = gtk_builder_get_widget (builder, OGMRIP_GLADE_ROOT);
+  gtk_container_add (GTK_CONTAINER (misc), widget);
+  gtk_widget_show (widget);
+
+  dialog->mv0_check = gtk_builder_get_widget (builder, "mv0-check");
+  dialog->v4mv_check = gtk_builder_get_widget (builder, "v4mv-check");
+  dialog->mbd_combo = gtk_builder_get_widget (builder, "mbd-combo");
+  dialog->strict_combo = gtk_builder_get_widget (builder, "strict-combo");
+  dialog->vb_strategy_combo = gtk_builder_get_widget (builder, "vb_strategy-combo");
+  dialog->qns_combo = gtk_builder_get_widget (builder, "qns-combo");
+  dialog->keyint_spin = gtk_builder_get_widget (builder, "keyint-spin");
+  dialog->last_pred_spin = gtk_builder_get_widget (builder, "last_pred-spin");
+  dialog->vqcomp_spin = gtk_builder_get_widget (builder, "vqcomp-spin");
+  dialog->dc_spin = gtk_builder_get_widget (builder, "dc-spin");
+  dialog->preme_combo = gtk_builder_get_widget (builder, "preme-combo");
+  dialog->cmp_spin = gtk_builder_get_widget (builder, "cmp-spin");
+  dialog->precmp_spin = gtk_builder_get_widget (builder, "precmp-spin");
+  dialog->subcmp_spin = gtk_builder_get_widget (builder, "subcmp-spin");
+  dialog->dia_spin = gtk_builder_get_widget (builder, "dia-spin");
+  dialog->predia_spin = gtk_builder_get_widget (builder, "predia-spin");
+  dialog->buf_size_spin = gtk_builder_get_widget (builder, "buf_size-spin");
+  dialog->min_rate_spin = gtk_builder_get_widget (builder, "min_rate-spin");
+  dialog->max_rate_spin = gtk_builder_get_widget (builder, "max_rate-spin");
+
+  g_object_unref (builder);
 }
 
-static OGMRipVideoOptionsPlugin lavc_options_plugin =
+static void
+ogmrip_options_editable_init (OGMRipOptionsEditableInterface *iface)
 {
-  NULL,
-  G_TYPE_NONE,
-  G_TYPE_NONE
-};
+}
 
-OGMRipVideoOptionsPlugin *
-ogmrip_init_options_plugin (void)
+gboolean
+ogmrip_init_plugin (GError **error)
 {
-  lavc_options_plugin.type = OGMRIP_TYPE_LAVC;
-  lavc_options_plugin.dialog = OGMRIP_TYPE_LAVC_DIALOG;
+  ogmrip_type_add_extension (OGMRIP_TYPE_LAVC, OGMRIP_TYPE_LAVC_DIALOG);
 
-  return &lavc_options_plugin;
+  return TRUE;
 }
 

@@ -9,7 +9,6 @@ libogmrip_encode_gtk_la_SOURCES =    \
   ogmrip-helper.c                    \
   ogmrip-list-item.c                 \
   ogmrip-options-editable.c          \
-  ogmrip-options-plugin.c            \
   ogmrip-profile-editor-dialog.c     \
   ogmrip-profile-manager-dialog.c    \
   ogmrip-profile-store.c             \
@@ -31,7 +30,6 @@ libogmrip_encode_gtk_la_HEADERS =    \
   ogmrip-helper.h                    \
   ogmrip-list-item.h                 \
   ogmrip-options-editable.h          \
-  ogmrip-options-plugin.h            \
   ogmrip-profile-editor-dialog.h     \
   ogmrip-profile-manager-dialog.h    \
   ogmrip-profile-store.h             \

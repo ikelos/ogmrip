@@ -188,24 +188,11 @@ ogmrip_theora_run (OGMJobSpawn *spawn)
   return result;
 }
 
-static OGMRipVideoPlugin theora_plugin =
-{
-  NULL,
-  G_TYPE_NONE,
-  "theora",
-  N_("Ogg Theora"),
-  OGMRIP_FORMAT_THEORA,
-  1,
-  1
-};
-
-OGMRipVideoPlugin *
+gboolean
 ogmrip_init_plugin (GError **error)
 {
   gboolean have_mplayer, have_theoraenc;
   gchar *fullname;
-
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
   have_mplayer = ogmrip_check_mplayer ();
 
@@ -213,19 +200,27 @@ ogmrip_init_plugin (GError **error)
   have_theoraenc = fullname != NULL;
   g_free (fullname);
 
-  theora_plugin.type = OGMRIP_TYPE_THEORA;
-
-  if (have_mplayer && have_theoraenc)
-    return &theora_plugin;
-
   if (!have_mplayer && !have_theoraenc)
-    g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, ("MPlayer and theoraenc are missing"));
-  else if (!have_mplayer)
-    g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, ("MPlayer is missing"));
-  else if (!have_theoraenc)
-    g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, ("theoraenc is missing"));
+  {
+    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, ("MPlayer and theoraenc are missing"));
+    return FALSE;
+  }
 
-  return NULL;
+  if (!have_mplayer)
+  {
+    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, ("MPlayer is missing"));
+    return FALSE;
+  }
 
+  if (!have_theoraenc)
+  {
+    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, ("theoraenc is missing"));
+    return FALSE;
+  }
+
+  ogmrip_type_register_codec (NULL, OGMRIP_TYPE_THEORA,
+      "theora", N_("Ogg Theora"), OGMRIP_FORMAT_THEORA);
+
+  return TRUE;
 }
 

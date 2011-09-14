@@ -129,23 +129,18 @@ ogmrip_audio_copy_run (OGMJobSpawn *spawn)
   return result;
 }
 
-static OGMRipAudioPlugin acopy_plugin =
-{
-  NULL,
-  G_TYPE_NONE,
-  "copy",
-  N_("Copy (for AC3 or DTS)"),
-  OGMRIP_FORMAT_COPY
-};
-
-OGMRipAudioPlugin *
-ogmrip_init_plugin (void)
+gboolean
+ogmrip_init_plugin (GError **error)
 {
   if (!ogmrip_check_mencoder ())
-    return NULL;
+  {
+    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MEncoder is missing"));
+    return FALSE;
+  }
 
-  acopy_plugin.type = OGMRIP_TYPE_AUDIO_COPY;
+  ogmrip_type_register_codec (NULL, OGMRIP_TYPE_AUDIO_COPY,
+      "copy", N_("Copy (for AC3 or DTS)"), OGMRIP_FORMAT_COPY);
 
-  return &acopy_plugin;
+  return TRUE;
 }
 

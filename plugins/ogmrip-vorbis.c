@@ -164,22 +164,11 @@ ogmrip_vorbis_run (OGMJobSpawn *spawn)
   return result;
 }
 
-static OGMRipAudioPlugin vorbis_plugin =
-{
-  NULL,
-  G_TYPE_NONE,
-  "vorbis",
-  N_("Ogg Vorbis"),
-  OGMRIP_FORMAT_VORBIS
-};
-
-OGMRipAudioPlugin *
+gboolean
 ogmrip_init_plugin (GError **error)
 {
   gboolean have_mplayer, have_oggenc;
   gchar *fullname;
-
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
   have_mplayer = ogmrip_check_mplayer ();
 
@@ -187,18 +176,27 @@ ogmrip_init_plugin (GError **error)
   have_oggenc = fullname != NULL;
   g_free (fullname);
 
-  vorbis_plugin.type = OGMRIP_TYPE_VORBIS;
-
-  if (have_mplayer && have_oggenc)
-    return &vorbis_plugin;
-
   if (!have_mplayer && !have_oggenc)
-    g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MPlayer and OggEnc are missing"));
-  else if (!have_mplayer)
-    g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MPlayer is missing"));
-  else if (!have_oggenc)
-    g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("OggEnc is missing"));
+  {
+    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MPlayer and OggEnc are missing"));
+    return FALSE;
+  }
 
-  return NULL;
+  if (!have_mplayer)
+  {
+    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MPlayer is missing"));
+    return FALSE;
+  }
+
+  if (!have_oggenc)
+  {
+    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("OggEnc is missing"));
+    return FALSE;
+  }
+
+  ogmrip_type_register_codec (NULL, OGMRIP_TYPE_VORBIS,
+      "vorbis", N_("Ogg Vorbis"), OGMRIP_FORMAT_VORBIS);
+
+  return TRUE;
 }
 

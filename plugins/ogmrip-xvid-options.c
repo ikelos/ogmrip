@@ -20,14 +20,17 @@
 #include "config.h"
 #endif
 
-#include <glib/gi18n.h>
+#include <ogmrip-encode-gtk.h>
 
 #include "ogmrip-xvid.h"
-#include "ogmrip-helper.h"
-#include "ogmrip-options-plugin.h"
+
+#include <glib/gi18n.h>
 
 #define OGMRIP_GLADE_FILE "ogmrip/ogmrip-xvid.glade"
 #define OGMRIP_GLADE_ROOT "root"
+
+#define gtk_builder_get_widget(builder, name) \
+    (GtkWidget *) gtk_builder_get_object ((builder), (name))
 
 #define OGMRIP_TYPE_XVID_DIALOG          (ogmrip_xvid_dialog_get_type ())
 #define OGMRIP_XVID_DIALOG(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_XVID_DIALOG, OGMRipXvidDialog))
@@ -40,13 +43,49 @@ typedef struct _OGMRipXvidDialogClass OGMRipXvidDialogClass;
 
 struct _OGMRipXvidDialog
 {
-  OGMRipPluginDialog parent_instance;
+  GtkDialog parent_instance;
+
+  OGMRipProfile *profile;
+
+  GtkWidget *bquant_offset_spin;
+  GtkWidget *bquant_ratio_spin;
+  GtkWidget *bvhq_check;
+  GtkWidget *chroma_me_check;
+  GtkWidget *chroma_opt_check;
+  GtkWidget *closed_gop_check;
+  GtkWidget *max_bframes_spin;
+  GtkWidget *frame_drop_ratio_spin;
+  GtkWidget *gmc_check;
+  GtkWidget *interlacing_check;
+  GtkWidget *max_bquant_spin;
+  GtkWidget *max_iquant_spin;
+  GtkWidget *max_pquant_spin;
+  GtkWidget *me_quality_combo;
+  GtkWidget *min_bquant_spin;
+  GtkWidget *min_iquant_spin;
+  GtkWidget *min_pquant_spin;
+  GtkWidget *max_keyint_spin;
+  GtkWidget *packed_check;
+  GtkWidget *profile_combo;
+  GtkWidget *quant_type_combo;
+  GtkWidget *vhq_combo;
+  GtkWidget *par_width_spin;
+  GtkWidget *par_height_spin;
+  GtkWidget *par_combo;
 };
 
 struct _OGMRipXvidDialogClass
 {
-  OGMRipPluginDialogClass parent_class;
+  GtkDialogClass parent_class;
 };
+
+enum
+{
+  PROP_0,
+  PROP_PROFILE
+};
+
+static void ogmrip_options_editable_init (OGMRipOptionsEditableInterface *iface);
 
 static gboolean
 ogmrip_xvid_dialog_set_frame_drop_ratio_sensitivity (GBinding *binding,
@@ -66,157 +105,101 @@ ogmrip_xvid_dialog_set_par_sensitivity (GBinding *binding,
   return TRUE;
 }
 
-G_DEFINE_TYPE (OGMRipXvidDialog, ogmrip_xvid_dialog, OGMRIP_TYPE_PLUGIN_DIALOG)
+G_DEFINE_TYPE_WITH_CODE (OGMRipXvidDialog, ogmrip_xvid_dialog, GTK_TYPE_DIALOG,
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_OPTIONS_EDITABLE, ogmrip_options_editable_init));
 
 static void
-ogmrip_xvid_dialog_constructed (GObject *gobject)
+ogmrip_xvid_dialog_set_profile (OGMRipXvidDialog *dialog, OGMRipProfile *profile)
 {
-  GError *error = NULL;
-
-  OGMRipProfile *profile;
   GSettings *settings;
 
-  GtkWidget *misc, *widget;
-  GtkBuilder *builder;
-
-  G_OBJECT_CLASS (ogmrip_xvid_dialog_parent_class)->constructed (gobject);
-
-  profile = ogmrip_plugin_dialog_get_profile (OGMRIP_PLUGIN_DIALOG (gobject));
-  if (!profile)
-  {
-    g_critical ("No profile has been specified");
-    return;
-  }
-
-  builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))
-  {
-    g_critical ("Couldn't load builder file: %s", error->message);
-    return;
-  }
+  if (dialog->profile)
+    g_object_unref (dialog->profile);
+  dialog->profile = g_object_ref (profile);
 
   settings = ogmrip_profile_get_child (profile, "xvid");
   g_assert (settings != NULL);
 
-  misc = gtk_dialog_get_content_area (GTK_DIALOG (gobject));
-
-  widget = gtk_builder_get_widget (builder, OGMRIP_GLADE_ROOT);
-  gtk_container_add (GTK_CONTAINER (misc), widget);
-  gtk_widget_show (widget);
-
-  widget = gtk_builder_get_widget (builder, "bquant_offset-spin");
   g_settings_bind (settings, OGMRIP_XVID_PROP_BQUANT_OFFSET,
-      widget, "value", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "bquant_ratio-spin");
+      dialog->bquant_offset_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_BQUANT_RATIO,
-      widget, "value", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "bvhq-check");
+      dialog->bquant_ratio_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_BVHQ,
-      widget, "active", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "chroma_me-check");
+      dialog->bvhq_check, "active", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_CHROMA_ME,
-      widget, "active", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "chroma_opt-check");
+      dialog->chroma_me_check, "active", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_CHROMA_OPT,
-      widget, "active", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "closed_gop-check");
+      dialog->chroma_opt_check, "active", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_CLOSED_GOP,
-      widget, "active", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "max_bframes-spin");
+      dialog->closed_gop_check, "active", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_MAX_BFRAMES,
-      widget, "value", G_SETTINGS_BIND_DEFAULT);
-
-  g_object_bind_property (misc, "active", widget, "sensitive",
-      G_BINDING_SYNC_CREATE | G_BINDING_INVERT_BOOLEAN);
-
-  misc = gtk_builder_get_widget (builder, "frame_drop_ratio-spin");
+      dialog->max_bframes_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_FRAME_DROP_RATIO,
-      misc, "value", G_SETTINGS_BIND_DEFAULT);
-
-  g_object_bind_property_full (widget, "value", misc, "sensitive", G_BINDING_SYNC_CREATE,
-      ogmrip_xvid_dialog_set_frame_drop_ratio_sensitivity, NULL, NULL, NULL);
-
-  widget = gtk_builder_get_widget (builder, "gmc-check");
+      dialog->frame_drop_ratio_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_GMC,
-      widget, "active", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "interlacing-check");
+      dialog->gmc_check, "active", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_INTERLACING,
-      widget, "active", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "max_bquant-spin");
+      dialog->interlacing_check, "active", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_MAX_BQUANT,
-      widget, "value", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "max_iquant-spin");
+      dialog->max_bquant_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_MAX_IQUANT,
-      widget, "value", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "max_pquant-spin");
+      dialog->max_iquant_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_MAX_PQUANT,
-      widget, "value", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "me_quality-combo");
+      dialog->max_pquant_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_ME_QUALITY,
-      widget, "active", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "min_bquant-spin");
+      dialog->me_quality_combo, "active", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_MIN_BQUANT,
-      widget, "value", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "min_iquant-spin");
+      dialog->min_bquant_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_MIN_IQUANT,
-      widget, "value", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "min_pquant-spin");
+      dialog->min_iquant_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_MIN_PQUANT,
-      widget, "value", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "max_keyint-spin");
+      dialog->min_pquant_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_MAX_KEYINT,
-      widget, "value", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "packed-check");
+      dialog->max_keyint_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_PACKED,
-      widget, "active", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "profile-combo");
+      dialog->packed_check, "active", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_PROFILE,
-      widget, "active", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "quant_type-combo");
+      dialog->profile_combo, "active", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_QUANT_TYPE,
-      widget, "active", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "vhq-combo");
+      dialog->quant_type_combo, "active", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_VHQ,
-      widget, "active", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "par_width-spin");
+      dialog->vhq_combo, "active", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_PAR_WIDTH,
-      widget, "value", G_SETTINGS_BIND_DEFAULT);
-
-  misc = gtk_builder_get_widget (builder, "par_height-spin");
+      dialog->par_width_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_PAR_HEIGHT,
-      misc, "value", G_SETTINGS_BIND_DEFAULT);
-
-  g_object_bind_property (widget, "sensitive", misc, "sensitive", G_BINDING_SYNC_CREATE);
-
-  misc = gtk_builder_get_widget (builder, "par-combo");
+      dialog->par_height_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_PAR,
-      misc, "active", G_SETTINGS_BIND_DEFAULT);
-
-  g_object_bind_property_full (misc, "active", widget, "sensitive", G_BINDING_SYNC_CREATE,
-      ogmrip_xvid_dialog_set_par_sensitivity, NULL, NULL, NULL);
+      dialog->par_combo, "active", G_SETTINGS_BIND_DEFAULT);
 
   g_object_unref (settings);
-  g_object_unref (builder);
+}
+
+static void
+ogmrip_xvid_dialog_get_property (GObject *gobject, guint prop_id, GValue *value, GParamSpec *pspec)
+{
+  switch (prop_id)
+  {
+    case PROP_PROFILE:
+      g_value_set_object (value, OGMRIP_XVID_DIALOG (gobject)->profile);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
+      break;
+  }
+}
+
+static void
+ogmrip_xvid_dialog_set_property (GObject *gobject, guint prop_id, const GValue *value, GParamSpec *pspec)
+{
+  switch (prop_id)
+  {
+    case PROP_PROFILE:
+      ogmrip_xvid_dialog_set_profile (OGMRIP_XVID_DIALOG (gobject), g_value_get_object (value));
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
+      break;
+  }
 }
 
 static void
@@ -225,36 +208,93 @@ ogmrip_xvid_dialog_class_init (OGMRipXvidDialogClass *klass)
   GObjectClass *gobject_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->constructed = ogmrip_xvid_dialog_constructed;
+  gobject_class->get_property = ogmrip_xvid_dialog_get_property;
+  gobject_class->set_property = ogmrip_xvid_dialog_set_property;
+
+  g_object_class_override_property (gobject_class, PROP_PROFILE, "profile");
 }
 
 static void
 ogmrip_xvid_dialog_init (OGMRipXvidDialog *dialog)
 {
+  GError *error = NULL;
+
+  GtkBuilder *builder;
+  GtkWidget *misc, *widget;
+
   gtk_dialog_add_buttons (GTK_DIALOG (dialog),
       GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
       NULL);
   gtk_window_set_title (GTK_WINDOW (dialog), _("XviD Options"));
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
+
+  builder = gtk_builder_new ();
+  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))
+    g_error ("Couldn't load builder file: %s", error->message);
+
+  misc = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+
+  widget = gtk_builder_get_widget (builder, OGMRIP_GLADE_ROOT);
+  gtk_container_add (GTK_CONTAINER (misc), widget);
+  gtk_widget_show (widget);
+
+  dialog->bquant_offset_spin = gtk_builder_get_widget (builder, "bquant_offset-spin");
+  dialog->bquant_ratio_spin = gtk_builder_get_widget (builder, "bquant_ratio-spin");
+  dialog->bvhq_check = gtk_builder_get_widget (builder, "bvhq-check");
+  dialog->chroma_me_check = gtk_builder_get_widget (builder, "chroma_me-check");
+  dialog->chroma_opt_check = gtk_builder_get_widget (builder, "chroma_opt-check");
+  dialog->closed_gop_check = gtk_builder_get_widget (builder, "closed_gop-check");
+  dialog->max_bframes_spin = gtk_builder_get_widget (builder, "max_bframes-spin");
+  dialog->frame_drop_ratio_spin = gtk_builder_get_widget (builder, "frame_drop_ratio-spin");
+  dialog->gmc_check = gtk_builder_get_widget (builder, "gmc-check");
+  dialog->interlacing_check = gtk_builder_get_widget (builder, "interlacing-check");
+  dialog->max_bquant_spin = gtk_builder_get_widget (builder, "max_bquant-spin");
+  dialog->max_iquant_spin = gtk_builder_get_widget (builder, "max_iquant-spin");
+  dialog->max_pquant_spin = gtk_builder_get_widget (builder, "max_pquant-spin");
+  dialog->me_quality_combo = gtk_builder_get_widget (builder, "me_quality-combo");
+  dialog->min_bquant_spin = gtk_builder_get_widget (builder, "min_bquant-spin");
+  dialog->min_iquant_spin = gtk_builder_get_widget (builder, "min_iquant-spin");
+  dialog->min_pquant_spin = gtk_builder_get_widget (builder, "min_pquant-spin");
+  dialog->max_keyint_spin = gtk_builder_get_widget (builder, "max_keyint-spin");
+  dialog->packed_check = gtk_builder_get_widget (builder, "packed-check");
+  dialog->profile_combo = gtk_builder_get_widget (builder, "profile-combo");
+  dialog->quant_type_combo = gtk_builder_get_widget (builder, "quant_type-combo");
+  dialog->vhq_combo = gtk_builder_get_widget (builder, "vhq-combo");
+  dialog->par_width_spin = gtk_builder_get_widget (builder, "par_width-spin");
+  dialog->par_height_spin = gtk_builder_get_widget (builder, "par_height-spin");
+  dialog->par_combo = gtk_builder_get_widget (builder, "par-combo");
+
+  g_object_bind_property_full (dialog->max_bframes_spin, "value",
+      dialog->frame_drop_ratio_spin, "sensitive", G_BINDING_SYNC_CREATE,
+      ogmrip_xvid_dialog_set_frame_drop_ratio_sensitivity, NULL, NULL, NULL);
+
+  g_object_bind_property (dialog->par_width_spin, "sensitive",
+      dialog->par_height_spin, "sensitive", G_BINDING_SYNC_CREATE);
+
+  g_object_bind_property_full (dialog->par_combo, "active",
+      dialog->par_width_spin, "sensitive", G_BINDING_SYNC_CREATE,
+      ogmrip_xvid_dialog_set_par_sensitivity, NULL, NULL, NULL);
+
+  g_object_unref (builder);
 }
 
-static OGMRipVideoOptionsPlugin xvid_options_plugin =
+static void
+ogmrip_options_editable_init (OGMRipOptionsEditableInterface *iface)
 {
-  NULL,
-  G_TYPE_NONE,
-  G_TYPE_NONE
-};
+}
 
-OGMRipVideoOptionsPlugin *
-ogmrip_init_options_plugin (void)
+gboolean
+ogmrip_init_plugin (GError **error)
 {
-  xvid_options_plugin.type = ogmrip_plugin_get_video_codec_by_name ("xvid");
-  if (xvid_options_plugin.type == G_TYPE_NONE)
-    return NULL;
+  GType gtype;
 
-  xvid_options_plugin.dialog = OGMRIP_TYPE_XVID_DIALOG;
+  gtype = ogmrip_type_from_name ("xvid");
+  if (gtype == G_TYPE_NONE)
+    return FALSE;
 
-  return &xvid_options_plugin;
+  ogmrip_type_add_extension (gtype, OGMRIP_TYPE_XVID_DIALOG);
+
+  return TRUE;
 }
 

@@ -102,28 +102,18 @@ ogmrip_wav_run (OGMJobSpawn *spawn)
   return result;
 }
 
-static OGMRipAudioPlugin wav_plugin =
-{
-  NULL,
-  G_TYPE_NONE,
-  "wav",
-  N_("Wave (uncompressed PCM)"),
-  OGMRIP_FORMAT_PCM
-};
-
-OGMRipAudioPlugin *
+gboolean
 ogmrip_init_plugin (GError **error)
 {
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
-
   if (!ogmrip_check_mplayer ())
   {
-    g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MPlayer is missing"));
-    return NULL;
+    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MPlayer is missing"));
+    return FALSE;
   }
 
-  wav_plugin.type = OGMRIP_TYPE_WAV;
+  ogmrip_type_register_codec (NULL, OGMRIP_TYPE_WAV,
+      "wav", N_("Wave (uncompressed PCM)"), OGMRIP_FORMAT_PCM);
 
-  return &wav_plugin;
+  return TRUE;
 }
 

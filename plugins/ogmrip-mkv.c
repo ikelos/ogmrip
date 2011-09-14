@@ -392,19 +392,6 @@ ogmrip_matroska_run (OGMJobSpawn *spawn)
   return result;
 }
 
-static OGMRipContainerPlugin mkv_plugin =
-{
-  NULL,
-  G_TYPE_NONE,
-  "mkv",
-  N_("Matroska Media (MKV)"),
-  FALSE,
-  TRUE,
-  G_MAXINT,
-  G_MAXINT,
-  NULL
-};
-
 static gint formats[] =
 {
   OGMRIP_FORMAT_MPEG1,
@@ -428,18 +415,16 @@ static gint formats[] =
   -1
 };
 
-OGMRipContainerPlugin *
+gboolean
 ogmrip_init_plugin (GError **error)
 {
   gchar *output;
   guint i = 0;
 
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
-
   if (!g_spawn_command_line_sync ("mkvmerge --list-types", &output, NULL, NULL, NULL))
   {
-    g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("mkvmerge is missing"));
-    return NULL;
+    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("mkvmerge is missing"));
+    return FALSE;
   }
 
   while (formats[i] != -1)
@@ -453,9 +438,9 @@ ogmrip_init_plugin (GError **error)
 
   g_free (output);
 
-  mkv_plugin.type = OGMRIP_TYPE_MATROSKA;
-  mkv_plugin.formats = formats;
+  ogmrip_type_register_container (NULL, OGMRIP_TYPE_MATROSKA,
+      "mkv", N_("Matroska Media (MKV)"), formats);
 
-  return &mkv_plugin;
+  return TRUE;
 }
 

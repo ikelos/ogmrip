@@ -167,22 +167,11 @@ ogmrip_aac_run (OGMJobSpawn *spawn)
   return result;
 }
 
-static OGMRipAudioPlugin aac_plugin =
-{
-  NULL,
-  G_TYPE_NONE,
-  "aac",
-  N_("Advanced Audio Coding (AAC)"),
-  OGMRIP_FORMAT_AAC
-};
-
-OGMRipAudioPlugin *
+gboolean
 ogmrip_init_plugin (GError **error)
 {
   gboolean have_mplayer, have_faac;
   gchar *fullname;
-
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
   have_mplayer = ogmrip_check_mplayer ();
 
@@ -190,18 +179,27 @@ ogmrip_init_plugin (GError **error)
   have_faac = fullname != NULL;
   g_free (fullname);
 
-  aac_plugin.type = OGMRIP_TYPE_AAC;
-
-  if (have_mplayer && have_faac)
-    return &aac_plugin;
-
   if (!have_mplayer && !have_faac)
-    g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MPlayer and FAAC are missing"));
-  else if (!have_mplayer)
-    g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MPlayer is missing"));
-  else if (!have_faac)
-    g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("FAAC is missing"));
+  {
+    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MPlayer and FAAC are missing"));
+    return FALSE;
+  }
 
-  return NULL;
+  if (!have_mplayer)
+  {
+    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MPlayer is missing"));
+    return FALSE;
+  }
+
+  if (!have_faac)
+  {
+    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("FAAC is missing"));
+    return FALSE;
+  }
+
+  ogmrip_type_register_codec (NULL, OGMRIP_TYPE_AAC,
+      "aac", N_("Advanced Audio Coding (AAC)"), OGMRIP_FORMAT_AAC);
+
+  return TRUE;
 }
 

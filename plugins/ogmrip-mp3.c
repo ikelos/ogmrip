@@ -179,22 +179,11 @@ ogmrip_mp3_run (OGMJobSpawn *spawn)
   return result;
 }
 
-static OGMRipAudioPlugin mp3_plugin =
-{
-  NULL,
-  G_TYPE_NONE,
-  "mp3",
-  N_("MPEG-1 layer III (MP3)"),
-  OGMRIP_FORMAT_MP3
-};
-
-OGMRipAudioPlugin *
+gboolean
 ogmrip_init_plugin (GError **error)
 {
   gboolean have_mplayer, have_lame;
   gchar *fullname;
-
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
   have_mplayer = ogmrip_check_mplayer ();
 
@@ -202,18 +191,27 @@ ogmrip_init_plugin (GError **error)
   have_lame = fullname != NULL;
   g_free (fullname);
 
-  mp3_plugin.type = OGMRIP_TYPE_MP3;
-
-  if (have_mplayer && have_lame)
-    return &mp3_plugin;
-
   if (!have_mplayer && !have_lame)
-    g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MPlayer and LAME are missing"));
-  else if (!have_mplayer)
-    g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MPlayer is missing"));
-  else if (!have_lame)
-    g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("LAME is missing"));
+  {
+    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MPlayer and LAME are missing"));
+    return FALSE;
+  }
 
-  return NULL;
+  if (!have_mplayer)
+  {
+    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MPlayer is missing"));
+    return FALSE;
+  }
+
+  if (!have_lame)
+  {
+    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("LAME is missing"));
+    return FALSE;
+  }
+
+  ogmrip_type_register_codec (NULL, OGMRIP_TYPE_MP3,
+      "mp3", N_("MPEG-1 layer III (MP3)"), OGMRIP_FORMAT_MP3);
+
+  return TRUE;
 }
 

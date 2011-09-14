@@ -1984,8 +1984,8 @@ ogmrip_init (void)
 
   ogmrip_settings_init ();
 
-  ogmrip_plugin_init ();
-  ogmrip_options_plugin_init ();
+  // ogmrip_plugin_init ();
+  // ogmrip_options_plugin_init ();
 
 #ifdef HAVE_LIBNOTIFY_SUPPORT
   notify_init (PACKAGE_NAME);
@@ -2012,8 +2012,8 @@ ogmrip_uninit (void)
 
   ogmrip_settings_uninit ();
 
-  ogmrip_options_plugin_uninit ();
-  ogmrip_plugin_uninit ();
+  // ogmrip_options_plugin_uninit ();
+  // ogmrip_plugin_uninit ();
 }
 
 static GOptionEntry opts[] =

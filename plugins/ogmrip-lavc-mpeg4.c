@@ -56,34 +56,24 @@ ogmrip_lavc_mpeg4_init (OGMRipLavcMpeg4 *lavc_mpeg4)
 {
 }
 
-static OGMRipVideoPlugin lavc_mpeg4_plugin =
-{
-  NULL,
-  G_TYPE_NONE,
-  "lavc-mpeg4",
-  N_("Lavc Mpeg-4"),
-  OGMRIP_FORMAT_MPEG4,
-  G_MAXINT,
-  8
-};
-
-OGMRipVideoPlugin *
-ogmrip_init_plugin (void)
+gboolean
+ogmrip_init_plugin (GError **error)
 {
   gchar *output;
   gboolean match;
 
   if (!g_spawn_command_line_sync ("mencoder -ovc help", &output, NULL, NULL, NULL))
-    return NULL;
+    return FALSE;
 
   match = g_regex_match_simple ("^ *lavc *- .*$", output, G_REGEX_MULTILINE, 0);
   g_free (output);
 
   if (!match)
-    return NULL;
+    return FALSE;
 
-  lavc_mpeg4_plugin.type = OGMRIP_TYPE_LAVC_MPEG4;
+  ogmrip_type_register_codec (NULL, OGMRIP_TYPE_LAVC_MPEG4,
+      "lavc-mpeg4", N_("Lavc Mpeg-4"), OGMRIP_FORMAT_MPEG4);
 
-  return &lavc_mpeg4_plugin;
+  return TRUE;
 }
 

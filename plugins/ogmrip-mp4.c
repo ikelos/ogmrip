@@ -546,20 +546,7 @@ ogmrip_mp4_run (OGMJobSpawn *spawn)
   return result;
 }
 
-static OGMRipContainerPlugin mp4_plugin =
-{
-  NULL,
-  G_TYPE_NONE,
-  "mp4",
-  N_("Mpeg-4 Media (MP4)"),
-  FALSE,
-  TRUE,
-  G_MAXINT,
-  G_MAXINT,
-  NULL
-};
-
-static gint formats[] = 
+static OGMRipFormat formats[] = 
 {
   OGMRIP_FORMAT_MPEG4,
   OGMRIP_FORMAT_MPEG2,
@@ -575,18 +562,16 @@ static gint formats[] =
   -1
 };
 
-OGMRipContainerPlugin *
+gboolean
 ogmrip_init_plugin (GError **error)
 {
   gchar *output;
   gint major_version = 0, minor_version = 0, micro_version = 0;
 
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
-
   if (!g_spawn_command_line_sync (PROGRAM " -version", &output, NULL, NULL, NULL))
   {
-    g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MP4Box is missing"));
-    return NULL;
+    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MP4Box is missing"));
+    return FALSE;
   }
 
   if (g_str_has_prefix (output, "MP4Box - GPAC version "))
@@ -615,9 +600,9 @@ ogmrip_init_plugin (GError **error)
     formats[i+1] = OGMRIP_FORMAT_COPY;
   }
 
-  mp4_plugin.type = OGMRIP_TYPE_MP4;
-  mp4_plugin.formats = formats;
+  ogmrip_type_register_container (NULL, OGMRIP_TYPE_MP4,
+      "mp4", N_("Mpeg-4 Media (MP4)"), formats);
 
-  return &mp4_plugin;
+  return TRUE;
 }
 

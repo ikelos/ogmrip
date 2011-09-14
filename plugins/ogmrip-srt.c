@@ -512,29 +512,17 @@ ogmrip_srt_run (OGMJobSpawn *spawn)
   return result;
 }
 
-static OGMRipSubpPlugin srt_plugin =
-{
-  NULL,
-  G_TYPE_NONE,
-  "srt",
-  N_("SRT text"),
-  OGMRIP_FORMAT_SRT,
-  TRUE
-};
-
-OGMRipSubpPlugin *
+gboolean
 ogmrip_init_plugin (GError **error)
 {
 #if defined(HAVE_GOCR_SUPPORT) || defined(HAVE_OCRAD_SUPPORT) || defined(HAVE_TESSERACT_SUPPORT)
   gchar *fullname;
 #endif
 
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
-
   if (!ogmrip_check_mencoder ())
   {
-    g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MEncoder is missing"));
-    return NULL;
+    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MEncoder is missing"));
+    return FALSE;
   }
 
 #ifdef HAVE_TESSERACT_SUPPORT
@@ -570,12 +558,13 @@ ogmrip_init_plugin (GError **error)
 
   if (!use_gocr && !use_ocrad && !use_tesseract)
   {
-    g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("GOCR, Ocrad and Tesseract are missing"));
-    return NULL;
+    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("GOCR, Ocrad and Tesseract are missing"));
+    return FALSE;
   }
 
-  srt_plugin.type = OGMRIP_TYPE_SRT;
+  ogmrip_type_register_codec (NULL, OGMRIP_TYPE_SRT,
+      "srt", N_("SRT text"), OGMRIP_FORMAT_SRT);
 
-  return &srt_plugin;
+  return TRUE;
 }
 

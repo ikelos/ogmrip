@@ -260,29 +260,18 @@ ogmrip_vobsub_run (OGMJobSpawn *spawn)
   return result;
 }
 
-static OGMRipSubpPlugin vobsub_plugin =
-{
-  NULL,
-  G_TYPE_NONE,
-  "vobsub",
-  N_("VobSub"),
-  OGMRIP_FORMAT_VOBSUB,
-  FALSE
-};
-
-OGMRipSubpPlugin *
+gboolean
 ogmrip_init_plugin (GError **error)
 {
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
-
   if (!ogmrip_check_mencoder ())
   {
-    g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MEncoder is missing"));
-    return NULL;
+    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MEncoder is missing"));
+    return FALSE;
   }
 
-  vobsub_plugin.type = OGMRIP_TYPE_VOBSUB;
+  ogmrip_type_register_codec (NULL, OGMRIP_TYPE_VOBSUB,
+      "vobsub", N_("VobSub"), OGMRIP_FORMAT_VOBSUB);
 
-  return &vobsub_plugin;
+  return TRUE;
 }
 
