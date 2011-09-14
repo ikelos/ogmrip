@@ -67,7 +67,7 @@ libogmrip_encode_la_HEADERS = \
   ogmrip-encode.h
 
 libogmrip_encode_la_LDFLAGS = \
-  -version-info $(OGMRIP_LT_VERSION)
+  -version-info $(OGMRIP_ENCODE_LT_VERSION)
 
 libogmrip_encode_la_LIBADD = \
   $(top_builddir)/libogmrip-media/libogmrip-media.la \
@@ -90,7 +90,7 @@ libogmrip_mplayer_la_SOURCES = \
   ogmrip-mplayer.c
   
 libogmrip_mplayer_la_LDFLAGS = \
-  -version-info $(OGMRIP_LT_VERSION)
+  -version-info $(OGMRIP_ENCODE_LT_VERSION)
 
 libogmrip_mplayer_la_LIBADD = \
   $(top_builddir)/libogmrip-job/libogmrip-job.la \
@@ -107,7 +107,7 @@ libogmrip_lavc_la_SOURCES = \
   ogmrip-lavc.c
   
 libogmrip_lavc_la_LDFLAGS = \
-  -version-info $(OGMRIP_LT_VERSION)
+  -version-info $(OGMRIP_ENCODE_LT_VERSION)
 
 libogmrip_lavc_la_LIBADD = \
   $(top_builddir)/libogmrip-job/libogmrip-job.la \

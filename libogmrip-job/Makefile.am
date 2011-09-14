@@ -32,7 +32,7 @@ libogmrip_job_la_HEADERS =  \
   ogmrip-job.h
 
 libogmrip_job_la_LDFLAGS = \
-  -version-info $(OGMJOB_LT_VERSION)
+  -version-info $(OGMRIP_JOB_LT_VERSION)
 
 ogmjob-marshal.h: ogmjob-marshal.list $(GLIB_GENMARSHAL)
 	$(GLIB_GENMARSHAL) $< --header --prefix=ogmjob_cclosure_marshal > $@

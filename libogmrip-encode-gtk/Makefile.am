@@ -38,7 +38,7 @@ libogmrip_encode_gtk_la_HEADERS =    \
   ogmrip-encode-gtk.h
 
 libogmrip_encode_gtk_la_LDFLAGS = \
-  -version-info $(OGMRIP_GTK_LT_VERSION)
+  -version-info $(OGMRIP_ENCODE_LT_VERSION)
 
 libogmrip_encode_gtk_la_LIBADD = \
   $(top_builddir)/libogmrip-media/libogmrip-media.la \

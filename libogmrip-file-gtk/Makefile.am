@@ -18,7 +18,7 @@ libogmrip_file_gtk_la_HEADERS = \
   ogmrip-file-gtk.h
 
 libogmrip_file_gtk_la_LDFLAGS = \
-  -version-info $(OGMRIP_GTK_LT_VERSION)
+  -version-info $(OGMRIP_MEDIA_LT_VERSION)
 
 libogmrip_file_gtk_la_LIBADD = \
   $(top_builddir)/libogmrip-file/libogmrip-file.la \

@@ -17,7 +17,7 @@ libogmrip_file_la_HEADERS = \
   ogmrip-file.h
 
 libogmrip_file_la_LDFLAGS = \
-  -version-info $(OGMDVD_LT_VERSION)
+  -version-info $(OGMRIP_MEDIA_LT_VERSION)
 
 libogmrip_file_la_LIBADD = \
   $(top_builddir)/libogmrip-media/libogmrip-media.la
