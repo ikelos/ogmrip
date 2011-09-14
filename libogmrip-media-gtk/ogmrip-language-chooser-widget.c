@@ -17,7 +17,6 @@
  */
 
 #include "ogmrip-language-chooser-widget.h"
-#include "ogmrip-language-store.h"
 
 struct _OGMRipLanguageChooserWidgetPriv
 {
