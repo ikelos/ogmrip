@@ -16,14 +16,21 @@ ogmrip-mp4.c
 ogmrip-video-file.c
 - ajouter delai
 
+ogmrip-hardsub.c, ogmrip-novideo.c
+- inscrire les types
+
+ogmrip-theora.c, ogmrip-xvid.c
+- surcharger la propriété 'passes' pour le nombre max de passes (1 pour theora, 2 pour xvid)
+
+ogmrip-avi.c
+- limiter le nombre de pistes audio (8) et subp (1)
+
 ogmrip-xvid.glade
-- ajouter trellis, qpel, grayscale, cartoon, b frames
+- ajouter trellis (analysis), qpel (analysis), grayscale, cartoon, b frames (frame type)
 
 ogmrip-lavc.glade
-- ajouter trellis, qpel, grayscale, v4mv, b frames
+- ajouter trellis (analysis), qpel (analysis), grayscale, v4mv (analysis), b frames (frame type)
 
 ogmrip-x264.glade
-- ajouter trellis, partitions, b frames
+- ajouter trellis (analysis), partitions (analysis), b frames (frame type)
 
-modules
-- utiliser giomodule et extension points ?
