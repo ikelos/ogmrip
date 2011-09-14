@@ -22,7 +22,7 @@
 
 #include "ogmrip-encoding-parser.h"
 #include "ogmrip-profile-engine.h"
-#include "ogmrip-plugin.h"
+#include "ogmrip-type.h"
 
 static void
 ogmrip_encoding_parse_property (OGMRipXML *xml, gpointer gobject, gpointer klass)
@@ -106,8 +106,8 @@ ogmrip_encoding_parse_container (OGMRipEncoding *encoding, OGMRipXML *xml)
   {
     GType type;
 
-    type = ogmrip_plugin_get_container_by_name (name);
-    if (type != G_TYPE_NONE)
+    type = ogmrip_type_from_name (name);
+    if (type != G_TYPE_NONE && g_type_is_a (type, OGMRIP_TYPE_CONTAINER))
     {
       OGMRipContainer *container;
       OGMRipContainerClass *klass;
@@ -134,8 +134,8 @@ ogmrip_encoding_parse_video_codec (OGMRipEncoding *encoding, OGMRipXML *xml)
   {
     GType type;
 
-    type = ogmrip_plugin_get_video_codec_by_name (name);
-    if (type != G_TYPE_NONE)
+    type = ogmrip_type_from_name (name);
+    if (type != G_TYPE_NONE && g_type_is_a (type, OGMRIP_TYPE_VIDEO_CODEC))
     {
       OGMRipTitle *title;
       OGMRipVideoCodec *codec;
@@ -165,8 +165,8 @@ ogmrip_encoding_parse_audio_codec (OGMRipEncoding *encoding, OGMRipXML *xml)
   {
     GType type;
 
-    type = ogmrip_plugin_get_audio_codec_by_name (name);
-    if (type != G_TYPE_NONE)
+    type = ogmrip_type_from_name (name);
+    if (type != G_TYPE_NONE && g_type_is_a (type, OGMRIP_TYPE_AUDIO_CODEC))
     {
       OGMRipAudioStream *stream;
       guint nr;
@@ -219,8 +219,8 @@ ogmrip_encoding_parse_subp_codec (OGMRipEncoding *encoding, OGMRipXML *xml)
   {
     GType type;
 
-    type = ogmrip_plugin_get_subp_codec_by_name (name);
-    if (type != G_TYPE_NONE)
+    type = ogmrip_type_from_name (name);
+    if (type != G_TYPE_NONE && g_type_is_a (type, OGMRIP_TYPE_SUBP_CODEC))
     {
       OGMRipSubpStream *stream;
       guint nr;
@@ -436,7 +436,7 @@ ogmrip_encoding_dump_container (OGMRipXML *xml, OGMRipContainer *container)
   ogmrip_xml_append (xml, "container");
 
   ogmrip_xml_set_string (xml, "type",
-      ogmrip_plugin_get_container_name (G_OBJECT_TYPE (container)));
+      ogmrip_type_name (G_OBJECT_TYPE (container)));
 
   klass = OGMRIP_CONTAINER_GET_CLASS (container);
 
@@ -460,7 +460,7 @@ ogmrip_encoding_dump_video_codec (OGMRipXML *xml, OGMRipCodec *codec)
   ogmrip_xml_append (xml, "video-codec");
 
   ogmrip_xml_set_string (xml, "type",
-      ogmrip_plugin_get_video_codec_name (G_OBJECT_TYPE (codec)));
+      ogmrip_type_name (G_OBJECT_TYPE (codec)));
 
   klass = OGMRIP_VIDEO_CODEC_GET_CLASS (codec);
 
@@ -507,7 +507,7 @@ ogmrip_encoding_dump_audio_codec (OGMRipXML *xml, OGMRipCodec *codec)
   ogmrip_xml_append (xml, "audio-codec");
 
   ogmrip_xml_set_string (xml, "type",
-      ogmrip_plugin_get_audio_codec_name (G_OBJECT_TYPE (codec)));
+      ogmrip_type_name (G_OBJECT_TYPE (codec)));
 
   stream = ogmrip_codec_get_input (codec);
   ogmrip_xml_set_uint (xml, "stream",
@@ -540,7 +540,7 @@ ogmrip_encoding_dump_subp_codec (OGMRipXML *xml, OGMRipCodec *codec)
   ogmrip_xml_append (xml, "subp-codec");
 
   ogmrip_xml_set_string (xml, "type",
-      ogmrip_plugin_get_subp_codec_name (G_OBJECT_TYPE (codec)));
+      ogmrip_type_name (G_OBJECT_TYPE (codec)));
 
   stream = ogmrip_codec_get_input (codec);
   ogmrip_xml_set_uint (xml, "stream",

@@ -1,5 +1,5 @@
 /* OGMRip - A library for DVD ripping and encoding
- * Copyright (C) 2004-2011 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2011 Olivier Rolland <billl@users.typeforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,21 +16,22 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef __OGMRIP_ENCODE_GTK_H__
-#define __OGMRIP_ENCODE_GTK_H__
+#ifndef __OGMRIP_TYPE_CHOOSER_WIDGET_H__
+#define __OGMRIP_TYPE_CHOOSER_WIDGET_H__
 
-#include <ogmrip-encode.h>
-#include <ogmrip-audio-chooser-widget.h>
-#include <ogmrip-encoding-manager-dialog.h>
-#include <ogmrip-helper.h>
-#include <ogmrip-list-item.h>
-#include <ogmrip-options-plugin.h>
-#include <ogmrip-profile-editor-dialog.h>
-#include <ogmrip-profile-manager-dialog.h>
-#include <ogmrip-profile-store.h>
-#include <ogmrip-progress-dialog.h>
-#include <ogmrip-subp-chooser-widget.h>
 #include <ogmrip-type-store.h>
 
-#endif /* __OGMRIP_ENCODE_GTK_H__ */
+G_BEGIN_DECLS
+
+void  ogmrip_type_chooser_widget_construct  (GtkComboBox *chooser,
+                                             GType       gtype);
+GType ogmrip_type_chooser_widget_get_active (GtkComboBox *chooser);
+void  ogmrip_type_chooser_widget_set_active (GtkComboBox *chooser,
+                                             GType       gtype);
+void  ogmrip_type_chooser_widget_set_filter (GtkComboBox *chooser,
+                                             GType       gtype);
+
+G_END_DECLS
+
+#endif /* __OGMRIP_TYPE_CHOOSER_WIDGET_H__ */
 

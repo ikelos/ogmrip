@@ -279,7 +279,7 @@ ogmrip_options_dialog_set_sensitivity (OGMRipOptionsDialog *dialog, OGMRipProfil
     settings = ogmrip_profile_get_child (profile, OGMRIP_PROFILE_VIDEO);
 
     codec = g_settings_get_string (settings, OGMRIP_PROFILE_CODEC);
-    video_codec = ogmrip_plugin_get_video_codec_by_name (codec);
+    video_codec = ogmrip_type_from_name (codec);
     g_free (codec);
 
     scaler = g_settings_get_uint (settings, OGMRIP_PROFILE_SCALER);
@@ -553,9 +553,13 @@ ogmrip_options_dialog_autoscale_button_clicked (OGMRipOptionsDialog *dialog)
 
   GType codec;
   guint x, y, w, h;
+  gchar *name;
 
   profile = ogmrip_profile_chooser_get_active (GTK_COMBO_BOX (dialog->priv->profile_combo));
-  codec = ogmrip_profile_get_video_codec_type (profile, NULL);
+
+  ogmrip_profile_get (profile, OGMRIP_PROFILE_VIDEO, OGMRIP_PROFILE_CODEC, "s", &name);
+  codec = g_type_from_name (name);
+  g_free (name);
 
   encoding = ogmrip_encoding_new (dialog->priv->title);
 

@@ -7,7 +7,6 @@ ogmrip_SOURCES = \
   ogmrip-main.c            \
   ogmrip-options-dialog.c  \
   ogmrip-pref-dialog.c     \
-  ogmrip-profiles.c        \
   ogmrip-spell-dialog.c    \
   ogmrip-update-dialog.c
 
@@ -16,7 +15,6 @@ EXTRA_DIST = \
   ogmrip-settings.h        \
   ogmrip-options-dialog.h  \
   ogmrip-pref-dialog.h     \
-  ogmrip-profiles.h        \
   ogmrip-spell-dialog.h    \
   ogmrip-update-dialog.h
 

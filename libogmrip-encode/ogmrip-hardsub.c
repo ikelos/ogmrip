@@ -21,6 +21,7 @@
 #endif
 
 #include "ogmrip-hardsub.h"
+#include "ogmrip-type.h"
 
 #include <glib/gi18n-lib.h>
 
@@ -35,22 +36,13 @@ static void
 ogmrip_hardsub_init (OGMRipHardSub *hardsub)
 {
 }
-
-static OGMRipSubpPlugin hardsub_plugin =
-{
-  NULL,
-  G_TYPE_NONE,
-  "hardsub",
-  N_("Hardcoded subtitle"),
-  0,
-  FALSE
-};
-
-OGMRipSubpPlugin *
+/*
+gboolean
 ogmrip_hardsub_get_plugin (void)
 {
-  hardsub_plugin.type = OGMRIP_TYPE_HARDSUB;
+  ogmrip_type_register_codec (NULL, OGMRIP_TYPE_HARDSUB,
+      "hardsub", N_("Hardcoded subtitle"), OGMRIP_FORMAT_UNDEFINED);
 
-  return &hardsub_plugin;
+  return TRUE;
 }
-
+*/

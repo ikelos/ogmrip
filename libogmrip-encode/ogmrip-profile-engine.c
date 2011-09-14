@@ -18,7 +18,7 @@
 
 #include "ogmrip-profile-engine.h"
 #include "ogmrip-profile-keys.h"
-#include "ogmrip-plugin.h"
+#include "ogmrip-type.h"
 #include "ogmrip-xml.h"
 
 #include <string.h>
@@ -106,31 +106,31 @@ ogmrip_profile_engine_check (OGMRipProfileEngine *engine, OGMRipProfile *profile
     return FALSE;
 
   ogmrip_profile_get (profile, OGMRIP_PROFILE_GENERAL, OGMRIP_PROFILE_CONTAINER, "s", &str);
-  container = ogmrip_plugin_get_container_by_name (str);
+  container = ogmrip_type_from_name (str);
   g_free (str);
 
   if (container == G_TYPE_NONE)
     return FALSE;
 
   ogmrip_profile_get (profile, OGMRIP_PROFILE_VIDEO, OGMRIP_PROFILE_CODEC, "s", &str);
-  codec = ogmrip_plugin_get_video_codec_by_name (str);
+  codec = ogmrip_type_from_name (str);
   g_free (str);
 
-  if (codec == G_TYPE_NONE || !ogmrip_plugin_can_contain_video (container, codec))
+  if (codec == G_TYPE_NONE || !ogmrip_container_contains (container, ogmrip_codec_format (codec)))
     return FALSE;
 
   ogmrip_profile_get (profile, OGMRIP_PROFILE_AUDIO, OGMRIP_PROFILE_CODEC, "s", &str);
-  codec = ogmrip_plugin_get_audio_codec_by_name (str);
+  codec = ogmrip_type_from_name (str);
   g_free (str);
 
-  if (codec != G_TYPE_NONE && !ogmrip_plugin_can_contain_audio (container, codec))
+  if (codec != G_TYPE_NONE && !ogmrip_container_contains (container, ogmrip_codec_format (codec)))
     return FALSE;
 
   ogmrip_profile_get (profile, OGMRIP_PROFILE_SUBP, OGMRIP_PROFILE_CODEC, "s", &str);
-  codec = ogmrip_plugin_get_subp_codec_by_name (str);
+  codec = ogmrip_type_from_name(str);
   g_free (str);
 
-  if (codec != G_TYPE_NONE && !ogmrip_plugin_can_contain_subp (container, codec))
+  if (codec != G_TYPE_NONE && !ogmrip_container_contains(container, ogmrip_codec_format (codec)))
     return FALSE;
 
   return TRUE;

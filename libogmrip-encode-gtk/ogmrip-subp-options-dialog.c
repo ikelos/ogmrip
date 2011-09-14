@@ -22,15 +22,15 @@
 
 #include "ogmrip-subp-options-dialog.h"
 #include "ogmrip-language-chooser-widget.h"
-#include "ogmrip-helper.h"
+#include "ogmrip-type-chooser-widget.h"
 
 #include <glib/gi18n-lib.h>
 
 #define OGMRIP_GLADE_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-profile-editor.glade"
 #define OGMRIP_GLADE_ROOT "subp-page"
 
-#define OGMRIP_SUBP_OPTIONS_DIALOG_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_SUBP_OPTIONS_DIALOG, OGMRipSubpOptionsDialogPriv))
+#define gtk_builder_get_widget(builder, name) \
+    (GtkWidget *) gtk_builder_get_object ((builder), (name))
 
 struct _OGMRipSubpOptionsDialogPriv
 {
@@ -70,14 +70,10 @@ static void
 ogmrip_subp_options_dialog_codec_changed (GtkWidget *combo, GtkWidget *table)
 {
   GType codec;
-  gchar *name;
 
-  name = ogmrip_codec_chooser_get_active (GTK_COMBO_BOX (combo));
-  codec = ogmrip_plugin_get_subp_codec_by_name (name);
-  g_free (name);
-
+  codec = ogmrip_type_chooser_widget_get_active (GTK_COMBO_BOX (combo));
   if (codec != G_TYPE_NONE)
-    gtk_widget_set_sensitive (table, ogmrip_plugin_get_subp_codec_text (codec));
+    gtk_widget_set_sensitive (table, ogmrip_codec_format (codec) != OGMRIP_FORMAT_VOBSUB);
 }
 
 static OGMRipCharset
@@ -95,16 +91,13 @@ ogmrip_subp_options_dialog_set_charset (OGMRipSubpOptionsDialog *dialog, OGMRipC
 static GType
 ogmrip_subp_options_dialog_get_codec (OGMRipSubpOptionsDialog *dialog)
 {
-  return ogmrip_codec_chooser_get_active_type (GTK_COMBO_BOX (dialog->priv->codec_combo));
+  return ogmrip_type_chooser_widget_get_active (GTK_COMBO_BOX (dialog->priv->codec_combo));
 }
 
 static void
 ogmrip_subp_options_dialog_set_codec (OGMRipSubpOptionsDialog *dialog, GType codec)
 {
-  const gchar *name;
-
-  name = ogmrip_plugin_get_subp_codec_name (codec);
-  ogmrip_codec_chooser_set_active (GTK_COMBO_BOX (dialog->priv->codec_combo), name);
+  ogmrip_type_chooser_widget_set_active (GTK_COMBO_BOX (dialog->priv->codec_combo), codec);
 }
 
 static gboolean
@@ -188,7 +181,8 @@ ogmrip_subp_options_dialog_init (OGMRipSubpOptionsDialog *dialog)
   GtkTreeModel *model;
   GtkTreeIter iter;
 
-  dialog->priv = OGMRIP_SUBP_OPTIONS_DIALOG_GET_PRIVATE (dialog);
+  dialog->priv = G_TYPE_INSTANCE_GET_PRIVATE (dialog,
+      OGMRIP_TYPE_SUBP_OPTIONS_DIALOG, OGMRipSubpOptionsDialogPriv);
 
   builder = gtk_builder_new ();
   if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))
@@ -278,7 +272,7 @@ ogmrip_subp_options_dialog_init (OGMRipSubpOptionsDialog *dialog)
   g_object_bind_property (dialog->priv->default_check, "active", root, "visible", G_BINDING_INVERT_BOOLEAN);
 
   dialog->priv->codec_combo = gtk_builder_get_widget (builder, "subp-codec-combo");
-  ogmrip_subp_codec_chooser_construct (GTK_COMBO_BOX (dialog->priv->codec_combo));
+  ogmrip_type_chooser_widget_construct (GTK_COMBO_BOX (dialog->priv->codec_combo), OGMRIP_TYPE_SUBP_CODEC);
 
   dialog->priv->charset_combo = gtk_builder_get_widget (builder, "charset-combo");
   gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->charset_combo), 0);

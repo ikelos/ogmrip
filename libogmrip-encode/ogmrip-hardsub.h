@@ -20,7 +20,6 @@
 #define __OGMRIP_HARDSUB_H__
 
 #include <ogmrip-subp-codec.h>
-#include <ogmrip-plugin.h>
 
 G_BEGIN_DECLS
 
@@ -43,9 +42,7 @@ struct _OGMRipHardSubClass
   OGMRipSubpCodecClass parent_class;
 };
 
-GType              ogmrip_hardsub_get_type   (void);
-
-OGMRipSubpPlugin * ogmrip_hardsub_get_plugin (void);
+GType ogmrip_hardsub_get_type (void);
 
 G_END_DECLS
 

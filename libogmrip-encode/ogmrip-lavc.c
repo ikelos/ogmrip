@@ -29,9 +29,9 @@
 
 #include "ogmrip-fs.h"
 #include "ogmrip-lavc.h"
+#include "ogmrip-type.h"
 #include "ogmrip-version.h"
 #include "ogmrip-mplayer.h"
-#include "ogmrip-plugin.h"
 #include "ogmrip-configurable.h"
 
 #include <ogmrip-job.h>
@@ -178,7 +178,7 @@ ogmrip_lavc_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   if (lavc->priv->qpel)
     g_string_append (options, ":qpel");
 
-  if (ogmrip_plugin_get_video_codec_format (G_TYPE_FROM_INSTANCE (video)) == OGMRIP_FORMAT_MPEG4 && lavc->priv->v4mv)
+  if (ogmrip_codec_format (G_OBJECT_TYPE (video)) == OGMRIP_FORMAT_MPEG4 && lavc->priv->v4mv)
     g_string_append (options, ":v4mv");
 
   if (lavc->priv->trellis)

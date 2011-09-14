@@ -17,11 +17,11 @@
  */
 
 #include "ogmrip-stub.h"
-#include "ogmrip-plugin.h"
 #include "ogmrip-video-codec.h"
 #include "ogmrip-audio-codec.h"
 #include "ogmrip-subp-codec.h"
 #include "ogmrip-chapters.h"
+#include "ogmrip-type.h"
 
 #include <glib/gstdio.h>
 
@@ -291,7 +291,7 @@ ogmrip_video_stub_constructed (GObject *gobject)
 {
   OGMRipStub *stub = OGMRIP_STUB (gobject);
 
-  stub->priv->format = ogmrip_plugin_get_video_codec_format (G_OBJECT_TYPE (stub->priv->codec));
+  stub->priv->format = ogmrip_codec_format (G_OBJECT_TYPE (stub->priv->codec));
 
   G_OBJECT_CLASS (ogmrip_video_stub_parent_class)->constructed (gobject);
 }
@@ -363,7 +363,7 @@ ogmrip_audio_stub_constructed (GObject *gobject)
 {
   OGMRipStub *stub = OGMRIP_STUB (gobject);
 
-  stub->priv->format = ogmrip_plugin_get_audio_codec_format (G_OBJECT_TYPE (stub->priv->codec));
+  stub->priv->format = ogmrip_codec_format (G_OBJECT_TYPE (stub->priv->codec));
 
   G_OBJECT_CLASS (ogmrip_audio_stub_parent_class)->constructed (gobject);
 }
@@ -435,7 +435,7 @@ ogmrip_subp_stub_constructed (GObject *gobject)
 {
   OGMRipStub *stub = OGMRIP_STUB (gobject);
 
-  stub->priv->format = ogmrip_plugin_get_subp_codec_format (G_OBJECT_TYPE (stub->priv->codec));
+  stub->priv->format = ogmrip_codec_format(G_OBJECT_TYPE (stub->priv->codec));
 
   G_OBJECT_CLASS (ogmrip_subp_stub_parent_class)->constructed (gobject);
 }

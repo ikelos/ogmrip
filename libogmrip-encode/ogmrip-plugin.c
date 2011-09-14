@@ -226,17 +226,19 @@ ogmrip_plugin_init (void)
 
   if (!subp_plugins)
   {
+/*
     OGMRipSubpPlugin *plugin;
-
+*/
     subp_plugins = ogmrip_plugin_load (subp_plugins, OGMRIP_SUBP_PLUGINS_DIR, OGMRIP_TYPE_SUBP_CODEC);
 
     dir = g_build_filename (g_get_home_dir (), ".ogmrip", "subp-plugins", NULL);
     subp_plugins = ogmrip_plugin_load (subp_plugins, dir, OGMRIP_TYPE_SUBP_CODEC);
     g_free (dir);
-
+/*
     plugin = ogmrip_hardsub_get_plugin ();
     if (plugin)
       subp_plugins = g_slist_insert_sorted (subp_plugins, plugin, (GCompareFunc) ogmrip_plugin_compare);
+*/
   }
 
   if (!container_plugins)

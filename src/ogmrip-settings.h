@@ -47,15 +47,6 @@ enum
 void  ogmrip_settings_init   (void);
 void  ogmrip_settings_uninit (void);
 
-GType ogmrip_profile_get_container_type   (OGMRipProfile *profile,
-                                           const gchar   *name);
-GType ogmrip_profile_get_video_codec_type (OGMRipProfile *profile,
-                                           const gchar   *name);
-GType ogmrip_profile_get_audio_codec_type (OGMRipProfile *profile,
-                                           const gchar   *name);
-GType ogmrip_profile_get_subp_codec_type  (OGMRipProfile *profile,
-                                           const gchar   *name);
-
 G_END_DECLS
 
 #endif /* __OGMRIP_GCONF_H__ */

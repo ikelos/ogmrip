@@ -43,25 +43,6 @@ void     gtk_container_clear     (GtkContainer *container);
 gboolean ogmrip_open_title       (GtkWindow    *parent,
                                   OGMRipTitle  *title);
 
-/*
- * Containers and Codecs
- */
-
-void        ogmrip_container_chooser_construct   (GtkComboBox *chooser);
-void        ogmrip_video_codec_chooser_construct (GtkComboBox *chooser);
-void        ogmrip_video_codec_chooser_filter    (GtkComboBox *chooser,
-                                                  GType       container);
-void        ogmrip_audio_codec_chooser_construct (GtkComboBox *chooser);
-void        ogmrip_audio_codec_chooser_filter    (GtkComboBox *chooser,
-                                                  GType       container);
-void        ogmrip_subp_codec_chooser_construct  (GtkComboBox *chooser);
-void        ogmrip_subp_codec_chooser_filter     (GtkComboBox *chooser,
-                                                  GType       container);
-gchar *     ogmrip_codec_chooser_get_active      (GtkComboBox *chooser);
-GType       ogmrip_codec_chooser_get_active_type (GtkComboBox *chooser);
-void        ogmrip_codec_chooser_set_active      (GtkComboBox *chooser,
-                                                  const gchar *codec);
-
 G_END_DECLS
 
 #endif /* __OGMRIP_HELPER_H__ */

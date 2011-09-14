@@ -33,10 +33,10 @@
 #include "ogmrip-configurable.h"
 #include "ogmrip-hardsub.h"
 #include "ogmrip-marshal.h"
-#include "ogmrip-plugin.h"
 #include "ogmrip-analyze.h"
 #include "ogmrip-copy.h"
 #include "ogmrip-test.h"
+#include "ogmrip-type.h"
 #include "ogmrip-fs.h"
 
 #include <ogmrip-dvd.h>
@@ -252,10 +252,11 @@ ogmrip_encoding_constructed (GObject *gobject)
 
   if (!encoding->priv->container)
   {
-    GType type;
+    GType *types;
 
-    type = ogmrip_plugin_get_nth_container (0);
-    encoding->priv->container = g_object_new (type, NULL);
+    types = ogmrip_type_children (OGMRIP_TYPE_CONTAINER, NULL);
+    if (types[0] != G_TYPE_NONE)
+      encoding->priv->container = g_object_new (types[0], NULL);
   }
 
   (*G_OBJECT_CLASS (ogmrip_encoding_parent_class)->constructed) (gobject);
@@ -1066,7 +1067,7 @@ ogmrip_encoding_get_audio_overhead (OGMRipEncoding *encoding, OGMRipAudioCodec *
   sample_rate = 48000;
   channels = 1;
 
-  if (ogmrip_plugin_get_audio_codec_format (G_OBJECT_TYPE (codec)) == OGMRIP_FORMAT_COPY)
+  if (ogmrip_codec_format (G_OBJECT_TYPE (codec)) == OGMRIP_FORMAT_COPY)
   {
     OGMRipStream *stream;
 

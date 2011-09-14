@@ -21,8 +21,9 @@
 #endif
 
 #include "ogmrip-audio-options-dialog.h"
-#include "ogmrip-helper.h"
+#include "ogmrip-type-chooser-widget.h"
 
+#include <ogmrip-encode.h>
 #include <ogmrip-media-gtk.h>
 
 #include <glib/gi18n-lib.h>
@@ -30,8 +31,8 @@
 #define OGMRIP_GLADE_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-profile-editor.glade"
 #define OGMRIP_GLADE_ROOT "audio-page"
 
-#define OGMRIP_AUDIO_OPTIONS_DIALOG_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_AUDIO_OPTIONS_DIALOG, OGMRipAudioOptionsDialogPriv))
+#define gtk_builder_get_widget(builder, name) \
+    (GtkWidget *) gtk_builder_get_object ((builder), (name))
 
 struct _OGMRipAudioOptionsDialogPriv
 {
@@ -71,14 +72,10 @@ static void
 ogmrip_audio_options_dialog_codec_changed (GtkWidget *combo, GtkWidget *table)
 {
   GType codec;
-  gchar *name;
 
-  name = ogmrip_codec_chooser_get_active (GTK_COMBO_BOX (combo));
-  codec = ogmrip_plugin_get_audio_codec_by_name (name);
-  g_free (name);
-
+  codec = ogmrip_type_chooser_widget_get_active (GTK_COMBO_BOX (combo));
   if (codec != G_TYPE_NONE)
-    gtk_widget_set_sensitive (table, ogmrip_plugin_get_audio_codec_format (codec) != OGMRIP_FORMAT_COPY);
+    gtk_widget_set_sensitive (table, ogmrip_codec_format (codec) != OGMRIP_FORMAT_COPY);
 }
 
 static gint
@@ -96,16 +93,13 @@ ogmrip_audio_options_dialog_set_channels (OGMRipAudioOptionsDialog *dialog, OGMR
 static GType
 ogmrip_audio_options_dialog_get_codec (OGMRipAudioOptionsDialog *dialog)
 {
-  return ogmrip_codec_chooser_get_active_type (GTK_COMBO_BOX (dialog->priv->codec_combo));
+  return ogmrip_type_chooser_widget_get_active (GTK_COMBO_BOX (dialog->priv->codec_combo));
 }
 
 static void
 ogmrip_audio_options_dialog_set_codec (OGMRipAudioOptionsDialog *dialog, GType codec)
 {
-  const gchar *name;
-
-  name = ogmrip_plugin_get_audio_codec_name (codec);
-  ogmrip_codec_chooser_set_active (GTK_COMBO_BOX (dialog->priv->codec_combo), name);
+  ogmrip_type_chooser_widget_set_active (GTK_COMBO_BOX (dialog->priv->codec_combo), codec);
 }
 
 static gboolean
@@ -189,7 +183,8 @@ ogmrip_audio_options_dialog_init (OGMRipAudioOptionsDialog *dialog)
   GtkTreeModel *model;
   GtkTreeIter iter;
 
-  dialog->priv = OGMRIP_AUDIO_OPTIONS_DIALOG_GET_PRIVATE (dialog);
+  dialog->priv = G_TYPE_INSTANCE_GET_PRIVATE (dialog,
+      OGMRIP_TYPE_AUDIO_OPTIONS_DIALOG, OGMRipAudioOptionsDialogPriv);
 
   builder = gtk_builder_new ();
   if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))
@@ -279,7 +274,7 @@ ogmrip_audio_options_dialog_init (OGMRipAudioOptionsDialog *dialog)
   g_object_bind_property (dialog->priv->default_check, "active", root, "visible", G_BINDING_INVERT_BOOLEAN);
 
   dialog->priv->codec_combo = gtk_builder_get_widget (builder, "audio-codec-combo");
-  ogmrip_audio_codec_chooser_construct (GTK_COMBO_BOX (dialog->priv->codec_combo));
+  ogmrip_type_chooser_widget_construct (GTK_COMBO_BOX (dialog->priv->codec_combo), OGMRIP_TYPE_AUDIO_CODEC);
 
   dialog->priv->quality_spin = gtk_builder_get_widget (builder, "audio-quality-spin");
   gtk_spin_button_set_value (GTK_SPIN_BUTTON (dialog->priv->quality_spin), 3);

@@ -21,16 +21,16 @@
 #endif
 
 #include "ogmrip-profile-editor-dialog.h"
-#include "ogmrip-options-plugin.h"
-#include "ogmrip-helper.h"
+#include "ogmrip-type-chooser-widget.h"
+#include "ogmrip-options-editable.h"
 
 #include <glib/gi18n-lib.h>
 
 #define OGMRIP_GLADE_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-profile-editor.glade"
 #define OGMRIP_GLADE_ROOT "root"
 
-#define OGMRIP_PROFILE_EDITOR_DIALOG_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_PROFILE_EDITOR_DIALOG, OGMRipProfileEditorDialogPriv))
+#define gtk_builder_get_widget(builder, name) \
+    (GtkWidget *) gtk_builder_get_object ((builder), (name))
 
 struct _OGMRipProfileEditorDialogPriv
 {
@@ -58,6 +58,19 @@ static void ogmrip_profile_editor_dialog_set_property (GObject               *go
                                                        const GValue          *value,
                                                        GParamSpec            *pspec);
 static void ogmrip_profile_editor_dialog_dispose      (GObject               *gobject);
+
+static guint
+g_settings_get_uint (GSettings *settings, const gchar *key)
+{
+  guint val;
+
+  g_return_val_if_fail (G_IS_SETTINGS (settings), 0);
+  g_return_val_if_fail (key != NULL, 0);
+
+  g_settings_get (settings, key, "u", &val);
+
+  return val;
+}
 
 static GtkTreeRowReference *
 gtk_tree_model_get_row_reference (GtkTreeModel *model, GtkTreeIter *iter)
@@ -97,27 +110,29 @@ ogmrip_profile_editor_dialog_update_codecs (OGMRipProfileEditorDialog *editor)
 {
   GType type;
 
-  type = ogmrip_codec_chooser_get_active_type (GTK_COMBO_BOX (editor->priv->container_chooser));
+  type = ogmrip_type_chooser_widget_get_active (GTK_COMBO_BOX (editor->priv->container_chooser));
   if (type != G_TYPE_NONE)
   {
-    ogmrip_video_codec_chooser_filter (GTK_COMBO_BOX (editor->priv->video_chooser), type);
-    ogmrip_audio_codec_chooser_filter (GTK_COMBO_BOX (editor->priv->audio_chooser), type);
-    ogmrip_subp_codec_chooser_filter (GTK_COMBO_BOX (editor->priv->subp_chooser), type);
+    ogmrip_type_chooser_widget_set_filter (GTK_COMBO_BOX (editor->priv->video_chooser), type);
+    ogmrip_type_chooser_widget_set_filter (GTK_COMBO_BOX (editor->priv->audio_chooser), type);
+    ogmrip_type_chooser_widget_set_filter (GTK_COMBO_BOX (editor->priv->subp_chooser), type);
   }
 }
 
 static void
 ogmrip_profile_editor_container_options_button_clicked (OGMRipProfileEditorDialog *editor)
 {
-  GtkWidget *dialog;
   GType type;
 
-  type = ogmrip_codec_chooser_get_active_type (GTK_COMBO_BOX (editor->priv->container_chooser));
+  type = ogmrip_type_chooser_widget_get_active (GTK_COMBO_BOX (editor->priv->container_chooser));
   g_assert (type != G_TYPE_NONE);
 
-  dialog = ogmrip_container_options_plugin_dialog_new (type, editor->priv->profile);
-  if (dialog)
+  type = ogmrip_type_get_extension (type, OGMRIP_TYPE_OPTIONS_EDITABLE);
+  if (type != G_TYPE_NONE)
   {
+    GtkWidget *dialog;
+
+    dialog = g_object_new (type, "profile", editor->priv->profile, NULL);
     gtk_dialog_run (GTK_DIALOG (dialog));
     gtk_widget_destroy (dialog);
   }
@@ -126,15 +141,17 @@ ogmrip_profile_editor_container_options_button_clicked (OGMRipProfileEditorDialo
 static void
 ogmrip_profile_editor_video_options_button_clicked (OGMRipProfileEditorDialog *editor)
 {
-  GtkWidget *dialog;
   GType type;
 
-  type = ogmrip_codec_chooser_get_active_type (GTK_COMBO_BOX (editor->priv->video_chooser));
+  type = ogmrip_type_chooser_widget_get_active (GTK_COMBO_BOX (editor->priv->video_chooser));
   g_assert (type != G_TYPE_NONE);
 
-  dialog = ogmrip_video_options_plugin_dialog_new (type, editor->priv->profile);
-  if (dialog)
+  type = ogmrip_type_get_extension (type, OGMRIP_TYPE_OPTIONS_EDITABLE);
+  if (type != G_TYPE_NONE)
   {
+    GtkWidget *dialog;
+
+    dialog = g_object_new (type, "profile", editor->priv->profile, NULL);
     gtk_dialog_run (GTK_DIALOG (dialog));
     gtk_widget_destroy (dialog);
   }
@@ -143,15 +160,17 @@ ogmrip_profile_editor_video_options_button_clicked (OGMRipProfileEditorDialog *e
 static void
 ogmrip_profile_editor_audio_options_button_clicked (OGMRipProfileEditorDialog *editor)
 {
-  GtkWidget *dialog;
   GType type;
 
-  type = ogmrip_codec_chooser_get_active_type (GTK_COMBO_BOX (editor->priv->audio_chooser));
+  type = ogmrip_type_chooser_widget_get_active (GTK_COMBO_BOX (editor->priv->audio_chooser));
   g_assert (type != G_TYPE_NONE);
 
-  dialog = ogmrip_audio_options_plugin_dialog_new (type, editor->priv->profile);
-  if (dialog)
+  type = ogmrip_type_get_extension (type, OGMRIP_TYPE_OPTIONS_EDITABLE);
+  if (type != G_TYPE_NONE)
   {
+    GtkWidget *dialog;
+
+    dialog = g_object_new (type, "profile", editor->priv->profile, NULL);
     gtk_dialog_run (GTK_DIALOG (dialog));
     gtk_widget_destroy (dialog);
   }
@@ -160,15 +179,17 @@ ogmrip_profile_editor_audio_options_button_clicked (OGMRipProfileEditorDialog *e
 static void
 ogmrip_profile_editor_subp_options_button_clicked (OGMRipProfileEditorDialog *editor)
 {
-  GtkWidget *dialog;
   GType type;
 
-  type = ogmrip_codec_chooser_get_active_type (GTK_COMBO_BOX (editor->priv->subp_chooser));
+  type = ogmrip_type_chooser_widget_get_active (GTK_COMBO_BOX (editor->priv->subp_chooser));
   g_assert (type != G_TYPE_NONE);
 
-  dialog = ogmrip_subp_options_plugin_dialog_new (type, editor->priv->profile);
-  if (dialog)
+  type = ogmrip_type_get_extension (type, OGMRIP_TYPE_OPTIONS_EDITABLE);
+  if (type != G_TYPE_NONE)
   {
+    GtkWidget *dialog;
+
+    dialog = g_object_new (type, "profile", editor->priv->profile, NULL);
     gtk_dialog_run (GTK_DIALOG (dialog));
     gtk_widget_destroy (dialog);
   }
@@ -180,13 +201,15 @@ ogmrip_profile_editor_dialog_container_setting_changed (GtkWidget *chooser, GSet
 static void
 ogmrip_profile_editor_dialog_container_chooser_changed (GtkWidget *chooser, GSettings *settings)
 {
-  gchar *name;
+  GType type;
 
   g_signal_handlers_block_by_func (settings,
       ogmrip_profile_editor_dialog_container_setting_changed, chooser);
 
-  name = ogmrip_codec_chooser_get_active (GTK_COMBO_BOX (chooser));
-  g_settings_set_string (settings, OGMRIP_PROFILE_CONTAINER, name);
+  type = ogmrip_type_chooser_widget_get_active (GTK_COMBO_BOX (chooser));
+  g_assert (type != G_TYPE_NONE);
+
+  g_settings_set_string (settings, OGMRIP_PROFILE_CONTAINER, ogmrip_type_name (type));
 
   g_signal_handlers_unblock_by_func (settings,
       ogmrip_profile_editor_dialog_container_setting_changed, chooser);
@@ -201,7 +224,7 @@ ogmrip_profile_editor_dialog_container_setting_changed (GtkWidget *chooser, GSet
       ogmrip_profile_editor_dialog_container_chooser_changed, settings);
 
   name = g_settings_get_string (settings, OGMRIP_PROFILE_CONTAINER);
-  ogmrip_codec_chooser_set_active (GTK_COMBO_BOX (chooser), name);
+  ogmrip_type_chooser_widget_set_active (GTK_COMBO_BOX (chooser), ogmrip_type_from_name (name));
   g_free (name);
 
   g_signal_handlers_unblock_by_func (chooser,
@@ -214,13 +237,15 @@ ogmrip_profile_editor_dialog_codec_setting_changed (GtkWidget *chooser, GSetting
 static void
 ogmrip_profile_editor_dialog_codec_chooser_changed (GtkWidget *chooser, GSettings *settings)
 {
-  gchar *name;
+  GType type;
 
   g_signal_handlers_block_by_func (settings,
       ogmrip_profile_editor_dialog_codec_setting_changed, chooser);
 
-  name = ogmrip_codec_chooser_get_active (GTK_COMBO_BOX (chooser));
-  g_settings_set_string (settings, OGMRIP_PROFILE_CODEC, name);
+  type = ogmrip_type_chooser_widget_get_active (GTK_COMBO_BOX (chooser));
+  g_assert (type != G_TYPE_NONE);
+
+  g_settings_set_string (settings, OGMRIP_PROFILE_CODEC, ogmrip_type_name (type));
 
   g_signal_handlers_unblock_by_func (settings,
       ogmrip_profile_editor_dialog_codec_setting_changed, chooser);
@@ -235,7 +260,7 @@ ogmrip_profile_editor_dialog_codec_setting_changed (GtkWidget *chooser, GSetting
       ogmrip_profile_editor_dialog_codec_chooser_changed, settings);
 
   name = g_settings_get_string (settings, OGMRIP_PROFILE_CODEC);
-  ogmrip_codec_chooser_set_active (GTK_COMBO_BOX (chooser), name);
+  ogmrip_type_chooser_widget_set_active (GTK_COMBO_BOX (chooser), ogmrip_type_from_name (name));
   g_free (name);
 
   g_signal_handlers_unblock_by_func (chooser,
@@ -247,7 +272,7 @@ ogmrip_profile_editor_dialog_set_user_entry_visibility (GtkWidget *chooser, GtkT
 {
   GType type;
 
-  type = ogmrip_codec_chooser_get_active_type (GTK_COMBO_BOX (chooser));
+  type = ogmrip_type_chooser_widget_get_active (GTK_COMBO_BOX (chooser));
   if (type != G_TYPE_NONE)
   {
     GtkTreeIter iter;
@@ -257,7 +282,8 @@ ogmrip_profile_editor_dialog_set_user_entry_visibility (GtkWidget *chooser, GtkT
       GtkTreeModel *model; 
 
       model = gtk_tree_row_reference_get_model (ref);
-      gtk_list_store_set (GTK_LIST_STORE (model), &iter, 1, ogmrip_options_plugin_exists (type), -1);
+      gtk_list_store_set (GTK_LIST_STORE (model), &iter,
+          1, ogmrip_type_get_extension (type, GTK_TYPE_DIALOG) != G_TYPE_NONE, -1);
     }
   }
 }
@@ -288,9 +314,9 @@ ogmrip_profile_editor_set_options_button_sensitivity (GBinding *binding, const G
 
   chooser = (GtkWidget *) g_binding_get_source (binding);
 
-  type = ogmrip_codec_chooser_get_active_type (GTK_COMBO_BOX (chooser));
+  type = ogmrip_type_chooser_widget_get_active (GTK_COMBO_BOX (chooser));
   g_value_set_boolean (target_value,
-      type != G_TYPE_NONE && ogmrip_options_plugin_exists (type));
+      type != G_TYPE_NONE && ogmrip_type_get_extension (type, GTK_TYPE_DIALOG) != G_TYPE_NONE);
 
   return TRUE;
 }
@@ -303,11 +329,12 @@ ogmrip_profile_editor_set_quality_options_sensitivity (GBinding *binding, const 
   gint format;
 
   chooser = (GtkWidget *) g_binding_get_source (binding);
+  
+  type = ogmrip_type_chooser_widget_get_active (GTK_COMBO_BOX (chooser));
+  g_assert (type != G_TYPE_NONE);
 
-  type = ogmrip_codec_chooser_get_active_type (GTK_COMBO_BOX (chooser));
-  format = type != G_TYPE_NONE ? ogmrip_plugin_get_audio_codec_format (type) : -1;
-
-  g_value_set_boolean (target_value, format != -1 && format != OGMRIP_FORMAT_COPY && format != OGMRIP_FORMAT_PCM);
+  format = ogmrip_codec_format (type);
+  g_value_set_boolean (target_value, format != OGMRIP_FORMAT_UNDEFINED && format != OGMRIP_FORMAT_COPY && format != OGMRIP_FORMAT_PCM);
 
   return TRUE;
 }
@@ -321,10 +348,11 @@ ogmrip_profile_editor_set_audio_options_sensitivity (GBinding *binding, const GV
 
   chooser = (GtkWidget *) g_binding_get_source (binding);
 
-  type = ogmrip_codec_chooser_get_active_type (GTK_COMBO_BOX (chooser));
-  format = type != G_TYPE_NONE ? ogmrip_plugin_get_audio_codec_format (type) : -1;
+  type = ogmrip_type_chooser_widget_get_active (GTK_COMBO_BOX (chooser));
+  g_assert (type != G_TYPE_NONE);
 
-  g_value_set_boolean (target_value, format != -1 && format != OGMRIP_FORMAT_COPY);
+  format = ogmrip_codec_format (type);
+  g_value_set_boolean (target_value, format != OGMRIP_FORMAT_UNDEFINED && format != OGMRIP_FORMAT_COPY);
 
   return TRUE;
 }
@@ -337,9 +365,10 @@ ogmrip_profile_editor_set_text_options_sensitivity (GBinding *binding, const GVa
 
   chooser = (GtkWidget *) g_binding_get_source (binding);
 
-  type = ogmrip_codec_chooser_get_active_type (GTK_COMBO_BOX (chooser));
-  g_value_set_boolean (target_value,
-      type != G_TYPE_NONE && ogmrip_plugin_get_subp_codec_text (type));
+  type = ogmrip_type_chooser_widget_get_active (GTK_COMBO_BOX (chooser));
+  g_assert (type != G_TYPE_NONE);
+
+  g_value_set_boolean (target_value, ogmrip_codec_format (type) != OGMRIP_FORMAT_VOBSUB);
 
   return TRUE;
 }
@@ -398,10 +427,11 @@ ogmrip_profile_editor_set_passes_spin_adjustment (GBinding *binding, const GValu
 
   widget = (GtkWidget *) g_binding_get_source (binding);
 
-  type = ogmrip_codec_chooser_get_active_type (GTK_COMBO_BOX (widget));
+  type = ogmrip_type_chooser_widget_get_active (GTK_COMBO_BOX (widget));
   if (type != G_TYPE_NONE)
   {
     GtkAdjustment *adj;
+    GParamSpec *pspec;
     gint value, lower, upper;
 
     widget = (GtkWidget *) g_binding_get_target (binding);
@@ -410,7 +440,9 @@ ogmrip_profile_editor_set_passes_spin_adjustment (GBinding *binding, const GValu
 
     value = gtk_adjustment_get_value (adj);
     lower = gtk_adjustment_get_lower (adj);
-    upper = ogmrip_plugin_get_video_codec_passes (type);
+
+    pspec = ogmrip_type_property (type, "passes");
+    upper = G_PARAM_SPEC_UINT (pspec)->maximum;
 
     g_value_set_object (target_value,
         gtk_adjustment_new (CLAMP (value, lower, upper), lower, upper,
@@ -445,7 +477,8 @@ ogmrip_profile_editor_dialog_class_init (OGMRipProfileEditorDialogClass *klass)
 static void
 ogmrip_profile_editor_dialog_init (OGMRipProfileEditorDialog *dialog)
 {
-  dialog->priv = OGMRIP_PROFILE_EDITOR_DIALOG_GET_PRIVATE (dialog);
+  dialog->priv = G_TYPE_INSTANCE_GET_PRIVATE (dialog,
+      OGMRIP_TYPE_PROFILE_EDITOR_DIALOG, OGMRipProfileEditorDialogPriv);
 }
 
 static void
@@ -465,10 +498,7 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
   (*G_OBJECT_CLASS (ogmrip_profile_editor_dialog_parent_class)->constructed) (gobject);
 
   if (!dialog->priv->profile)
-  {
-    g_critical ("No profile specified");
-    return;
-  }
+    g_error ("No profile specified");
 
   misc = gtk_dialog_get_action_area (GTK_DIALOG (gobject));
 /*
@@ -488,10 +518,7 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
 
   builder = gtk_builder_new ();
   if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))
-  {
-    g_critical ("Couldn't load builder file: %s", error->message);
-    return;
-  }
+    g_error ("Couldn't load builder file: %s", error->message);
 
   misc = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
 
@@ -506,7 +533,7 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
   settings = ogmrip_profile_get_child (dialog->priv->profile, OGMRIP_PROFILE_GENERAL);
 
   dialog->priv->container_chooser = gtk_builder_get_widget (builder, "container-combo");
-  ogmrip_container_chooser_construct (GTK_COMBO_BOX (dialog->priv->container_chooser));
+  ogmrip_type_chooser_widget_construct (GTK_COMBO_BOX (dialog->priv->container_chooser), OGMRIP_TYPE_CONTAINER);
 
   ogmrip_profile_editor_dialog_container_setting_changed (dialog->priv->container_chooser, settings);
 
@@ -574,7 +601,7 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
   settings = ogmrip_profile_get_child (dialog->priv->profile, OGMRIP_PROFILE_VIDEO);
 
   dialog->priv->video_chooser = gtk_builder_get_widget (builder, "video-codec-combo");
-  ogmrip_video_codec_chooser_construct (GTK_COMBO_BOX (dialog->priv->video_chooser));
+  ogmrip_type_chooser_widget_construct (GTK_COMBO_BOX (dialog->priv->video_chooser), OGMRIP_TYPE_VIDEO_CODEC);
 
   ogmrip_profile_editor_dialog_codec_setting_changed (dialog->priv->video_chooser, settings);
 
@@ -681,7 +708,7 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
   settings = ogmrip_profile_get_child (dialog->priv->profile, OGMRIP_PROFILE_AUDIO);
 
   dialog->priv->audio_chooser = gtk_builder_get_widget (builder, "audio-codec-combo");
-  ogmrip_audio_codec_chooser_construct (GTK_COMBO_BOX (dialog->priv->audio_chooser));
+  ogmrip_type_chooser_widget_construct (GTK_COMBO_BOX (dialog->priv->video_chooser), OGMRIP_TYPE_AUDIO_CODEC);
 
   ogmrip_profile_editor_dialog_codec_setting_changed (dialog->priv->audio_chooser, settings);
 
@@ -735,7 +762,7 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
   settings = ogmrip_profile_get_child (dialog->priv->profile, OGMRIP_PROFILE_SUBP);
 
   dialog->priv->subp_chooser = gtk_builder_get_widget (builder, "subp-codec-combo");
-  ogmrip_subp_codec_chooser_construct (GTK_COMBO_BOX (dialog->priv->subp_chooser));
+  ogmrip_type_chooser_widget_construct (GTK_COMBO_BOX (dialog->priv->video_chooser), OGMRIP_TYPE_SUBP_CODEC);
 
   ogmrip_profile_editor_dialog_codec_setting_changed (dialog->priv->subp_chooser, settings);
 

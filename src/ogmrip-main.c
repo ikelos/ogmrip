@@ -781,8 +781,12 @@ ogmrip_main_create_container (OGMRipData *data, OGMRipProfile *profile)
   OGMRipContainer *container;
   GSettings *settings;
   GType type;
+  gchar *name;
 
-  type = ogmrip_profile_get_container_type (profile, NULL);
+  ogmrip_profile_get (profile, OGMRIP_PROFILE_GENERAL, OGMRIP_PROFILE_CONTAINER, "s", &name);
+  type = ogmrip_type_from_name (name);
+  g_free (name);
+
   g_assert (type != G_TYPE_NONE);
 
   container = g_object_new (type, NULL);
@@ -813,8 +817,12 @@ ogmrip_main_create_video_codec (OGMRipData *data, OGMRipProfile *profile,
   GSettings *settings;
   GType type;
   guint w, h, m;
+  gchar *name;
 
-  type = ogmrip_profile_get_video_codec_type (profile, NULL);
+  ogmrip_profile_get (profile, OGMRIP_PROFILE_VIDEO, OGMRIP_PROFILE_CODEC, "s", &name);
+  type = ogmrip_type_from_name (name);
+  g_free (name);
+
   if (type == G_TYPE_NONE)
     return NULL;
 
@@ -885,7 +893,13 @@ ogmrip_main_create_audio_codec (OGMRipData *data, OGMRipProfile *profile,
   if (options)
     type = ogmrip_audio_options_get_codec (options);
   else
-    type = ogmrip_profile_get_audio_codec_type (profile, NULL);
+  {
+    gchar *name;
+
+    ogmrip_profile_get (profile, OGMRIP_PROFILE_AUDIO, OGMRIP_PROFILE_CODEC, "s", &name);
+    type = ogmrip_type_from_name (name);
+    g_free (name);
+  }
 
   if (type == G_TYPE_NONE)
     return NULL;
@@ -947,7 +961,13 @@ ogmrip_main_create_subp_codec (OGMRipData *data, OGMRipProfile *profile,
   if (options)
     type = ogmrip_subp_options_get_codec (options);
   else
-    type = ogmrip_profile_get_subp_codec_type (profile, NULL);
+  {
+    gchar *name;
+
+    ogmrip_profile_get (profile, OGMRIP_PROFILE_SUBP, OGMRIP_PROFILE_CODEC, "s", &name);
+    type = ogmrip_type_from_name (name);
+    g_free (name);
+  }
 
   if (type == G_TYPE_NONE)
     return NULL;
@@ -1056,18 +1076,18 @@ ogmrip_main_set_filename (OGMRipData *data, OGMRipEncoding *encoding)
   {
     codec = ogmrip_encoding_get_video_codec (encoding);
     if (codec)
-      g_string_append_printf (filename, " - %s", ogmrip_plugin_get_video_codec_name (G_OBJECT_TYPE (codec)));
+      g_string_append_printf (filename, " - %s", ogmrip_type_name (G_OBJECT_TYPE (codec)));
   }
 
   if (format >= 3)
   {
     codec = ogmrip_encoding_get_nth_audio_codec (encoding, 0);
     if (codec)
-      g_string_append_printf (filename, " - %s", ogmrip_plugin_get_audio_codec_name (G_OBJECT_TYPE (codec)));
+      g_string_append_printf (filename, " - %s", ogmrip_type_name (G_OBJECT_TYPE (codec)));
   }
 
   container = ogmrip_encoding_get_container (encoding);
-  g_string_append_printf (filename, ".%s", ogmrip_plugin_get_container_name (G_OBJECT_TYPE (container)));
+  g_string_append_printf (filename, ".%s", ogmrip_type_name (G_OBJECT_TYPE (container)));
 
   path = g_settings_get_string (settings, OGMRIP_SETTINGS_OUTPUT_DIR);
   str = g_build_filename (path, filename->str, NULL);
@@ -1094,7 +1114,7 @@ ogmrip_main_encoding_completed (OGMRipData *data, OGMJobSpawn *spawn, guint resu
     if (OGMRIP_IS_SUBP_CODEC (spawn))
     {
 #ifdef HAVE_ENCHANT_SUPPORT
-      if (ogmrip_plugin_get_subp_codec_text (G_OBJECT_TYPE (spawn)))
+      if (ogmrip_codec_format (G_OBJECT_TYPE (spawn)) != OGMRIP_FORMAT_VOBSUB)
       {
         OGMRipProfile *profile;
         gboolean spell_check;

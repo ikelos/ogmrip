@@ -25,8 +25,8 @@
 
 #include "ogmrip-mplayer.h"
 #include "ogmrip-version.h"
-#include "ogmrip-plugin.h"
 #include "ogmrip-enums.h"
+#include "ogmrip-type.h"
 #include "ogmrip-fs.h"
 
 #include <stdio.h>
@@ -559,15 +559,12 @@ ogmrip_mencoder_video_command (OGMRipVideoCodec *video, const gchar *output, gui
   GPtrArray *argv;
   OGMRipStream *stream;
 
-  gint format;
   const gchar *uri;
   gdouble start, length;
   gchar *ofps, *chap;
   gboolean scale;
 
   stream = ogmrip_codec_get_input (OGMRIP_CODEC (video));
-
-  format = ogmrip_plugin_get_video_codec_format (G_OBJECT_TYPE (video));
 
   argv = g_ptr_array_new ();
 
@@ -583,7 +580,7 @@ ogmrip_mencoder_video_command (OGMRipVideoCodec *video, const gchar *output, gui
 
   scale = FALSE;
 
-  if (format == OGMRIP_FORMAT_COPY)
+  if (ogmrip_codec_format (G_OBJECT_TYPE (video)) == OGMRIP_FORMAT_COPY)
     g_ptr_array_add (argv, g_strdup ("-nosound"));
   else
   {
@@ -805,7 +802,6 @@ ogmrip_mplayer_video_command (OGMRipVideoCodec *video, const gchar *output)
   OGMRipSubpStream *sstream;
   GPtrArray *argv;
 
-  gint format;
   const gchar *uri;
   gdouble start, length;
   gboolean forced, scale;
@@ -815,8 +811,6 @@ ogmrip_mplayer_video_command (OGMRipVideoCodec *video, const gchar *output)
   g_return_val_if_fail (output != NULL, NULL);
 
   stream = ogmrip_codec_get_input (OGMRIP_CODEC (video));
-
-  format = ogmrip_plugin_get_video_codec_format (G_OBJECT_TYPE (video));
 
   argv = g_ptr_array_new ();
 
@@ -850,7 +844,7 @@ ogmrip_mplayer_video_command (OGMRipVideoCodec *video, const gchar *output)
 
   scale = FALSE;
 
-  if (format != OGMRIP_FORMAT_COPY)
+  if (ogmrip_codec_format (G_OBJECT_TYPE (video)) != OGMRIP_FORMAT_COPY)
   {
     OGMRipScalerType scaler;
 

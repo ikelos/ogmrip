@@ -8,6 +8,7 @@ libogmrip_encode_gtk_la_SOURCES =    \
   ogmrip-encoding-manager-dialog.c   \
   ogmrip-helper.c                    \
   ogmrip-list-item.c                 \
+  ogmrip-options-editable.c          \
   ogmrip-options-plugin.c            \
   ogmrip-profile-editor-dialog.c     \
   ogmrip-profile-manager-dialog.c    \
@@ -15,7 +16,9 @@ libogmrip_encode_gtk_la_SOURCES =    \
   ogmrip-progress-dialog.c           \
   ogmrip-subp-chooser-widget.c       \
   ogmrip-subp-options.c              \
-  ogmrip-subp-options-dialog.c
+  ogmrip-subp-options-dialog.c       \
+  ogmrip-type-chooser-widget.c       \
+  ogmrip-type-store.c
 
 libogmrip_encode_gtk_ladir = \
   $(includedir)/ogmrip-encode
@@ -27,6 +30,7 @@ libogmrip_encode_gtk_la_HEADERS =    \
   ogmrip-encoding-manager-dialog.h   \
   ogmrip-helper.h                    \
   ogmrip-list-item.h                 \
+  ogmrip-options-editable.h          \
   ogmrip-options-plugin.h            \
   ogmrip-profile-editor-dialog.h     \
   ogmrip-profile-manager-dialog.h    \
@@ -35,6 +39,7 @@ libogmrip_encode_gtk_la_HEADERS =    \
   ogmrip-subp-chooser-widget.h       \
   ogmrip-subp-options.h              \
   ogmrip-subp-options-dialog.h       \
+  ogmrip-type-store.h                \
   ogmrip-encode-gtk.h
 
 libogmrip_encode_gtk_la_LDFLAGS = \
@@ -61,6 +66,9 @@ INCLUDES = \
   -I$(top_srcdir)/libogmrip-encode    \
   -DOGMRIP_LIB_DIR=\""$(libdir)"\"    \
   -DOGMRIP_DATA_DIR=\""$(datadir)"\"
+
+EXTRA_DIST = \
+  ogmrip-type-chooser-widget.h
 
 CLEANFILES = \
   $(BUILT_SOURCES)
