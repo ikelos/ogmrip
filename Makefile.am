@@ -3,6 +3,7 @@ SUBDIRS = \
   libogmrip-media  \
   libogmrip-file   \
   libogmrip-dvd    \
+  libogmrip-module \
   libogmrip-encode \
   avibox \
   dvdcpy
