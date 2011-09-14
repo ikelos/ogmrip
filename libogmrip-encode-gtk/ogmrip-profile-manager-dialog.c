@@ -25,8 +25,6 @@
 #include "ogmrip-profile-store.h"
 #include "ogmrip-error-dialog.h"
 
-#include "ogmrip-helper.h"
-
 #include <ogmrip-encode.h>
 
 #include <glib/gi18n-lib.h>
@@ -34,8 +32,8 @@
 #define OGMRIP_GLADE_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-profiles.glade"
 #define OGMRIP_GLADE_ROOT "root"
 
-#define OGMRIP_PROFILE_MANAGER_DIALOG_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_PROFILE_MANAGER_DIALOG, OGMRipProfileManagerDialogPriv))
+#define gtk_builder_get_widget(builder, name) \
+    (GtkWidget *) gtk_builder_get_object ((builder), (name))
 
 struct _OGMRipProfileManagerDialogPriv
 {
@@ -364,14 +362,12 @@ ogmrip_profile_manager_dialog_init (OGMRipProfileManagerDialog *dialog)
   GtkTreeViewColumn *column;
   GtkCellRenderer *cell;
 
-  dialog->priv = OGMRIP_PROFILE_MANAGER_DIALOG_GET_PRIVATE (dialog);
+  dialog->priv = G_TYPE_INSTANCE_GET_PRIVATE (dialog,
+      OGMRIP_TYPE_PROFILE_MANAGER_DIALOG, OGMRipProfileManagerDialogPriv);
 
   builder = gtk_builder_new ();
   if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))
-  {
-    g_critical ("Couldn't load builder file: %s", error->message);
-    return;
-  }
+    g_error ("Couldn't load builder file: %s", error->message);
 
   gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE);
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);

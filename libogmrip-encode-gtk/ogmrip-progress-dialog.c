@@ -21,7 +21,6 @@
 #endif
 
 #include "ogmrip-progress-dialog.h"
-#include "ogmrip-helper.h"
 
 #include <glib/gi18n.h>
 
@@ -29,12 +28,12 @@
 #include <libnotify/notify.h>
 #endif /* HAVE_LIBNOTIFY_SUPPORT */
 
-#define OGMRIP_PROGRESS_DIALOG_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_PROGRESS_DIALOG, OGMRipProgressDialogPriv))
-
 #define OGMRIP_ICON_FILE  "pixmaps" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip.png"
 #define OGMRIP_GLADE_FILE "ogmrip"  G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-progress.glade"
 #define OGMRIP_GLADE_ROOT "root"
+
+#define gtk_builder_get_widget(builder, name) \
+    (GtkWidget *) gtk_builder_get_object ((builder), (name))
 
 struct _OGMRipProgressDialogPriv
 {
@@ -173,7 +172,8 @@ ogmrip_progress_dialog_init (OGMRipProgressDialog *dialog)
   GtkUIManager *ui_manager;
   GClosure *closure;
 
-  dialog->priv = OGMRIP_PROGRESS_DIALOG_GET_PRIVATE (dialog);
+  dialog->priv = G_TYPE_INSTANCE_GET_PRIVATE (dialog,
+      OGMRIP_TYPE_PROGRESS_DIALOG, OGMRipProgressDialogPriv);
 
   builder = gtk_builder_new ();
   if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))

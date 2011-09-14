@@ -30,16 +30,8 @@ G_BEGIN_DECLS
 #define gtk_builder_get_widget(builder, name) \
     (GtkWidget *) gtk_builder_get_object ((builder), (name))
 
-#if !GTK_CHECK_VERSION(2,24,0)
-#define GTK_COMBO_BOX_TEXT(obj) GTK_COMBO_BOX(obj)
-#define gtk_combo_box_text_new() gtk_combo_box_new_text()
-#define gtk_combo_box_text_append_text(obj,txt) gtk_combo_box_append_text(obj,txt)
-#define gtk_combo_box_text_remove(obj,pos) gtk_combo_box_remove_text(obj,pos)
-#endif
-
 guint    g_settings_get_uint     (GSettings    *settings,
                                   const gchar  *key);
-void     gtk_container_clear     (GtkContainer *container);
 gboolean ogmrip_open_title       (GtkWindow    *parent,
                                   OGMRipTitle  *title);
 

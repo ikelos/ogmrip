@@ -21,23 +21,17 @@
 #endif
 
 #include "ogmrip-novideo.h"
+#include "ogmrip-type.h"
 
 #include <glib/gi18n-lib.h>
-
-static OGMRipVideoPlugin novideo_plugin =
-{
-  NULL,
-  G_TYPE_NONE,
-  "novideo",
-  N_("No Video"),
-  0,
-  0,
-  0
-};
-
-OGMRipVideoPlugin *
+/*
+gboolean
 ogmrip_novideo_get_plugin (void)
 {
-  return &novideo_plugin;
+  ogmrip_type_register_codec (NULL, G_TYPE_NONE,
+      "novideo", N_("No Video"), OGMRIP_FORMAT_UNDEFINED);
+
+  return TRUE;
 }
+*/
 

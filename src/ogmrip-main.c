@@ -20,13 +20,13 @@
 #include "config.h"
 #endif
 
-#include "ogmrip-job.h"
-#include "ogmrip-dvd.h"
-#include "ogmrip-dvd-gtk.h"
-#include "ogmrip-encode-gtk.h"
-#include "ogmrip-media-gtk.h"
-#include "ogmrip-settings.h"
+#include <ogmrip-job.h>
+#include <ogmrip-dvd-gtk.h>
+#include <ogmrip-encode-gtk.h>
+#include <ogmrip-media-gtk.h>
 
+#include "ogmrip-helper.h"
+#include "ogmrip-settings.h"
 #include "ogmrip-options-dialog.h"
 #include "ogmrip-pref-dialog.h"
 
@@ -75,6 +75,19 @@ typedef struct
 } OGMRipData;
 
 extern GSettings *settings;
+
+static void
+gtk_container_clear (GtkContainer *container)
+{
+  GList *list, *link;
+
+  g_return_if_fail (GTK_IS_CONTAINER (container));
+
+  list = gtk_container_get_children (container);
+  for (link = list; link; link = link->next)
+    gtk_container_remove (container, GTK_WIDGET (link->data));
+  g_list_free (list);
+}
 
 #ifdef HAVE_ENCHANT_SUPPORT
 /*

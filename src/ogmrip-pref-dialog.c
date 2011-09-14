@@ -22,6 +22,7 @@
 
 #include "ogmrip-pref-dialog.h"
 
+#include "ogmrip-helper.h"
 #include "ogmrip-settings.h"
 
 #include <glib/gi18n.h>
@@ -117,10 +118,7 @@ ogmrip_pref_dialog_init (OGMRipPrefDialog *dialog)
 
   builder = gtk_builder_new ();
   if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))
-  {
-    g_critical ("Couldn't load builder file: %s", error->message);
-    return;
-  }
+    g_error ("Couldn't load builder file: %s", error->message);
 
   gtk_dialog_add_buttons (GTK_DIALOG (dialog), GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE, NULL);
   gtk_container_set_border_width (GTK_CONTAINER (dialog), 5);

@@ -22,7 +22,6 @@
 #include <ogmrip-encode.h>
 #include <ogmrip-audio-chooser-widget.h>
 #include <ogmrip-encoding-manager-dialog.h>
-#include <ogmrip-helper.h>
 #include <ogmrip-list-item.h>
 #include <ogmrip-options-editable.h>
 #include <ogmrip-profile-editor-dialog.h>

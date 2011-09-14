@@ -23,15 +23,14 @@
 #include "ogmrip-encoding-manager-dialog.h"
 #include "ogmrip-profile-keys.h"
 #include "ogmrip-error-dialog.h"
-#include "ogmrip-helper.h"
 
 #include <glib/gi18n-lib.h>
 
 #define OGMRIP_GLADE_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-queue.glade"
 #define OGMRIP_GLADE_ROOT "root"
 
-#define OGMRIP_ENCODING_MANAGER_DIALOG_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_ENCODING_MANAGER_DIALOG, OGMRipEncodingManagerDialogPriv))
+#define gtk_builder_get_widget(builder, name) \
+    (GtkWidget *) gtk_builder_get_object ((builder), (name))
 
 enum
 {
@@ -470,7 +469,8 @@ ogmrip_encoding_manager_dialog_init (OGMRipEncodingManagerDialog *dialog)
   GtkCellRenderer *renderer;
   GtkTreeViewColumn *column;
 
-  dialog->priv = OGMRIP_ENCODING_MANAGER_DIALOG_GET_PRIVATE (dialog);
+  dialog->priv = G_TYPE_INSTANCE_GET_PRIVATE (dialog,
+      OGMRIP_TYPE_ENCODING_MANAGER_DIALOG, OGMRipEncodingManagerDialogPriv);
 
   builder = gtk_builder_new ();
   if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))

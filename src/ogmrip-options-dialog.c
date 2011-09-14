@@ -23,6 +23,7 @@
 #include "ogmrip-options-dialog.h"
 #include "ogmrip-crop-dialog.h"
 
+#include "ogmrip-helper.h"
 #include "ogmrip-settings.h"
 
 #include <glib/gi18n.h>
@@ -649,17 +650,11 @@ ogmrip_options_dialog_constructed (GObject *gobject)
     N_("Large"), N_("Extra Large"), N_("Full"), N_("User Defined") };
 
   if (!dialog->priv->encoding)
-  {
-    g_critical ("No encoding has been specified");
-    return;
-  }
+    g_error ("No encoding has been specified");
 
   builder = gtk_builder_new ();
   if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))
-  {
-    g_critical ("Couldn't load builder file: %s", error->message);
-    return;
-  }
+    g_error ("Couldn't load builder file: %s", error->message);
 
   gtk_window_set_title (GTK_WINDOW (dialog), _("Options"));
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);

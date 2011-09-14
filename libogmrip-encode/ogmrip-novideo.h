@@ -19,11 +19,9 @@
 #ifndef __OGMRIP_NOVIDEO_H__
 #define __OGMRIP_NOVIDEO_H__
 
-#include <ogmrip-plugin.h>
+#include <glib.h>
 
 G_BEGIN_DECLS
-
-OGMRipVideoPlugin * ogmrip_novideo_get_plugin (void);
 
 G_END_DECLS
 

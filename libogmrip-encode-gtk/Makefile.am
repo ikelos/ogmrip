@@ -6,7 +6,6 @@ libogmrip_encode_gtk_la_SOURCES =    \
   ogmrip-audio-options.c             \
   ogmrip-audio-options-dialog.c      \
   ogmrip-encoding-manager-dialog.c   \
-  ogmrip-helper.c                    \
   ogmrip-list-item.c                 \
   ogmrip-options-editable.c          \
   ogmrip-profile-editor-dialog.c     \
@@ -27,7 +26,6 @@ libogmrip_encode_gtk_la_HEADERS =    \
   ogmrip-audio-options.h             \
   ogmrip-audio-options-dialog.h      \
   ogmrip-encoding-manager-dialog.h   \
-  ogmrip-helper.h                    \
   ogmrip-list-item.h                 \
   ogmrip-options-editable.h          \
   ogmrip-profile-editor-dialog.h     \

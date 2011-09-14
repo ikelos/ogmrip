@@ -53,19 +53,6 @@ g_settings_get_uint (GSettings *settings, const gchar *key)
   return val;
 }
 
-void
-gtk_container_clear (GtkContainer *container)
-{
-  GList *list, *link;
-
-  g_return_if_fail (GTK_IS_CONTAINER (container));
-
-  list = gtk_container_get_children (container);
-  for (link = list; link; link = link->next)
-    gtk_container_remove (container, GTK_WIDGET (link->data));
-  g_list_free (list);
-}
-
 static void
 gtk_dialog_response_accept (GtkDialog *dialog)
 {
