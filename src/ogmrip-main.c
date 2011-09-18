@@ -2006,32 +2006,12 @@ ogmrip_tmp_dir_changed_cb (GSettings *settings, const gchar *key)
   g_free (path);
 }
 
-static void
-ogmrip_startup_cb (GApplication *app)
+static gboolean
+ogmrip_startup_thread (GIOSchedulerJob *job, GCancellable *cancellable, GApplication *app)
 {
   OGMRipModuleEngine *module_engine;
   OGMRipProfileEngine *profile_engine;
   gchar *path;
-
-  settings = g_settings_new ("org.ogmrip.preferences");
-  g_object_set_data_full (G_OBJECT (app), "settings", settings, g_object_unref);
-
-  path = g_settings_get_string (settings, OGMRIP_SETTINGS_OUTPUT_DIR);
-  if (!strlen (path))
-    g_settings_set_string (settings, OGMRIP_SETTINGS_OUTPUT_DIR, g_get_user_special_dir (G_USER_DIRECTORY_VIDEOS));
-  g_free (path);
-
-  path = g_settings_get_string (settings, OGMRIP_SETTINGS_TMP_DIR);
-  if (!strlen (path))
-    g_settings_set_string (settings, OGMRIP_SETTINGS_TMP_DIR, g_get_tmp_dir ());
-  g_free (path);
-
-  g_signal_connect (settings, "changed::" OGMRIP_SETTINGS_TMP_DIR,
-      G_CALLBACK (ogmrip_tmp_dir_changed_cb), NULL);
-
-#ifdef HAVE_LIBNOTIFY_SUPPORT
-  notify_init (PACKAGE_NAME);
-#endif /* HAVE_LIBNOTIFY_SUPPORT */
 
   module_engine = ogmrip_module_engine_get_default ();
   g_object_set_data_full (G_OBJECT (app), "module-engine", module_engine, g_object_unref);
@@ -2062,6 +2042,37 @@ ogmrip_startup_cb (GApplication *app)
   path = g_build_filename (g_get_user_data_dir (), "ogmrip", "profiles", NULL);
   ogmrip_profile_engine_add_path (profile_engine, path);
   g_free (path);
+
+  return FALSE;
+}
+
+static void
+ogmrip_startup_cb (GApplication *app)
+{
+  gchar *path;
+
+  settings = g_settings_new ("org.ogmrip.preferences");
+  g_object_set_data_full (G_OBJECT (app), "settings", settings, g_object_unref);
+
+  path = g_settings_get_string (settings, OGMRIP_SETTINGS_OUTPUT_DIR);
+  if (!strlen (path))
+    g_settings_set_string (settings, OGMRIP_SETTINGS_OUTPUT_DIR, g_get_user_special_dir (G_USER_DIRECTORY_VIDEOS));
+  g_free (path);
+
+  path = g_settings_get_string (settings, OGMRIP_SETTINGS_TMP_DIR);
+  if (!strlen (path))
+    g_settings_set_string (settings, OGMRIP_SETTINGS_TMP_DIR, g_get_tmp_dir ());
+  g_free (path);
+
+  g_signal_connect (settings, "changed::" OGMRIP_SETTINGS_TMP_DIR,
+      G_CALLBACK (ogmrip_tmp_dir_changed_cb), NULL);
+
+#ifdef HAVE_LIBNOTIFY_SUPPORT
+  notify_init (PACKAGE_NAME);
+#endif /* HAVE_LIBNOTIFY_SUPPORT */
+
+  g_io_scheduler_push_job ((GIOSchedulerJobFunc) ogmrip_startup_thread,
+      app, NULL, G_PRIORITY_HIGH, NULL);
 }
 
 #ifdef G_ENABLE_DEBUG
