@@ -70,10 +70,11 @@ libogmrip_encode_la_LDFLAGS = \
   -version-info $(OGMRIP_ENCODE_LT_VERSION)
 
 libogmrip_encode_la_LIBADD = \
+  $(top_builddir)/libogmrip-job/libogmrip-job.la \
+  $(top_builddir)/libogmrip-module/libogmrip-module.la \
   $(top_builddir)/libogmrip-media/libogmrip-media.la \
   $(top_builddir)/libogmrip-file/libogmrip-file.la \
-  $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la \
-  $(top_builddir)/libogmrip-job/libogmrip-job.la
+  $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la
 
 ogmrip-marshal.h: ogmrip-marshal.list $(GLIB_GENMARSHAL)
 	$(GLIB_GENMARSHAL) $< --header --prefix=ogmrip_cclosure_marshal > $@
@@ -128,6 +129,7 @@ EXTRA_DIST = \
 
 INCLUDES = \
   -I$(top_srcdir)/libogmrip-job    \
+  -I$(top_srcdir)/libogmrip-module \
   -I$(top_srcdir)/libogmrip-media  \
   -I$(top_srcdir)/libogmrip-file   \
   -I$(top_srcdir)/libogmrip-dvd    \
