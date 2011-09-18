@@ -43,6 +43,7 @@ enum
 };
 
 static GHashTable *table;
+G_LOCK_DEFINE_STATIC (table);
 
 G_DEFINE_TYPE (OGMRipTypeInfo, ogmrip_type_info, G_TYPE_INITIALLY_UNOWNED);
 
@@ -150,18 +151,22 @@ ogmrip_type_register_static (GType gtype, OGMRipTypeInfo *info)
 }
 
 static void
-ogmrip_type_module_unloaded (GTypeModule *module, gpointer gtype)
+ogmrip_type_module_type_unloaded (OGMRipModule *module, gpointer gtype)
 {
+  G_LOCK (table);
   g_hash_table_remove (table, gtype);
+  G_UNLOCK (table);
 
-  g_signal_handlers_disconnect_by_func (module, ogmrip_type_module_unloaded, gtype);
+  g_signal_handlers_disconnect_by_func (module, ogmrip_type_module_type_unloaded, gtype);
 }
 
 void
-ogmrip_type_register_dynamic (GTypeModule *module, GType gtype, OGMRipTypeInfo *info)
+ogmrip_type_register_dynamic (OGMRipModule *module, GType gtype, OGMRipTypeInfo *info)
 {
-  g_return_if_fail (module == NULL || G_IS_TYPE_MODULE (module));
+  g_return_if_fail (module == NULL || OGMRIP_IS_MODULE (module));
   g_return_if_fail (OGMRIP_IS_TYPE_INFO (info));
+
+  G_LOCK (table);
 
   if (!table)
     table = g_hash_table_new_full (g_direct_hash, g_direct_equal, NULL, (GDestroyNotify) g_object_unref);
@@ -170,28 +175,85 @@ ogmrip_type_register_dynamic (GTypeModule *module, GType gtype, OGMRipTypeInfo *
 
   g_hash_table_insert (table, GUINT_TO_POINTER (gtype), g_object_ref_sink (info));
 
+  G_UNLOCK (table);
+
   if (module)
     g_signal_connect (module, "unload",
-        G_CALLBACK (ogmrip_type_module_unloaded), GUINT_TO_POINTER (gtype));
+        G_CALLBACK (ogmrip_type_module_type_unloaded), GUINT_TO_POINTER (gtype));
 }
 
 static OGMRipTypeInfo *
 ogmrip_type_info_lookup (GType gtype)
 {
+  OGMRipTypeInfo *info;
+
   if (!table)
     return NULL;
 
-  return g_hash_table_lookup (table, GUINT_TO_POINTER (gtype));
+  G_LOCK (table);
+  info = g_hash_table_lookup (table, GUINT_TO_POINTER (gtype));
+  G_UNLOCK (table);
+
+  return info;
 }
 
 void
-ogmrip_type_add_extension (GType gtype, GType extension)
+ogmrip_type_add_static_extension (GType gtype, GType extension)
+{
+  ogmrip_type_add_dynamic_extension (NULL, gtype, extension);
+}
+
+typedef struct
+{
+  OGMRipTypeInfo *info;
+  GType extension;
+} DynamicExtensionData;
+
+static void
+ogmrip_type_module_extension_unloaded (OGMRipModule *module, DynamicExtensionData *data)
+{
+  GType *extensions;
+  guint i;
+
+  extensions = (GType *) data->info->priv->extensions->data;
+  for (i = 0; i < data->info->priv->extensions->len; i ++)
+  {
+    if (extensions[i] == data->extension)
+    {
+      g_array_remove_index (data->info->priv->extensions, i);
+      break;
+    }
+  }
+
+  g_signal_handlers_disconnect_by_func (module, ogmrip_type_module_extension_unloaded, data);
+  g_object_unref (data->info);
+  g_free (data);
+}
+
+void
+ogmrip_type_add_dynamic_extension (OGMRipModule *module, GType gtype, GType extension)
 {
   OGMRipTypeInfo *info;
 
+  g_return_if_fail (module == NULL || OGMRIP_IS_MODULE (module));
+
   info = ogmrip_type_info_lookup (gtype);
   if (info)
+  {
     g_array_append_val (info->priv->extensions, extension);
+
+    if (module)
+    {
+      DynamicExtensionData *data;
+
+      data = g_new0 (DynamicExtensionData, 1);
+      data->info = g_object_ref (info);
+      data->extension = extension;
+
+      g_signal_connect (module, "unload",
+          G_CALLBACK (ogmrip_type_module_extension_unloaded), data);
+    }
+  }
 }
 
 GType
@@ -253,7 +315,10 @@ ogmrip_type_from_name (const gchar *name)
   if (!table)
     return G_TYPE_NONE;
 
+  G_LOCK (table);
   info = g_hash_table_find (table, (GHRFunc) compare_with_name, (gpointer) name);
+  G_UNLOCK (table);
+
   if (!info)
     return G_TYPE_NONE;
 
@@ -270,12 +335,19 @@ ogmrip_type_children (GType gtype, guint *n)
   if (!table)
     return NULL;
 
-  types = g_array_new (TRUE, FALSE, sizeof (GType));
+  types = g_array_new (FALSE, FALSE, sizeof (GType));
+
+  G_LOCK (table);
 
   g_hash_table_iter_init (&iter, table);
   while (g_hash_table_iter_next (&iter, NULL, (gpointer*) &info))
     if (g_type_is_a (info->priv->gtype, gtype))
-      g_array_append_vals (types, &info->priv->gtype, 1);
+      g_array_append_val (types, info->priv->gtype);
+
+  gtype = G_TYPE_NONE;
+  g_array_append_val (types, gtype);
+
+  G_UNLOCK (table);
 
   if (n)
     *n = types->len;
@@ -299,10 +371,11 @@ ogmrip_type_property (GType gtype, const gchar *property)
 }
 
 void
-ogmrip_type_register_codec (GTypeModule *module, GType gtype, const gchar *name, const gchar *description, OGMRipFormat format)
+ogmrip_type_register_codec (OGMRipModule *module, GType gtype, const gchar *name, const gchar *description, OGMRipFormat format)
 {
   OGMRipTypeInfo *info;
 
+  g_return_if_fail (module == NULL || OGMRIP_IS_MODULE (module));
   g_return_if_fail (gtype == G_TYPE_NONE || g_type_is_a (gtype, OGMRIP_TYPE_CODEC));
   g_return_if_fail (name != NULL);
 
@@ -314,7 +387,7 @@ ogmrip_type_register_codec (GTypeModule *module, GType gtype, const gchar *name,
 
   g_array_append_val (info->priv->formats, format);
 
-  ogmrip_type_register_static (gtype, info);
+  ogmrip_type_register_dynamic (module, gtype, info);
 }
 
 OGMRipFormat
@@ -335,11 +408,12 @@ ogmrip_codec_format (GType gtype)
 }
 
 void
-ogmrip_type_register_container (GTypeModule *module, GType gtype, const gchar *name, const gchar *description, OGMRipFormat *formats)
+ogmrip_type_register_container (OGMRipModule *module, GType gtype, const gchar *name, const gchar *description, OGMRipFormat *formats)
 {
   OGMRipTypeInfo *info;
   guint len;
 
+  g_return_if_fail (module == NULL || OGMRIP_IS_MODULE (module));
   g_return_if_fail (g_type_is_a (gtype, OGMRIP_TYPE_CONTAINER));
   g_return_if_fail (name != NULL);
   g_return_if_fail (formats != NULL);
@@ -356,7 +430,7 @@ ogmrip_type_register_container (GTypeModule *module, GType gtype, const gchar *n
 
   g_array_append_vals (info->priv->formats, formats, len);
 
-  ogmrip_type_register_static (gtype, info);
+  ogmrip_type_register_dynamic (module, gtype, info);
 }
 
 gboolean
