@@ -415,7 +415,7 @@ ogmrip_configurable_iface_init (OGMRipConfigurableInterface *iface)
 }
 
 G_DEFINE_DYNAMIC_TYPE_EXTENDED (OGMRipXvid, ogmrip_xvid, OGMRIP_TYPE_VIDEO_CODEC, 0,
-    G_IMPLEMENT_INTERFACE_DYNAMIC (OGMRIP_TYPE_CONFIGURABLE, ogmrip_configurable_iface_init))
+    G_IMPLEMENT_INTERFACE_DYNAMIC (OGMRIP_TYPE_CONFIGURABLE, ogmrip_configurable_iface_init));
 
 static void
 ogmrip_xvid_class_init (OGMRipXvidClass *klass)
@@ -894,35 +894,32 @@ ogmrip_xvid_run (OGMJobSpawn *spawn)
   return result;
 }
 
-gboolean
-ogmrip_init_plugin (OGMRipModule *module, GError **error)
+void
+ogmrip_module_load (OGMRipModule *module)
 {
   gboolean match;
   gchar *output;
 
   if (!ogmrip_check_mencoder ())
   {
-    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MEncoder is missing"));
-    return FALSE;
+    g_warning (_("MEncoder is missing"));
+    return;
   }
 
   if (!g_spawn_command_line_sync ("mencoder -ovc help", &output, NULL, NULL, NULL))
-    return FALSE;
+    return;
 
   match = g_regex_match_simple ("^ *xvid *- .*$", output, G_REGEX_MULTILINE, 0);
   g_free (output);
 
   if (!match)
   {
-    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MEncoder is built without XviD support"));
-    return FALSE;
+    g_warning (_("MEncoder is built without XviD support"));
+    return;
   }
 
   ogmrip_xvid_register_type (G_TYPE_MODULE (module));
-
-  ogmrip_type_register_codec (NULL, OGMRIP_TYPE_XVID,
-      "xvid", N_("XviD"), OGMRIP_FORMAT_MPEG4);
-
-  return TRUE;
+  ogmrip_type_register_codec (module,
+      OGMRIP_TYPE_XVID, "xvid", N_("XviD"), OGMRIP_FORMAT_MPEG4);
 }
 

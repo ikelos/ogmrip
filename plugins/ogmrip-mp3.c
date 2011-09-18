@@ -20,15 +20,14 @@
 #include "config.h"
 #endif
 
-#include <ogmrip-job.h>
 #include <ogmrip-encode.h>
 #include <ogmrip-mplayer.h>
+#include <ogmrip-module.h>
 
-#include <unistd.h>
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
 
-#define PROGRAM "lame"
+#define LAME "lame"
 
 #define OGMRIP_TYPE_MP3          (ogmrip_mp3_get_type ())
 #define OGMRIP_MP3(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_MP3, OGMRipMp3))
@@ -76,7 +75,7 @@ ogmrip_mp3_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input
   quality = ogmrip_audio_codec_get_quality (audio);
 
   argv = g_ptr_array_new ();
-  g_ptr_array_add (argv, g_strdup (PROGRAM));
+  g_ptr_array_add (argv, g_strdup (LAME));
   g_ptr_array_add (argv, g_strdup ("--nohist"));
   g_ptr_array_add (argv, g_strdup ("-h"));
 
@@ -112,7 +111,7 @@ ogmrip_wav_command (OGMRipAudioCodec *audio, gboolean header, const gchar *outpu
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
-G_DEFINE_TYPE (OGMRipMp3, ogmrip_mp3, OGMRIP_TYPE_AUDIO_CODEC)
+G_DEFINE_DYNAMIC_TYPE (OGMRipMp3, ogmrip_mp3, OGMRIP_TYPE_AUDIO_CODEC)
 
 static void
 ogmrip_mp3_class_init (OGMRipMp3Class *klass)
@@ -121,6 +120,11 @@ ogmrip_mp3_class_init (OGMRipMp3Class *klass)
 
   spawn_class = OGMJOB_SPAWN_CLASS (klass);
   spawn_class->run = ogmrip_mp3_run;
+}
+
+static void
+ogmrip_mp3_class_finalize (OGMRipMp3Class *klass)
+{
 }
 
 static void
@@ -179,39 +183,38 @@ ogmrip_mp3_run (OGMJobSpawn *spawn)
   return result;
 }
 
-gboolean
-ogmrip_init_plugin (GError **error)
+void
+ogmrip_module_load (OGMRipModule *module)
 {
   gboolean have_mplayer, have_lame;
   gchar *fullname;
 
   have_mplayer = ogmrip_check_mplayer ();
 
-  fullname = g_find_program_in_path (PROGRAM);
+  fullname = g_find_program_in_path (LAME);
   have_lame = fullname != NULL;
   g_free (fullname);
 
   if (!have_mplayer && !have_lame)
   {
-    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MPlayer and LAME are missing"));
-    return FALSE;
+    g_warning (_("MPlayer and LAME are missing"));
+    return;
   }
 
   if (!have_mplayer)
   {
-    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MPlayer is missing"));
-    return FALSE;
+    g_warning (_("MPlayer is missing"));
+    return;
   }
 
   if (!have_lame)
   {
-    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("LAME is missing"));
-    return FALSE;
+    g_warning (_("LAME is missing"));
+    return;
   }
 
-  ogmrip_type_register_codec (NULL, OGMRIP_TYPE_MP3,
-      "mp3", N_("MPEG-1 layer III (MP3)"), OGMRIP_FORMAT_MP3);
-
-  return TRUE;
+  ogmrip_mp3_register_type (G_TYPE_MODULE (module));
+  ogmrip_type_register_codec (module,
+      OGMRIP_TYPE_MP3, "mp3", N_("MPEG-1 layer III (MP3)"), OGMRIP_FORMAT_MP3);
 }
 

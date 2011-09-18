@@ -20,15 +20,14 @@
 #include "config.h"
 #endif
 
-#include <ogmrip-job.h>
 #include <ogmrip-encode.h>
 #include <ogmrip-mplayer.h>
+#include <ogmrip-module.h>
 
-#include <unistd.h>
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
 
-#define PROGRAM "theoraenc"
+#define THEORAENC "theoraenc"
 
 #define OGMRIP_TYPE_THEORA          (ogmrip_theora_get_type ())
 #define OGMRIP_THEORA(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_THEORA, OGMRipTheora))
@@ -93,7 +92,7 @@ ogmrip_theora_command (OGMRipVideoCodec *video, const gchar *input)
 
   argv = g_ptr_array_new ();
 
-  g_ptr_array_add (argv, g_strdup (PROGRAM));
+  g_ptr_array_add (argv, g_strdup (THEORAENC));
 
   g_ptr_array_add (argv, g_strdup ("-o"));
   g_ptr_array_add (argv, g_strdup (output));
@@ -121,7 +120,7 @@ ogmrip_theora_command (OGMRipVideoCodec *video, const gchar *input)
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
-G_DEFINE_TYPE (OGMRipTheora, ogmrip_theora, OGMRIP_TYPE_VIDEO_CODEC)
+G_DEFINE_DYNAMIC_TYPE (OGMRipTheora, ogmrip_theora, OGMRIP_TYPE_VIDEO_CODEC)
 
 static void
 ogmrip_theora_class_init (OGMRipTheoraClass *klass)
@@ -131,6 +130,11 @@ ogmrip_theora_class_init (OGMRipTheoraClass *klass)
   spawn_class = OGMJOB_SPAWN_CLASS (klass);
 
   spawn_class->run = ogmrip_theora_run;
+}
+
+static void
+ogmrip_theora_class_finalize (OGMRipTheoraClass *klass)
+{
 }
 
 static void
@@ -188,39 +192,38 @@ ogmrip_theora_run (OGMJobSpawn *spawn)
   return result;
 }
 
-gboolean
-ogmrip_init_plugin (GError **error)
+void
+ogmrip_module_load (OGMRipModule *module)
 {
   gboolean have_mplayer, have_theoraenc;
   gchar *fullname;
 
   have_mplayer = ogmrip_check_mplayer ();
 
-  fullname = g_find_program_in_path (PROGRAM);
+  fullname = g_find_program_in_path (THEORAENC);
   have_theoraenc = fullname != NULL;
   g_free (fullname);
 
   if (!have_mplayer && !have_theoraenc)
   {
-    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, ("MPlayer and theoraenc are missing"));
-    return FALSE;
+    g_warning (_("MPlayer and theoraenc are missing"));
+    return;
   }
 
   if (!have_mplayer)
   {
-    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, ("MPlayer is missing"));
-    return FALSE;
+    g_warning (_("MPlayer is missing"));
+    return;
   }
 
   if (!have_theoraenc)
   {
-    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, ("theoraenc is missing"));
-    return FALSE;
+    g_warning (_("theoraenc is missing"));
+    return;
   }
 
-  ogmrip_type_register_codec (NULL, OGMRIP_TYPE_THEORA,
-      "theora", N_("Ogg Theora"), OGMRIP_FORMAT_THEORA);
-
-  return TRUE;
+  ogmrip_theora_register_type (G_TYPE_MODULE (module));
+  ogmrip_type_register_codec (module,
+      OGMRIP_TYPE_THEORA, "theora", N_("Ogg Theora"), OGMRIP_FORMAT_THEORA);
 }
 

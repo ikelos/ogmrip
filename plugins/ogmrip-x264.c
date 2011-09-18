@@ -22,12 +22,10 @@
 
 #include "ogmrip-x264.h"
 
-#include <ogmrip-job.h>
 #include <ogmrip-mplayer.h>
+#include <ogmrip-module.h>
 
 #include <math.h>
-#include <stdio.h>
-#include <unistd.h>
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
 
@@ -501,8 +499,8 @@ ogmrip_configurable_iface_init (OGMRipConfigurableInterface *iface)
   iface->configure = ogmrip_x264_configure;
 }
 
-G_DEFINE_TYPE_WITH_CODE (OGMRipX264, ogmrip_x264, OGMRIP_TYPE_VIDEO_CODEC,
-    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_CONFIGURABLE, ogmrip_configurable_iface_init))
+G_DEFINE_DYNAMIC_TYPE_EXTENDED (OGMRipX264, ogmrip_x264, OGMRIP_TYPE_VIDEO_CODEC, 0,
+    G_IMPLEMENT_INTERFACE_DYNAMIC (OGMRIP_TYPE_CONFIGURABLE, ogmrip_configurable_iface_init))
 
 static void
 ogmrip_x264_class_init (OGMRipX264Class *klass)
@@ -631,6 +629,11 @@ ogmrip_x264_class_init (OGMRipX264Class *klass)
   g_object_class_install_property (gobject_class, PROP_DELAY,
       g_param_spec_uint ("start-delay", "Start delay property", "Set start delay",
         0, G_MAXUINT, 1, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+}
+
+static void
+ogmrip_x264_class_finalize (OGMRipX264Class *klass)
+{
 }
 
 static void
@@ -994,28 +997,28 @@ ogmrip_x264_check_option (const gchar *option)
   return status == 0;
 }
 
-gboolean
-ogmrip_init_plugin (GError **error)
+void
+ogmrip_module_load (OGMRipModule *module)
 {
   gboolean match;
   gchar *output;
 
   if (!ogmrip_check_mencoder ())
   {
-    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MEncoder is missing"));
-    return FALSE;
+    g_warning (_("MEncoder is missing"));
+    return;
   }
 
   if (!g_spawn_command_line_sync ("mencoder -ovc help", &output, NULL, NULL, NULL))
-    return FALSE;
+    return;
 
   match = g_regex_match_simple ("^ *x264 *- .*$", output, G_REGEX_MULTILINE, 0);
   g_free (output);
 
   if (!match)
   {
-    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MEncoder is build without X264 support"));
-    return FALSE;
+    g_warning (_("MEncoder is build without X264 support"));
+    return;
   }
 
   x264_have_8x8dct         = ogmrip_x264_check_option ("8x8dct");
@@ -1034,9 +1037,8 @@ ogmrip_init_plugin (GError **error)
   x264_have_slow_firstpass = ogmrip_x264_check_option ("slow_firstpass");
   x264_have_nombtree       = ogmrip_x264_check_option ("nombtree");
 
-  ogmrip_type_register_codec (NULL, OGMRIP_TYPE_X264,
-      "x264", N_("X264"), OGMRIP_FORMAT_H264);
-
-  return TRUE;
+  ogmrip_x264_register_type (G_TYPE_MODULE (module));
+  ogmrip_type_register_codec (module,
+      OGMRIP_TYPE_X264, "x264", N_("X264"), OGMRIP_FORMAT_H264);
 }
 

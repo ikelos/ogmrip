@@ -20,9 +20,9 @@
 #include "config.h"
 #endif
 
-#include <ogmrip-job.h>
 #include <ogmrip-encode.h>
 #include <ogmrip-mplayer.h>
+#include <ogmrip-module.h>
 
 #include <stdio.h>
 #include <glib/gi18n-lib.h>
@@ -90,7 +90,7 @@ ogmrip_audio_copy_command (OGMRipAudioCodec *audio)
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
-G_DEFINE_TYPE (OGMRipAudioCopy, ogmrip_audio_copy, OGMRIP_TYPE_AUDIO_CODEC)
+G_DEFINE_DYNAMIC_TYPE (OGMRipAudioCopy, ogmrip_audio_copy, OGMRIP_TYPE_AUDIO_CODEC)
 
 static void
 ogmrip_audio_copy_class_init (OGMRipAudioCopyClass *klass)
@@ -99,6 +99,11 @@ ogmrip_audio_copy_class_init (OGMRipAudioCopyClass *klass)
 
   spawn_class = OGMJOB_SPAWN_CLASS (klass);
   spawn_class->run = ogmrip_audio_copy_run;
+}
+
+static void
+ogmrip_audio_copy_class_finalize (OGMRipAudioCopyClass *klass)
+{
 }
 
 static void
@@ -129,18 +134,16 @@ ogmrip_audio_copy_run (OGMJobSpawn *spawn)
   return result;
 }
 
-gboolean
-ogmrip_init_plugin (GError **error)
+void
+ogmrip_module_load (OGMRipModule *module)
 {
   if (!ogmrip_check_mencoder ())
+    g_warning (_("MEncoder is missing"));
+  else
   {
-    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MEncoder is missing"));
-    return FALSE;
+    ogmrip_audio_copy_register_type (G_TYPE_MODULE (module));
+    ogmrip_type_register_codec (module,
+        OGMRIP_TYPE_AUDIO_COPY, "copy", N_("Copy (for AC3 or DTS)"), OGMRIP_FORMAT_COPY);
   }
-
-  ogmrip_type_register_codec (NULL, OGMRIP_TYPE_AUDIO_COPY,
-      "copy", N_("Copy (for AC3 or DTS)"), OGMRIP_FORMAT_COPY);
-
-  return TRUE;
 }
 

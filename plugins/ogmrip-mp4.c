@@ -22,15 +22,15 @@
 
 #include <ogmrip-encode.h>
 #include <ogmrip-mplayer.h>
+#include <ogmrip-module.h>
 
 #include <errno.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include <glib/gi18n-lib.h>
 #include <glib/gstdio.h>
 
-#define PROGRAM "MP4Box"
+#define MP4BOX "MP4Box"
 
 #define OGMRIP_TYPE_MP4           (ogmrip_mp4_get_type ())
 #define OGMRIP_MP4(obj)           (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_MP4, OGMRipMp4))
@@ -190,7 +190,7 @@ ogmrip_mp4box_extract_command (const gchar *input)
   GPtrArray *argv;
 
   argv = g_ptr_array_new ();
-  g_ptr_array_add (argv, g_strdup (PROGRAM));
+  g_ptr_array_add (argv, g_strdup (MP4BOX));
   g_ptr_array_add (argv, g_strdup ("-aviraw"));
   g_ptr_array_add (argv, g_strdup ("video"));
   g_ptr_array_add (argv, g_strdup (input));
@@ -281,7 +281,7 @@ ogmrip_mp4_create_command (OGMRipContainer *mp4, const gchar *input, const gchar
     return NULL;
 
   argv = g_ptr_array_new ();
-  g_ptr_array_add (argv, g_strdup (PROGRAM));
+  g_ptr_array_add (argv, g_strdup (MP4BOX));
 
   if (OGMRIP_MP4 (mp4)->naudio <= 1 && OGMRIP_MP4 (mp4)->nsubp < 1)
     g_ptr_array_add (argv, g_strdup ("-isma"));
@@ -352,7 +352,7 @@ ogmrip_mp4_split_command (OGMRipContainer *mp4, const gchar *input)
   guint tsize;
 
   argv = g_ptr_array_new ();
-  g_ptr_array_add (argv, g_strdup (PROGRAM));
+  g_ptr_array_add (argv, g_strdup (MP4BOX));
 
   g_ptr_array_add (argv, g_strdup ("-tmp"));
   g_ptr_array_add (argv, g_strdup (ogmrip_fs_get_tmp_dir ()));
@@ -423,7 +423,7 @@ ogmrip_mp4_get_info (OGMRipMp4 *mp4, OGMRipFile *file)
   }
 }
 
-G_DEFINE_TYPE (OGMRipMp4, ogmrip_mp4, OGMRIP_TYPE_CONTAINER)
+G_DEFINE_DYNAMIC_TYPE (OGMRipMp4, ogmrip_mp4, OGMRIP_TYPE_CONTAINER)
 
 static void
 ogmrip_mp4_class_init (OGMRipMp4Class *klass)
@@ -435,6 +435,11 @@ ogmrip_mp4_class_init (OGMRipMp4Class *klass)
   container_class = OGMRIP_CONTAINER_CLASS (klass);
 
   spawn_class->run = ogmrip_mp4_run;
+}
+
+static void
+ogmrip_mp4_class_finalize (OGMRipMp4Class *klass)
+{
 }
 
 static void
@@ -562,16 +567,16 @@ static OGMRipFormat formats[] =
   -1
 };
 
-gboolean
-ogmrip_init_plugin (GError **error)
+void
+ogmrip_module_load (OGMRipModule *module)
 {
   gchar *output;
   gint major_version = 0, minor_version = 0, micro_version = 0;
 
-  if (!g_spawn_command_line_sync (PROGRAM " -version", &output, NULL, NULL, NULL))
+  if (!g_spawn_command_line_sync (MP4BOX " -version", &output, NULL, NULL, NULL))
   {
-    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MP4Box is missing"));
-    return FALSE;
+    g_warning (_("MP4Box is missing"));
+    return;
   }
 
   if (g_str_has_prefix (output, "MP4Box - GPAC version "))
@@ -600,9 +605,8 @@ ogmrip_init_plugin (GError **error)
     formats[i+1] = OGMRIP_FORMAT_COPY;
   }
 
-  ogmrip_type_register_container (NULL, OGMRIP_TYPE_MP4,
-      "mp4", N_("Mpeg-4 Media (MP4)"), formats);
-
-  return TRUE;
+  ogmrip_mp4_register_type (G_TYPE_MODULE (module));
+  ogmrip_type_register_container (module,
+      OGMRIP_TYPE_MP4, "mp4", N_("Mpeg-4 Media (MP4)"), formats);
 }
 

@@ -2,14 +2,17 @@
 # Video Codecs
 #
 
-video_codecsdir=$(libdir)/ogmrip/video-plugins
+pluginsdir=$(libdir)/ogmrip/plugins
 
-video_codecs_LTLIBRARIES =
+plugins_LTLIBRARIES =
 
-video_codecs_HEADERS =
+plugin_includedir = \
+  $(includedir)/ogmrip-encode
+
+plugin_include_HEADERS =
 
 if HAVE_LAVC_SUPPORT
-video_codecs_LTLIBRARIES += \
+plugins_LTLIBRARIES += \
   ogmrip-lavc-mpeg4.la
 
 ogmrip_lavc_mpeg4_la_SOURCES = \
@@ -26,12 +29,12 @@ ogmrip_lavc_mpeg4_la_LIBADD = \
   $(top_builddir)/libogmrip-encode/libogmrip-lavc.la \
   $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
 
-video_codecs_HEADERS += \
+plugin_include_HEADERS += \
   ogmrip-lavc-mpeg4.h
 endif
 
 if HAVE_XVID_SUPPORT
-video_codecs_LTLIBRARIES += \
+plugins_LTLIBRARIES += \
   ogmrip-xvid.la
 
 ogmrip_xvid_la_SOURCES = \
@@ -49,12 +52,12 @@ ogmrip_xvid_la_LIBADD = \
   $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la \
   $(top_builddir)/libogmrip-encode/libogmrip-encode.la
 
-video_codecs_HEADERS += \
+plugin_include_HEADERS += \
   ogmrip-xvid.h
 endif
 
 if HAVE_THEORA_SUPPORT
-video_codecs_LTLIBRARIES += \
+plugins_LTLIBRARIES += \
   ogmrip-theora.la
 
 ogmrip_theora_la_SOURCES = \
@@ -73,7 +76,7 @@ ogmrip_theora_la_LIBADD = \
 endif
 
 if HAVE_X264_SUPPORT
-video_codecs_LTLIBRARIES += \
+plugins_LTLIBRARIES += \
   ogmrip-x264.la
 
 ogmrip_x264_la_SOURCES = \
@@ -91,7 +94,7 @@ ogmrip_x264_la_LIBADD = \
   $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la \
   -lm
 
-video_codecs_HEADERS += \
+plugin_include_HEADERS += \
   ogmrip-x264.h
 endif
 
@@ -99,9 +102,7 @@ endif
 # Audio Codecs
 #
 
-audio_codecsdir=$(libdir)/ogmrip/audio-plugins
-
-audio_codecs_LTLIBRARIES = \
+plugins_LTLIBRARIES += \
   ogmrip-acopy.la  \
   ogmrip-wav.la
 
@@ -134,7 +135,7 @@ ogmrip_wav_la_LIBADD = \
   $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
 
 if HAVE_MP3_SUPPORT
-audio_codecs_LTLIBRARIES += \
+plugins_LTLIBRARIES += \
   ogmrip-mp3.la
 
 ogmrip_mp3_la_SOURCES = \
@@ -153,7 +154,7 @@ ogmrip_mp3_la_LIBADD = \
 endif
 
 if HAVE_VORBIS_SUPPORT
-audio_codecs_LTLIBRARIES += \
+plugins_LTLIBRARIES += \
   ogmrip-vorbis.la
 
 ogmrip_vorbis_la_SOURCES = \
@@ -172,7 +173,7 @@ ogmrip_vorbis_la_LIBADD = \
 endif
 
 if HAVE_AAC_SUPPORT
-audio_codecs_LTLIBRARIES += \
+plugins_LTLIBRARIES += \
   ogmrip-aac.la
 
 ogmrip_aac_la_SOURCES = \
@@ -194,9 +195,7 @@ endif
 # Subp Codecs
 #
 
-subp_codecsdir=$(libdir)/ogmrip/subp-plugins
-
-subp_codecs_LTLIBRARIES = \
+plugins_LTLIBRARIES += \
   ogmrip-vobsub.la
 
 ogmrip_vobsub_la_SOURCES = \
@@ -214,7 +213,7 @@ ogmrip_vobsub_la_LIBADD = \
   $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
 
 if HAVE_SRT_SUPPORT
-subp_codecs_LTLIBRARIES += \
+plugins_LTLIBRARIES += \
   ogmrip-srt.la
 
 ogmrip_srt_la_SOURCES = \
@@ -238,9 +237,7 @@ endif
 # Containers
 #
 
-containersdir=$(libdir)/ogmrip/container-plugins
-
-containers_LTLIBRARIES = \
+plugins_LTLIBRARIES += \
   ogmrip-avi.la
 
 ogmrip_avi_la_SOURCES = \
@@ -258,7 +255,7 @@ ogmrip_avi_la_LIBADD = \
   $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
 
 if HAVE_OGM_SUPPORT
-containers_LTLIBRARIES += \
+plugins_LTLIBRARIES += \
   ogmrip-ogg.la
 
 ogmrip_ogg_la_SOURCES = \
@@ -278,7 +275,7 @@ ogmrip_ogg_la_LIBADD = \
 endif
 
 if HAVE_MKV_SUPPORT
-containers_LTLIBRARIES += \
+plugins_LTLIBRARIES += \
   ogmrip-mkv.la
 
 ogmrip_mkv_la_SOURCES = \
@@ -298,7 +295,7 @@ ogmrip_mkv_la_LIBADD = \
 endif
 
 if HAVE_MP4_SUPPORT
-containers_LTLIBRARIES += \
+plugins_LTLIBRARIES += \
   ogmrip-mp4.la
 
 ogmrip_mp4_la_SOURCES = \
@@ -323,12 +320,13 @@ endif
 #
 
 if HAVE_GTK_SUPPORT
-options_plugindir=$(libdir)/ogmrip/options-plugins
 
-options_plugin_LTLIBRARIES =
+extensionsdir=$(libdir)/ogmrip/extensions
+
+extensions_LTLIBRARIES =
 
 if HAVE_LAVC_SUPPORT
-options_plugin_LTLIBRARIES += \
+extensions_LTLIBRARIES += \
   ogmrip-lavc-options.la
 
 ogmrip_lavc_options_la_SOURCES = \
@@ -347,7 +345,7 @@ ogmrip_lavc_options_la_LIBADD = \
 endif
 
 if HAVE_XVID_SUPPORT
-options_plugin_LTLIBRARIES += \
+extensions_LTLIBRARIES += \
   ogmrip-xvid-options.la
 
 ogmrip_xvid_options_la_SOURCES = \
@@ -365,7 +363,7 @@ ogmrip_xvid_options_la_LIBADD = \
 endif
 
 if HAVE_X264_SUPPORT
-options_plugin_LTLIBRARIES += \
+extensions_LTLIBRARIES += \
   ogmrip-x264-options.la
 
 ogmrip_x264_options_la_SOURCES = \

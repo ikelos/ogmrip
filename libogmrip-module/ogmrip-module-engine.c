@@ -17,7 +17,6 @@
  */
 
 #include "ogmrip-module-engine.h"
-#include "ogmrip-module-object.h"
 
 #include <string.h>
 #include <gmodule.h>
@@ -34,10 +33,6 @@ enum
 };
 
 static OGMRipModuleEngine *default_engine = NULL;
-
-/*
- * TODO g_module_supported
- */
 
 static gchar **
 ogmrip_module_engine_get_modules (OGMRipModuleEngine *engine)
@@ -79,13 +74,17 @@ ogmrip_module_engine_constructor (GType type, guint n_params, GObjectConstructPa
 }
 
 static void
-ogmrip_module_engine_finalize (GObject *gobject)
+ogmrip_module_engine_dispose (GObject *gobject)
 {
   OGMRipModuleEngine *engine = OGMRIP_MODULE_ENGINE (gobject);
 
-  g_slist_free (engine->priv->modules);
+  if (engine->priv->modules)
+  {
+    g_slist_free_full (engine->priv->modules, (GDestroyNotify) g_type_module_unuse);
+    engine->priv->modules = NULL;
+  }
 
-  G_OBJECT_CLASS (ogmrip_module_engine_parent_class)->finalize (gobject);
+  G_OBJECT_CLASS (ogmrip_module_engine_parent_class)->dispose (gobject);
 }
 
 static void
@@ -118,7 +117,7 @@ ogmrip_module_engine_class_init (OGMRipModuleEngineClass *klass)
 
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->constructor = ogmrip_module_engine_constructor;
-  gobject_class->finalize = ogmrip_module_engine_finalize;
+  gobject_class->dispose = ogmrip_module_engine_dispose;
   gobject_class->get_property = ogmrip_module_engine_get_property;
 
   g_object_class_install_property (gobject_class, PROP_MODULES,
@@ -137,19 +136,20 @@ ogmrip_module_engine_get_default (void)
   return default_engine;
 }
 
-void
-ogmrip_module_engine_add_path (OGMRipModuleEngine *engine, const gchar *path)
+gboolean
+ogmrip_module_engine_add_path (OGMRipModuleEngine *engine, const gchar *path, GError **error)
 {
   GDir *dir;
   OGMRipModule *module;
   const gchar *name;
 
-  g_return_if_fail (OGMRIP_IS_MODULE_ENGINE (engine));
-  g_return_if_fail (path != NULL);
+  g_return_val_if_fail (OGMRIP_IS_MODULE_ENGINE (engine), FALSE);
+  g_return_val_if_fail (path != NULL, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  dir = g_dir_open (path, 0, NULL);
+  dir = g_dir_open (path, 0, error);
   if (!dir)
-    return;
+    return FALSE;
 
   while ((name = g_dir_read_name (dir)))
   {
@@ -158,7 +158,7 @@ ogmrip_module_engine_add_path (OGMRipModuleEngine *engine, const gchar *path)
     {
       module = ogmrip_module_new (name, path);
       if (g_type_module_use (G_TYPE_MODULE (module)))
-        engine->priv->modules = g_slist_append (engine->priv->modules, module);
+        engine->priv->modules = g_slist_prepend (engine->priv->modules, module);
       else
       {
         g_object_unref (module);
@@ -172,6 +172,8 @@ ogmrip_module_engine_add_path (OGMRipModuleEngine *engine, const gchar *path)
   g_dir_close (dir);
 
   g_object_notify (G_OBJECT (engine), "modules");
+
+  return TRUE;
 }
 
 static gint

@@ -20,11 +20,9 @@
 #include "config.h"
 #endif
 
-#include <ogmrip-job.h>
 #include <ogmrip-encode.h>
+#include <ogmrip-module.h>
 
-#include <math.h>
-#include <unistd.h>
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
 
@@ -253,7 +251,7 @@ ogmrip_ogg_split_command (OGMRipContainer *ogg, const gchar *input)
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
-G_DEFINE_TYPE (OGMRipOgg, ogmrip_ogg, OGMRIP_TYPE_CONTAINER)
+G_DEFINE_DYNAMIC_TYPE (OGMRipOgg, ogmrip_ogg, OGMRIP_TYPE_CONTAINER)
 
 static void
 ogmrip_ogg_class_init (OGMRipOggClass *klass)
@@ -265,6 +263,11 @@ ogmrip_ogg_class_init (OGMRipOggClass *klass)
   container_class = OGMRIP_CONTAINER_CLASS (klass);
 
   spawn_class->run = ogmrip_ogg_run;
+}
+
+static void
+ogmrip_ogg_class_finalize (OGMRipOggClass *klass)
+{
 }
 
 static void
@@ -351,8 +354,8 @@ static OGMRipFormat formats[] =
   -1
 };
 
-gboolean
-ogmrip_init_plugin (GError **error)
+void
+ogmrip_module_load (OGMRipModule *module)
 {
   gboolean have_ogmmerge, have_ogmsplit;
   gchar *fullname;
@@ -367,25 +370,24 @@ ogmrip_init_plugin (GError **error)
 
   if (!have_ogmmerge && !have_ogmsplit)
   {
-    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("ogmmerge and ogmsplit are missing"));
-    return FALSE;
+    g_warning (_("ogmmerge and ogmsplit are missing"));
+    return;
   }
 
   if (!have_ogmmerge)
   {
-    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("ogmmerge is missing"));
-    return FALSE;
+    g_warning (_("ogmmerge is missing"));
+    return;
   }
 
   if (!have_ogmsplit)
   {
-    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("ogmsplit is missing"));
-    return FALSE;
+    g_warning (_("ogmsplit is missing"));
+    return;
   }
 
-  ogmrip_type_register_container (NULL, OGMRIP_TYPE_OGG,
-      "ogm", N_("Ogg Media (OGM)"), formats);
-
-  return TRUE;
+  ogmrip_ogg_register_type (G_TYPE_MODULE (module));
+  ogmrip_type_register_container (module,
+      OGMRIP_TYPE_OGG, "ogm", N_("Ogg Media (OGM)"), formats);
 }
 

@@ -20,11 +20,11 @@
 #include "config.h"
 #endif
 
-#include <ogmrip-job.h>
 #include <ogmrip-encode.h>
 #include <ogmrip-mplayer.h>
+#include <ogmrip-module.h>
 
-#include <stdio.h>
+// #include <stdio.h>
 #include <glib/gi18n-lib.h>
 
 #define OGMRIP_TYPE_WAV          (ogmrip_wav_get_type ())
@@ -50,8 +50,6 @@ struct _OGMRipWavClass
 
 static gint ogmrip_wav_run (OGMJobSpawn *spawn);
 
-G_DEFINE_TYPE (OGMRipWav, ogmrip_wav, OGMRIP_TYPE_AUDIO_CODEC)
-
 static gchar **
 ogmrip_wav_command (OGMRipAudioCodec *audio, gboolean header)
 {
@@ -63,6 +61,8 @@ ogmrip_wav_command (OGMRipAudioCodec *audio, gboolean header)
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
+G_DEFINE_DYNAMIC_TYPE (OGMRipWav, ogmrip_wav, OGMRIP_TYPE_AUDIO_CODEC)
+
 static void
 ogmrip_wav_class_init (OGMRipWavClass *klass)
 {
@@ -71,6 +71,11 @@ ogmrip_wav_class_init (OGMRipWavClass *klass)
   spawn_class = OGMJOB_SPAWN_CLASS (klass);
 
   spawn_class->run = ogmrip_wav_run;
+}
+
+static void
+ogmrip_wav_class_finalize (OGMRipWavClass *klass)
+{
 }
 
 static void
@@ -102,18 +107,16 @@ ogmrip_wav_run (OGMJobSpawn *spawn)
   return result;
 }
 
-gboolean
-ogmrip_init_plugin (GError **error)
+void
+ogmrip_module_load (OGMRipModule *module)
 {
   if (!ogmrip_check_mplayer ())
+    g_warning (_("MPlayer is missing"));
+  else
   {
-    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MPlayer is missing"));
-    return FALSE;
+    ogmrip_wav_register_type (G_TYPE_MODULE (module));
+    ogmrip_type_register_codec (module,
+        OGMRIP_TYPE_WAV, "wav", N_("Wave (uncompressed PCM)"), OGMRIP_FORMAT_PCM);
   }
-
-  ogmrip_type_register_codec (NULL, OGMRIP_TYPE_WAV,
-      "wav", N_("Wave (uncompressed PCM)"), OGMRIP_FORMAT_PCM);
-
-  return TRUE;
 }
 

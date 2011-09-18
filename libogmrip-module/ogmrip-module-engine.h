@@ -19,7 +19,7 @@
 #ifndef __OGMRIP_MODULE_ENGINE_H__
 #define __OGMRIP_MODULE_ENGINE_H__
 
-#include <glib-object.h>
+#include <ogmrip-module-object.h>
 
 G_BEGIN_DECLS
 
@@ -48,8 +48,12 @@ struct _OGMRipModuleEngineClass
 
 GType                ogmrip_module_engine_get_type    (void) G_GNUC_CONST;
 OGMRipModuleEngine * ogmrip_module_engine_get_default (void);
-void                 ogmrip_module_engine_add_path    (OGMRipModuleEngine *engine,
-                                                       const gchar        *path);
+gboolean             ogmrip_module_engine_add_path    (OGMRipModuleEngine  *engine,
+                                                       const gchar         *path,
+                                                       GError              **error);
+OGMRipModule *       ogmrip_module_engine_get         (OGMRipModuleEngine  *engine,
+                                                       const gchar         *name);
+GSList *             ogmrip_module_engine_get_list    (OGMRipModuleEngine  *engine);
 
 G_END_DECLS
 

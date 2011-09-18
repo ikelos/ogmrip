@@ -22,6 +22,7 @@
 
 #include <ogmrip-lavc.h>
 #include <ogmrip-lavc-mpeg4.h>
+#include <ogmrip-module.h>
 
 #include <glib/gi18n-lib.h>
 
@@ -44,10 +45,15 @@ struct _OGMRipLavcMpeg4Class
   OGMRipLavcClass parent_class;
 };
 
-G_DEFINE_TYPE (OGMRipLavcMpeg4, ogmrip_lavc_mpeg4, OGMRIP_TYPE_LAVC)
+G_DEFINE_DYNAMIC_TYPE (OGMRipLavcMpeg4, ogmrip_lavc_mpeg4, OGMRIP_TYPE_LAVC)
 
 static void
 ogmrip_lavc_mpeg4_class_init (OGMRipLavcMpeg4Class *klass)
+{
+}
+
+static void
+ogmrip_lavc_mpeg4_class_finalize (OGMRipLavcMpeg4Class *klass)
 {
 }
 
@@ -56,24 +62,29 @@ ogmrip_lavc_mpeg4_init (OGMRipLavcMpeg4 *lavc_mpeg4)
 {
 }
 
-gboolean
-ogmrip_init_plugin (GError **error)
+void
+ogmrip_module_load (OGMRipModule *module)
 {
   gchar *output;
   gboolean match;
 
   if (!g_spawn_command_line_sync ("mencoder -ovc help", &output, NULL, NULL, NULL))
-    return FALSE;
+  {
+    g_warning (_("MEncoder is missing"));
+    return;
+  }
 
   match = g_regex_match_simple ("^ *lavc *- .*$", output, G_REGEX_MULTILINE, 0);
   g_free (output);
 
   if (!match)
-    return FALSE;
+  {
+    g_warning (_("MEncoder is built without LAVC support"));
+    return;
+  }
 
-  ogmrip_type_register_codec (NULL, OGMRIP_TYPE_LAVC_MPEG4,
-      "lavc-mpeg4", N_("Lavc Mpeg-4"), OGMRIP_FORMAT_MPEG4);
-
-  return TRUE;
+  ogmrip_lavc_mpeg4_register_type (G_TYPE_MODULE (module));
+  ogmrip_type_register_codec (module,
+      OGMRIP_TYPE_LAVC_MPEG4, "lavc-mpeg4", N_("Lavc Mpeg-4"), OGMRIP_FORMAT_MPEG4);
 }
 

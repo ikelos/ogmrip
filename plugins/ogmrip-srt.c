@@ -20,12 +20,10 @@
 #include "config.h"
 #endif
 
-#include <ogmrip-job.h>
 #include <ogmrip-encode.h>
 #include <ogmrip-mplayer.h>
+#include <ogmrip-module.h>
 
-#include <unistd.h>
-#include <string.h>
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
 
@@ -327,7 +325,7 @@ ogmrip_srt_ocr (OGMJobSpawn *spawn, const gchar *filename, gboolean lang)
 }
 
 
-G_DEFINE_TYPE (OGMRipSrt, ogmrip_srt, OGMRIP_TYPE_SUBP_CODEC)
+G_DEFINE_DYNAMIC_TYPE (OGMRipSrt, ogmrip_srt, OGMRIP_TYPE_SUBP_CODEC)
 
 static void
 ogmrip_srt_class_init (OGMRipSrtClass *klass)
@@ -337,6 +335,11 @@ ogmrip_srt_class_init (OGMRipSrtClass *klass)
   spawn_class = OGMJOB_SPAWN_CLASS (klass);
 
   spawn_class->run = ogmrip_srt_run;
+}
+
+static void
+ogmrip_srt_class_finalize (OGMRipSrtClass *klass)
+{
 }
 
 static void
@@ -512,8 +515,8 @@ ogmrip_srt_run (OGMJobSpawn *spawn)
   return result;
 }
 
-gboolean
-ogmrip_init_plugin (GError **error)
+void
+ogmrip_module_load (OGMRipModule *module)
 {
 #if defined(HAVE_GOCR_SUPPORT) || defined(HAVE_OCRAD_SUPPORT) || defined(HAVE_TESSERACT_SUPPORT)
   gchar *fullname;
@@ -521,8 +524,8 @@ ogmrip_init_plugin (GError **error)
 
   if (!ogmrip_check_mencoder ())
   {
-    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MEncoder is missing"));
-    return FALSE;
+    g_warning (_("MEncoder is missing"));
+    return;
   }
 
 #ifdef HAVE_TESSERACT_SUPPORT
@@ -558,13 +561,12 @@ ogmrip_init_plugin (GError **error)
 
   if (!use_gocr && !use_ocrad && !use_tesseract)
   {
-    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("GOCR, Ocrad and Tesseract are missing"));
-    return FALSE;
+    g_warning (_("GOCR, Ocrad and Tesseract are missing"));
+    return;
   }
 
-  ogmrip_type_register_codec (NULL, OGMRIP_TYPE_SRT,
-      "srt", N_("SRT text"), OGMRIP_FORMAT_SRT);
-
-  return TRUE;
+  ogmrip_srt_register_type (G_TYPE_MODULE (module));
+  ogmrip_type_register_codec (module,
+      OGMRIP_TYPE_SRT, "srt", N_("SRT text"), OGMRIP_FORMAT_SRT);
 }
 

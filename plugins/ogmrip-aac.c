@@ -20,15 +20,14 @@
 #include "config.h"
 #endif
 
-#include <ogmrip-job.h>
 #include <ogmrip-encode.h>
 #include <ogmrip-mplayer.h>
+#include <ogmrip-module.h>
 
-#include <unistd.h>
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
 
-#define PROGRAM "faac"
+#define FAAC "faac"
 
 #define OGMRIP_TYPE_AAC          (ogmrip_aac_get_type ())
 #define OGMRIP_AAC(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_AAC, OGMRipAac))
@@ -61,7 +60,7 @@ ogmrip_aac_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input
   quality = ogmrip_audio_codec_get_quality (audio);
 
   argv = g_ptr_array_new ();
-  g_ptr_array_add (argv, g_strdup (PROGRAM));
+  g_ptr_array_add (argv, g_strdup (FAAC));
 
   if (!header)
   {
@@ -100,7 +99,7 @@ ogmrip_wav_command (OGMRipAudioCodec *audio, gboolean header, const gchar *outpu
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
-G_DEFINE_TYPE (OGMRipAac, ogmrip_aac, OGMRIP_TYPE_AUDIO_CODEC)
+G_DEFINE_DYNAMIC_TYPE (OGMRipAac, ogmrip_aac, OGMRIP_TYPE_AUDIO_CODEC);
 
 static void
 ogmrip_aac_class_init (OGMRipAacClass *klass)
@@ -110,6 +109,11 @@ ogmrip_aac_class_init (OGMRipAacClass *klass)
   spawn_class = OGMJOB_SPAWN_CLASS (klass);
 
   spawn_class->run = ogmrip_aac_run;
+}
+
+static void
+ogmrip_aac_class_finalize (OGMRipAacClass *klass)
+{
 }
 
 static void
@@ -167,39 +171,38 @@ ogmrip_aac_run (OGMJobSpawn *spawn)
   return result;
 }
 
-gboolean
-ogmrip_init_plugin (GError **error)
+void
+ogmrip_module_load (OGMRipModule *module)
 {
   gboolean have_mplayer, have_faac;
   gchar *fullname;
 
   have_mplayer = ogmrip_check_mplayer ();
 
-  fullname = g_find_program_in_path (PROGRAM);
+  fullname = g_find_program_in_path (FAAC);
   have_faac = fullname != NULL;
   g_free (fullname);
 
   if (!have_mplayer && !have_faac)
   {
-    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MPlayer and FAAC are missing"));
-    return FALSE;
+    g_warning (_("MPlayer and FAAC are missing"));
+    return;
   }
 
   if (!have_mplayer)
   {
-    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MPlayer is missing"));
-    return FALSE;
+    g_warning (_("MPlayer is missing"));
+    return;
   }
 
   if (!have_faac)
   {
-    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("FAAC is missing"));
-    return FALSE;
+    g_warning (_("FAAC is missing"));
+    return;
   }
 
-  ogmrip_type_register_codec (NULL, OGMRIP_TYPE_AAC,
-      "aac", N_("Advanced Audio Coding (AAC)"), OGMRIP_FORMAT_AAC);
-
-  return TRUE;
+  ogmrip_aac_register_type (G_TYPE_MODULE (module));
+  ogmrip_type_register_codec (module,
+      OGMRIP_TYPE_AAC, "aac", N_("Advanced Audio Coding (AAC)"), OGMRIP_FORMAT_AAC);
 }
 

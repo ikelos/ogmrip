@@ -20,17 +20,13 @@
 #include "config.h"
 #endif
 
-#include <ogmrip-job.h>
 #include <ogmrip-encode.h>
+#include <ogmrip-module.h>
 
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
 
-#define PROGRAM "mkvmerge"
+#define MKVMERGE "mkvmerge"
 #define MKV_OVERHEAD 4
 
 #define OGMRIP_TYPE_MATROSKA          (ogmrip_matroska_get_type ())
@@ -290,7 +286,7 @@ ogmrip_matroska_command (OGMRipContainer *matroska)
   guint tsize, tnumber;
 
   argv = g_ptr_array_new ();
-  g_ptr_array_add (argv, g_strdup (PROGRAM));
+  g_ptr_array_add (argv, g_strdup (MKVMERGE));
 
   output = ogmrip_container_get_output (matroska);
   g_ptr_array_add (argv, g_strdup ("-o"));
@@ -325,7 +321,7 @@ ogmrip_matroska_command (OGMRipContainer *matroska)
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
-G_DEFINE_TYPE (OGMRipMatroska, ogmrip_matroska, OGMRIP_TYPE_CONTAINER)
+G_DEFINE_DYNAMIC_TYPE (OGMRipMatroska, ogmrip_matroska, OGMRIP_TYPE_CONTAINER)
 
 static void
 ogmrip_matroska_class_init (OGMRipMatroskaClass *klass)
@@ -342,6 +338,11 @@ ogmrip_matroska_class_init (OGMRipMatroskaClass *klass)
   g_object_class_install_property (gobject_class, PROP_OVERHEAD, 
         g_param_spec_uint ("overhead", "Overhead property", "Get overhead", 
            0, G_MAXUINT, MKV_OVERHEAD, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+}
+
+static void
+ogmrip_matroska_class_finalize (OGMRipMatroskaClass *klass)
+{
 }
 
 static void
@@ -415,32 +416,31 @@ static gint formats[] =
   -1
 };
 
-gboolean
-ogmrip_init_plugin (GError **error)
+void
+ogmrip_module_load (OGMRipModule *module)
 {
   gchar *output;
-  guint i = 0;
 
-  if (!g_spawn_command_line_sync ("mkvmerge --list-types", &output, NULL, NULL, NULL))
+  if (!g_spawn_command_line_sync (MKVMERGE " --list-types", &output, NULL, NULL, NULL))
+    g_warning (_("mkvmerge is missing"));
+  else
   {
-    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("mkvmerge is missing"));
-    return FALSE;
+    guint i = 0;
+
+    while (formats[i] != -1)
+      i++;
+
+    if (strstr (output, " drc ") || strstr (output, " Dirac "))
+      formats[i++] = OGMRIP_FORMAT_DIRAC;
+
+    if (strstr (output, " ivf ") || strstr (output, " IVF "))
+      formats[i++] = OGMRIP_FORMAT_VP8;
+
+    g_free (output);
+
+    ogmrip_matroska_register_type (G_TYPE_MODULE (module));
+    ogmrip_type_register_container (module,
+        OGMRIP_TYPE_MATROSKA, "mkv", N_("Matroska Media (MKV)"), formats);
   }
-
-  while (formats[i] != -1)
-    i++;
-
-  if (strstr (output, " drc ") || strstr (output, " Dirac "))
-    formats[i++] = OGMRIP_FORMAT_DIRAC;
-
-  if (strstr (output, " ivf ") || strstr (output, " IVF "))
-    formats[i++] = OGMRIP_FORMAT_VP8;
-
-  g_free (output);
-
-  ogmrip_type_register_container (NULL, OGMRIP_TYPE_MATROSKA,
-      "mkv", N_("Matroska Media (MKV)"), formats);
-
-  return TRUE;
 }
 

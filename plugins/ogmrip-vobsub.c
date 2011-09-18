@@ -20,15 +20,13 @@
 #include "config.h"
 #endif
 
-#include <ogmrip-job.h>
 #include <ogmrip-encode.h>
 #include <ogmrip-mplayer.h>
+#include <ogmrip-module.h>
 
 #include <errno.h>
 #include <fcntl.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
+
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
 
@@ -54,8 +52,6 @@ struct _OGMRipVobSubClass
 static gint ogmrip_vobsub_run      (OGMJobSpawn *spawn);
 static void ogmrip_vobsub_finalize (GObject     *gobject);
 
-G_DEFINE_TYPE (OGMRipVobSub, ogmrip_vobsub, OGMRIP_TYPE_SUBP_CODEC)
-
 static gchar **
 ogmrip_vobsub_command (OGMRipSubpCodec *subp, const gchar *input, const gchar *output)
 {
@@ -65,6 +61,8 @@ ogmrip_vobsub_command (OGMRipSubpCodec *subp, const gchar *input, const gchar *o
 
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
+
+G_DEFINE_DYNAMIC_TYPE (OGMRipVobSub, ogmrip_vobsub, OGMRIP_TYPE_SUBP_CODEC)
 
 static void
 ogmrip_vobsub_class_init (OGMRipVobSubClass *klass)
@@ -77,6 +75,11 @@ ogmrip_vobsub_class_init (OGMRipVobSubClass *klass)
 
   gobject_class->finalize = ogmrip_vobsub_finalize;
   spawn_class->run = ogmrip_vobsub_run;
+}
+
+static void
+ogmrip_vobsub_class_finalize (OGMRipVobSubClass *klass)
+{
 }
 
 static void
@@ -260,18 +263,17 @@ ogmrip_vobsub_run (OGMJobSpawn *spawn)
   return result;
 }
 
-gboolean
-ogmrip_init_plugin (GError **error)
+void
+ogmrip_module_load (OGMRipModule *module)
 {
   if (!ogmrip_check_mencoder ())
   {
-    // g_set_error (error, OGMRIP_PLUGIN_ERROR, OGMRIP_PLUGIN_ERROR_REQ, _("MEncoder is missing"));
-    return FALSE;
+    g_warning (_("MEncoder is missing"));
+    return;
   }
 
-  ogmrip_type_register_codec (NULL, OGMRIP_TYPE_VOBSUB,
-      "vobsub", N_("VobSub"), OGMRIP_FORMAT_VOBSUB);
-
-  return TRUE;
+  ogmrip_vobsub_register_type (G_TYPE_MODULE (module));
+  ogmrip_type_register_codec (module,
+      OGMRIP_TYPE_VOBSUB, "vobsub", N_("VobSub"), OGMRIP_FORMAT_VOBSUB);
 }
 
