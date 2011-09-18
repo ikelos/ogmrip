@@ -158,17 +158,20 @@ ogmrip_type_store_reload (OGMRipTypeStore *store)
   gtk_list_store_clear (GTK_LIST_STORE (store));
 
   types = ogmrip_type_children (store->priv->parent, NULL);
-  for (i = 0; types[i] != G_TYPE_NONE; i ++)
+  if (types)
   {
-    desc = ogmrip_type_description (types[i]);
+    for (i = 0; types[i] != G_TYPE_NONE; i ++)
+    {
+      desc = ogmrip_type_description (types[i]);
 
-    gtk_list_store_append (GTK_LIST_STORE (store), &iter);
-    gtk_list_store_set (GTK_LIST_STORE (store), &iter,
-        OGMRIP_TYPE_STORE_DESCRIPTION_COLUMN, desc,
-        OGMRIP_TYPE_STORE_TYPE_COLUMN, types[i],
-        -1);
+      gtk_list_store_append (GTK_LIST_STORE (store), &iter);
+      gtk_list_store_set (GTK_LIST_STORE (store), &iter,
+          OGMRIP_TYPE_STORE_DESCRIPTION_COLUMN, desc,
+          OGMRIP_TYPE_STORE_TYPE_COLUMN, types[i],
+          -1);
+    }
+    g_free (types);
   }
-  g_free (types);
 }
 
 GType
