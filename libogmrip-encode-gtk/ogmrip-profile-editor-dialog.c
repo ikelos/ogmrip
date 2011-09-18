@@ -708,7 +708,7 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
   settings = ogmrip_profile_get_child (dialog->priv->profile, OGMRIP_PROFILE_AUDIO);
 
   dialog->priv->audio_chooser = gtk_builder_get_widget (builder, "audio-codec-combo");
-  ogmrip_type_chooser_widget_construct (GTK_COMBO_BOX (dialog->priv->video_chooser), OGMRIP_TYPE_AUDIO_CODEC);
+  ogmrip_type_chooser_widget_construct (GTK_COMBO_BOX (dialog->priv->audio_chooser), OGMRIP_TYPE_AUDIO_CODEC);
 
   ogmrip_profile_editor_dialog_codec_setting_changed (dialog->priv->audio_chooser, settings);
 
@@ -762,7 +762,7 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
   settings = ogmrip_profile_get_child (dialog->priv->profile, OGMRIP_PROFILE_SUBP);
 
   dialog->priv->subp_chooser = gtk_builder_get_widget (builder, "subp-codec-combo");
-  ogmrip_type_chooser_widget_construct (GTK_COMBO_BOX (dialog->priv->video_chooser), OGMRIP_TYPE_SUBP_CODEC);
+  ogmrip_type_chooser_widget_construct (GTK_COMBO_BOX (dialog->priv->subp_chooser), OGMRIP_TYPE_SUBP_CODEC);
 
   ogmrip_profile_editor_dialog_codec_setting_changed (dialog->priv->subp_chooser, settings);
 

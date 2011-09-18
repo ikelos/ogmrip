@@ -93,10 +93,15 @@ ogmrip_type_chooser_widget_set_active (GtkComboBox *chooser, GType gtype)
 }
 
 static gboolean
-ogmrip_type_chooser_widget_filter (GtkTreeModel *model, GtkTreeIter *iter, GType gtype)
+ogmrip_type_chooser_widget_filter (GtkTreeModel *model, GtkTreeIter *iter, GType container)
 {
-  return ogmrip_container_contains (gtype,
-      ogmrip_type_store_get_gtype (OGMRIP_TYPE_STORE (model), iter));
+  GType gtype;
+
+  gtype = ogmrip_type_store_get_gtype (OGMRIP_TYPE_STORE (model), iter);
+  if (gtype == G_TYPE_NONE)
+    return FALSE;
+
+  return ogmrip_container_contains (container, ogmrip_codec_format (gtype));
 }
 
 void
