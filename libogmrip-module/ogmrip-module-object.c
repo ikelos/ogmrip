@@ -21,8 +21,7 @@
 #include <gmodule.h>
 #include <string.h>
 
-typedef gboolean (* OGMRipModuleRegisterFunc) (OGMRipModule *module,
-                                               GError       **error);
+typedef void (* OGMRipModuleRegisterFunc) (OGMRipModule *module);
 
 struct _OGMRipModulePriv
 {
@@ -38,6 +37,15 @@ enum
   PROP_NAME,
   PROP_PATH
 };
+
+enum
+{
+  LOAD,
+  UNLOAD,
+  LAST_SIGNAL
+};
+
+static int signals[LAST_SIGNAL] = { 0 };
 
 static gchar *
 ogmrip_module_build_path (OGMRipModule *module)
@@ -109,9 +117,8 @@ ogmrip_module_finalize (GObject *gobject)
 }
 
 static gboolean
-ogmrip_module_load (GTypeModule *gmodule)
+ogmrip_module_load_module (GTypeModule *gmodule)
 {
-  GError *error = NULL;
   OGMRipModule *module = OGMRIP_MODULE (gmodule);
   OGMRipModuleRegisterFunc register_func;
   gchar *path;
@@ -147,33 +154,25 @@ ogmrip_module_load (GTypeModule *gmodule)
     return FALSE;
   }
 
-  g_debug ("Loading module '%s'", module->priv->name);
 /*
   if (module->priv->resident)
     g_module_make_resident (module->priv->library);
 */
-  if (!register_func (module, &error))
-  {
-    if (error)
-    {
-      /*
-       * TODO error
-       */
-      g_error_free (error);
-    }
+  register_func (module);
 
-    return FALSE;
-  }
+  g_debug ("Loading module '%s'", module->priv->name);
+  g_signal_emit (module, signals[LOAD], 0);
 
   return TRUE;
 }
 
 static void
-ogmrip_module_unload (GTypeModule *gmodule)
+ogmrip_module_unload_module (GTypeModule *gmodule)
 {
   OGMRipModule *module = OGMRIP_MODULE (gmodule);
 
   g_debug ("Unloading module '%s'", module->priv->name);
+  g_signal_emit (module, signals[UNLOAD], 0);
 
   g_module_close (module->priv->library);
   module->priv->library = NULL;
@@ -198,8 +197,8 @@ ogmrip_module_class_init (OGMRipModuleClass *klass)
   gobject_class->finalize = ogmrip_module_finalize;
 
   module_class = G_TYPE_MODULE_CLASS (klass);
-  module_class->load = ogmrip_module_load;
-  module_class->unload = ogmrip_module_unload;
+  module_class->load = ogmrip_module_load_module;
+  module_class->unload = ogmrip_module_unload_module;
 
   g_object_class_install_property (gobject_class, PROP_NAME,
       g_param_spec_string ("name", "Module name", "The name of the module",
@@ -208,6 +207,18 @@ ogmrip_module_class_init (OGMRipModuleClass *klass)
   g_object_class_install_property (gobject_class, PROP_PATH,
       g_param_spec_string ("path", "Module path", "The path of the module",
         NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+
+  signals[LOAD] = g_signal_new ("load", G_TYPE_FROM_CLASS (klass),
+      G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+      G_STRUCT_OFFSET (OGMRipModuleClass, load_module), NULL, NULL,
+      g_cclosure_marshal_VOID__VOID,
+      G_TYPE_NONE, 0);
+
+  signals[UNLOAD] = g_signal_new ("unload", G_TYPE_FROM_CLASS (klass),
+      G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+      G_STRUCT_OFFSET (OGMRipModuleClass, unload_module), NULL, NULL,
+      g_cclosure_marshal_VOID__VOID,
+      G_TYPE_NONE, 0);
 
   g_type_class_add_private (klass, sizeof (OGMRipModulePriv));
 }
