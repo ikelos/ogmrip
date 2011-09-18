@@ -96,7 +96,7 @@ PKG_CHECK_MODULES(LIBXML, [libxml-2.0])
 CFLAGS="$CFLAGS $LIBXML_CFLAGS"
 LIBS="$LIBS $LIBXML_LIBS"
 
-PKG_CHECK_MODULES(LIBPNG, [libpng], [have_png_support=yes], [have_png_support=no])
+PKG_CHECK_MODULES(LIBPNG, [libpng zlib], [have_png_support=yes], [have_png_support=no])
 CFLAGS="$CFLAGS $LIBPNG_CFLAGS"
 LIBS="$LIBS $LIBPNG_LIBS"
 

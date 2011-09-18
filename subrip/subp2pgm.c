@@ -44,6 +44,7 @@
 
 #ifdef HAVE_PNG_SUPPORT
 #include <png.h>
+#include <zlib.h>
 #endif
 
 #ifdef HAVE_TIFF_SUPPORT
