@@ -16,26 +16,26 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef __OGMRIP_GCONF_H__
-#define __OGMRIP_GCONF_H__
+#ifndef __OGMRIP_SETTINGS_H__
+#define __OGMRIP_SETTINGS_H__
 
-#include <ogmrip-encode.h>
+#include <glib.h>
 
 G_BEGIN_DECLS
 
-#define OGMRIP_SETTINGS_PROFILE              "profile"
-#define OGMRIP_SETTINGS_OUTPUT_DIR           "output-directory"
-#define OGMRIP_SETTINGS_FILENAME             "filename"
-#define OGMRIP_SETTINGS_PREF_AUDIO           "prefered-audio-language"
-#define OGMRIP_SETTINGS_PREF_SUBP            "prefered-subp-language"
-#define OGMRIP_SETTINGS_CHAPTER_LANG         "chapters-language"
-#define OGMRIP_SETTINGS_TMP_DIR              "temporary-directory"
-#define OGMRIP_SETTINGS_COPY_DVD             "copy-dvd"
-#define OGMRIP_SETTINGS_AFTER_ENC            "after-encoding"
-#define OGMRIP_SETTINGS_KEEP_TMP             "keep-temporary-files"
-#define OGMRIP_SETTINGS_LOG_OUTPUT           "create-log-file"
-#define OGMRIP_SETTINGS_THREADS              "threads"
-#define OGMRIP_SETTINGS_AUTO_SUBP            "auto-subp"
+#define OGMRIP_SETTINGS_PROFILE      "profile"
+#define OGMRIP_SETTINGS_OUTPUT_DIR   "output-directory"
+#define OGMRIP_SETTINGS_FILENAME     "filename"
+#define OGMRIP_SETTINGS_PREF_AUDIO   "prefered-audio-language"
+#define OGMRIP_SETTINGS_PREF_SUBP    "prefered-subp-language"
+#define OGMRIP_SETTINGS_CHAPTER_LANG "chapters-language"
+#define OGMRIP_SETTINGS_TMP_DIR      "temporary-directory"
+#define OGMRIP_SETTINGS_COPY_DVD     "copy-dvd"
+#define OGMRIP_SETTINGS_AFTER_ENC    "after-encoding"
+#define OGMRIP_SETTINGS_KEEP_TMP     "keep-temporary-files"
+#define OGMRIP_SETTINGS_LOG_OUTPUT   "create-log-file"
+#define OGMRIP_SETTINGS_THREADS      "threads"
+#define OGMRIP_SETTINGS_AUTO_SUBP    "auto-subp"
 
 enum
 {
@@ -44,10 +44,7 @@ enum
   OGMRIP_AFTER_ENC_ASK
 };
 
-void  ogmrip_settings_init   (void);
-void  ogmrip_settings_uninit (void);
-
 G_END_DECLS
 
-#endif /* __OGMRIP_GCONF_H__ */
+#endif /* __OGMRIP_SETTINGS_H__ */
 

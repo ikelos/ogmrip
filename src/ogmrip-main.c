@@ -24,6 +24,7 @@
 #include <ogmrip-dvd-gtk.h>
 #include <ogmrip-encode-gtk.h>
 #include <ogmrip-media-gtk.h>
+#include <ogmrip-module.h>
 
 #include "ogmrip-helper.h"
 #include "ogmrip-settings.h"
@@ -37,8 +38,6 @@
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 #include <stdlib.h>
-
-#include <libxml/tree.h>
 
 #ifdef HAVE_LIBNOTIFY_SUPPORT
 #include <libnotify/notify.h>
@@ -74,7 +73,7 @@ typedef struct
   OGMRipPlayer *player;
 } OGMRipData;
 
-extern GSettings *settings;
+GSettings *settings;
 
 static void
 gtk_container_clear (GtkContainer *container)
@@ -570,13 +569,16 @@ ogmrip_main_encode (OGMRipData *data, OGMRipEncoding *encoding)
  * Imports a simple chapter file
  */
 static gboolean
-ogmrip_main_import_simple_chapters (OGMRipData *data, const gchar *filename)
+ogmrip_main_import_simple_chapters (OGMRipData *data, GFile *gfile)
 {
   FILE *file;
   gchar buf[201], *str;
   gint chap;
 
-  file = fopen (filename, "r");
+  str = g_file_get_path (gfile);
+  file = fopen (str, "r");
+  g_free (str);
+
   if (!file)
     return FALSE;
 
@@ -601,66 +603,78 @@ ogmrip_main_import_simple_chapters (OGMRipData *data, const gchar *filename)
  * Imports a matroska chapter file
  */
 static gboolean
-ogmrip_main_import_matroska_chapters (OGMRipData *data, const gchar *filename)
+ogmrip_main_import_matroska_chapters (OGMRipData *data, GFile *file)
 {
-  xmlDoc *doc;
-  xmlNode *node, *child;
-  xmlChar *str;
+  OGMRipXML *xml;
 
   gint chap = 0;
+  gchar *str;
 
-  doc = xmlParseFile (filename);
-  if (!doc)
+  xml = ogmrip_xml_new_from_file (file, NULL);
+  if (!xml)
     return FALSE;
 
-  node = xmlDocGetRootElement (doc);
-  if (!node)
+  if (!g_str_equal (ogmrip_xml_get_name (xml), "Chapters"))
   {
-    xmlFreeDoc (doc);
+    ogmrip_xml_free (xml);
     return FALSE;
   }
 
-  if (!xmlStrEqual (node->name, (xmlChar *) "Chapters"))
+  if (!ogmrip_xml_children (xml))
   {
-    xmlFreeDoc (doc);
+    ogmrip_xml_free (xml);
     return FALSE;
   }
 
-  for (node = node->children; node; node = node->next)
-    if (xmlStrEqual (node->name, (xmlChar *) "EditionEntry"))
+  do
+  {
+    if (g_str_equal (ogmrip_xml_get_name (xml), "EditionEntry"))
       break;
+  }
+  while (ogmrip_xml_next (xml));
 
-  if (!node)
+  if (!ogmrip_xml_children (xml))
   {
-    xmlFreeDoc (doc);
+    ogmrip_xml_free (xml);
     return FALSE;
   }
 
-  for (node = node->children; node; node = node->next)
+  do
   {
-    if (xmlStrEqual (node->name, (xmlChar *) "ChapterAtom"))
+    if (g_str_equal (ogmrip_xml_get_name (xml), "ChapterAtom"))
     {
-      for (child = node->children; child; child = child->next)
-        if (xmlStrEqual (child->name, (xmlChar *) "ChapterDisplay"))
-          break;
-
-      if (child)
+      if (ogmrip_xml_children (xml))
       {
-        for (child = child->children; child; child = child->next)
-          if (xmlStrEqual (child->name, (xmlChar *) "ChapterString"))
-            break;
-
-        if (child)
+        do
         {
-          str = xmlNodeGetContent (child);
-          ogmrip_chapter_store_set_label (OGMRIP_CHAPTER_STORE (data->chapter_store), chap, (gchar *) str);
-          chap ++;
+          if (g_str_equal (ogmrip_xml_get_name (xml), "ChapterDisplay"))
+            break;
         }
+        while (ogmrip_xml_next (xml));
+
+        if (ogmrip_xml_children (xml))
+        {
+          do
+          {
+            if (g_str_equal (ogmrip_xml_get_name (xml), "ChapterString"))
+            {
+              str = ogmrip_xml_get_string (xml, NULL);
+              ogmrip_chapter_store_set_label (OGMRIP_CHAPTER_STORE (data->chapter_store), chap ++, str);
+              g_free (str);
+            }
+          }
+          while (ogmrip_xml_next (xml));
+
+          ogmrip_xml_parent (xml);
+        }
+
+        ogmrip_xml_parent (xml);
       }
     }
   }
+  while (ogmrip_xml_next (xml));
 
-  xmlFreeDoc (doc);
+  ogmrip_xml_free (xml);
 
   return TRUE;
 }
@@ -1458,16 +1472,22 @@ ogmrip_main_import_chapters_activated (OGMRipData *data)
 
   if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_OK)
   {
-    gchar *filename;
+    GFile *file;
 
-    filename = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
-    if (filename)
+    file = gtk_file_chooser_get_file (GTK_FILE_CHOOSER (dialog));
+    if (file)
     {
-      if (!ogmrip_main_import_matroska_chapters (data, filename))
-        if (!ogmrip_main_import_simple_chapters (data, filename))
+      if (!ogmrip_main_import_matroska_chapters (data, file))
+        if (!ogmrip_main_import_simple_chapters (data, file))
+        {
+          gchar *path;
+
+          path = g_file_get_path (file);
           ogmrip_run_error_dialog (GTK_WINDOW (data->window), NULL,
-              _("Could not open the chapters file '%s'"), filename);
-      g_free (filename);
+              _("Could not open the chapters file '%s'"), path);
+          g_free (path);
+        }
+      g_object_unref (file);
     }
   }
   gtk_widget_destroy (dialog);
@@ -1802,12 +1822,7 @@ ogmrip_main_new (void)
 
   builder = gtk_builder_new ();
   if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))
-  {
-    g_warning ("Couldn't load builder file: %s", error->message);
-    g_object_unref (builder);
-    g_error_free (error);
-    return NULL;
-  }
+    g_error ("Couldn't load builder file: %s", error->message);
 
   data = g_new0 (OGMRipData, 1);
 
@@ -1820,8 +1835,6 @@ ogmrip_main_new (void)
       G_CALLBACK (ogmrip_main_delete_event), data);
   g_signal_connect_swapped (data->window, "destroy",
       G_CALLBACK (ogmrip_main_destroyed), data);
-  g_signal_connect (data->window, "destroy",
-      G_CALLBACK (gtk_main_quit), NULL);
 
   action_group = gtk_action_group_new ("MenuActions");
   gtk_action_group_set_translation_domain (action_group, GETTEXT_PACKAGE);
@@ -1983,51 +1996,81 @@ ogmrip_main_new (void)
   return data;
 }
 
+static void
+ogmrip_tmp_dir_changed_cb (GSettings *settings, const gchar *key)
+{
+  gchar *path;
+
+  path = g_settings_get_string (settings, key);
+  ogmrip_fs_set_tmp_dir (path);
+  g_free (path);
+}
+
+static void
+ogmrip_startup_cb (GApplication *app)
+{
+  OGMRipModuleEngine *module_engine;
+  OGMRipProfileEngine *profile_engine;
+  gchar *path;
+
+  settings = g_settings_new ("org.ogmrip.preferences");
+  g_object_set_data_full (G_OBJECT (app), "settings", settings, g_object_unref);
+
+  path = g_settings_get_string (settings, OGMRIP_SETTINGS_OUTPUT_DIR);
+  if (!strlen (path))
+    g_settings_set_string (settings, OGMRIP_SETTINGS_OUTPUT_DIR, g_get_user_special_dir (G_USER_DIRECTORY_VIDEOS));
+  g_free (path);
+
+  path = g_settings_get_string (settings, OGMRIP_SETTINGS_TMP_DIR);
+  if (!strlen (path))
+    g_settings_set_string (settings, OGMRIP_SETTINGS_TMP_DIR, g_get_tmp_dir ());
+  g_free (path);
+
+  g_signal_connect (settings, "changed::" OGMRIP_SETTINGS_TMP_DIR,
+      G_CALLBACK (ogmrip_tmp_dir_changed_cb), NULL);
+
+#ifdef HAVE_LIBNOTIFY_SUPPORT
+  notify_init (PACKAGE_NAME);
+#endif /* HAVE_LIBNOTIFY_SUPPORT */
+
+  module_engine = ogmrip_module_engine_get_default ();
+  g_object_set_data_full (G_OBJECT (app), "module-engine", module_engine, g_object_unref);
+
+  path = g_build_filename (OGMRIP_LIB_DIR, "ogmrip", "plugins", NULL);
+  ogmrip_module_engine_add_path (module_engine, path, NULL);
+  g_free (path);
+
+  path = g_build_filename (g_get_user_data_dir (), "ogmrip", "plugins", NULL);
+  ogmrip_module_engine_add_path (module_engine, path, NULL);
+  g_free (path);
+
+  path = g_build_filename (OGMRIP_LIB_DIR, "ogmrip", "extensions", NULL);
+  ogmrip_module_engine_add_path (module_engine, path, NULL);
+  g_free (path);
+
+  path = g_build_filename (g_get_user_data_dir (), "ogmrip", "extensions", NULL);
+  ogmrip_module_engine_add_path (module_engine, path, NULL);
+  g_free (path);
+
+  profile_engine = ogmrip_profile_engine_get_default ();
+  g_object_set_data_full (G_OBJECT (app), "profile-engine", profile_engine, g_object_unref);
+
+  path = g_build_filename (OGMRIP_DATA_DIR, "ogmrip", "profiles", NULL);
+  ogmrip_profile_engine_add_path (profile_engine, path);
+  g_free (path);
+
+  path = g_build_filename (g_get_user_data_dir (), "ogmrip", "profiles", NULL);
+  ogmrip_profile_engine_add_path (profile_engine, path);
+  g_free (path);
+}
+
 #ifdef G_ENABLE_DEBUG
 static gboolean debug = TRUE;
 #else
 static gboolean debug = FALSE;
 #endif
 
-static void
-ogmrip_init (void)
-{
-  OGMRipProfileEngine *engine;
-  gchar *path;
-
-  ogmrip_settings_init ();
-
-  // ogmrip_plugin_init ();
-  // ogmrip_options_plugin_init ();
-
-#ifdef HAVE_LIBNOTIFY_SUPPORT
-  notify_init (PACKAGE_NAME);
-#endif /* HAVE_LIBNOTIFY_SUPPORT */
-
-  engine = ogmrip_profile_engine_get_default ();
-
-  path = g_build_filename (OGMRIP_DATA_DIR, "ogmrip", "profiles", NULL);
-  ogmrip_profile_engine_add_path (engine, path);
-  g_free (path);
-
-  path = g_build_filename (g_get_user_data_dir (), "ogmrip", "profiles", NULL);
-  ogmrip_profile_engine_add_path (engine, path);
-  g_free (path);
-}
-
-static void
-ogmrip_uninit (void)
-{
-  OGMRipProfileEngine *engine;
-
-  engine = ogmrip_profile_engine_get_default ();
-  g_object_unref (engine);
-
-  ogmrip_settings_uninit ();
-
-  // ogmrip_options_plugin_uninit ();
-  // ogmrip_plugin_uninit ();
-}
+static gchar *filename = NULL;
 
 static GOptionEntry opts[] =
 {
@@ -2035,10 +2078,70 @@ static GOptionEntry opts[] =
   { NULL,    0,  0, 0,                 NULL,   NULL,                    NULL }
 };
 
+static gint
+ogmrip_command_line_cb (GApplication *app, GApplicationCommandLine *cmd)
+{
+  GError *error = NULL;
+  GOptionContext *context;
+  gboolean retval;
+  gchar **argv;
+  gint argc;
+
+  context = g_option_context_new ("[<PATH>]");
+  g_option_context_add_main_entries (context, opts, GETTEXT_PACKAGE);
+  g_option_context_add_group (context, gtk_get_option_group (TRUE));
+
+  argv = g_application_command_line_get_arguments (cmd, &argc);
+
+  retval = g_option_context_parse (context, &argc, &argv, &error);
+
+  if (retval && argc > 1 && g_file_test (argv[1], G_FILE_TEST_EXISTS))
+    filename = ogmrip_fs_get_full_path (argv[1]);
+
+  g_option_context_free (context);
+  g_strfreev (argv);
+
+  if (!retval)
+  {
+    g_print ("option parsing failed: %s\n", error->message);
+    g_error_free (error);
+
+    return EXIT_FAILURE;
+  }
+
+  if (debug)
+    ogmjob_log_set_print_stdout (TRUE);
+
+  g_application_activate (app);
+
+  return EXIT_SUCCESS;
+}
+
+static void
+ogmrip_activate_cb (GApplication *app)
+{
+  OGMRipData *data;
+
+  data = ogmrip_main_new ();
+  g_application_hold (app);
+  g_signal_connect_swapped (data->window, "destroy",
+      G_CALLBACK (g_application_release), app);
+
+  if (filename)
+  {
+    ogmrip_main_load (data, filename);
+    g_free (filename);
+    filename = NULL;
+  }
+
+  gtk_window_present (GTK_WINDOW (data->window));
+}
+
 int
 main (int argc, char *argv[])
 {
-  OGMRipData *data;
+  GApplication *app;
+  gint status;
 
 #ifdef ENABLE_NLS
   bindtextdomain (GETTEXT_PACKAGE, LOCALEDIR);
@@ -2046,34 +2149,23 @@ main (int argc, char *argv[])
   textdomain (GETTEXT_PACKAGE);
 #endif /* ENABLE_NLS */
 
-  if (!gtk_init_with_args (&argc, &argv, "<DVD DEVICE>", opts, GETTEXT_PACKAGE, NULL))
-    return EXIT_FAILURE;
+  gtk_init (&argc, &argv);
 
-  if (debug)
-    ogmjob_log_set_print_stdout (TRUE);
+  g_set_application_name (_("OGMRip"));
 
-  ogmrip_init ();
+  app = g_application_new ("org.gnome.ogmrip",
+      G_APPLICATION_HANDLES_COMMAND_LINE);
+  g_signal_connect (G_OBJECT (app), "startup",
+      G_CALLBACK (ogmrip_startup_cb), NULL);
+  g_signal_connect (G_OBJECT (app), "command-line",
+      G_CALLBACK (ogmrip_command_line_cb), NULL);
+  g_signal_connect (G_OBJECT (app), "activate",
+      G_CALLBACK (ogmrip_activate_cb), NULL);
 
-  data = ogmrip_main_new ();
+  status = g_application_run (app, argc, argv);
 
-  if (argc > 1)
-  {
-    if (g_file_test (argv[1], G_FILE_TEST_EXISTS))
-    {
-      gchar *filename;
+  g_object_unref (app);
 
-      filename = ogmrip_fs_get_full_path (argv[1]);
-      ogmrip_main_load (data, filename);
-      g_free (filename);
-    }
-  }
-
-  gtk_window_present (GTK_WINDOW (data->window));
-
-  gtk_main ();
-
-  ogmrip_uninit ();
-
-  return EXIT_SUCCESS;
+  return status;
 }
 
