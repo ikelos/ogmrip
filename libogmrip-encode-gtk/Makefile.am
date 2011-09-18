@@ -52,13 +52,14 @@ libogmrip_encode_gtk_la_LIBADD = \
   $(top_builddir)/libogmrip-encode/libogmrip-encode.la
 
 INCLUDES = \
+  -I$(top_srcdir)/libogmrip-job       \
+  -I$(top_srcdir)/libogmrip-module    \
   -I$(top_srcdir)/libogmrip-media     \
   -I$(top_srcdir)/libogmrip-media-gtk \
   -I$(top_srcdir)/libogmrip-file      \
   -I$(top_srcdir)/libogmrip-file-gtk  \
   -I$(top_srcdir)/libogmrip-dvd       \
   -I$(top_srcdir)/libogmrip-dvd-gtk   \
-  -I$(top_srcdir)/libogmrip-job       \
   -I$(top_srcdir)/libogmrip-encode    \
   -DOGMRIP_LIB_DIR=\""$(libdir)"\"    \
   -DOGMRIP_DATA_DIR=\""$(datadir)"\"
