@@ -54,8 +54,8 @@
       <summary>The directory to save the temporary files to</summary>
     </key>
     <key name="threads" type="u">
-      <default>1</default>
-      <summary>The maximum number of threads</summary>
+      <default>0</default>
+      <summary>The maximum number of threads (0 for automatic)</summary>
     </key>
   </schema>
 </schemalist>
