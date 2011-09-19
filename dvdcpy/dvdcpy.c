@@ -289,7 +289,7 @@ read_blocks (dvd_file_t *file, size_t offset, size_t size, unsigned char *buffer
 {
   ssize_t count, skip;
 
-  for (skip = 0; skip < size; skip ++)
+  for (count = 0, skip = 0; skip < size; skip ++)
   {
     count = DVDReadBlocks (file, offset + skip, size - skip, buffer);
     if (count > 0)
