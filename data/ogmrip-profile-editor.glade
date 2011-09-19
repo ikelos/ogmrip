@@ -1297,6 +1297,7 @@
                       <object class="GtkComboBoxText" id="channels-combo">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
+                        <property name="tooltip_text" translatable="yes">The maximum number of audio channels</property>
                         <items>
                           <item translatable="yes">Mono</item>
                           <item translatable="yes">Stereo</item>
