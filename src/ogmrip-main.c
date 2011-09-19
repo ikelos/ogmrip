@@ -104,12 +104,12 @@ ogmrip_main_spell_check (OGMRipData *data, const gchar *filename, gint lang)
   gchar *text, *corrected;
   gchar *new_file;
 
-  input = g_io_channel_new_file (filename, "r", NULL);
-  if (!input)
-    goto spell_check_cleanup;
-
   new_file = ogmrip_fs_mktemp ("sub.XXXXXX", NULL);
   if (!new_file)
+    goto spell_check_cleanup;
+
+  input = g_io_channel_new_file (filename, "r", NULL);
+  if (!input)
     goto spell_check_cleanup;
 
   output = g_io_channel_new_file (new_file, "w", NULL);
