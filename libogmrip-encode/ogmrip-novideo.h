@@ -23,6 +23,8 @@
 
 G_BEGIN_DECLS
 
+void ogmrip_novideo_register_codec (void);
+
 G_END_DECLS
 
 #endif /* __OGMRIP_NOVIDEO_H__ */

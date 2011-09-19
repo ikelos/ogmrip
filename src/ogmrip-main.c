@@ -2013,6 +2013,9 @@ ogmrip_startup_thread (GIOSchedulerJob *job, GCancellable *cancellable, GApplica
   OGMRipProfileEngine *profile_engine;
   gchar *path;
 
+  ogmrip_hardsub_register_codec ();
+  ogmrip_novideo_register_codec ();
+
   module_engine = ogmrip_module_engine_get_default ();
   g_object_set_data_full (G_OBJECT (app), "module-engine", module_engine, g_object_unref);
 

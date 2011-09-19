@@ -42,7 +42,8 @@ struct _OGMRipHardSubClass
   OGMRipSubpCodecClass parent_class;
 };
 
-GType ogmrip_hardsub_get_type (void);
+GType ogmrip_hardsub_get_type       (void);
+void  ogmrip_hardsub_register_codec (void);
 
 G_END_DECLS
 

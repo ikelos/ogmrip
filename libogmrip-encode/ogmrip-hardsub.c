@@ -36,13 +36,11 @@ static void
 ogmrip_hardsub_init (OGMRipHardSub *hardsub)
 {
 }
-/*
-gboolean
-ogmrip_hardsub_get_plugin (void)
+
+void
+ogmrip_hardsub_register_codec (void)
 {
   ogmrip_type_register_codec (NULL, OGMRIP_TYPE_HARDSUB,
       "hardsub", N_("Hardcoded subtitle"), OGMRIP_FORMAT_UNDEFINED);
-
-  return TRUE;
 }
-*/
+

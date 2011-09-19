@@ -24,14 +24,11 @@
 #include "ogmrip-type.h"
 
 #include <glib/gi18n-lib.h>
-/*
-gboolean
-ogmrip_novideo_get_plugin (void)
+
+void
+ogmrip_novideo_register_codec (void)
 {
   ogmrip_type_register_codec (NULL, G_TYPE_NONE,
       "novideo", N_("No Video"), OGMRIP_FORMAT_UNDEFINED);
-
-  return TRUE;
 }
-*/
 
