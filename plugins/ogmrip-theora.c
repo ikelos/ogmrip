@@ -48,7 +48,21 @@ struct _OGMRipTheoraClass
   OGMRipVideoCodecClass parent_class;
 };
 
-static gint ogmrip_theora_run (OGMJobSpawn *spawn);
+enum
+{
+  PROP_0,
+  PROP_PASSES
+};
+
+static gint ogmrip_theora_run          (OGMJobSpawn  *spawn);
+static void ogmrip_theora_get_property (GObject      *gobject,
+                                        guint        property_id,
+                                        GValue       *value,
+                                        GParamSpec   *pspec);
+static void ogmrip_theora_set_property (GObject      *gobject,
+                                        guint        property_id,
+                                        const GValue *value,
+                                        GParamSpec   *pspec);
 
 static gchar **
 ogmrip_yuv4mpeg_command (OGMRipVideoCodec *video, const gchar *output, const gchar *logf)
@@ -125,11 +139,19 @@ G_DEFINE_DYNAMIC_TYPE (OGMRipTheora, ogmrip_theora, OGMRIP_TYPE_VIDEO_CODEC)
 static void
 ogmrip_theora_class_init (OGMRipTheoraClass *klass)
 {
+  GObjectClass *gobject_class;
   OGMJobSpawnClass *spawn_class;
 
-  spawn_class = OGMJOB_SPAWN_CLASS (klass);
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->get_property = ogmrip_theora_get_property;
+  gobject_class->set_property = ogmrip_theora_set_property;
 
+  spawn_class = OGMJOB_SPAWN_CLASS (klass);
   spawn_class->run = ogmrip_theora_run;
+
+  g_object_class_install_property (gobject_class, PROP_PASSES, 
+        g_param_spec_uint ("passes", "Passes property", "Set the number of passes", 
+           1, 1, 1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 }
 
 static void
@@ -140,6 +162,34 @@ ogmrip_theora_class_finalize (OGMRipTheoraClass *klass)
 static void
 ogmrip_theora_init (OGMRipTheora *theora)
 {
+}
+
+static void
+ogmrip_theora_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
+{
+  switch (property_id)
+  {
+    case PROP_PASSES:
+      g_value_set_uint (value, ogmrip_video_codec_get_passes (OGMRIP_VIDEO_CODEC (gobject)));
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
+      break;
+  }
+}
+
+static void
+ogmrip_theora_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
+{
+  switch (property_id)
+  {
+    case PROP_PASSES:
+      ogmrip_video_codec_set_passes (OGMRIP_VIDEO_CODEC (gobject), g_value_get_uint (value));
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
+      break;
+  }
 }
 
 static gint

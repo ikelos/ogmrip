@@ -106,6 +106,7 @@ enum
   PROP_PAR,
   PROP_PAR_HEIGHT,
   PROP_PAR_WIDTH,
+  PROP_PASSES,
   PROP_PROFILE,
   PROP_QPEL,
   PROP_QUANT_TYPE,
@@ -546,6 +547,10 @@ ogmrip_xvid_class_init (OGMRipXvidClass *klass)
   g_object_class_install_property (gobject_class, PROP_TRELLIS,
       g_param_spec_boolean (OGMRIP_XVID_PROP_TRELLIS, NULL, NULL,
         OGMRIP_XVID_DEFAULT_TRELLIS, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_PASSES, 
+        g_param_spec_uint ("passes", "Passes property", "Set the number of passes", 
+           1, 2, 1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 }
 
 static void
@@ -718,6 +723,9 @@ ogmrip_xvid_get_property (GObject *gobject, guint property_id, GValue *value, GP
     case PROP_TRELLIS:
       g_value_set_boolean (value, xvid->trellis);
       break;
+    case PROP_PASSES:
+      g_value_set_uint (value, ogmrip_video_codec_get_passes (OGMRIP_VIDEO_CODEC (xvid)));
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
@@ -819,6 +827,9 @@ ogmrip_xvid_set_property (GObject *gobject, guint property_id, const GValue *val
       break;
     case PROP_TRELLIS:
       xvid->trellis = g_value_get_boolean (value);
+      break;
+    case PROP_PASSES:
+      ogmrip_video_codec_set_passes (OGMRIP_VIDEO_CODEC (xvid), g_value_get_uint (value));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
