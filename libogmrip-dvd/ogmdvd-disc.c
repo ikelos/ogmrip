@@ -903,6 +903,30 @@ ogmdvd_disc_device_changed_cb (GFileMonitor *monitor, GFile *file, GFile *other_
 }
 
 static gboolean
+ogmdvd_disc_copy_exists (OGMDvdDisc *disc, const gchar *path)
+{
+  OGMRipMedia *media;
+  const gchar *id1, *id2;
+  gboolean retval;
+
+  if (!g_file_test (path, G_FILE_TEST_IS_DIR))
+    return FALSE;
+
+  media = ogmdvd_disc_new (path, NULL);
+  if (!media)
+    return FALSE;
+
+  id1 = ogmrip_media_get_id (OGMRIP_MEDIA (disc));
+  id2 = ogmrip_media_get_id (media);
+
+  retval = id1 && id2 && g_str_equal (id1, id2);
+
+  g_object_unref (media);
+
+  return retval;
+}
+
+static gboolean
 ogmdvd_disc_copy (OGMRipMedia *media, const gchar *path, GCancellable *cancellable,
     OGMRipMediaCallback callback, gpointer user_data, GError **error)
 {
@@ -925,42 +949,45 @@ ogmdvd_disc_copy (OGMRipMedia *media, const gchar *path, GCancellable *cancellab
   if (!S_ISBLK (buf.st_mode))
     return TRUE;
 
-  is_open = ogmdvd_disc_is_open (media);
-  if (!is_open && !ogmdvd_disc_open (media, error))
-    return FALSE;
-
-  argv = ogmdvd_disc_copy_command (disc, path);
-
-  spawn = ogmjob_exec_newv (argv);
-  ogmjob_exec_add_watch_full (OGMJOB_EXEC (spawn),
-      (OGMJobWatch) ogmdvd_disc_copy_watch, NULL, TRUE, FALSE, FALSE);
-
-  handler_id = cancellable ? g_cancellable_connect (cancellable,
-      G_CALLBACK (ogmdvd_disc_copy_cancel_cb), spawn, NULL) : 0;
-
-  if (callback)
+  if (!ogmdvd_disc_copy_exists (disc, path))
   {
-    OGMDvdProgress progress;
+    is_open = ogmdvd_disc_is_open (media);
+    if (!is_open && !ogmdvd_disc_open (media, error))
+      return FALSE;
 
-    progress.disc = media;
-    progress.callback = callback;
-    progress.user_data = user_data;
+    argv = ogmdvd_disc_copy_command (disc, path);
 
-    g_signal_connect (spawn, "progress",
-        G_CALLBACK (ogmdvd_disc_copy_progress_cb), &progress);
+    spawn = ogmjob_exec_newv (argv);
+    ogmjob_exec_add_watch_full (OGMJOB_EXEC (spawn),
+        (OGMJobWatch) ogmdvd_disc_copy_watch, NULL, TRUE, FALSE, FALSE);
+
+    handler_id = cancellable ? g_cancellable_connect (cancellable,
+        G_CALLBACK (ogmdvd_disc_copy_cancel_cb), spawn, NULL) : 0;
+
+    if (callback)
+    {
+      OGMDvdProgress progress;
+
+      progress.disc = media;
+      progress.callback = callback;
+      progress.user_data = user_data;
+
+      g_signal_connect (spawn, "progress",
+          G_CALLBACK (ogmdvd_disc_copy_progress_cb), &progress);
+    }
+
+    result = ogmjob_spawn_run (spawn, error);
+    g_object_unref (spawn);
+
+    if (handler_id)
+      g_cancellable_disconnect (cancellable, handler_id);
+
+    if (!is_open)
+      ogmdvd_disc_close (media);
+
+    if (result != OGMJOB_RESULT_SUCCESS)
+      return FALSE;
   }
-
-  result = ogmjob_spawn_run (spawn, error);
-  g_object_unref (spawn);
-
-  if (handler_id)
-    g_cancellable_disconnect (cancellable, handler_id);
-
-  if (!is_open)
-    ogmdvd_disc_close (media);
-
-  if (result != OGMJOB_RESULT_SUCCESS)
-    return FALSE;
 
   if (disc->priv->orig_device)
     g_free (disc->priv->orig_device);
