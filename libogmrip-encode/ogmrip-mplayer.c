@@ -1128,8 +1128,6 @@ ogmrip_mencoder_container_append_audio_file (OGMRipContainer *container,
 
     if (g_stat (filename, &buf) == 0 && buf.st_size > 0)
     {
-      gint format;
-
       if (format == OGMRIP_FORMAT_AAC)
       {
         g_ptr_array_add (argv, g_strdup ("-fafmttag"));
