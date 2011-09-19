@@ -31,6 +31,7 @@
 #include <ogmrip-fs.h>
 #include <ogmrip-hardsub.h>
 #include <ogmrip-marshal.h>
+#include <ogmrip-novideo.h>
 #include <ogmrip-player.h>
 #include <ogmrip-profile-engine.h>
 #include <ogmrip-profile-keys.h>
