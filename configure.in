@@ -43,9 +43,6 @@ PKG_PROG_PKG_CONFIG
 CFLAGS="$CFLAGS -g -I/usr/local/include -I.. -Wall -Werror -D_FORTIFY_SOURCE=2"
 CFLAGS="$CFLAGS -DG_DISABLE_DEPRECATED -DGDK_PIXBUF_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED"
 CFLAGS="$CFLAGS -DG_DISABLE_SINGLE_INCLUDES -DGTK_DISABLE_SINGLE_INCLUDES"
-
-CPPFLAGS="$CPPFLAGS -I/usr/local/include -I.. -Wall -D_FORTIFY_SOURCE=2"
-
 LDFLAGS="$LDFLAGS -Wl,--export-dynamic -L/usr/local/lib -L/usr/pkg/lib"
 
 dnl **************************************************************
