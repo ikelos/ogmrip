@@ -160,12 +160,7 @@ ogmrip_module_engine_add_path (OGMRipModuleEngine *engine, const gchar *path, GE
       if (g_type_module_use (G_TYPE_MODULE (module)))
         engine->priv->modules = g_slist_prepend (engine->priv->modules, module);
       else
-      {
         g_object_unref (module);
-        /*
-         * TODO error
-         */
-      }
     }
   }
 

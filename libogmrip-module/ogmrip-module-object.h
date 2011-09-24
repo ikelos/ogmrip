@@ -54,6 +54,9 @@ OGMRipModule * ogmrip_module_new             (const gchar  *path,
                                               const gchar  *name);
 const gchar *  ogmrip_module_get_name        (OGMRipModule *module);
 const gchar *  ogmrip_module_get_path        (OGMRipModule *module);
+gboolean       ogmrip_module_get_symbol      (OGMRipModule *module,
+                                              const gchar  *name,
+                                              gpointer     *symbol);
 
 void           ogmrip_module_load            (OGMRipModule *module);
 

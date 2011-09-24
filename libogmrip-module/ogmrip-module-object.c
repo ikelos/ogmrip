@@ -245,3 +245,14 @@ ogmrip_module_get_path (OGMRipModule *module)
   return module->priv->path;
 }
 
+gboolean
+ogmrip_module_get_symbol (OGMRipModule *module, const gchar *name, gpointer *symbol)
+{
+  g_return_val_if_fail (OGMRIP_IS_MODULE (module), FALSE);
+
+  if (!module->priv->library)
+    return FALSE;
+
+  return g_module_symbol (module->priv->library, name, symbol);
+}
+
