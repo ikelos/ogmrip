@@ -292,6 +292,9 @@ ogmrip_encoding_manager_dialog_clear_activated (OGMRipEncodingManagerDialog *dia
     OGMRipEncoding *encoding;
     gboolean strike, valid;
 
+    g_signal_handlers_block_by_func (dialog->priv->manager,
+        ogmrip_encoding_manager_dialog_remove_encoding, dialog);
+
     do
     {
       gtk_tree_model_get (GTK_TREE_MODEL (dialog->priv->store), &iter,
@@ -303,15 +306,13 @@ ogmrip_encoding_manager_dialog_clear_activated (OGMRipEncodingManagerDialog *dia
       else
       {
         valid = gtk_list_store_remove (dialog->priv->store, &iter);
-
-        g_signal_handlers_block_by_func (dialog->priv->manager,
-            ogmrip_encoding_manager_dialog_remove_encoding, dialog);
         ogmrip_encoding_manager_remove (dialog->priv->manager, encoding);
-        g_signal_handlers_unblock_by_func (dialog->priv->manager,
-            ogmrip_encoding_manager_dialog_remove_encoding, dialog);
       }
     }
     while (valid);
+
+    g_signal_handlers_unblock_by_func (dialog->priv->manager,
+        ogmrip_encoding_manager_dialog_remove_encoding, dialog);
   }
 }
 

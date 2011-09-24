@@ -1553,6 +1553,25 @@ ogmrip_main_profiles_activated (OGMRipData *data)
 }
 
 /*
+ * When the encoding manager dialog sends the response signal
+ */
+static void
+ogmrip_main_encodings_responsed (OGMRipData *data, gint response_id, GtkWidget *dialog)
+{
+  if (response_id != GTK_RESPONSE_ACCEPT)
+    gtk_widget_destroy (dialog);
+  else
+  {
+    GList *list, *link;
+
+    list = ogmrip_encoding_manager_get_list (data->manager);
+    for (link = list; link; link = link->next)
+      ogmrip_main_encode (data, link->data);
+    g_list_free (list);
+  }
+}
+
+/*
  * When the encodings menu item is activated
  */
 static void
@@ -1564,8 +1583,10 @@ ogmrip_main_encodings_activated (OGMRipData *data)
   gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (data->window));
   gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
 
-  gtk_dialog_run (GTK_DIALOG (dialog));
-  gtk_widget_destroy (dialog);
+  g_signal_connect_swapped (dialog, "response",
+      G_CALLBACK (ogmrip_main_encodings_responsed), data);
+
+  gtk_window_present (GTK_WINDOW (dialog));
 }
 
 /*
