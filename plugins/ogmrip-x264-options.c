@@ -51,34 +51,35 @@ struct _OGMRipX264Dialog
 
   OGMRipProfile *profile;
 
-  GtkWidget *profile_combo;
+  GtkWidget *aud_check;
+  GtkWidget *b_adapt_spin;
   GtkWidget *bframes_spin;
-  GtkWidget *cabac_check;
-  GtkWidget *cqm_combo;
-  GtkWidget *subq_spin;
-  GtkWidget *global_header_check;
-  GtkWidget *weight_b_check;
-  GtkWidget *partitions_check;
-  GtkWidget *weight_p_combo;
   GtkWidget *b_pyramid_check;
   GtkWidget *b_pyramid_combo;
   GtkWidget *b_pyramid_label;
+  GtkWidget *brdo_check;
+  GtkWidget *cabac_check;
+  GtkWidget *cqm_combo;
+  GtkWidget *dct8x8_check;
+  GtkWidget *direct_combo;
   GtkWidget *frameref_spin;
+  GtkWidget *global_header_check;
+  GtkWidget *keyint_spin;
+  GtkWidget *level_idc_spin;
   GtkWidget *me_combo;
   GtkWidget *merange_spin;
-  GtkWidget *dct8x8_check;
   GtkWidget *mixed_refs_check;
-  GtkWidget *brdo_check;
-  GtkWidget *vbv_maxrate_spin;
-  GtkWidget *vbv_bufsize_spin;
-  GtkWidget *level_idc_spin;
-  GtkWidget *direct_combo;
-  GtkWidget *b_adapt_spin;
-  GtkWidget *keyint_spin;
+  GtkWidget *partitions_check;
+  GtkWidget *profile_combo;
   GtkWidget *psy_rd_spin;
   GtkWidget *psy_trellis_spin;
-  GtkWidget *aud_check;
   GtkWidget *rc_lookahead_spin;
+  GtkWidget *subq_spin;
+  GtkWidget *trellis_combo;
+  GtkWidget *vbv_bufsize_spin;
+  GtkWidget *vbv_maxrate_spin;
+  GtkWidget *weight_b_check;
+  GtkWidget *weight_p_combo;
 };
 
 struct _OGMRipX264DialogClass
@@ -125,7 +126,7 @@ ogmrip_x264_set_me (const GValue *value, const GVariantType *type, gpointer user
 {
   return g_variant_new_uint32 (g_value_get_uint (value) + 1);
 }
-/*
+
 static void
 ogmrip_x264_dialog_profile_changed (OGMRipX264Dialog *dialog)
 {
@@ -135,11 +136,11 @@ ogmrip_x264_dialog_profile_changed (OGMRipX264Dialog *dialog)
 
   if (profile != OGMRIP_X264_PROFILE_HIGH)
   {
-    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->x88dct_check), FALSE);
+    gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->dct8x8_check), FALSE);
     gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->cqm_combo), 0);
   }
 
-  gtk_widget_set_sensitive (dialog->x88dct_check, x264_have_8x8dct && profile == OGMRIP_X264_PROFILE_HIGH);
+  gtk_widget_set_sensitive (dialog->dct8x8_check, x264_have_8x8dct && profile == OGMRIP_X264_PROFILE_HIGH);
   gtk_widget_set_sensitive (dialog->cqm_combo, profile == OGMRIP_X264_PROFILE_HIGH);
 
   if (profile == OGMRIP_X264_PROFILE_BASELINE)
@@ -201,7 +202,7 @@ ogmrip_x264_dialog_frameref_changed (OGMRipX264Dialog *dialog)
   if (frameref <= 1)
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->mixed_refs_check), FALSE);
 }
-*/
+
 static gboolean
 ogmrip_x264_dialog_set_vbv_bufsize_sensitivity (GBinding *binding,
     const GValue *source_value, GValue *target_value, gpointer data)
@@ -277,6 +278,8 @@ ogmrip_x264_dialog_set_profile (OGMRipX264Dialog *dialog, OGMRipProfile *profile
       dialog->aud_check, "active", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_X264_PROP_RC_LOOKAHEAD,
       dialog->rc_lookahead_spin, "value", G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (settings, OGMRIP_X264_PROP_TRELLIS,
+      dialog->trellis_combo, "active", G_SETTINGS_BIND_DEFAULT);
 
   if (x264_have_b_pyramid)
     g_settings_bind (settings, OGMRIP_X264_PROP_B_PYRAMID,
@@ -360,22 +363,20 @@ ogmrip_x264_dialog_init (OGMRipX264Dialog *dialog)
   gtk_widget_show (widget);
 
   dialog->profile_combo = gtk_builder_get_widget (builder, "profile-combo");
-/*
-  g_signal_connect_swapped (widget, "changed",
+  g_signal_connect_swapped (dialog->profile_combo, "changed",
       G_CALLBACK (ogmrip_x264_dialog_profile_changed), dialog);
-*/
+
   dialog->bframes_spin = gtk_builder_get_widget (builder, "bframes-spin");
-/*
-  g_signal_connect_swapped (widget, "value-changed",
+  g_signal_connect_swapped (dialog->bframes_spin, "value-changed",
       G_CALLBACK (ogmrip_x264_dialog_bframes_changed), dialog);
-*/
+
   dialog->cabac_check = gtk_builder_get_widget (builder, "cabac-check");
   dialog->cqm_combo = gtk_builder_get_widget (builder, "cqm-combo");
+
   dialog->subq_spin = gtk_builder_get_widget (builder, "subq-spin");
-/*
-  g_signal_connect_swapped (widget, "value-changed",
+  g_signal_connect_swapped (dialog->subq_spin, "value-changed",
       G_CALLBACK (ogmrip_x264_dialog_subq_changed), dialog);
-*/
+
   dialog->global_header_check = gtk_builder_get_widget (builder, "global_header-check");
   dialog->weight_b_check = gtk_builder_get_widget (builder, "weight_b-check");
   dialog->partitions_check = gtk_builder_get_widget (builder, "partitions-check");
@@ -393,10 +394,9 @@ ogmrip_x264_dialog_init (OGMRipX264Dialog *dialog)
   gtk_widget_set_visible (dialog->b_pyramid_label, x264_have_b_pyramid);
 
   dialog->frameref_spin = gtk_builder_get_widget (builder, "frameref-spin");
-/*
-  g_signal_connect_swapped (widget, "value-changed",
+  g_signal_connect_swapped (dialog->frameref_spin, "value-changed",
       G_CALLBACK (ogmrip_x264_dialog_frameref_changed), dialog);
-*/
+
   dialog->me_combo = gtk_builder_get_widget (builder, "me-combo");
   gtk_widget_set_sensitive (dialog->me_combo, x264_have_me);
 
@@ -440,6 +440,8 @@ ogmrip_x264_dialog_init (OGMRipX264Dialog *dialog)
   dialog->rc_lookahead_spin = gtk_builder_get_widget (builder, "rc_lookahead-spin");
   gtk_widget_set_sensitive (dialog->rc_lookahead_spin, x264_have_lookahead);
 
+  dialog->trellis_combo = gtk_builder_get_widget (builder, "trellis-combo");
+
   g_object_unref (builder);
 }
 
@@ -451,52 +453,52 @@ ogmrip_options_editable_init (OGMRipOptionsEditableInterface *iface)
 void
 ogmrip_module_load (OGMRipModule *module)
 {
+  OGMRipModuleEngine *engine;
   GType gtype;
-/*
-  GModule *module;
-*/
+  gboolean *symbol;
+
+  engine = ogmrip_module_engine_get_default ();
+
   gtype = ogmrip_type_from_name ("x264");
   if (gtype == G_TYPE_NONE)
     return;
-/*
-  module = ogmrip_plugin_get_video_codec_module (x264_options_plugin.type);
-  if (module)
-  {
-    gboolean *symbol;
 
-    if (g_module_symbol (module, "x264_have_8x8dct", (gpointer *) &symbol))
-      x264_have_8x8dct = *symbol;
-
-    if (g_module_symbol (module, "x264_have_brdo", (gpointer *) &symbol))
-      x264_have_brdo = *symbol;
-
-    if (g_module_symbol (module, "x264_have_psy", (gpointer *) &symbol))
-      x264_have_psy = *symbol;
-
-    if (g_module_symbol (module, "x264_have_aud", (gpointer *) &symbol))
-      x264_have_aud = *symbol;
-
-    if (g_module_symbol (module, "x264_have_lookahead", (gpointer *) &symbol))
-      x264_have_lookahead = *symbol;
-
-    if (g_module_symbol (module, "x264_have_me", (gpointer *) &symbol))
-      x264_have_me = *symbol;
-
-    if (x264_have_me && g_module_symbol (module, "x264_have_me_tesa", (gpointer *) &symbol))
-      x264_have_me_tesa = *symbol;
-
-    if (g_module_symbol (module, "x264_have_mixed_refs", (gpointer *) &symbol))
-      x264_have_mixed_refs = *symbol;
-
-    if (g_module_symbol (module, "x264_have_b_pyramid", (gpointer *) &symbol))
-      x264_have_b_pyramid = *symbol;
-
-    if (g_module_symbol (module, "x264_have_weight_p", (gpointer *) &symbol))
-      x264_have_weight_p = *symbol;
-  }
-*/
   ogmrip_x264_dialog_register_type (G_TYPE_MODULE (module));
   ogmrip_type_add_dynamic_extension (module,
       gtype, OGMRIP_TYPE_X264_DIALOG);
+
+  module = ogmrip_module_engine_get (engine, "ogmrip-x264" "." G_MODULE_SUFFIX);
+  if (!module)
+    return;
+
+  if (ogmrip_module_get_symbol (module, "x264_have_8x8dct", (gpointer *) &symbol))
+    x264_have_8x8dct = *symbol;
+
+  if (ogmrip_module_get_symbol (module, "x264_have_brdo", (gpointer *) &symbol))
+    x264_have_brdo = *symbol;
+
+  if (ogmrip_module_get_symbol (module, "x264_have_psy", (gpointer *) &symbol))
+    x264_have_psy = *symbol;
+
+  if (ogmrip_module_get_symbol (module, "x264_have_aud", (gpointer *) &symbol))
+    x264_have_aud = *symbol;
+
+  if (ogmrip_module_get_symbol (module, "x264_have_lookahead", (gpointer *) &symbol))
+    x264_have_lookahead = *symbol;
+
+  if (ogmrip_module_get_symbol (module, "x264_have_me", (gpointer *) &symbol))
+    x264_have_me = *symbol;
+
+  if (x264_have_me && ogmrip_module_get_symbol (module, "x264_have_me_tesa", (gpointer *) &symbol))
+    x264_have_me_tesa = *symbol;
+
+  if (ogmrip_module_get_symbol (module, "x264_have_mixed_refs", (gpointer *) &symbol))
+    x264_have_mixed_refs = *symbol;
+
+  if (ogmrip_module_get_symbol (module, "x264_have_b_pyramid", (gpointer *) &symbol))
+    x264_have_b_pyramid = *symbol;
+
+  if (ogmrip_module_get_symbol (module, "x264_have_weight_p", (gpointer *) &symbol))
+    x264_have_weight_p = *symbol;
 }
 
