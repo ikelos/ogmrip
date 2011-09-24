@@ -9,7 +9,7 @@
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="border_width">12</property>
-        <property name="spacing">18</property>
+        <property name="spacing">12</property>
         <child>
           <object class="GtkVBox" id="vbox1">
             <property name="visible">True</property>
@@ -38,7 +38,7 @@
                   <object class="GtkTable" id="table">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="n_rows">5</property>
+                    <property name="n_rows">7</property>
                     <property name="n_columns">2</property>
                     <property name="column_spacing">6</property>
                     <property name="row_spacing">6</property>
@@ -54,13 +54,13 @@
                       </object>
                       <packing>
                         <property name="right_attach">2</property>
-                        <property name="top_attach">4</property>
-                        <property name="bottom_attach">5</property>
+                        <property name="top_attach">5</property>
+                        <property name="bottom_attach">6</property>
                       </packing>
                     </child>
                     <child>
                       <object class="GtkCheckButton" id="interlacing-check">
-                        <property name="label" translatable="yes">Force interlaced encoding (interlacing)</property>
+                        <property name="label" translatable="yes">Interlaced encoding (interlacing)</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
@@ -75,8 +75,8 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkCheckButton" id="b_adapt-check">
-                        <property name="label" translatable="yes">Adaptative quantization (b_adapt)</property>
+                      <object class="GtkCheckButton" id="lumi_mask-check">
+                        <property name="label" translatable="yes">Adaptive quantization (lumi_mask)</property>
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">False</property>
@@ -159,6 +159,38 @@
                         <property name="right_attach">2</property>
                       </packing>
                     </child>
+                    <child>
+                      <object class="GtkCheckButton" id="qpel-check">
+                        <property name="label" translatable="yes">Quarter pixel (qpel)</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="xalign">0</property>
+                        <property name="draw_indicator">True</property>
+                      </object>
+                      <packing>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">4</property>
+                        <property name="bottom_attach">5</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkCheckButton" id="trellis-check">
+                        <property name="label" translatable="yes">Trellis quantization (trellis)</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="xalign">0</property>
+                        <property name="draw_indicator">True</property>
+                      </object>
+                      <packing>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">6</property>
+                        <property name="bottom_attach">7</property>
+                      </packing>
+                    </child>
                   </object>
                 </child>
               </object>
@@ -181,17 +213,53 @@
             <property name="can_focus">False</property>
             <property name="spacing">6</property>
             <child>
-              <object class="GtkLabel" id="label3">
+              <object class="GtkHBox" id="hbox1">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="xalign">0</property>
-                <property name="label" translatable="yes">&lt;b&gt;Restrictions&lt;/b&gt;</property>
-                <property name="use_markup">True</property>
+                <property name="spacing">6</property>
+                <child>
+                  <object class="GtkLabel" id="label3">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="xalign">0</property>
+                    <property name="label" translatable="yes">&lt;b&gt;Restrictions&lt;/b&gt;</property>
+                    <property name="use_markup">True</property>
+                  </object>
+                  <packing>
+                    <property name="expand">True</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="label5">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Min</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLabel" id="label7">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="label" translatable="yes">Max</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
               </object>
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
-                <property name="position">0</property>
+                <property name="position">1</property>
               </packing>
             </child>
             <child>
@@ -203,55 +271,16 @@
                   <object class="GtkTable" id="table1">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="n_rows">6</property>
-                    <property name="n_columns">2</property>
+                    <property name="n_rows">3</property>
+                    <property name="n_columns">3</property>
                     <property name="column_spacing">6</property>
                     <property name="row_spacing">6</property>
-                    <child>
-                      <object class="GtkLabel" id="label9">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Max B-frame quantizer (max_bquant):</property>
-                      </object>
-                      <packing>
-                        <property name="top_attach">5</property>
-                        <property name="bottom_attach">6</property>
-                        <property name="x_options">GTK_FILL</property>
-                      </packing>
-                    </child>
                     <child>
                       <object class="GtkLabel" id="label8">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Min B-frame quantizer (min_bquant):</property>
-                      </object>
-                      <packing>
-                        <property name="top_attach">4</property>
-                        <property name="bottom_attach">5</property>
-                        <property name="x_options">GTK_FILL</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel" id="label7">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Max P-frame quantizer (max_pquant):</property>
-                      </object>
-                      <packing>
-                        <property name="top_attach">3</property>
-                        <property name="bottom_attach">4</property>
-                        <property name="x_options">GTK_FILL</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel" id="label6">
-                        <property name="visible">True</property>
-                        <property name="can_focus">False</property>
-                        <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Min P-frame quantizer (min_pquant):</property>
+                        <property name="label" translatable="yes">B-frame quantizer (bquant):</property>
                       </object>
                       <packing>
                         <property name="top_attach">2</property>
@@ -260,11 +289,11 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkLabel" id="label5">
+                      <object class="GtkLabel" id="label6">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Max I-frame quantizer (max_iquant):</property>
+                        <property name="label" translatable="yes">P-frame quantizer (pquant):</property>
                       </object>
                       <packing>
                         <property name="top_attach">1</property>
@@ -277,7 +306,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="xalign">0</property>
-                        <property name="label" translatable="yes">Min I-frame quantizer (min_iquant):</property>
+                        <property name="label" translatable="yes">I-frame quantizer (iquant):</property>
                       </object>
                       <packing>
                         <property name="x_options">GTK_FILL</property>
@@ -295,7 +324,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkSpinButton" id="max_iquant-spin">
+                      <object class="GtkSpinButton" id="min_pquant-spin">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="invisible_char">●</property>
@@ -308,7 +337,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkSpinButton" id="min_pquant-spin">
+                      <object class="GtkSpinButton" id="min_bquant-spin">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="invisible_char">●</property>
@@ -321,29 +350,29 @@
                       </packing>
                     </child>
                     <child>
+                      <object class="GtkSpinButton" id="max_iquant-spin">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="invisible_char">●</property>
+                        <property name="invisible_char_set">True</property>
+                      </object>
+                      <packing>
+                        <property name="left_attach">2</property>
+                        <property name="right_attach">3</property>
+                      </packing>
+                    </child>
+                    <child>
                       <object class="GtkSpinButton" id="max_pquant-spin">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="invisible_char">●</property>
+                        <property name="invisible_char_set">True</property>
                       </object>
                       <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">3</property>
-                        <property name="bottom_attach">4</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkSpinButton" id="min_bquant-spin">
-                        <property name="visible">True</property>
-                        <property name="can_focus">True</property>
-                        <property name="invisible_char">●</property>
-                      </object>
-                      <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">4</property>
-                        <property name="bottom_attach">5</property>
+                        <property name="left_attach">2</property>
+                        <property name="right_attach">3</property>
+                        <property name="top_attach">1</property>
+                        <property name="bottom_attach">2</property>
                       </packing>
                     </child>
                     <child>
@@ -351,12 +380,13 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="invisible_char">●</property>
+                        <property name="invisible_char_set">True</property>
                       </object>
                       <packing>
-                        <property name="left_attach">1</property>
-                        <property name="right_attach">2</property>
-                        <property name="top_attach">5</property>
-                        <property name="bottom_attach">6</property>
+                        <property name="left_attach">2</property>
+                        <property name="right_attach">3</property>
+                        <property name="top_attach">2</property>
+                        <property name="bottom_attach">3</property>
                       </packing>
                     </child>
                   </object>
@@ -365,7 +395,7 @@
               <packing>
                 <property name="expand">True</property>
                 <property name="fill">True</property>
-                <property name="position">1</property>
+                <property name="position">2</property>
               </packing>
             </child>
           </object>
@@ -392,7 +422,7 @@
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="border_width">12</property>
-        <property name="spacing">18</property>
+        <property name="spacing">12</property>
         <child>
           <object class="GtkVBox" id="vbox4">
             <property name="visible">True</property>
@@ -579,7 +609,7 @@
                   <object class="GtkTable" id="table3">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="n_rows">2</property>
+                    <property name="n_rows">4</property>
                     <property name="n_columns">2</property>
                     <property name="column_spacing">6</property>
                     <property name="row_spacing">6</property>
@@ -631,6 +661,38 @@
                         <property name="bottom_attach">2</property>
                       </packing>
                     </child>
+                    <child>
+                      <object class="GtkCheckButton" id="cartoon-check">
+                        <property name="label" translatable="yes">Cartoon mode</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="xalign">0</property>
+                        <property name="draw_indicator">True</property>
+                      </object>
+                      <packing>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">3</property>
+                        <property name="bottom_attach">4</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkCheckButton" id="grayscale-check">
+                        <property name="label" translatable="yes">Grayscale mode</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">False</property>
+                        <property name="use_action_appearance">False</property>
+                        <property name="xalign">0</property>
+                        <property name="draw_indicator">True</property>
+                      </object>
+                      <packing>
+                        <property name="right_attach">2</property>
+                        <property name="top_attach">2</property>
+                        <property name="bottom_attach">3</property>
+                      </packing>
+                    </child>
                   </object>
                 </child>
               </object>
@@ -668,7 +730,7 @@
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="border_width">12</property>
-        <property name="spacing">18</property>
+        <property name="spacing">12</property>
         <child>
           <object class="GtkVBox" id="vbox7">
             <property name="visible">True</property>
@@ -989,5 +1051,17 @@
         <property name="tab_fill">False</property>
       </packing>
     </child>
+  </object>
+  <object class="GtkSizeGroup" id="sizegroup1">
+    <widgets>
+      <widget name="label5"/>
+      <widget name="label7"/>
+      <widget name="min_iquant-spin"/>
+      <widget name="max_iquant-spin"/>
+      <widget name="min_pquant-spin"/>
+      <widget name="max_pquant-spin"/>
+      <widget name="min_bquant-spin"/>
+      <widget name="max_bquant-spin"/>
+    </widgets>
   </object>
 </interface>

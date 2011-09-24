@@ -50,6 +50,7 @@ struct _OGMRipXvid
   gboolean gmc;
   gboolean grayscale;
   gboolean interlacing;
+  gboolean lumi_mask;
   gboolean packed;
   gboolean qpel;
   gboolean trellis;
@@ -93,6 +94,7 @@ enum
   PROP_GMC,
   PROP_GRAYSCALE,
   PROP_INTERLACING,
+  PROP_LUMI_MASK,
   PROP_MAX_BFRAMES,
   PROP_MAX_BQUANT,
   PROP_MAX_IQUANT,
@@ -200,6 +202,11 @@ ogmrip_xvid_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
     g_string_append (options, ":chroma_opt");
   else
     g_string_append (options, ":nochroma_opt");
+
+  if (xvid->lumi_mask)
+    g_string_append (options, ":lumi_mask");
+  else
+    g_string_append (options, ":nolumi_mask");
 
   g_string_append_printf (options, ":vhq=%u:bvhq=%u", xvid->vhq, xvid->bvhq);
 
@@ -346,63 +353,65 @@ ogmrip_xvid_configure (OGMRipConfigurable *configurable, OGMRipProfile *profile)
   settings = ogmrip_profile_get_child (profile, "xvid");
   if (settings)
   {
-    g_settings_bind (settings, "profile", configurable, OGMRIP_XVID_PROP_PROFILE,
-        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    g_settings_bind (settings, "quant-type", configurable, OGMRIP_XVID_PROP_QUANT_TYPE,
-        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    g_settings_bind (settings, "me-quality", configurable, OGMRIP_XVID_PROP_ME_QUALITY,
-        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    g_settings_bind (settings, "vhq", configurable, OGMRIP_XVID_PROP_VHQ,
-        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    g_settings_bind (settings, "bvhq", configurable, OGMRIP_XVID_PROP_BVHQ,
-        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    g_settings_bind (settings, "par", configurable, OGMRIP_XVID_PROP_PAR,
-        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    g_settings_bind (settings, "min-iquant", configurable, OGMRIP_XVID_PROP_MIN_IQUANT,
-        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    g_settings_bind (settings, "max-iquant", configurable, OGMRIP_XVID_PROP_MAX_IQUANT,
-        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    g_settings_bind (settings, "min-pquant", configurable, OGMRIP_XVID_PROP_MIN_PQUANT,
-        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    g_settings_bind (settings, "max-pquant", configurable, OGMRIP_XVID_PROP_MAX_PQUANT,
-        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    g_settings_bind (settings, "min-bquant", configurable, OGMRIP_XVID_PROP_MIN_BQUANT,
-        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    g_settings_bind (settings, "max-bquant", configurable, OGMRIP_XVID_PROP_MAX_BQUANT,
-        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    g_settings_bind (settings, "max-keyint", configurable, OGMRIP_XVID_PROP_MAX_KEYINT,
-        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    g_settings_bind (settings, "frame-drop-ratio", configurable, OGMRIP_XVID_PROP_FRAME_DROP_RATIO,
+    g_settings_bind (settings, "bquant-offset", configurable, OGMRIP_XVID_PROP_BQUANT_OFFSET,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
     g_settings_bind (settings, "bquant-ratio", configurable, OGMRIP_XVID_PROP_BQUANT_RATIO,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    g_settings_bind (settings, "bquant-offset", configurable, OGMRIP_XVID_PROP_BQUANT_OFFSET,
+    g_settings_bind (settings, "bvhq", configurable, OGMRIP_XVID_PROP_BVHQ,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    g_settings_bind (settings, "par-width", configurable, OGMRIP_XVID_PROP_PAR_WIDTH,
-        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    g_settings_bind (settings, "par-height", configurable, OGMRIP_XVID_PROP_PAR_HEIGHT,
-        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    g_settings_bind (settings, "gmc", configurable, OGMRIP_XVID_PROP_GMC,
-        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    g_settings_bind (settings, "interlacing", configurable, OGMRIP_XVID_PROP_INTERLACING,
+    g_settings_bind (settings, "cartoon", configurable, OGMRIP_XVID_PROP_CARTOON,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
     g_settings_bind (settings, "chroma-me", configurable, OGMRIP_XVID_PROP_CHROMA_ME,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
     g_settings_bind (settings, "chroma-opt", configurable, OGMRIP_XVID_PROP_CHROMA_OPT,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    g_settings_bind (settings, "packed", configurable, OGMRIP_XVID_PROP_PACKED,
-        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
     g_settings_bind (settings, "closed-gop", configurable, OGMRIP_XVID_PROP_CLOSED_GOP,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    g_settings_bind (settings, "cartoon", configurable, OGMRIP_XVID_PROP_CARTOON,
+    g_settings_bind (settings, "frame-drop-ratio", configurable, OGMRIP_XVID_PROP_FRAME_DROP_RATIO,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "gmc", configurable, OGMRIP_XVID_PROP_GMC,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
     g_settings_bind (settings, "grayscale", configurable, OGMRIP_XVID_PROP_GRAYSCALE,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "interlacing", configurable, OGMRIP_XVID_PROP_INTERLACING,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "lumi-mask", configurable, OGMRIP_XVID_PROP_LUMI_MASK,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "max-bframes", configurable, OGMRIP_XVID_PROP_MAX_BFRAMES,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "max-bquant", configurable, OGMRIP_XVID_PROP_MAX_BQUANT,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "max-iquant", configurable, OGMRIP_XVID_PROP_MAX_IQUANT,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "max-keyint", configurable, OGMRIP_XVID_PROP_MAX_KEYINT,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "max-pquant", configurable, OGMRIP_XVID_PROP_MAX_PQUANT,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "me-quality", configurable, OGMRIP_XVID_PROP_ME_QUALITY,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "min-bquant", configurable, OGMRIP_XVID_PROP_MIN_BQUANT,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "min-iquant", configurable, OGMRIP_XVID_PROP_MIN_IQUANT,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "min-pquant", configurable, OGMRIP_XVID_PROP_MIN_PQUANT,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "packed", configurable, OGMRIP_XVID_PROP_PACKED,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "par", configurable, OGMRIP_XVID_PROP_PAR,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "par-height", configurable, OGMRIP_XVID_PROP_PAR_HEIGHT,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "par-width", configurable, OGMRIP_XVID_PROP_PAR_WIDTH,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "profile", configurable, OGMRIP_XVID_PROP_PROFILE,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
     g_settings_bind (settings, "qpel", configurable, OGMRIP_XVID_PROP_QPEL,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "quant-type", configurable, OGMRIP_XVID_PROP_QUANT_TYPE,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
     g_settings_bind (settings, "trellis", configurable, OGMRIP_XVID_PROP_TRELLIS,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    g_settings_bind (settings, "max-bframes", configurable, OGMRIP_XVID_PROP_MAX_BFRAMES,
+    g_settings_bind (settings, "vhq", configurable, OGMRIP_XVID_PROP_VHQ,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
 
     g_object_unref (settings);
@@ -551,6 +560,10 @@ ogmrip_xvid_class_init (OGMRipXvidClass *klass)
   g_object_class_install_property (gobject_class, PROP_PASSES, 
         g_param_spec_uint ("passes", "Passes property", "Set the number of passes", 
            1, 2, 1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_LUMI_MASK,
+      g_param_spec_boolean (OGMRIP_XVID_PROP_LUMI_MASK, NULL, NULL,
+        OGMRIP_XVID_DEFAULT_LUMI_MASK, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 }
 
 static void
@@ -561,35 +574,36 @@ ogmrip_xvid_class_finalize (OGMRipXvidClass *klass)
 static void
 ogmrip_xvid_init (OGMRipXvid *xvid)
 {
-  xvid->chroma_me = OGMRIP_XVID_DEFAULT_CHROMA_ME;
-  xvid->chroma_opt = OGMRIP_XVID_DEFAULT_CHROMA_OPT;
-  xvid->closed_gop = OGMRIP_XVID_DEFAULT_CLOSED_GOP;
-  xvid->gmc = OGMRIP_XVID_DEFAULT_GMC;
-  xvid->interlacing = OGMRIP_XVID_DEFAULT_INTERLACING;
-  xvid->packed = OGMRIP_XVID_DEFAULT_PACKED;
   xvid->bquant_offset = OGMRIP_XVID_DEFAULT_BQUANT_OFFSET;
   xvid->bquant_ratio = OGMRIP_XVID_DEFAULT_BQUANT_RATIO;
   xvid->bvhq = OGMRIP_XVID_DEFAULT_BVHQ;
+  xvid->cartoon = OGMRIP_XVID_DEFAULT_CARTOON;
+  xvid->chroma_me = OGMRIP_XVID_DEFAULT_CHROMA_ME;
+  xvid->chroma_opt = OGMRIP_XVID_DEFAULT_CHROMA_OPT;
+  xvid->closed_gop = OGMRIP_XVID_DEFAULT_CLOSED_GOP;
   xvid->frame_drop_ratio = OGMRIP_XVID_DEFAULT_FRAME_DROP_RATIO;
+  xvid->gmc = OGMRIP_XVID_DEFAULT_GMC;
+  xvid->grayscale = OGMRIP_XVID_DEFAULT_GRAYSCALE;
+  xvid->interlacing = OGMRIP_XVID_DEFAULT_INTERLACING;
+  xvid->lumi_mask = OGMRIP_XVID_DEFAULT_LUMI_MASK;
   xvid->max_bframes = OGMRIP_XVID_DEFAULT_MAX_BFRAMES;
   xvid->max_bquant = OGMRIP_XVID_DEFAULT_MAX_BQUANT;
   xvid->max_iquant = OGMRIP_XVID_DEFAULT_MAX_IQUANT;
+  xvid->max_keyint = OGMRIP_XVID_DEFAULT_MAX_KEYINT;
   xvid->max_pquant = OGMRIP_XVID_DEFAULT_MAX_PQUANT;
   xvid->me_quality = OGMRIP_XVID_DEFAULT_ME_QUALITY;
   xvid->min_bquant = OGMRIP_XVID_DEFAULT_MIN_BQUANT;
   xvid->min_iquant = OGMRIP_XVID_DEFAULT_MIN_IQUANT;
   xvid->min_pquant = OGMRIP_XVID_DEFAULT_MIN_PQUANT;
-  xvid->max_keyint = OGMRIP_XVID_DEFAULT_MAX_KEYINT;
-  xvid->par = OGMRIP_XVID_DEFAULT_PAR;
+  xvid->packed = OGMRIP_XVID_DEFAULT_PACKED;
   xvid->par_height = OGMRIP_XVID_DEFAULT_PAR_HEIGHT;
+  xvid->par = OGMRIP_XVID_DEFAULT_PAR;
   xvid->par_width = OGMRIP_XVID_DEFAULT_PAR_WIDTH;
   xvid->profile = OGMRIP_XVID_DEFAULT_PROFILE;
-  xvid->quant_type = OGMRIP_XVID_DEFAULT_QUANT_TYPE;
-  xvid->vhq = OGMRIP_XVID_DEFAULT_VHQ;
-  xvid->cartoon = OGMRIP_XVID_DEFAULT_CARTOON;
-  xvid->grayscale = OGMRIP_XVID_DEFAULT_GRAYSCALE;
   xvid->qpel = OGMRIP_XVID_DEFAULT_QPEL;
+  xvid->quant_type = OGMRIP_XVID_DEFAULT_QUANT_TYPE;
   xvid->trellis = OGMRIP_XVID_DEFAULT_TRELLIS;
+  xvid->vhq = OGMRIP_XVID_DEFAULT_VHQ;
 }
 
 static void
@@ -726,6 +740,9 @@ ogmrip_xvid_get_property (GObject *gobject, guint property_id, GValue *value, GP
     case PROP_PASSES:
       g_value_set_uint (value, ogmrip_video_codec_get_passes (OGMRIP_VIDEO_CODEC (xvid)));
       break;
+    case PROP_LUMI_MASK:
+      g_value_set_boolean (value, xvid->lumi_mask);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
@@ -830,6 +847,9 @@ ogmrip_xvid_set_property (GObject *gobject, guint property_id, const GValue *val
       break;
     case PROP_PASSES:
       ogmrip_video_codec_set_passes (OGMRIP_VIDEO_CODEC (xvid), g_value_get_uint (value));
+      break;
+    case PROP_LUMI_MASK:
+      xvid->lumi_mask = g_value_get_boolean (value);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);

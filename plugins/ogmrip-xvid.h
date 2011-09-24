@@ -34,6 +34,7 @@ G_BEGIN_DECLS
 #define OGMRIP_XVID_PROP_GMC                 "gmc"
 #define OGMRIP_XVID_PROP_GRAYSCALE           "grayscale"
 #define OGMRIP_XVID_PROP_INTERLACING         "interlacing"
+#define OGMRIP_XVID_PROP_LUMI_MASK           "lumi-mask"
 #define OGMRIP_XVID_PROP_MAX_BFRAMES         "max-bframes"
 #define OGMRIP_XVID_PROP_MAX_BQUANT          "max-bquant"
 #define OGMRIP_XVID_PROP_MAX_IQUANT          "max-iquant"
@@ -64,6 +65,7 @@ G_BEGIN_DECLS
 #define OGMRIP_XVID_DEFAULT_GMC              FALSE
 #define OGMRIP_XVID_DEFAULT_GRAYSCALE        FALSE
 #define OGMRIP_XVID_DEFAULT_INTERLACING      FALSE
+#define OGMRIP_XVID_DEFAULT_LUMI_MASK        TRUE
 #define OGMRIP_XVID_DEFAULT_MAX_BFRAMES      2
 #define OGMRIP_XVID_DEFAULT_MAX_BQUANT       31
 #define OGMRIP_XVID_DEFAULT_MAX_IQUANT       31

@@ -51,28 +51,33 @@ struct _OGMRipXvidDialog
   GtkWidget *bquant_offset_spin;
   GtkWidget *bquant_ratio_spin;
   GtkWidget *bvhq_check;
+  GtkWidget *cartoon_check;
   GtkWidget *chroma_me_check;
   GtkWidget *chroma_opt_check;
   GtkWidget *closed_gop_check;
-  GtkWidget *max_bframes_spin;
   GtkWidget *frame_drop_ratio_spin;
   GtkWidget *gmc_check;
+  GtkWidget *grayscale_check;
   GtkWidget *interlacing_check;
+  GtkWidget *lumi_mask_check;
+  GtkWidget *max_bframes_spin;
   GtkWidget *max_bquant_spin;
   GtkWidget *max_iquant_spin;
+  GtkWidget *max_keyint_spin;
   GtkWidget *max_pquant_spin;
   GtkWidget *me_quality_combo;
   GtkWidget *min_bquant_spin;
   GtkWidget *min_iquant_spin;
   GtkWidget *min_pquant_spin;
-  GtkWidget *max_keyint_spin;
   GtkWidget *packed_check;
-  GtkWidget *profile_combo;
-  GtkWidget *quant_type_combo;
-  GtkWidget *vhq_combo;
-  GtkWidget *par_width_spin;
-  GtkWidget *par_height_spin;
   GtkWidget *par_combo;
+  GtkWidget *par_height_spin;
+  GtkWidget *par_width_spin;
+  GtkWidget *profile_combo;
+  GtkWidget *qpel_check;
+  GtkWidget *quant_type_combo;
+  GtkWidget *trellis_check;
+  GtkWidget *vhq_combo;
 };
 
 struct _OGMRipXvidDialogClass
@@ -127,24 +132,32 @@ ogmrip_xvid_dialog_set_profile (OGMRipXvidDialog *dialog, OGMRipProfile *profile
       dialog->bquant_ratio_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_BVHQ,
       dialog->bvhq_check, "active", G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (settings, OGMRIP_XVID_PROP_CARTOON,
+      dialog->cartoon_check, "active", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_CHROMA_ME,
       dialog->chroma_me_check, "active", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_CHROMA_OPT,
       dialog->chroma_opt_check, "active", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_CLOSED_GOP,
       dialog->closed_gop_check, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_MAX_BFRAMES,
-      dialog->max_bframes_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_FRAME_DROP_RATIO,
       dialog->frame_drop_ratio_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_GMC,
       dialog->gmc_check, "active", G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (settings, OGMRIP_XVID_PROP_GRAYSCALE,
+      dialog->grayscale_check, "active", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_INTERLACING,
       dialog->interlacing_check, "active", G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (settings, OGMRIP_XVID_PROP_LUMI_MASK,
+      dialog->lumi_mask_check, "active", G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (settings, OGMRIP_XVID_PROP_MAX_BFRAMES,
+      dialog->max_bframes_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_MAX_BQUANT,
       dialog->max_bquant_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_MAX_IQUANT,
       dialog->max_iquant_spin, "value", G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (settings, OGMRIP_XVID_PROP_MAX_KEYINT,
+      dialog->max_keyint_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_MAX_PQUANT,
       dialog->max_pquant_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_ME_QUALITY,
@@ -155,22 +168,24 @@ ogmrip_xvid_dialog_set_profile (OGMRipXvidDialog *dialog, OGMRipProfile *profile
       dialog->min_iquant_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_MIN_PQUANT,
       dialog->min_pquant_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_MAX_KEYINT,
-      dialog->max_keyint_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_PACKED,
       dialog->packed_check, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_PROFILE,
-      dialog->profile_combo, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_QUANT_TYPE,
-      dialog->quant_type_combo, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_VHQ,
-      dialog->vhq_combo, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_PAR_WIDTH,
-      dialog->par_width_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_PAR_HEIGHT,
-      dialog->par_height_spin, "value", G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_XVID_PROP_PAR,
       dialog->par_combo, "active", G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (settings, OGMRIP_XVID_PROP_PAR_HEIGHT,
+      dialog->par_height_spin, "value", G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (settings, OGMRIP_XVID_PROP_PAR_WIDTH,
+      dialog->par_width_spin, "value", G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (settings, OGMRIP_XVID_PROP_PROFILE,
+      dialog->profile_combo, "active", G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (settings, OGMRIP_XVID_PROP_QPEL,
+      dialog->qpel_check, "active", G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (settings, OGMRIP_XVID_PROP_QUANT_TYPE,
+      dialog->quant_type_combo, "active", G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (settings, OGMRIP_XVID_PROP_TRELLIS,
+      dialog->trellis_check, "active", G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (settings, OGMRIP_XVID_PROP_VHQ,
+      dialog->vhq_combo, "active", G_SETTINGS_BIND_DEFAULT);
 
   g_object_unref (settings);
 }
@@ -248,28 +263,33 @@ ogmrip_xvid_dialog_init (OGMRipXvidDialog *dialog)
   dialog->bquant_offset_spin = gtk_builder_get_widget (builder, "bquant_offset-spin");
   dialog->bquant_ratio_spin = gtk_builder_get_widget (builder, "bquant_ratio-spin");
   dialog->bvhq_check = gtk_builder_get_widget (builder, "bvhq-check");
+  dialog->cartoon_check = gtk_builder_get_widget (builder, "cartoon-check");
   dialog->chroma_me_check = gtk_builder_get_widget (builder, "chroma_me-check");
   dialog->chroma_opt_check = gtk_builder_get_widget (builder, "chroma_opt-check");
   dialog->closed_gop_check = gtk_builder_get_widget (builder, "closed_gop-check");
-  dialog->max_bframes_spin = gtk_builder_get_widget (builder, "max_bframes-spin");
   dialog->frame_drop_ratio_spin = gtk_builder_get_widget (builder, "frame_drop_ratio-spin");
   dialog->gmc_check = gtk_builder_get_widget (builder, "gmc-check");
+  dialog->grayscale_check = gtk_builder_get_widget (builder, "grayscale-check");
   dialog->interlacing_check = gtk_builder_get_widget (builder, "interlacing-check");
+  dialog->lumi_mask_check = gtk_builder_get_widget (builder, "lumi_mask-check");
+  dialog->max_bframes_spin = gtk_builder_get_widget (builder, "max_bframes-spin");
   dialog->max_bquant_spin = gtk_builder_get_widget (builder, "max_bquant-spin");
   dialog->max_iquant_spin = gtk_builder_get_widget (builder, "max_iquant-spin");
+  dialog->max_keyint_spin = gtk_builder_get_widget (builder, "max_keyint-spin");
   dialog->max_pquant_spin = gtk_builder_get_widget (builder, "max_pquant-spin");
   dialog->me_quality_combo = gtk_builder_get_widget (builder, "me_quality-combo");
   dialog->min_bquant_spin = gtk_builder_get_widget (builder, "min_bquant-spin");
   dialog->min_iquant_spin = gtk_builder_get_widget (builder, "min_iquant-spin");
   dialog->min_pquant_spin = gtk_builder_get_widget (builder, "min_pquant-spin");
-  dialog->max_keyint_spin = gtk_builder_get_widget (builder, "max_keyint-spin");
   dialog->packed_check = gtk_builder_get_widget (builder, "packed-check");
-  dialog->profile_combo = gtk_builder_get_widget (builder, "profile-combo");
-  dialog->quant_type_combo = gtk_builder_get_widget (builder, "quant_type-combo");
-  dialog->vhq_combo = gtk_builder_get_widget (builder, "vhq-combo");
-  dialog->par_width_spin = gtk_builder_get_widget (builder, "par_width-spin");
-  dialog->par_height_spin = gtk_builder_get_widget (builder, "par_height-spin");
   dialog->par_combo = gtk_builder_get_widget (builder, "par-combo");
+  dialog->par_height_spin = gtk_builder_get_widget (builder, "par_height-spin");
+  dialog->par_width_spin = gtk_builder_get_widget (builder, "par_width-spin");
+  dialog->profile_combo = gtk_builder_get_widget (builder, "profile-combo");
+  dialog->qpel_check = gtk_builder_get_widget (builder, "qpel-check");
+  dialog->quant_type_combo = gtk_builder_get_widget (builder, "quant_type-combo");
+  dialog->trellis_check = gtk_builder_get_widget (builder, "trellis-check");
+  dialog->vhq_combo = gtk_builder_get_widget (builder, "vhq-combo");
 
   g_object_bind_property_full (dialog->max_bframes_spin, "value",
       dialog->frame_drop_ratio_spin, "sensitive", G_BINDING_SYNC_CREATE,

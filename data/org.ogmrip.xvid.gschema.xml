@@ -135,5 +135,9 @@
       <default>2</default>
       <summary>Maximum number of B-frames between I/P-frames</summary>
     </key>
+    <key name="lumi-mask" type="b">
+      <default>true</default>
+      <summary>Adaptive quantization</summary>
+    </key>
   </schema>
 </schemalist>
