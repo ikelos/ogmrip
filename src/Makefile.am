@@ -7,8 +7,7 @@ ogmrip_SOURCES = \
   ogmrip-main.c           \
   ogmrip-options-dialog.c \
   ogmrip-pref-dialog.c    \
-  ogmrip-spell-dialog.c   \
-  ogmrip-update-dialog.c
+  ogmrip-spell-dialog.c
 
 EXTRA_DIST = \
   ogmrip-crop-dialog.h    \
@@ -16,8 +15,7 @@ EXTRA_DIST = \
   ogmrip-options-dialog.h \
   ogmrip-pref-dialog.h    \
   ogmrip-settings.h       \
-  ogmrip-spell-dialog.h   \
-  ogmrip-update-dialog.h
+  ogmrip-spell-dialog.h
 
 ogmrip_LDADD = \
   $(top_builddir)/libogmrip-job/libogmrip-job.la               \

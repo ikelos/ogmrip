@@ -34,7 +34,6 @@ ui_DATA = ogmrip-ui.xml               \
           ogmrip-profiles.glade       \
           ogmrip-progress.glade       \
           ogmrip-queue.glade          \
-          ogmrip-update.glade         \
           ogmrip-spell.glade          \
           ogmrip-lavc.glade           \
           ogmrip-x264.glade           \
