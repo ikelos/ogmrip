@@ -1,26 +1,14 @@
-ogmrip-main.c
-- mise à jour des profils
-
 ogmrip-options-dialog.c
 - test de compressibilité
 
 ogmrip-encoding-manager.c
 - comment connaitre les encodages non faits ?
 
-ogmrip-copy.c
-- vérifier si une copie existe déjà
-
 ogmrip-mp4.c
 - comment savoir si la vidéo a été encodée avec global_header ?
 
 ogmrip-video-file.c
 - ajouter delai
-
-ogmrip-hardsub.c, ogmrip-novideo.c
-- inscrire les types
-
-ogmrip-theora.c, ogmrip-xvid.c
-- surcharger la propriété 'passes' pour le nombre max de passes (1 pour theora, 2 pour xvid)
 
 ogmrip-avi.c
 - limiter le nombre de pistes audio (8) et subp (1)
@@ -32,5 +20,8 @@ ogmrip-lavc.glade
 - ajouter trellis (analysis), qpel (analysis), grayscale, v4mv (analysis), b frames (frame type)
 
 ogmrip-x264.glade
-- ajouter trellis (analysis), partitions (analysis), b frames (frame type)
+- ajouter partitions (analysis)
+
+dvdcpy.c
+- vérifier que l'id est préservé
 

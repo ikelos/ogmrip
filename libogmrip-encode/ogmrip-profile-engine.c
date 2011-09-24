@@ -18,6 +18,7 @@
 
 #include "ogmrip-profile-engine.h"
 #include "ogmrip-profile-keys.h"
+#include "ogmrip-marshal.h"
 #include "ogmrip-type.h"
 #include "ogmrip-xml.h"
 
@@ -43,6 +44,7 @@ enum
 {
   ADD,
   REMOVE,
+  UPDATE,
   LAST_SIGNAL
 };
 
@@ -246,6 +248,12 @@ ogmrip_profile_engine_remove_internal (OGMRipProfileEngine *engine, OGMRipProfil
   g_free (name);
 }
 
+static gboolean
+ogmrip_profile_engine_update_internal (OGMRipProfileEngine *engine, OGMRipProfile *profile)
+{
+  return TRUE;
+}
+
 static void
 ogmrip_profile_engine_init (OGMRipProfileEngine *engine)
 {
@@ -269,6 +277,7 @@ ogmrip_profile_engine_class_init (OGMRipProfileEngineClass *klass)
 
   klass->add = ogmrip_profile_engine_add_internal;
   klass->remove = ogmrip_profile_engine_remove_internal;
+  klass->update = ogmrip_profile_engine_update_internal;
 
   g_object_class_install_property (gobject_class, PROP_PROFILES,
       g_param_spec_boxed ("profiles", "profiles", "profiles",
@@ -283,6 +292,11 @@ ogmrip_profile_engine_class_init (OGMRipProfileEngineClass *klass)
       G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
       G_STRUCT_OFFSET (OGMRipProfileEngineClass, remove), NULL, NULL,
       g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, OGMRIP_TYPE_PROFILE);
+
+  signals[UPDATE] = g_signal_new ("update", G_TYPE_FROM_CLASS (klass),
+      G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+      G_STRUCT_OFFSET (OGMRipProfileEngineClass, update), NULL, NULL,
+      ogmrip_cclosure_marshal_BOOLEAN__OBJECT, G_TYPE_BOOLEAN, 1, OGMRIP_TYPE_PROFILE);
 
   g_type_class_add_private (klass, sizeof (OGMRipProfileEnginePriv));
 }
@@ -313,31 +327,38 @@ ogmrip_profile_engine_load_file (OGMRipProfileEngine *engine, const gchar *filen
     if (name)
     {
       OGMRipProfile *profile;
+      gboolean load = TRUE;
 
       profile = ogmrip_profile_engine_get (engine, name);
       if (profile)
       {
-/*
         GVariant *variant;
         guint major1, minor1, major2, minor2;
 
-        g_settings_get (G_SETTINGS (profile), "version", "(uu)", &major1, &minor1);
+        g_settings_get (G_SETTINGS (profile), OGMRIP_PROFILE_VERSION, "(uu)", &major1, &minor1);
 
-        variant = ogmrip_xml_get_variant (xml, "version", "(uu)");
+        variant = ogmrip_xml_get_variant (xml, OGMRIP_PROFILE_VERSION, "(uu)");
         g_variant_get (variant, "(uu)", &major2, &minor2);
         g_variant_unref (variant);
 
+        load = FALSE;
         if (major2 > major1 || (major2 == major1 && minor2 > minor1))
         {
+          g_signal_emit (engine, signals[UPDATE], 0, profile, &load);
+          if (load)
+            ogmrip_profile_engine_remove (engine, profile);
+          else
+            g_settings_set (G_SETTINGS (profile), OGMRIP_PROFILE_VERSION, "(uu)", major2, minor2);
         }
-*/
       }
-      else
+
+      if (load)
       {
         profile = ogmrip_profile_new_from_file (file, NULL);
         ogmrip_profile_engine_add (engine, profile);
         g_object_unref (profile);
       }
+
       g_free (name);
     }
 

@@ -2028,6 +2028,29 @@ ogmrip_tmp_dir_changed_cb (GSettings *settings, const gchar *key)
 }
 
 static gboolean
+ogmrip_main_profile_manager_update_cb (OGMRipProfileEngine *engine, OGMRipProfile *profile)
+{
+  GtkWidget *dialog;
+  gchar *name;
+  gint response;
+
+  name = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_NAME);
+
+  dialog = gtk_message_dialog_new_with_markup (NULL, 0,
+      GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "<b>%s</b>\n\n%s",
+      "A new version of the following profile is available.", name);
+  gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog),
+      "Do you want to use it ?");
+
+  g_free (name);
+
+  response = gtk_dialog_run (GTK_DIALOG (dialog));
+  gtk_widget_destroy (dialog);
+
+  return response == GTK_RESPONSE_YES;
+}
+
+static gboolean
 ogmrip_startup_thread (GIOSchedulerJob *job, GCancellable *cancellable, GApplication *app)
 {
   OGMRipModuleEngine *module_engine;
@@ -2058,6 +2081,9 @@ ogmrip_startup_thread (GIOSchedulerJob *job, GCancellable *cancellable, GApplica
 
   profile_engine = ogmrip_profile_engine_get_default ();
   g_object_set_data_full (G_OBJECT (app), "profile-engine", profile_engine, g_object_unref);
+
+  g_signal_connect (profile_engine, "update",
+      G_CALLBACK (ogmrip_main_profile_manager_update_cb), NULL);
 
   path = g_build_filename (OGMRIP_DATA_DIR, "ogmrip", "profiles", NULL);
   ogmrip_profile_engine_add_path (profile_engine, path);

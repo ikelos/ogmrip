@@ -20,6 +20,7 @@
 #   OBJECT      for GObject or derived types (GObject*)
 #   NONE        deprecated alias for VOID
 #   BOOL        deprecated alias for BOOLEAN
-                                                                                                                                        
+ 
+BOOLEAN:OBJECT
 VOID:OBJECT,DOUBLE
 VOID:OBJECT,UINT
