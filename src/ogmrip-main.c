@@ -370,6 +370,8 @@ ogmrip_main_clean (OGMRipData *data, OGMRipEncoding *encoding, gboolean error)
         ogmrip_fs_rmdir (uri + 6, TRUE, NULL);
     }
   }
+
+  g_object_unref (encoding);
 }
 
 /*
@@ -394,12 +396,8 @@ ogmrip_main_display_error (OGMRipData *data, OGMRipEncoding *encoding, GError *e
   if (filename)
   {
     GFileInputStream *stream;
-    GtkTextBuffer *buffer;
     GtkTextIter iter;
     GFile *file;
-
-    gchar text[2048];
-    gssize n;
 
     area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
 
@@ -422,16 +420,24 @@ ogmrip_main_display_error (OGMRipData *data, OGMRipEncoding *encoding, GError *e
     gtk_widget_set_size_request (widget, 700, 400);
 
     file = g_file_new_for_path (filename);
+
     stream = g_file_read (file, NULL, NULL);
+    if (stream)
+    {
+      GtkTextBuffer *buffer;
+      gchar text[2048];
+      gssize n;
+
+      buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (widget));
+      gtk_text_buffer_get_start_iter (buffer, &iter);
+
+      while ((n = g_input_stream_read (G_INPUT_STREAM (stream), text, 2048, NULL, NULL)) > 0)
+        gtk_text_buffer_insert (buffer, &iter, text, n);
+
+      g_object_unref (stream);
+    }
+
     g_object_unref (file);
-
-    buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (widget));
-    gtk_text_buffer_get_start_iter (buffer, &iter);
-
-    while ((n = g_input_stream_read (G_INPUT_STREAM (stream), text, 2048, NULL, NULL)) > 0)
-      gtk_text_buffer_insert (buffer, &iter, text, n);
-
-    g_object_unref (stream);
   }
 
   gtk_dialog_run (GTK_DIALOG (dialog));
@@ -550,8 +556,6 @@ ogmrip_main_encode (OGMRipData *data, OGMRipEncoding *encoding)
 
     gtk_widget_destroy (dialog);
 
-    ogmrip_main_clean (data, encoding, result == OGMJOB_RESULT_ERROR);
-
     if (cookie >= 0)
       ogmrip_main_dbus_uninhibit (data, cookie);
 
@@ -562,6 +566,8 @@ ogmrip_main_encode (OGMRipData *data, OGMRipEncoding *encoding)
       ogmrip_main_display_error (data, encoding, error);
       g_clear_error (&error);
     }
+
+    ogmrip_main_clean (data, encoding, result == OGMJOB_RESULT_ERROR);
   }
 }
 
@@ -1566,7 +1572,7 @@ ogmrip_main_encodings_responsed (OGMRipData *data, gint response_id, GtkWidget *
 
     list = ogmrip_encoding_manager_get_list (data->manager);
     for (link = list; link; link = link->next)
-      ogmrip_main_encode (data, link->data);
+      ogmrip_main_encode (data, g_object_ref (link->data));
     g_list_free (list);
   }
 }
