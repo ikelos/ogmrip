@@ -405,8 +405,12 @@ ogmrip_mplayer_wav_command (OGMRipAudioCodec *audio, gboolean header, const gcha
   g_ptr_array_add (argv, g_strdup_printf ("%d", ogmrip_mplayer_map_audio_id (stream)));
 
   uri = ogmrip_media_get_uri (ogmrip_title_get_media (ogmrip_stream_get_title (stream)));
+
   g_ptr_array_add (argv, g_strdup ("-dvd-device"));
-  g_ptr_array_add (argv, g_strdup (uri));
+  if (g_str_has_prefix (uri, "dvd://"))
+    g_ptr_array_add (argv, g_strdup (uri + 6));
+  else
+    g_ptr_array_add (argv, g_strdup (uri));
 
   vid = ogmrip_title_get_nr (ogmrip_stream_get_title (stream));
 
@@ -531,13 +535,12 @@ ogmrip_mencoder_audio_command (OGMRipAudioCodec *audio, const gchar *output)
   g_ptr_array_add (argv, g_strdup (output));
 
   uri = ogmrip_media_get_uri (ogmrip_title_get_media (ogmrip_stream_get_title (stream)));
-  if (!g_str_has_prefix (uri, "dvd://"))
-    g_warning ("Unknown scheme for '%s'", uri);
-  else
-  {
-    g_ptr_array_add (argv, g_strdup ("-dvd-device"));
+
+  g_ptr_array_add (argv, g_strdup ("-dvd-device"));
+  if (g_str_has_prefix (uri, "dvd://"))
     g_ptr_array_add (argv, g_strdup (uri + 6));
-  }
+  else
+    g_ptr_array_add (argv, g_strdup (uri));
 
   return argv;
 }
@@ -751,13 +754,12 @@ ogmrip_mencoder_video_command (OGMRipVideoCodec *video, const gchar *output, gui
   g_ptr_array_add (argv, g_strdup (output));
 
   uri = ogmrip_media_get_uri (ogmrip_title_get_media (ogmrip_stream_get_title (stream)));
-  if (!g_str_has_prefix (uri, "dvd://"))
-    g_warning ("Unknown scheme for '%s'", uri);
-  else
-  {
-    g_ptr_array_add (argv, g_strdup ("-dvd-device"));
+
+  g_ptr_array_add (argv, g_strdup ("-dvd-device"));
+  if (g_str_has_prefix (uri, "dvd://"))
     g_ptr_array_add (argv, g_strdup (uri + 6));
-  }
+  else
+    g_ptr_array_add (argv, g_strdup (uri));
 
   return argv;
 }
@@ -970,8 +972,12 @@ ogmrip_mplayer_video_command (OGMRipVideoCodec *video, const gchar *output)
   }
 
   uri = ogmrip_media_get_uri (ogmrip_title_get_media (ogmrip_stream_get_title (stream)));
+
   g_ptr_array_add (argv, g_strdup ("-dvd-device"));
-  g_ptr_array_add (argv, g_strdup (uri + 6));
+  if (g_str_has_prefix (uri, "dvd://"))
+    g_ptr_array_add (argv, g_strdup (uri + 6));
+  else
+    g_ptr_array_add (argv, g_strdup (uri));
 
   return argv;
 }
@@ -1095,13 +1101,12 @@ ogmrip_mencoder_vobsub_command (OGMRipSubpCodec *subp, const gchar *output)
   }
 
   uri = ogmrip_media_get_uri (ogmrip_title_get_media (ogmrip_stream_get_title (stream)));
-  if (!g_str_has_prefix (uri, "dvd://"))
-    g_warning ("Unknown scheme for '%s'", uri);
-  else
-  {
-    g_ptr_array_add (argv, g_strdup ("-dvd-device"));
+
+  g_ptr_array_add (argv, g_strdup ("-dvd-device"));
+  if (g_str_has_prefix (uri, "dvd://"))
     g_ptr_array_add (argv, g_strdup (uri + 6));
-  }
+  else
+    g_ptr_array_add (argv, g_strdup (uri));
 
   vid = ogmrip_title_get_nr (ogmrip_stream_get_title (stream));
 

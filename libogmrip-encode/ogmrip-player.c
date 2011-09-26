@@ -154,13 +154,12 @@ ogmrip_mplayer_play_command (OGMRipPlayer *player)
   }
 
   uri = ogmrip_media_get_uri (ogmrip_title_get_media (player->priv->title));
-  if (!g_str_has_prefix (uri, "dvd://"))
-    g_warning ("Unknown scheme for '%s'", uri);
-  else
-  {
-    g_ptr_array_add (argv, g_strdup ("-dvd-device"));
+
+  g_ptr_array_add (argv, g_strdup ("-dvd-device"));
+  if (g_str_has_prefix (uri, "dvd://"))
     g_ptr_array_add (argv, g_strdup (uri + 6));
-  }
+  else
+    g_ptr_array_add (argv, g_strdup (uri));
 
   vid = ogmrip_title_get_nr (player->priv->title);
 
