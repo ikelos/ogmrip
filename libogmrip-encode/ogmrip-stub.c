@@ -491,7 +491,7 @@ ogmrip_chapters_stub_constructed (GObject *gobject)
 
   stub->priv->format = OGMRIP_FORMAT_CHAPTERS;
 
-  G_OBJECT_CLASS (ogmrip_subp_stub_parent_class)->constructed (gobject);
+  G_OBJECT_CLASS (ogmrip_chapters_stub_parent_class)->constructed (gobject);
 }
 
 static void
