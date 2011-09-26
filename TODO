@@ -1,3 +1,6 @@
+ogmrip-main.c
+- interdire extract tant que tous les modules et profils n'ont pas été chargés
+
 ogmrip-options-dialog.c
 - test de compressibilité
 
@@ -12,12 +15,6 @@ ogmrip-video-file.c
 
 ogmrip-avi.c
 - limiter le nombre de pistes audio (8) et subp (1)
-
-ogmrip-xvid.glade
-- ajouter trellis (analysis), qpel (analysis), grayscale, cartoon, b frames (frame type)
-
-ogmrip-lavc.glade
-- ajouter trellis (analysis), qpel (analysis), grayscale, v4mv (analysis), b frames (frame type)
 
 ogmrip-x264.glade
 - ajouter partitions (analysis)
