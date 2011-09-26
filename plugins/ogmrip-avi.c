@@ -60,26 +60,45 @@ static void ogmrip_avi_get_property (GObject     *gobject,
 static gint ogmrip_avi_run          (OGMJobSpawn *spawn);
 
 static void
-ogmrip_avi_foreach_file (OGMRipContainer *avi, OGMRipFile *file, GPtrArray *argv)
+ogmrip_avi_add_file (OGMRipContainer *avi, OGMRipFile *file, gboolean video, GPtrArray *argv)
 {
-  if (OGMRIP_IS_VIDEO_STREAM (file) || OGMRIP_IS_AUDIO_STREAM (file))
+  const gchar *filename;
+  struct stat buf;
+
+  filename = ogmrip_file_get_path (file);
+
+  if (g_stat (filename, &buf) == 0 && buf.st_size > 0)
   {
-    const gchar *filename;
-    struct stat buf;
-
-    filename = ogmrip_file_get_path (file);
-
-    if (g_stat (filename, &buf) == 0 && buf.st_size > 0)
+    if (video)
     {
-      if (OGMRIP_IS_VIDEO_STREAM (file))
-      {
-        g_ptr_array_add (argv, g_strdup ("-n"));
-        g_ptr_array_add (argv, g_strdup ("-i"));
-      }
-
-      g_ptr_array_add (argv, g_strdup (filename));
+      g_ptr_array_add (argv, g_strdup ("-n"));
+      g_ptr_array_add (argv, g_strdup ("-i"));
     }
+    g_ptr_array_add (argv, g_strdup (filename));
   }
+}
+
+static void
+ogmrip_avi_add_video_file (OGMRipContainer *avi, GPtrArray *argv)
+{
+  GList *list, *link;
+
+  list = ogmrip_container_get_files (avi);
+  for (link = list; link; link = link->next)
+    if (OGMRIP_IS_VIDEO_STREAM (link->data))
+      break;
+
+  if (link)
+    ogmrip_avi_add_file (avi, link->data, TRUE, argv);
+
+  g_list_free (list);
+}
+
+static void
+ogmrip_avi_foreach_audio_file (OGMRipContainer *avi, OGMRipFile *file, GPtrArray *argv)
+{
+  if (OGMRIP_IS_AUDIO_STREAM (file))
+    ogmrip_avi_add_file (avi, file, FALSE, argv);
 }
 
 static gchar **
@@ -96,8 +115,10 @@ ogmrip_avi_command (OGMRipContainer *avi, GError **error)
   g_ptr_array_add (argv, g_strdup ("-o"));
   g_ptr_array_add (argv, g_strdup (output));
 
+  ogmrip_avi_add_video_file (avi, argv);
+
   ogmrip_container_foreach_file (avi,
-      (OGMRipContainerFunc) ogmrip_avi_foreach_file, argv);
+      (OGMRipContainerFunc) ogmrip_avi_foreach_audio_file, argv);
 
   ogmrip_container_get_split (avi, &tnumber, &tsize);
   if (tnumber > 1)
