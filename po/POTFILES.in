@@ -10,7 +10,6 @@ data/ogmrip-profiles.glade
 data/ogmrip-progress.glade
 data/ogmrip-queue.glade
 data/ogmrip-spell.glade
-data/ogmrip-update.glade
 data/ogmrip-x264.glade
 data/ogmrip-xvid.glade
 
@@ -44,13 +43,13 @@ libogmrip-encode-gtk/ogmrip-profile-manager-dialog.c
 libogmrip-encode-gtk/ogmrip-progress-dialog.c
 libogmrip-encode-gtk/ogmrip-subp-options-dialog.c
 
+src/ogmrip-application.c
 src/ogmrip-crop-dialog.c
 src/ogmrip-helper.c
 src/ogmrip-main.c
 src/ogmrip-options-dialog.c
 src/ogmrip-pref-dialog.c
 src/ogmrip-spell-dialog.c
-src/ogmrip-update-dialog.c
 
 plugins/ogmrip-aac.c
 plugins/ogmrip-acopy.c

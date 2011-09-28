@@ -1,5 +1,8 @@
 ogmrip-main.c
-- interdire extract tant que tous les modules et profils n'ont pas été chargés
+- vérifier que la destination n'existe pas déjà
+
+ogmrip-encoding.c
+- vérifier que la destination est accessible en écriture
 
 ogmrip-options-dialog.c
 - test de compressibilité
@@ -12,6 +15,9 @@ ogmrip-mp4.c
 
 ogmrip-video-file.c
 - ajouter delai
+
+ogmrip-subp-file.c
+- ajouter la reconnaissance des fichiers de sous-titres
 
 ogmrip-avi.c
 - limiter le nombre de pistes audio (8) et subp (1)
