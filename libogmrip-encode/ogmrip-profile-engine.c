@@ -397,8 +397,10 @@ ogmrip_profile_engine_rescan (OGMRipProfileEngine *engine)
 
   g_return_if_fail (OGMRIP_IS_PROFILE_ENGINE (engine));
 
+  g_object_freeze_notify (G_OBJECT (engine));
   for (link = engine->priv->paths; link; link = link->next)
     ogmrip_profile_engine_load_dir (engine, link->data);
+  g_object_thaw_notify (G_OBJECT (engine));
 }
 
 void
@@ -409,7 +411,9 @@ ogmrip_profile_engine_add_path (OGMRipProfileEngine *engine, const gchar *path)
 
   engine->priv->paths = g_list_append (engine->priv->paths, g_strdup  (path));
 
+  g_object_freeze_notify (G_OBJECT (engine));
   ogmrip_profile_engine_load_dir (engine, path);
+  g_object_thaw_notify (G_OBJECT (engine));
 }
 
 OGMRipProfile *
