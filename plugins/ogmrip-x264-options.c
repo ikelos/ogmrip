@@ -207,7 +207,10 @@ static gboolean
 ogmrip_x264_dialog_set_vbv_bufsize_sensitivity (GBinding *binding,
     const GValue *source_value, GValue *target_value, gpointer data)
 {
-  g_value_set_boolean (target_value, g_value_get_int (source_value) > 0);
+  gint value;
+
+  value = g_value_get_double (source_value);
+  g_value_set_boolean (target_value, value > 0);
 
   return TRUE;
 }
@@ -218,77 +221,98 @@ G_DEFINE_DYNAMIC_TYPE_EXTENDED (OGMRipX264Dialog, ogmrip_x264_dialog, GTK_TYPE_D
 static void
 ogmrip_x264_dialog_set_profile (OGMRipX264Dialog *dialog, OGMRipProfile *profile)
 {
-  GSettings *settings;
+  if (dialog->profile)
+  {
+    g_object_unref (dialog->profile);
+    dialog->profile = NULL;
+  }
+
+  if (profile)
+  {
+    GSettings *settings;
+
+    dialog->profile = g_object_ref (profile);
+
+    settings = ogmrip_profile_get_child (profile, "x264");
+    g_assert (settings != NULL);
+
+    g_settings_bind (settings, OGMRIP_X264_PROP_PROFILE,
+        dialog->profile_combo, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_B_FRAMES,
+        dialog->bframes_spin, "value", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_CABAC,
+        dialog->cabac_check, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_CQM,
+        dialog->cqm_combo, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_SUBQ,
+        dialog->subq_spin, "value", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_GLOBAL_HEADER,
+        dialog->global_header_check, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_WEIGHT_B,
+        dialog->weight_b_check, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_PARTITIONS,
+        dialog->partitions_check, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_WEIGHT_P,
+        dialog->weight_p_combo, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_FRAMEREF,
+        dialog->frameref_spin, "value", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind_with_mapping (settings, OGMRIP_X264_PROP_ME,
+        dialog->me_combo, "active", G_SETTINGS_BIND_DEFAULT,
+        ogmrip_x264_get_me, ogmrip_x264_set_me, NULL, NULL);
+    g_settings_bind (settings, OGMRIP_X264_PROP_MERANGE,
+        dialog->merange_spin, "value", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_8X8DCT,
+        dialog->dct8x8_check, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_MIXED_REFS,
+        dialog->mixed_refs_check, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_BRDO,
+        dialog->brdo_check, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_VBV_MAXRATE,
+        dialog->vbv_maxrate_spin, "value", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_VBV_BUFSIZE,
+        dialog->vbv_bufsize_spin, "value", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_LEVEL_IDC,
+        dialog->level_idc_spin, "value", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_DIRECT,
+        dialog->direct_combo, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_B_ADAPT,
+        dialog->b_adapt_spin, "value", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_KEYINT,
+        dialog->keyint_spin, "value", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_PSY_RD,
+        dialog->psy_rd_spin, "value", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_PSY_TRELLIS,
+        dialog->psy_trellis_spin, "value", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_AUD,
+        dialog->aud_check, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_RC_LOOKAHEAD,
+        dialog->rc_lookahead_spin, "value", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_TRELLIS,
+        dialog->trellis_combo, "active", G_SETTINGS_BIND_DEFAULT);
+
+    if (x264_have_b_pyramid)
+      g_settings_bind (settings, OGMRIP_X264_PROP_B_PYRAMID,
+          dialog->b_pyramid_combo, "active", G_SETTINGS_BIND_DEFAULT);
+    else
+      g_settings_bind (settings, OGMRIP_X264_PROP_B_PYRAMID,
+          dialog->b_pyramid_check, "active", G_SETTINGS_BIND_DEFAULT);
+
+    g_object_unref (settings);
+  }
+}
+
+static void
+ogmrip_x264_dialog_dispose (GObject *gobject)
+{
+  OGMRipX264Dialog *dialog = OGMRIP_X264_DIALOG (gobject);
 
   if (dialog->profile)
+  {
     g_object_unref (dialog->profile);
-  dialog->profile = g_object_ref (profile);
+    dialog->profile = NULL;
+  }
 
-  settings = ogmrip_profile_get_child (profile, "x264");
-  g_assert (settings != NULL);
-
-  g_settings_bind (settings, OGMRIP_X264_PROP_PROFILE,
-      dialog->profile_combo, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_X264_PROP_B_FRAMES,
-      dialog->bframes_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_X264_PROP_CABAC,
-      dialog->cabac_check, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_X264_PROP_CQM,
-      dialog->cqm_combo, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_X264_PROP_SUBQ,
-      dialog->subq_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_X264_PROP_GLOBAL_HEADER,
-      dialog->global_header_check, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_X264_PROP_WEIGHT_B,
-      dialog->weight_b_check, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_X264_PROP_PARTITIONS,
-      dialog->partitions_check, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_X264_PROP_WEIGHT_P,
-      dialog->weight_p_combo, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_X264_PROP_FRAMEREF,
-      dialog->frameref_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind_with_mapping (settings, OGMRIP_X264_PROP_ME,
-      dialog->me_combo, "active", G_SETTINGS_BIND_DEFAULT,
-      ogmrip_x264_get_me, ogmrip_x264_set_me, NULL, NULL);
-  g_settings_bind (settings, OGMRIP_X264_PROP_MERANGE,
-      dialog->merange_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_X264_PROP_8X8DCT,
-      dialog->dct8x8_check, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_X264_PROP_MIXED_REFS,
-      dialog->mixed_refs_check, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_X264_PROP_BRDO,
-      dialog->brdo_check, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_X264_PROP_VBV_MAXRATE,
-      dialog->vbv_maxrate_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_X264_PROP_VBV_BUFSIZE,
-      dialog->vbv_bufsize_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_X264_PROP_LEVEL_IDC,
-      dialog->level_idc_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_X264_PROP_DIRECT,
-      dialog->direct_combo, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_X264_PROP_B_ADAPT,
-      dialog->b_adapt_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_X264_PROP_KEYINT,
-      dialog->keyint_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_X264_PROP_PSY_RD,
-      dialog->psy_rd_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_X264_PROP_PSY_TRELLIS,
-      dialog->psy_trellis_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_X264_PROP_AUD,
-      dialog->aud_check, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_X264_PROP_RC_LOOKAHEAD,
-      dialog->rc_lookahead_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_X264_PROP_TRELLIS,
-      dialog->trellis_combo, "active", G_SETTINGS_BIND_DEFAULT);
-
-  if (x264_have_b_pyramid)
-    g_settings_bind (settings, OGMRIP_X264_PROP_B_PYRAMID,
-        dialog->b_pyramid_combo, "active", G_SETTINGS_BIND_DEFAULT);
-  else
-    g_settings_bind (settings, OGMRIP_X264_PROP_B_PYRAMID,
-        dialog->b_pyramid_check, "active", G_SETTINGS_BIND_DEFAULT);
-
-  g_object_unref (settings);
+  G_OBJECT_CLASS (ogmrip_x264_dialog_parent_class)->dispose (gobject);
 }
 
 static void
@@ -325,6 +349,7 @@ ogmrip_x264_dialog_class_init (OGMRipX264DialogClass *klass)
   GObjectClass *gobject_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->dispose = ogmrip_x264_dialog_dispose;
   gobject_class->get_property = ogmrip_x264_dialog_get_property;
   gobject_class->set_property = ogmrip_x264_dialog_set_property;
 
@@ -467,7 +492,7 @@ ogmrip_module_load (OGMRipModule *module)
   ogmrip_type_add_dynamic_extension (module,
       gtype, OGMRIP_TYPE_X264_DIALOG);
 
-  module = ogmrip_module_engine_get (engine, "ogmrip-x264" "." G_MODULE_SUFFIX);
+  module = ogmrip_module_engine_get (engine, "ogmrip-x264");
   if (!module)
     return;
 

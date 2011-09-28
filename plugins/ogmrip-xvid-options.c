@@ -97,7 +97,10 @@ static gboolean
 ogmrip_xvid_dialog_set_frame_drop_ratio_sensitivity (GBinding *binding,
     const GValue *source_value, GValue *target_value, gpointer data)
 {
-  g_value_set_boolean (target_value, g_value_get_int (source_value) == 0);
+  gint value;
+
+  value = g_value_get_double (source_value);
+  g_value_set_boolean (target_value, value == 0);
 
   return TRUE;
 }
@@ -117,77 +120,98 @@ G_DEFINE_DYNAMIC_TYPE_EXTENDED (OGMRipXvidDialog, ogmrip_xvid_dialog, GTK_TYPE_D
 static void
 ogmrip_xvid_dialog_set_profile (OGMRipXvidDialog *dialog, OGMRipProfile *profile)
 {
-  GSettings *settings;
+  if (dialog->profile)
+  {
+    g_object_unref (dialog->profile);
+    dialog->profile = NULL;
+  }
+
+  if (profile)
+  {
+    GSettings *settings;
+
+    dialog->profile = g_object_ref (profile);
+
+    settings = ogmrip_profile_get_child (profile, "xvid");
+    g_assert (settings != NULL);
+
+    g_settings_bind (settings, OGMRIP_XVID_PROP_BQUANT_OFFSET,
+        dialog->bquant_offset_spin, "value", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_BQUANT_RATIO,
+        dialog->bquant_ratio_spin, "value", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_BVHQ,
+        dialog->bvhq_check, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_CARTOON,
+        dialog->cartoon_check, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_CHROMA_ME,
+        dialog->chroma_me_check, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_CHROMA_OPT,
+        dialog->chroma_opt_check, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_CLOSED_GOP,
+        dialog->closed_gop_check, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_FRAME_DROP_RATIO,
+        dialog->frame_drop_ratio_spin, "value", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_GMC,
+        dialog->gmc_check, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_GRAYSCALE,
+        dialog->grayscale_check, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_INTERLACING,
+        dialog->interlacing_check, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_LUMI_MASK,
+        dialog->lumi_mask_check, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_MAX_BFRAMES,
+        dialog->max_bframes_spin, "value", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_MAX_BQUANT,
+        dialog->max_bquant_spin, "value", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_MAX_IQUANT,
+        dialog->max_iquant_spin, "value", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_MAX_KEYINT,
+        dialog->max_keyint_spin, "value", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_MAX_PQUANT,
+        dialog->max_pquant_spin, "value", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_ME_QUALITY,
+        dialog->me_quality_combo, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_MIN_BQUANT,
+        dialog->min_bquant_spin, "value", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_MIN_IQUANT,
+        dialog->min_iquant_spin, "value", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_MIN_PQUANT,
+        dialog->min_pquant_spin, "value", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_PACKED,
+        dialog->packed_check, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_PAR,
+        dialog->par_combo, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_PAR_HEIGHT,
+        dialog->par_height_spin, "value", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_PAR_WIDTH,
+        dialog->par_width_spin, "value", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_PROFILE,
+        dialog->profile_combo, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_QPEL,
+        dialog->qpel_check, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_QUANT_TYPE,
+        dialog->quant_type_combo, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_TRELLIS,
+        dialog->trellis_check, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_XVID_PROP_VHQ,
+        dialog->vhq_combo, "active", G_SETTINGS_BIND_DEFAULT);
+
+    g_object_unref (settings);
+  }
+}
+
+static void
+ogmrip_xvid_dialog_dispose (GObject *gobject)
+{
+  OGMRipXvidDialog *dialog = OGMRIP_XVID_DIALOG (gobject);
 
   if (dialog->profile)
+  {
     g_object_unref (dialog->profile);
-  dialog->profile = g_object_ref (profile);
+    dialog->profile = NULL;
+  }
 
-  settings = ogmrip_profile_get_child (profile, "xvid");
-  g_assert (settings != NULL);
-
-  g_settings_bind (settings, OGMRIP_XVID_PROP_BQUANT_OFFSET,
-      dialog->bquant_offset_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_BQUANT_RATIO,
-      dialog->bquant_ratio_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_BVHQ,
-      dialog->bvhq_check, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_CARTOON,
-      dialog->cartoon_check, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_CHROMA_ME,
-      dialog->chroma_me_check, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_CHROMA_OPT,
-      dialog->chroma_opt_check, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_CLOSED_GOP,
-      dialog->closed_gop_check, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_FRAME_DROP_RATIO,
-      dialog->frame_drop_ratio_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_GMC,
-      dialog->gmc_check, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_GRAYSCALE,
-      dialog->grayscale_check, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_INTERLACING,
-      dialog->interlacing_check, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_LUMI_MASK,
-      dialog->lumi_mask_check, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_MAX_BFRAMES,
-      dialog->max_bframes_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_MAX_BQUANT,
-      dialog->max_bquant_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_MAX_IQUANT,
-      dialog->max_iquant_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_MAX_KEYINT,
-      dialog->max_keyint_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_MAX_PQUANT,
-      dialog->max_pquant_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_ME_QUALITY,
-      dialog->me_quality_combo, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_MIN_BQUANT,
-      dialog->min_bquant_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_MIN_IQUANT,
-      dialog->min_iquant_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_MIN_PQUANT,
-      dialog->min_pquant_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_PACKED,
-      dialog->packed_check, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_PAR,
-      dialog->par_combo, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_PAR_HEIGHT,
-      dialog->par_height_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_PAR_WIDTH,
-      dialog->par_width_spin, "value", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_PROFILE,
-      dialog->profile_combo, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_QPEL,
-      dialog->qpel_check, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_QUANT_TYPE,
-      dialog->quant_type_combo, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_TRELLIS,
-      dialog->trellis_check, "active", G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_XVID_PROP_VHQ,
-      dialog->vhq_combo, "active", G_SETTINGS_BIND_DEFAULT);
-
-  g_object_unref (settings);
+  G_OBJECT_CLASS (ogmrip_xvid_dialog_parent_class)->dispose (gobject);
 }
 
 static void
@@ -224,6 +248,7 @@ ogmrip_xvid_dialog_class_init (OGMRipXvidDialogClass *klass)
   GObjectClass *gobject_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->dispose = ogmrip_xvid_dialog_dispose;
   gobject_class->get_property = ogmrip_xvid_dialog_get_property;
   gobject_class->set_property = ogmrip_xvid_dialog_set_property;
 
