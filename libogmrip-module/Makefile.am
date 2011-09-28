@@ -11,7 +11,7 @@ libogmrip_module_la_HEADERS = \
   ogmrip-module.h
 
 libogmrip_module_la_LDFLAGS = \
-  -version-info $(OGMRIP_PLUGIN_LT_VERSION)
+  -version-info $(OGMRIP_MODULE_LT_VERSION)
 
 libogmrip_module_la_LIBADD = \
   $(top_builddir)/libogmrip-media/libogmrip-media.la
