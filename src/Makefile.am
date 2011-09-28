@@ -2,6 +2,7 @@ bin_PROGRAMS = \
   ogmrip
 
 ogmrip_SOURCES = \
+  ogmrip-application.c    \
   ogmrip-crop-dialog.c    \
   ogmrip-helper.c         \
   ogmrip-main.c           \
@@ -10,6 +11,7 @@ ogmrip_SOURCES = \
   ogmrip-spell-dialog.c
 
 EXTRA_DIST = \
+  ogmrip-application.h    \
   ogmrip-crop-dialog.h    \
   ogmrip-helper.h         \
   ogmrip-options-dialog.h \

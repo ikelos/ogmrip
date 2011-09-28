@@ -28,6 +28,7 @@
 
 #include "ogmrip-helper.h"
 #include "ogmrip-settings.h"
+#include "ogmrip-application.h"
 #include "ogmrip-options-dialog.h"
 #include "ogmrip-pref-dialog.h"
 
@@ -269,35 +270,32 @@ ogmrip_main_dbus_uninhibit (OGMRipData *data, guint cookie)
 /*
  * Loads a media
  */
-static void
+static gboolean
 ogmrip_main_load (OGMRipData *data, const gchar *path)
 {
   GError *error = NULL;
   OGMRipMedia *disc;
+  gint nvid;
 
   disc = ogmdvd_disc_new (path, &error);
   if (!disc)
   {
-    ogmrip_run_error_dialog (GTK_WINDOW (data->window), error, ("Could not open the DVD"));
+    ogmrip_run_error_dialog (GTK_WINDOW (data->window), error, _("Could not open the DVD"));
     g_clear_error (&error);
+    return FALSE;
   }
-  else
-  {
-    const gchar *label = NULL;
-    gint nvid;
 
-    if (data->media)
-      g_object_unref (data->media);
-    data->media = disc;
+  if (data->media)
+    g_object_unref (data->media);
+  data->media = disc;
 
-    ogmrip_title_chooser_set_media (OGMRIP_TITLE_CHOOSER (data->title_chooser), disc);
+  ogmrip_title_chooser_set_media (OGMRIP_TITLE_CHOOSER (data->title_chooser), disc);
 
-    nvid = ogmrip_media_get_n_titles (disc);
-    if (nvid > 0)
-      label = ogmrip_media_get_label (disc);
+  nvid = ogmrip_media_get_n_titles (disc);
+  gtk_entry_set_text (GTK_ENTRY (data->title_entry),
+      nvid > 0 ? ogmrip_media_get_label (disc) : "");
 
-    gtk_entry_set_text (GTK_ENTRY (data->title_entry), label ? label : "");
-  }
+  return TRUE;
 }
 
 /*
@@ -1816,7 +1814,7 @@ ogmrip_main_connect_proxy (GtkUIManager *uimanager, GtkAction *action, GtkWidget
 }
 
 static OGMRipData *
-ogmrip_main_new (void)
+ogmrip_main_new (GApplication *app)
 {
   GtkActionEntry action_entries[] =
   {
@@ -1934,19 +1932,16 @@ ogmrip_main_new (void)
       G_CALLBACK (ogmrip_main_load_activated), data);
 
   widget = gtk_builder_get_widget (builder, "load-button");
-  g_signal_connect_swapped (widget, "clicked",
-      G_CALLBACK (ogmrip_main_load_activated), data);
+  gtk_activatable_set_related_action (GTK_ACTIVATABLE (widget), action);
 
   data->extract_action =  gtk_action_group_get_action (action_group, "Extract");
+  g_object_bind_property (app, "is-prepared",
+      data->extract_action, "sensitive", G_BINDING_SYNC_CREATE);
   g_signal_connect_swapped (data->extract_action, "activate",
       G_CALLBACK (ogmrip_main_extract_activated), data);
 
   widget = gtk_builder_get_widget (builder, "extract-button");
-  g_object_bind_property (data->extract_action, "sensitive",
-      widget, "sensitive", G_BINDING_SYNC_CREATE);
-
-  g_signal_connect_swapped (widget, "clicked",
-      G_CALLBACK (ogmrip_main_extract_activated), data);
+  gtk_activatable_set_related_action (GTK_ACTIVATABLE (widget), data->extract_action);
 
   widget = gtk_builder_get_widget (builder, "play-button");
   g_object_bind_property (data->extract_action, "sensitive",
@@ -2099,11 +2094,16 @@ ogmrip_startup_thread (GIOSchedulerJob *job, GCancellable *cancellable, GApplica
   ogmrip_profile_engine_add_path (profile_engine, path);
   g_free (path);
 
+  ogmrip_application_prepare (OGMRIP_APPLICATION (app));
+
   return FALSE;
 }
 
+/*
+ * When the application starts
+ */
 static void
-ogmrip_startup_cb (GApplication *app)
+ogmrip_application_startup_cb (GApplication *app)
 {
   gchar *path;
 
@@ -2131,77 +2131,47 @@ ogmrip_startup_cb (GApplication *app)
       app, NULL, G_PRIORITY_HIGH, NULL);
 }
 
-#ifdef G_ENABLE_DEBUG
-static gboolean debug = TRUE;
-#else
-static gboolean debug = FALSE;
-#endif
-
-static gchar *filename = NULL;
-
-static GOptionEntry opts[] =
-{
-  { "debug", 0,  0, G_OPTION_ARG_NONE, &debug, "Enable debug messages", NULL },
-  { NULL,    0,  0, 0,                 NULL,   NULL,                    NULL }
-};
-
-static gint
-ogmrip_command_line_cb (GApplication *app, GApplicationCommandLine *cmd)
-{
-  GError *error = NULL;
-  GOptionContext *context;
-  gboolean retval;
-  gchar **argv;
-  gint argc;
-
-  context = g_option_context_new ("[<PATH>]");
-  g_option_context_add_main_entries (context, opts, GETTEXT_PACKAGE);
-  g_option_context_add_group (context, gtk_get_option_group (TRUE));
-
-  argv = g_application_command_line_get_arguments (cmd, &argc);
-
-  retval = g_option_context_parse (context, &argc, &argv, &error);
-
-  if (retval && argc > 1 && g_file_test (argv[1], G_FILE_TEST_EXISTS))
-    filename = ogmrip_fs_get_full_path (argv[1]);
-
-  g_option_context_free (context);
-  g_strfreev (argv);
-
-  if (!retval)
-  {
-    g_print ("option parsing failed: %s\n", error->message);
-    g_error_free (error);
-
-    return EXIT_FAILURE;
-  }
-
-  if (debug)
-    ogmjob_log_set_print_stdout (TRUE);
-
-  g_application_activate (app);
-
-  return EXIT_SUCCESS;
-}
-
+/*
+ * When the application is activated
+ */
 static void
-ogmrip_activate_cb (GApplication *app)
+ogmrip_application_activate_cb (GApplication *app)
 {
   OGMRipData *data;
 
-  data = ogmrip_main_new ();
+  data = ogmrip_main_new (app);
+
   g_application_hold (app);
   g_signal_connect_swapped (data->window, "destroy",
       G_CALLBACK (g_application_release), app);
 
-  if (filename)
-  {
-    ogmrip_main_load (data, filename);
-    g_free (filename);
-    filename = NULL;
-  }
-
   gtk_window_present (GTK_WINDOW (data->window));
+}
+
+static void
+ogmrip_application_open_cb (GApplication *app, GFile **files, gint n_files, const gchar *hint)
+{
+  OGMRipData *data;
+  gchar *filename;
+  gint i;
+
+  for (i = 0; i < n_files; i ++)
+  {
+    data = ogmrip_main_new (app);
+
+    filename = g_file_get_path (files[i]);
+    if (!g_file_test (filename, G_FILE_TEST_EXISTS) ||
+        !ogmrip_main_load (data, filename))
+      gtk_widget_destroy (data->window);
+    else
+    {
+      g_application_hold (app);
+      g_signal_connect_swapped (data->window, "destroy",
+          G_CALLBACK (g_application_release), app);
+      gtk_window_present (GTK_WINDOW (data->window));
+    }
+    g_free (filename);
+  }
 }
 
 int
@@ -2220,14 +2190,13 @@ main (int argc, char *argv[])
 
   g_set_application_name (_("OGMRip"));
 
-  app = g_application_new ("org.gnome.ogmrip",
-      G_APPLICATION_HANDLES_COMMAND_LINE);
+  app = ogmrip_application_new ("org.gnome.ogmrip");
   g_signal_connect (G_OBJECT (app), "startup",
-      G_CALLBACK (ogmrip_startup_cb), NULL);
-  g_signal_connect (G_OBJECT (app), "command-line",
-      G_CALLBACK (ogmrip_command_line_cb), NULL);
+      G_CALLBACK (ogmrip_application_startup_cb), NULL);
   g_signal_connect (G_OBJECT (app), "activate",
-      G_CALLBACK (ogmrip_activate_cb), NULL);
+      G_CALLBACK (ogmrip_application_activate_cb), NULL);
+  g_signal_connect (G_OBJECT (app), "open",
+      G_CALLBACK (ogmrip_application_open_cb), NULL);
 
   status = g_application_run (app, argc, argv);
 
