@@ -459,6 +459,7 @@ data/ogmrip-file.pc
 data/ogmrip-file-gtk.pc
 data/ogmrip-dvd.pc
 data/ogmrip-dvd-gtk.pc
+data/ogmrip-module.pc
 data/ogmrip-encode.pc
 data/ogmrip-encode-gtk.pc
 po/Makefile.in
