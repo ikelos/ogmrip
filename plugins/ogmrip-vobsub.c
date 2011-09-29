@@ -53,11 +53,12 @@ static gint ogmrip_vobsub_run      (OGMJobSpawn *spawn);
 static void ogmrip_vobsub_finalize (GObject     *gobject);
 
 static gchar **
-ogmrip_vobsub_command (OGMRipSubpCodec *subp, const gchar *input, const gchar *output)
+ogmrip_vobsub_command (OGMRipSubpCodec *subp)
 {
   GPtrArray *argv;
 
-  argv = ogmrip_mencoder_vobsub_command (subp, output);
+  argv = ogmrip_mencoder_vobsub_command (subp,
+      ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (subp))));
 
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
@@ -221,7 +222,7 @@ ogmrip_vobsub_run (OGMJobSpawn *spawn)
   gchar **argv;
   gint result;
 
-  argv = ogmrip_vobsub_command (OGMRIP_SUBP_CODEC (spawn), NULL, NULL);
+  argv = ogmrip_vobsub_command (OGMRIP_SUBP_CODEC (spawn));
   if (!argv)
     return OGMJOB_RESULT_ERROR;
 
