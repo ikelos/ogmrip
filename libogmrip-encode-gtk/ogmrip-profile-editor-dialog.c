@@ -59,19 +59,6 @@ static void ogmrip_profile_editor_dialog_set_property (GObject               *go
                                                        GParamSpec            *pspec);
 static void ogmrip_profile_editor_dialog_dispose      (GObject               *gobject);
 
-static guint
-g_settings_get_uint (GSettings *settings, const gchar *key)
-{
-  guint val;
-
-  g_return_val_if_fail (G_IS_SETTINGS (settings), 0);
-  g_return_val_if_fail (key != NULL, 0);
-
-  g_settings_get (settings, key, "u", &val);
-
-  return val;
-}
-
 static GtkTreeRowReference *
 gtk_tree_model_get_row_reference (GtkTreeModel *model, GtkTreeIter *iter)
 {

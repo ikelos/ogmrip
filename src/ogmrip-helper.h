@@ -30,10 +30,8 @@ G_BEGIN_DECLS
 #define gtk_builder_get_widget(builder, name) \
     (GtkWidget *) gtk_builder_get_object ((builder), (name))
 
-guint    g_settings_get_uint     (GSettings    *settings,
-                                  const gchar  *key);
-gboolean ogmrip_open_title       (GtkWindow    *parent,
-                                  OGMRipTitle  *title);
+gboolean ogmrip_open_title (GtkWindow   *parent,
+                            OGMRipTitle *title);
 
 G_END_DECLS
 

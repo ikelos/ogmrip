@@ -40,19 +40,6 @@
 extern const gchar *ogmdvd_languages[][3];
 extern const guint  ogmdvd_nlanguages;
 
-guint
-g_settings_get_uint (GSettings *settings, const gchar *key)
-{
-  guint val;
-
-  g_return_val_if_fail (G_IS_SETTINGS (settings), 0);
-  g_return_val_if_fail (key != NULL, 0);
-
-  g_settings_get (settings, key, "u", &val);
-
-  return val;
-}
-
 static void
 gtk_dialog_response_accept (GtkDialog *dialog)
 {
