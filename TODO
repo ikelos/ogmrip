@@ -1,11 +1,6 @@
-ogmrip-main.c
-- vérifier que la destination n'existe pas déjà
-
 ogmrip-encoding.c
+- vérifier que la destination n'existe pas déjà
 - vérifier que la destination est accessible en écriture
-
-ogmrip-options-dialog.c
-- test de compressibilité
 
 ogmrip-encoding-manager.c
 - comment connaitre les encodages non faits ?
