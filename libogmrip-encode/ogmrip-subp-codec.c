@@ -305,7 +305,7 @@ ogmrip_subp_codec_set_label (OGMRipSubpCodec *subp, const gchar *label)
  *
  * Returns: the track name
  */
-G_CONST_RETURN gchar *
+const gchar *
 ogmrip_subp_codec_get_label (OGMRipSubpCodec *subp)
 {
   g_return_val_if_fail (OGMRIP_IS_SUBP_CODEC (subp), NULL);
