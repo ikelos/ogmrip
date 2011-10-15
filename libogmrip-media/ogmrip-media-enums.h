@@ -240,20 +240,8 @@ typedef enum
   OGMRIP_FORMAT_DTS,
   OGMRIP_FORMAT_AAC,
   OGMRIP_FORMAT_VORBIS,
-  OGMRIP_FORMAT_MICRODVD,
-  OGMRIP_FORMAT_SUBRIP,
   OGMRIP_FORMAT_SRT,
-  OGMRIP_FORMAT_SAMI,
-  OGMRIP_FORMAT_VPLAYER,
-  OGMRIP_FORMAT_RT,
   OGMRIP_FORMAT_SSA,
-  OGMRIP_FORMAT_PJS,
-  OGMRIP_FORMAT_MPSUB,
-  OGMRIP_FORMAT_AQT,
-  OGMRIP_FORMAT_SRT_2_0,
-  OGMRIP_FORMAT_SUBRIP_0_9,
-  OGMRIP_FORMAT_JACOSUB,
-  OGMRIP_FORMAT_MPL_2,
   OGMRIP_FORMAT_VOBSUB,
   OGMRIP_FORMAT_COPY,
   OGMRIP_FORMAT_MP2,
@@ -261,6 +249,7 @@ typedef enum
   OGMRIP_FORMAT_FLAC,
   OGMRIP_FORMAT_VP8,
   OGMRIP_FORMAT_CHAPTERS,
+  OGMRIP_FORMAT_PGS,
   OGMRIP_FORMAT_LAST
 } OGMRipFormat;
 
@@ -282,20 +271,9 @@ typedef enum
                                            (format) == OGMRIP_FORMAT_VORBIS || \
                                            (format) == OGMRIP_FORMAT_FLAC)
 
-#define OGMRIP_IS_SUBP_FORMAT(format)     ((format) == OGMRIP_FORMAT_MICRODVD   || \
-                                           (format) == OGMRIP_FORMAT_SUBRIP     || \
-                                           (format) == OGMRIP_FORMAT_SRT        || \
-                                           (format) == OGMRIP_FORMAT_SAMI       || \
-                                           (format) == OGMRIP_FORMAT_VPLAYER    || \
-                                           (format) == OGMRIP_FORMAT_RT         || \
-                                           (format) == OGMRIP_FORMAT_SSA        || \
-                                           (format) == OGMRIP_FORMAT_PJS        || \
-                                           (format) == OGMRIP_FORMAT_MPSUB      || \
-                                           (format) == OGMRIP_FORMAT_AQT        || \
-                                           (format) == OGMRIP_FORMAT_SRT_2_0    || \
-                                           (format) == OGMRIP_FORMAT_SUBRIP_0_9 || \
-                                           (format) == OGMRIP_FORMAT_JACOSUB    || \
-                                           (format) == OGMRIP_FORMAT_MPL_2      || \
+#define OGMRIP_IS_SUBP_FORMAT(format)     ((format) == OGMRIP_FORMAT_SRT || \
+                                           (format) == OGMRIP_FORMAT_SSA || \
+                                           (format) == OGMRIP_FORMAT_PGS || \
                                            (format) == OGMRIP_FORMAT_VOBSUB)
 
 #define OGMRIP_IS_CHAPTERS_FORMAT(format) ((format) == OGMRIP_FORMAT_CHAPTERS)
