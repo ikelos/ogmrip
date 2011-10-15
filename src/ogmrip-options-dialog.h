@@ -55,6 +55,9 @@ struct _OGMRipOptionsDialogClass
 GType       ogmrip_options_dialog_get_type         (void);
 
 GtkWidget * ogmrip_options_dialog_new              (OGMRipEncoding      *encoding);
+GtkWidget * ogmrip_options_dialog_new_at_scale     (OGMRipEncoding      *encoding,
+                                                    guint               width,
+                                                    guint               height);
 void        ogmrip_options_dialog_get_scale_size   (OGMRipOptionsDialog *dialog,
                                                     guint               *width,
                                                     guint               *height);

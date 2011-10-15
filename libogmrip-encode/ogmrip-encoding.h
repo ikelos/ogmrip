@@ -97,6 +97,7 @@ OGMRipEncoding *   ogmrip_encoding_new_from_file       (GFile                *fi
 gboolean           ogmrip_encoding_export              (OGMRipEncoding       *encoding,
                                                         GFile                *file,
                                                         GError               **error);
+void               ogmrip_encoding_clear               (OGMRipEncoding       *encoding);
 OGMRipCodec *      ogmrip_encoding_get_video_codec     (OGMRipEncoding       *encoding);
 void               ogmrip_encoding_set_video_codec     (OGMRipEncoding       *encoding,
                                                         OGMRipVideoCodec     *codec);
@@ -154,6 +155,8 @@ void               ogmrip_encoding_autoscale           (OGMRipEncoding       *en
                                                         gdouble              bpp,
                                                         guint                *width,
                                                         guint                *height);
+gint               ogmrip_encoding_test                (OGMRipEncoding       *encoding,
+                                                        GError               **error);
 gint               ogmrip_encoding_encode              (OGMRipEncoding       *encoding,
                                                         GError               **error);
 void               ogmrip_encoding_cancel              (OGMRipEncoding       *encoding);

@@ -448,6 +448,6 @@ ogmrip_test_run (OGMJobSpawn *spawn)
 OGMJobSpawn *
 ogmrip_test_new (OGMRipEncoding *encoding)
 {
-  return g_object_new (OGMRIP_TYPE_TEST, NULL);
+  return g_object_new (OGMRIP_TYPE_TEST, "encoding", encoding, NULL);
 }
 

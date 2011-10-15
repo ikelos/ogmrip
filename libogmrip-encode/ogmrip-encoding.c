@@ -267,44 +267,7 @@ ogmrip_encoding_dispose (GObject *gobject)
 {
   OGMRipEncoding *encoding = OGMRIP_ENCODING (gobject);
 
-  if (encoding->priv->container)
-  {
-    g_object_unref (encoding->priv->container);
-    encoding->priv->container = NULL;
-  }
-
-  if (encoding->priv->profile)
-  {
-    g_object_unref (encoding->priv->profile);
-    encoding->priv->profile = NULL;
-  }
-
-  if (encoding->priv->video_codec)
-  {
-    g_object_unref (encoding->priv->video_codec);
-    encoding->priv->video_codec = NULL;
-  }
-
-  if (encoding->priv->audio_codecs)
-  {
-    g_list_foreach (encoding->priv->audio_codecs, (GFunc) g_object_unref, NULL);
-    g_list_free (encoding->priv->audio_codecs);
-    encoding->priv->audio_codecs = NULL;
-  }
-
-  if (encoding->priv->subp_codecs)
-  {
-    g_list_foreach (encoding->priv->subp_codecs, (GFunc) g_object_unref, NULL);
-    g_list_free (encoding->priv->subp_codecs);
-    encoding->priv->subp_codecs = NULL;
-  }
-
-  if (encoding->priv->chapters)
-  {
-    g_list_foreach (encoding->priv->chapters, (GFunc) g_object_unref, NULL);
-    g_list_free (encoding->priv->chapters);
-    encoding->priv->chapters = NULL;
-  }
+  ogmrip_encoding_clear (encoding);
 
   if (encoding->priv->title)
   {
@@ -568,6 +531,51 @@ ogmrip_encoding_new_from_file (GFile *file, GError **error)
   ogmrip_xml_free (xml);
 
   return encoding;
+}
+
+void
+ogmrip_encoding_clear (OGMRipEncoding *encoding)
+{
+  g_return_if_fail (OGMRIP_IS_ENCODING (encoding));
+
+  if (encoding->priv->container)
+  {
+    g_object_unref (encoding->priv->container);
+    encoding->priv->container = NULL;
+  }
+
+  if (encoding->priv->video_codec)
+  {
+    g_object_unref (encoding->priv->video_codec);
+    encoding->priv->video_codec = NULL;
+  }
+
+  if (encoding->priv->audio_codecs)
+  {
+    g_list_foreach (encoding->priv->audio_codecs, (GFunc) g_object_unref, NULL);
+    g_list_free (encoding->priv->audio_codecs);
+    encoding->priv->audio_codecs = NULL;
+  }
+
+  if (encoding->priv->subp_codecs)
+  {
+    g_list_foreach (encoding->priv->subp_codecs, (GFunc) g_object_unref, NULL);
+    g_list_free (encoding->priv->subp_codecs);
+    encoding->priv->subp_codecs = NULL;
+  }
+
+  if (encoding->priv->chapters)
+  {
+    g_list_foreach (encoding->priv->chapters, (GFunc) g_object_unref, NULL);
+    g_list_free (encoding->priv->chapters);
+    encoding->priv->chapters = NULL;
+  }
+
+  if (encoding->priv->profile)
+  {
+    g_object_unref (encoding->priv->profile);
+    encoding->priv->profile = NULL;
+  }
 }
 
 gboolean
@@ -1249,7 +1257,7 @@ ogmrip_encoding_check_space (OGMRipEncoding *encoding, guint64 output_size, guin
     retval = output_size + tmp_size < output_space;
     if (!retval)
     {
-      str = g_format_size_for_display (output_size + tmp_size);
+      str = g_format_size (output_size + tmp_size);
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_NO_SPACE,
           _("Not enough space to store output and temporary files (%s needed)."), str);
       g_free (str);
@@ -1260,7 +1268,7 @@ ogmrip_encoding_check_space (OGMRipEncoding *encoding, guint64 output_size, guin
     retval = output_size < output_space;
     if (!retval)
     {
-      str = g_format_size_for_display (output_size);
+      str = g_format_size (output_size);
       g_set_error (error, G_IO_ERROR, G_IO_ERROR_NO_SPACE,
           _("Not enough space to store the output file (%s needed)."), str);
       g_free (str);
@@ -1270,7 +1278,7 @@ ogmrip_encoding_check_space (OGMRipEncoding *encoding, guint64 output_size, guin
       retval = tmp_size < tmp_space;
       if (!retval)
       {
-        str = g_format_size_for_display (output_size);
+        str = g_format_size (output_size);
         g_set_error (error, G_IO_ERROR, G_IO_ERROR_NO_SPACE,
             _("Not enough space to store the temporary files (%s needed)."), str);
         g_free (str);
@@ -1350,7 +1358,7 @@ ogmrip_encoding_analyze (OGMRipEncoding *encoding, GError **error)
   return result;
 }
 
-static gint
+gint
 ogmrip_encoding_test (OGMRipEncoding *encoding, GError **error)
 {
   OGMJobSpawn *spawn;

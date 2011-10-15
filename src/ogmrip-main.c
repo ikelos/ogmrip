@@ -570,6 +570,71 @@ ogmrip_main_encode (OGMRipData *data, OGMRipEncoding *encoding)
 }
 
 /*
+ * Tests an encoding
+ */
+static void
+ogmrip_main_test (OGMRipData *data, OGMRipEncoding *encoding, guint *width, guint *height)
+{
+  if (ogmrip_open_title (GTK_WINDOW (data->window), ogmrip_encoding_get_title (encoding)))
+  {
+    GError *error = NULL;
+    GtkWidget *dialog;
+    gint result, cookie;
+
+    cookie = ogmrip_main_dbus_inhibit (data);
+
+    dialog = ogmrip_progress_dialog_new (GTK_WINDOW (data->window),
+        GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT, TRUE);
+    ogmrip_progress_dialog_set_title (OGMRIP_PROGRESS_DIALOG (dialog),
+        ogmrip_container_get_label (ogmrip_encoding_get_container (encoding)));
+
+    g_signal_connect (dialog, "response",
+        G_CALLBACK (ogmrip_main_progress_dialog_response), encoding);
+    g_signal_connect (dialog, "delete-event",
+        G_CALLBACK (gtk_true), NULL);
+
+    gtk_window_present (GTK_WINDOW (dialog));
+
+    g_signal_connect (encoding, "run",
+        G_CALLBACK (ogmrip_main_encoding_spawn_run), dialog);
+    g_signal_connect (encoding, "progress",
+        G_CALLBACK (ogmrip_main_encoding_spawn_progress), dialog);
+
+    result = ogmrip_encoding_test (encoding, &error);
+
+    g_signal_handlers_disconnect_by_func (encoding,
+        ogmrip_main_encoding_spawn_run, dialog);
+    g_signal_handlers_disconnect_by_func (encoding,
+        ogmrip_main_encoding_spawn_progress, dialog);
+
+    gtk_widget_destroy (dialog);
+
+    if (cookie >= 0)
+      ogmrip_main_dbus_uninhibit (data, cookie);
+
+    ogmrip_title_close (ogmrip_encoding_get_title (encoding));
+
+    if (result == OGMJOB_RESULT_SUCCESS)
+    {
+      OGMRipCodec *codec;
+
+      codec = ogmrip_encoding_get_video_codec (encoding);
+      ogmrip_video_codec_get_scale_size (OGMRIP_VIDEO_CODEC (codec), width, height);
+    }
+
+    if (result == OGMJOB_RESULT_ERROR || error != NULL)
+    {
+      ogmrip_main_display_error (data, encoding, error);
+      g_clear_error (&error);
+    }
+
+    ogmrip_main_clean (data, encoding, result == OGMJOB_RESULT_ERROR);
+  }
+
+  ogmrip_encoding_clear (encoding);
+}
+
+/*
  * Imports a simple chapter file
  */
 static gboolean
@@ -1224,16 +1289,12 @@ ogmrip_main_load_activated (OGMRipData *data)
   gtk_widget_destroy (dialog);
 }
 
-/*
- * When the extract button is activated
- */
 static void
-ogmrip_main_extract_activated (OGMRipData *data)
+ogmrip_main_run_options_dialog (OGMRipData *data, OGMRipEncoding *encoding, guint width, guint height)
 {
   GtkWidget *dialog;
   OGMRipTitle *title;
 
-  OGMRipEncoding *encoding;
   OGMRipProfile *profile;
   OGMRipContainer *container;
   OGMRipCodec *vcodec, *codec;
@@ -1246,17 +1307,23 @@ ogmrip_main_extract_activated (OGMRipData *data)
 
   title = ogmrip_title_chooser_get_active (OGMRIP_TITLE_CHOOSER (data->title_chooser));
 
-  encoding = ogmrip_encoding_new (title);
-  ogmrip_encoding_set_relative (encoding,
-      gtk_widget_is_sensitive (data->relative_check) &
-      gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (data->relative_check)));
+  if (encoding)
+    dialog = ogmrip_options_dialog_new_at_scale (encoding, width, height);
+  else
+  {
+    encoding = ogmrip_encoding_new (title);
+    ogmrip_encoding_set_relative (encoding,
+        gtk_widget_is_sensitive (data->relative_check) &
+        gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (data->relative_check)));
 
-  dialog = ogmrip_options_dialog_new (encoding);
+    dialog = ogmrip_options_dialog_new (encoding);
+  }
+
   gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (data->window));
   gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
 
   response = gtk_dialog_run (GTK_DIALOG (dialog));
-  if (response != OGMRIP_RESPONSE_EXTRACT && response != OGMRIP_RESPONSE_ENQUEUE)
+  if (response != OGMRIP_RESPONSE_EXTRACT && response != OGMRIP_RESPONSE_ENQUEUE && response != OGMRIP_RESPONSE_TEST)
   {
     gtk_widget_destroy (dialog);
     g_object_unref (encoding);
@@ -1397,6 +1464,22 @@ ogmrip_main_extract_activated (OGMRipData *data)
     ogmrip_encoding_manager_add (data->manager, encoding);
     g_object_unref (encoding);
   }
+  else if (response == OGMRIP_RESPONSE_TEST)
+  {
+    guint width, height;
+
+    ogmrip_main_test (data, encoding, &width, &height);
+    ogmrip_main_run_options_dialog (data, encoding, width, height);
+  }
+}
+
+/*
+ * When the extract button is activated
+ */
+static void
+ogmrip_main_extract_activated (OGMRipData *data)
+{
+  ogmrip_main_run_options_dialog (data, NULL, 0, 0);
 }
 
 /*
