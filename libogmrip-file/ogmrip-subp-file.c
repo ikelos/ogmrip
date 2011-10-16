@@ -27,6 +27,21 @@ static GObject * ogmrip_subp_file_constructor  (GType type,
                                                 guint n_properties,
                                                 GObjectConstructParam *properties);
 
+static gint
+ogmrip_media_info_get_subp_format (OGMRipMediaInfo *info)
+{
+  const gchar *str;
+
+  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_TEXT, 0, "Format");
+  if (!str)
+    return OGMRIP_FORMAT_UNDEFINED;
+
+  if (g_str_equal (str, "SubRip"))
+    return OGMRIP_FORMAT_SRT;
+
+  return OGMRIP_FORMAT_UNDEFINED;
+}
+
 G_DEFINE_TYPE_WITH_CODE (OGMRipSubpFile, ogmrip_subp_file, OGMRIP_TYPE_FILE,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_SUBP_STREAM, ogmrip_subp_iface_init));
 
@@ -69,6 +84,14 @@ ogmrip_subp_file_constructor (GType type, guint n_properties, GObjectConstructPa
 
     str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "TextCount");
     if (!str || !g_str_equal (str, "1"))
+    {
+      g_object_unref (info);
+      g_object_unref (gobject);
+      return NULL;
+    }
+
+    OGMRIP_FILE (gobject)->priv->format = ogmrip_media_info_get_subp_format (info);
+    if (OGMRIP_FILE (gobject)->priv->format < 0)
     {
       g_object_unref (info);
       g_object_unref (gobject);
