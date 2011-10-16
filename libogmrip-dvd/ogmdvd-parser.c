@@ -460,10 +460,12 @@ ogmdvd_parser_analyze (OGMDvdParser *parser, guchar *buffer)
       {
         if (parser->progressive_frames < 6)
         {
+          ogmdvd_parser_mpeg2 (parser, buffer, len);
+          /*
           gint flags;
 
           flags = ogmdvd_parser_mpeg2 (parser, buffer, len);
-          /*
+
           if (parser->height == 480 && (flags & PIC_FLAG_PROGRESSIVE_FRAME))
             parser->progressive_frames ++;
           */
