@@ -57,6 +57,7 @@ enum
   PROP_LANGUAGE
 };
 
+static void ogmrip_audio_codec_constructed  (GObject      *gobject);
 static void ogmrip_audio_codec_finalize     (GObject      *gobject);
 static void ogmrip_audio_codec_set_property (GObject      *gobject,
                                              guint        property_id,
@@ -76,6 +77,7 @@ ogmrip_audio_codec_class_init (OGMRipAudioCodecClass *klass)
 
   gobject_class = G_OBJECT_CLASS (klass);
 
+  gobject_class->constructed = ogmrip_audio_codec_constructed;
   gobject_class->finalize = ogmrip_audio_codec_finalize;
   gobject_class->set_property = ogmrip_audio_codec_set_property;
   gobject_class->get_property = ogmrip_audio_codec_get_property;
@@ -120,6 +122,18 @@ ogmrip_audio_codec_init (OGMRipAudioCodec *audio)
 
   audio->priv->srate = 48000;
   audio->priv->quality = 3;
+}
+
+static void
+ogmrip_audio_codec_constructed (GObject *gobject)
+{
+  OGMRipStream *stream;
+
+  stream = ogmrip_codec_get_input (OGMRIP_CODEC (gobject));
+  if (!OGMRIP_IS_AUDIO_STREAM (stream))
+    g_error ("No audio stream specified");
+
+  G_OBJECT_CLASS (ogmrip_audio_codec_parent_class)->constructed (gobject);
 }
 
 static void

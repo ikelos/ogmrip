@@ -49,6 +49,7 @@ enum
   PROP_ENCODING
 };
 
+static void ogmrip_test_constructed  (GObject      *gobject);
 static void ogmrip_test_dispose      (GObject      *gobject);
 static void ogmrip_test_get_property (GObject      *gobject,
                                       guint        property_id,
@@ -69,6 +70,7 @@ ogmrip_test_class_init (OGMRipTestClass *klass)
   OGMJobSpawnClass *spawn_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->constructed = ogmrip_test_constructed;
   gobject_class->dispose = ogmrip_test_dispose;
   gobject_class->get_property = ogmrip_test_get_property;
   gobject_class->set_property = ogmrip_test_set_property;
@@ -87,6 +89,15 @@ static void
 ogmrip_test_init (OGMRipTest *test)
 {
   test->priv = OGMRIP_TEST_GET_PRIVATE (test);
+}
+
+static void
+ogmrip_test_constructed (GObject *gobject)
+{
+  if (!OGMRIP_TEST (gobject)->priv->encoding)
+    g_error ("No encoding specified");
+
+  G_OBJECT_CLASS (ogmrip_test_parent_class)->constructed (gobject);
 }
 
 static void

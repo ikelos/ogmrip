@@ -49,6 +49,7 @@ enum
   PROP_LANGUAGE
 };
 
+static void ogmrip_subp_codec_constructed  (GObject      *gobject);
 static void ogmrip_subp_codec_finalize     (GObject      *gobject);
 static void ogmrip_subp_codec_set_property (GObject      *gobject,
                                             guint        property_id,
@@ -68,6 +69,7 @@ ogmrip_subp_codec_class_init (OGMRipSubpCodecClass *klass)
 
   gobject_class = G_OBJECT_CLASS (klass);
 
+  gobject_class->constructed = ogmrip_subp_codec_constructed;
   gobject_class->finalize = ogmrip_subp_codec_finalize;
   gobject_class->set_property = ogmrip_subp_codec_set_property;
   gobject_class->get_property = ogmrip_subp_codec_get_property;
@@ -101,6 +103,18 @@ static void
 ogmrip_subp_codec_init (OGMRipSubpCodec *subp)
 {
   subp->priv = OGMRIP_SUBP_GET_PRIVATE (subp);
+}
+
+static void
+ogmrip_subp_codec_constructed (GObject *gobject)
+{
+  OGMRipStream *stream;
+
+  stream = ogmrip_codec_get_input (OGMRIP_CODEC (gobject));
+  if (!OGMRIP_IS_SUBP_STREAM (stream))
+    g_error ("No subp stream specified");
+
+  G_OBJECT_CLASS (ogmrip_subp_codec_parent_class)->constructed (gobject);
 }
 
 static void

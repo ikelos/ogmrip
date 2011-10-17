@@ -105,6 +105,7 @@ enum
   PROP_SCALE_HEIGHT
 };
 
+static void ogmrip_video_codec_constructed  (GObject      *gobject);
 static void ogmrip_video_codec_dispose      (GObject      *gobject);
 static void ogmrip_video_codec_set_property (GObject      *gobject,
                                              guint        property_id,
@@ -123,6 +124,7 @@ ogmrip_video_codec_class_init (OGMRipVideoCodecClass *klass)
   GObjectClass *gobject_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->constructed = ogmrip_video_codec_constructed;
   gobject_class->dispose = ogmrip_video_codec_dispose;
   gobject_class->set_property = ogmrip_video_codec_set_property;
   gobject_class->get_property = ogmrip_video_codec_get_property;
@@ -251,6 +253,18 @@ ogmrip_video_codec_init (OGMRipVideoCodec *video)
   video->priv->bpp = 0.25;
   video->priv->passes = 1;
   video->priv->can_crop = TRUE;
+}
+
+static void
+ogmrip_video_codec_constructed (GObject *gobject)
+{
+  OGMRipStream *stream;
+
+  stream = ogmrip_codec_get_input (OGMRIP_CODEC (gobject));
+  if (!OGMRIP_IS_VIDEO_STREAM (stream))
+    g_error ("No video stream specified");
+
+  G_OBJECT_CLASS (ogmrip_video_codec_parent_class)->constructed (gobject);
 }
 
 static void

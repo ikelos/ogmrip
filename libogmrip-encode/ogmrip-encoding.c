@@ -250,6 +250,9 @@ ogmrip_encoding_constructed (GObject *gobject)
 {
   OGMRipEncoding *encoding = OGMRIP_ENCODING (gobject);
 
+  if (!encoding->priv->title)
+    g_error ("No title specified");
+
   if (!encoding->priv->container)
   {
     GType *types;

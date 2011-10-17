@@ -94,6 +94,9 @@ ogmrip_copy_constructed (GObject *gobject)
 {
   OGMRipCopy *copy = OGMRIP_COPY (gobject);
 
+  if (!copy->priv->media)
+    g_error ("No media specified");
+
   if (!copy->priv->path)
     copy->priv->path = g_strdup ("/dev/null");
 

@@ -143,6 +143,9 @@ ogmrip_codec_constructed (GObject *gobject)
   OGMRipCodec *codec = OGMRIP_CODEC (gobject);
   gchar *filename, *uri;
 
+  if (!codec->priv->input)
+    g_error ("No input stream specified");
+
   filename = ogmrip_fs_mktemp ("ogmrip.XXXXXX", NULL);
   uri = g_filename_to_uri (filename, NULL, NULL);
   g_free (filename);

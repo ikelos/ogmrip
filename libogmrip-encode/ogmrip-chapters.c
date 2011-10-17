@@ -91,6 +91,9 @@ ogmrip_chapters_constructed (GObject *gobject)
 
   stream = ogmrip_codec_get_input (OGMRIP_CODEC (chapters));
 
+  if (!OGMRIP_IS_VIDEO_STREAM (stream))
+    g_error ("No video stream specified"); 
+
   chapters->priv->nchapters = ogmrip_title_get_n_chapters (ogmrip_stream_get_title (stream));
   if (chapters->priv->nchapters > 0)
     chapters->priv->labels = g_new0 (gchar *, chapters->priv->nchapters + 1);

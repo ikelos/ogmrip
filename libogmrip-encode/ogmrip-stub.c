@@ -291,6 +291,9 @@ ogmrip_video_stub_constructed (GObject *gobject)
 {
   OGMRipStub *stub = OGMRIP_STUB (gobject);
 
+  if (!stub->priv->codec)
+    g_error ("No video codec specified");
+
   stub->priv->format = ogmrip_codec_format (G_OBJECT_TYPE (stub->priv->codec));
 
   G_OBJECT_CLASS (ogmrip_video_stub_parent_class)->constructed (gobject);
@@ -363,6 +366,9 @@ ogmrip_audio_stub_constructed (GObject *gobject)
 {
   OGMRipStub *stub = OGMRIP_STUB (gobject);
 
+  if (!stub->priv->codec)
+    g_error ("No audio codec specified");
+
   stub->priv->format = ogmrip_codec_format (G_OBJECT_TYPE (stub->priv->codec));
 
   G_OBJECT_CLASS (ogmrip_audio_stub_parent_class)->constructed (gobject);
@@ -434,6 +440,9 @@ static void
 ogmrip_subp_stub_constructed (GObject *gobject)
 {
   OGMRipStub *stub = OGMRIP_STUB (gobject);
+
+  if (!stub->priv->codec)
+    g_error ("No subp codec specified");
 
   stub->priv->format = ogmrip_codec_format(G_OBJECT_TYPE (stub->priv->codec));
 
