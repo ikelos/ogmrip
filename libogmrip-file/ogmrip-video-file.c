@@ -20,7 +20,6 @@
 #include "ogmrip-media-info.h"
 #include "ogmrip-file-priv.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 
 static void ogmrip_video_iface_init  (OGMRipVideoStreamInterface *iface);
@@ -28,57 +27,7 @@ static GObject * ogmrip_video_file_constructor  (GType type,
                                                  guint n_properties,
                                                  GObjectConstructParam *properties);
 
-static gint
-ogmrip_media_info_get_video_format (OGMRipMediaInfo *info)
-{
-  const gchar *str;
-
-  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "Format");
-  if (!str)
-    return OGMRIP_FORMAT_UNDEFINED;
-
-  if (g_str_equal (str, "MPEG Video"))
-  {
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "Format_Version");
-
-    if (str && g_str_equal (str, "Version 1"))
-      return OGMRIP_FORMAT_MPEG1;
-
-    if (str && g_str_equal (str, "Version 2"))
-      return OGMRIP_FORMAT_MPEG2;
-
-    return OGMRIP_FORMAT_UNDEFINED;
-  }
-
-  if (g_str_equal (str, "JPEG"))
-  {
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "CodecID");
-
-    if (str && g_str_equal (str, "MJPG"))
-      return OGMRIP_FORMAT_MJPEG;
-
-    return OGMRIP_FORMAT_UNDEFINED;
-  }
-
-  if (g_str_equal (str, "MPEG-4 Visual"))
-    return OGMRIP_FORMAT_MPEG4;
-
-  if (g_str_equal (str, "AVC"))
-    return OGMRIP_FORMAT_H264;
-
-  if (g_str_equal (str, "Dirac"))
-    return OGMRIP_FORMAT_DIRAC;
-
-  if (g_str_equal (str, "Theora"))
-    return OGMRIP_FORMAT_THEORA;
-
-  if (g_str_equal (str, "VP8"))
-    return OGMRIP_FORMAT_VP8;
-
-  return OGMRIP_FORMAT_UNDEFINED;
-}
-
-G_DEFINE_TYPE_WITH_CODE (OGMRipVideoFile, ogmrip_video_file, G_TYPE_OBJECT,
+G_DEFINE_TYPE_WITH_CODE (OGMRipVideoFile, ogmrip_video_file, OGMRIP_TYPE_VIDEO_FILE,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_VIDEO_STREAM, ogmrip_video_iface_init));
 
 static void
@@ -118,10 +67,8 @@ ogmrip_video_file_constructor (GType type, guint n_properties, GObjectConstructP
     return NULL;
   }
 
-  if (g_file_test (OGMRIP_FILE (gobject)->priv->path, G_FILE_TEST_EXISTS) &&
-      ogmrip_media_info_open (info, OGMRIP_FILE (gobject)->priv->path))
+  if (ogmrip_media_info_open (info, OGMRIP_FILE (gobject)->priv->path))
   {
-    OGMRipVideoFile *video = OGMRIP_VIDEO_FILE (gobject);
     const gchar *str;
 
     str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "VideoCount");
@@ -132,7 +79,7 @@ ogmrip_video_file_constructor (GType type, guint n_properties, GObjectConstructP
       return NULL;
     }
 
-    OGMRIP_FILE (gobject)->priv->format = ogmrip_media_info_get_video_format (info);
+    OGMRIP_FILE (gobject)->priv->format = ogmrip_media_info_get_video_format (info, 0);
     if (OGMRIP_FILE (gobject)->priv->format < 0)
     {
       g_object_unref (info);
@@ -140,75 +87,10 @@ ogmrip_video_file_constructor (GType type, guint n_properties, GObjectConstructP
       return NULL;
     }
 
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "Duration");
-    OGMRIP_FILE (gobject)->priv->length = str ? atoi (str) / 1000. : -1.0;
+    ogmrip_media_info_get_file_info (info,  OGMRIP_FILE (gobject)->priv);
+    ogmrip_media_info_get_video_info (info, 0, OGMRIP_VIDEO_FILE (gobject)->priv);
 
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "StreamSize");
-    OGMRIP_FILE (gobject)->priv->size = str ? atoll (str) : -1;
-
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "Title");
-    OGMRIP_FILE (gobject)->priv->label = str ? g_strdup (str) : NULL;
-
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "BitRate");
-    video->priv->bitrate = str ? atoi (str) : -1;
-
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "Width");
-    video->priv->width = str ? atoi (str) : 0;
-
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "Height");
-    video->priv->height = str ? atoi (str) : 0;
-
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "Standard");
-    if (str)
-    {
-      if (g_str_equal (str, "PAL"))
-        video->priv->standard = OGMRIP_STANDARD_PAL;
-      else if (g_str_equal (str, "NTSC"))
-        video->priv->standard = OGMRIP_STANDARD_NTSC;
-    }
-
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "FrameRate");
-    if (str)
-    {
-      if (g_str_equal (str, "25.000"))
-        video->priv->framerate_num = 25;
-      else if (g_str_equal (str, "23.976"))
-      {
-        video->priv->framerate_num = 24000;
-        video->priv->framerate_num = 1001;
-      }
-      else if (g_str_equal (str, "29.970"))
-      {
-        video->priv->framerate_num = 30000;
-        video->priv->framerate_num = 1001;
-      }
-      else
-      {
-        gdouble framerate;
-        
-        framerate = strtod (str, NULL);
-        video->priv->framerate_num = framerate * 1000;
-        video->priv->framerate_num = 1000;
-      }
-    }
-
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, 0, "DisplayAspectRatio");
-    if (str)
-    {
-      if (sscanf (str, "%u:%u", &video->priv->aspect_num, &video->priv->aspect_denom) != 2)
-      {
-        gdouble aspect;
-
-        aspect = strtod (str, NULL);
-        video->priv->aspect_num = aspect * 1000;
-        video->priv->aspect_denom = 1000;
-      }
-
-      if (video->priv->aspect_num == 16 && video->priv->aspect_denom == 9)
-        video->priv->aspect = OGMRIP_ASPECT_16_9;
-      else if (video->priv->aspect_num == 16 && video->priv->aspect_denom == 9)
-        video->priv->aspect = OGMRIP_ASPECT_4_3;
-    }
+    OGMRIP_FILE (gobject)->priv->title_size = OGMRIP_VIDEO_FILE (gobject)->priv->size;
 
     ogmrip_media_info_close (info);
   }

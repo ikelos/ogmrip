@@ -4,6 +4,8 @@ lib_LTLIBRARIES = \
 libogmrip_file_la_SOURCES = \
   ogmrip-audio-file.c  \
   ogmrip-file-object.c \
+  ogmrip-file-priv.c   \
+  ogmrip-media-file.c  \
   ogmrip-media-info.c  \
   ogmrip-subp-file.c   \
   ogmrip-video-file.c
@@ -11,6 +13,7 @@ libogmrip_file_la_SOURCES = \
 libogmrip_file_la_HEADERS = \
   ogmrip-audio-file.h  \
   ogmrip-file-object.h \
+  ogmrip-media-file.h  \
   ogmrip-media-info.h  \
   ogmrip-subp-file.h   \
   ogmrip-video-file.h  \

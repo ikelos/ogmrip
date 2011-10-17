@@ -19,13 +19,21 @@
 #ifndef __OGMRIP_FILE_PRIV_H__
 #define __OGMRIP_FILE_PRIV_H__
 
+#include <ogmrip-media-info.h>
+#include <ogmrip-video-file.h>
+#include <ogmrip-audio-file.h>
+#include <ogmrip-subp-file.h>
+
+G_BEGIN_DECLS
+
 struct _OGMRipFilePriv
 {
   gchar *uri;
   gchar *path;
   gchar *label;
   gdouble length;
-  gint64 size;
+  gint64 media_size;
+  gint64 title_size;
   gint format;
 };
 
@@ -40,6 +48,7 @@ struct _OGMRipVideoFilePriv
   guint framerate_denom;
   guint aspect_num;
   guint aspect_denom;
+  gint64 size;
 };
 
 struct _OGMRipAudioFilePriv
@@ -48,12 +57,42 @@ struct _OGMRipAudioFilePriv
   gint channels;
   gint language;
   gint samplerate;
+  gint64 size;
+  gchar *label;
 };
 
 struct _OGMRipSubpFilePriv
 {
   gint language;
+  gint64 size;
+  gchar *label;
 };
+
+struct _OGMRipMediaFilePriv
+{
+  GList *audio_streams;
+  GList *subp_streams;
+};
+
+void ogmrip_media_info_get_file_info    (OGMRipMediaInfo     *info,
+                                         OGMRipFilePriv      *file);
+gint ogmrip_media_info_get_video_format (OGMRipMediaInfo     *info,
+                                         guint               track);
+void ogmrip_media_info_get_video_info   (OGMRipMediaInfo     *info,
+                                         guint               track,
+                                         OGMRipVideoFilePriv *video);
+gint ogmrip_media_info_get_audio_format (OGMRipMediaInfo     *info,
+                                         guint               track);
+void ogmrip_media_info_get_audio_info   (OGMRipMediaInfo     *info,
+                                         guint               track,
+                                         OGMRipAudioFilePriv *audio);
+gint ogmrip_media_info_get_subp_format  (OGMRipMediaInfo     *info,
+                                         guint               track);
+void ogmrip_media_info_get_subp_info    (OGMRipMediaInfo     *info,
+                                         guint               track,
+                                         OGMRipSubpFilePriv  *subp);
+
+G_END_DECLS
 
 #endif /* __OGMRIP_FILE_PRIV_H__ */
 

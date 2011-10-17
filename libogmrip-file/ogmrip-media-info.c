@@ -18,6 +18,8 @@
 
 #include "ogmrip-media-info.h"
 
+#include <ogmrip-media.h>
+
 #define MEDIAINFO_GLIBC
 #include <MediaInfoDLL/MediaInfoDLL.h>
 

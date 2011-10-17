@@ -27,46 +27,6 @@ static GObject * ogmrip_audio_file_constructor  (GType type,
                                                  guint n_properties,
                                                  GObjectConstructParam *properties);
 
-static gint
-ogmrip_media_info_get_audio_format (OGMRipMediaInfo *info)
-{
-  const gchar *str;
-
-  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_AUDIO, 0, "Format");
-  if (!str)
-    return OGMRIP_FORMAT_UNDEFINED;
-
-  if (g_str_equal (str, "MPEG Audio"))
-  {
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_AUDIO, 0, "Format_Profile");
-
-    if (str && g_str_equal (str, "Layer 3"))
-      return OGMRIP_FORMAT_MP3;
-
-    if (str && g_str_equal (str, "Layer 2"))
-      return OGMRIP_FORMAT_MP2;
-
-    return OGMRIP_FORMAT_UNDEFINED;
-  }
-
-  if (g_str_equal (str, "FLAC"))
-    return OGMRIP_FORMAT_FLAC;
-
-  if (g_str_equal (str, "DTS"))
-    return OGMRIP_FORMAT_DTS;
-
-  if (g_str_equal (str, "AC-3"))
-    return OGMRIP_FORMAT_AC3;
-
-  if (g_str_equal (str, "Vorbis"))
-    return OGMRIP_FORMAT_VORBIS;
-
-  if (g_str_equal (str, "PCM"))
-    return OGMRIP_FORMAT_PCM;
-
-  return OGMRIP_FORMAT_UNDEFINED;
-}
-
 G_DEFINE_TYPE_WITH_CODE (OGMRipAudioFile, ogmrip_audio_file, OGMRIP_TYPE_FILE,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_AUDIO_STREAM, ogmrip_audio_iface_init));
 
@@ -105,8 +65,7 @@ ogmrip_audio_file_constructor (GType type, guint n_properties, GObjectConstructP
     return NULL;
   }
 
-  if (g_file_test (OGMRIP_FILE (gobject)->priv->path, G_FILE_TEST_EXISTS) &&
-      ogmrip_media_info_open (info, OGMRIP_FILE (gobject)->priv->path))
+  if (ogmrip_media_info_open (info, OGMRIP_FILE (gobject)->priv->path))
   {
     const gchar *str;
 
@@ -118,7 +77,7 @@ ogmrip_audio_file_constructor (GType type, guint n_properties, GObjectConstructP
       return NULL;
     }
 
-    OGMRIP_FILE (gobject)->priv->format = ogmrip_media_info_get_audio_format (info);
+    OGMRIP_FILE (gobject)->priv->format = ogmrip_media_info_get_audio_format (info, 0);
     if (OGMRIP_FILE (gobject)->priv->format < 0)
     {
       g_object_unref (info);
@@ -126,26 +85,10 @@ ogmrip_audio_file_constructor (GType type, guint n_properties, GObjectConstructP
       return NULL;
     }
 
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_AUDIO, 0, "Duration");
-    OGMRIP_FILE (gobject)->priv->length = str ? atoi (str) / 1000. : -1.0;
+    ogmrip_media_info_get_file_info (info, OGMRIP_FILE (gobject)->priv);
+    ogmrip_media_info_get_audio_info (info, 0, OGMRIP_AUDIO_FILE (gobject)->priv);
 
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_AUDIO, 0, "StreamSize");
-    OGMRIP_FILE (gobject)->priv->size = str ? atoll (str) : -1;
-
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "Track");
-    OGMRIP_FILE (gobject)->priv->label = str ? g_strdup (str) : NULL;
-
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_AUDIO, 0, "BitRate");
-    OGMRIP_AUDIO_FILE (gobject)->priv->bitrate = str ? atoi (str) : -1;
-
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_AUDIO, 0, "Channel(s)");
-    OGMRIP_AUDIO_FILE (gobject)->priv->channels = str ? atoi (str) : -1;
-
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_AUDIO, 0, "SamplingRate");
-    OGMRIP_AUDIO_FILE (gobject)->priv->samplerate = str ? atoi (str) : -1;
-
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_AUDIO, 0, "Language/String2");
-    OGMRIP_AUDIO_FILE (gobject)->priv->language = str ? (str[0] << 8) | str[1] : 0;
+    OGMRIP_FILE (gobject)->priv->title_size = OGMRIP_AUDIO_FILE (gobject)->priv->size;
 
     ogmrip_media_info_close (info);
   }
@@ -168,7 +111,7 @@ ogmrip_audio_file_get_channels (OGMRipAudioStream *audio)
 static const gchar *
 ogmrip_audio_file_get_label (OGMRipAudioStream *audio)
 {
-  return OGMRIP_FILE (audio)->priv->label;
+  return OGMRIP_AUDIO_FILE (audio)->priv->label;
 }
 
 static gint

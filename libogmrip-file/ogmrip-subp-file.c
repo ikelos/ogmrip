@@ -27,21 +27,6 @@ static GObject * ogmrip_subp_file_constructor  (GType type,
                                                 guint n_properties,
                                                 GObjectConstructParam *properties);
 
-static gint
-ogmrip_media_info_get_subp_format (OGMRipMediaInfo *info)
-{
-  const gchar *str;
-
-  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_TEXT, 0, "Format");
-  if (!str)
-    return OGMRIP_FORMAT_UNDEFINED;
-
-  if (g_str_equal (str, "SubRip"))
-    return OGMRIP_FORMAT_SRT;
-
-  return OGMRIP_FORMAT_UNDEFINED;
-}
-
 G_DEFINE_TYPE_WITH_CODE (OGMRipSubpFile, ogmrip_subp_file, OGMRIP_TYPE_FILE,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_SUBP_STREAM, ogmrip_subp_iface_init));
 
@@ -77,8 +62,7 @@ ogmrip_subp_file_constructor (GType type, guint n_properties, GObjectConstructPa
     return NULL;
   }
 
-  if (g_file_test (OGMRIP_FILE (gobject)->priv->path, G_FILE_TEST_EXISTS) &&
-      ogmrip_media_info_open (info, OGMRIP_FILE (gobject)->priv->path))
+  if (ogmrip_media_info_open (info, OGMRIP_FILE (gobject)->priv->path))
   {
     const gchar *str;
 
@@ -90,25 +74,17 @@ ogmrip_subp_file_constructor (GType type, guint n_properties, GObjectConstructPa
       return NULL;
     }
 
-    OGMRIP_FILE (gobject)->priv->format = ogmrip_media_info_get_subp_format (info);
+    OGMRIP_FILE (gobject)->priv->format = ogmrip_media_info_get_subp_format (info, 0);
     if (OGMRIP_FILE (gobject)->priv->format < 0)
     {
       g_object_unref (info);
       g_object_unref (gobject);
       return NULL;
     }
+    ogmrip_media_info_get_file_info (info, OGMRIP_FILE (gobject)->priv);
+    ogmrip_media_info_get_subp_info (info, 0, OGMRIP_SUBP_FILE (gobject)->priv);
 
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_TEXT, 0, "Duration");
-    OGMRIP_FILE (gobject)->priv->length = str ? atoi (str) / 1000. : -1.0;
-
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_TEXT, 0, "StreamSize");
-    OGMRIP_FILE (gobject)->priv->size = str ? atoll (str) : -1;
-
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "Title");
-    OGMRIP_FILE (gobject)->priv->label = str ? g_strdup (str) : NULL;
-
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_TEXT, 0, "Language/String2");
-    OGMRIP_SUBP_FILE (gobject)->priv->language = str ? (str[0] << 8) | str[1] : 0;
+    OGMRIP_FILE (gobject)->priv->title_size = OGMRIP_SUBP_FILE (gobject)->priv->size;
 
     ogmrip_media_info_close (info);
   }
@@ -119,7 +95,7 @@ ogmrip_subp_file_constructor (GType type, guint n_properties, GObjectConstructPa
 static const gchar *
 ogmrip_subp_file_get_label (OGMRipSubpStream *subp)
 {
-  return OGMRIP_FILE (subp)->priv->label;;
+  return OGMRIP_SUBP_FILE (subp)->priv->label;;
 }
 
 static gint

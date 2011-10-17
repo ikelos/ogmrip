@@ -21,6 +21,7 @@
 
 #include <ogmrip-audio-file.h>
 #include <ogmrip-file-object.h>
+#include <ogmrip-media-file.h>
 #include <ogmrip-media-info.h>
 #include <ogmrip-subp-file.h>
 #include <ogmrip-video-file.h>
