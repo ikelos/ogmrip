@@ -482,7 +482,7 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
   GtkTreeRowReference *ref;
   GtkTreeIter iter;
 
-  (*G_OBJECT_CLASS (ogmrip_profile_editor_dialog_parent_class)->constructed) (gobject);
+  G_OBJECT_CLASS (ogmrip_profile_editor_dialog_parent_class)->constructed (gobject);
 
   if (!dialog->priv->profile)
     g_error ("No profile specified");
