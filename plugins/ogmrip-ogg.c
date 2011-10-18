@@ -257,11 +257,8 @@ static void
 ogmrip_ogg_class_init (OGMRipOggClass *klass)
 {
   OGMJobSpawnClass *spawn_class;
-  OGMRipContainerClass *container_class;
 
   spawn_class = OGMJOB_SPAWN_CLASS (klass);
-  container_class = OGMRIP_CONTAINER_CLASS (klass);
-
   spawn_class->run = ogmrip_ogg_run;
 }
 

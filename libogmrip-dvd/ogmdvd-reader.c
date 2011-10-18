@@ -107,7 +107,7 @@ ogmdvd_reader_new_by_cells (OGMDvdTitle *title, guint start_cell, gint end_cell,
   pgc_t *pgc;
 
   guint8 vts;
-  guint16 pgcn, pgn;
+  guint16 pgcn;
 
   dvd_file_t *file;
 
@@ -115,8 +115,6 @@ ogmdvd_reader_new_by_cells (OGMDvdTitle *title, guint start_cell, gint end_cell,
   g_return_val_if_fail (end_cell < 0 || start_cell <= end_cell, NULL);
 
   pgcn = title->priv->vts_file->vts_ptt_srpt->title[title->priv->ttn - 1].ptt[0].pgcn;
-  pgn  = title->priv->vts_file->vts_ptt_srpt->title[title->priv->ttn - 1].ptt[0].pgn;
-
   pgc = title->priv->vts_file->vts_pgcit->pgci_srp[pgcn - 1].pgc;
 
   g_return_val_if_fail (start_cell < pgc->nr_of_cells && end_cell <= pgc->nr_of_cells, NULL);

@@ -429,11 +429,8 @@ static void
 ogmrip_mp4_class_init (OGMRipMp4Class *klass)
 {
   OGMJobSpawnClass *spawn_class;
-  OGMRipContainerClass *container_class;
 
   spawn_class = OGMJOB_SPAWN_CLASS (klass);
-  container_class = OGMRIP_CONTAINER_CLASS (klass);
-
   spawn_class->run = ogmrip_mp4_run;
 }
 
