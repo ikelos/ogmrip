@@ -717,6 +717,26 @@ ogmdvd_disc_get_property (GObject *gobject, guint prop_id, GValue *value, GParam
 }
 
 static void
+ogmdvd_disc_set_uri (OGMDvdDisc *disc, const gchar *str)
+{
+  gchar *name, *path;
+
+  name = g_path_get_basename (str);
+  if (g_ascii_strcasecmp (name, "video_ts") != 0)
+    path = g_strdup (str);
+  else
+    path = g_path_get_dirname (str);
+  g_free (name);
+
+  if (g_str_has_prefix (path, "dvd://"))
+    disc->priv->uri = g_strdup (path);
+  else
+    disc->priv->uri = g_strdup_printf ("dvd://%s", path);
+
+  g_free (path);
+}
+
+static void
 ogmdvd_disc_set_property (GObject *gobject, guint prop_id, const GValue *value, GParamSpec *pspec)
 {
   OGMDvdDisc *disc = OGMDVD_DISC (gobject);
@@ -724,7 +744,7 @@ ogmdvd_disc_set_property (GObject *gobject, guint prop_id, const GValue *value, 
   switch (prop_id)
   {
     case PROP_URI:
-      disc->priv->uri = g_value_dup_string (value);
+      ogmdvd_disc_set_uri (disc, g_value_get_string (value));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);

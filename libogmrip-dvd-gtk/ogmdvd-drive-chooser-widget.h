@@ -19,7 +19,7 @@
 #ifndef __OGMDVD_DRIVE_CHOOSER_WIDGET_H__
 #define __OGMDVD_DRIVE_CHOOSER_WIDGET_H__
 
-#include <ogmdvd-drive-chooser.h>
+#include <ogmrip-media-chooser.h>
 
 G_BEGIN_DECLS
 

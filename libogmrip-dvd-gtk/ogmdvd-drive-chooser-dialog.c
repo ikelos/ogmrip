@@ -31,6 +31,7 @@
 #include "ogmdvd-drive-chooser-widget.h"
 
 #include <ogmrip-dvd.h>
+#include <ogmrip-drive.h>
 
 #include <glib/gi18n-lib.h>
 
@@ -51,24 +52,64 @@ struct _OGMDvdDriveChooserDialogPriv
   GtkWidget *load_button;
 };
 
-/*
- * GObject vfuncs
- */
-
-static void ogmdvd_drive_chooser_init (OGMDvdDriveChooserInterface *iface);
-
-static gchar * ogmdvd_drive_chooser_dialog_get_device     (OGMDvdDriveChooser       *chooser,
-                                                           OGMDvdDeviceType         *type);
-static void    ogmdvd_drive_chooser_dialog_eject_clicked  (GtkDialog                *dialog);
-static void    ogmdvd_drive_chooser_dialog_device_changed (OGMDvdDriveChooserDialog *dialog,
-                                                           const gchar              *device,
-                                                           OGMDvdDeviceType         type,
-                                                           GtkWidget                *chooser);
+static void ogmrip_media_chooser_init (OGMRipMediaChooserInterface *iface);
 
 static int signals[LAST_SIGNAL] = { 0 };
 
+static OGMRipMedia *
+ogmdvd_drive_chooser_dialog_get_media (OGMRipMediaChooser *chooser)
+{
+  OGMDvdDriveChooserDialog *dialog = OGMDVD_DRIVE_CHOOSER_DIALOG (chooser);
+
+  return ogmrip_media_chooser_get_media (OGMRIP_MEDIA_CHOOSER (dialog->priv->chooser));
+}
+
+static void
+ogmdvd_drive_chooser_dialog_media_changed (OGMDvdDriveChooserDialog *dialog, OGMRipMedia *media, GtkWidget *chooser)
+{
+  /*
+   * TODO insensitive if not block device
+   */
+  gtk_widget_set_sensitive (dialog->priv->eject_button, media != NULL/* && type == OGMRIP_DEVICE_BLOCK*/);
+  gtk_widget_set_sensitive (dialog->priv->load_button, media != NULL);
+}
+
+static void
+ogmdvd_drive_chooser_dialog_eject_clicked (GtkDialog *dialog)
+{
+  OGMRipMedia *media;
+
+  media = ogmrip_media_chooser_get_media (OGMRIP_MEDIA_CHOOSER (OGMDVD_DRIVE_CHOOSER_DIALOG (dialog)->priv->chooser));
+  if (media)
+  {
+    OGMRipMonitor *monitor;
+    OGMRipDrive *drive;
+    const gchar *uri;
+    gchar *device;
+
+    uri = ogmrip_media_get_uri (media);
+
+    monitor = ogmrip_monitor_get_default ();
+
+    device = strstr (uri, "://");
+    if (device)
+      drive = ogmrip_monitor_get_drive (monitor, device + 3);
+    else
+      drive = ogmrip_monitor_get_drive (monitor, uri);
+
+    g_object_unref (monitor);
+
+    if (drive)
+    {
+      g_signal_emit (dialog, signals[EJECT], 0, NULL);
+      ogmrip_drive_eject (drive);
+      g_object_unref (drive);
+    }
+  }
+}
+
 G_DEFINE_TYPE_WITH_CODE (OGMDvdDriveChooserDialog, ogmdvd_drive_chooser_dialog, GTK_TYPE_DIALOG,
-    G_IMPLEMENT_INTERFACE (OGMDVD_TYPE_DRIVE_CHOOSER, ogmdvd_drive_chooser_init))
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_MEDIA_CHOOSER, ogmrip_media_chooser_init))
 
 static void
 ogmdvd_drive_chooser_dialog_class_init (OGMDvdDriveChooserDialogClass *klass)
@@ -92,18 +133,15 @@ ogmdvd_drive_chooser_dialog_class_init (OGMDvdDriveChooserDialogClass *klass)
 }
 
 static void
-ogmdvd_drive_chooser_init (OGMDvdDriveChooserInterface *iface)
+ogmrip_media_chooser_init (OGMRipMediaChooserInterface *iface)
 {
-  iface->get_device = ogmdvd_drive_chooser_dialog_get_device;
+  iface->get_media = ogmdvd_drive_chooser_dialog_get_media;
 }
 
 static void
 ogmdvd_drive_chooser_dialog_init (OGMDvdDriveChooserDialog *dialog)
 {
   GtkWidget *area, *image, *label, *vbox;
-
-  OGMDvdDeviceType type;
-  gchar *device;
 
   dialog->priv = OGMDVD_DRIVE_CHOOSER_DIALOG_GET_PRIVATE (dialog);
 
@@ -119,7 +157,8 @@ ogmdvd_drive_chooser_dialog_init (OGMDvdDriveChooserDialog *dialog)
   gtk_container_add (GTK_CONTAINER (area), dialog->priv->eject_button);
   gtk_widget_show (dialog->priv->eject_button);
 
-  g_signal_connect_swapped (dialog->priv->eject_button, "clicked", G_CALLBACK (ogmdvd_drive_chooser_dialog_eject_clicked), dialog);
+  g_signal_connect_swapped (dialog->priv->eject_button, "clicked",
+      G_CALLBACK (ogmdvd_drive_chooser_dialog_eject_clicked), dialog);
 
   image = gtk_image_new_from_stock (GTK_STOCK_REFRESH, GTK_ICON_SIZE_BUTTON);
   gtk_button_set_image (GTK_BUTTON (dialog->priv->eject_button), image);
@@ -151,70 +190,10 @@ ogmdvd_drive_chooser_dialog_init (OGMDvdDriveChooserDialog *dialog)
 
   gtk_label_set_mnemonic_widget (GTK_LABEL (label), dialog->priv->chooser);
 
-  g_signal_connect_swapped (dialog->priv->chooser, "device-changed", 
-      G_CALLBACK (ogmdvd_drive_chooser_dialog_device_changed), dialog);
+  g_signal_connect_swapped (dialog->priv->chooser, "media-changed", 
+      G_CALLBACK (ogmdvd_drive_chooser_dialog_media_changed), dialog);
 
-  device = ogmdvd_drive_chooser_get_device (OGMDVD_DRIVE_CHOOSER (dialog->priv->chooser), &type);
-
-  gtk_widget_set_sensitive (dialog->priv->eject_button, device != NULL && type == OGMDVD_DEVICE_BLOCK);
-  gtk_widget_set_sensitive (dialog->priv->load_button, device != NULL && type != OGMDVD_DEVICE_NONE);
-
-  g_free (device);
-}
-
-/*
- * OGMDvdDriveChooser vfuncs
- */
-
-static gchar *
-ogmdvd_drive_chooser_dialog_get_device (OGMDvdDriveChooser *chooser, OGMDvdDeviceType *type)
-{
-  OGMDvdDriveChooserDialog *dialog;
-
-  g_return_val_if_fail (OGMDVD_IS_DRIVE_CHOOSER_DIALOG (chooser), NULL);
-
-  dialog = OGMDVD_DRIVE_CHOOSER_DIALOG (chooser);
-
-  return ogmdvd_drive_chooser_get_device (OGMDVD_DRIVE_CHOOSER (dialog->priv->chooser), type);
-}
-
-/*
- * Internal functions
- */
-
-static void
-ogmdvd_drive_chooser_dialog_eject_clicked (GtkDialog *dialog)
-{
-  OGMDvdDeviceType type;
-  gchar *device;
-
-  device = ogmdvd_drive_chooser_get_device (OGMDVD_DRIVE_CHOOSER (OGMDVD_DRIVE_CHOOSER_DIALOG (dialog)->priv->chooser), &type);
-  if (device != NULL && type == OGMDVD_DEVICE_BLOCK)
-  {
-    OGMDvdMonitor *monitor;
-    OGMDvdDrive *drive;
-
-    monitor = ogmdvd_monitor_get_default ();
-    drive = ogmdvd_monitor_get_drive (monitor, device);
-    g_object_unref (monitor);
-
-    if (drive)
-    {
-      g_signal_emit (dialog, signals[EJECT], 0, NULL);
-      ogmdvd_drive_eject (OGMDVD_DRIVE (drive));
-      g_object_unref (drive);
-    }
-  }
-
-  if (device)
-    g_free (device);
-}
-
-static void
-ogmdvd_drive_chooser_dialog_device_changed (OGMDvdDriveChooserDialog *dialog, const gchar *device, OGMDvdDeviceType type, GtkWidget *chooser)
-{
-  gtk_widget_set_sensitive (dialog->priv->load_button, device != NULL);
-  gtk_widget_set_sensitive (dialog->priv->eject_button, device != NULL && type == OGMDVD_DEVICE_BLOCK);
+  gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->chooser), 0);
 }
 
 /**

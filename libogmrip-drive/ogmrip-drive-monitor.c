@@ -1,38 +1,35 @@
-/* OGMDvd - A wrapper library around libdvdread
+/* OGMRipDrive - An optical drive library form OGMRip
  * Copyright (C) 2009-2011 Olivier Rolland <billl@users.sourceforge.net>
  *
- * Code from libbrasero-media
- * Copyright (C) Philippe Rouquier 2005-2009 <bonfire-app@wanadoo.fr>
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * Libbrasero-media is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * Libbrasero-media is distributed in the hope that it will be useful,
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Library General Public License for more details.
- * 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
 /**
- * SECTION:ogmdvd-monitor
- * @title: OGMDvdMonitor
- * @include: ogmdvd-monitor.h
+ * SECTION:ogmrip-monitor
+ * @title: OGMRipMonitor
+ * @include: ogmrip-monitor.h
  * @short_description: An object monitoring optical drives
  */
 
-#include "ogmdvd-monitor.h"
-#include "ogmdvd-device.h"
+#include "ogmrip-drive-monitor.h"
+#include "ogmrip-drive-device.h"
 
 #include <glib.h>
 #include <gio/gio.h>
 
-struct _OGMDvdMonitorPriv
+struct _OGMRipMonitorPriv
 {
   GSList *drives;
 
@@ -42,7 +39,7 @@ struct _OGMDvdMonitorPriv
   GVolumeMonitor *gmonitor;
 };
 
-#define OGMDVD_MONITOR_GET_PRIV(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMDVD_TYPE_MONITOR, OGMDvdMonitorPriv))
+#define OGMRIP_MONITOR_GET_PRIV(o) (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_MONITOR, OGMRipMonitorPriv))
 
 enum
 {
@@ -53,44 +50,44 @@ enum
 
 static guint signals[LAST_SIGNAL] = { 0 };
 
-G_DEFINE_TYPE (OGMDvdMonitor, ogmdvd_monitor, G_TYPE_OBJECT);
+G_DEFINE_TYPE (OGMRipMonitor, ogmrip_monitor, G_TYPE_OBJECT);
 
 static gboolean
-ogmdvd_monitor_is_drive (OGMDvdMonitor *monitor, const gchar *device)
+ogmrip_monitor_is_drive (OGMRipMonitor *monitor, const gchar *device)
 {
   gpointer handle;
   gboolean res;
 
-  handle = ogmdvd_device_open (device, FALSE);
+  handle = ogmrip_device_open (device, FALSE);
   if (!handle)
     return FALSE;
 
-  res = ogmdvd_device_inquiry (handle, NULL, NULL);
+  res = ogmrip_device_inquiry (handle, NULL, NULL);
 
   /*
    * vérifier si le lecteur sait lire les dvd ?
    */
 
-  ogmdvd_device_close (handle);
+  ogmrip_device_close (handle);
 
   return res;
 }
 
 static void
-ogmdvd_monitor_add_drive (OGMDvdMonitor *self, const gchar *device, GDrive *gdrive)
+ogmrip_monitor_add_drive (OGMRipMonitor *self, const gchar *device, GDrive *gdrive)
 {
-  OGMDvdDrive *drive;
+  OGMRipDrive *drive;
 
-  drive = ogmdvd_monitor_get_drive (self, device);
+  drive = ogmrip_monitor_get_drive (self, device);
   if (drive)
   {
     self->priv->waiting_removal = g_slist_remove (self->priv->waiting_removal, drive);
     g_object_set (drive, "gdrive", gdrive, NULL);
     g_object_unref (drive);
   }
-  else if (ogmdvd_monitor_is_drive (self, device))
+  else if (ogmrip_monitor_is_drive (self, device))
   {
-    drive = g_object_new (OGMDVD_TYPE_DRIVE, "gdrive", gdrive, NULL);
+    drive = g_object_new (OGMRIP_TYPE_DRIVE, "gdrive", gdrive, NULL);
     self->priv->drives = g_slist_prepend (self->priv->drives, drive);
 
     g_signal_emit (self, signals [DRIVE_ADDED], 0, drive);
@@ -98,9 +95,9 @@ ogmdvd_monitor_add_drive (OGMDvdMonitor *self, const gchar *device, GDrive *gdri
 }
 
 static gboolean
-ogmdvd_monitor_disconnected (OGMDvdMonitor *self)
+ogmrip_monitor_disconnected (OGMRipMonitor *self)
 {
-  OGMDvdDrive *drive;
+  OGMRipDrive *drive;
 
   if (!self->priv->waiting_removal)
   {
@@ -120,11 +117,11 @@ ogmdvd_monitor_disconnected (OGMDvdMonitor *self)
 }
 
 static void
-ogmdvd_monitor_remove_drive (OGMDvdMonitor *self, const gchar *device, GDrive *gdrive)
+ogmrip_monitor_remove_drive (OGMRipMonitor *self, const gchar *device, GDrive *gdrive)
 {
-  OGMDvdDrive *drive;
+  OGMRipDrive *drive;
 
-  drive = ogmdvd_monitor_get_drive (self, device);
+  drive = ogmrip_monitor_get_drive (self, device);
   if (drive)
   {
     if (g_slist_find (self->priv->waiting_removal, drive) != NULL)
@@ -133,13 +130,13 @@ ogmdvd_monitor_remove_drive (OGMDvdMonitor *self, const gchar *device, GDrive *g
     {
       GDrive *associated_gdrive;
 
-      associated_gdrive = ogmdvd_drive_get_gdrive (drive);
+      associated_gdrive = ogmrip_drive_get_gdrive (drive);
       if (associated_gdrive == gdrive)
       {
         self->priv->waiting_removal = g_slist_append (self->priv->waiting_removal, drive);
 
         if (!self->priv->waiting_removal_id)
-          self->priv->waiting_removal_id = g_timeout_add_seconds (2, (GSourceFunc) ogmdvd_monitor_disconnected, self);
+          self->priv->waiting_removal_id = g_timeout_add_seconds (2, (GSourceFunc) ogmrip_monitor_disconnected, self);
       }
     }
     g_object_unref (drive);
@@ -147,35 +144,35 @@ ogmdvd_monitor_remove_drive (OGMDvdMonitor *self, const gchar *device, GDrive *g
 }
 
 static void
-ogmdvd_monitor_connected_cb (GVolumeMonitor *monitor, GDrive *gdrive, OGMDvdMonitor *self)
+ogmrip_monitor_connected_cb (GVolumeMonitor *monitor, GDrive *gdrive, OGMRipMonitor *self)
 {
   gchar *device;
 
   device = g_drive_get_identifier (gdrive, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE);
-  ogmdvd_monitor_add_drive (self, device, gdrive);
+  ogmrip_monitor_add_drive (self, device, gdrive);
   g_free (device);
 }
 
 static void
-ogmdvd_monitor_disconnected_cb (GVolumeMonitor *monitor, GDrive *gdrive, OGMDvdMonitor *self)
+ogmrip_monitor_disconnected_cb (GVolumeMonitor *monitor, GDrive *gdrive, OGMRipMonitor *self)
 {
   gchar *device;
 
   device = g_drive_get_identifier (gdrive, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE);
-  ogmdvd_monitor_remove_drive (self, device, gdrive);
+  ogmrip_monitor_remove_drive (self, device, gdrive);
   g_free (device);
 }
 
 static void
-ogmdvd_monitor_init (OGMDvdMonitor *self)
+ogmrip_monitor_init (OGMRipMonitor *self)
 {
   GList *iter, *drives;
   GDrive *gdrive;
 
-  OGMDvdDrive *drive;
+  OGMRipDrive *drive;
   gchar *device;
 
-  self->priv = OGMDVD_MONITOR_GET_PRIV (self);
+  self->priv = OGMRIP_MONITOR_GET_PRIV (self);
 
   self->priv->gmonitor = g_volume_monitor_get ();
 
@@ -185,9 +182,9 @@ ogmdvd_monitor_init (OGMDvdMonitor *self)
     gdrive = iter->data;
 
     device = g_drive_get_identifier (gdrive, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE);
-    if (ogmdvd_monitor_is_drive (self, device))
+    if (ogmrip_monitor_is_drive (self, device))
     {
-      drive = g_object_new (OGMDVD_TYPE_DRIVE, "gdrive", gdrive, NULL);
+      drive = g_object_new (OGMRIP_TYPE_DRIVE, "gdrive", gdrive, NULL);
       self->priv->drives = g_slist_prepend (self->priv->drives, drive);
     }
     g_free (device);
@@ -196,17 +193,17 @@ ogmdvd_monitor_init (OGMDvdMonitor *self)
   g_list_free (drives);
 
   g_signal_connect (self->priv->gmonitor, "drive-connected",
-      G_CALLBACK (ogmdvd_monitor_connected_cb), self);
+      G_CALLBACK (ogmrip_monitor_connected_cb), self);
   g_signal_connect (self->priv->gmonitor, "drive-disconnected",
-      G_CALLBACK (ogmdvd_monitor_disconnected_cb), self);
+      G_CALLBACK (ogmrip_monitor_disconnected_cb), self);
 }
 
 static void
-ogmdvd_monitor_finalize (GObject *object)
+ogmrip_monitor_finalize (GObject *object)
 {
-  OGMDvdMonitor *self;
+  OGMRipMonitor *self;
 
-  self = OGMDVD_MONITOR (object);
+  self = OGMRIP_MONITOR (object);
 
   if (self->priv->waiting_removal_id)
   {
@@ -230,60 +227,60 @@ ogmdvd_monitor_finalize (GObject *object)
   if (self->priv->gmonitor)
   {
     g_signal_handlers_disconnect_by_func (self->priv->gmonitor,
-                                          ogmdvd_monitor_connected_cb,
+                                          ogmrip_monitor_connected_cb,
                                           self);
     g_signal_handlers_disconnect_by_func (self->priv->gmonitor,
-                                          ogmdvd_monitor_disconnected_cb,
+                                          ogmrip_monitor_disconnected_cb,
                                           self);
     g_object_unref (self->priv->gmonitor);
   }
 
-  G_OBJECT_CLASS (ogmdvd_monitor_parent_class)->finalize (object);
+  G_OBJECT_CLASS (ogmrip_monitor_parent_class)->finalize (object);
 }
 
 static void
-ogmdvd_monitor_class_init (OGMDvdMonitorClass *klass)
+ogmrip_monitor_class_init (OGMRipMonitorClass *klass)
 {
   GObjectClass* object_class;
 
   object_class = G_OBJECT_CLASS (klass);
-  object_class->finalize = ogmdvd_monitor_finalize;
+  object_class->finalize = ogmrip_monitor_finalize;
 
   signals[DRIVE_ADDED] = g_signal_new ("drive_added",
                                        G_OBJECT_CLASS_TYPE (klass),
                                        G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE,
-                                       G_STRUCT_OFFSET (OGMDvdMonitorClass, drive_added),
+                                       G_STRUCT_OFFSET (OGMRipMonitorClass, drive_added),
                                        NULL, NULL,
                                        g_cclosure_marshal_VOID__OBJECT,
                                        G_TYPE_NONE, 1,
-                                       OGMDVD_TYPE_DRIVE);
+                                       OGMRIP_TYPE_DRIVE);
 
   signals[DRIVE_REMOVED] = g_signal_new ("drive_removed",
                                          G_OBJECT_CLASS_TYPE (klass),
                                          G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE,
-                                         G_STRUCT_OFFSET (OGMDvdMonitorClass, drive_removed),
+                                         G_STRUCT_OFFSET (OGMRipMonitorClass, drive_removed),
                                          NULL, NULL,
                                          g_cclosure_marshal_VOID__OBJECT,
                                          G_TYPE_NONE, 1,
-                                         OGMDVD_TYPE_DRIVE);
+                                         OGMRIP_TYPE_DRIVE);
 
-  g_type_class_add_private (klass, sizeof (OGMDvdMonitorPriv));
+  g_type_class_add_private (klass, sizeof (OGMRipMonitorPriv));
 }
 
-static OGMDvdMonitor *singleton = NULL;
+static OGMRipMonitor *singleton = NULL;
 
 /**
- * ogmdvd_monitor_get_default:
+ * ogmrip_monitor_get_default:
  *
  * Gets the default monitor.
  *
- * Returns: an #OGMDvdMonitor
+ * Returns: an #OGMRipMonitor
  **/
-OGMDvdMonitor *
-ogmdvd_monitor_get_default (void)
+OGMRipMonitor *
+ogmrip_monitor_get_default (void)
 {
   if (!singleton)
-    singleton = g_object_new (OGMDVD_TYPE_MONITOR, NULL);
+    singleton = g_object_new (OGMRIP_TYPE_MONITOR, NULL);
 
   g_object_ref (singleton);
 
@@ -291,29 +288,29 @@ ogmdvd_monitor_get_default (void)
 }
 
 /**
- * ogmdvd_monitor_get_drive:
- * @monitor: #OGMDvdMonitor
+ * ogmrip_monitor_get_drive:
+ * @monitor: #OGMRipMonitor
  * @device: a device path
  *
  * Gets the drive with the given device in any.
  *
- * Returns: an #OGMDvdDrive or NULL
+ * Returns: an #OGMRipDrive or NULL
  **/
-OGMDvdDrive *
-ogmdvd_monitor_get_drive (OGMDvdMonitor *monitor, const gchar *device)
+OGMRipDrive *
+ogmrip_monitor_get_drive (OGMRipMonitor *monitor, const gchar *device)
 {
   GSList *iter;
-  OGMDvdDrive *drive;
+  OGMRipDrive *drive;
   const gchar *dev;
 
-  g_return_val_if_fail (OGMDVD_IS_MONITOR (monitor), NULL);
+  g_return_val_if_fail (OGMRIP_IS_MONITOR (monitor), NULL);
   g_return_val_if_fail (device != NULL, NULL);
 
   for (iter = monitor->priv->drives; iter; iter = iter->next)
   {
     drive = iter->data;
 
-    dev = ogmdvd_drive_get_device (drive);
+    dev = ogmrip_drive_get_device (drive);
     if (dev && g_str_equal (dev, device))
     {
       g_object_ref (drive);
@@ -325,19 +322,19 @@ ogmdvd_monitor_get_drive (OGMDvdMonitor *monitor, const gchar *device)
 }
 
 /**
- * ogmdvd_monitor_get_drives:
- * @monitor: #OGMDvdMonitor
+ * ogmrip_monitor_get_drives:
+ * @monitor: #OGMRipMonitor
  *
- * Get the list of available #OGMDvdDrive.
+ * Get the list of available #OGMRipDrive.
  *
  * Returns: a list of optical drives
  **/
 GSList *
-ogmdvd_monitor_get_drives (OGMDvdMonitor *monitor)
+ogmrip_monitor_get_drives (OGMRipMonitor *monitor)
 {
   GSList *drives;
 
-  g_return_val_if_fail (OGMDVD_IS_MONITOR (monitor), NULL);
+  g_return_val_if_fail (OGMRIP_IS_MONITOR (monitor), NULL);
 
   drives = g_slist_copy (monitor->priv->drives);
   g_slist_foreach (drives, (GFunc) g_object_ref, NULL);

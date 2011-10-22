@@ -1,5 +1,5 @@
-/* OGMDvd - A wrapper library around libdvdread
- * Copyright (C) 2004-2011 Olivier Rolland <billl@users.sourceforge.net>
+/* OGMRipDrive - An optical drive library form OGMRip
+ * Copyright (C) 2009-2011 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -16,15 +16,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef __OGMRIP_DVD_H__
-#define __OGMRIP_DVD_H__
+#ifndef __OGMRIP_DRIVE_H__
+#define __OGMRIP_DRIVE_H__
 
-#include <ogmdvd-audio.h>
-#include <ogmdvd-disc.h>
-#include <ogmdvd-parser.h>
-#include <ogmdvd-reader.h>
-#include <ogmdvd-subp.h>
-#include <ogmdvd-title.h>
+#include <glib.h>
 
-#endif /* __OGMRIP_DVD_H__ */
+G_BEGIN_DECLS
 
+#include <ogmrip-drive-object.h>
+#include <ogmrip-drive-monitor.h>
+
+G_END_DECLS
+
+#endif /* __OGMRIP_DRIVE_H__ */

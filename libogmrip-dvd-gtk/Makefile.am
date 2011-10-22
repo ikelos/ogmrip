@@ -6,7 +6,6 @@ BUILT_SOURCES = \
   ogmdvd-marshal.h
 
 libogmrip_dvd_gtk_la_SOURCES =  \
-  ogmdvd-drive-chooser.c        \
   ogmdvd-drive-chooser-widget.c \
   ogmdvd-drive-chooser-dialog.c \
   ogmdvd-marshal.c
@@ -15,7 +14,6 @@ libogmrip_dvd_gtk_ladir = \
   $(includedir)/ogmrip-dvd
 
 libogmrip_dvd_gtk_la_HEADERS =  \
-  ogmdvd-drive-chooser.h        \
   ogmdvd-drive-chooser-widget.h \
   ogmdvd-drive-chooser-dialog.h \
   ogmdvd-marshal.h              \
@@ -26,6 +24,8 @@ libogmrip_dvd_gtk_la_LDFLAGS = \
 
 libogmrip_dvd_gtk_la_LIBADD = \
   $(top_builddir)/libogmrip-media/libogmrip-media.la \
+  $(top_builddir)/libogmrip-media-gtk/libogmrip-media-gtk.la \
+  $(top_builddir)/libogmrip-drive/libogmrip-drive.la \
   $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la
 
 ogmdvd-marshal.h: ogmdvd-marshal.list $(GLIB_GENMARSHAL)
@@ -40,6 +40,8 @@ EXTRA_DIST = \
 
 INCLUDES = \
   -I$(top_srcdir)/libogmrip-media \
+  -I$(top_srcdir)/libogmrip-media-gtk \
+  -I$(top_srcdir)/libogmrip-drive \
   -I$(top_srcdir)/libogmrip-dvd
 
 CLEANFILES = \

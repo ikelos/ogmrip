@@ -30,6 +30,7 @@
 #include "ogmdvd-drive-chooser-widget.h"
 
 #include <ogmrip-dvd.h>
+#include <ogmrip-drive.h>
 
 #include <glib/gi18n-lib.h>
 
@@ -40,14 +41,18 @@ enum
 {
   TEXT_COLUMN,
   TYPE_COLUMN,
-  DEVICE_COLUMN,
+  MEDIA_COLUMN,
   DRIVE_COLUMN,
   N_COLUMNS
 };
 
 enum
 {
-  FILE_SEP_ROW = OGMDVD_DEVICE_DIR + 1,
+  NONE_ROW,
+  DEVICE_ROW,
+  FILE_ROW,
+  DIR_ROW,
+  FILE_SEP_ROW,
   SEL_SEP_ROW,
   FILE_SEL_ROW,
   DIR_SEL_ROW
@@ -58,33 +63,194 @@ struct _OGMDvdDriveChooserWidgetPriv
   GtkTreeRowReference *last_row;
 };
 
-static void     ogmdvd_drive_chooser_init              (OGMDvdDriveChooserInterface *iface);
-static void     ogmdvd_drive_chooser_widget_changed    (GtkComboBox                 *combo_box);
-static gchar *  ogmdvd_drive_chooser_widget_get_device (OGMDvdDriveChooser          *chooser,
-                                                        OGMDvdDeviceType            *type);
-static void     ogmdvd_drive_chooser_widget_fill       (OGMDvdDriveChooserWidget    *chooser);
-static gboolean ogmdvd_drive_chooser_widget_sep_func   (GtkTreeModel                *model,
-                                                        GtkTreeIter                 *iter,
-                                                        gpointer                    data);
+typedef struct
+{
+  OGMRipDrive *drive;
+  gulong handler;
+} OGMRipDisconnector;
+
+static void ogmrip_media_chooser_init (OGMRipMediaChooserInterface *iface);
+static void ogmdvd_drive_chooser_widget_changed (GtkComboBox *combo);
+
+static void
+ogmrip_signal_disconnector (gpointer data, GObject *gobject)
+{
+  OGMRipDisconnector *disconnector = data;
+
+  g_signal_handler_disconnect (disconnector->drive, disconnector->handler);
+
+  g_free (disconnector);
+}
+
+static OGMRipMedia *
+ogmdvd_drive_chooser_widget_get_media (OGMRipMediaChooser *chooser)
+{
+  OGMRipMedia *media;
+  GtkTreeModel *model;
+  GtkTreeIter iter;
+  gint type;
+
+  if (!gtk_combo_box_get_active_iter (GTK_COMBO_BOX (chooser), &iter))
+    return NULL;
+
+  model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
+
+  gtk_tree_model_get (model, &iter, TYPE_COLUMN, &type, -1);
+  if (type != DEVICE_ROW && type != FILE_ROW && type != DIR_ROW)
+    return NULL;
+
+  gtk_tree_model_get (model, &iter, MEDIA_COLUMN, &media, -1);
+  if (media)
+    g_object_unref (media);
+
+  return media;
+}
+
+static gboolean
+ogmdvd_drive_chooser_widget_sep_func (GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
+{
+  gint type = NONE_ROW;
+
+  gtk_tree_model_get (model, iter, TYPE_COLUMN, &type, -1);
+
+  return (type == FILE_SEP_ROW || type == SEL_SEP_ROW);
+}
+
+static void
+ogmdvd_drive_chooser_widget_medium_removed (OGMDvdDriveChooserWidget *chooser, OGMRipDrive *drive1)
+{
+  GtkTreeModel *model;
+  GtkTreeIter iter;
+  gint type;
+
+  model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
+  if (gtk_tree_model_get_iter_first (model, &iter))
+  {
+    OGMRipDrive *drive2;
+
+    do
+    {
+      gtk_tree_model_get (model, &iter, TYPE_COLUMN, &type, DRIVE_COLUMN, &drive2, -1);
+      if (type == DEVICE_ROW && drive1 == drive2)
+      {
+        gtk_list_store_remove (GTK_LIST_STORE (model), &iter);
+        break;
+      }
+    }
+    while (gtk_tree_model_iter_next (model, &iter));
+  }
+
+  if (gtk_tree_model_get_iter_first (model, &iter))
+  {
+    gtk_tree_model_get (model, &iter, TYPE_COLUMN, &type, -1);
+    if (type != DEVICE_ROW && type != NONE_ROW)
+    {
+      GtkTreeIter it;
+
+      gtk_list_store_insert_before (GTK_LIST_STORE (model), &it, &iter);
+      gtk_list_store_set (GTK_LIST_STORE (model), &it,
+          TEXT_COLUMN, _("<b>No DVD</b>\nNo device"), TYPE_COLUMN, NONE_ROW, -1);
+    }
+  }
+
+  if (gtk_combo_box_get_active (GTK_COMBO_BOX (chooser)) == -1)
+    gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), 0);
+}
+
+static void
+ogmdvd_drive_chooser_widget_medium_added (OGMDvdDriveChooserWidget *chooser, OGMRipDrive *drive)
+{
+  OGMRipMedia *media;
+
+  // media = ogmrip_disc_new (ogmrip_media_get_device (media), NULL);
+  media = NULL;
+  if (!media)
+    ogmdvd_drive_chooser_widget_medium_removed (chooser, drive);
+  else
+  {
+    GtkTreeModel *model;
+    GtkTreeIter sibling, iter;
+    gchar *text, *name, *title;
+
+    name = ogmrip_drive_get_name (drive);
+    if (!name)
+      name = g_strdup (_("Unknown Media"));
+
+    title = g_markup_escape_text (ogmrip_media_get_label (media), -1);
+    text = g_strdup_printf ("<b>%s</b>\n%s", title, name);
+    g_free (title);
+
+    g_free (name);
+
+    model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
+    if (gtk_tree_model_get_iter_first (model, &sibling))
+    {
+      gint type;
+
+      do
+      {
+        gtk_tree_model_get (model, &sibling, TYPE_COLUMN, &type, -1);
+        if (type != DEVICE_ROW)
+          break;
+      }
+      while (gtk_tree_model_iter_next (model, &sibling));
+
+      if (type == NONE_ROW)
+        iter = sibling;
+      else
+        gtk_list_store_insert_before (GTK_LIST_STORE (model), &iter, &sibling);
+    }
+    else
+      gtk_list_store_append (GTK_LIST_STORE (model), &iter);
+
+    gtk_list_store_set (GTK_LIST_STORE (model), &iter, TEXT_COLUMN, text,
+        TYPE_COLUMN, DEVICE_ROW, MEDIA_COLUMN, media, DRIVE_COLUMN, drive, -1);
+    g_free (text);
+
+    g_object_unref (media);
+
+    if (gtk_combo_box_get_active (GTK_COMBO_BOX (chooser)) == -1)
+      gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), 0);
+    else
+    {
+      if (gtk_combo_box_get_active_iter (GTK_COMBO_BOX (chooser), &sibling))
+      {
+        GtkTreePath *path1, *path2;
+
+        path1 = gtk_tree_model_get_path (model, &iter);
+        path2 = gtk_tree_model_get_path (model, &sibling);
+
+        if (path1 && path2 && gtk_tree_path_compare (path1, path2) == 0)
+          ogmdvd_drive_chooser_widget_changed (GTK_COMBO_BOX (chooser));
+
+        if (path1)
+          gtk_tree_path_free (path1);
+
+        if (path2)
+          gtk_tree_path_free (path2);
+      }
+    }
+  }
+}
 
 G_DEFINE_TYPE_WITH_CODE (OGMDvdDriveChooserWidget, ogmdvd_drive_chooser_widget, GTK_TYPE_COMBO_BOX,
-    G_IMPLEMENT_INTERFACE (OGMDVD_TYPE_DRIVE_CHOOSER, ogmdvd_drive_chooser_init))
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_MEDIA_CHOOSER, ogmrip_media_chooser_init))
 
 static void
 ogmdvd_drive_chooser_widget_class_init (OGMDvdDriveChooserWidgetClass *klass)
 {
   GtkComboBoxClass *combo_box_class;
 
-  combo_box_class = (GtkComboBoxClass *) klass;
+  combo_box_class = GTK_COMBO_BOX_CLASS (klass);
   combo_box_class->changed = ogmdvd_drive_chooser_widget_changed;
 
   g_type_class_add_private (klass, sizeof (OGMDvdDriveChooserWidgetPriv));
 }
 
 static void
-ogmdvd_drive_chooser_init (OGMDvdDriveChooserInterface  *iface)
+ogmrip_media_chooser_init (OGMRipMediaChooserInterface  *iface)
 {
-  iface->get_device = ogmdvd_drive_chooser_widget_get_device;
+  iface->get_media = ogmdvd_drive_chooser_widget_get_media;
 }
 
 static void
@@ -92,10 +258,16 @@ ogmdvd_drive_chooser_widget_init (OGMDvdDriveChooserWidget *chooser)
 {
   GtkCellRenderer *cell;
   GtkListStore *store;
+  GtkTreeIter iter;
+
+  GSList *drives, *drive;
+
+  OGMRipMonitor *monitor;
+  OGMRipDisconnector *disconnector;
 
   chooser->priv = OGMDVD_DRIVE_CHOOSER_WIDGET_GET_PRIVATE (chooser);
 
-  store = gtk_list_store_new (N_COLUMNS, G_TYPE_STRING, G_TYPE_INT, G_TYPE_STRING, G_TYPE_POINTER);
+  store = gtk_list_store_new (N_COLUMNS, G_TYPE_STRING, G_TYPE_INT, G_TYPE_OBJECT, G_TYPE_POINTER);
   gtk_combo_box_set_model (GTK_COMBO_BOX (chooser), GTK_TREE_MODEL (store));
   g_object_unref (store);
 
@@ -106,25 +278,71 @@ ogmdvd_drive_chooser_widget_init (OGMDvdDriveChooserWidget *chooser)
   gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (chooser), cell, TRUE);
   gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (chooser), cell, "markup", TEXT_COLUMN, NULL);
 
-  ogmdvd_drive_chooser_widget_fill (chooser);
+  monitor = ogmrip_monitor_get_default ();
+  drives = ogmrip_monitor_get_drives (monitor);
+  g_object_unref (monitor);
+
+  for (drive = drives; drive; drive = drive->next)
+  {
+    if (ogmrip_drive_get_drive_type (OGMRIP_DRIVE (drive->data)) & OGMRIP_DRIVE_DVD)
+    {
+      disconnector = g_new0 (OGMRipDisconnector, 1);
+
+      disconnector->drive = drive->data;
+      disconnector->handler = g_signal_connect_swapped (drive->data, "medium-added",
+          G_CALLBACK (ogmdvd_drive_chooser_widget_medium_added), chooser);
+
+      g_object_weak_ref (G_OBJECT (chooser), ogmrip_signal_disconnector, disconnector);
+
+      disconnector = g_new0 (OGMRipDisconnector, 1);
+
+      disconnector->drive = drive->data;
+      disconnector->handler = g_signal_connect_swapped (drive->data, "medium-removed", 
+          G_CALLBACK (ogmdvd_drive_chooser_widget_medium_removed), chooser);
+
+      g_object_weak_ref (G_OBJECT (chooser), ogmrip_signal_disconnector, disconnector);
+    }
+  }
+
+  g_slist_foreach (drives, (GFunc) g_object_unref, NULL);
+  g_slist_free (drives);
+
+  if (gtk_tree_model_iter_n_children (GTK_TREE_MODEL (store), NULL) == 0)
+  {
+    gtk_list_store_append (store, &iter);
+    gtk_list_store_set (store, &iter,
+        TEXT_COLUMN, _("<b>No DVD</b>\nNo device"), TYPE_COLUMN, NONE_ROW, -1);
+  }
+
+  gtk_list_store_append (store, &iter);
+  gtk_list_store_set (store, &iter,
+      TEXT_COLUMN, NULL, TYPE_COLUMN, SEL_SEP_ROW, -1);
+
+  gtk_list_store_append (store, &iter);
+  gtk_list_store_set (store, &iter,
+      TEXT_COLUMN, _("Select a DVD structure..."), TYPE_COLUMN, DIR_SEL_ROW, -1);
+
+  gtk_list_store_append (store, &iter);
+  gtk_list_store_set (store, &iter,
+      TEXT_COLUMN, _("Select an ISO file..."), TYPE_COLUMN, FILE_SEL_ROW, -1);
+
 }
 
 static gboolean
-ogmdvd_drive_chooser_widget_add_device (GtkComboBox *combo_box, const gchar *device, gboolean file)
+ogmdvd_drive_chooser_widget_add_media (GtkComboBox *combo, OGMRipMedia *media, gboolean file)
 {
-  OGMRipMedia *disc;
   GtkTreeModel *model;
   GtkTreeIter sibling, iter;
   gchar *title, *text;
   gint type;
 
-  model = gtk_combo_box_get_model (combo_box);
+  model = gtk_combo_box_get_model (combo);
   if (gtk_tree_model_get_iter_first (model, &sibling))
   {
     do
     {
       gtk_tree_model_get (model, &sibling, TYPE_COLUMN, &type, -1);
-      if (type != OGMDVD_DEVICE_BLOCK && type != OGMDVD_DEVICE_NONE)
+      if (type != DEVICE_ROW && type != NONE_ROW)
         break;
     }
     while (gtk_tree_model_iter_next (model, &sibling));
@@ -142,7 +360,7 @@ ogmdvd_drive_chooser_widget_add_device (GtkComboBox *combo_box, const gchar *dev
       if (gtk_tree_model_iter_next (model, &sibling))
       {
         gtk_tree_model_get (model, &sibling, TYPE_COLUMN, &type, -1);
-        if (type == OGMDVD_DEVICE_FILE || type == OGMDVD_DEVICE_DIR)
+        if (type == FILE_ROW || type == DIR_ROW)
           iter = sibling;
       }
     }
@@ -151,36 +369,31 @@ ogmdvd_drive_chooser_widget_add_device (GtkComboBox *combo_box, const gchar *dev
   if (!gtk_list_store_iter_is_valid (GTK_LIST_STORE (model), &iter))
     return FALSE;
 
-  disc = ogmdvd_disc_new (device, NULL);
-  if (!disc)
-    return FALSE;
-
-  title = g_markup_escape_text (ogmrip_media_get_label (disc), -1);
-  text = g_strdup_printf ("<b>%s</b>\n%s", title, device);
+  title = g_markup_escape_text (ogmrip_media_get_label (media), -1);
+  text = g_strdup_printf ("<b>%s</b>\n%s", title, ogmrip_media_get_uri (media) + 6);
   g_free (title);
 
   gtk_list_store_set (GTK_LIST_STORE (model), &iter, TEXT_COLUMN, text,
-      TYPE_COLUMN, file ? OGMDVD_DEVICE_FILE : OGMDVD_DEVICE_DIR, DEVICE_COLUMN, device, DRIVE_COLUMN, NULL, -1);
+      TYPE_COLUMN, file ? FILE_ROW : DIR_ROW, MEDIA_COLUMN, media, DRIVE_COLUMN, NULL, -1);
   g_free (text);
 
-  gtk_combo_box_set_active_iter (combo_box, &iter);
+  gtk_combo_box_set_active_iter (combo, &iter);
 
   return TRUE;
 }
 
-static gchar *
-ogmdvd_drive_chooser_widget_select_file (GtkComboBox *combo_box, gboolean file)
+static OGMRipMedia *
+ogmdvd_drive_chooser_widget_select_file (GtkComboBox *combo, gboolean file)
 {
+  OGMRipMedia *media = NULL;
   GtkWidget *dialog, *toplevel;
   GdkPixbuf *pixbuf;
 
-  gchar *device = NULL;
-
-  dialog = gtk_file_chooser_dialog_new (file ? _("Select an ISO file") : _("Select a DVD structure"),
+  dialog = gtk_file_chooser_dialog_new (file ? _("Select an media file") : _("Select a media structure"),
       NULL, file ? GTK_FILE_CHOOSER_ACTION_OPEN : GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
       GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_OK, NULL);
 
-  toplevel = gtk_widget_get_toplevel (GTK_WIDGET (combo_box));
+  toplevel = gtk_widget_get_toplevel (GTK_WIDGET (combo));
   if (gtk_widget_is_toplevel (toplevel) && GTK_IS_WINDOW (toplevel))
   {
     gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (toplevel));
@@ -212,61 +425,52 @@ ogmdvd_drive_chooser_widget_select_file (GtkComboBox *combo_box, gboolean file)
 
   if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_OK)
   {
-    gchar *dir;
+    gchar *path;
 
     gtk_widget_hide (dialog);
 
-    dir = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
-    if (dir)
+    path = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
+    if (path)
     {
-      gchar *basename;
-
-      basename = g_path_get_basename (dir);
-      if (g_ascii_strcasecmp (basename, "video_ts") == 0)
-        device = g_path_get_dirname (dir);
-      else
-        device = g_strdup (dir);
-      g_free (basename);
+      media = ogmdvd_disc_new (path, NULL);
+      g_free (path);
     }
-    g_free (dir);
   }
 
   gtk_widget_destroy (dialog);
 
-  return device;
+  return media;
 }
 
 static void
-ogmdvd_drive_chooser_widget_changed (GtkComboBox *combo_box)
+ogmdvd_drive_chooser_widget_changed (GtkComboBox *combo)
 {
   OGMDvdDriveChooserWidget *chooser;
-
+  OGMRipMedia *media = NULL;
   GtkTreeModel *model;
   GtkTreeIter iter;
-
-  gchar *device = NULL;
   gint type;
 
-  chooser = OGMDVD_DRIVE_CHOOSER_WIDGET (combo_box);
-  model = gtk_combo_box_get_model (combo_box);
+  chooser = OGMDVD_DRIVE_CHOOSER_WIDGET (combo);
+  model = gtk_combo_box_get_model (combo);
 
-  if (gtk_combo_box_get_active_iter (combo_box, &iter))
+  if (gtk_combo_box_get_active_iter (combo, &iter))
   {
     gtk_tree_model_get (model, &iter, TYPE_COLUMN, &type, -1);
     switch (type)
     {
-      case OGMDVD_DEVICE_BLOCK:
-      case OGMDVD_DEVICE_FILE:
-      case OGMDVD_DEVICE_DIR:
-        gtk_tree_model_get (model, &iter, DEVICE_COLUMN, &device, -1);
+      case DEVICE_ROW:
+      case FILE_ROW:
+      case DIR_ROW:
+        gtk_tree_model_get (model, &iter, MEDIA_COLUMN, &media, -1);
         break;
       case FILE_SEL_ROW:
       case DIR_SEL_ROW:
-        device = ogmdvd_drive_chooser_widget_select_file (combo_box, type == FILE_SEL_ROW);
-        if (!device || !ogmdvd_drive_chooser_widget_add_device (combo_box, device, type == FILE_SEL_ROW))
+        media = ogmdvd_drive_chooser_widget_select_file (combo, type == FILE_SEL_ROW);
+        if (!media || !ogmdvd_drive_chooser_widget_add_media (combo, media, type == FILE_SEL_ROW))
         {
           if (!chooser->priv->last_row)
-            gtk_combo_box_set_active (combo_box, 0);
+            gtk_combo_box_set_active (combo, 0);
           else
           {
             GtkTreePath *path;
@@ -274,9 +478,9 @@ ogmdvd_drive_chooser_widget_changed (GtkComboBox *combo_box)
 
             path = gtk_tree_row_reference_get_path (chooser->priv->last_row);
             if (gtk_tree_model_get_iter (model, &prev, path))
-              gtk_combo_box_set_active_iter (combo_box, &prev);
+              gtk_combo_box_set_active_iter (combo, &prev);
             else
-              gtk_combo_box_set_active (combo_box, 0);
+              gtk_combo_box_set_active (combo, 0);
             gtk_tree_path_free (path);
           }
         }
@@ -285,7 +489,7 @@ ogmdvd_drive_chooser_widget_changed (GtkComboBox *combo_box)
         break;
     }
 
-    if (type <= OGMDVD_DEVICE_DIR)
+    if (type <= DIR_ROW)
     {
       GtkTreePath *path;
 
@@ -298,256 +502,10 @@ ogmdvd_drive_chooser_widget_changed (GtkComboBox *combo_box)
     }
   }
 
-  g_signal_emit_by_name (combo_box, "device-changed", device, type <= OGMDVD_DEVICE_DIR ? type : OGMDVD_DEVICE_NONE);
+  g_signal_emit_by_name (combo, "media-changed", media);
 
-  if (device)
-    g_free (device);
-}
-
-/*
- * Internal signals
- */
-
-static void
-ogmdvd_drive_chooser_widget_medium_removed (OGMDvdDriveChooserWidget *chooser, OGMDvdDrive *drive1)
-{
-  GtkTreeModel *model;
-  GtkTreeIter iter;
-  gint type;
-
-  model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
-  if (gtk_tree_model_get_iter_first (model, &iter))
-  {
-    OGMDvdDrive *drive2;
-
-    do
-    {
-      gtk_tree_model_get (model, &iter, TYPE_COLUMN, &type, DRIVE_COLUMN, &drive2, -1);
-      if (type == OGMDVD_DEVICE_BLOCK && drive1 == drive2)
-      {
-        gtk_list_store_remove (GTK_LIST_STORE (model), &iter);
-        break;
-      }
-    }
-    while (gtk_tree_model_iter_next (model, &iter));
-  }
-
-  if (gtk_tree_model_get_iter_first (model, &iter))
-  {
-    gtk_tree_model_get (model, &iter, TYPE_COLUMN, &type, -1);
-    if (type != OGMDVD_DEVICE_BLOCK && type != OGMDVD_DEVICE_NONE)
-    {
-      GtkTreeIter it;
-
-      gtk_list_store_insert_before (GTK_LIST_STORE (model), &it, &iter);
-      gtk_list_store_set (GTK_LIST_STORE (model), &it,
-          TEXT_COLUMN, _("<b>No DVD</b>\nNo device"), TYPE_COLUMN, OGMDVD_DEVICE_NONE, -1);
-    }
-  }
-
-  if (gtk_combo_box_get_active (GTK_COMBO_BOX (chooser)) == -1)
-    gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), 0);
-}
-
-static void
-ogmdvd_drive_chooser_widget_medium_added (OGMDvdDriveChooserWidget *chooser, OGMDvdDrive *drive)
-{
-  OGMRipMedia *disc;
-
-  disc = ogmdvd_disc_new (ogmdvd_drive_get_device (drive), NULL);
-  if (!disc)
-    ogmdvd_drive_chooser_widget_medium_removed (chooser, drive);
-  else
-  {
-    GtkTreeModel *model;
-    GtkTreeIter sibling, iter;
-    gchar *text, *name, *title;
-
-    name = ogmdvd_drive_get_name (drive);
-    if (!name)
-      name = g_strdup (_("Unknown Drive"));
-
-    title = g_markup_escape_text (ogmrip_media_get_label (disc), -1);
-    text = g_strdup_printf ("<b>%s</b>\n%s", title, name);
-    g_free (title);
-
-    g_free (name);
-
-    model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
-    if (gtk_tree_model_get_iter_first (model, &sibling))
-    {
-      gint type;
-
-      do
-      {
-        gtk_tree_model_get (model, &sibling, TYPE_COLUMN, &type, -1);
-        if (type != OGMDVD_DEVICE_BLOCK)
-          break;
-      }
-      while (gtk_tree_model_iter_next (model, &sibling));
-
-      if (type == OGMDVD_DEVICE_NONE)
-        iter = sibling;
-      else
-        gtk_list_store_insert_before (GTK_LIST_STORE (model), &iter, &sibling);
-    }
-    else
-      gtk_list_store_append (GTK_LIST_STORE (model), &iter);
-
-    gtk_list_store_set (GTK_LIST_STORE (model), &iter, TEXT_COLUMN, text, TYPE_COLUMN, OGMDVD_DEVICE_BLOCK,
-        DEVICE_COLUMN, ogmdvd_drive_get_device (drive), DRIVE_COLUMN, drive, -1);
-    g_free (text);
-
-    g_object_unref (disc);
-
-    if (gtk_combo_box_get_active (GTK_COMBO_BOX (chooser)) == -1)
-      gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), 0);
-    else
-    {
-      if (gtk_combo_box_get_active_iter (GTK_COMBO_BOX (chooser), &sibling))
-      {
-        GtkTreePath *path1, *path2;
-
-        path1 = gtk_tree_model_get_path (model, &iter);
-        path2 = gtk_tree_model_get_path (model, &sibling);
-
-        if (path1 && path2 && gtk_tree_path_compare (path1, path2) == 0)
-          ogmdvd_drive_chooser_widget_changed (GTK_COMBO_BOX (chooser));
-
-        if (path1)
-          gtk_tree_path_free (path1);
-
-        if (path2)
-          gtk_tree_path_free (path2);
-      }
-    }
-  }
-}
-
-/*
- * Internal functions
- */
-
-typedef struct
-{
-  OGMDvdDrive *drive;
-  gulong handler;
-} OGMRipDisconnector;
-
-static void
-ogmrip_signal_disconnector (gpointer data, GObject *gobject)
-{
-  OGMRipDisconnector *disconnector = data;
-
-  g_signal_handler_disconnect (disconnector->drive, disconnector->handler);
-
-  g_free (disconnector);
-}
-
-static void
-ogmdvd_drive_chooser_widget_fill (OGMDvdDriveChooserWidget *chooser)
-{
-  GtkTreeModel *model;
-  GtkTreeIter iter;
-  GSList *drives, *drive;
-
-  OGMDvdMonitor *monitor;
-  OGMRipDisconnector *disconnector;
-
-  monitor = ogmdvd_monitor_get_default ();
-  drives = ogmdvd_monitor_get_drives (monitor);
-  g_object_unref (monitor);
-
-  for (drive = drives; drive; drive = drive->next)
-  {
-    if (ogmdvd_drive_get_drive_type (OGMDVD_DRIVE (drive->data)) & OGMDVD_DRIVE_DVD)
-    {
-      disconnector = g_new0 (OGMRipDisconnector, 1);
-
-      disconnector->drive = drive->data;
-      disconnector->handler = g_signal_connect_swapped (drive->data, "medium-added",
-          G_CALLBACK (ogmdvd_drive_chooser_widget_medium_added), chooser);
-
-      g_object_weak_ref (G_OBJECT (chooser), ogmrip_signal_disconnector, disconnector);
-
-      disconnector = g_new0 (OGMRipDisconnector, 1);
-
-      disconnector->drive = drive->data;
-      disconnector->handler = g_signal_connect_swapped (drive->data, "medium-removed", 
-          G_CALLBACK (ogmdvd_drive_chooser_widget_medium_removed), chooser);
-
-      g_object_weak_ref (G_OBJECT (chooser), ogmrip_signal_disconnector, disconnector);
-/*
-      ogmdvd_drive_chooser_widget_medium_added (chooser, OGMDVD_DRIVE (drive->data));
-*/
-    }
-  }
-
-  g_slist_foreach (drives, (GFunc) g_object_unref, NULL);
-  g_slist_free (drives);
-
-  model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
-
-  if (gtk_tree_model_iter_n_children (model, NULL) == 0)
-  {
-    gtk_list_store_append (GTK_LIST_STORE (model), &iter);
-    gtk_list_store_set (GTK_LIST_STORE (model), &iter,
-        TEXT_COLUMN, _("<b>No DVD</b>\nNo device"), TYPE_COLUMN, OGMDVD_DEVICE_NONE, -1);
-  }
-
-  gtk_list_store_append (GTK_LIST_STORE (model), &iter);
-  gtk_list_store_set (GTK_LIST_STORE (model), &iter,
-      TEXT_COLUMN, NULL, TYPE_COLUMN, SEL_SEP_ROW, -1);
-
-  gtk_list_store_append (GTK_LIST_STORE (model), &iter);
-  gtk_list_store_set (GTK_LIST_STORE (model), &iter,
-      TEXT_COLUMN, _("Select a DVD structure..."), TYPE_COLUMN, DIR_SEL_ROW, -1);
-
-  gtk_list_store_append (GTK_LIST_STORE (model), &iter);
-  gtk_list_store_set (GTK_LIST_STORE (model), &iter,
-      TEXT_COLUMN, _("Select an ISO file..."), TYPE_COLUMN, FILE_SEL_ROW, -1);
-
-  gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), 0);
-}
-
-static gboolean
-ogmdvd_drive_chooser_widget_sep_func (GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
-{
-  gint type = OGMDVD_DEVICE_NONE;
-
-  gtk_tree_model_get (model, iter, TYPE_COLUMN, &type, -1);
-
-  return (type == FILE_SEP_ROW || type == SEL_SEP_ROW);
-}
-
-static gchar *
-ogmdvd_drive_chooser_widget_get_device (OGMDvdDriveChooser *chooser, OGMDvdDeviceType *type)
-{
-  const gchar *device;
-  GtkTreeModel *model;
-  GtkTreeIter iter;
-  gint atype;
-
-  g_return_val_if_fail (OGMDVD_IS_DRIVE_CHOOSER_WIDGET (chooser), NULL);
-
-  if (!gtk_combo_box_get_active_iter (GTK_COMBO_BOX (chooser), &iter))
-    return NULL;
-
-  model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
-
-  gtk_tree_model_get (model, &iter, TYPE_COLUMN, &atype, -1);
-  if (atype != OGMDVD_DEVICE_BLOCK && atype != OGMDVD_DEVICE_FILE && atype != OGMDVD_DEVICE_DIR)
-    return NULL;
-
-  gtk_tree_model_get (model, &iter, DEVICE_COLUMN, &device, -1);
-
-  if (type)
-    *type = atype;
-
-  if (!device)
-    return NULL;
-
-  return g_strdup (device);
+  if (media)
+    g_object_unref (media);
 }
 
 /**

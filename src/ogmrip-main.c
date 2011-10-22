@@ -53,6 +53,7 @@
 typedef struct
 {
   OGMRipMedia *media;
+  gboolean prepared;
 
   GtkWidget *window;
 
@@ -270,30 +271,38 @@ ogmrip_main_dbus_uninhibit (OGMRipData *data, guint cookie)
 /*
  * Loads a media
  */
-static gboolean
-ogmrip_main_load (OGMRipData *data, const gchar *path)
+static void
+ogmrip_main_load (OGMRipData *data, OGMRipMedia *media)
 {
-  GError *error = NULL;
-  OGMRipMedia *disc;
   gint nvid;
-
-  disc = ogmdvd_disc_new (path, &error);
-  if (!disc)
-  {
-    ogmrip_run_error_dialog (GTK_WINDOW (data->window), error, _("Could not open the DVD"));
-    g_clear_error (&error);
-    return FALSE;
-  }
 
   if (data->media)
     g_object_unref (data->media);
-  data->media = disc;
+  data->media = media;
 
-  ogmrip_title_chooser_set_media (OGMRIP_TITLE_CHOOSER (data->title_chooser), disc);
+  ogmrip_title_chooser_set_media (OGMRIP_TITLE_CHOOSER (data->title_chooser), media);
 
-  nvid = ogmrip_media_get_n_titles (disc);
+  nvid = ogmrip_media_get_n_titles (media);
   gtk_entry_set_text (GTK_ENTRY (data->title_entry),
-      nvid > 0 ? ogmrip_media_get_label (disc) : "");
+      nvid > 0 ? ogmrip_media_get_label (media) : "");
+
+  gtk_action_set_sensitive (data->extract_action, data->prepared);
+}
+
+static gboolean
+ogmrip_main_load_path (OGMRipData *data, const gchar *path)
+{
+  OGMRipMedia *media;
+
+  media = ogmdvd_disc_new (path, NULL);
+  if (!media)
+  {
+    ogmrip_run_error_dialog (GTK_WINDOW (data->window), NULL, _("Could not open the media"));
+    return FALSE;
+  }
+
+  ogmrip_main_load (data, media);
+  g_object_unref (media);
 
   return TRUE;
 }
@@ -346,7 +355,7 @@ ogmrip_main_clean (OGMRipData *data, OGMRipEncoding *encoding, gboolean error)
     {
       GtkWidget *dialog;
 
-      dialog = gtk_message_dialog_new (GTK_WINDOW (data->window), 
+      dialog = gtk_message_dialog_new (GTK_WINDOW (data->window),
           GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
           GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
           _("Do you want to remove the copy of the DVD ?"));
@@ -1236,17 +1245,17 @@ ogmrip_main_eject_activated (OGMRipData *data, GtkWidget *dialog)
 {
   if (data->media)
   {
-    gchar *device;
+    OGMRipMedia *media;
 
-    device = ogmdvd_drive_chooser_get_device (OGMDVD_DRIVE_CHOOSER (dialog), NULL);
-    if (device)
+    media = ogmrip_media_chooser_get_media (OGMRIP_MEDIA_CHOOSER (dialog));
+    if (media)
     {
       const gchar *uri;
 
       uri = ogmrip_media_get_uri (data->media);
       if (!g_str_has_prefix (uri, "dvd://"))
         g_warning ("Unknown scheme for '%s'", uri);
-      else if (g_str_equal (device, uri + 6))
+      else if (g_str_equal (ogmrip_media_get_uri (media), uri))
       {
         g_object_unref (data->media);
         data->media = NULL;
@@ -1254,7 +1263,6 @@ ogmrip_main_eject_activated (OGMRipData *data, GtkWidget *dialog)
         ogmrip_title_chooser_set_media (OGMRIP_TITLE_CHOOSER (data->title_chooser), NULL);
         gtk_entry_set_text (GTK_ENTRY (data->title_entry), "");
       }
-      g_free (device);
     }
   }
 }
@@ -1275,16 +1283,13 @@ ogmrip_main_load_activated (OGMRipData *data)
 
   if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_OK)
   {
-    gchar *device;
+    OGMRipMedia *media;
 
     gtk_widget_hide (dialog);
 
-    device = ogmdvd_drive_chooser_get_device (OGMDVD_DRIVE_CHOOSER (dialog), NULL);
-    if (device)
-    {
-      ogmrip_main_load (data, device);
-      g_free (device);
-    }
+    media = ogmrip_media_chooser_get_media (OGMRIP_MEDIA_CHOOSER (dialog));
+    if (media)
+      ogmrip_main_load (data, media);
   }
   gtk_widget_destroy (dialog);
 }
@@ -1431,7 +1436,7 @@ ogmrip_main_run_options_dialog (OGMRipData *data, OGMRipEncoding *encoding, guin
     g_object_unref (codec);
   }
 
-  if (g_settings_get_boolean (settings, OGMRIP_SETTINGS_AUTO_SUBP) && 
+  if (g_settings_get_boolean (settings, OGMRIP_SETTINGS_AUTO_SUBP) &&
       !ogmrip_encoding_get_nth_subp_codec (encoding, 0))
   {
     codec = ogmrip_encoding_get_nth_audio_codec (encoding, 0);
@@ -1684,17 +1689,17 @@ ogmrip_main_about_activated (OGMRipData *data)
 {
   static GdkPixbuf *icon = NULL;
 
-  const gchar *authors[] = 
-  { 
-    "Olivier Rolland <billl@users.sourceforge.net>", 
-    NULL 
+  const gchar *authors[] =
+  {
+    "Olivier Rolland <billl@users.sourceforge.net>",
+    NULL
   };
   gchar *translator_credits = _("translator-credits");
 
-  const gchar *documenters[] = 
-  { 
+  const gchar *documenters[] =
+  {
     "Olivier Rolland <billl@users.sourceforge.net>",
-    NULL 
+    NULL
   };
 
   if (!icon)
@@ -1703,7 +1708,7 @@ ogmrip_main_about_activated (OGMRipData *data)
   if (g_str_equal (translator_credits, "translator-credits"))
     translator_credits = NULL;
 
-  gtk_show_about_dialog (GTK_WINDOW (data->window), 
+  gtk_show_about_dialog (GTK_WINDOW (data->window),
       "name", PACKAGE_NAME,
       "version", PACKAGE_VERSION,
       "comments", _("A DVD Encoder for GNOME"),
@@ -1772,7 +1777,7 @@ ogmrip_main_chapter_selection_changed (OGMRipData *data)
     }
   }
 
-  gtk_action_set_sensitive (data->extract_action, sensitive); 
+  gtk_action_set_sensitive (data->extract_action, sensitive);
   gtk_widget_set_sensitive (data->relative_check, sensitive && (start_chap > 0 || end_chap != -1));
 }
 
@@ -1802,7 +1807,7 @@ ogmrip_main_destroyed (OGMRipData *data)
     g_object_unref (data->player);
     data->player = NULL;
   }
-  
+
   if (data->manager)
   {
     g_object_unref (data->manager);
@@ -1896,6 +1901,14 @@ ogmrip_main_connect_proxy (GtkUIManager *uimanager, GtkAction *action, GtkWidget
   }
 }
 
+static void
+ogmrip_main_app_prepared (OGMRipData *data, GParamSpec *pspec, GApplication *app)
+{
+  gtk_action_set_sensitive (data->extract_action, data->media != NULL);
+
+  data->prepared = TRUE;
+}
+
 static OGMRipData *
 ogmrip_main_new (GApplication *app)
 {
@@ -1933,6 +1946,8 @@ ogmrip_main_new (GApplication *app)
     g_error ("Couldn't load builder file: %s", error->message);
 
   data = g_new0 (OGMRipData, 1);
+  g_signal_connect_swapped (app, "notify::is-prepared",
+      G_CALLBACK (ogmrip_main_app_prepared), data);
 
   data->window = gtk_builder_get_widget (builder, "main-window");
   gtk_window_set_default_size (GTK_WINDOW (data->window), 350, 500);
@@ -2018,8 +2033,6 @@ ogmrip_main_new (GApplication *app)
   gtk_activatable_set_related_action (GTK_ACTIVATABLE (widget), action);
 
   data->extract_action =  gtk_action_group_get_action (action_group, "Extract");
-  g_object_bind_property (app, "is-prepared",
-      data->extract_action, "sensitive", G_BINDING_SYNC_CREATE);
   g_signal_connect_swapped (data->extract_action, "activate",
       G_CALLBACK (ogmrip_main_extract_activated), data);
 
@@ -2072,7 +2085,7 @@ ogmrip_main_new (GApplication *app)
 
   data->chapter_store = gtk_tree_view_get_model (GTK_TREE_VIEW (child));
 
-  g_signal_connect_swapped (data->chapter_store, "selection-changed", 
+  g_signal_connect_swapped (data->chapter_store, "selection-changed",
       G_CALLBACK (ogmrip_main_chapter_selection_changed), data);
 
   action = gtk_action_group_get_action (action_group, "SelectAll");
@@ -2244,7 +2257,7 @@ ogmrip_application_open_cb (GApplication *app, GFile **files, gint n_files, cons
 
     filename = g_file_get_path (files[i]);
     if (!g_file_test (filename, G_FILE_TEST_EXISTS) ||
-        !ogmrip_main_load (data, filename))
+        !ogmrip_main_load_path (data, filename))
       gtk_widget_destroy (data->window);
     else
     {

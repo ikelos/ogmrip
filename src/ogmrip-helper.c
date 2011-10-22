@@ -36,6 +36,7 @@
 #include <locale.h>
 
 #include <ogmrip-dvd.h>
+#include <ogmrip-drive.h>
 
 extern const gchar *ogmdvd_languages[][3];
 extern const guint  ogmdvd_nlanguages;
@@ -47,9 +48,9 @@ gtk_dialog_response_accept (GtkDialog *dialog)
 }
 
 static gboolean
-ogmrip_drive_eject_idle (OGMDvdDrive *drive)
+ogmrip_drive_eject_idle (OGMRipDrive *drive)
 {
-  ogmdvd_drive_eject (drive);
+  ogmrip_drive_eject (drive);
 
   return FALSE;
 }
@@ -58,8 +59,8 @@ gboolean
 ogmrip_open_title (GtkWindow *parent, OGMRipTitle *title)
 {
   GError *error = NULL;
-  OGMDvdMonitor *monitor;
-  OGMDvdDrive *drive;
+  OGMRipMonitor *monitor;
+  OGMRipDrive *drive;
   GtkWidget *dialog;
   const gchar *uri;
 
@@ -74,8 +75,8 @@ ogmrip_open_title (GtkWindow *parent, OGMRipTitle *title)
 
   uri = ogmrip_media_get_uri (ogmrip_title_get_media (title));
 
-  monitor = ogmdvd_monitor_get_default ();
-  drive = ogmdvd_monitor_get_drive (monitor, uri + 6);
+  monitor = ogmrip_monitor_get_default ();
+  drive = ogmrip_monitor_get_drive (monitor, uri + 6);
   g_object_unref (monitor);
 
   if (!drive)

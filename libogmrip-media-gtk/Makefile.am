@@ -7,6 +7,7 @@ libogmrip_media_gtk_la_SOURCES =   \
   ogmrip-error-dialog.c            \
   ogmrip-language-chooser-widget.c \
   ogmrip-language-store.c          \
+  ogmrip-media-chooser.c           \
   ogmrip-source-chooser.c          \
   ogmrip-title-chooser.c           \
   ogmrip-title-chooser-widget.c
@@ -20,6 +21,7 @@ libogmrip_media_gtk_la_HEADERS =   \
   ogmrip-error-dialog.h            \
   ogmrip-language-chooser-widget.h \
   ogmrip-language-store.h          \
+  ogmrip-media-chooser.h           \
   ogmrip-source-chooser.h          \
   ogmrip-title-chooser.h           \
   ogmrip-title-chooser-widget.h    \

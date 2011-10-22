@@ -1,4 +1,4 @@
-/* OGMDvd - A wrapper library around libdvdread
+/* OGMRipDrive - An optical drive library form OGMRip
  * Copyright (C) 2009-2011 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -20,9 +20,9 @@
 #include "config.h"
 #endif
 
-#include "ogmdvd-device.h"
-#include "ogmdvd-transport.h"
-#include "ogmdvd-drive.h"
+#include "ogmrip-drive-device.h"
+#include "ogmrip-drive-transport.h"
+#include "ogmrip-drive-object.h"
 
 #include <fcntl.h>
 #include <string.h>
@@ -33,7 +33,7 @@
 #endif
 
 gpointer
-ogmdvd_device_open (const gchar *device, gboolean exclusive)
+ogmrip_device_open (const gchar *device, gboolean exclusive)
 {
   g_return_val_if_fail (device != NULL, NULL);
 
@@ -103,7 +103,7 @@ ogmdvd_device_open (const gchar *device, gboolean exclusive)
 }
 
 void
-ogmdvd_device_close (gpointer handle)
+ogmrip_device_close (gpointer handle)
 {
   g_return_if_fail (handle != NULL);
 
@@ -117,7 +117,7 @@ ogmdvd_device_close (gpointer handle)
 }
 
 gint
-ogmdvd_device_get_fd (gpointer handle)
+ogmrip_device_get_fd (gpointer handle)
 {
   g_return_val_if_fail (handle != NULL, -1);
 
@@ -133,7 +133,7 @@ ogmdvd_device_get_fd (gpointer handle)
 }
 
 gboolean
-ogmdvd_device_inquiry (gpointer handle, gchar **vendor, gchar **name)
+ogmrip_device_inquiry (gpointer handle, gchar **vendor, gchar **name)
 {
   Scsi_Command *cmd;
   guchar buf[36];
@@ -141,7 +141,7 @@ ogmdvd_device_inquiry (gpointer handle, gchar **vendor, gchar **name)
 
   g_return_val_if_fail (handle != NULL, FALSE);
 
-  fd = ogmdvd_device_get_fd (handle);
+  fd = ogmrip_device_get_fd (handle);
   if (fd < 0)
     return FALSE;
 
@@ -169,14 +169,14 @@ ogmdvd_device_inquiry (gpointer handle, gchar **vendor, gchar **name)
 }
 
 gint
-ogmdvd_device_test_unit (gpointer handle)
+ogmrip_device_test_unit (gpointer handle)
 {
   Scsi_Command *cmd;
   gint fd, res;
 
   g_return_val_if_fail (handle != NULL, -1);
 
-  fd = ogmdvd_device_get_fd (handle);
+  fd = ogmrip_device_get_fd (handle);
   if (fd < 0)
     return -1;
 
@@ -193,14 +193,14 @@ ogmdvd_device_test_unit (gpointer handle)
 }
 
 gboolean
-ogmdvd_device_start_stop_unit (gpointer handle)
+ogmrip_device_start_stop_unit (gpointer handle)
 {
   Scsi_Command *cmd;
   gint fd, res;
 
   g_return_val_if_fail (handle != NULL, FALSE);
 
-  fd = ogmdvd_device_get_fd (handle);
+  fd = ogmrip_device_get_fd (handle);
   if (fd < 0)
     return FALSE;
 
@@ -219,14 +219,14 @@ ogmdvd_device_start_stop_unit (gpointer handle)
 }
 
 gint
-ogmdvd_device_set_lock (gpointer handle, gboolean lock)
+ogmrip_device_set_lock (gpointer handle, gboolean lock)
 {
   Scsi_Command *cmd;
   gint fd, res;
 
   g_return_val_if_fail (handle != NULL, -1);
 
-  fd = ogmdvd_device_get_fd (handle);
+  fd = ogmrip_device_get_fd (handle);
   if (fd < 0)
     return -1;
 
@@ -244,7 +244,7 @@ ogmdvd_device_set_lock (gpointer handle, gboolean lock)
 }
 
 gint
-ogmdvd_device_get_profile (gpointer handle)
+ogmrip_device_get_profile (gpointer handle)
 {
   Scsi_Command *cmd;
   guchar buf[8], info[32], formats[260];
@@ -253,7 +253,7 @@ ogmdvd_device_get_profile (gpointer handle)
 
   g_return_val_if_fail (handle != NULL, -1);
 
-  fd = ogmdvd_device_get_fd (handle);
+  fd = ogmrip_device_get_fd (handle);
   if (fd < 0)
     return -1;
 
@@ -326,7 +326,7 @@ cleanup:
 }
 
 gint
-ogmdvd_device_get_capabilities (gpointer handle)
+ogmrip_device_get_capabilities (gpointer handle)
 {
   Scsi_Command *cmd;
   guchar buf[264];
@@ -335,7 +335,7 @@ ogmdvd_device_get_capabilities (gpointer handle)
 
   g_return_val_if_fail (handle != NULL, -1);
 
-  fd = ogmdvd_device_get_fd (handle);
+  fd = ogmrip_device_get_fd (handle);
   if (fd < 0)
     return -1;
 
@@ -369,49 +369,49 @@ ogmdvd_device_get_capabilities (gpointer handle)
   {
     switch (buf[i] << 8 | buf[i + 1])
     {
-      case OGMDVD_PROFILE_CDROM:
-        caps |= OGMDVD_DRIVE_CDROM;
+      case OGMRIP_PROFILE_CDROM:
+        caps |= OGMRIP_DRIVE_CDROM;
         break;
-      case OGMDVD_PROFILE_CDR:
-        caps |= OGMDVD_DRIVE_CDR;
+      case OGMRIP_PROFILE_CDR:
+        caps |= OGMRIP_DRIVE_CDR;
         break;
-      case OGMDVD_PROFILE_CDRW:
-        caps |= OGMDVD_DRIVE_CDRW;
+      case OGMRIP_PROFILE_CDRW:
+        caps |= OGMRIP_DRIVE_CDRW;
         break;
-      case OGMDVD_PROFILE_DVD_ROM:
-        caps |= OGMDVD_DRIVE_DVD;
+      case OGMRIP_PROFILE_DVD_ROM:
+        caps |= OGMRIP_DRIVE_DVD;
         break;
-      case OGMDVD_PROFILE_DVD_R:
-        caps |= OGMDVD_DRIVE_DVDR;
+      case OGMRIP_PROFILE_DVD_R:
+        caps |= OGMRIP_DRIVE_DVDR;
         break;
-      case OGMDVD_PROFILE_DVD_RAM:
-        caps |= OGMDVD_DRIVE_DVDRAM;
+      case OGMRIP_PROFILE_DVD_RAM:
+        caps |= OGMRIP_DRIVE_DVDRAM;
         break;
-      case OGMDVD_PROFILE_DVD_RW_RESTRICTED:
-      case OGMDVD_PROFILE_DVD_RW_SEQUENTIAL:
-        caps |= OGMDVD_DRIVE_DVDRW;
+      case OGMRIP_PROFILE_DVD_RW_RESTRICTED:
+      case OGMRIP_PROFILE_DVD_RW_SEQUENTIAL:
+        caps |= OGMRIP_DRIVE_DVDRW;
         break;
-      case OGMDVD_PROFILE_DVD_RW_PLUS:
-        caps |= OGMDVD_DRIVE_DVDRW_PLUS;
+      case OGMRIP_PROFILE_DVD_RW_PLUS:
+        caps |= OGMRIP_DRIVE_DVDRW_PLUS;
         break;
-      case OGMDVD_PROFILE_DVD_R_PLUS:
-        caps |= OGMDVD_DRIVE_DVDR_PLUS;
+      case OGMRIP_PROFILE_DVD_R_PLUS:
+        caps |= OGMRIP_DRIVE_DVDR_PLUS;
         break;
-      case OGMDVD_PROFILE_DVD_RW_PLUS_DL:
-        caps |= OGMDVD_DRIVE_DVDRW_PLUS_DL;
+      case OGMRIP_PROFILE_DVD_RW_PLUS_DL:
+        caps |= OGMRIP_DRIVE_DVDRW_PLUS_DL;
         break;
-      case OGMDVD_PROFILE_DVD_R_PLUS_DL:
-        caps |= OGMDVD_DRIVE_DVDR_PLUS_DL;
+      case OGMRIP_PROFILE_DVD_R_PLUS_DL:
+        caps |= OGMRIP_DRIVE_DVDR_PLUS_DL;
         break;
-      case OGMDVD_PROFILE_BD_ROM:
-        caps |= OGMDVD_DRIVE_BD;
+      case OGMRIP_PROFILE_BD_ROM:
+        caps |= OGMRIP_DRIVE_BD;
         break;
-      case OGMDVD_PROFILE_BR_R_SEQUENTIAL:
-      case OGMDVD_PROFILE_BR_R_RANDOM:
-        caps |= OGMDVD_DRIVE_BDR;
+      case OGMRIP_PROFILE_BR_R_SEQUENTIAL:
+      case OGMRIP_PROFILE_BR_R_RANDOM:
+        caps |= OGMRIP_DRIVE_BDR;
         break;
-      case OGMDVD_PROFILE_BD_RW:
-        caps |= OGMDVD_DRIVE_BDRW;
+      case OGMRIP_PROFILE_BD_RW:
+        caps |= OGMRIP_DRIVE_BDRW;
         break;
       default:
         break;

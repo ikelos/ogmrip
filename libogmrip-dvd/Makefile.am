@@ -2,28 +2,22 @@ lib_LTLIBRARIES = \
   libogmrip-dvd.la
 
 libogmrip_dvd_la_SOURCES = \
-  ogmdvd-audio.c     \
-  ogmdvd-contrib.c   \
-  ogmdvd-device.c    \
-  ogmdvd-disc.c      \
-  ogmdvd-drive.c     \
-  ogmdvd-monitor.c   \
-  ogmdvd-parser.c    \
-  ogmdvd-priv.c      \
-  ogmdvd-reader.c    \
-  ogmdvd-subp.c      \
-  ogmdvd-title.c     \
-  ogmdvd-transport.c
+  ogmdvd-audio.c   \
+  ogmdvd-contrib.c \
+  ogmdvd-disc.c    \
+  ogmdvd-parser.c  \
+  ogmdvd-priv.c    \
+  ogmdvd-reader.c  \
+  ogmdvd-subp.c    \
+  ogmdvd-title.c
 
 libogmrip_dvd_la_HEADERS = \
-  ogmdvd-audio.h   \
-  ogmdvd-disc.h    \
-  ogmdvd-drive.h   \
-  ogmdvd-monitor.h \
-  ogmdvd-parser.h  \
-  ogmdvd-reader.h  \
-  ogmdvd-subp.h    \
-  ogmdvd-title.h   \
+  ogmdvd-audio.h  \
+  ogmdvd-disc.h   \
+  ogmdvd-parser.h \
+  ogmdvd-reader.h \
+  ogmdvd-subp.h   \
+  ogmdvd-title.h  \
   ogmrip-dvd.h
 
 libogmrip_dvd_la_LDFLAGS = \
@@ -38,8 +32,6 @@ libogmrip_dvd_ladir = \
 
 EXTRA_DIST = \
   ogmdvd-contrib.h   \
-  ogmdvd-device.h    \
-  ogmdvd-transport.h \
   ogmdvd-priv.h
 
 INCLUDES = \

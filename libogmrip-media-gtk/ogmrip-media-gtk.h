@@ -23,6 +23,7 @@
 #include <ogmrip-error-dialog.h>
 #include <ogmrip-language-chooser-widget.h>
 #include <ogmrip-language-store.h>
+#include <ogmrip-media-chooser.h>
 #include <ogmrip-source-chooser.h>
 #include <ogmrip-title-chooser-widget.h>
 
