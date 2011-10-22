@@ -27,7 +27,7 @@ static GObject * ogmrip_video_file_constructor  (GType type,
                                                  guint n_properties,
                                                  GObjectConstructParam *properties);
 
-G_DEFINE_TYPE_WITH_CODE (OGMRipVideoFile, ogmrip_video_file, OGMRIP_TYPE_VIDEO_FILE,
+G_DEFINE_TYPE_WITH_CODE (OGMRipVideoFile, ogmrip_video_file, OGMRIP_TYPE_FILE,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_VIDEO_STREAM, ogmrip_video_iface_init));
 
 static void

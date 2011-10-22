@@ -102,8 +102,10 @@ ogmrip_media_info_open (OGMRipMediaInfo *info, const gchar *filename)
   g_return_val_if_fail (OGMRIP_IS_MEDIA_INFO (info), FALSE);
   g_return_val_if_fail (filename != NULL, FALSE);
 
-  if (info->priv->is_open)
-    MediaInfo_Close (info->priv->handle);
+  ogmrip_media_info_close (info);
+
+  if (!g_file_test (filename, G_FILE_TEST_IS_REGULAR))
+    return FALSE;
 
   info->priv->is_open = MediaInfo_Open (info->priv->handle, filename);
 
@@ -116,7 +118,10 @@ ogmrip_media_info_close (OGMRipMediaInfo *info)
   g_return_if_fail (OGMRIP_IS_MEDIA_INFO (info));
 
   if (info->priv->is_open)
+  {
     MediaInfo_Close (info->priv->handle);
+    info->priv->is_open = FALSE;
+  }
 }
 
 const gchar *

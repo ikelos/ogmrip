@@ -23,6 +23,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define OGMRIP_TYPE_MEDIA_FILE_STREAM (ogmrip_media_file_stream_get_type ())
+#define OGMRIP_MEDIA_FILE_STREAM(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_MEDIA_FILE_STREAM, OGMRipMediaFileStream))
+
+typedef struct _OGMRipMediaFileStream      OGMRipMediaFileStream;
+typedef struct _OGMRipMediaFileStreamClass OGMRipMediaFileStreamClass;
+
+struct _OGMRipMediaFileStream
+{
+  GObject parent_instance;
+
+  OGMRipTitle *title;
+  gint format;
+};
+
+struct _OGMRipMediaFileStreamClass
+{
+  GObjectClass parent_class;
+};
+
 #define OGMRIP_TYPE_MEDIA_FILE_AUDIO (ogmrip_media_file_audio_get_type ())
 #define OGMRIP_MEDIA_FILE_AUDIO(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_MEDIA_FILE_AUDIO, OGMRipMediaFileAudio))
 
@@ -31,14 +50,14 @@ typedef struct _OGMRipMediaFileAudioClass OGMRipMediaFileAudioClass;
 
 struct _OGMRipMediaFileAudio
 {
-  GObject parent_instance;
+  OGMRipMediaFileStream parent_instance;
 
   OGMRipAudioFilePriv *priv;
 };
 
 struct _OGMRipMediaFileAudioClass
 {
-  GObjectClass parent_class;
+  OGMRipMediaFileStreamClass parent_class;
 };
 
 #define OGMRIP_TYPE_MEDIA_FILE_SUBP (ogmrip_media_file_subp_get_type ())
@@ -49,24 +68,57 @@ typedef struct _OGMRipMediaFileSubpClass OGMRipMediaFileSubpClass;
 
 struct _OGMRipMediaFileSubp
 {
-  GObject parent_instance;
+  OGMRipMediaFileStream parent_instance;
 
   OGMRipSubpFilePriv *priv;
 };
 
 struct _OGMRipMediaFileSubpClass
 {
-  GObjectClass parent_class;
+  OGMRipMediaFileStreamClass parent_class;
 };
 
 static void      ogmrip_title_iface_init        (OGMRipTitleInterface       *iface);
+static void      ogmrip_stream_iface_init       (OGMRipStreamInterface      *iface);
 static void      ogmrip_audio_stream_iface_init (OGMRipAudioStreamInterface *iface);
 static void      ogmrip_subp_stream_iface_init  (OGMRipSubpStreamInterface  *iface);
 static GObject * ogmrip_media_file_constructor  (GType type,
                                                  guint n_properties,
                                                  GObjectConstructParam *properties);
 
-G_DEFINE_TYPE_WITH_CODE (OGMRipMediaFileAudio, ogmrip_media_file_audio, G_TYPE_OBJECT,
+G_DEFINE_ABSTRACT_TYPE_WITH_CODE (OGMRipMediaFileStream, ogmrip_media_file_stream, G_TYPE_OBJECT,
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_STREAM, ogmrip_stream_iface_init));
+
+static void
+ogmrip_media_file_stream_init (OGMRipMediaFileStream *stream)
+{
+}
+
+static void
+ogmrip_media_file_stream_class_init (OGMRipMediaFileStreamClass *klass)
+{
+}
+
+static gint
+ogmrip_media_file_get_format (OGMRipStream *stream)
+{
+  return OGMRIP_MEDIA_FILE_STREAM (stream)->format;
+}
+
+OGMRipTitle *
+ogmrip_media_file_get_title (OGMRipStream *stream)
+{
+  return OGMRIP_MEDIA_FILE_STREAM (stream)->title;
+}
+
+static void
+ogmrip_stream_iface_init (OGMRipStreamInterface *iface)
+{
+  iface->get_format = ogmrip_media_file_get_format;
+  iface->get_title  = ogmrip_media_file_get_title;
+}
+
+G_DEFINE_TYPE_WITH_CODE (OGMRipMediaFileAudio, ogmrip_media_file_audio, OGMRIP_TYPE_MEDIA_FILE_STREAM,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_AUDIO_STREAM, ogmrip_audio_stream_iface_init));
 
 static void
@@ -121,7 +173,7 @@ ogmrip_audio_stream_iface_init (OGMRipAudioStreamInterface *iface)
   iface->get_sample_rate  = ogmrip_media_file_audio_get_sample_rate;
 }
 
-G_DEFINE_TYPE_WITH_CODE (OGMRipMediaFileSubp, ogmrip_media_file_subp, G_TYPE_OBJECT,
+G_DEFINE_TYPE_WITH_CODE (OGMRipMediaFileSubp, ogmrip_media_file_subp, OGMRIP_TYPE_MEDIA_FILE_STREAM,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_SUBP_STREAM, ogmrip_subp_stream_iface_init));
 
 static void
@@ -194,49 +246,34 @@ ogmrip_media_file_constructor (GType type, guint n_properties, GObjectConstructP
 
   if (ogmrip_media_info_open (info, OGMRIP_FILE (gobject)->priv->path))
   {
-    OGMRipStream *stream;
+    OGMRipMediaFileStream *stream;
     const gchar *str;
     gint i, n;
-/*
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "VideoCount");
-    if (!str || !g_str_equal (str, "1"))
-    {
-      g_object_unref (info);
-      g_object_unref (gobject);
-      return NULL;
-    }
 
-    OGMRIP_FILE (gobject)->priv->format = ogmrip_media_info_get_video_format (info, 0);
-    if (OGMRIP_FILE (gobject)->priv->format < 0)
-    {
-      g_object_unref (info);
-      g_object_unref (gobject);
-      return NULL;
-    }
-
-    ogmrip_media_info_get_file_info (info, OGMRIP_FILE (gobject)->priv);
-    ogmrip_media_info_get_video_info (info, 0, OGMRIP_VIDEO_FILE (gobject)->priv);
-
-    OGMRIP_FILE (gobject)->priv->title_size = OGMRIP_VIDEO_FILE (gobject)->priv->size;
-*/
     str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "AudioCount");
 
-    n = atoi (str);
+    n = str ? atoi (str) : 0;
     for (i = 0; i < n; i ++)
     {
       stream = g_object_new (OGMRIP_TYPE_MEDIA_FILE_AUDIO, 0);
+      stream->title = OGMRIP_TITLE (gobject);
+      stream->format = ogmrip_media_info_get_audio_format (info, i);
+
       ogmrip_media_info_get_audio_info (info, i, OGMRIP_MEDIA_FILE_AUDIO (stream)->priv);
-      OGMRIP_FILE (gobject)->priv->title_size += OGMRIP_MEDIA_FILE_AUDIO (gobject)->priv->size;
+      OGMRIP_FILE (gobject)->priv->title_size += OGMRIP_MEDIA_FILE_AUDIO (stream)->priv->size;
     }
 
     str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "TextCount");
 
-    n = atoi (str);
+    n = str ? atoi (str) : 0;
     for (i = 0; i < n; i ++)
     {
       stream = g_object_new (OGMRIP_TYPE_MEDIA_FILE_SUBP, 0);
+      stream->title = OGMRIP_TITLE (gobject);
+      stream->format = ogmrip_media_info_get_subp_format (info, i);
+
       ogmrip_media_info_get_subp_info (info, i, OGMRIP_MEDIA_FILE_SUBP (stream)->priv);
-      OGMRIP_FILE (gobject)->priv->title_size += OGMRIP_MEDIA_FILE_SUBP (gobject)->priv->size;
+      OGMRIP_FILE (gobject)->priv->title_size += OGMRIP_MEDIA_FILE_SUBP (stream)->priv->size;
     }
 
     ogmrip_media_info_close (info);
