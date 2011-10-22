@@ -98,8 +98,12 @@ ogmrip_type_chooser_widget_filter (GtkTreeModel *model, GtkTreeIter *iter, GType
   GType gtype;
 
   gtype = ogmrip_type_store_get_gtype (OGMRIP_TYPE_STORE (model), iter);
+
   if (gtype == G_TYPE_NONE)
     return FALSE;
+
+  if (gtype == OGMRIP_TYPE_HARDSUB)
+    return TRUE;
 
   return ogmrip_container_contains (container, ogmrip_codec_format (gtype));
 }

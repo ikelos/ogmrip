@@ -321,7 +321,7 @@ ogmrip_matroska_command (OGMRipContainer *matroska)
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
-G_DEFINE_DYNAMIC_TYPE (OGMRipMatroska, ogmrip_matroska, OGMRIP_TYPE_CONTAINER)
+G_DEFINE_TYPE (OGMRipMatroska, ogmrip_matroska, OGMRIP_TYPE_CONTAINER)
 
 static void
 ogmrip_matroska_class_init (OGMRipMatroskaClass *klass)
@@ -338,11 +338,6 @@ ogmrip_matroska_class_init (OGMRipMatroskaClass *klass)
   g_object_class_install_property (gobject_class, PROP_OVERHEAD, 
         g_param_spec_uint ("overhead", "Overhead property", "Get overhead", 
            0, G_MAXUINT, MKV_OVERHEAD, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-}
-
-static void
-ogmrip_matroska_class_finalize (OGMRipMatroskaClass *klass)
-{
 }
 
 static void
@@ -438,9 +433,8 @@ ogmrip_module_load (OGMRipModule *module)
 
     g_free (output);
 
-    ogmrip_matroska_register_type (G_TYPE_MODULE (module));
-    ogmrip_type_register_container (module,
-        OGMRIP_TYPE_MATROSKA, "mkv", N_("Matroska Media (MKV)"), formats);
+    ogmrip_register_container (OGMRIP_TYPE_MATROSKA,
+        "mkv", N_("Matroska Media (MKV)"), formats);
   }
 }
 

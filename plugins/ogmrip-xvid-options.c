@@ -114,8 +114,8 @@ ogmrip_xvid_dialog_set_par_sensitivity (GBinding *binding,
   return TRUE;
 }
 
-G_DEFINE_DYNAMIC_TYPE_EXTENDED (OGMRipXvidDialog, ogmrip_xvid_dialog, GTK_TYPE_DIALOG, 0,
-    G_IMPLEMENT_INTERFACE_DYNAMIC (OGMRIP_TYPE_OPTIONS_EDITABLE, ogmrip_options_editable_init));
+G_DEFINE_TYPE_EXTENDED (OGMRipXvidDialog, ogmrip_xvid_dialog, GTK_TYPE_DIALOG, 0,
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_OPTIONS_EDITABLE, ogmrip_options_editable_init));
 
 static void
 ogmrip_xvid_dialog_set_profile (OGMRipXvidDialog *dialog, OGMRipProfile *profile)
@@ -256,11 +256,6 @@ ogmrip_xvid_dialog_class_init (OGMRipXvidDialogClass *klass)
 }
 
 static void
-ogmrip_xvid_dialog_class_finalize (OGMRipXvidDialogClass *klass)
-{
-}
-
-static void
 ogmrip_xvid_dialog_init (OGMRipXvidDialog *dialog)
 {
   GError *error = NULL;
@@ -344,8 +339,6 @@ ogmrip_module_load (OGMRipModule *module)
   if (gtype == G_TYPE_NONE)
     return;
 
-  ogmrip_xvid_dialog_register_type (G_TYPE_MODULE (module));
-  ogmrip_type_add_dynamic_extension (module,
-      gtype, OGMRIP_TYPE_XVID_DIALOG);
+  ogmrip_type_add_extension (gtype, OGMRIP_TYPE_XVID_DIALOG);
 }
 

@@ -40,7 +40,7 @@ ogmrip_hardsub_init (OGMRipHardSub *hardsub)
 void
 ogmrip_hardsub_register_codec (void)
 {
-  ogmrip_type_register_codec (NULL, OGMRIP_TYPE_HARDSUB,
+  ogmrip_register_codec (OGMRIP_TYPE_HARDSUB,
       "hardsub", N_("Hardcoded subtitle"), OGMRIP_FORMAT_UNDEFINED);
 }
 

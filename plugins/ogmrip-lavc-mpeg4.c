@@ -45,15 +45,10 @@ struct _OGMRipLavcMpeg4Class
   OGMRipLavcClass parent_class;
 };
 
-G_DEFINE_DYNAMIC_TYPE (OGMRipLavcMpeg4, ogmrip_lavc_mpeg4, OGMRIP_TYPE_LAVC)
+G_DEFINE_TYPE (OGMRipLavcMpeg4, ogmrip_lavc_mpeg4, OGMRIP_TYPE_LAVC)
 
 static void
 ogmrip_lavc_mpeg4_class_init (OGMRipLavcMpeg4Class *klass)
-{
-}
-
-static void
-ogmrip_lavc_mpeg4_class_finalize (OGMRipLavcMpeg4Class *klass)
 {
 }
 
@@ -83,8 +78,7 @@ ogmrip_module_load (OGMRipModule *module)
     return;
   }
 
-  ogmrip_lavc_mpeg4_register_type (G_TYPE_MODULE (module));
-  ogmrip_type_register_codec (module,
-      OGMRIP_TYPE_LAVC_MPEG4, "lavc-mpeg4", N_("Lavc Mpeg-4"), OGMRIP_FORMAT_MPEG4);
+  ogmrip_register_codec (OGMRIP_TYPE_LAVC_MPEG4,
+      "lavc-mpeg4", N_("Lavc Mpeg-4"), OGMRIP_FORMAT_MPEG4);
 }
 

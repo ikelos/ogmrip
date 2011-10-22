@@ -24,64 +24,17 @@
 
 G_BEGIN_DECLS
 
-#define OGMRIP_TYPE_TYPE_INFO            (ogmrip_type_info_get_type ())
-#define OGMRIP_TYPE_INFO(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_TYPE_INFO, OGMRipTypeInfo))
-#define OGMRIP_TYPE_INFO_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_TYPE_INFO, OGMRipTypeInfoClass))
-#define OGMRIP_IS_TYPE_INFO(obj)         (G_TYPE_CHECK_INSTANCE_TYPE (obj, OGMRIP_TYPE_TYPE_INFO))
-#define OGMRIP_IS_TYPE_INFO_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_TYPE_INFO))
-
-typedef struct _OGMRipTypeInfo      OGMRipTypeInfo;
-typedef struct _OGMRipTypeInfoClass OGMRipTypeInfoClass;
-typedef struct _OGMRipTypeInfoPriv  OGMRipTypeInfoPriv;
-
-struct _OGMRipTypeInfo
-{
-  GInitiallyUnowned parent_instance;
-
-  OGMRipTypeInfoPriv *priv;
-};
-
-struct _OGMRipTypeInfoClass
-{
-  GInitiallyUnownedClass parent_class;
-};
-
-GType         ogmrip_type_info_get_type         (void);
-
-void          ogmrip_type_register_static       (GType          gtype,
-                                                 OGMRipTypeInfo *info);
-void          ogmrip_type_register_dynamic      (OGMRipModule   *module,
-                                                 GType          gtype,
-                                                 OGMRipTypeInfo *info);
-const gchar * ogmrip_type_name                  (GType          gtype);
-const gchar * ogmrip_type_description           (GType          gtype);
-GParamSpec *  ogmrip_type_property              (GType          gtype,
-                                                 const gchar    *property);
-GType         ogmrip_type_from_name             (const gchar    *name);
-GType *       ogmrip_type_children              (GType          gtype,
-                                                 guint          *n);
-void          ogmrip_type_add_static_extension  (GType          gtype,
-                                                 GType          extension);
-void          ogmrip_type_add_dynamic_extension (OGMRipModule   *module,
-                                                 GType          gtype,
-                                                 GType          extension);
-GType         ogmrip_type_get_extension         (GType          gtype,
-                                                 GType          iface);
-
-void          ogmrip_type_register_codec        (OGMRipModule   *module,
-                                                 GType          gtype,
-                                                 const gchar    *name,
-                                                 const gchar    *description,
-                                                 OGMRipFormat   format);
-OGMRipFormat  ogmrip_codec_format               (GType          gtype);
-
-void          ogmrip_type_register_container    (OGMRipModule   *module,
-                                                 GType          gtype,
-                                                 const gchar    *name,
-                                                 const gchar    *description,
-                                                 OGMRipFormat   *format);
-gboolean      ogmrip_container_contains         (GType          gtype,
-                                                 OGMRipFormat   format);
+void          ogmrip_register_codec     (GType          gtype,
+                                         const gchar    *name,
+                                         const gchar    *description,
+                                         OGMRipFormat   format);
+OGMRipFormat  ogmrip_codec_format       (GType          gtype);
+void          ogmrip_register_container (GType          gtype,
+                                         const gchar    *name,
+                                         const gchar    *description,
+                                         OGMRipFormat   *format);
+gboolean      ogmrip_container_contains (GType          gtype,
+                                         OGMRipFormat   format);
 
 G_END_DECLS
 

@@ -96,7 +96,7 @@ ogmrip_wav_command (OGMRipAudioCodec *audio, gboolean header, const gchar *outpu
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
-G_DEFINE_DYNAMIC_TYPE (OGMRipVorbis, ogmrip_vorbis, OGMRIP_TYPE_AUDIO_CODEC)
+G_DEFINE_TYPE (OGMRipVorbis, ogmrip_vorbis, OGMRIP_TYPE_AUDIO_CODEC)
 
 static void
 ogmrip_vorbis_class_init (OGMRipVorbisClass *klass)
@@ -106,11 +106,6 @@ ogmrip_vorbis_class_init (OGMRipVorbisClass *klass)
   spawn_class = OGMJOB_SPAWN_CLASS (klass);
 
   spawn_class->run = ogmrip_vorbis_run;
-}
-
-static void
-ogmrip_vorbis_class_finalize (OGMRipVorbisClass *klass)
-{
 }
 
 static void
@@ -198,8 +193,7 @@ ogmrip_module_load (OGMRipModule *module)
     return;
   }
 
-  ogmrip_vorbis_register_type (G_TYPE_MODULE (module));
-  ogmrip_type_register_codec (module,
-      OGMRIP_TYPE_VORBIS, "vorbis", N_("Ogg Vorbis"), OGMRIP_FORMAT_VORBIS);
+  ogmrip_register_codec (OGMRIP_TYPE_VORBIS,
+      "vorbis", N_("Ogg Vorbis"), OGMRIP_FORMAT_VORBIS);
 }
 

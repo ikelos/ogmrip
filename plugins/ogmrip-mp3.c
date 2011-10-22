@@ -111,7 +111,7 @@ ogmrip_wav_command (OGMRipAudioCodec *audio, gboolean header, const gchar *outpu
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
-G_DEFINE_DYNAMIC_TYPE (OGMRipMp3, ogmrip_mp3, OGMRIP_TYPE_AUDIO_CODEC)
+G_DEFINE_TYPE (OGMRipMp3, ogmrip_mp3, OGMRIP_TYPE_AUDIO_CODEC)
 
 static void
 ogmrip_mp3_class_init (OGMRipMp3Class *klass)
@@ -120,11 +120,6 @@ ogmrip_mp3_class_init (OGMRipMp3Class *klass)
 
   spawn_class = OGMJOB_SPAWN_CLASS (klass);
   spawn_class->run = ogmrip_mp3_run;
-}
-
-static void
-ogmrip_mp3_class_finalize (OGMRipMp3Class *klass)
-{
 }
 
 static void
@@ -213,8 +208,7 @@ ogmrip_module_load (OGMRipModule *module)
     return;
   }
 
-  ogmrip_mp3_register_type (G_TYPE_MODULE (module));
-  ogmrip_type_register_codec (module,
-      OGMRIP_TYPE_MP3, "mp3", N_("MPEG-1 layer III (MP3)"), OGMRIP_FORMAT_MP3);
+  ogmrip_register_codec (OGMRIP_TYPE_MP3,
+      "mp3", N_("MPEG-1 layer III (MP3)"), OGMRIP_FORMAT_MP3);
 }
 

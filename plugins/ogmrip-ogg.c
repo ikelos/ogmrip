@@ -251,7 +251,7 @@ ogmrip_ogg_split_command (OGMRipContainer *ogg, const gchar *input)
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
-G_DEFINE_DYNAMIC_TYPE (OGMRipOgg, ogmrip_ogg, OGMRIP_TYPE_CONTAINER)
+G_DEFINE_TYPE (OGMRipOgg, ogmrip_ogg, OGMRIP_TYPE_CONTAINER)
 
 static void
 ogmrip_ogg_class_init (OGMRipOggClass *klass)
@@ -260,11 +260,6 @@ ogmrip_ogg_class_init (OGMRipOggClass *klass)
 
   spawn_class = OGMJOB_SPAWN_CLASS (klass);
   spawn_class->run = ogmrip_ogg_run;
-}
-
-static void
-ogmrip_ogg_class_finalize (OGMRipOggClass *klass)
-{
 }
 
 static void
@@ -383,8 +378,7 @@ ogmrip_module_load (OGMRipModule *module)
     return;
   }
 
-  ogmrip_ogg_register_type (G_TYPE_MODULE (module));
-  ogmrip_type_register_container (module,
-      OGMRIP_TYPE_OGG, "ogm", N_("Ogg Media (OGM)"), formats);
+  ogmrip_register_container (OGMRIP_TYPE_OGG,
+      "ogm", N_("Ogg Media (OGM)"), formats);
 }
 

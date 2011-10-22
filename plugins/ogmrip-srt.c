@@ -325,7 +325,7 @@ ogmrip_srt_ocr (OGMJobSpawn *spawn, const gchar *filename, gboolean lang)
 }
 
 
-G_DEFINE_DYNAMIC_TYPE (OGMRipSrt, ogmrip_srt, OGMRIP_TYPE_SUBP_CODEC)
+G_DEFINE_TYPE (OGMRipSrt, ogmrip_srt, OGMRIP_TYPE_SUBP_CODEC)
 
 static void
 ogmrip_srt_class_init (OGMRipSrtClass *klass)
@@ -335,11 +335,6 @@ ogmrip_srt_class_init (OGMRipSrtClass *klass)
   spawn_class = OGMJOB_SPAWN_CLASS (klass);
 
   spawn_class->run = ogmrip_srt_run;
-}
-
-static void
-ogmrip_srt_class_finalize (OGMRipSrtClass *klass)
-{
 }
 
 static void
@@ -565,8 +560,7 @@ ogmrip_module_load (OGMRipModule *module)
     return;
   }
 
-  ogmrip_srt_register_type (G_TYPE_MODULE (module));
-  ogmrip_type_register_codec (module,
-      OGMRIP_TYPE_SRT, "srt", N_("SRT text"), OGMRIP_FORMAT_SRT);
+  ogmrip_register_codec (OGMRIP_TYPE_SRT,
+      "srt", N_("SRT text"), OGMRIP_FORMAT_SRT);
 }
 

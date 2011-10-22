@@ -38,15 +38,6 @@ enum
   PROP_PATH
 };
 
-enum
-{
-  LOAD,
-  UNLOAD,
-  LAST_SIGNAL
-};
-
-static int signals[LAST_SIGNAL] = { 0 };
-
 static gchar *
 ogmrip_module_build_path (OGMRipModule *module)
 {
@@ -154,14 +145,11 @@ ogmrip_module_load_module (GTypeModule *gmodule)
     return FALSE;
   }
 
-/*
-  if (module->priv->resident)
-    g_module_make_resident (module->priv->library);
-*/
+  g_module_make_resident (module->priv->library);
+
   register_func (module);
 
   g_debug ("Loading module '%s'", module->priv->name);
-  g_signal_emit (module, signals[LOAD], 0);
 
   return TRUE;
 }
@@ -172,7 +160,6 @@ ogmrip_module_unload_module (GTypeModule *gmodule)
   OGMRipModule *module = OGMRIP_MODULE (gmodule);
 
   g_debug ("Unloading module '%s'", module->priv->name);
-  g_signal_emit (module, signals[UNLOAD], 0);
 
   g_module_close (module->priv->library);
   module->priv->library = NULL;
@@ -207,18 +194,6 @@ ogmrip_module_class_init (OGMRipModuleClass *klass)
   g_object_class_install_property (gobject_class, PROP_PATH,
       g_param_spec_string ("path", "Module path", "The path of the module",
         NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
-
-  signals[LOAD] = g_signal_new ("load", G_TYPE_FROM_CLASS (klass),
-      G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
-      G_STRUCT_OFFSET (OGMRipModuleClass, load_module), NULL, NULL,
-      g_cclosure_marshal_VOID__VOID,
-      G_TYPE_NONE, 0);
-
-  signals[UNLOAD] = g_signal_new ("unload", G_TYPE_FROM_CLASS (klass),
-      G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
-      G_STRUCT_OFFSET (OGMRipModuleClass, unload_module), NULL, NULL,
-      g_cclosure_marshal_VOID__VOID,
-      G_TYPE_NONE, 0);
 
   g_type_class_add_private (klass, sizeof (OGMRipModulePriv));
 }

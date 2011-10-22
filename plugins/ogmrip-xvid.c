@@ -424,8 +424,8 @@ ogmrip_configurable_iface_init (OGMRipConfigurableInterface *iface)
   iface->configure = ogmrip_xvid_configure;
 }
 
-G_DEFINE_DYNAMIC_TYPE_EXTENDED (OGMRipXvid, ogmrip_xvid, OGMRIP_TYPE_VIDEO_CODEC, 0,
-    G_IMPLEMENT_INTERFACE_DYNAMIC (OGMRIP_TYPE_CONFIGURABLE, ogmrip_configurable_iface_init));
+G_DEFINE_TYPE_EXTENDED (OGMRipXvid, ogmrip_xvid, OGMRIP_TYPE_VIDEO_CODEC, 0,
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_CONFIGURABLE, ogmrip_configurable_iface_init));
 
 static void
 ogmrip_xvid_class_init (OGMRipXvidClass *klass)
@@ -564,11 +564,6 @@ ogmrip_xvid_class_init (OGMRipXvidClass *klass)
   g_object_class_install_property (gobject_class, PROP_LUMI_MASK,
       g_param_spec_boolean (OGMRIP_XVID_PROP_LUMI_MASK, NULL, NULL,
         OGMRIP_XVID_DEFAULT_LUMI_MASK, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-}
-
-static void
-ogmrip_xvid_class_finalize (OGMRipXvidClass *klass)
-{
 }
 
 static void
@@ -949,8 +944,7 @@ ogmrip_module_load (OGMRipModule *module)
     return;
   }
 
-  ogmrip_xvid_register_type (G_TYPE_MODULE (module));
-  ogmrip_type_register_codec (module,
-      OGMRIP_TYPE_XVID, "xvid", N_("XviD"), OGMRIP_FORMAT_MPEG4);
+  ogmrip_register_codec (OGMRIP_TYPE_XVID,
+      "xvid", N_("XviD"), OGMRIP_FORMAT_MPEG4);
 }
 

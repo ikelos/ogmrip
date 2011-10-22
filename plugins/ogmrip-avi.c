@@ -173,7 +173,7 @@ ogmrip_copy_command (OGMRipContainer *container, const gchar *input, const gchar
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
-G_DEFINE_DYNAMIC_TYPE (OGMRipAvi, ogmrip_avi, OGMRIP_TYPE_CONTAINER)
+G_DEFINE_TYPE (OGMRipAvi, ogmrip_avi, OGMRIP_TYPE_CONTAINER)
 
 static void
 ogmrip_avi_class_init (OGMRipAviClass *klass)
@@ -190,11 +190,6 @@ ogmrip_avi_class_init (OGMRipAviClass *klass)
   g_object_class_install_property (gobject_class, PROP_OVERHEAD,
       g_param_spec_uint ("overhead", "overhead", "overhead",
         0, G_MAXUINT, AVI_OVERHEAD, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-}
-
-static void
-ogmrip_avi_class_finalize (OGMRipAviClass *klass)
-{
 }
 
 static void
@@ -327,10 +322,7 @@ ogmrip_module_load (OGMRipModule *module)
   if (!have_avibox)
     g_warning (_("avibox is missing"));
   else
-  {
-    ogmrip_avi_register_type (G_TYPE_MODULE (module));
-    ogmrip_type_register_container (module,
-        OGMRIP_TYPE_AVI, "avi", N_("Audio-Video Interlace (AVI)"), formats);
-  }
+    ogmrip_register_container (OGMRIP_TYPE_AVI,
+        "avi", N_("Audio-Video Interlace (AVI)"), formats);
 }
 

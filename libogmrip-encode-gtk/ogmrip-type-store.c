@@ -149,9 +149,6 @@ void
 ogmrip_type_store_reload (OGMRipTypeStore *store)
 {
   GType *types;
-  GtkTreeIter iter;
-  const gchar *desc;
-  guint i;
 
   g_return_if_fail (OGMRIP_IS_TYPE_STORE (store));
 
@@ -160,6 +157,10 @@ ogmrip_type_store_reload (OGMRipTypeStore *store)
   types = ogmrip_type_children (store->priv->parent, NULL);
   if (types)
   {
+    GtkTreeIter iter;
+    const gchar *desc;
+    guint i;
+
     for (i = 0; types[i] != G_TYPE_NONE; i ++)
     {
       desc = ogmrip_type_description (types[i]);

@@ -99,7 +99,7 @@ ogmrip_wav_command (OGMRipAudioCodec *audio, gboolean header, const gchar *outpu
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
-G_DEFINE_DYNAMIC_TYPE (OGMRipAac, ogmrip_aac, OGMRIP_TYPE_AUDIO_CODEC);
+G_DEFINE_TYPE (OGMRipAac, ogmrip_aac, OGMRIP_TYPE_AUDIO_CODEC);
 
 static void
 ogmrip_aac_class_init (OGMRipAacClass *klass)
@@ -109,11 +109,6 @@ ogmrip_aac_class_init (OGMRipAacClass *klass)
   spawn_class = OGMJOB_SPAWN_CLASS (klass);
 
   spawn_class->run = ogmrip_aac_run;
-}
-
-static void
-ogmrip_aac_class_finalize (OGMRipAacClass *klass)
-{
 }
 
 static void
@@ -201,8 +196,7 @@ ogmrip_module_load (OGMRipModule *module)
     return;
   }
 
-  ogmrip_aac_register_type (G_TYPE_MODULE (module));
-  ogmrip_type_register_codec (module,
-      OGMRIP_TYPE_AAC, "aac", N_("Advanced Audio Coding (AAC)"), OGMRIP_FORMAT_AAC);
+  ogmrip_register_codec (OGMRIP_TYPE_AAC,
+      "aac", N_("Advanced Audio Coding (AAC)"), OGMRIP_FORMAT_AAC);
 }
 

@@ -19,8 +19,9 @@
 #ifndef __OGMRIP_MODULE_H__
 #define __OGMRIP_MODULE_H__
 
-#include <ogmrip-module-object.h>
 #include <ogmrip-module-engine.h>
+#include <ogmrip-module-object.h>
+#include <ogmrip-module-type.h>
 
 #endif /* __OGMRIP_MODULE_H__ */
 

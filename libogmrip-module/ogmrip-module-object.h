@@ -44,21 +44,18 @@ struct _OGMRipModule
 struct _OGMRipModuleClass
 {
   GTypeModuleClass parent_class;
-
-  void (* load_module)   (OGMRipModule *module);
-  void (* unload_module) (OGMRipModule *module);
 };
 
-GType          ogmrip_module_get_type        (void) G_GNUC_CONST;
-OGMRipModule * ogmrip_module_new             (const gchar  *path,
-                                              const gchar  *name);
-const gchar *  ogmrip_module_get_name        (OGMRipModule *module);
-const gchar *  ogmrip_module_get_path        (OGMRipModule *module);
-gboolean       ogmrip_module_get_symbol      (OGMRipModule *module,
-                                              const gchar  *name,
-                                              gpointer     *symbol);
+GType          ogmrip_module_get_type   (void) G_GNUC_CONST;
+OGMRipModule * ogmrip_module_new        (const gchar  *path,
+                                         const gchar  *name);
+const gchar *  ogmrip_module_get_name   (OGMRipModule *module);
+const gchar *  ogmrip_module_get_path   (OGMRipModule *module);
+gboolean       ogmrip_module_get_symbol (OGMRipModule *module,
+                                         const gchar  *name,
+                                         gpointer     *symbol);
 
-void           ogmrip_module_load            (OGMRipModule *module);
+void           ogmrip_module_load       (OGMRipModule *module);
 
 G_END_DECLS
 

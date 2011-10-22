@@ -134,7 +134,7 @@ ogmrip_theora_command (OGMRipVideoCodec *video, const gchar *input)
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
-G_DEFINE_DYNAMIC_TYPE (OGMRipTheora, ogmrip_theora, OGMRIP_TYPE_VIDEO_CODEC)
+G_DEFINE_TYPE (OGMRipTheora, ogmrip_theora, OGMRIP_TYPE_VIDEO_CODEC)
 
 static void
 ogmrip_theora_class_init (OGMRipTheoraClass *klass)
@@ -152,11 +152,6 @@ ogmrip_theora_class_init (OGMRipTheoraClass *klass)
   g_object_class_install_property (gobject_class, PROP_PASSES, 
         g_param_spec_uint ("passes", "Passes property", "Set the number of passes", 
            1, 1, 1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-}
-
-static void
-ogmrip_theora_class_finalize (OGMRipTheoraClass *klass)
-{
 }
 
 static void
@@ -272,8 +267,7 @@ ogmrip_module_load (OGMRipModule *module)
     return;
   }
 
-  ogmrip_theora_register_type (G_TYPE_MODULE (module));
-  ogmrip_type_register_codec (module,
-      OGMRIP_TYPE_THEORA, "theora", N_("Ogg Theora"), OGMRIP_FORMAT_THEORA);
+  ogmrip_register_codec (OGMRIP_TYPE_THEORA,
+      "theora", N_("Ogg Theora"), OGMRIP_FORMAT_THEORA);
 }
 

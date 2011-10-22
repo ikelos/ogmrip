@@ -423,7 +423,7 @@ ogmrip_mp4_get_info (OGMRipMp4 *mp4, OGMRipFile *file)
   }
 }
 
-G_DEFINE_DYNAMIC_TYPE (OGMRipMp4, ogmrip_mp4, OGMRIP_TYPE_CONTAINER)
+G_DEFINE_TYPE (OGMRipMp4, ogmrip_mp4, OGMRIP_TYPE_CONTAINER)
 
 static void
 ogmrip_mp4_class_init (OGMRipMp4Class *klass)
@@ -432,11 +432,6 @@ ogmrip_mp4_class_init (OGMRipMp4Class *klass)
 
   spawn_class = OGMJOB_SPAWN_CLASS (klass);
   spawn_class->run = ogmrip_mp4_run;
-}
-
-static void
-ogmrip_mp4_class_finalize (OGMRipMp4Class *klass)
-{
 }
 
 static void
@@ -602,8 +597,7 @@ ogmrip_module_load (OGMRipModule *module)
     formats[i+1] = OGMRIP_FORMAT_COPY;
   }
 
-  ogmrip_mp4_register_type (G_TYPE_MODULE (module));
-  ogmrip_type_register_container (module,
-      OGMRIP_TYPE_MP4, "mp4", N_("Mpeg-4 Media (MP4)"), formats);
+  ogmrip_register_container (OGMRIP_TYPE_MP4,
+      "mp4", N_("Mpeg-4 Media (MP4)"), formats);
 }
 

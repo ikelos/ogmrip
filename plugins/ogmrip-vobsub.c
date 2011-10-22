@@ -63,7 +63,7 @@ ogmrip_vobsub_command (OGMRipSubpCodec *subp)
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
-G_DEFINE_DYNAMIC_TYPE (OGMRipVobSub, ogmrip_vobsub, OGMRIP_TYPE_SUBP_CODEC)
+G_DEFINE_TYPE (OGMRipVobSub, ogmrip_vobsub, OGMRIP_TYPE_SUBP_CODEC)
 
 static void
 ogmrip_vobsub_class_init (OGMRipVobSubClass *klass)
@@ -76,11 +76,6 @@ ogmrip_vobsub_class_init (OGMRipVobSubClass *klass)
 
   gobject_class->finalize = ogmrip_vobsub_finalize;
   spawn_class->run = ogmrip_vobsub_run;
-}
-
-static void
-ogmrip_vobsub_class_finalize (OGMRipVobSubClass *klass)
-{
 }
 
 static void
@@ -273,8 +268,7 @@ ogmrip_module_load (OGMRipModule *module)
     return;
   }
 
-  ogmrip_vobsub_register_type (G_TYPE_MODULE (module));
-  ogmrip_type_register_codec (module,
-      OGMRIP_TYPE_VOBSUB, "vobsub", N_("VobSub"), OGMRIP_FORMAT_VOBSUB);
+  ogmrip_register_codec (OGMRIP_TYPE_VOBSUB,
+      "vobsub", N_("VobSub"), OGMRIP_FORMAT_VOBSUB);
 }
 

@@ -22,372 +22,68 @@
 #include "ogmrip-audio-codec.h"
 #include "ogmrip-subp-codec.h"
 
-struct _OGMRipTypeInfoPriv
+#define OGMRIP_TYPE_PLUGIN_INFO            (ogmrip_plugin_info_get_type ())
+#define OGMRIP_PLUGIN_INFO(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_PLUGIN_INFO, OGMRipPluginInfo))
+#define OGMRIP_PLUGIN_INFO_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_PLUGIN_INFO, OGMRipPluginInfoClass))
+#define OGMRIP_IS_PLUGIN_INFO(obj)         (G_TYPE_CHECK_INSTANCE_TYPE (obj, OGMRIP_TYPE_PLUGIN_INFO))
+#define OGMRIP_IS_PLUGIN_INFO_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_PLUGIN_INFO))
+
+typedef struct _OGMRipPluginInfo      OGMRipPluginInfo;
+typedef struct _OGMRipPluginInfoClass OGMRipPluginInfoClass;
+typedef struct _OGMRipPluginInfoPriv  OGMRipPluginInfoPriv;
+
+struct _OGMRipPluginInfo
 {
-  GType gtype;
-  gpointer klass;
-
-  gchar *name;
-  gchar *description;
-
-  GArray *extensions;
+  OGMRipTypeInfo parent_instance;
 
   GArray *formats;
 };
 
-enum
+struct _OGMRipPluginInfoClass
 {
-  PROP_0,
-  PROP_NAME,
-  PROP_DESCRIPTION
+  OGMRipTypeInfoClass parent_class;
 };
 
-static GHashTable *table;
-G_LOCK_DEFINE_STATIC (table);
-
-G_DEFINE_TYPE (OGMRipTypeInfo, ogmrip_type_info, G_TYPE_INITIALLY_UNOWNED);
+G_DEFINE_TYPE (OGMRipPluginInfo, ogmrip_plugin_info, OGMRIP_TYPE_TYPE_INFO);
 
 static void
-ogmrip_type_info_dispose (GObject *gobject)
+ogmrip_plugin_info_finalize (GObject *gobject)
 {
-  OGMRipTypeInfo *info = OGMRIP_TYPE_INFO (gobject);
+  OGMRipPluginInfo *info = OGMRIP_PLUGIN_INFO (gobject);
 
-  if (info->priv->klass)
-  {
-    g_type_class_unref (info->priv->klass);
-    info->priv->klass = NULL;
-  }
+  g_array_free (info->formats, TRUE);
 
-  G_OBJECT_CLASS (ogmrip_type_info_parent_class)->dispose (gobject);
+  G_OBJECT_CLASS (ogmrip_plugin_info_parent_class)->finalize (gobject);
 }
 
 static void
-ogmrip_type_info_finalize (GObject *gobject)
-{
-  OGMRipTypeInfo *info = OGMRIP_TYPE_INFO (gobject);
-
-  g_free (info->priv->name);
-  g_free (info->priv->description);
-
-  g_array_free (info->priv->formats, TRUE);
-  g_array_free (info->priv->extensions, TRUE);
-
-  G_OBJECT_CLASS (ogmrip_type_info_parent_class)->finalize (gobject);
-}
-
-static void
-ogmrip_type_info_get_property (GObject *gobject, guint prop_id, GValue *value, GParamSpec *pspec)
-{
-  OGMRipTypeInfo *info = OGMRIP_TYPE_INFO (gobject);
-
-  switch (prop_id)
-  {
-    case PROP_NAME:
-      g_value_set_string (value, info->priv->name);
-      break;
-    case PROP_DESCRIPTION:
-      g_value_set_string (value, info->priv->description);
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
-      break;
-  }
-}
-
-static void
-ogmrip_type_info_set_property (GObject *gobject, guint prop_id, const GValue *value, GParamSpec *pspec)
-{
-  OGMRipTypeInfo *info = OGMRIP_TYPE_INFO (gobject);
-
-  switch (prop_id)
-  {
-    case PROP_NAME:
-      info->priv->name = g_value_dup_string (value);
-      break;
-    case PROP_DESCRIPTION:
-      info->priv->description = g_value_dup_string (value);
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
-      break;
-  }
-}
-
-static void
-ogmrip_type_info_class_init (OGMRipTypeInfoClass *klass)
+ogmrip_plugin_info_class_init (OGMRipPluginInfoClass *klass)
 {
   GObjectClass *gobject_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->dispose = ogmrip_type_info_dispose;
-  gobject_class->finalize = ogmrip_type_info_finalize;
-  gobject_class->get_property = ogmrip_type_info_get_property;
-  gobject_class->set_property = ogmrip_type_info_set_property;
-
-  g_object_class_install_property (gobject_class, PROP_NAME,
-      g_param_spec_string ("name", "name", "name", NULL,
-        G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_DESCRIPTION,
-      g_param_spec_string ("description", "description", "description", NULL,
-        G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
-
-  g_type_class_add_private (klass, sizeof (OGMRipTypeInfoPriv));
+  gobject_class->finalize = ogmrip_plugin_info_finalize;
 }
 
 static void
-ogmrip_type_info_init (OGMRipTypeInfo *info)
+ogmrip_plugin_info_init (OGMRipPluginInfo *info)
 {
-  info->priv = G_TYPE_INSTANCE_GET_PRIVATE (info, OGMRIP_TYPE_TYPE_INFO, OGMRipTypeInfoPriv);
-
-  info->priv->formats = g_array_new (FALSE, FALSE, sizeof (OGMRipFormat));
-  info->priv->extensions = g_array_new (FALSE, FALSE, sizeof (GType));
+  info->formats = g_array_new (FALSE, FALSE, sizeof (OGMRipFormat));
 }
 
 void
-ogmrip_type_register_static (GType gtype, OGMRipTypeInfo *info)
+ogmrip_register_codec (GType gtype, const gchar *name, const gchar *description, OGMRipFormat format)
 {
-  ogmrip_type_register_dynamic (NULL, gtype, info);
-}
+  OGMRipPluginInfo *info;
 
-static void
-ogmrip_type_module_type_unloaded (OGMRipModule *module, gpointer gtype)
-{
-  G_LOCK (table);
-  g_hash_table_remove (table, gtype);
-  G_UNLOCK (table);
-
-  g_signal_handlers_disconnect_by_func (module, ogmrip_type_module_type_unloaded, gtype);
-}
-
-void
-ogmrip_type_register_dynamic (OGMRipModule *module, GType gtype, OGMRipTypeInfo *info)
-{
-  g_return_if_fail (module == NULL || OGMRIP_IS_MODULE (module));
-  g_return_if_fail (OGMRIP_IS_TYPE_INFO (info));
-
-  G_LOCK (table);
-
-  if (!table)
-    table = g_hash_table_new_full (g_direct_hash, g_direct_equal, NULL, (GDestroyNotify) g_object_unref);
-
-  info->priv->gtype = gtype;
-
-  g_hash_table_insert (table, GUINT_TO_POINTER (gtype), g_object_ref_sink (info));
-
-  G_UNLOCK (table);
-
-  if (module)
-    g_signal_connect (module, "unload",
-        G_CALLBACK (ogmrip_type_module_type_unloaded), GUINT_TO_POINTER (gtype));
-}
-
-static OGMRipTypeInfo *
-ogmrip_type_info_lookup (GType gtype)
-{
-  OGMRipTypeInfo *info;
-
-  if (!table)
-    return NULL;
-
-  G_LOCK (table);
-  info = g_hash_table_lookup (table, GUINT_TO_POINTER (gtype));
-  G_UNLOCK (table);
-
-  return info;
-}
-
-void
-ogmrip_type_add_static_extension (GType gtype, GType extension)
-{
-  ogmrip_type_add_dynamic_extension (NULL, gtype, extension);
-}
-
-typedef struct
-{
-  OGMRipTypeInfo *info;
-  GType extension;
-} DynamicExtensionData;
-
-static void
-ogmrip_type_module_extension_unloaded (OGMRipModule *module, DynamicExtensionData *data)
-{
-  GType *extensions;
-  guint i;
-
-  extensions = (GType *) data->info->priv->extensions->data;
-  for (i = 0; i < data->info->priv->extensions->len; i ++)
-  {
-    if (extensions[i] == data->extension)
-    {
-      g_array_remove_index (data->info->priv->extensions, i);
-      break;
-    }
-  }
-
-  g_signal_handlers_disconnect_by_func (module, ogmrip_type_module_extension_unloaded, data);
-  g_object_unref (data->info);
-  g_free (data);
-}
-
-void
-ogmrip_type_add_dynamic_extension (OGMRipModule *module, GType gtype, GType extension)
-{
-  OGMRipTypeInfo *info;
-
-  g_return_if_fail (module == NULL || OGMRIP_IS_MODULE (module));
-
-  info = ogmrip_type_info_lookup (gtype);
-  if (info)
-  {
-    g_array_append_val (info->priv->extensions, extension);
-
-    if (module)
-    {
-      DynamicExtensionData *data;
-
-      data = g_new0 (DynamicExtensionData, 1);
-      data->info = g_object_ref (info);
-      data->extension = extension;
-
-      g_signal_connect (module, "unload",
-          G_CALLBACK (ogmrip_type_module_extension_unloaded), data);
-    }
-  }
-}
-
-GType
-ogmrip_type_get_extension (GType gtype, GType iface)
-{
-  OGMRipTypeInfo *info;
-  GType *extensions;
-  guint i;
-
-  info = ogmrip_type_info_lookup (gtype);
-  if (!info)
-    return G_TYPE_NONE;
-
-  extensions = (GType *) info->priv->extensions->data;
-  for (i = 0; i < info->priv->extensions->len; i ++)
-    if (g_type_is_a (extensions[i], iface))
-      return extensions[i];
-
-  return G_TYPE_NONE;
-}
-
-const gchar *
-ogmrip_type_name (GType gtype)
-{
-  OGMRipTypeInfo *info;
-
-  info = ogmrip_type_info_lookup (gtype);
-  if (!info)
-    return NULL;
-
-  return info->priv->name;
-}
-
-const gchar *
-ogmrip_type_description (GType gtype)
-{
-  OGMRipTypeInfo *info;
-
-  info = ogmrip_type_info_lookup (gtype);
-  if (!info)
-    return NULL;
-
-  return info->priv->description;
-}
-
-static gboolean
-compare_with_name (gpointer key, OGMRipTypeInfo *info, const gchar *name)
-{
-  return g_str_equal (info->priv->name, name);
-}
-
-GType
-ogmrip_type_from_name (const gchar *name)
-{
-  OGMRipTypeInfo *info;
-
-  g_return_val_if_fail (name != NULL, G_TYPE_NONE);
-
-  if (!table)
-    return G_TYPE_NONE;
-
-  G_LOCK (table);
-  info = g_hash_table_find (table, (GHRFunc) compare_with_name, (gpointer) name);
-  G_UNLOCK (table);
-
-  if (!info)
-    return G_TYPE_NONE;
-
-  return info->priv->gtype;
-}
-
-GType *
-ogmrip_type_children (GType gtype, guint *n)
-{
-  GArray *types;
-  GHashTableIter iter;
-  OGMRipTypeInfo *info;
-
-  if (!table)
-    return NULL;
-
-  types = g_array_new (FALSE, FALSE, sizeof (GType));
-
-  G_LOCK (table);
-
-  g_hash_table_iter_init (&iter, table);
-  while (g_hash_table_iter_next (&iter, NULL, (gpointer*) &info))
-    if (g_type_is_a (info->priv->gtype, gtype))
-      g_array_append_val (types, info->priv->gtype);
-
-  gtype = G_TYPE_NONE;
-  g_array_append_val (types, gtype);
-
-  G_UNLOCK (table);
-
-  if (n)
-    *n = types->len;
-
-  return (GType *) g_array_free (types, FALSE);
-}
-
-GParamSpec *
-ogmrip_type_property (GType gtype, const gchar *property)
-{
-  OGMRipTypeInfo *info;
-
-  info = ogmrip_type_info_lookup (gtype);
-  if (!info)
-    return NULL;
-
-  if (!info->priv->klass)
-    info->priv->klass = g_type_class_ref (gtype);
-
-  return g_object_class_find_property (info->priv->klass, property);
-}
-
-void
-ogmrip_type_register_codec (OGMRipModule *module, GType gtype, const gchar *name, const gchar *description, OGMRipFormat format)
-{
-  OGMRipTypeInfo *info;
-
-  g_return_if_fail (module == NULL || OGMRIP_IS_MODULE (module));
   g_return_if_fail (gtype == G_TYPE_NONE || g_type_is_a (gtype, OGMRIP_TYPE_CODEC));
   g_return_if_fail (name != NULL);
 
-  info = g_object_new (OGMRIP_TYPE_TYPE_INFO, NULL);
-  info->priv->name = g_strdup (name);
+  info = g_object_new (OGMRIP_TYPE_PLUGIN_INFO, "name", name, "description", description, NULL);
 
-  if (description)
-    info->priv->description = g_strdup (description);
+  g_array_append_val (info->formats, format);
 
-  g_array_append_val (info->priv->formats, format);
-
-  ogmrip_type_register_dynamic (module, gtype, info);
+  ogmrip_type_register (gtype, OGMRIP_TYPE_INFO (info));
 }
 
 OGMRipFormat
@@ -402,18 +98,17 @@ ogmrip_codec_format (GType gtype)
   if (!info)
     return OGMRIP_FORMAT_UNDEFINED;
 
-  formats = (OGMRipFormat *) info->priv->formats->data;
+  formats = (OGMRipFormat *) OGMRIP_PLUGIN_INFO (info)->formats->data;
 
   return formats[0];
 }
 
 void
-ogmrip_type_register_container (OGMRipModule *module, GType gtype, const gchar *name, const gchar *description, OGMRipFormat *formats)
+ogmrip_register_container (GType gtype, const gchar *name, const gchar *description, OGMRipFormat *formats)
 {
-  OGMRipTypeInfo *info;
+  OGMRipPluginInfo *info;
   guint len;
 
-  g_return_if_fail (module == NULL || OGMRIP_IS_MODULE (module));
   g_return_if_fail (g_type_is_a (gtype, OGMRIP_TYPE_CONTAINER));
   g_return_if_fail (name != NULL);
   g_return_if_fail (formats != NULL);
@@ -422,15 +117,11 @@ ogmrip_type_register_container (OGMRipModule *module, GType gtype, const gchar *
   while (formats[len] > OGMRIP_FORMAT_UNDEFINED)
     len ++;
 
-  info = g_object_new (OGMRIP_TYPE_TYPE_INFO, NULL);
-  info->priv->name = g_strdup (name);
+  info = g_object_new (OGMRIP_TYPE_PLUGIN_INFO, "name", name, "description", description, NULL);
 
-  if (description)
-    info->priv->description = g_strdup (description);
+  g_array_append_vals (info->formats, formats, len);
 
-  g_array_append_vals (info->priv->formats, formats, len);
-
-  ogmrip_type_register_dynamic (module, gtype, info);
+  ogmrip_type_register (gtype, OGMRIP_TYPE_INFO (info));
 }
 
 gboolean
@@ -447,8 +138,8 @@ ogmrip_container_contains (GType gtype, OGMRipFormat format)
   if (!info)
     return OGMRIP_FORMAT_UNDEFINED;
 
-  formats = (OGMRipFormat *) info->priv->formats->data;
-  for (i = 0; i < info->priv->formats->len; i ++)
+  formats = (OGMRipFormat *) OGMRIP_PLUGIN_INFO (info)->formats->data;
+  for (i = 0; i < OGMRIP_PLUGIN_INFO (info)->formats->len; i ++)
     if (formats[i] == format)
       return TRUE;
 

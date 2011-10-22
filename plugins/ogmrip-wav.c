@@ -61,7 +61,7 @@ ogmrip_wav_command (OGMRipAudioCodec *audio, gboolean header)
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
-G_DEFINE_DYNAMIC_TYPE (OGMRipWav, ogmrip_wav, OGMRIP_TYPE_AUDIO_CODEC)
+G_DEFINE_TYPE (OGMRipWav, ogmrip_wav, OGMRIP_TYPE_AUDIO_CODEC)
 
 static void
 ogmrip_wav_class_init (OGMRipWavClass *klass)
@@ -71,11 +71,6 @@ ogmrip_wav_class_init (OGMRipWavClass *klass)
   spawn_class = OGMJOB_SPAWN_CLASS (klass);
 
   spawn_class->run = ogmrip_wav_run;
-}
-
-static void
-ogmrip_wav_class_finalize (OGMRipWavClass *klass)
-{
 }
 
 static void
@@ -113,10 +108,7 @@ ogmrip_module_load (OGMRipModule *module)
   if (!ogmrip_check_mplayer ())
     g_warning (_("MPlayer is missing"));
   else
-  {
-    ogmrip_wav_register_type (G_TYPE_MODULE (module));
-    ogmrip_type_register_codec (module,
-        OGMRIP_TYPE_WAV, "wav", N_("Wave (uncompressed PCM)"), OGMRIP_FORMAT_PCM);
-  }
+    ogmrip_register_codec (OGMRIP_TYPE_WAV,
+        "wav", N_("Wave (uncompressed PCM)"), OGMRIP_FORMAT_PCM);
 }
 
