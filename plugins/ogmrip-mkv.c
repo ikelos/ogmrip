@@ -41,11 +41,26 @@ typedef struct _OGMRipMatroskaClass OGMRipMatroskaClass;
 struct _OGMRipMatroska
 {
   OGMRipContainer parent_instance;
+
+  gboolean webm;
 };
 
 struct _OGMRipMatroskaClass
 {
   OGMRipContainerClass parent_class;
+};
+
+typedef struct _OGMRipWebm      OGMRipWebm;
+typedef struct _OGMRipWebmClass OGMRipWebmClass;
+
+struct _OGMRipWebm
+{
+  OGMRipMatroska parent_instance;
+};
+
+struct _OGMRipWebmClass
+{
+  OGMRipMatroskaClass parent_class;
 };
 
 enum
@@ -388,7 +403,20 @@ ogmrip_matroska_run (OGMJobSpawn *spawn)
   return result;
 }
 
-static gint formats[] =
+G_DEFINE_TYPE (OGMRipWebm, ogmrip_webm, OGMRIP_TYPE_MATROSKA)
+
+static void
+ogmrip_webm_class_init (OGMRipWebmClass *klass)
+{
+}
+
+static void
+ogmrip_webm_init (OGMRipWebm *webm)
+{
+  OGMRIP_MATROSKA (webm)->webm = TRUE;
+}
+
+static gint mkv_formats[] =
 {
   OGMRIP_FORMAT_MPEG1,
   OGMRIP_FORMAT_MPEG2,
@@ -411,6 +439,13 @@ static gint formats[] =
   -1
 };
 
+static gint webm_formats[] =
+{
+  OGMRIP_FORMAT_VORBIS,
+  OGMRIP_FORMAT_VP8,
+  -1
+};
+
 void
 ogmrip_module_load (OGMRipModule *module)
 {
@@ -420,21 +455,29 @@ ogmrip_module_load (OGMRipModule *module)
     g_warning (_("mkvmerge is missing"));
   else
   {
+    gboolean have_webm;
     guint i = 0;
 
-    while (formats[i] != -1)
+    while (mkv_formats[i] != -1)
       i++;
 
     if (strstr (output, " drc ") || strstr (output, " Dirac "))
-      formats[i++] = OGMRIP_FORMAT_DIRAC;
+      mkv_formats[i++] = OGMRIP_FORMAT_DIRAC;
 
     if (strstr (output, " ivf ") || strstr (output, " IVF "))
-      formats[i++] = OGMRIP_FORMAT_VP8;
+      mkv_formats[i++] = OGMRIP_FORMAT_VP8;
+
+    have_webm = strstr (output, " webm ") != NULL ||
+      strstr (output, " WebM ") != NULL;
 
     g_free (output);
 
     ogmrip_register_container (OGMRIP_TYPE_MATROSKA,
-        "mkv", N_("Matroska Media (MKV)"), formats);
+        "mkv", N_("Matroska Media (MKV)"), mkv_formats);
+
+    if (have_webm)
+      ogmrip_register_container (ogmrip_webm_get_type (),
+          "webm", N_("WebM Media (webm)"), webm_formats);
   }
 }
 
