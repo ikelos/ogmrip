@@ -8,6 +8,8 @@ libogmrip_media_gtk_la_SOURCES =   \
   ogmrip-language-chooser-widget.c \
   ogmrip-language-store.c          \
   ogmrip-media-chooser.c           \
+  ogmrip-media-chooser-dialog.c    \
+  ogmrip-media-chooser-widget.c    \
   ogmrip-source-chooser.c          \
   ogmrip-title-chooser.c           \
   ogmrip-title-chooser-widget.c
@@ -22,6 +24,8 @@ libogmrip_media_gtk_la_HEADERS =   \
   ogmrip-language-chooser-widget.h \
   ogmrip-language-store.h          \
   ogmrip-media-chooser.h           \
+  ogmrip-media-chooser-dialog.h    \
+  ogmrip-media-chooser-widget.h    \
   ogmrip-source-chooser.h          \
   ogmrip-title-chooser.h           \
   ogmrip-title-chooser-widget.h    \
@@ -31,8 +35,12 @@ libogmrip_media_gtk_la_LDFLAGS = \
   -version-info $(OGMRIP_MEDIA_LT_VERSION)
 
 libogmrip_media_gtk_la_LIBADD = \
-  $(top_builddir)/libogmrip-media/libogmrip-media.la
+  $(top_builddir)/libogmrip-media/libogmrip-media.la \
+  $(top_builddir)/libogmrip-drive/libogmrip-drive.la \
+  $(top_builddir)/libogmrip-module/libogmrip-module.la
 
 INCLUDES = \
-  -I$(top_srcdir)/libogmrip-media
+  -I$(top_srcdir)/libogmrip-media \
+  -I$(top_srcdir)/libogmrip-drive \
+  -I$(top_srcdir)/libogmrip-module
 

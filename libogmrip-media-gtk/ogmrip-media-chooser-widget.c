@@ -1,4 +1,4 @@
-/* OGMDvd - A wrapper library around libdvdread
+/* OGMRip - A wrapper library around libdvdread
  * Copyright (C) 2004-2011 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -21,21 +21,22 @@
 #endif
 
 /**
- * SECTION:ogmdvd-drive-chooser-widget
- * @title: OGMDvdDriveChooserWidget
- * @include: ogmdvd-drive-chooser-widget.h
- * @short_description: DVD drive chooser widget that can be embedded in other widgets
+ * SECTION:ogmrip-media-chooser-widget
+ * @title: OGMRipMediaChooserWidget
+ * @include: ogmrip-media-chooser-widget.h
+ * @short_description: DVD media chooser widget that can be embedded in other widgets
  */
 
-#include "ogmdvd-drive-chooser-widget.h"
+#include "ogmrip-media-chooser-widget.h"
 
-#include <ogmrip-dvd.h>
+#include <ogmrip-media.h>
 #include <ogmrip-drive.h>
+#include <ogmrip-module.h>
 
 #include <glib/gi18n-lib.h>
 
-#define OGMDVD_DRIVE_CHOOSER_WIDGET_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMDVD_TYPE_DRIVE_CHOOSER_WIDGET, OGMDvdDriveChooserWidgetPriv))
+#define OGMRIP_MEDIA_CHOOSER_WIDGET_GET_PRIVATE(o) \
+  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_MEDIA_CHOOSER_WIDGET, OGMRipMediaChooserWidgetPriv))
 
 enum
 {
@@ -58,7 +59,7 @@ enum
   DIR_SEL_ROW
 };
 
-struct _OGMDvdDriveChooserWidgetPriv
+struct _OGMRipMediaChooserWidgetPriv
 {
   GtkTreeRowReference *last_row;
 };
@@ -70,7 +71,33 @@ typedef struct
 } OGMRipDisconnector;
 
 static void ogmrip_media_chooser_init (OGMRipMediaChooserInterface *iface);
-static void ogmdvd_drive_chooser_widget_changed (GtkComboBox *combo);
+static void ogmrip_media_chooser_widget_changed (GtkComboBox *combo);
+
+OGMRipMedia *
+ogmrip_media_new (const gchar *path)
+{
+  OGMRipMedia *media = NULL;
+  GType *types;
+  guint i;
+
+  if (!path)
+    return NULL;
+
+  types = ogmrip_type_children (OGMRIP_TYPE_MEDIA, NULL);
+  if (!types)
+    return NULL;
+
+  for (i = 0; types[i] != G_TYPE_NONE; i ++)
+  {
+    media = g_object_new (types[i], "uri", path, NULL);
+    if (media)
+      break;
+  }
+
+  g_free (types);
+
+  return media;
+}
 
 static void
 ogmrip_signal_disconnector (gpointer data, GObject *gobject)
@@ -83,7 +110,7 @@ ogmrip_signal_disconnector (gpointer data, GObject *gobject)
 }
 
 static OGMRipMedia *
-ogmdvd_drive_chooser_widget_get_media (OGMRipMediaChooser *chooser)
+ogmrip_media_chooser_widget_get_media (OGMRipMediaChooser *chooser)
 {
   OGMRipMedia *media;
   GtkTreeModel *model;
@@ -107,7 +134,7 @@ ogmdvd_drive_chooser_widget_get_media (OGMRipMediaChooser *chooser)
 }
 
 static gboolean
-ogmdvd_drive_chooser_widget_sep_func (GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
+ogmrip_media_chooser_widget_sep_func (GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
 {
   gint type = NONE_ROW;
 
@@ -117,7 +144,7 @@ ogmdvd_drive_chooser_widget_sep_func (GtkTreeModel *model, GtkTreeIter *iter, gp
 }
 
 static void
-ogmdvd_drive_chooser_widget_medium_removed (OGMDvdDriveChooserWidget *chooser, OGMRipDrive *drive1)
+ogmrip_media_chooser_widget_medium_removed (OGMRipMediaChooserWidget *chooser, OGMRipDrive *drive1)
 {
   GtkTreeModel *model;
   GtkTreeIter iter;
@@ -158,14 +185,13 @@ ogmdvd_drive_chooser_widget_medium_removed (OGMDvdDriveChooserWidget *chooser, O
 }
 
 static void
-ogmdvd_drive_chooser_widget_medium_added (OGMDvdDriveChooserWidget *chooser, OGMRipDrive *drive)
+ogmrip_media_chooser_widget_medium_added (OGMRipMediaChooserWidget *chooser, OGMRipDrive *drive)
 {
   OGMRipMedia *media;
 
-  // media = ogmrip_disc_new (ogmrip_media_get_device (media), NULL);
-  media = NULL;
+  media = ogmrip_media_new (ogmrip_drive_get_device (drive));
   if (!media)
-    ogmdvd_drive_chooser_widget_medium_removed (chooser, drive);
+    ogmrip_media_chooser_widget_medium_removed (chooser, drive);
   else
   {
     GtkTreeModel *model;
@@ -221,7 +247,7 @@ ogmdvd_drive_chooser_widget_medium_added (OGMDvdDriveChooserWidget *chooser, OGM
         path2 = gtk_tree_model_get_path (model, &sibling);
 
         if (path1 && path2 && gtk_tree_path_compare (path1, path2) == 0)
-          ogmdvd_drive_chooser_widget_changed (GTK_COMBO_BOX (chooser));
+          ogmrip_media_chooser_widget_changed (GTK_COMBO_BOX (chooser));
 
         if (path1)
           gtk_tree_path_free (path1);
@@ -233,28 +259,28 @@ ogmdvd_drive_chooser_widget_medium_added (OGMDvdDriveChooserWidget *chooser, OGM
   }
 }
 
-G_DEFINE_TYPE_WITH_CODE (OGMDvdDriveChooserWidget, ogmdvd_drive_chooser_widget, GTK_TYPE_COMBO_BOX,
+G_DEFINE_TYPE_WITH_CODE (OGMRipMediaChooserWidget, ogmrip_media_chooser_widget, GTK_TYPE_COMBO_BOX,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_MEDIA_CHOOSER, ogmrip_media_chooser_init))
 
 static void
-ogmdvd_drive_chooser_widget_class_init (OGMDvdDriveChooserWidgetClass *klass)
+ogmrip_media_chooser_widget_class_init (OGMRipMediaChooserWidgetClass *klass)
 {
   GtkComboBoxClass *combo_box_class;
 
   combo_box_class = GTK_COMBO_BOX_CLASS (klass);
-  combo_box_class->changed = ogmdvd_drive_chooser_widget_changed;
+  combo_box_class->changed = ogmrip_media_chooser_widget_changed;
 
-  g_type_class_add_private (klass, sizeof (OGMDvdDriveChooserWidgetPriv));
+  g_type_class_add_private (klass, sizeof (OGMRipMediaChooserWidgetPriv));
 }
 
 static void
 ogmrip_media_chooser_init (OGMRipMediaChooserInterface  *iface)
 {
-  iface->get_media = ogmdvd_drive_chooser_widget_get_media;
+  iface->get_media = ogmrip_media_chooser_widget_get_media;
 }
 
 static void
-ogmdvd_drive_chooser_widget_init (OGMDvdDriveChooserWidget *chooser)
+ogmrip_media_chooser_widget_init (OGMRipMediaChooserWidget *chooser)
 {
   GtkCellRenderer *cell;
   GtkListStore *store;
@@ -265,14 +291,14 @@ ogmdvd_drive_chooser_widget_init (OGMDvdDriveChooserWidget *chooser)
   OGMRipMonitor *monitor;
   OGMRipDisconnector *disconnector;
 
-  chooser->priv = OGMDVD_DRIVE_CHOOSER_WIDGET_GET_PRIVATE (chooser);
+  chooser->priv = OGMRIP_MEDIA_CHOOSER_WIDGET_GET_PRIVATE (chooser);
 
   store = gtk_list_store_new (N_COLUMNS, G_TYPE_STRING, G_TYPE_INT, G_TYPE_OBJECT, G_TYPE_POINTER);
   gtk_combo_box_set_model (GTK_COMBO_BOX (chooser), GTK_TREE_MODEL (store));
   g_object_unref (store);
 
   gtk_combo_box_set_row_separator_func (GTK_COMBO_BOX (chooser),
-      ogmdvd_drive_chooser_widget_sep_func, NULL, NULL);
+      ogmrip_media_chooser_widget_sep_func, NULL, NULL);
 
   cell = gtk_cell_renderer_text_new ();
   gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (chooser), cell, TRUE);
@@ -290,7 +316,7 @@ ogmdvd_drive_chooser_widget_init (OGMDvdDriveChooserWidget *chooser)
 
       disconnector->drive = drive->data;
       disconnector->handler = g_signal_connect_swapped (drive->data, "medium-added",
-          G_CALLBACK (ogmdvd_drive_chooser_widget_medium_added), chooser);
+          G_CALLBACK (ogmrip_media_chooser_widget_medium_added), chooser);
 
       g_object_weak_ref (G_OBJECT (chooser), ogmrip_signal_disconnector, disconnector);
 
@@ -298,7 +324,7 @@ ogmdvd_drive_chooser_widget_init (OGMDvdDriveChooserWidget *chooser)
 
       disconnector->drive = drive->data;
       disconnector->handler = g_signal_connect_swapped (drive->data, "medium-removed", 
-          G_CALLBACK (ogmdvd_drive_chooser_widget_medium_removed), chooser);
+          G_CALLBACK (ogmrip_media_chooser_widget_medium_removed), chooser);
 
       g_object_weak_ref (G_OBJECT (chooser), ogmrip_signal_disconnector, disconnector);
     }
@@ -329,7 +355,7 @@ ogmdvd_drive_chooser_widget_init (OGMDvdDriveChooserWidget *chooser)
 }
 
 static gboolean
-ogmdvd_drive_chooser_widget_add_media (GtkComboBox *combo, OGMRipMedia *media, gboolean file)
+ogmrip_media_chooser_widget_add_media (GtkComboBox *combo, OGMRipMedia *media, gboolean file)
 {
   GtkTreeModel *model;
   GtkTreeIter sibling, iter;
@@ -383,7 +409,7 @@ ogmdvd_drive_chooser_widget_add_media (GtkComboBox *combo, OGMRipMedia *media, g
 }
 
 static OGMRipMedia *
-ogmdvd_drive_chooser_widget_select_file (GtkComboBox *combo, gboolean file)
+ogmrip_media_chooser_widget_select_file (GtkComboBox *combo, gboolean file)
 {
   OGMRipMedia *media = NULL;
   GtkWidget *dialog, *toplevel;
@@ -432,7 +458,7 @@ ogmdvd_drive_chooser_widget_select_file (GtkComboBox *combo, gboolean file)
     path = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
     if (path)
     {
-      media = ogmdvd_disc_new (path, NULL);
+      media = ogmrip_media_new (path);
       g_free (path);
     }
   }
@@ -443,15 +469,15 @@ ogmdvd_drive_chooser_widget_select_file (GtkComboBox *combo, gboolean file)
 }
 
 static void
-ogmdvd_drive_chooser_widget_changed (GtkComboBox *combo)
+ogmrip_media_chooser_widget_changed (GtkComboBox *combo)
 {
-  OGMDvdDriveChooserWidget *chooser;
+  OGMRipMediaChooserWidget *chooser;
   OGMRipMedia *media = NULL;
   GtkTreeModel *model;
   GtkTreeIter iter;
   gint type;
 
-  chooser = OGMDVD_DRIVE_CHOOSER_WIDGET (combo);
+  chooser = OGMRIP_MEDIA_CHOOSER_WIDGET (combo);
   model = gtk_combo_box_get_model (combo);
 
   if (gtk_combo_box_get_active_iter (combo, &iter))
@@ -466,8 +492,8 @@ ogmdvd_drive_chooser_widget_changed (GtkComboBox *combo)
         break;
       case FILE_SEL_ROW:
       case DIR_SEL_ROW:
-        media = ogmdvd_drive_chooser_widget_select_file (combo, type == FILE_SEL_ROW);
-        if (!media || !ogmdvd_drive_chooser_widget_add_media (combo, media, type == FILE_SEL_ROW))
+        media = ogmrip_media_chooser_widget_select_file (combo, type == FILE_SEL_ROW);
+        if (!media || !ogmrip_media_chooser_widget_add_media (combo, media, type == FILE_SEL_ROW))
         {
           if (!chooser->priv->last_row)
             gtk_combo_box_set_active (combo, 0);
@@ -509,18 +535,18 @@ ogmdvd_drive_chooser_widget_changed (GtkComboBox *combo)
 }
 
 /**
- * ogmdvd_drive_chooser_widget_new:
+ * ogmrip_media_chooser_widget_new:
  *
- * Creates a new #OGMDvdDriveChooserWidget.
+ * Creates a new #OGMRipMediaChooserWidget.
  *
- * Returns: The new #OGMDvdDriveChooserWidget
+ * Returns: The new #OGMRipMediaChooserWidget
  */
 GtkWidget *
-ogmdvd_drive_chooser_widget_new (void)
+ogmrip_media_chooser_widget_new (void)
 {
   GtkWidget *widget;
 
-  widget = g_object_new (OGMDVD_TYPE_DRIVE_CHOOSER_WIDGET, NULL);
+  widget = g_object_new (OGMRIP_TYPE_MEDIA_CHOOSER_WIDGET, NULL);
 
   return widget;
 }

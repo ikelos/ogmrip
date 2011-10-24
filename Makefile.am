@@ -2,9 +2,9 @@ SUBDIRS = \
   libogmrip-drive  \
   libogmrip-job    \
   libogmrip-media  \
-  libogmrip-file   \
-  libogmrip-dvd    \
   libogmrip-module \
+  libogmrip-dvd    \
+  libogmrip-file   \
   libogmrip-encode \
   avibox \
   dvdcpy
@@ -12,7 +12,6 @@ SUBDIRS = \
 if HAVE_GTK_SUPPORT
 SUBDIRS +=      \
   libogmrip-media-gtk  \
-  libogmrip-dvd-gtk    \
   libogmrip-file-gtk   \
   libogmrip-encode-gtk \
   src

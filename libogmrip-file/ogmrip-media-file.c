@@ -20,6 +20,8 @@
 #include "ogmrip-media-info.h"
 #include "ogmrip-file-priv.h"
 
+#include <ogmrip-module.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -321,5 +323,14 @@ ogmrip_media_file_new (const gchar *uri)
   g_return_val_if_fail (uri != NULL, NULL);
 
   return g_object_new (OGMRIP_TYPE_MEDIA_FILE, "uri", uri, NULL);
+}
+
+void
+ogmrip_file_register_media (void)
+{
+  OGMRipTypeInfo *info;
+
+  info = g_object_new (OGMRIP_TYPE_TYPE_INFO, "name", "File", "description", "File", NULL);
+  ogmrip_type_register (OGMRIP_TYPE_MEDIA_FILE, info);
 }
 

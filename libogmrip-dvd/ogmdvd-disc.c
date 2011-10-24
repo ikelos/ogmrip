@@ -34,6 +34,7 @@
 #include "ogmdvd-subp.h"
 
 #include <ogmrip-job.h>
+#include <ogmrip-module.h>
 
 #include <sys/ioctl.h>
 #include <sys/types.h>
@@ -1089,5 +1090,14 @@ ogmdvd_disc_new (const gchar *device, GError **error)
   g_free (uri);
 
   return media;
+}
+
+void
+ogmrip_dvd_register_media (void)
+{
+  OGMRipTypeInfo *info;
+
+  info = g_object_new (OGMRIP_TYPE_TYPE_INFO, "name", "DVD", "description", "DVD", NULL);
+  ogmrip_type_register (OGMDVD_TYPE_DISC, info);
 }
 

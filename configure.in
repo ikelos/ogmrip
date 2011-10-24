@@ -446,7 +446,6 @@ libogmrip-file/Makefile
 libogmrip-file-gtk/Makefile
 libogmrip-dvd/Makefile
 libogmrip-drive/Makefile
-libogmrip-dvd-gtk/Makefile
 libogmrip-module/Makefile
 libogmrip-encode/Makefile
 libogmrip-encode/ogmrip-version.h

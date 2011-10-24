@@ -77,7 +77,9 @@ struct _OGMDvdDiscClass
   GObjectClass parent_class;
 };
 
-GQuark       ogmdvd_error_quark   (void);
+void ogmrip_dvd_register_media (void);
+
+GQuark        ogmdvd_error_quark   (void);
 
 GType         ogmdvd_disc_get_type (void);
 OGMRipMedia * ogmdvd_disc_new      (const gchar *device,

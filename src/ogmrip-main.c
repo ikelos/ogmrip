@@ -21,7 +21,8 @@
 #endif
 
 #include <ogmrip-job.h>
-#include <ogmrip-dvd-gtk.h>
+#include <ogmrip-dvd.h>
+#include <ogmrip-file.h>
 #include <ogmrip-encode-gtk.h>
 #include <ogmrip-media-gtk.h>
 #include <ogmrip-module.h>
@@ -289,12 +290,14 @@ ogmrip_main_load (OGMRipData *data, OGMRipMedia *media)
   gtk_action_set_sensitive (data->extract_action, data->prepared);
 }
 
+OGMRipMedia * ogmrip_media_new (const gchar *path);
+
 static gboolean
 ogmrip_main_load_path (OGMRipData *data, const gchar *path)
 {
   OGMRipMedia *media;
 
-  media = ogmdvd_disc_new (path, NULL);
+  media = ogmrip_media_new (path);
   if (!media)
   {
     ogmrip_run_error_dialog (GTK_WINDOW (data->window), NULL, _("Could not open the media"));
@@ -1275,7 +1278,7 @@ ogmrip_main_load_activated (OGMRipData *data)
 {
   GtkWidget *dialog;
 
-  dialog = ogmdvd_drive_chooser_dialog_new ();
+  dialog = ogmrip_media_chooser_dialog_new ();
   gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (data->window));
   gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
 
@@ -2153,6 +2156,9 @@ ogmrip_startup_thread (GIOSchedulerJob *job, GCancellable *cancellable, GApplica
   OGMRipModuleEngine *module_engine;
   OGMRipProfileEngine *profile_engine;
   gchar *path;
+
+  ogmrip_dvd_register_media ();
+  ogmrip_file_register_media ();
 
   ogmrip_hardsub_register_codec ();
   ogmrip_novideo_register_codec ();

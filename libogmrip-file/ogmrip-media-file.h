@@ -46,6 +46,8 @@ struct _OGMRipMediaFileClass
   OGMRipVideoFileClass parent_class;
 };
 
+void          ogmrip_file_register_media (void);
+
 GType         ogmrip_media_file_get_type (void);
 OGMRipMedia * ogmrip_media_file_new      (const gchar *uri);
 

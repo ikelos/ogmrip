@@ -1,4 +1,4 @@
-/* OGMDvd - A wrapper library around libdvdread
+/* OGMRip - A wrapper library around libdvdread
  * Copyright (C) 2004-2011 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -21,22 +21,22 @@
 #endif
 
 /**
- * SECTION:ogmdvd-drive-chooser-dialog
- * @title: OGMDvdDriveChooserDialog
- * @include: ogmdvd-drive-chooser-dialog.h
- * @short_description: A DVD drive chooser dialog
+ * SECTION:ogmrip-media-chooser-dialog
+ * @title: OGMRipMediaChooserDialog
+ * @include: ogmrip-media-chooser-dialog.h
+ * @short_description: A DVD media chooser dialog
  */
 
-#include "ogmdvd-drive-chooser-dialog.h"
-#include "ogmdvd-drive-chooser-widget.h"
+#include "ogmrip-media-chooser-dialog.h"
+#include "ogmrip-media-chooser-widget.h"
 
-#include <ogmrip-dvd.h>
+#include <ogmrip-media.h>
 #include <ogmrip-drive.h>
 
 #include <glib/gi18n-lib.h>
 
-#define OGMDVD_DRIVE_CHOOSER_DIALOG_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMDVD_TYPE_DRIVE_CHOOSER_DIALOG, OGMDvdDriveChooserDialogPriv))
+#define OGMRIP_MEDIA_CHOOSER_DIALOG_GET_PRIVATE(o) \
+  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_MEDIA_CHOOSER_DIALOG, OGMRipMediaChooserDialogPriv))
 
 enum
 {
@@ -44,7 +44,7 @@ enum
   LAST_SIGNAL
 };
 
-struct _OGMDvdDriveChooserDialogPriv
+struct _OGMRipMediaChooserDialogPriv
 {
   GtkWidget *chooser;
 
@@ -57,15 +57,15 @@ static void ogmrip_media_chooser_init (OGMRipMediaChooserInterface *iface);
 static int signals[LAST_SIGNAL] = { 0 };
 
 static OGMRipMedia *
-ogmdvd_drive_chooser_dialog_get_media (OGMRipMediaChooser *chooser)
+ogmrip_media_chooser_dialog_get_media (OGMRipMediaChooser *chooser)
 {
-  OGMDvdDriveChooserDialog *dialog = OGMDVD_DRIVE_CHOOSER_DIALOG (chooser);
+  OGMRipMediaChooserDialog *dialog = OGMRIP_MEDIA_CHOOSER_DIALOG (chooser);
 
   return ogmrip_media_chooser_get_media (OGMRIP_MEDIA_CHOOSER (dialog->priv->chooser));
 }
 
 static void
-ogmdvd_drive_chooser_dialog_media_changed (OGMDvdDriveChooserDialog *dialog, OGMRipMedia *media, GtkWidget *chooser)
+ogmrip_media_chooser_dialog_media_changed (OGMRipMediaChooserDialog *dialog, OGMRipMedia *media, GtkWidget *chooser)
 {
   /*
    * TODO insensitive if not block device
@@ -75,11 +75,11 @@ ogmdvd_drive_chooser_dialog_media_changed (OGMDvdDriveChooserDialog *dialog, OGM
 }
 
 static void
-ogmdvd_drive_chooser_dialog_eject_clicked (GtkDialog *dialog)
+ogmrip_media_chooser_dialog_eject_clicked (GtkDialog *dialog)
 {
   OGMRipMedia *media;
 
-  media = ogmrip_media_chooser_get_media (OGMRIP_MEDIA_CHOOSER (OGMDVD_DRIVE_CHOOSER_DIALOG (dialog)->priv->chooser));
+  media = ogmrip_media_chooser_get_media (OGMRIP_MEDIA_CHOOSER (OGMRIP_MEDIA_CHOOSER_DIALOG (dialog)->priv->chooser));
   if (media)
   {
     OGMRipMonitor *monitor;
@@ -108,42 +108,42 @@ ogmdvd_drive_chooser_dialog_eject_clicked (GtkDialog *dialog)
   }
 }
 
-G_DEFINE_TYPE_WITH_CODE (OGMDvdDriveChooserDialog, ogmdvd_drive_chooser_dialog, GTK_TYPE_DIALOG,
+G_DEFINE_TYPE_WITH_CODE (OGMRipMediaChooserDialog, ogmrip_media_chooser_dialog, GTK_TYPE_DIALOG,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_MEDIA_CHOOSER, ogmrip_media_chooser_init))
 
 static void
-ogmdvd_drive_chooser_dialog_class_init (OGMDvdDriveChooserDialogClass *klass)
+ogmrip_media_chooser_dialog_class_init (OGMRipMediaChooserDialogClass *klass)
 {
   GObjectClass *object_class;
 
   object_class = G_OBJECT_CLASS (klass);
 
   /**
-   * OGMDvdDriveChooserDialog::eject
+   * OGMRipMediaChooserDialog::eject
    * @dialog: the widget that received the signal
    *
    * Emitted each time the eject button is clicked.
    */
   signals[EJECT] = g_signal_new ("eject", G_TYPE_FROM_CLASS (object_class), 
       G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
-      G_STRUCT_OFFSET (OGMDvdDriveChooserDialogClass, eject), NULL, NULL,
+      G_STRUCT_OFFSET (OGMRipMediaChooserDialogClass, eject), NULL, NULL,
       g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
-  g_type_class_add_private (klass, sizeof (OGMDvdDriveChooserDialogPriv));
+  g_type_class_add_private (klass, sizeof (OGMRipMediaChooserDialogPriv));
 }
 
 static void
 ogmrip_media_chooser_init (OGMRipMediaChooserInterface *iface)
 {
-  iface->get_media = ogmdvd_drive_chooser_dialog_get_media;
+  iface->get_media = ogmrip_media_chooser_dialog_get_media;
 }
 
 static void
-ogmdvd_drive_chooser_dialog_init (OGMDvdDriveChooserDialog *dialog)
+ogmrip_media_chooser_dialog_init (OGMRipMediaChooserDialog *dialog)
 {
   GtkWidget *area, *image, *label, *vbox;
 
-  dialog->priv = OGMDVD_DRIVE_CHOOSER_DIALOG_GET_PRIVATE (dialog);
+  dialog->priv = OGMRIP_MEDIA_CHOOSER_DIALOG_GET_PRIVATE (dialog);
 
   gtk_window_set_title (GTK_WINDOW (dialog), _("Open DVD Disk"));
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
@@ -158,7 +158,7 @@ ogmdvd_drive_chooser_dialog_init (OGMDvdDriveChooserDialog *dialog)
   gtk_widget_show (dialog->priv->eject_button);
 
   g_signal_connect_swapped (dialog->priv->eject_button, "clicked",
-      G_CALLBACK (ogmdvd_drive_chooser_dialog_eject_clicked), dialog);
+      G_CALLBACK (ogmrip_media_chooser_dialog_eject_clicked), dialog);
 
   image = gtk_image_new_from_stock (GTK_STOCK_REFRESH, GTK_ICON_SIZE_BUTTON);
   gtk_button_set_image (GTK_BUTTON (dialog->priv->eject_button), image);
@@ -177,38 +177,38 @@ ogmdvd_drive_chooser_dialog_init (OGMDvdDriveChooserDialog *dialog)
   gtk_container_add (GTK_CONTAINER (area), vbox);
   gtk_widget_show (vbox);
 
-  label = gtk_label_new (_("<b>Select _DVD Drive:</b>"));
+  label = gtk_label_new (_("<b>Select _DVD Media:</b>"));
   gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
   gtk_label_set_use_underline (GTK_LABEL (label), TRUE);
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
   gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 0);
   gtk_widget_show (label);
 
-  dialog->priv->chooser = ogmdvd_drive_chooser_widget_new ();
+  dialog->priv->chooser = ogmrip_media_chooser_widget_new ();
   gtk_box_pack_start (GTK_BOX (vbox), dialog->priv->chooser, TRUE, TRUE, 0);
   gtk_widget_show (dialog->priv->chooser);
 
   gtk_label_set_mnemonic_widget (GTK_LABEL (label), dialog->priv->chooser);
 
   g_signal_connect_swapped (dialog->priv->chooser, "media-changed", 
-      G_CALLBACK (ogmdvd_drive_chooser_dialog_media_changed), dialog);
+      G_CALLBACK (ogmrip_media_chooser_dialog_media_changed), dialog);
 
   gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->chooser), 0);
 }
 
 /**
- * ogmdvd_drive_chooser_dialog_new:
+ * ogmrip_media_chooser_dialog_new:
  *
- * Creates a new #OGMDvdDriveChooserDialog.
+ * Creates a new #OGMRipMediaChooserDialog.
  *
- * Returns: The new #OGMDvdDriveChooserDialog
+ * Returns: The new #OGMRipMediaChooserDialog
  */
 GtkWidget *
-ogmdvd_drive_chooser_dialog_new (void)
+ogmrip_media_chooser_dialog_new (void)
 {
   GtkWidget *widget;
 
-  widget = g_object_new (OGMDVD_TYPE_DRIVE_CHOOSER_DIALOG, NULL);
+  widget = g_object_new (OGMRIP_TYPE_MEDIA_CHOOSER_DIALOG, NULL);
 
   return widget;
 }

@@ -24,7 +24,8 @@ libogmrip_dvd_la_LDFLAGS = \
   -version-info $(OGMRIP_MEDIA_LT_VERSION)
 
 libogmrip_dvd_la_LIBADD = \
-  $(top_builddir)/libogmrip-media/libogmrip-media.la \
+  $(top_builddir)/libogmrip-media/libogmrip-media.la   \
+  $(top_builddir)/libogmrip-module/libogmrip-module.la \
   $(top_builddir)/libogmrip-job/libogmrip-job.la
 
 libogmrip_dvd_ladir = \
@@ -35,5 +36,7 @@ EXTRA_DIST = \
   ogmdvd-priv.h
 
 INCLUDES = \
-  -I$(top_srcdir)/libogmrip-media \
+  -I$(top_srcdir)/libogmrip-media  \
+  -I$(top_srcdir)/libogmrip-module \
   -I$(top_srcdir)/libogmrip-job
+
