@@ -360,6 +360,7 @@ ogmrip_lavc_options_la_LIBTOOLFLAGS = \
 
 ogmrip_lavc_options_la_LIBADD = \
   $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
+  $(top_builddir)/libogmrip-module/libogmrip-module.la \
   $(top_builddir)/libogmrip-encode/libogmrip-lavc.la \
   $(top_builddir)/libogmrip-encode-gtk/libogmrip-encode-gtk.la
 endif
@@ -379,6 +380,7 @@ ogmrip_xvid_options_la_LIBTOOLFLAGS = \
 
 ogmrip_xvid_options_la_LIBADD = \
   $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
+  $(top_builddir)/libogmrip-module/libogmrip-module.la \
   $(top_builddir)/libogmrip-encode-gtk/libogmrip-encode-gtk.la
 endif
 
@@ -397,6 +399,7 @@ ogmrip_x264_options_la_LIBTOOLFLAGS = \
 
 ogmrip_x264_options_la_LIBADD = \
   $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
+  $(top_builddir)/libogmrip-module/libogmrip-module.la \
   $(top_builddir)/libogmrip-encode-gtk/libogmrip-encode-gtk.la
 endif
 endif

@@ -46,6 +46,7 @@ libogmrip_encode_gtk_la_LIBADD = \
   $(top_builddir)/libogmrip-media-gtk/libogmrip-media-gtk.la \
   $(top_builddir)/libogmrip-file/libogmrip-file.la \
   $(top_builddir)/libogmrip-file-gtk/libogmrip-file-gtk.la \
+  $(top_builddir)/libogmrip-module/libogmrip-module.la \
   $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la \
   $(top_builddir)/libogmrip-job/libogmrip-job.la \
   $(top_builddir)/libogmrip-encode/libogmrip-encode.la
