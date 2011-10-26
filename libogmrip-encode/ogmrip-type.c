@@ -22,6 +22,8 @@
 #include "ogmrip-audio-codec.h"
 #include "ogmrip-subp-codec.h"
 
+#include <ogmrip-media.h>
+
 #define OGMRIP_TYPE_PLUGIN_INFO            (ogmrip_plugin_info_get_type ())
 #define OGMRIP_PLUGIN_INFO(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_PLUGIN_INFO, OGMRipPluginInfo))
 #define OGMRIP_PLUGIN_INFO_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_PLUGIN_INFO, OGMRipPluginInfoClass))
@@ -132,11 +134,13 @@ ogmrip_container_contains (GType gtype, OGMRipFormat format)
   guint i;
 
   g_return_val_if_fail (g_type_is_a (gtype, OGMRIP_TYPE_CONTAINER), FALSE);
-  g_return_val_if_fail (format != OGMRIP_FORMAT_UNDEFINED, FALSE);
 
   info = ogmrip_type_info_lookup (gtype);
   if (!info)
-    return OGMRIP_FORMAT_UNDEFINED;
+    return FALSE;
+
+  if (format == OGMRIP_FORMAT_UNDEFINED)
+    return TRUE;
 
   formats = (OGMRipFormat *) OGMRIP_PLUGIN_INFO (info)->formats->data;
   for (i = 0; i < OGMRIP_PLUGIN_INFO (info)->formats->len; i ++)
