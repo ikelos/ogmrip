@@ -55,10 +55,24 @@ struct _OGMRipVp8Class
   OGMRipVideoCodecClass parent_class;
 };
 
-static GType ogmrip_vp8_get_type (void);
-static void  ogmrip_vp8_notify   (GObject     *gobject,
-                                  GParamSpec  *pspec);
-static gint  ogmrip_vp8_run      (OGMJobSpawn *spawn);
+enum
+{
+  PROP_0,
+  PROP_PASSES,
+};
+
+static GType ogmrip_vp8_get_type    (void);
+static void  ogmrip_vp8_notify      (GObject      *gobject,
+                                     GParamSpec   *pspec);
+static void ogmrip_vp8_get_property (GObject      *gobject,
+                                     guint        property_id,
+                                     GValue       *value,
+                                     GParamSpec   *pspec);
+static void ogmrip_vp8_set_property (GObject      *gobject,
+                                     guint        property_id,
+                                     const GValue *value,
+                                     GParamSpec   *pspec);
+static gint  ogmrip_vp8_run         (OGMJobSpawn  *spawn);
 
 static gboolean have_vpxenc = FALSE;
 
@@ -184,6 +198,34 @@ ogmrip_vp8_command (OGMRipVideoCodec *video, const gchar *fifo, guint pass, guin
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
+static OGMJobSpawn *
+ogmrip_vp8_pipeline (OGMJobSpawn *spawn, const gchar *fifo, guint pass, guint passes, const gchar *log_file)
+{
+  OGMJobSpawn *pipeline, *child;
+  gchar **argv;
+
+  pipeline = ogmjob_pipeline_new ();
+
+  argv = ogmrip_yuv4mpeg_command (OGMRIP_VIDEO_CODEC (spawn), fifo);
+  if (argv)
+  {
+    child = ogmjob_exec_newv (argv);
+    ogmjob_exec_add_watch_full (OGMJOB_EXEC (child), (OGMJobWatch) ogmrip_mplayer_video_watch, spawn, TRUE, FALSE, FALSE);
+    ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
+    g_object_unref (child);
+
+    argv = ogmrip_vp8_command (OGMRIP_VIDEO_CODEC (spawn), fifo, pass + 1, passes, log_file);
+    if (argv)
+    {
+      child = ogmjob_exec_newv (argv);
+      ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
+      g_object_unref (child);
+    }
+  }
+
+  return pipeline;
+}
+
 G_DEFINE_TYPE (OGMRipVp8, ogmrip_vp8, OGMRIP_TYPE_VIDEO_CODEC)
 
 static void
@@ -194,9 +236,15 @@ ogmrip_vp8_class_init (OGMRipVp8Class *klass)
 
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->notify = ogmrip_vp8_notify;
+  gobject_class->get_property = ogmrip_vp8_get_property;
+  gobject_class->set_property = ogmrip_vp8_set_property;
 
   spawn_class = OGMJOB_SPAWN_CLASS (klass);
   spawn_class->run = ogmrip_vp8_run;
+
+  g_object_class_install_property (gobject_class, PROP_PASSES,
+      g_param_spec_uint ("passes", "Passes property", "Set the number of passes",
+        1, 2, 1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 }
 
 static void
@@ -259,32 +307,32 @@ ogmrip_vp8_notify (GObject *gobject, GParamSpec *pspec)
   }
 }
 
-static OGMJobSpawn *
-ogmrip_vp8_pipeline (OGMJobSpawn *spawn, const gchar *fifo, guint pass, guint passes, const gchar *log_file)
+static void
+ogmrip_vp8_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
 {
-  OGMJobSpawn *pipeline, *child;
-  gchar **argv;
-
-  pipeline = ogmjob_pipeline_new ();
-
-  argv = ogmrip_yuv4mpeg_command (OGMRIP_VIDEO_CODEC (spawn), fifo);
-  if (argv)
+  switch (property_id)
   {
-    child = ogmjob_exec_newv (argv);
-    ogmjob_exec_add_watch_full (OGMJOB_EXEC (child), (OGMJobWatch) ogmrip_mplayer_video_watch, spawn, TRUE, FALSE, FALSE);
-    ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
-    g_object_unref (child);
-
-    argv = ogmrip_vp8_command (OGMRIP_VIDEO_CODEC (spawn), fifo, pass + 1, passes, log_file);
-    if (argv)
-    {
-      child = ogmjob_exec_newv (argv);
-      ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
-      g_object_unref (child);
-    }
+    case PROP_PASSES:
+      g_value_set_uint (value, ogmrip_video_codec_get_passes (OGMRIP_VIDEO_CODEC (gobject)));
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
+      break;
   }
+}
 
-  return pipeline;
+static void
+ogmrip_vp8_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
+{
+  switch (property_id)
+  {
+    case PROP_PASSES:
+      ogmrip_video_codec_set_passes (OGMRIP_VIDEO_CODEC (gobject), g_value_get_uint (value));
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
+      break;
+  }
 }
 
 static gint
@@ -352,10 +400,8 @@ ogmrip_module_load (OGMRipModule *module)
     }
   }
   g_free (filename);
-/*
-  2,
-*/
+
   ogmrip_register_codec (OGMRIP_TYPE_VP8,
-      "vp8", _("VP8"), OGMRIP_FORMAT_VP8);
+      "vp8", _("Vp8"), OGMRIP_FORMAT_VP8);
 }
 
