@@ -1,10 +1,6 @@
 ogmrip-media.c
 - vérifier que les médias sont correctement déréférencés
 
-ogmdvd-drive-chooser-widget.c
-ogmdvd-drive-chooser-dialog.c
-- rendre générique et déplacer dans libogmrip-media-gtk
-
 ogmrip-encoding.c
 - vérifier que la destination n'existe pas déjà
 - vérifier que la destination est accessible en écriture
