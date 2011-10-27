@@ -312,6 +312,14 @@ LIBS="$LIBS $THEORA_LIBS"
 
 dnl **************************************************************
 
+AC_ARG_ENABLE(dirac-support,
+  AC_HELP_STRING([--disable-dirac-support], [disable Dirac support]),
+  [have_dirac_support="$enableval"], [have_dirac_support="yes"])
+
+AM_CONDITIONAL(HAVE_DIRAC_SUPPORT, [test x"$have_dirac_support" = x"yes"])
+
+dnl **************************************************************
+
 AC_ARG_ENABLE(vorbis-support,
   AC_HELP_STRING([--disable-vorbis-support], [disable Ogg Vorbis support]),
   [have_vorbis_support="$enableval"], [have_vorbis_support="yes"])

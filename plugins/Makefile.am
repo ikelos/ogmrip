@@ -114,9 +114,27 @@ ogmrip_vp8_la_LIBTOOLFLAGS = \
 ogmrip_vp8_la_LIBADD = \
   $(top_builddir)/libogmrip-job/libogmrip-job.la \
   $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
-  $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la \
-  $(top_builddir)/libogmrip-encode/libogmrip-encode.la
-# endif
+  $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
+endif
+
+if HAVE_DIRAC_SUPPORT
+plugins_LTLIBRARIES += \
+  ogmrip-dirac.la
+
+ogmrip_dirac_la_SOURCES = \
+  ogmrip-dirac.c
+
+ogmrip_dirac_la_LDFLAGS = \
+  -export-dynamic -module -avoid-version
+
+ogmrip_dirac_la_LIBTOOLFLAGS = \
+  --tag=disable-static
+
+ogmrip_dirac_la_LIBADD = \
+  $(top_builddir)/libogmrip-job/libogmrip-job.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
+endif
 
 #
 # Audio Codecs
