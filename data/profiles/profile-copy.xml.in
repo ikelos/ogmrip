@@ -1,0 +1,18 @@
+<profile name="default-copy" version="(1,0)">
+  <key name="name">'&lt;b&gt;Copy&lt;/b&gt;&#xA;No reencoding'</key>
+  <section name="general">
+    <key name="container">'mkv'</key>
+  </section>
+  <section name="video">
+    <key name="codec">'video-copy'</key>
+    <key name="passes">1</key>
+    <key name="scaler">0</key>
+    <key name="can-crop">false</key>
+  </section>
+  <section name="audio">
+    <key name="codec">'audio-copy'</key>
+  </section>
+  <section name="subp">
+    <key name="codec">'vobsub'</key>
+  </section>
+</profile>

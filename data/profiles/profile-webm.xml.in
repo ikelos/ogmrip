@@ -1,0 +1,15 @@
+<profile name="default-webm" version="(1,0)">
+  <key name="name">'&lt;b&gt;WebM Video&lt;/b&gt;&#xA;2-pass, 1x700MB (WebM + VP8 + Vorbis)'</key>
+  <section name="general">
+    <key name="container">'webm'</key>
+  </section>
+  <section name="video">
+    <key name="codec">'vp8'</key>
+  </section>
+  <section name="audio">
+    <key name="codec">'vorbis'</key>
+  </section>
+  <section name="subp">
+    <key name="codec">'hardsub'</key>
+  </section>
+</profile>

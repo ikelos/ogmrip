@@ -6,8 +6,7 @@ profilesfile = \
   profile-mkv.xml.in  \
   profile-ogm.xml.in  \
   profile-webm.xml.in \
-  profile-copy.xml.in \
-  profile-iphone.xml.in
+  profile-copy.xml.in
 
 profiles_DATA = \
   $(profilesfile:.xml.in=.xml)
