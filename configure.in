@@ -468,16 +468,20 @@ libogmrip-encode/ogmrip-version.h
 libogmrip-encode-gtk/Makefile
 plugins/Makefile
 data/Makefile
-data/ogmrip-job.pc
-data/ogmrip-media.pc
-data/ogmrip-media-gtk.pc
-data/ogmrip-file.pc
-data/ogmrip-file-gtk.pc
-data/ogmrip-dvd.pc
-data/ogmrip-dvd-gtk.pc
-data/ogmrip-module.pc
-data/ogmrip-encode.pc
-data/ogmrip-encode-gtk.pc
+data/pkgconfig/Makefile
+data/pkgconfig/ogmrip-job.pc
+data/pkgconfig/ogmrip-media.pc
+data/pkgconfig/ogmrip-media-gtk.pc
+data/pkgconfig/ogmrip-file.pc
+data/pkgconfig/ogmrip-file-gtk.pc
+data/pkgconfig/ogmrip-dvd.pc
+data/pkgconfig/ogmrip-dvd-gtk.pc
+data/pkgconfig/ogmrip-module.pc
+data/pkgconfig/ogmrip-encode.pc
+data/pkgconfig/ogmrip-encode-gtk.pc
+data/profiles/Makefile
+data/schemas/Makefile
+data/ui/Makefile
 po/Makefile.in
 Makefile
 ])
@@ -554,6 +558,12 @@ else
   AC_MSG_NOTICE([   Ogg Theora support disabled])
 fi
 
+if test x"$have_dirac_support" = xyes; then
+  AC_MSG_NOTICE([** Dirac support enabled])
+else
+  AC_MSG_NOTICE([   Dirac support disabled])
+fi
+
 if test x"$have_mp3_support" = xyes; then
   AC_MSG_NOTICE([** MP3 support enabled])
 else
@@ -570,6 +580,12 @@ if test x"$have_aac_support" = xyes; then
   AC_MSG_NOTICE([** AAC support enabled])
 else
   AC_MSG_NOTICE([   AAC support disabled])
+fi
+
+if test x"$have_flac_support" = xyes; then
+  AC_MSG_NOTICE([** FLAC support enabled])
+else
+  AC_MSG_NOTICE([   FLAC support disabled])
 fi
 
 if test x"$have_srt_support" = xyes; then
