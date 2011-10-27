@@ -229,6 +229,25 @@ ogmrip_aac_la_LIBADD = \
   $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
 endif
 
+if HAVE_FLAC_SUPPORT
+plugins_LTLIBRARIES += \
+  ogmrip-flac.la
+
+ogmrip_flac_la_SOURCES = \
+  ogmrip-flac.c
+
+ogmrip_flac_la_LDFLAGS = \
+  -export-dynamic -module -avoid-version
+
+ogmrip_flac_la_LIBTOOLFLAGS = \
+  --tag=disable-static
+
+ogmrip_flac_la_LIBADD = \
+  $(top_builddir)/libogmrip-job/libogmrip-job.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
+endif
+
 #
 # Subp Codecs
 #
