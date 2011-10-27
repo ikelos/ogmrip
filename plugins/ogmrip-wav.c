@@ -109,6 +109,6 @@ ogmrip_module_load (OGMRipModule *module)
     g_warning (_("MPlayer is missing"));
   else
     ogmrip_register_codec (OGMRIP_TYPE_WAV,
-        "wav", N_("Wave (uncompressed PCM)"), OGMRIP_FORMAT_PCM);
+        "wav", _("Wave (uncompressed PCM)"), OGMRIP_FORMAT_PCM);
 }
 

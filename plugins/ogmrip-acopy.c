@@ -136,6 +136,6 @@ ogmrip_module_load (OGMRipModule *module)
     g_warning (_("MEncoder is missing"));
   else
     ogmrip_register_codec (OGMRIP_TYPE_AUDIO_COPY,
-        "copy", N_("Copy (for AC3 or DTS)"), OGMRIP_FORMAT_COPY);
+        "copy", _("Copy (for AC3 or DTS)"), OGMRIP_FORMAT_COPY);
 }
 

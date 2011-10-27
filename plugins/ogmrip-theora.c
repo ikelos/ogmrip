@@ -268,6 +268,6 @@ ogmrip_module_load (OGMRipModule *module)
   }
 
   ogmrip_register_codec (OGMRIP_TYPE_THEORA,
-      "theora", N_("Ogg Theora"), OGMRIP_FORMAT_THEORA);
+      "theora", _("Ogg Theora"), OGMRIP_FORMAT_THEORA);
 }
 

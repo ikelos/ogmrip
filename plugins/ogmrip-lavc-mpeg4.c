@@ -79,6 +79,6 @@ ogmrip_module_load (OGMRipModule *module)
   }
 
   ogmrip_register_codec (OGMRIP_TYPE_LAVC_MPEG4,
-      "lavc-mpeg4", N_("Lavc Mpeg-4"), OGMRIP_FORMAT_MPEG4);
+      "lavc-mpeg4", _("Lavc Mpeg-4"), OGMRIP_FORMAT_MPEG4);
 }
 

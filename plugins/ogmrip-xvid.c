@@ -945,6 +945,6 @@ ogmrip_module_load (OGMRipModule *module)
   }
 
   ogmrip_register_codec (OGMRIP_TYPE_XVID,
-      "xvid", N_("XviD"), OGMRIP_FORMAT_MPEG4);
+      "xvid", _("XviD"), OGMRIP_FORMAT_MPEG4);
 }
 

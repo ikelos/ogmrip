@@ -598,6 +598,6 @@ ogmrip_module_load (OGMRipModule *module)
   }
 
   ogmrip_register_container (OGMRIP_TYPE_MP4,
-      "mp4", N_("Mpeg-4 Media (MP4)"), formats);
+      "mp4", _("Mpeg-4 Media (MP4)"), formats);
 }
 

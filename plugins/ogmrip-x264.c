@@ -1033,6 +1033,6 @@ ogmrip_module_load (OGMRipModule *module)
   x264_have_nombtree       = ogmrip_x264_check_option ("nombtree");
 
   ogmrip_register_codec (OGMRIP_TYPE_X264,
-      "x264", N_("X264"), OGMRIP_FORMAT_H264);
+      "x264", _("X264"), OGMRIP_FORMAT_H264);
 }
 

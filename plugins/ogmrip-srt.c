@@ -561,6 +561,6 @@ ogmrip_module_load (OGMRipModule *module)
   }
 
   ogmrip_register_codec (OGMRIP_TYPE_SRT,
-      "srt", N_("SRT text"), OGMRIP_FORMAT_SRT);
+      "srt", _("SRT text"), OGMRIP_FORMAT_SRT);
 }
 

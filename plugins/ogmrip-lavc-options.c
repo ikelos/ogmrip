@@ -21,7 +21,6 @@
 #endif
 
 #include <ogmrip-lavc.h>
-#include <ogmrip-lavc-mpeg4.h>
 #include <ogmrip-encode-gtk.h>
 #include <ogmrip-module.h>
 

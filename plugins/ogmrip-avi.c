@@ -323,6 +323,6 @@ ogmrip_module_load (OGMRipModule *module)
     g_warning (_("avibox is missing"));
   else
     ogmrip_register_container (OGMRIP_TYPE_AVI,
-        "avi", N_("Audio-Video Interlace (AVI)"), formats);
+        "avi", _("Audio-Video Interlace (AVI)"), formats);
 }
 
