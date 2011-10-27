@@ -123,19 +123,19 @@ ogmrip_vp8_la_LIBADD = \
 #
 
 plugins_LTLIBRARIES += \
-  ogmrip-acopy.la  \
+  ogmrip-copy.la  \
   ogmrip-wav.la
 
-ogmrip_acopy_la_SOURCES = \
-  ogmrip-acopy.c
+ogmrip_copy_la_SOURCES = \
+  ogmrip-copy.c
 
-ogmrip_acopy_la_LDFLAGS = \
+ogmrip_copy_la_LDFLAGS = \
   -export-dynamic -module -avoid-version
 
-ogmrip_acopy_la_LIBTOOLFLAGS = \
+ogmrip_copy_la_LIBTOOLFLAGS = \
   --tag=disable-static
 
-ogmrip_acopy_la_LIBADD = \
+ogmrip_copy_la_LIBADD = \
   $(top_builddir)/libogmrip-job/libogmrip-job.la \
   $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
   $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
