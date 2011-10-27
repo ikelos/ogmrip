@@ -13,24 +13,21 @@ plugin_include_HEADERS =
 
 if HAVE_LAVC_SUPPORT
 plugins_LTLIBRARIES += \
-  ogmrip-lavc-mpeg4.la
+  ogmrip-lavc-mpeg.la
 
-ogmrip_lavc_mpeg4_la_SOURCES = \
-  ogmrip-lavc-mpeg4.c
+ogmrip_lavc_mpeg_la_SOURCES = \
+  ogmrip-lavc-mpeg.c
   
-ogmrip_lavc_mpeg4_la_LDFLAGS = \
+ogmrip_lavc_mpeg_la_LDFLAGS = \
   -export-dynamic -module -avoid-version
 
-ogmrip_lavc_mpeg4_la_LIBTOOLFLAGS = \
+ogmrip_lavc_mpeg_la_LIBTOOLFLAGS = \
   --tag=disable-static
 
-ogmrip_lavc_mpeg4_la_LIBADD = \
+ogmrip_lavc_mpeg_la_LIBADD = \
   $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
   $(top_builddir)/libogmrip-encode/libogmrip-lavc.la \
   $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
-
-plugin_include_HEADERS += \
-  ogmrip-lavc-mpeg4.h
 endif
 
 if HAVE_XVID_SUPPORT
@@ -98,7 +95,7 @@ plugin_include_HEADERS += \
   ogmrip-x264.h
 endif
 
-# if HAVE_VP8_SUPPORT
+if HAVE_VP8_SUPPORT
 plugins_LTLIBRARIES += \
   ogmrip-vp8.la
 
