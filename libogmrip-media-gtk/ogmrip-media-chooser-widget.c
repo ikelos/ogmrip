@@ -176,7 +176,7 @@ ogmrip_media_chooser_widget_medium_removed (OGMRipMediaChooserWidget *chooser, O
 
       gtk_list_store_insert_before (GTK_LIST_STORE (model), &it, &iter);
       gtk_list_store_set (GTK_LIST_STORE (model), &it,
-          TEXT_COLUMN, _("<b>No DVD</b>\nNo device"), TYPE_COLUMN, NONE_ROW, -1);
+          TEXT_COLUMN, _("<b>No media</b>\nNo drive"), TYPE_COLUMN, NONE_ROW, -1);
     }
   }
 
@@ -200,7 +200,7 @@ ogmrip_media_chooser_widget_medium_added (OGMRipMediaChooserWidget *chooser, OGM
 
     name = ogmrip_drive_get_name (drive);
     if (!name)
-      name = g_strdup (_("Unknown Media"));
+      name = g_strdup (_("Unknown media"));
 
     title = g_markup_escape_text (ogmrip_media_get_label (media), -1);
     text = g_strdup_printf ("<b>%s</b>\n%s", title, name);
@@ -337,7 +337,7 @@ ogmrip_media_chooser_widget_init (OGMRipMediaChooserWidget *chooser)
   {
     gtk_list_store_append (store, &iter);
     gtk_list_store_set (store, &iter,
-        TEXT_COLUMN, _("<b>No DVD</b>\nNo device"), TYPE_COLUMN, NONE_ROW, -1);
+        TEXT_COLUMN, _("<b>No media</b>\nNo drive"), TYPE_COLUMN, NONE_ROW, -1);
   }
 
   gtk_list_store_append (store, &iter);
@@ -346,11 +346,11 @@ ogmrip_media_chooser_widget_init (OGMRipMediaChooserWidget *chooser)
 
   gtk_list_store_append (store, &iter);
   gtk_list_store_set (store, &iter,
-      TEXT_COLUMN, _("Select a DVD structure..."), TYPE_COLUMN, DIR_SEL_ROW, -1);
+      TEXT_COLUMN, _("Select a media directory..."), TYPE_COLUMN, DIR_SEL_ROW, -1);
 
   gtk_list_store_append (store, &iter);
   gtk_list_store_set (store, &iter,
-      TEXT_COLUMN, _("Select an ISO file..."), TYPE_COLUMN, FILE_SEL_ROW, -1);
+      TEXT_COLUMN, _("Select a media file..."), TYPE_COLUMN, FILE_SEL_ROW, -1);
 
 }
 
@@ -415,7 +415,7 @@ ogmrip_media_chooser_widget_select_file (GtkComboBox *combo, gboolean file)
   GtkWidget *dialog, *toplevel;
   GdkPixbuf *pixbuf;
 
-  dialog = gtk_file_chooser_dialog_new (file ? _("Select an media file") : _("Select a media structure"),
+  dialog = gtk_file_chooser_dialog_new (file ? _("Select an media file") : _("Select a media directory"),
       NULL, file ? GTK_FILE_CHOOSER_ACTION_OPEN : GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
       GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_OK, NULL);
 

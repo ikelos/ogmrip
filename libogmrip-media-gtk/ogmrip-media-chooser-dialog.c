@@ -145,7 +145,7 @@ ogmrip_media_chooser_dialog_init (OGMRipMediaChooserDialog *dialog)
 
   dialog->priv = OGMRIP_MEDIA_CHOOSER_DIALOG_GET_PRIVATE (dialog);
 
-  gtk_window_set_title (GTK_WINDOW (dialog), _("Open DVD Disk"));
+  gtk_window_set_title (GTK_WINDOW (dialog), _("Select media"));
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
   gtk_window_set_modal (GTK_WINDOW (dialog), TRUE);
 
@@ -177,7 +177,7 @@ ogmrip_media_chooser_dialog_init (OGMRipMediaChooserDialog *dialog)
   gtk_container_add (GTK_CONTAINER (area), vbox);
   gtk_widget_show (vbox);
 
-  label = gtk_label_new (_("<b>Select _DVD Media:</b>"));
+  label = gtk_label_new (_("<b>Select _media:</b>"));
   gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
   gtk_label_set_use_underline (GTK_LABEL (label), TRUE);
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);

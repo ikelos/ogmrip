@@ -1,17 +1,18 @@
 [encoding: UTF-8]
 
-data/ogmrip-crop.glade
-data/ogmrip-lavc.glade
-data/ogmrip-main.glade
-data/ogmrip-options.glade
-data/ogmrip-pref.glade
-data/ogmrip-profile-editor.glade
-data/ogmrip-profiles.glade
-data/ogmrip-progress.glade
-data/ogmrip-queue.glade
-data/ogmrip-spell.glade
-data/ogmrip-x264.glade
-data/ogmrip-xvid.glade
+data/ui/ogmrip-crop.glade
+data/ui/ogmrip-lavc.glade
+data/ui/ogmrip-main.glade
+data/ui/ogmrip-options.glade
+data/ui/ogmrip-pref.glade
+data/ui/ogmrip-profile-editor.glade
+data/ui/ogmrip-profiles.glade
+data/ui/ogmrip-progress.glade
+data/ui/ogmrip-queue.glade
+data/ui/ogmrip-spell.glade
+data/ui/ogmrip-x264.glade
+data/ui/ogmrip-xvid.glade
+data/ui/ogmrip.desktop.in
 
 libogmrip-dvd/ogmdvd-disc.c
 libogmrip-dvd/ogmdvd-title.c
@@ -25,15 +26,14 @@ libogmrip-encode/ogmrip-xml.c
 
 libogmrip-media-gtk/ogmrip-chapter-store.c
 libogmrip-media-gtk/ogmrip-chapter-view.c
+libogmrip-media-gtk/ogmrip-media-chooser-dialog.c
+libogmrip-media-gtk/ogmrip-media-chooser-widget.c
 libogmrip-media-gtk/ogmrip-title-chooser-widget.c
 
 libogmrip-file-gtk/ogmrip-audio-file-chooser-dialog.c
 libogmrip-file-gtk/ogmrip-file-chooser-dialog.c
 libogmrip-file-gtk/ogmrip-source-chooser-widget.c
 libogmrip-file-gtk/ogmrip-subp-file-chooser-dialog.c
-
-libogmrip-dvd-gtk/ogmdvd-drive-chooser-dialog.c
-libogmrip-dvd-gtk/ogmdvd-drive-chooser-widget.c
 
 libogmrip-encode-gtk/ogmrip-audio-options-dialog.c
 libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c
@@ -52,9 +52,11 @@ src/ogmrip-pref-dialog.c
 src/ogmrip-spell-dialog.c
 
 plugins/ogmrip-aac.c
-plugins/ogmrip-acopy.c
 plugins/ogmrip-avi.c
-plugins/ogmrip-lavc-mpeg4.c
+plugins/ogmrip-copy.c
+plugins/ogmrip-dirac.c
+plugins/ogmrip-flac.c
+plugins/ogmrip-lavc-mpeg.c
 plugins/ogmrip-lavc-options.c
 plugins/ogmrip-mkv.c
 plugins/ogmrip-mp3.c
@@ -64,10 +66,9 @@ plugins/ogmrip-srt.c
 plugins/ogmrip-theora.c
 plugins/ogmrip-vobsub.c
 plugins/ogmrip-vorbis.c
+plugins/ogmrip-vp8.c
 plugins/ogmrip-wav.c
 plugins/ogmrip-x264.c
 plugins/ogmrip-x264-options.c
 plugins/ogmrip-xvid.c
 plugins/ogmrip-xvid-options.c
-
-data/ogmrip.desktop.in
