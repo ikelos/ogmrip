@@ -57,17 +57,19 @@ enum
   PROP_START_POSITION
 };
 
-static void ogmrip_codec_constructed  (GObject      *gobject);
-static void ogmrip_codec_dispose      (GObject      *gobject);
-static void ogmrip_codec_set_property (GObject      *gobject,
-                                       guint        property_id,
-                                       const GValue *value,
-                                       GParamSpec   *pspec);
-static void ogmrip_codec_get_property (GObject      *gobject,
-                                       guint        property_id,
-                                       GValue       *value,
-                                       GParamSpec   *pspec);
-static gint ogmrip_codec_run          (OGMJobSpawn  *spawn);
+static void     ogmrip_codec_constructed  (GObject      *gobject);
+static void     ogmrip_codec_dispose      (GObject      *gobject);
+static void     ogmrip_codec_set_property (GObject      *gobject,
+                                           guint        property_id,
+                                           const GValue *value,
+                                           GParamSpec   *pspec);
+static void     ogmrip_codec_get_property (GObject      *gobject,
+                                           guint        property_id,
+                                           GValue       *value,
+                                           GParamSpec   *pspec);
+static gboolean ogmrip_codec_run          (OGMJobTask   *task,
+                                           GCancellable *cancellable,
+                                           GError       **error);
 
 static void
 ogmrip_codec_set_input (OGMRipCodec *codec, OGMRipStream *input)
@@ -90,7 +92,7 @@ static void
 ogmrip_codec_class_init (OGMRipCodecClass *klass)
 {
   GObjectClass *gobject_class;
-  OGMJobSpawnClass *spawn_class;
+  OGMJobTaskClass *task_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->constructed = ogmrip_codec_constructed;
@@ -98,8 +100,8 @@ ogmrip_codec_class_init (OGMRipCodecClass *klass)
   gobject_class->set_property = ogmrip_codec_set_property;
   gobject_class->get_property = ogmrip_codec_get_property;
 
-  spawn_class = OGMJOB_SPAWN_CLASS (klass);
-  spawn_class->run = ogmrip_codec_run;
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_codec_run;
 
   g_object_class_install_property (gobject_class, PROP_INPUT, 
         g_param_spec_object ("input", "Input property", "Set input title", 
@@ -235,15 +237,31 @@ ogmrip_codec_get_property (GObject *gobject, guint property_id, GValue *value, G
   }
 }
 
-static gint
-ogmrip_codec_run (OGMJobSpawn *spawn)
+static gboolean
+ogmrip_codec_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
-  OGMRipTitle *title = OGMRIP_CODEC (spawn)->priv->title;
+  OGMRipTitle *title = OGMRIP_CODEC (task)->priv->title;
+  const gchar *filename;
+  gboolean retval;
+  gchar *path;
 
-  g_return_val_if_fail (title != NULL, OGMJOB_RESULT_ERROR);
-  g_return_val_if_fail (ogmrip_title_is_open (title), OGMJOB_RESULT_ERROR);
+  g_return_val_if_fail (title != NULL, FALSE);
+  g_return_val_if_fail (ogmrip_title_is_open (title), FALSE);
 
-  return OGMJOB_SPAWN_CLASS (ogmrip_codec_parent_class)->run (spawn);
+  filename = ogmrip_file_get_path (OGMRIP_CODEC (task)->priv->output);
+
+  path = g_path_get_dirname (filename);
+  retval = g_access (path, R_OK | W_OK);
+  g_free (path);
+
+  if (retval < 0)
+  {
+    g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+        "Output directory is not readable and/or writeable");
+    return FALSE;
+  }
+
+  return OGMJOB_TASK_CLASS (ogmrip_codec_parent_class)->run (task, cancellable, error);
 }
 
 /**

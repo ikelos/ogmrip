@@ -69,24 +69,26 @@ enum
   PROP_OVERHEAD
 };
 
-static void ogmrip_matroska_get_property (GObject     *gobject,
-                                          guint       property_id,
-                                          GValue      *value,
-                                          GParamSpec  *pspec);
-static gint ogmrip_matroska_run          (OGMJobSpawn *spawn);
+static void     ogmrip_matroska_get_property (GObject      *gobject,
+                                              guint        property_id,
+                                              GValue       *value,
+                                              GParamSpec   *pspec);
+static gboolean ogmrip_matroska_run          (OGMJobTask   *task,
+                                              GCancellable *cancellable,
+                                              GError       **error);
 
-static gdouble
-ogmrip_matroska_watch (OGMJobExec *exec, const gchar *buffer, OGMRipContainer *matroska)
+static gboolean
+ogmrip_matroska_watch (OGMJobTask *task, const gchar *buffer, OGMRipContainer *matroska, GError **error)
 {
   gulong frames, total;
   guint percent;
 
   if (sscanf (buffer, "progress: %lu/%lu frames (%u%%)", &frames, &total, &percent) == 3)
-    return percent / 100.0;
+    ogmjob_task_set_progress (task, percent / 100.0);
   else if (sscanf (buffer, "Progress: %u%%", &percent) == 1)
-    return percent / 100.0;
+    ogmjob_task_set_progress (task, percent / 100.0);
 
-  return -1.0;
+  return TRUE;
 }
 
 static void
@@ -342,13 +344,13 @@ static void
 ogmrip_matroska_class_init (OGMRipMatroskaClass *klass)
 {
   GObjectClass *gobject_class;
-  OGMJobSpawnClass *spawn_class;
+  OGMJobTaskClass *task_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->get_property = ogmrip_matroska_get_property;
 
-  spawn_class = OGMJOB_SPAWN_CLASS (klass);
-  spawn_class->run = ogmrip_matroska_run;
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_matroska_run;
 
   g_object_class_install_property (gobject_class, PROP_OVERHEAD, 
         g_param_spec_uint ("overhead", "Overhead property", "Get overhead", 
@@ -374,31 +376,31 @@ ogmrip_matroska_get_property (GObject *gobject, guint property_id, GValue *value
   }
 }
 
-static gint
-ogmrip_matroska_run (OGMJobSpawn *spawn)
+static gboolean
+ogmrip_matroska_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
-  OGMJobSpawn *child;
+  OGMJobTask *child;
   gchar **argv;
-  gint result;
+  gboolean result;
 
-  argv = ogmrip_matroska_command (OGMRIP_CONTAINER (spawn));
+  argv = ogmrip_matroska_command (OGMRIP_CONTAINER (task));
   if (!argv)
-    return OGMJOB_RESULT_ERROR;
+    return FALSE;
 
-  child = ogmjob_exec_newv (argv);
-  ogmjob_exec_add_watch_full (OGMJOB_EXEC (child), (OGMJobWatch) ogmrip_matroska_watch, spawn, TRUE, FALSE, FALSE);
-  ogmjob_container_add (OGMJOB_CONTAINER (spawn), child);
+  child = ogmjob_spawn_newv (argv);
+  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child), (OGMJobWatch) ogmrip_matroska_watch, task);
+  ogmjob_container_add (OGMJOB_CONTAINER (task), child);
   g_object_unref (child);
 
-  result = OGMJOB_SPAWN_CLASS (ogmrip_matroska_parent_class)->run (spawn);
+  result = OGMJOB_TASK_CLASS (ogmrip_matroska_parent_class)->run (task, cancellable, error);
 
   /*
    * If mkvmerge returns 1, it's only a warning
    */
-  if (ogmjob_exec_get_status (OGMJOB_EXEC (child)) == 1)
-    result = OGMJOB_RESULT_SUCCESS;
+  if (ogmjob_spawn_get_status (OGMJOB_SPAWN (child)) == 1)
+    result = TRUE;
 
-  ogmjob_container_remove (OGMJOB_CONTAINER (spawn), child);
+  ogmjob_container_remove (OGMJOB_CONTAINER (task), child);
 
   return result;
 }

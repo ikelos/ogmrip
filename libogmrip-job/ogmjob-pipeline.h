@@ -19,7 +19,7 @@
 #ifndef __OGMJOB_PIPELINE_H__
 #define __OGMJOB_PIPELINE_H__
 
-#include <ogmjob-list.h>
+#include <ogmjob-container.h>
 
 G_BEGIN_DECLS
 
@@ -36,18 +36,18 @@ typedef struct _OGMJobPipelineClass OGMJobPipelineClass;
 
 struct _OGMJobPipeline
 {
-  OGMJobList parent_instance;
+  OGMJobContainer parent_instance;
 
   OGMJobPipelinePriv *priv;
 };
 
 struct _OGMJobPipelineClass
 {
-  OGMJobListClass parent_class;
+  OGMJobContainerClass parent_class;
 };
 
-GType         ogmjob_pipeline_get_type (void);
-OGMJobSpawn * ogmjob_pipeline_new      (void);
+GType        ogmjob_pipeline_get_type (void);
+OGMJobTask * ogmjob_pipeline_new      (void);
 
 G_END_DECLS
 

@@ -21,12 +21,11 @@
 
 #include <ogmjob-bin.h>
 #include <ogmjob-container.h>
-#include <ogmjob-exec.h>
-#include <ogmjob-list.h>
 #include <ogmjob-log.h>
 #include <ogmjob-pipeline.h>
 #include <ogmjob-queue.h>
 #include <ogmjob-spawn.h>
+#include <ogmjob-task.h>
 
 #endif /* __OGMRIP_JOB_H__ */
 

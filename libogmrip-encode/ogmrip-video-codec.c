@@ -26,9 +26,6 @@
 #include "ogmrip-video-codec.h"
 #include "ogmrip-version.h"
 
-#include <ogmjob-exec.h>
-#include <ogmjob-queue.h>
-
 #include <string.h>
 #include <stdio.h>
 

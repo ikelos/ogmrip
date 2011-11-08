@@ -20,7 +20,7 @@
  * SECTION:ogmjob-bin
  * @title: OGMJobBin
  * @include: ogmjob-bin.h
- * @short_description: Base class for spawns which contain one spawn only
+ * @short_description: Base class for tasks which contain one task only
  */
 
 #include "ogmjob-bin.h"
@@ -30,29 +30,98 @@
 
 struct _OGMJobBinPriv
 {
-  OGMJobSpawn *child;
+  OGMJobTask *child;
 };
-
-static gint ogmjob_bin_run      (OGMJobSpawn     *spawn);
-static void ogmjob_bin_add      (OGMJobContainer *container,
-                                OGMJobSpawn     *child);
-static void ogmjob_bin_remove   (OGMJobContainer *container,
-                                OGMJobSpawn     *child);
-static void ogmjob_bin_forall   (OGMJobContainer *container,
-                                OGMJobCallback  callback,
-                                gpointer       data);
 
 G_DEFINE_ABSTRACT_TYPE (OGMJobBin, ogmjob_bin, OGMJOB_TYPE_CONTAINER)
 
 static void
+ogmjob_bin_run_async (OGMJobTask *task, GCancellable *cancellable, GAsyncReadyCallback callback, gpointer user_data)
+{
+  OGMJobBin *bin = OGMJOB_BIN (task);
+
+  if (bin->priv->child)
+    ogmjob_task_run_async (bin->priv->child, cancellable, callback, user_data);
+}
+
+static gboolean
+ogmjob_bin_run_finish (OGMJobTask *task, GAsyncResult *res, GError **error)
+{
+  OGMJobBin *bin = OGMJOB_BIN (task);
+
+  if (!bin->priv->child)
+    return FALSE;
+
+  return ogmjob_task_run_finish (bin->priv->child, res, error);
+}
+
+static gboolean
+ogmjob_bin_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
+{
+  OGMJobBin *bin = OGMJOB_BIN (task);
+
+  if (!bin->priv->child)
+    return TRUE;
+
+  return ogmjob_task_run (bin->priv->child, cancellable, error);
+}
+
+static void
+ogmjob_bin_child_progress (OGMJobContainer *container, GParamSpec *pspec, OGMJobTask *child)
+{
+  ogmjob_task_set_progress (OGMJOB_TASK (container), ogmjob_task_get_progress (child));
+}
+
+static void
+ogmjob_bin_add (OGMJobContainer *container, OGMJobTask *task)
+{
+  OGMJobBin *bin;
+
+  bin = OGMJOB_BIN (container);
+  if (!bin->priv->child)
+  {
+    bin->priv->child = g_object_ref (task);
+
+    g_signal_connect_swapped (task, "notify::progress", 
+        G_CALLBACK (ogmjob_bin_child_progress), container);
+  }
+}
+
+static void
+ogmjob_bin_remove (OGMJobContainer *container, OGMJobTask *task)
+{
+  OGMJobBin *bin;
+
+  bin = OGMJOB_BIN (container);
+  if (bin->priv->child == task)
+  {
+    g_signal_handlers_disconnect_by_func (task, ogmjob_bin_child_progress, container);
+
+    g_object_unref (task);
+    bin->priv->child = NULL;
+  }
+}
+
+static void
+ogmjob_bin_forall (OGMJobContainer *container, OGMJobCallback callback, gpointer data)
+{
+  OGMJobBin *bin;
+
+  bin = OGMJOB_BIN (container);
+  if (callback && bin->priv->child)
+    (* callback) (bin->priv->child, data);
+}
+
+static void
 ogmjob_bin_class_init (OGMJobBinClass *klass)
 {
-  OGMJobSpawnClass *spawn_class;
+  OGMJobTaskClass *task_class;
   OGMJobContainerClass *container_class;
 
-
-  spawn_class = OGMJOB_SPAWN_CLASS (klass);
-  spawn_class->run = ogmjob_bin_run;
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run_async = ogmjob_bin_run_async;
+  task_class->run_finish = ogmjob_bin_run_finish;
+  task_class->run = ogmjob_bin_run;
 
   container_class = OGMJOB_CONTAINER_CLASS (klass);
   container_class->add = ogmjob_bin_add;
@@ -69,91 +138,15 @@ ogmjob_bin_init (OGMJobBin *bin)
   bin->priv->child = NULL;
 }
 
-static gint
-ogmjob_bin_run (OGMJobSpawn *spawn)
-{
-  OGMJobBin *bin;
-
-  bin = OGMJOB_BIN (spawn);
-  if (bin->priv->child)
-  {
-    GError *tmp_error = NULL;
-    gint result;
-
-    result = ogmjob_spawn_run (bin->priv->child, &tmp_error);
-    if (result == OGMJOB_RESULT_ERROR && tmp_error)
-      ogmjob_spawn_propagate_error (spawn, tmp_error);
-
-    return result;
-  }
-
-  return OGMJOB_RESULT_SUCCESS;
-}
-
-static void
-ogmjob_bin_child_progress (OGMJobContainer *container, gdouble fraction, OGMJobSpawn *child)
-{
-  g_signal_emit_by_name (container, "progress", fraction);
-}
-
-static void
-ogmjob_bin_add (OGMJobContainer *container, OGMJobSpawn *child)
-{
-  OGMJobBin *bin;
-
-  bin = OGMJOB_BIN (container);
-  if (bin->priv->child == NULL)
-  {
-    guint handler;
-
-    g_object_ref (child);
-    bin->priv->child = child;
-
-    handler = g_signal_connect_swapped (child, "progress", 
-        G_CALLBACK (ogmjob_bin_child_progress), container);
-    g_object_set_data (G_OBJECT (child), "__child_progress_handler__", 
-        GUINT_TO_POINTER (handler));
-  }
-}
-
-static void
-ogmjob_bin_remove (OGMJobContainer *container, OGMJobSpawn *child)
-{
-  OGMJobBin *bin;
-
-  bin = OGMJOB_BIN (container);
-  if (bin->priv->child == child)
-  {
-    gpointer handler;
-
-    handler = g_object_get_data (G_OBJECT (child), "__child_progress_handler__");
-    if (handler)
-      g_signal_handler_disconnect (child, GPOINTER_TO_UINT (handler));
-
-    g_object_unref (child);
-    bin->priv->child = NULL;
-  }
-}
-
-static void
-ogmjob_bin_forall (OGMJobContainer *container, OGMJobCallback callback, gpointer data)
-{
-  OGMJobBin *bin;
-
-  bin = OGMJOB_BIN (container);
-  if (callback && bin->priv->child)
-    (* callback) (bin->priv->child, data);
-}
-
 /**
  * ogmjob_bin_get_child:
  * @bin: An #OGMJobBin
  *
- * Gets the child of the #OGMJobBin, or NULL if the bin contains no child spawn.
+ * Gets the child of the #OGMJobBin, or NULL if the bin contains no child task.
  *
- * Returns: An #OGMJobSpawn
+ * Returns: An #OGMJobTask
  */
-OGMJobSpawn *
+OGMJobTask *
 ogmjob_bin_get_child (OGMJobBin *bin)
 {
   g_return_val_if_fail (OGMJOB_IS_BIN (bin), NULL);

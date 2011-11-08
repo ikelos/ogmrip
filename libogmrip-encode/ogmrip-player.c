@@ -27,7 +27,6 @@
 #include "config.h"
 #endif
 
-#include "ogmrip-mplayer.h"
 #include "ogmrip-player.h"
 #include "ogmrip-version.h"
 

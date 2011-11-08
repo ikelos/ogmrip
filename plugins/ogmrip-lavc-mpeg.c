@@ -76,7 +76,9 @@ struct _OGMRipLavcMpeg2Class
   OGMRipLavcClass parent_class;
 };
 
-static gint ogmrip_lavc_mpeg2_run (OGMJobSpawn *spawn);
+static gboolean ogmrip_lavc_mpeg2_run (OGMJobTask   *task,
+                                       GCancellable *cancellable,
+                                       GError       **error);
 
 G_DEFINE_TYPE (OGMRipLavcMpeg2, ogmrip_lavc_mpeg2, OGMRIP_TYPE_LAVC)
 
@@ -91,11 +93,11 @@ ogmrip_lavc_mpeg2_get_codec (void)
 static void
 ogmrip_lavc_mpeg2_class_init (OGMRipLavcMpeg2Class *klass)
 {
-  OGMJobSpawnClass *spawn_class;
+  OGMJobTaskClass *task_class;
   OGMRipLavcClass *lavc_class;
 
-  spawn_class = (OGMJobSpawnClass *) klass;
-  spawn_class->run = ogmrip_lavc_mpeg2_run;
+  task_class = (OGMJobTaskClass *) klass;
+  task_class->run = ogmrip_lavc_mpeg2_run;
 
   lavc_class = (OGMRipLavcClass *) klass;
   lavc_class->get_codec = ogmrip_lavc_mpeg2_get_codec;
@@ -106,12 +108,12 @@ ogmrip_lavc_mpeg2_init (OGMRipLavcMpeg2 *lavc_mpeg2)
 {
 }
 
-static gint
-ogmrip_lavc_mpeg2_run (OGMJobSpawn *spawn)
+static gboolean
+ogmrip_lavc_mpeg2_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
-  ogmrip_lavc_set_v4mv (OGMRIP_LAVC (spawn), FALSE);
+  ogmrip_lavc_set_v4mv (OGMRIP_LAVC (task), FALSE);
 
-  return OGMJOB_SPAWN_CLASS (ogmrip_lavc_mpeg2_parent_class)->run (spawn);
+  return OGMJOB_TASK_CLASS (ogmrip_lavc_mpeg2_parent_class)->run (task, cancellable, error);
 }
 
 typedef struct _OGMRipLavcMpeg4      OGMRipLavcMpeg4;

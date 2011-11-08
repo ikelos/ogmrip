@@ -20,13 +20,13 @@
  * SECTION:ogmjob-container
  * @title: OGMJobContainer
  * @include: ogmjob-container.h
- * @short_description: Base class for spawns which contain other spawns
+ * @short_description: Base class for tasks which contain other tasks
  */
 
 #include "ogmjob-container.h"
 
-#define OGMJOB_CONTAINER_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMJOB_TYPE_CONTAINER, OGMJobContainerPriv))
+#define OGMJOB_CONTAINER_GET_CLASS(obj) \
+  (G_TYPE_INSTANCE_GET_CLASS ((obj), OGMJOB_TYPE_CONTAINER, OGMJobContainerClass))
 
 enum
 {
@@ -36,32 +36,29 @@ enum
 };
 
 static void ogmjob_container_dispose     (GObject         *object);
-static void ogmjob_container_cancel      (OGMJobSpawn     *spawn);
-static void ogmjob_container_suspend     (OGMJobSpawn     *spawn);
-static void ogmjob_container_resume      (OGMJobSpawn     *spawn);
+static void ogmjob_container_suspend     (OGMJobTask      *task);
+static void ogmjob_container_resume      (OGMJobTask      *task);
 static void ogmjob_container_real_add    (OGMJobContainer *container, 
-                                          OGMJobSpawn     *child);
+                                          OGMJobTask      *task);
 static void ogmjob_container_real_remove (OGMJobContainer *container,
-                                          OGMJobSpawn     *spawn);
+                                          OGMJobTask      *task);
 
 static gint signals[LAST_SIGNAL] = { 0 };
 
-G_DEFINE_ABSTRACT_TYPE (OGMJobContainer, ogmjob_container, OGMJOB_TYPE_SPAWN)
+G_DEFINE_ABSTRACT_TYPE (OGMJobContainer, ogmjob_container, OGMJOB_TYPE_TASK)
 
 static void
 ogmjob_container_class_init (OGMJobContainerClass *klass)
 {
   GObjectClass *gobject_class;
-  OGMJobSpawnClass *spawn_class;
+  OGMJobTaskClass *task_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
-  spawn_class = OGMJOB_SPAWN_CLASS (klass);
-
   gobject_class->dispose = ogmjob_container_dispose;
 
-  spawn_class->cancel = ogmjob_container_cancel;
-  spawn_class->suspend = ogmjob_container_suspend;
-  spawn_class->resume = ogmjob_container_resume;
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->suspend = ogmjob_container_suspend;
+  task_class->resume = ogmjob_container_resume;
 
   klass->add = ogmjob_container_real_add;
   klass->remove = ogmjob_container_real_remove;
@@ -69,26 +66,26 @@ ogmjob_container_class_init (OGMJobContainerClass *klass)
   /**
    * OGMJobContainer::add
    * @container: the container that received the signal
-   * @child: the child to be added
+   * @task: the task to be added
    *
-   * Emitted each time a child is added to a container.
+   * Emitted each time a task is added to a container.
    */
   signals[ADD] = g_signal_new ("add", G_TYPE_FROM_CLASS (gobject_class),
       G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS, 
       G_STRUCT_OFFSET (OGMJobContainerClass, add), NULL, NULL,
-      g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, OGMJOB_TYPE_SPAWN);
+      g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, OGMJOB_TYPE_TASK);
 
   /**
    * OGMJobContainer::remove
    * @container: the container that received the signal
-   * @child: the child to be removed
+   * @task: the task to be removed
    *
-   * Emitted each time a child is removed from a container.
+   * Emitted each time a task is removed from a container.
    */
   signals[REMOVE] = g_signal_new ("remove", G_TYPE_FROM_CLASS (gobject_class),
       G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS, 
       G_STRUCT_OFFSET (OGMJobContainerClass, remove), NULL, NULL,
-      g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, OGMJOB_TYPE_SPAWN);
+      g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, OGMJOB_TYPE_TASK);
 }
 
 static void
@@ -106,34 +103,27 @@ ogmjob_container_dispose (GObject *gobject)
 }
 
 static void
-ogmjob_container_cancel (OGMJobSpawn *spawn)
+ogmjob_container_suspend (OGMJobTask *task)
 {
-  ogmjob_container_foreach (OGMJOB_CONTAINER (spawn), 
-      (OGMJobCallback) ogmjob_spawn_cancel, NULL);
+  ogmjob_container_foreach (OGMJOB_CONTAINER (task), 
+      (OGMJobCallback) ogmjob_task_suspend, NULL);
 }
 
 static void
-ogmjob_container_suspend (OGMJobSpawn *spawn)
+ogmjob_container_resume (OGMJobTask *task)
 {
-  ogmjob_container_foreach (OGMJOB_CONTAINER (spawn), 
-      (OGMJobCallback) ogmjob_spawn_suspend, NULL);
+  ogmjob_container_foreach (OGMJOB_CONTAINER (task), 
+      (OGMJobCallback) ogmjob_task_resume, NULL);
 }
 
 static void
-ogmjob_container_resume (OGMJobSpawn *spawn)
-{
-  ogmjob_container_foreach (OGMJOB_CONTAINER (spawn), 
-      (OGMJobCallback) ogmjob_spawn_resume, NULL);
-}
-
-static void
-ogmjob_container_real_add (OGMJobContainer *container, OGMJobSpawn *spawn)
+ogmjob_container_real_add (OGMJobContainer *container, OGMJobTask *task)
 {
   g_warning ("Not implemented\n");
 }
 
 static void
-ogmjob_container_real_remove (OGMJobContainer *container, OGMJobSpawn *spawn)
+ogmjob_container_real_remove (OGMJobContainer *container, OGMJobTask *task)
 {
   g_warning ("Not implemented\n");
 }
@@ -141,41 +131,33 @@ ogmjob_container_real_remove (OGMJobContainer *container, OGMJobSpawn *spawn)
 /**
  * ogmjob_container_add:
  * @container: An #OGMJobContainer
- * @spawn: An #OGMJobSpawn
+ * @task: An #OGMJobTask
  *
- * Adds @spawn to @container.
+ * Adds @task to @container.
  */
 void
-ogmjob_container_add (OGMJobContainer *container, OGMJobSpawn *spawn)
+ogmjob_container_add (OGMJobContainer *container, OGMJobTask *task)
 {
   g_return_if_fail (OGMJOB_IS_CONTAINER (container));
-  g_return_if_fail (OGMJOB_IS_SPAWN (spawn));
+  g_return_if_fail (OGMJOB_IS_TASK (task));
 
-  if (ogmjob_spawn_get_parent (spawn))
-    g_warning ("Can't add a spawn which is already in a container.\n");
-  else
-  {
-    g_signal_emit (container, signals[ADD], 0, spawn);
-    ogmjob_spawn_set_parent (spawn, OGMJOB_SPAWN (container));
-  }
+  g_signal_emit (container, signals[ADD], 0, task);
 }
 
 /**
  * ogmjob_container_remove:
  * @container: An #OGMJobContainer
- * @spawn: An #OGMJobSpawn
+ * @task: An #OGMJobTask
  *
- * Removes @spawn from @container.
+ * Removes @task from @container.
  */
 void
-ogmjob_container_remove (OGMJobContainer *container, OGMJobSpawn *spawn)
+ogmjob_container_remove (OGMJobContainer *container, OGMJobTask *task)
 {
   g_return_if_fail (OGMJOB_IS_CONTAINER (container));
-  g_return_if_fail (OGMJOB_IS_SPAWN (spawn));
+  g_return_if_fail (OGMJOB_IS_TASK (task));
 
-  ogmjob_spawn_set_parent (spawn, NULL);
-
-  g_signal_emit (container, signals[REMOVE], 0, spawn);
+  g_signal_emit (container, signals[REMOVE], 0, task);
 }
 
 /**
@@ -184,7 +166,7 @@ ogmjob_container_remove (OGMJobContainer *container, OGMJobSpawn *spawn)
  * @callback: A callback
  * @data: Callback user data
  *
- * Invokes @callback on each child of @container.
+ * Invokes @callback on each task of @container.
  */
 void
 ogmjob_container_foreach (OGMJobContainer *container, OGMJobCallback callback, gpointer data)

@@ -24,7 +24,6 @@
  */
 
 #include "ogmrip-container.h"
-#include "ogmjob-exec.h"
 
 #include <unistd.h>
 #include <glib/gstdio.h>

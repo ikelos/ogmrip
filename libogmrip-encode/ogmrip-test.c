@@ -27,6 +27,8 @@
 #include "ogmrip-profile-keys.h"
 #include "ogmrip-fs.h"
 
+#include <glib/gstdio.h>
+
 #define SAMPLE_LENGTH  10.0
 #define SAMPLE_PERCENT 0.05
 
@@ -49,25 +51,27 @@ enum
   PROP_ENCODING
 };
 
-static void ogmrip_test_constructed  (GObject      *gobject);
-static void ogmrip_test_dispose      (GObject      *gobject);
-static void ogmrip_test_get_property (GObject      *gobject,
-                                      guint        property_id,
-                                      GValue       *value,
-                                      GParamSpec   *pspec);
-static void ogmrip_test_set_property (GObject      *gobject,
-                                      guint        property_id,
-                                      const GValue *value,
-                                      GParamSpec   *pspec);
-static gint ogmrip_test_run          (OGMJobSpawn  *spawn);
+static void     ogmrip_test_constructed  (GObject      *gobject);
+static void     ogmrip_test_dispose      (GObject      *gobject);
+static void     ogmrip_test_get_property (GObject      *gobject,
+                                          guint        property_id,
+                                          GValue       *value,
+                                          GParamSpec   *pspec);
+static void     ogmrip_test_set_property (GObject      *gobject,
+                                          guint        property_id,
+                                          const GValue *value,
+                                          GParamSpec   *pspec);
+static gboolean ogmrip_test_run          (OGMJobTask   *task,
+                                          GCancellable *cancellable,
+                                          GError       **error);
 
-G_DEFINE_TYPE (OGMRipTest, ogmrip_test, OGMJOB_TYPE_SPAWN)
+G_DEFINE_TYPE (OGMRipTest, ogmrip_test, OGMJOB_TYPE_TASK)
 
 static void
 ogmrip_test_class_init (OGMRipTestClass *klass)
 {
   GObjectClass *gobject_class;
-  OGMJobSpawnClass *spawn_class;
+  OGMJobTaskClass *task_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->constructed = ogmrip_test_constructed;
@@ -75,8 +79,8 @@ ogmrip_test_class_init (OGMRipTestClass *klass)
   gobject_class->get_property = ogmrip_test_get_property;
   gobject_class->set_property = ogmrip_test_set_property;
 
-  spawn_class = OGMJOB_SPAWN_CLASS (klass);
-  spawn_class->run = ogmrip_test_run;
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_test_run;
 
   g_object_class_install_property (gobject_class, PROP_ENCODING, 
         g_param_spec_object ("encoding", "Encoding property", "Set encoding", 
@@ -209,16 +213,15 @@ ogmrip_test_restore_codec_info (OGMRipCodec *codec, OGMRipCodecInfo *info)
   }
 }
 
-static gint
-ogmrip_test_encode_audio (OGMRipTest *test, gdouble start_position, gdouble play_length)
+static gboolean
+ogmrip_test_encode_audio (OGMRipTest *test, gdouble start_position, gdouble play_length, GCancellable *cancellable, GError **error)
 {
   GList *list, *link;
-  gint result = OGMJOB_RESULT_ERROR;
+  gboolean result = FALSE;
 
   list = ogmrip_encoding_get_audio_codecs (test->priv->encoding);
   for (link = list; link; link = link->next)
   {
-    GError *error = NULL;
     OGMRipCodecInfo info;
 
     ogmrip_test_save_codec_info (link->data, &info);
@@ -226,13 +229,11 @@ ogmrip_test_encode_audio (OGMRipTest *test, gdouble start_position, gdouble play
     ogmrip_codec_set_start_position (link->data, start_position);
     ogmrip_codec_set_play_length (link->data, play_length);
 
-    result  = ogmjob_spawn_run (link->data, &error);
-    if (result == OGMJOB_RESULT_ERROR)
-      ogmjob_spawn_propagate_error (OGMJOB_SPAWN (test), error);
+    result  = ogmjob_task_run (link->data, cancellable, error);
 
     ogmrip_test_restore_codec_info (link->data, &info);
 
-    if (result != OGMJOB_RESULT_SUCCESS)
+    if (!result)
       break;
   }
   g_list_free (list);
@@ -240,16 +241,15 @@ ogmrip_test_encode_audio (OGMRipTest *test, gdouble start_position, gdouble play
   return result;
 }
 
-static gint
-ogmrip_test_encode_subp (OGMRipTest *test, gdouble start_position, gdouble play_length)
+static gboolean
+ogmrip_test_encode_subp (OGMRipTest *test, gdouble start_position, gdouble play_length, GCancellable *cancellable, GError **error)
 {
   GList *list, *link;
-  gint result = OGMJOB_RESULT_ERROR;
+  gboolean result = FALSE;
 
   list = ogmrip_encoding_get_subp_codecs (test->priv->encoding);
   for (link = list; link; link = link->next)
   {
-    GError *error = NULL;
     OGMRipCodecInfo info;
 
     ogmrip_test_save_codec_info (link->data, &info);
@@ -257,13 +257,11 @@ ogmrip_test_encode_subp (OGMRipTest *test, gdouble start_position, gdouble play_
     ogmrip_codec_set_start_position (link->data, start_position);
     ogmrip_codec_set_play_length (link->data, play_length);
 
-    result  = ogmjob_spawn_run (link->data, &error);
-    if (result == OGMJOB_RESULT_ERROR)
-      ogmjob_spawn_propagate_error (OGMJOB_SPAWN (test), error);
+    result  = ogmjob_task_run (link->data, cancellable, error);
 
     ogmrip_test_restore_codec_info (link->data, &info);
 
-    if (result != OGMJOB_RESULT_SUCCESS)
+    if (!result)
       break;
   }
   g_list_free (list);
@@ -271,16 +269,14 @@ ogmrip_test_encode_subp (OGMRipTest *test, gdouble start_position, gdouble play_
   return result;
 }
 
-static gint
-ogmrip_test_encode_video (OGMRipTest *test, gdouble start_position, gdouble play_length, gint *bitrate)
+static gboolean
+ogmrip_test_encode_video (OGMRipTest *test, gdouble start_position, gdouble play_length, gint *bitrate, GCancellable *cancellable, GError **error)
 {
-  GError *error = NULL;
-
   OGMRipCodec *codec;
   OGMRipCodecInfo info;
   OGMRipFile *output;
   OGMRipMedia *file;
-  gint result;
+  gboolean result;
 
   codec = ogmrip_encoding_get_video_codec (test->priv->encoding);
 
@@ -291,30 +287,28 @@ ogmrip_test_encode_video (OGMRipTest *test, gdouble start_position, gdouble play
   ogmrip_codec_set_start_position  (codec, start_position);
   ogmrip_codec_set_play_length (codec, play_length);
 
-  result  = ogmjob_spawn_run (OGMJOB_SPAWN (codec), &error);
-  if (result == OGMJOB_RESULT_ERROR)
-    ogmjob_spawn_propagate_error (OGMJOB_SPAWN (test), error);
+  result  = ogmjob_task_run (OGMJOB_TASK (codec), cancellable, error);
 
   ogmrip_test_restore_codec_info (codec, &info);
 
-  if (result != OGMJOB_RESULT_SUCCESS)
-    return result;
+  if (!result)
+    return FALSE;
 
   test->priv->fraction += test->priv->step;
-  g_signal_emit_by_name (test, "progress", test->priv->fraction);
+  ogmjob_task_set_progress (OGMJOB_TASK (test), test->priv->fraction);
 
   output = ogmrip_codec_get_output (codec);
 
   file = ogmrip_video_file_new (ogmrip_stream_get_uri (OGMRIP_STREAM (output)));
   if (!file)
-    return OGMJOB_RESULT_ERROR;
+    return FALSE;
 
   *bitrate = ogmrip_video_stream_get_bitrate (OGMRIP_VIDEO_STREAM (file));
 
-  ogmrip_fs_unlink (ogmrip_file_get_path (OGMRIP_FILE (output)));
+  g_unlink (ogmrip_file_get_path (OGMRIP_FILE (output)));
   g_object_unref (file);
 
-  return OGMJOB_RESULT_SUCCESS;
+  return TRUE;
 }
 
 static void
@@ -359,11 +353,11 @@ ogmrip_test_set_scale_size (OGMRipTest *test, guint optimal_bitrate, guint user_
   ogmrip_video_codec_set_scale_size (OGMRIP_VIDEO_CODEC (codec), scale_w, scale_h);
 }
 
-static gint
-ogmrip_test_run (OGMJobSpawn *spawn)
+static gboolean
+ogmrip_test_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
-  OGMRipTest *test = OGMRIP_TEST (spawn);
-  gint result = OGMJOB_RESULT_ERROR;
+  OGMRipTest *test = OGMRIP_TEST (task);
+  gboolean result = FALSE;
 
   OGMRipEncodingInfo info;
   guint files, optimal_bitrate = 0, user_bitrate = 0;
@@ -372,10 +366,9 @@ ogmrip_test_run (OGMJobSpawn *spawn)
   if (ogmrip_encoding_get_method (test->priv->encoding) == OGMRIP_ENCODING_QUANTIZER)
   {
 /*
-    ogmjob_spawn_propagate_error (spawn,
-        g_error_new (G_FILE_ERROR, G_FILE_ERROR_TOTO, "Cannot open file '%s': %s", filename));
+    g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_TOTO, "Cannot open file '%s': %s", filename);
 */
-    return OGMJOB_RESULT_ERROR;
+    return FALSE;
   }
 
   ogmrip_test_save_encoding_info (test->priv->encoding, &info);
@@ -396,23 +389,23 @@ ogmrip_test_run (OGMJobSpawn *spawn)
       /*
        * Encode subtitles
        */
-      result = ogmrip_test_encode_subp (test, start, SAMPLE_LENGTH * SAMPLE_PERCENT);
-      if (result != OGMJOB_RESULT_SUCCESS)
+      result = ogmrip_test_encode_subp (test, start, SAMPLE_LENGTH * SAMPLE_PERCENT, cancellable, error);
+      if (!result)
         break;
 
       /*
        * Encoding audio
        */
-      result = ogmrip_test_encode_audio (test, start, SAMPLE_LENGTH * SAMPLE_PERCENT);
-      if (result != OGMJOB_RESULT_SUCCESS)
+      result = ogmrip_test_encode_audio (test, start, SAMPLE_LENGTH * SAMPLE_PERCENT, cancellable, error);
+      if (!result)
         break;
     }
 
     /*
      * Encode video
      */
-    result = ogmrip_test_encode_video (test, start, SAMPLE_LENGTH * SAMPLE_PERCENT, &bitrate);
-    if (result != OGMJOB_RESULT_SUCCESS)
+    result = ogmrip_test_encode_video (test, start, SAMPLE_LENGTH * SAMPLE_PERCENT, &bitrate, cancellable, error);
+    if (!result)
       break;
 
     /*
@@ -427,7 +420,7 @@ ogmrip_test_run (OGMJobSpawn *spawn)
     }
   }
 
-  if (result == OGMJOB_RESULT_SUCCESS)
+  if (result)
   {
     if (files > 0)
     {
@@ -456,7 +449,7 @@ ogmrip_test_run (OGMJobSpawn *spawn)
   return result;
 }
 
-OGMJobSpawn *
+OGMJobTask *
 ogmrip_test_new (OGMRipEncoding *encoding)
 {
   return g_object_new (OGMRIP_TYPE_TEST, "encoding", encoding, NULL);

@@ -46,9 +46,9 @@ struct _OGMJobBinClass
   OGMJobContainerClass parent_class;
 };
 
-GType         ogmjob_bin_get_type  (void);
+GType        ogmjob_bin_get_type  (void);
 
-OGMJobSpawn * ogmjob_bin_get_child (OGMJobBin *bin);
+OGMJobTask * ogmjob_bin_get_child (OGMJobBin *bin);
 
 G_END_DECLS
 

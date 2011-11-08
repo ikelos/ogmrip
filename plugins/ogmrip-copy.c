@@ -40,7 +40,9 @@ struct _OGMRipAudioCopyClass
   OGMRipAudioCodecClass parent_class;
 };
 
-static gint ogmrip_audio_copy_run (OGMJobSpawn *spawn);
+static gboolean ogmrip_audio_copy_run (OGMJobTask   *task,
+                                       GCancellable *cancellable,
+                                       GError       **error);
 
 static gchar **
 ogmrip_audio_copy_command (OGMRipAudioCodec *audio)
@@ -87,10 +89,10 @@ G_DEFINE_TYPE (OGMRipAudioCopy, ogmrip_audio_copy, OGMRIP_TYPE_AUDIO_CODEC)
 static void
 ogmrip_audio_copy_class_init (OGMRipAudioCopyClass *klass)
 {
-  OGMJobSpawnClass *spawn_class;
+  OGMJobTaskClass *task_class;
 
-  spawn_class = OGMJOB_SPAWN_CLASS (klass);
-  spawn_class->run = ogmrip_audio_copy_run;
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_audio_copy_run;
 }
 
 static void
@@ -98,25 +100,25 @@ ogmrip_audio_copy_init (OGMRipAudioCopy *audio_copy)
 {
 }
 
-static gint
-ogmrip_audio_copy_run (OGMJobSpawn *spawn)
+static gboolean
+ogmrip_audio_copy_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
-  OGMJobSpawn *child;
+  OGMJobTask *child;
   gchar **argv;
-  gint result;
+  gboolean result;
 
-  argv = ogmrip_audio_copy_command (OGMRIP_AUDIO_CODEC (spawn));
+  argv = ogmrip_audio_copy_command (OGMRIP_AUDIO_CODEC (task));
   if (!argv)
-    return OGMJOB_RESULT_ERROR;
+    return FALSE;
 
-  child = ogmjob_exec_newv (argv);
-  ogmjob_exec_add_watch_full (OGMJOB_EXEC (child), (OGMJobWatch) ogmrip_mencoder_codec_watch, spawn, TRUE, FALSE, FALSE);
-  ogmjob_container_add (OGMJOB_CONTAINER (spawn), child);
+  child = ogmjob_spawn_newv (argv);
+  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child), (OGMJobWatch) ogmrip_mencoder_codec_watch, task);
+  ogmjob_container_add (OGMJOB_CONTAINER (task), child);
   g_object_unref (child);
 
-  result = OGMJOB_SPAWN_CLASS (ogmrip_audio_copy_parent_class)->run (spawn);
+  result = OGMJOB_TASK_CLASS (ogmrip_audio_copy_parent_class)->run (task, cancellable, error);
 
-  ogmjob_container_remove (OGMJOB_CONTAINER (spawn), child);
+  ogmjob_container_remove (OGMJOB_CONTAINER (task), child);
 
   return result;
 }
@@ -140,15 +142,17 @@ enum
   PROP_PASSES
 };
 
-static void ogmrip_copy_get_property (GObject      *gobject,
-                                      guint        property_id,
-                                      GValue       *value,
-                                      GParamSpec   *pspec);
-static void ogmrip_copy_set_property (GObject      *gobject,
-                                      guint        property_id,
-                                      const GValue *value,
-                                      GParamSpec   *pspec);
-static gint ogmrip_video_copy_run    (OGMJobSpawn  *spawn);
+static void     ogmrip_copy_get_property (GObject      *gobject,
+                                          guint        property_id,
+                                          GValue       *value,
+                                          GParamSpec   *pspec);
+static void     ogmrip_copy_set_property (GObject      *gobject,
+                                          guint        property_id,
+                                          const GValue *value,
+                                          GParamSpec   *pspec);
+static gboolean ogmrip_video_copy_run    (OGMJobTask   *task,
+                                          GCancellable *cancellable,
+                                          GError       **error);
 
 G_DEFINE_TYPE (OGMRipVideoCopy, ogmrip_video_copy, OGMRIP_TYPE_VIDEO_CODEC)
 
@@ -156,14 +160,14 @@ static void
 ogmrip_video_copy_class_init (OGMRipVideoCopyClass *klass)
 {
   GObjectClass *gobject_class;
-  OGMJobSpawnClass *spawn_class;
+  OGMJobTaskClass *task_class;
   
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->get_property = ogmrip_copy_get_property;
   gobject_class->set_property = ogmrip_copy_set_property;
 
-  spawn_class = OGMJOB_SPAWN_CLASS (klass);
-  spawn_class->run = ogmrip_video_copy_run;
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_video_copy_run;
 
   g_object_class_install_property (gobject_class, PROP_PASSES,
         g_param_spec_uint ("passes", "Passes property", "Set the number of passes",
@@ -242,25 +246,25 @@ ogmrip_video_copy_command (OGMRipVideoCodec *video)
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
-static gint
-ogmrip_video_copy_run (OGMJobSpawn *spawn)
+static gboolean
+ogmrip_video_copy_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
-  OGMJobSpawn *child;
+  OGMJobTask *child;
   gchar **argv;
-  gint result;
+  gboolean result;
 
-  argv = ogmrip_video_copy_command (OGMRIP_VIDEO_CODEC (spawn));
+  argv = ogmrip_video_copy_command (OGMRIP_VIDEO_CODEC (task));
   if (!argv)
-    return OGMJOB_RESULT_ERROR;
+    return FALSE;
 
-  child = ogmjob_exec_newv (argv);
-  ogmjob_exec_add_watch_full (OGMJOB_EXEC (child), (OGMJobWatch) ogmrip_mencoder_codec_watch, spawn, TRUE, FALSE, FALSE);
-  ogmjob_container_add (OGMJOB_CONTAINER (spawn), child);
+  child = ogmjob_spawn_newv (argv);
+  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child), (OGMJobWatch) ogmrip_mencoder_codec_watch, task);
+  ogmjob_container_add (OGMJOB_CONTAINER (task), child);
   g_object_unref (child);
 
-  result = OGMJOB_SPAWN_CLASS (ogmrip_video_copy_parent_class)->run (spawn);
+  result = OGMJOB_TASK_CLASS (ogmrip_video_copy_parent_class)->run (task, cancellable, error);
 
-  ogmjob_container_remove (OGMJOB_CONTAINER (spawn), child);
+  ogmjob_container_remove (OGMJOB_CONTAINER (task), child);
 
   return result;
 }

@@ -19,7 +19,7 @@
 #ifndef __OGMJOB_SPAWN_H__
 #define __OGMJOB_SPAWN_H__
 
-#include <glib-object.h>
+#include <ogmjob-task.h>
 
 G_BEGIN_DECLS
 
@@ -28,65 +28,49 @@ G_BEGIN_DECLS
 #define OGMJOB_SPAWN_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), OGMJOB_TYPE_SPAWN, OGMJobSpawnClass))
 #define OGMJOB_IS_SPAWN(obj)       (G_TYPE_CHECK_INSTANCE_TYPE ((obj), OGMJOB_TYPE_SPAWN))
 #define OGMJOB_IS_SPAWN_CLASS(obj) (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMJOB_TYPE_SPAWN))
-#define OGMJOB_SPAWN_ERROR         (ogmjob_spawn_error_quark ())
-
-/**
- * OGMJobResultType:
- * @OGMJOB_RESULT_ERROR: An error occured
- * @OGMJOB_RESULT_CANCEL: The spawn has been canceled
- * @OGMJOB_RESULT_COMPLETED:  The spawn has completed successfully
- *
- * Result codes returned by ogmjob_spawn_run()
- */
-typedef enum
-{
-  OGMJOB_RESULT_ERROR   = -1,
-  OGMJOB_RESULT_CANCEL  =  0,
-  OGMJOB_RESULT_SUCCESS =  1
-} OGMJobResultType;
 
 typedef struct _OGMJobSpawn      OGMJobSpawn;
 typedef struct _OGMJobSpawnPriv  OGMJobSpawnPriv;
 typedef struct _OGMJobSpawnClass OGMJobSpawnClass;
 
+/**
+ * OGMJobWatch:
+ * @spawn: An #OGMJobSpawn
+ * @buffer: The data read
+ * @data: The user data
+ *
+ * Specifies the type of functions passed to ogmjob_spawn_add_watch(), and
+ * ogmjob_spawn_add_watch_full().
+ *
+ * Returns: The progress made, or -1
+ */
+typedef gboolean (* OGMJobWatch) (OGMJobSpawn *spawn,
+                                  const gchar *buffer,
+                                  gpointer    data,
+                                  GError      **error);
+
 struct _OGMJobSpawn
 {
-  GObject parent_instance;
+  OGMJobTask parent_instance;
 
   OGMJobSpawnPriv *priv;
 };
 
 struct _OGMJobSpawnClass
 {
-  GObjectClass parent_class;
-
-  gint (* run)      (OGMJobSpawn *spawn);
-  void (* cancel)   (OGMJobSpawn *spawn);
-  void (* progress) (OGMJobSpawn *spawn,
-                     gdouble     fraction);
-  void (* suspend)  (OGMJobSpawn *spawn);
-  void (* resume)   (OGMJobSpawn *spawn);
+  OGMJobTaskClass parent_class;
 };
 
-GType         ogmjob_spawn_get_type        (void);
-GQuark        ogmjob_spawn_error_quark     (void);
-
-gint          ogmjob_spawn_run             (OGMJobSpawn  *spawn,
-                                            GError       **error);
-void          ogmjob_spawn_cancel          (OGMJobSpawn  *spawn);
-
-void          ogmjob_spawn_suspend         (OGMJobSpawn  *spawn);
-void          ogmjob_spawn_resume          (OGMJobSpawn  *spawn);
-
-void          ogmjob_spawn_set_async       (OGMJobSpawn  *spawn,
-                                            gboolean     async);
-gboolean      ogmjob_spawn_get_async       (OGMJobSpawn  *spawn);
-
-OGMJobSpawn * ogmjob_spawn_get_parent      (OGMJobSpawn *spawn);
-void          ogmjob_spawn_set_parent      (OGMJobSpawn *spawn,
-                                           OGMJobSpawn  *parent);
-void          ogmjob_spawn_propagate_error (OGMJobSpawn  *spawn,
-                                            GError       *error);
+GType        ogmjob_spawn_get_type         (void);
+OGMJobTask * ogmjob_spawn_new              (const gchar *command_line);
+OGMJobTask * ogmjob_spawn_newv             (gchar       **argv);
+gint         ogmjob_spawn_get_status       (OGMJobSpawn *spawn);
+void         ogmjob_spawn_set_watch_stdout (OGMJobSpawn *spawn,
+                                            OGMJobWatch watch_func,
+                                            gpointer    watch_data);
+void         ogmjob_spawn_set_watch_stderr (OGMJobSpawn *spawn,
+                                            OGMJobWatch watch_func,
+                                            gpointer    watch_data);
 
 G_END_DECLS
 

@@ -48,7 +48,9 @@ struct _OGMRipVorbisClass
   OGMRipAudioCodecClass parent_class;
 };
 
-static gint ogmrip_vorbis_run (OGMJobSpawn *spawn);
+static gboolean ogmrip_vorbis_run (OGMJobTask   *task,
+                                   GCancellable *cancellable,
+                                   GError       **error);
 
 gchar **
 ogmrip_vorbis_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input)
@@ -101,11 +103,11 @@ G_DEFINE_TYPE (OGMRipVorbis, ogmrip_vorbis, OGMRIP_TYPE_AUDIO_CODEC)
 static void
 ogmrip_vorbis_class_init (OGMRipVorbisClass *klass)
 {
-  OGMJobSpawnClass *spawn_class;
+  OGMJobTaskClass *task_class;
 
-  spawn_class = OGMJOB_SPAWN_CLASS (klass);
+  task_class = OGMJOB_TASK_CLASS (klass);
 
-  spawn_class->run = ogmrip_vorbis_run;
+  task_class->run = ogmrip_vorbis_run;
 }
 
 static void
@@ -113,48 +115,44 @@ ogmrip_vorbis_init (OGMRipVorbis *vorbis)
 {
 }
 
-static gint
-ogmrip_vorbis_run (OGMJobSpawn *spawn)
+static gboolean
+ogmrip_vorbis_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
-  GError *error = NULL;
-  OGMJobSpawn *pipeline;
-  OGMJobSpawn *child;
+  OGMJobTask *pipeline;
+  OGMJobTask *child;
   gchar **argv, *fifo;
-  gint result;
+  gboolean result;
 
-  result = OGMJOB_RESULT_ERROR;
+  result = FALSE;
 
-  fifo = ogmrip_fs_mkftemp ("fifo.XXXXXX", &error);
+  fifo = ogmrip_fs_mkftemp ("fifo.XXXXXX", error);
   if (!fifo)
-  {
-    ogmjob_spawn_propagate_error (spawn, error);
-    return OGMJOB_RESULT_ERROR;
-  }
+    return FALSE;
 
   pipeline = ogmjob_pipeline_new ();
-  ogmjob_container_add (OGMJOB_CONTAINER (spawn), pipeline);
+  ogmjob_container_add (OGMJOB_CONTAINER (task), pipeline);
   g_object_unref (pipeline);
 
-  argv = ogmrip_wav_command (OGMRIP_AUDIO_CODEC (spawn), FALSE, fifo);
+  argv = ogmrip_wav_command (OGMRIP_AUDIO_CODEC (task), FALSE, fifo);
   if (argv)
   {
-    child = ogmjob_exec_newv (argv);
-    ogmjob_exec_add_watch_full (OGMJOB_EXEC (child), (OGMJobWatch) ogmrip_mplayer_wav_watch, spawn, TRUE, FALSE, FALSE);
+    child = ogmjob_spawn_newv (argv);
+    ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child), (OGMJobWatch) ogmrip_mplayer_wav_watch, task);
     ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
     g_object_unref (child);
 
-    argv = ogmrip_vorbis_command (OGMRIP_AUDIO_CODEC (spawn), FALSE, fifo);
+    argv = ogmrip_vorbis_command (OGMRIP_AUDIO_CODEC (task), FALSE, fifo);
     if (argv)
     {
-      child = ogmjob_exec_newv (argv);
+      child = ogmjob_spawn_newv (argv);
       ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
       g_object_unref (child);
 
-      result = OGMJOB_SPAWN_CLASS (ogmrip_vorbis_parent_class)->run (spawn);
+      result = OGMJOB_TASK_CLASS (ogmrip_vorbis_parent_class)->run (task, cancellable, error);
     }
   }
 
-  ogmjob_container_remove (OGMJOB_CONTAINER (spawn), pipeline);
+  ogmjob_container_remove (OGMJOB_CONTAINER (task), pipeline);
 
   if (g_file_test (fifo, G_FILE_TEST_EXISTS))
     g_unlink (fifo);

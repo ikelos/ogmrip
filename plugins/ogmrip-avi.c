@@ -53,11 +53,13 @@ enum
   PROP_OVERHEAD
 };
 
-static void ogmrip_avi_get_property (GObject     *gobject,
-                                     guint       property_id,
-                                     GValue      *value,
-                                     GParamSpec  *pspec);
-static gint ogmrip_avi_run          (OGMJobSpawn *spawn);
+static void     ogmrip_avi_get_property (GObject      *gobject,
+                                         guint        property_id,
+                                         GValue       *value,
+                                         GParamSpec   *pspec);
+static gboolean ogmrip_avi_run          (OGMJobTask   *task,
+                                         GCancellable *cancellable,
+                                         GError       **error);
 
 static void
 ogmrip_avi_add_file (OGMRipContainer *avi, OGMRipFile *file, gboolean video, GPtrArray *argv)
@@ -139,8 +141,8 @@ ogmrip_avi_command (OGMRipContainer *avi, GError **error)
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
-static gdouble
-ogmrip_avi_watch (OGMJobExec *exec, const gchar *buffer, OGMRipContainer *matroska)
+static gboolean
+ogmrip_avi_watch (OGMJobTask *task, const gchar *buffer, OGMRipContainer *matroska, GError **error)
 {
   gulong frames, total;
   guint percent;
@@ -148,9 +150,9 @@ ogmrip_avi_watch (OGMJobExec *exec, const gchar *buffer, OGMRipContainer *matros
 
   str = strrchr (buffer, ':');
   if (str && sscanf (str, ": %06lu-%06lu frames written (%u%%)", &frames, &total, &percent) == 3)
-    return percent / 100.0;
+    ogmjob_task_set_progress (task, percent / 100.0);
 
-  return -1.0;
+  return TRUE;
 }
 
 static gchar **
@@ -179,13 +181,13 @@ static void
 ogmrip_avi_class_init (OGMRipAviClass *klass)
 {
   GObjectClass *gobject_class;
-  OGMJobSpawnClass *spawn_class;
+  OGMJobTaskClass *task_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->get_property = ogmrip_avi_get_property;
 
-  spawn_class = OGMJOB_SPAWN_CLASS (klass);
-  spawn_class->run = ogmrip_avi_run;
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_avi_run;
 
   g_object_class_install_property (gobject_class, PROP_OVERHEAD,
       g_param_spec_uint ("overhead", "overhead", "overhead",
@@ -212,9 +214,9 @@ ogmrip_avi_get_property (GObject *gobject, guint property_id, GValue *value, GPa
 }
 
 static void
-ogmrip_avi_foreach_subp (OGMRipContainer *avi, OGMRipFile *file, OGMJobSpawn *queue)
+ogmrip_avi_foreach_subp (OGMRipContainer *avi, OGMRipFile *file, OGMJobTask *queue)
 {
-  OGMJobSpawn *child;
+  OGMJobTask *child;
   const gchar *filename;
   gchar *input, **argv;
   gint format;
@@ -227,7 +229,7 @@ ogmrip_avi_foreach_subp (OGMRipContainer *avi, OGMRipFile *file, OGMJobSpawn *qu
     argv = ogmrip_copy_command (avi, filename, "srt");
     if (argv)
     {
-      child = ogmjob_exec_newv (argv);
+      child = ogmjob_spawn_newv (argv);
       ogmjob_container_add (OGMJOB_CONTAINER (queue), child);
       g_object_unref (child);
     }
@@ -240,7 +242,7 @@ ogmrip_avi_foreach_subp (OGMRipContainer *avi, OGMRipFile *file, OGMJobSpawn *qu
 
     if (argv)
     {
-      child = ogmjob_exec_newv (argv);
+      child = ogmjob_spawn_newv (argv);
       ogmjob_container_add (OGMJOB_CONTAINER (queue), child);
       g_object_unref (child);
     }
@@ -251,45 +253,39 @@ ogmrip_avi_foreach_subp (OGMRipContainer *avi, OGMRipFile *file, OGMJobSpawn *qu
 
     if (argv)
     {
-      child = ogmjob_exec_newv (argv);
+      child = ogmjob_spawn_newv (argv);
       ogmjob_container_add (OGMJOB_CONTAINER (queue), child);
       g_object_unref (child);
     }
   }
 }
 
-static gint
-ogmrip_avi_run (OGMJobSpawn *spawn)
+static gboolean
+ogmrip_avi_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
-  GError *error = NULL;
-  OGMJobSpawn *queue, *child;
+  OGMJobTask *queue, *child;
   gchar **argv;
-  gint result;
-
-  result = OGMJOB_RESULT_ERROR;
+  gboolean result;
 
   queue = ogmjob_queue_new ();
-  ogmjob_container_add (OGMJOB_CONTAINER (spawn), queue);
+  ogmjob_container_add (OGMJOB_CONTAINER (task), queue);
   g_object_unref (queue);
 
-  argv = ogmrip_avi_command (OGMRIP_CONTAINER (spawn), &error);
+  argv = ogmrip_avi_command (OGMRIP_CONTAINER (task), error);
   if (!argv)
-  {
-    ogmjob_spawn_propagate_error (spawn, error);
-    return OGMJOB_RESULT_ERROR;
-  }
+    return FALSE;
 
-  child = ogmjob_exec_newv (argv);
-  ogmjob_exec_add_watch_full (OGMJOB_EXEC (child), (OGMJobWatch) ogmrip_avi_watch, spawn, TRUE, FALSE, FALSE);
+  child = ogmjob_spawn_newv (argv);
+  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child), (OGMJobWatch) ogmrip_avi_watch, task);
   ogmjob_container_add (OGMJOB_CONTAINER (queue), child);
   g_object_unref (child);
 
-  ogmrip_container_foreach_file (OGMRIP_CONTAINER (spawn), 
+  ogmrip_container_foreach_file (OGMRIP_CONTAINER (task), 
       (OGMRipContainerFunc) ogmrip_avi_foreach_subp, queue);
 
-  result = OGMJOB_SPAWN_CLASS (ogmrip_avi_parent_class)->run (spawn);
+  result = OGMJOB_TASK_CLASS (ogmrip_avi_parent_class)->run (task, cancellable, error);
 
-  ogmjob_container_remove (OGMJOB_CONTAINER (spawn), queue);
+  ogmjob_container_remove (OGMJOB_CONTAINER (task), queue);
 
   return result;
 }

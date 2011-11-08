@@ -38,9 +38,10 @@ G_BEGIN_DECLS
 GPtrArray * ogmrip_mplayer_wav_command        (OGMRipAudioCodec *audio,
                                                gboolean         header,
                                                const gchar      *output);
-gdouble     ogmrip_mplayer_wav_watch          (OGMJobExec       *exec,
+gboolean    ogmrip_mplayer_wav_watch          (OGMJobTask       *task,
                                                const gchar      *buffer,
-                                               OGMRipAudioCodec *audio);
+                                               OGMRipAudioCodec *audio,
+                                               GError           **error);
 
 /*
  * Subtitles
@@ -48,18 +49,20 @@ gdouble     ogmrip_mplayer_wav_watch          (OGMJobExec       *exec,
 
 GPtrArray * ogmrip_mencoder_vobsub_command (OGMRipSubpCodec *subp,
                                             const gchar     *output);
-gdouble     ogmrip_mencoder_vobsub_watch   (OGMJobExec      *exec, 
+gboolean    ogmrip_mencoder_vobsub_watch   (OGMJobTask      *task, 
                                             const gchar     *buffer, 
-                                            OGMRipSubpCodec *subp);
+                                            OGMRipSubpCodec *subp,
+                                            GError          **error);
 
 /*
  * Container
  */
 
 GPtrArray * ogmrip_mencoder_container_command (OGMRipContainer *container);
-gdouble     ogmrip_mencoder_container_watch   (OGMJobExec      *exec,
+gboolean    ogmrip_mencoder_container_watch   (OGMJobTask      *task,
                                                const gchar     *buffer,
-                                               OGMRipContainer *container);
+                                               OGMRipContainer *container,
+                                               GError          **error);
 
 /*
  * Misc
@@ -70,15 +73,17 @@ GPtrArray * ogmrip_mencoder_video_command    (OGMRipVideoCodec  *video,
                                               guint             pass);
 GPtrArray * ogmrip_mencoder_audio_command    (OGMRipAudioCodec  *audio,
                                               const gchar       *output);
-gdouble     ogmrip_mencoder_codec_watch      (OGMJobExec        *exec,
+gboolean    ogmrip_mencoder_codec_watch      (OGMJobTask        *task,
                                               const gchar       *buffer,
-                                              OGMRipCodec       *codec);
+                                              OGMRipCodec       *codec,
+                                              GError            **error);
 
 GPtrArray * ogmrip_mplayer_video_command     (OGMRipVideoCodec  *video,
                                               const gchar       *output);
-gdouble     ogmrip_mplayer_video_watch       (OGMJobExec        *exec,
+gboolean    ogmrip_mplayer_video_watch       (OGMJobTask        *task,
                                               const gchar       *buffer,
-                                              OGMRipVideoCodec  *video);
+                                              OGMRipVideoCodec  *video,
+                                              GError            **error);
 
 G_END_DECLS
 

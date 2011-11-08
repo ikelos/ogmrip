@@ -41,26 +41,28 @@ enum
   PROP_PATH
 };
 
-static void ogmrip_copy_constructed  (GObject      *gobject);
-static void ogmrip_copy_dispose      (GObject      *gobject);
-static void ogmrip_copy_finalize     (GObject      *gobject);
-static void ogmrip_copy_set_property (GObject      *gobject,
-                                      guint        property_id,
-                                      const GValue *value,
-                                      GParamSpec   *pspec);
-static void ogmrip_copy_get_property (GObject      *gobject,
-                                      guint        property_id,
-                                      GValue       *value,
-                                      GParamSpec   *pspec);
-static gint ogmrip_copy_run          (OGMJobSpawn  *spawn);
+static void     ogmrip_copy_constructed  (GObject      *gobject);
+static void     ogmrip_copy_dispose      (GObject      *gobject);
+static void     ogmrip_copy_finalize     (GObject      *gobject);
+static void     ogmrip_copy_set_property (GObject      *gobject,
+                                          guint        property_id,
+                                          const GValue *value,
+                                          GParamSpec   *pspec);
+static void     ogmrip_copy_get_property (GObject      *gobject,
+                                          guint        property_id,
+                                          GValue       *value,
+                                          GParamSpec   *pspec);
+static gboolean ogmrip_copy_run          (OGMJobTask   *task,
+                                          GCancellable *cancellable,
+                                          GError       **error);
 
-G_DEFINE_TYPE (OGMRipCopy, ogmrip_copy, OGMJOB_TYPE_SPAWN)
+G_DEFINE_TYPE (OGMRipCopy, ogmrip_copy, OGMJOB_TYPE_TASK)
 
 static void
 ogmrip_copy_class_init (OGMRipCopyClass *klass)
 {
   GObjectClass *gobject_class;
-  OGMJobSpawnClass *spawn_class;
+  OGMJobTaskClass *task_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->constructed = ogmrip_copy_constructed;
@@ -69,8 +71,8 @@ ogmrip_copy_class_init (OGMRipCopyClass *klass)
   gobject_class->get_property = ogmrip_copy_get_property;
   gobject_class->set_property = ogmrip_copy_set_property;
 
-  spawn_class = OGMJOB_SPAWN_CLASS (klass);
-  spawn_class->run = ogmrip_copy_run;
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_copy_run;
 
   g_object_class_install_property (gobject_class, PROP_MEDIA, 
         g_param_spec_object ("media", "Media property", "Set media", 
@@ -167,30 +169,17 @@ ogmrip_copy_get_property (GObject *gobject, guint property_id, GValue *value, GP
 }
 
 static void
-ogmrip_copy_progress (OGMRipMedia *media, gdouble percent, gpointer spawn)
+ogmrip_copy_progress (OGMRipMedia *media, gdouble percent, gpointer task)
 {
-  g_signal_emit_by_name (spawn, "progress", percent);
+  ogmjob_task_set_progress (task, percent);
 }
 
-static gint
-ogmrip_copy_run (OGMJobSpawn *spawn)
+static gboolean
+ogmrip_copy_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
-  OGMRipCopy *copy = OGMRIP_COPY (spawn);
-  GCancellable *cancellable;
-  gint retval;
+  OGMRipCopy *copy = OGMRIP_COPY (task);
 
-  cancellable = g_cancellable_new ();
-
-  if (ogmrip_media_copy (copy->priv->media, copy->priv->path, cancellable, ogmrip_copy_progress, spawn, NULL))
-    retval = OGMJOB_RESULT_SUCCESS;
-  else if (g_cancellable_is_cancelled (cancellable))
-    retval = OGMJOB_RESULT_CANCEL;
-  else
-    retval = OGMJOB_RESULT_ERROR;
-
-  g_object_unref (cancellable);
-
-  return retval;
+  return ogmrip_media_copy (copy->priv->media, copy->priv->path, cancellable, ogmrip_copy_progress, task, error);
 }
 
 /**
@@ -202,7 +191,7 @@ ogmrip_copy_run (OGMJobSpawn *spawn)
  *
  * Returns: The new #OGMRipCopy
  */
-OGMJobSpawn *
+OGMJobTask *
 ogmrip_copy_new (OGMRipMedia *media, const gchar *path)
 {
   g_return_val_if_fail (OGMRIP_IS_MEDIA (media), NULL);

@@ -97,17 +97,19 @@ struct _OGMRipLavcPriv
   guint strict;
 };
 
-static void ogmrip_lavc_get_property (GObject      *gobject,
-                                      guint        property_id,
-                                      GValue       *value,
-                                      GParamSpec   *pspec);
-static void ogmrip_lavc_set_property (GObject      *gobject,
-                                      guint        property_id,
-                                      const GValue *value,
-                                      GParamSpec   *pspec);
-static void ogmrip_lavc_notify       (GObject      *object,
-                                      GParamSpec   *pspec);
-static gint ogmrip_lavc_run          (OGMJobSpawn  *spawn);
+static void     ogmrip_lavc_get_property (GObject      *gobject,
+                                          guint        property_id,
+                                          GValue       *value,
+                                          GParamSpec   *pspec);
+static void     ogmrip_lavc_set_property (GObject      *gobject,
+                                          guint        property_id,
+                                          const GValue *value,
+                                          GParamSpec   *pspec);
+static void     ogmrip_lavc_notify       (GObject      *object,
+                                          GParamSpec   *pspec);
+static gboolean ogmrip_lavc_run          (OGMJobTask   *task,
+                                          GCancellable *cancellable,
+                                          GError       **error);
 
 static gdouble
 ogmrip_lavc_get_quantizer (OGMRipVideoCodec *video)
@@ -346,15 +348,15 @@ static void
 ogmrip_lavc_class_init (OGMRipLavcClass *klass)
 {
   GObjectClass *gobject_class;
-  OGMJobSpawnClass *spawn_class;
+  OGMJobTaskClass *task_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->get_property = ogmrip_lavc_get_property;
   gobject_class->set_property = ogmrip_lavc_set_property;
   gobject_class->notify = ogmrip_lavc_notify;
 
-  spawn_class = OGMJOB_SPAWN_CLASS (klass);
-  spawn_class->run = ogmrip_lavc_run;
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_lavc_run;
 
   g_object_class_install_property (gobject_class, PROP_HEADER,
       g_param_spec_uint (OGMRIP_LAVC_PROP_HEADER, "Header property", "Set header",
@@ -691,18 +693,19 @@ ogmrip_lavc_notify (GObject *object, GParamSpec *pspec)
   }
 }
 
-static gint
-ogmrip_lavc_run (OGMJobSpawn *spawn)
+static gboolean
+ogmrip_lavc_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
-  OGMJobSpawn *queue, *child;
+  OGMJobTask *queue, *child;
   gchar **argv, *log_file;
-  gint pass, passes, result;
+  gint pass, passes;
+  gboolean result;
 
   queue = ogmjob_queue_new ();
-  ogmjob_container_add (OGMJOB_CONTAINER (spawn), queue);
+  ogmjob_container_add (OGMJOB_CONTAINER (task), queue);
   g_object_unref (queue);
 
-  passes = ogmrip_video_codec_get_passes (OGMRIP_VIDEO_CODEC (spawn));
+  passes = ogmrip_video_codec_get_passes (OGMRIP_VIDEO_CODEC (task));
 
   log_file = NULL;
   if (passes > 1)
@@ -710,19 +713,19 @@ ogmrip_lavc_run (OGMJobSpawn *spawn)
 
   for (pass = 0; pass < passes; pass ++)
   {
-    argv = ogmrip_lavc_command (OGMRIP_VIDEO_CODEC (spawn), pass + 1, passes, log_file);
+    argv = ogmrip_lavc_command (OGMRIP_VIDEO_CODEC (task), pass + 1, passes, log_file);
     if (!argv)
-      return OGMJOB_RESULT_ERROR;
+      return FALSE;
 
-    child = ogmjob_exec_newv (argv);
-    ogmjob_exec_add_watch_full (OGMJOB_EXEC (child), (OGMJobWatch) ogmrip_mencoder_codec_watch, spawn, TRUE, FALSE, FALSE);
+    child = ogmjob_spawn_newv (argv);
+    ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child), (OGMJobWatch) ogmrip_mencoder_codec_watch, task);
     ogmjob_container_add (OGMJOB_CONTAINER (queue), child);
     g_object_unref (child);
   }
 
-  result = OGMJOB_SPAWN_CLASS (ogmrip_lavc_parent_class)->run (spawn);
+  result = OGMJOB_TASK_CLASS (ogmrip_lavc_parent_class)->run (task, cancellable, error);
 
-  ogmjob_container_remove (OGMJOB_CONTAINER (spawn), queue);
+  ogmjob_container_remove (OGMJOB_CONTAINER (task), queue);
 
   g_unlink (log_file);
   g_free (log_file);
@@ -739,7 +742,7 @@ ogmrip_lavc_run (OGMJobSpawn *spawn)
  *
  * Returns: The new #OGMRipLavc
  */
-OGMJobSpawn *
+OGMJobTask *
 ogmrip_lavc_new (OGMRipTitle *title, const gchar *output)
 {
   g_return_val_if_fail (title != NULL, NULL);

@@ -36,18 +36,18 @@ typedef struct _OGMRipTestPriv  OGMRipTestPriv;
 
 struct _OGMRipTest
 {
-  OGMJobSpawn parent_instance;
+  OGMJobTask parent_instance;
 
   OGMRipTestPriv *priv;
 };
 
 struct _OGMRipTestClass
 {
-  OGMJobSpawnClass parent_class;
+  OGMJobTaskClass parent_class;
 };
 
-GType         ogmrip_test_get_type (void);
-OGMJobSpawn * ogmrip_test_new      (OGMRipEncoding *encoding);
+GType        ogmrip_test_get_type (void);
+OGMJobTask * ogmrip_test_new      (OGMRipEncoding *encoding);
 
 G_END_DECLS
 

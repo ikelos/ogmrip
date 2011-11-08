@@ -48,7 +48,9 @@ struct _OGMRipWavClass
   OGMRipAudioCodecClass parent_class;
 };
 
-static gint ogmrip_wav_run (OGMJobSpawn *spawn);
+static gboolean ogmrip_wav_run (OGMJobTask   *task,
+                                GCancellable *cancellable,
+                                GError       **error);
 
 static gchar **
 ogmrip_wav_command (OGMRipAudioCodec *audio, gboolean header)
@@ -66,11 +68,11 @@ G_DEFINE_TYPE (OGMRipWav, ogmrip_wav, OGMRIP_TYPE_AUDIO_CODEC)
 static void
 ogmrip_wav_class_init (OGMRipWavClass *klass)
 {
-  OGMJobSpawnClass *spawn_class;
+  OGMJobTaskClass *task_class;
 
-  spawn_class = OGMJOB_SPAWN_CLASS (klass);
+  task_class = OGMJOB_TASK_CLASS (klass);
 
-  spawn_class->run = ogmrip_wav_run;
+  task_class->run = ogmrip_wav_run;
 }
 
 static void
@@ -79,25 +81,25 @@ ogmrip_wav_init (OGMRipWav *wav)
   wav->header = TRUE;
 }
 
-static gint
-ogmrip_wav_run (OGMJobSpawn *spawn)
+static gboolean
+ogmrip_wav_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
-  OGMJobSpawn *child;
+  OGMJobTask *child;
   gchar **argv;
-  gint result;
+  gboolean result;
 
-  argv = ogmrip_wav_command (OGMRIP_AUDIO_CODEC (spawn), OGMRIP_WAV (spawn)->header);
+  argv = ogmrip_wav_command (OGMRIP_AUDIO_CODEC (task), OGMRIP_WAV (task)->header);
   if (!argv)
-    return OGMJOB_RESULT_ERROR;
+    return FALSE;
 
-  child = ogmjob_exec_newv (argv);
-  ogmjob_exec_add_watch_full (OGMJOB_EXEC (child), (OGMJobWatch) ogmrip_mplayer_wav_watch, spawn, TRUE, FALSE, FALSE);
-  ogmjob_container_add (OGMJOB_CONTAINER (spawn), child);
+  child = ogmjob_spawn_newv (argv);
+  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child), (OGMJobWatch) ogmrip_mplayer_wav_watch, task);
+  ogmjob_container_add (OGMJOB_CONTAINER (task), child);
   g_object_unref (child);
 
-  result = OGMJOB_SPAWN_CLASS (ogmrip_wav_parent_class)->run (spawn);
+  result = OGMJOB_TASK_CLASS (ogmrip_wav_parent_class)->run (task, cancellable, error);
 
-  ogmjob_container_remove (OGMJOB_CONTAINER (spawn), child);
+  ogmjob_container_remove (OGMJOB_CONTAINER (task), child);
 
   return result;
 }

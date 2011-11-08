@@ -28,17 +28,19 @@
 #define OGMRIP_CHAPTERS_GET_PRIVATE(o) \
     (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_CHAPTERS, OGMRipChaptersPriv))
 
-static void ogmrip_chapters_constructed  (GObject      *gobject);
-static void ogmrip_chapters_finalize     (GObject      *gobject);
-static void ogmrip_chapters_set_property (GObject      *gobject,
-                                          guint        property_id,
-                                          const GValue *value,
-                                          GParamSpec   *pspec);
-static void ogmrip_chapters_get_property (GObject      *gobject,
-                                          guint        property_id,
-                                          GValue       *value,
-                                          GParamSpec   *pspec);
-static gint ogmrip_chapters_run          (OGMJobSpawn  *spawn);
+static void     ogmrip_chapters_constructed  (GObject      *gobject);
+static void     ogmrip_chapters_finalize     (GObject      *gobject);
+static void     ogmrip_chapters_set_property (GObject      *gobject,
+                                              guint        property_id,
+                                              const GValue *value,
+                                              GParamSpec   *pspec);
+static void     ogmrip_chapters_get_property (GObject      *gobject,
+                                              guint        property_id,
+                                              GValue       *value,
+                                              GParamSpec   *pspec);
+static gboolean ogmrip_chapters_run          (OGMJobTask   *task,
+                                              GCancellable *cancellable,
+                                              GError       **error);
 
 struct _OGMRipChaptersPriv
 {
@@ -59,7 +61,7 @@ static void
 ogmrip_chapters_class_init (OGMRipChaptersClass *klass)
 {
   GObjectClass *gobject_class;
-  OGMJobSpawnClass *spawn_class;
+  OGMJobTaskClass *task_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->constructed = ogmrip_chapters_constructed;
@@ -67,8 +69,8 @@ ogmrip_chapters_class_init (OGMRipChaptersClass *klass)
   gobject_class->get_property = ogmrip_chapters_get_property;
   gobject_class->set_property = ogmrip_chapters_set_property;
 
-  spawn_class = OGMJOB_SPAWN_CLASS (klass);
-  spawn_class->run = ogmrip_chapters_run;
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_chapters_run;
 
   g_object_class_install_property (gobject_class, PROP_LANGUAGE, 
         g_param_spec_uint ("language", "Language property", "Set language", 
@@ -167,8 +169,8 @@ ogmrip_chapters_save (OGMRipChapters *chapters, GIOChannel *channel, guint n, co
   g_free (str);
 }
 
-static gint
-ogmrip_chapters_run (OGMJobSpawn *spawn)
+static gboolean
+ogmrip_chapters_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
   GIOChannel *channel;
   OGMRipStream *stream;
@@ -178,14 +180,14 @@ ogmrip_chapters_run (OGMJobSpawn *spawn)
   gdouble seconds, length;
   gint i;
 
-  output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (spawn)));
-  channel = g_io_channel_new_file (output, "w", NULL);
+  output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (task)));
+  channel = g_io_channel_new_file (output, "w", error);
   if (!channel)
-    return OGMJOB_RESULT_ERROR;
+    return FALSE;
 
-  ogmrip_codec_get_chapters (OGMRIP_CODEC (spawn), &start_chapter, &end_chapter);
+  ogmrip_codec_get_chapters (OGMRIP_CODEC (task), &start_chapter, &end_chapter);
 
-  stream = ogmrip_codec_get_input (OGMRIP_CODEC (spawn));
+  stream = ogmrip_codec_get_input (OGMRIP_CODEC (task));
 
   for (i = start_chapter, seconds = length = 0.0; i <= end_chapter; i++)
   {
@@ -194,14 +196,14 @@ ogmrip_chapters_run (OGMJobSpawn *spawn)
     if (i < end_chapter)
       seconds = ogmrip_title_get_chapters_length (ogmrip_stream_get_title (stream), i, i, NULL);
 
-    ogmrip_chapters_save (OGMRIP_CHAPTERS (spawn), 
-        channel, i - start_chapter + 1, OGMRIP_CHAPTERS (spawn)->priv->labels[i], length * 1000);
+    ogmrip_chapters_save (OGMRIP_CHAPTERS (task), 
+        channel, i - start_chapter + 1, OGMRIP_CHAPTERS (task)->priv->labels[i], length * 1000);
   }
 
   g_io_channel_shutdown (channel, TRUE, NULL);
   g_io_channel_unref (channel);
 
-  return OGMJOB_RESULT_SUCCESS;
+  return TRUE;
 }
 
 /**

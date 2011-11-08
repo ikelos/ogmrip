@@ -54,18 +54,20 @@ enum
   PROP_PASSES
 };
 
-static gint ogmrip_theora_run          (OGMJobSpawn  *spawn);
-static void ogmrip_theora_get_property (GObject      *gobject,
-                                        guint        property_id,
-                                        GValue       *value,
-                                        GParamSpec   *pspec);
-static void ogmrip_theora_set_property (GObject      *gobject,
-                                        guint        property_id,
-                                        const GValue *value,
-                                        GParamSpec   *pspec);
+static void     ogmrip_theora_get_property (GObject      *gobject,
+                                            guint        property_id,
+                                            GValue       *value,
+                                            GParamSpec   *pspec);
+static void     ogmrip_theora_set_property (GObject      *gobject,
+                                            guint        property_id,
+                                            const GValue *value,
+                                            GParamSpec   *pspec);
+static gboolean ogmrip_theora_run          (OGMJobTask   *task,
+                                            GCancellable *cancellable,
+                                            GError       **error);
 
 static gchar **
-ogmrip_yuv4mpeg_command (OGMRipVideoCodec *video, const gchar *output, const gchar *logf)
+ogmrip_yuv4mpeg_command (OGMRipVideoCodec *video, const gchar *output)
 {
   OGMRipTitle *title;
   GPtrArray *argv;
@@ -140,14 +142,14 @@ static void
 ogmrip_theora_class_init (OGMRipTheoraClass *klass)
 {
   GObjectClass *gobject_class;
-  OGMJobSpawnClass *spawn_class;
+  OGMJobTaskClass *task_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->get_property = ogmrip_theora_get_property;
   gobject_class->set_property = ogmrip_theora_set_property;
 
-  spawn_class = OGMJOB_SPAWN_CLASS (klass);
-  spawn_class->run = ogmrip_theora_run;
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_theora_run;
 
   g_object_class_install_property (gobject_class, PROP_PASSES, 
         g_param_spec_uint ("passes", "Passes property", "Set the number of passes", 
@@ -187,48 +189,44 @@ ogmrip_theora_set_property (GObject *gobject, guint property_id, const GValue *v
   }
 }
 
-static gint
-ogmrip_theora_run (OGMJobSpawn *spawn)
+static gboolean
+ogmrip_theora_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
-  GError *error = NULL;
-  OGMJobSpawn *pipeline;
-  OGMJobSpawn *child;
+  OGMJobTask *pipeline;
+  OGMJobTask *child;
   gchar **argv, *fifo;
-  gint result;
+  gboolean result;
 
-  result = OGMJOB_RESULT_ERROR;
+  result = FALSE;
 
-  fifo = ogmrip_fs_mkftemp ("fifo.XXXXXX", &error);
+  fifo = ogmrip_fs_mkftemp ("fifo.XXXXXX", error);
   if (!fifo)
-  {
-    ogmjob_spawn_propagate_error (spawn, error);
-    return OGMJOB_RESULT_ERROR;
-  }
+    return FALSE;
 
   pipeline = ogmjob_pipeline_new ();
-  ogmjob_container_add (OGMJOB_CONTAINER (spawn), pipeline);
+  ogmjob_container_add (OGMJOB_CONTAINER (task), pipeline);
   g_object_unref (pipeline);
 
-  argv = ogmrip_yuv4mpeg_command (OGMRIP_VIDEO_CODEC (spawn), fifo, NULL);
+  argv = ogmrip_yuv4mpeg_command (OGMRIP_VIDEO_CODEC (task), fifo);
   if (argv)
   {
-    child = ogmjob_exec_newv (argv);
-    ogmjob_exec_add_watch_full (OGMJOB_EXEC (child), (OGMJobWatch) ogmrip_mplayer_video_watch, spawn, TRUE, FALSE, FALSE);
+    child = ogmjob_spawn_newv (argv);
+    ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child), (OGMJobWatch) ogmrip_mplayer_video_watch, task);
     ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
     g_object_unref (child);
 
-    argv = ogmrip_theora_command (OGMRIP_VIDEO_CODEC (spawn), fifo);
+    argv = ogmrip_theora_command (OGMRIP_VIDEO_CODEC (task), fifo);
     if (argv)
     {
-      child = ogmjob_exec_newv (argv);
+      child = ogmjob_spawn_newv (argv);
       ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
       g_object_unref (child);
 
-      result = OGMJOB_SPAWN_CLASS (ogmrip_theora_parent_class)->run (spawn);
+      result = OGMJOB_TASK_CLASS (ogmrip_theora_parent_class)->run (task, cancellable, error);
     }
   }
 
-  ogmjob_container_remove (OGMJOB_CONTAINER (spawn), pipeline);
+  ogmjob_container_remove (OGMJOB_CONTAINER (task), pipeline);
 
   if (g_file_test (fifo, G_FILE_TEST_EXISTS))
     g_unlink (fifo);

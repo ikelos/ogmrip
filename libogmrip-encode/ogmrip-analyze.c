@@ -40,32 +40,34 @@ enum
   PROP_TITLE
 };
 
-static void ogmrip_analyze_dispose      (GObject      *gobject);
-static void ogmrip_analyze_set_property (GObject      *gobject,
-                                         guint        property_id,
-                                         const GValue *value,
-                                         GParamSpec   *pspec);
-static void ogmrip_analyze_get_property (GObject      *gobject,
-                                         guint        property_id,
-                                         GValue       *value,
-                                         GParamSpec   *pspec);
-static gint ogmrip_analyze_run          (OGMJobSpawn  *spawn);
+static void     ogmrip_analyze_dispose      (GObject      *gobject);
+static void     ogmrip_analyze_set_property (GObject      *gobject,
+                                             guint        property_id,
+                                             const GValue *value,
+                                             GParamSpec   *pspec);
+static void     ogmrip_analyze_get_property (GObject      *gobject,
+                                             guint        property_id,
+                                             GValue       *value,
+                                             GParamSpec   *pspec);
+static gboolean ogmrip_analyze_run          (OGMJobTask   *task,
+                                             GCancellable *cancellable,
+                                             GError       **error);
 
-G_DEFINE_TYPE (OGMRipAnalyze, ogmrip_analyze, OGMJOB_TYPE_SPAWN)
+G_DEFINE_TYPE (OGMRipAnalyze, ogmrip_analyze, OGMJOB_TYPE_TASK)
 
 static void
 ogmrip_analyze_class_init (OGMRipAnalyzeClass *klass)
 {
   GObjectClass *gobject_class;
-  OGMJobSpawnClass *spawn_class;
+  OGMJobTaskClass *task_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->dispose = ogmrip_analyze_dispose;
   gobject_class->get_property = ogmrip_analyze_get_property;
   gobject_class->set_property = ogmrip_analyze_set_property;
 
-  spawn_class = OGMJOB_SPAWN_CLASS (klass);
-  spawn_class->run = ogmrip_analyze_run;
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_analyze_run;
 
   g_object_class_install_property (gobject_class, PROP_TITLE, 
         g_param_spec_object ("title", "Title property", "Set title", 
@@ -127,30 +129,17 @@ ogmrip_analyze_get_property (GObject *gobject, guint property_id, GValue *value,
 }
 
 static void
-ogmrip_analyze_progress (OGMRipTitle *title, gdouble percent, gpointer spawn)
+ogmrip_analyze_progress (OGMRipTitle *title, gdouble percent, gpointer task)
 {
-  g_signal_emit_by_name (spawn, "progress", percent);
+  ogmjob_task_set_progress (task, percent);
 }
 
-static gint
-ogmrip_analyze_run (OGMJobSpawn *spawn)
+static gboolean
+ogmrip_analyze_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
-  OGMRipAnalyze *analyze = OGMRIP_ANALYZE (spawn);
-  GCancellable *cancellable;
-  gint retval;
+  OGMRipAnalyze *analyze = OGMRIP_ANALYZE (task);
 
-  cancellable = g_cancellable_new ();
-
-  if (ogmrip_title_analyze (analyze->priv->title, cancellable, ogmrip_analyze_progress, spawn, NULL))
-    retval = OGMJOB_RESULT_SUCCESS;
-  else if (g_cancellable_is_cancelled (cancellable))
-    retval = OGMJOB_RESULT_CANCEL;
-  else
-    retval = OGMJOB_RESULT_ERROR;
-
-  g_object_unref (cancellable);
-
-  return retval;
+  return ogmrip_title_analyze (analyze->priv->title, cancellable, ogmrip_analyze_progress, task, error);
 }
 
 /**
@@ -162,7 +151,7 @@ ogmrip_analyze_run (OGMJobSpawn *spawn)
  *
  * Returns: The new #OGMRipAnalyze
  */
-OGMJobSpawn *
+OGMJobTask *
 ogmrip_analyze_new (OGMRipTitle *title)
 {
   g_return_val_if_fail (OGMRIP_IS_TITLE (title), NULL);

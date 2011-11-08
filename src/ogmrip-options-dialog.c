@@ -464,9 +464,9 @@ ogmrip_options_dialog_crop_button_clicked (OGMRipOptionsDialog *parent)
 }
 
 static void
-ogmrip_progress_dialog_response_cb (OGMRipProgressDialog *dialog, gint response_id, OGMJobSpawn *spawn)
+ogmrip_progress_dialog_response_cb (OGMRipProgressDialog *dialog, gint response_id, GCancellable *cancellable)
 {
-  ogmjob_spawn_cancel (spawn);
+  g_cancellable_cancel (cancellable);
 }
 
 static void
@@ -474,8 +474,9 @@ ogmrip_options_dialog_autocrop_button_clicked (OGMRipOptionsDialog *parent)
 {
   if (ogmrip_open_title (GTK_WINDOW (parent), parent->priv->title))
   {
+    GCancellable *cancellable;
     GtkWidget *dialog;
-    OGMJobSpawn *spawn;
+    OGMJobTask *task;
     gint result;
 
     dialog = ogmrip_progress_dialog_new (GTK_WINDOW (parent), 
@@ -486,13 +487,17 @@ ogmrip_options_dialog_autocrop_button_clicked (OGMRipOptionsDialog *parent)
 
     ogmrip_progress_dialog_set_message (OGMRIP_PROGRESS_DIALOG (dialog), _("Analyzing video stream"));
 
-    spawn = ogmrip_analyze_new (parent->priv->title);
-    g_signal_connect (dialog, "response", G_CALLBACK (ogmrip_progress_dialog_response_cb), spawn);
+    task = ogmrip_analyze_new (parent->priv->title);
 
-    result = ogmjob_spawn_run (spawn, NULL);
-    g_object_unref (spawn);
+    cancellable = g_cancellable_new ();
+    g_signal_connect (dialog, "response", G_CALLBACK (ogmrip_progress_dialog_response_cb), cancellable);
 
-    if (result == OGMJOB_RESULT_SUCCESS)
+    result = ogmjob_task_run (task, cancellable, NULL);
+
+    g_object_unref (task);
+    g_object_unref (cancellable);
+
+    if (result)
     {
       OGMRipVideoStream *stream;
       guint x, y, w, h;

@@ -132,18 +132,20 @@ enum
   B_PYRAMID_NORMAL
 };
 
-static void ogmrip_x264_finalize     (GObject      *gobject);
-static void ogmrip_x264_notify       (GObject      *gobject,
-                                      GParamSpec   *pspec);
-static void ogmrip_x264_get_property (GObject      *gobject,
-                                      guint        property_id,
-                                      GValue       *value,
-                                      GParamSpec   *pspec);
-static void ogmrip_x264_set_property (GObject      *gobject,
-                                      guint        property_id,
-                                      const GValue *value,
-                                      GParamSpec   *pspec);
-static gint ogmrip_x264_run          (OGMJobSpawn  *spawn);
+static void     ogmrip_x264_finalize     (GObject      *gobject);
+static void     ogmrip_x264_notify       (GObject      *gobject,
+                                          GParamSpec   *pspec);
+static void     ogmrip_x264_get_property (GObject      *gobject,
+                                          guint        property_id,
+                                          GValue       *value,
+                                          GParamSpec   *pspec);
+static void     ogmrip_x264_set_property (GObject      *gobject,
+                                          guint        property_id,
+                                          const GValue *value,
+                                          GParamSpec   *pspec);
+static gboolean ogmrip_x264_run          (OGMJobTask   *task,
+                                          GCancellable *cancellable,
+                                          GError       **error);
 
 static const gchar *me_name[] =
 {
@@ -506,7 +508,7 @@ static void
 ogmrip_x264_class_init (OGMRipX264Class *klass)
 {
   GObjectClass *gobject_class;
-  OGMJobSpawnClass *spawn_class;
+  OGMJobTaskClass *task_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->finalize = ogmrip_x264_finalize;
@@ -514,8 +516,8 @@ ogmrip_x264_class_init (OGMRipX264Class *klass)
   gobject_class->get_property = ogmrip_x264_get_property;
   gobject_class->set_property = ogmrip_x264_set_property;
 
-  spawn_class = OGMJOB_SPAWN_CLASS (klass);
-  spawn_class->run = ogmrip_x264_run;
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_x264_run;
 
   g_object_class_install_property (gobject_class, PROP_8X8DCT,
       g_param_spec_boolean (OGMRIP_X264_PROP_8X8DCT, "8x8 dct property", "Set 8x8 dct",
@@ -893,38 +895,43 @@ ogmrip_x264_set_property (GObject *gobject, guint property_id, const GValue *val
   }
 }
 
-static gint
-ogmrip_x264_run (OGMJobSpawn *spawn)
+static gboolean
+ogmrip_x264_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
-  OGMJobSpawn *queue, *child;
+  OGMJobTask *queue, *child;
   gchar **argv, *log_file, *mbtree_file;
-  gint pass, passes, result;
+  gint pass, passes;
+  gboolean result;
 
   queue = ogmjob_queue_new ();
-  ogmjob_container_add (OGMJOB_CONTAINER (spawn), queue);
+  ogmjob_container_add (OGMJOB_CONTAINER (task), queue);
   g_object_unref (queue);
 
-  passes = ogmrip_video_codec_get_passes (OGMRIP_VIDEO_CODEC (spawn));
+  passes = ogmrip_video_codec_get_passes (OGMRIP_VIDEO_CODEC (task));
 
   log_file = NULL;
   if (passes > 1)
-    log_file = ogmrip_fs_mktemp ("log.XXXXXX", NULL);
+  {
+    log_file = ogmrip_fs_mktemp ("log.XXXXXX", error);
+    if (!log_file)
+      return FALSE;
+  }
 
   for (pass = 0; pass < passes; pass ++)
   {
-    argv = ogmrip_x264_command (OGMRIP_VIDEO_CODEC (spawn), pass + 1, passes, log_file);
+    argv = ogmrip_x264_command (OGMRIP_VIDEO_CODEC (task), pass + 1, passes, log_file);
     if (!argv)
-      return OGMJOB_RESULT_ERROR;
+      return FALSE;
 
-    child = ogmjob_exec_newv (argv);
-    ogmjob_exec_add_watch_full (OGMJOB_EXEC (child), (OGMJobWatch) ogmrip_mencoder_codec_watch, spawn, TRUE, FALSE, FALSE);
+    child = ogmjob_spawn_newv (argv);
+    ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child), (OGMJobWatch) ogmrip_mencoder_codec_watch, task);
     ogmjob_container_add (OGMJOB_CONTAINER (queue), child);
     g_object_unref (child);
   }
 
-  result = OGMJOB_SPAWN_CLASS (ogmrip_x264_parent_class)->run (spawn);
+  result = OGMJOB_TASK_CLASS (ogmrip_x264_parent_class)->run (task, cancellable, error);
 
-  ogmjob_container_remove (OGMJOB_CONTAINER (spawn), queue);
+  ogmjob_container_remove (OGMJOB_CONTAINER (task), queue);
 
   mbtree_file = g_strconcat (log_file, ".mbtree", NULL);
   if (g_file_test (mbtree_file, G_FILE_TEST_EXISTS))

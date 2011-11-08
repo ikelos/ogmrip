@@ -194,19 +194,8 @@ ogmrip_mplayer_set_deint (OGMRipVideoCodec *video, GPtrArray *argv, GString *opt
   }
 }
 
-/**
- * ogmrip_mencoder_codec_watch:
- * @exec: An #OGMJobExec
- * @buffer: The buffer to parse
- * @codec: An #OGMRipCodec
- *
- * This function parses the output of mencoder when encoding a stream and
- * returns the progress made.
- *
- * Returns: The progress made, or -1.0
- */
-gdouble
-ogmrip_mencoder_codec_watch (OGMJobExec *exec, const gchar *buffer, OGMRipCodec *codec)
+gboolean
+ogmrip_mencoder_codec_watch (OGMJobTask *task, const gchar *buffer, OGMRipCodec *codec, GError **error)
 {
   gint frames, progress;
   gdouble seconds;
@@ -215,46 +204,24 @@ ogmrip_mencoder_codec_watch (OGMJobExec *exec, const gchar *buffer, OGMRipCodec 
   if (sscanf (buffer, "Pos:%s %df (%d%%)", pos, &frames, &progress) == 3)
   {
     seconds = strtod (pos, NULL);
-    return seconds / ogmrip_codec_get_length (codec, NULL);
+    ogmjob_task_set_progress (task, seconds / ogmrip_codec_get_length (codec, NULL));
   }
 
-  return -1.0;
+  return TRUE;
 }
 
-/**
- * ogmrip_mencoder_container_watch:
- * @exec: An #OGMJobExec
- * @buffer: The buffer to parse
- * @container: An #OGMRipContainer
- *
- * This function parses the output of mencoder when merging streams and returns
- * the progress made.
- *
- * Returns: The progress made, or -1.0
- */
-gdouble
-ogmrip_mencoder_container_watch (OGMJobExec *exec, const gchar *buffer, OGMRipContainer *container)
+gboolean
+ogmrip_mencoder_container_watch (OGMJobTask *task, const gchar *buffer, OGMRipContainer *container, GError **error)
 {
   gint frames, progress;
   gchar pos[10];
 
   if (sscanf (buffer, "Pos:%s %df (%d%%)", pos, &frames, &progress) == 3)
-    return progress / 100.;
+    ogmjob_task_set_progress (task, progress / 100.);
 
-  return -1.0;
+  return TRUE;
 }
 
-/**
- * ogmrip_mplayer_wav_command:
- * @audio: An #OGMRipAudioCodec
- * @header: Whether to add the PCM header
- * @output: The output file, or NULL
- *
- * This function creates the command line for encoding an audio stream in PCM
- * or WAV.
- *
- * Returns: A new #GPtrArray, or NULL
- */
 GPtrArray *
 ogmrip_mplayer_wav_command (OGMRipAudioCodec *audio, gboolean header, const gchar *output)
 {
@@ -427,19 +394,8 @@ ogmrip_mplayer_wav_command (OGMRipAudioCodec *audio, gboolean header, const gcha
   return argv;
 }
 
-/**
- * ogmrip_mplayer_wav_watch:
- * @exec: An #OGMJobExec
- * @buffer: The buffer to parse
- * @audio: An #OGMRipAudioCodec
- *
- * This function parses the output of mplayer when encoding an audio stream in
- * WAV or PCM and returns the progress made.
- *
- * Returns: The progress made, or -1.0
- */
-gdouble
-ogmrip_mplayer_wav_watch (OGMJobExec *exec, const gchar *buffer, OGMRipAudioCodec *audio)
+gboolean
+ogmrip_mplayer_wav_watch (OGMJobTask *task, const gchar *buffer, OGMRipAudioCodec *audio, GError **error)
 {
   gchar pos[12], pos_time[12], total[12];
   static gdouble start;
@@ -453,22 +409,12 @@ ogmrip_mplayer_wav_watch (OGMJobExec *exec, const gchar *buffer, OGMRipAudioCode
     if (!start)
       start = secs;
 
-    return (secs - start) / ogmrip_codec_get_length (OGMRIP_CODEC (audio), NULL);
+    ogmjob_task_set_progress (task, (secs - start) / ogmrip_codec_get_length (OGMRIP_CODEC (audio), NULL));
   }
 
-  return -1.0;
+  return TRUE;
 }
 
-/**
- * ogmrip_mencoder_audio_command:
- * @audio: An #OGMRipAudioCodec
- * @output: The output file, or NULL
- *
- * This function creates the common part of the command line when using mencoder
- * to encode an audio stream.
- *
- * Returns: A new #GPtrArray, or NULL
- */
 GPtrArray *
 ogmrip_mencoder_audio_command (OGMRipAudioCodec *audio, const gchar *output)
 {
@@ -545,17 +491,6 @@ ogmrip_mencoder_audio_command (OGMRipAudioCodec *audio, const gchar *output)
   return argv;
 }
 
-/**
- * ogmrip_mencoder_video_command:
- * @video: An #OGMRipVideoCodec
- * @output: The output file, or NULL
- * @pass: The number of passes
- *
- * This function creates the common part of the command line when using mencoder
- * to encode a video stream.
- *
- * Returns: A new #GPtrArray, or NULL
- */
 GPtrArray *
 ogmrip_mencoder_video_command (OGMRipVideoCodec *video, const gchar *output, guint pass)
 {
@@ -764,39 +699,18 @@ ogmrip_mencoder_video_command (OGMRipVideoCodec *video, const gchar *output, gui
   return argv;
 }
 
-/**
- * ogmrip_mplayer_video_watch:
- * @exec: An #OGMJobExec
- * @buffer: The buffer to parse
- * @video: An #OGMRipVideoCodec
- *
- * This function parses the output of mplayer when encoding a video stream and
- * returns the progress made.
- *
- * Returns: The progress made, or -1.0
- */
-gdouble
-ogmrip_mplayer_video_watch (OGMJobExec *exec, const gchar *buffer, OGMRipVideoCodec *video)
+gboolean
+ogmrip_mplayer_video_watch (OGMJobTask *task, const gchar *buffer, OGMRipVideoCodec *video, GError **error)
 {
   gchar v[10];
   gint frame, decoded;
 
   if (sscanf (buffer, "V:%s %d/%d", v, &frame, &decoded) == 3)
-    return decoded / (gdouble) ogmrip_mplayer_get_frames (OGMRIP_CODEC (video));
+    ogmjob_task_set_progress (task, decoded / (gdouble) ogmrip_mplayer_get_frames (OGMRIP_CODEC (video)));
 
-  return -1.0;
+  return TRUE;
 }
 
-/**
- * ogmrip_mplayer_video_command:
- * @video: An #OGMRipVideoCodec
- * @output: The output file, or NULL
- *
- * This function creates the common part of the command line when using mplayer
- * to encode a video stream.
- *
- * Returns: A new #GPtrArray, or NULL
- */
 GPtrArray *
 ogmrip_mplayer_video_command (OGMRipVideoCodec *video, const gchar *output)
 {
@@ -982,19 +896,8 @@ ogmrip_mplayer_video_command (OGMRipVideoCodec *video, const gchar *output)
   return argv;
 }
 
-/**
- * ogmrip_mencoder_vobsub_watch:
- * @exec: An #OGMJobExec
- * @buffer: The buffer to parse
- * @subp: An #OGMRipSubpCodec
- *
- * This function parses the output of mencoder when extracting VobSub subtitles
- * and returns the progress made.
- *
- * Returns: The progress made, or -1.0
- */
-gdouble
-ogmrip_mencoder_vobsub_watch (OGMJobExec *exec, const gchar *buffer, OGMRipSubpCodec *subp)
+gboolean
+ogmrip_mencoder_vobsub_watch (OGMJobTask *task, const gchar *buffer, OGMRipSubpCodec *subp, GError **error)
 {
   gint frames, progress;
   gdouble seconds;
@@ -1003,22 +906,12 @@ ogmrip_mencoder_vobsub_watch (OGMJobExec *exec, const gchar *buffer, OGMRipSubpC
   if (sscanf (buffer, "Pos:%s %df (%d%%)", pos, &frames, &progress) == 3)
   {
     seconds = strtod (pos, NULL);
-    return 0.98 * seconds / ogmrip_codec_get_length (OGMRIP_CODEC (subp), NULL);
+    ogmjob_task_set_progress (task, 0.98 * seconds / ogmrip_codec_get_length (OGMRIP_CODEC (subp), NULL));
   }
 
-  return -1.0;
+  return TRUE;
 }
 
-/**
- * ogmrip_mencoder_vobsub_command:
- * @subp: An #OGMRipSubpCodec
- * @output: The output file, or NULL
- *
- * This function creates the command line for extracting VobSub subtitles
- * using mencoder.
- *
- * Returns: A new #GPtrArray, or NULL
- */
 GPtrArray *
 ogmrip_mencoder_vobsub_command (OGMRipSubpCodec *subp, const gchar *output)
 {
@@ -1208,15 +1101,6 @@ ogmrip_mencoder_container_foreach_file (OGMRipContainer *container, OGMRipFile *
   }
 }
 
-/**
- * ogmrip_mencoder_container_command:
- * @container: An #OGMRipContainer
- *
- * This function creates the common part of the command line to merge streams
- * using mencoder.
- *
- * Returns: A new #GPtrArray, or NULL
- */
 GPtrArray *
 ogmrip_mencoder_container_command (OGMRipContainer *container)
 {

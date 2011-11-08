@@ -46,8 +46,8 @@ struct _OGMRipAnalyzeClass
   OGMJobSpawnClass parent_class;
 };
 
-GType         ogmrip_analyze_get_type (void);
-OGMJobSpawn * ogmrip_analyze_new      (OGMRipTitle *title);
+GType        ogmrip_analyze_get_type (void);
+OGMJobTask * ogmrip_analyze_new      (OGMRipTitle *title);
 
 G_END_DECLS
 

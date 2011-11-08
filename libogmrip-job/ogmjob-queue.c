@@ -20,7 +20,7 @@
  * SECTION:ogmjob-queue
  * @title: OGMJobQueue
  * @include: ogmjob-queue.h
- * @short_description: A container to run spawns in order
+ * @short_description: A container to run tasks in order
  */
 
 #include "ogmjob-queue.h"
@@ -33,27 +33,30 @@
 
 struct _OGMJobQueuePriv
 {
-  gdouble progress;
+  GList *children;
   guint nchildren;
   guint completed;
+  gdouble progress;
 };
 
-static gint ogmjob_queue_run    (OGMJobSpawn     *spawn);
-static void ogmjob_queue_add    (OGMJobContainer *container,
-                                 OGMJobSpawn     *child);
-static void ogmjob_queue_remove (OGMJobContainer *container,
-                                 OGMJobSpawn     *child);
+static gboolean ogmjob_queue_run    (OGMJobTask      *task,
+                                     GCancellable    *cancellable,
+                                     GError          **error);
+static void     ogmjob_queue_add    (OGMJobContainer *container,
+                                     OGMJobTask      *task);
+static void     ogmjob_queue_remove (OGMJobContainer *container,
+                                     OGMJobTask      *task);
 
-G_DEFINE_TYPE (OGMJobQueue, ogmjob_queue, OGMJOB_TYPE_LIST)
+G_DEFINE_TYPE (OGMJobQueue, ogmjob_queue, OGMJOB_TYPE_CONTAINER)
 
 static void
 ogmjob_queue_class_init (OGMJobQueueClass *klass)
 {
-  OGMJobSpawnClass *spawn_class;
+  OGMJobTaskClass *task_class;
   OGMJobContainerClass *container_class;
 
-  spawn_class = OGMJOB_SPAWN_CLASS (klass);
-  spawn_class->run = ogmjob_queue_run;
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmjob_queue_run;
 
   container_class = OGMJOB_CONTAINER_CLASS (klass);
   container_class->add = ogmjob_queue_add;
@@ -68,71 +71,68 @@ ogmjob_queue_init (OGMJobQueue *queue)
   queue->priv = OGMJOB_QUEUE_GET_PRIVATE (queue);
 }
 
-static gint
-ogmjob_queue_run (OGMJobSpawn *spawn)
+static gboolean
+ogmjob_queue_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
-  OGMJobQueue *queue;
-  GList *child, *children;
+  OGMJobQueue *queue = OGMJOB_QUEUE (task);
+  GList *child;
+  gboolean result;
 
-  GError *tmp_error = NULL;
-  gint result = OGMJOB_RESULT_SUCCESS;
+  if (!queue->priv->children)
+    return TRUE;
 
-  queue = OGMJOB_QUEUE (spawn);
-
-  children = ogmjob_list_get_children (OGMJOB_LIST (spawn));
-  queue->priv->nchildren = g_list_length (children);
+  queue->priv->nchildren = g_list_length (queue->priv->children);
   queue->priv->completed = 0;
 
-  for (child = children; child; child = child->next)
+  for (child = queue->priv->children; child; child = child->next)
   {
-    if (result != OGMJOB_RESULT_SUCCESS)
+    result = ogmjob_task_run (child->data, cancellable, error);
+    if (!result)
       break;
 
-    ogmjob_spawn_set_async (OGMJOB_SPAWN (child->data), FALSE);
-    result = ogmjob_spawn_run (OGMJOB_SPAWN (child->data), &tmp_error);
     queue->priv->completed ++;
-
-    if (result == OGMJOB_RESULT_ERROR && tmp_error)
-      ogmjob_spawn_propagate_error (spawn, tmp_error);
   }
-  g_list_free (children);
 
   return result;
 }
 
 static void
-ogmjob_queue_child_progress (OGMJobQueue *queue, gdouble fraction, OGMJobSpawn *child)
+ogmjob_queue_child_progress (OGMJobQueue *queue, GParamSpec *pspec, OGMJobTask *task)
 {
-  if (fraction < 0.0)
-    g_signal_emit_by_name (queue, "progress", fraction);
-
-  fraction = (queue->priv->completed + fraction) / (gdouble) queue->priv->nchildren;
-  g_signal_emit_by_name (queue, "progress", fraction);
+  ogmjob_task_set_progress (OGMJOB_TASK (queue),
+      (queue->priv->completed + ogmjob_task_get_progress (task)) / (gdouble) queue->priv->nchildren);
 }
 
 static void
-ogmjob_queue_add (OGMJobContainer *container, OGMJobSpawn *child)
+ogmjob_queue_add (OGMJobContainer *container, OGMJobTask *task)
 {
-  guint handler;
+  OGMJobQueue *queue = OGMJOB_QUEUE (container);
 
-  handler = g_signal_connect_swapped (child, "progress", 
+  queue->priv->children = g_list_append (queue->priv->children, g_object_ref (task));
+
+  g_signal_connect_swapped (task, "notify::progress", 
       G_CALLBACK (ogmjob_queue_child_progress), container);
-  g_object_set_data (G_OBJECT (child), "__child_progress_handler__", 
-      GUINT_TO_POINTER (handler));
 
-  OGMJOB_CONTAINER_CLASS (ogmjob_queue_parent_class)->add (container, child);
+  OGMJOB_CONTAINER_CLASS (ogmjob_queue_parent_class)->add (container, task);
 }
 
 static void
-ogmjob_queue_remove (OGMJobContainer *container, OGMJobSpawn *child)
+ogmjob_queue_remove (OGMJobContainer *container, OGMJobTask *task)
 {
-  gpointer handler;
+  OGMJobQueue *queue = OGMJOB_QUEUE (container);
+  GList *link;
 
-  handler = g_object_get_data (G_OBJECT (child), "__child_progress_handler__");
-  if (handler)
-    g_signal_handler_disconnect (child, GPOINTER_TO_UINT (handler));
+  link = g_list_find (queue->priv->children, task);
+  if (link)
+  {
+    g_signal_handlers_disconnect_by_func (task, ogmjob_queue_child_progress, container);
 
-  OGMJOB_CONTAINER_CLASS (ogmjob_queue_parent_class)->remove (container, child);
+    g_object_unref (task);
+    queue->priv->children = g_list_remove_link (queue->priv->children, link);
+    g_list_free (link);
+  }
+
+  OGMJOB_CONTAINER_CLASS (ogmjob_queue_parent_class)->remove (container, task);
 }
 
 /**
@@ -142,7 +142,7 @@ ogmjob_queue_remove (OGMJobContainer *container, OGMJobSpawn *child)
  *
  * Returns: The new #OGMJobQueue
  */
-OGMJobSpawn *
+OGMJobTask *
 ogmjob_queue_new (void)
 {
   return g_object_new (OGMJOB_TYPE_QUEUE, NULL);

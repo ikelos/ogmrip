@@ -887,27 +887,21 @@ ogmdvd_disc_copy_command (OGMDvdDisc *disc, const gchar *path)
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
-static gdouble
-ogmdvd_disc_copy_watch (OGMJobExec *exec, const gchar *buffer, gpointer data)
+static gboolean
+ogmdvd_disc_copy_watch (OGMJobTask *spawn, const gchar *buffer, gpointer data, GError **error)
 {
   guint bytes, total, percent;
 
   if (sscanf (buffer, "%u/%u blocks written (%u%%)", &bytes, &total, &percent) == 3)
-    return percent / 100.;
+    ogmjob_task_set_progress (spawn, percent / 100.);
 
-  return -1;
+  return TRUE;
 }
 
 static void
-ogmdvd_disc_copy_cancel_cb (GCancellable *cancellable, OGMJobSpawn *spawn)
+ogmdvd_disc_copy_progress_cb (OGMJobTask *spawn, GParamSpec *pspec, OGMDvdProgress *progress)
 {
-  ogmjob_spawn_cancel (spawn);
-}
-
-static void
-ogmdvd_disc_copy_progress_cb (OGMJobSpawn *spawn, gdouble fraction, OGMDvdProgress *progress)
-{
-  progress->callback (progress->disc, fraction, progress->user_data);
+  progress->callback (progress->disc, ogmjob_task_get_progress (spawn), progress->user_data);
 }
 
 static void
@@ -952,11 +946,10 @@ ogmdvd_disc_copy (OGMRipMedia *media, const gchar *path, GCancellable *cancellab
     OGMRipMediaCallback callback, gpointer user_data, GError **error)
 {
   OGMDvdDisc *disc = OGMDVD_DISC (media);
-  OGMJobSpawn *spawn;
+  OGMJobTask *spawn;
   GFile *file;
 
   struct stat buf;
-  gulong handler_id;
   gboolean is_open;
   gchar **argv;
   gint result;
@@ -978,12 +971,9 @@ ogmdvd_disc_copy (OGMRipMedia *media, const gchar *path, GCancellable *cancellab
 
     argv = ogmdvd_disc_copy_command (disc, path);
 
-    spawn = ogmjob_exec_newv (argv);
-    ogmjob_exec_add_watch_full (OGMJOB_EXEC (spawn),
-        (OGMJobWatch) ogmdvd_disc_copy_watch, NULL, TRUE, FALSE, FALSE);
-
-    handler_id = cancellable ? g_cancellable_connect (cancellable,
-        G_CALLBACK (ogmdvd_disc_copy_cancel_cb), spawn, NULL) : 0;
+    spawn = ogmjob_spawn_newv (argv);
+    ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (spawn),
+        (OGMJobWatch) ogmdvd_disc_copy_watch, NULL);
 
     if (callback)
     {
@@ -993,20 +983,17 @@ ogmdvd_disc_copy (OGMRipMedia *media, const gchar *path, GCancellable *cancellab
       progress.callback = callback;
       progress.user_data = user_data;
 
-      g_signal_connect (spawn, "progress",
+      g_signal_connect (spawn, "notify::progress",
           G_CALLBACK (ogmdvd_disc_copy_progress_cb), &progress);
     }
 
-    result = ogmjob_spawn_run (spawn, error);
+    result = ogmjob_task_run (spawn, cancellable, error);
     g_object_unref (spawn);
-
-    if (handler_id)
-      g_cancellable_disconnect (cancellable, handler_id);
 
     if (!is_open)
       ogmdvd_disc_close (media);
 
-    if (result != OGMJOB_RESULT_SUCCESS)
+    if (!result)
       return FALSE;
   }
 

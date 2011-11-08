@@ -170,13 +170,13 @@ ogmrip_crop_dialog_grab_command (OGMRipCropDialog *dialog, gulong frame)
 static void
 ogmrip_crop_dialog_grab_frame (OGMRipCropDialog *dialog, gulong frame)
 {
-  OGMJobSpawn *spawn;
+  OGMJobTask *task;
   gchar **cmd;
 
   cmd = ogmrip_crop_dialog_grab_command (dialog, frame);
 
-  spawn = ogmjob_exec_newv (cmd);
-  if (ogmjob_spawn_run (spawn, NULL) == OGMJOB_RESULT_SUCCESS)
+  task = ogmjob_spawn_newv (cmd);
+  if (ogmjob_task_run (task, NULL, NULL))
   {
     gchar *filename;
 
@@ -208,7 +208,7 @@ ogmrip_crop_dialog_grab_frame (OGMRipCropDialog *dialog, gulong frame)
     if (dialog->priv->pixbuf)
       ogmrip_crop_dialog_crop_frame (dialog);
   }
-  g_object_unref (spawn);
+  g_object_unref (task);
 }
 
 static void

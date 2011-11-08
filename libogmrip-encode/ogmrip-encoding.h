@@ -81,13 +81,13 @@ struct _OGMRipEncodingClass
   GObjectClass parent_class;
 
   void (* run)      (OGMRipEncoding *encoding,
-                     OGMJobSpawn    *spawn);
+                     OGMJobTask     *task);
   void (* progress) (OGMRipEncoding *encoding,
-                     OGMJobSpawn    *spawn,
+                     OGMJobTask     *task,
                      gdouble        fraction);
   void (* complete) (OGMRipEncoding *encoding,
-                     OGMJobSpawn    *spawn,
-                     guint          result);
+                     OGMJobTask     *task,
+                     gboolean       result);
 };
 
 GType              ogmrip_encoding_get_type            (void);
@@ -155,11 +155,12 @@ void               ogmrip_encoding_autoscale           (OGMRipEncoding       *en
                                                         gdouble              bpp,
                                                         guint                *width,
                                                         guint                *height);
-gint               ogmrip_encoding_test                (OGMRipEncoding       *encoding,
+gboolean           ogmrip_encoding_test                (OGMRipEncoding       *encoding,
+                                                        GCancellable         *cancellable,
                                                         GError               **error);
-gint               ogmrip_encoding_encode              (OGMRipEncoding       *encoding,
+gboolean           ogmrip_encoding_encode              (OGMRipEncoding       *encoding,
+                                                        GCancellable         *cancellable,
                                                         GError               **error);
-void               ogmrip_encoding_cancel              (OGMRipEncoding       *encoding);
 void               ogmrip_encoding_suspend             (OGMRipEncoding       *encoding);
 void               ogmrip_encoding_resume              (OGMRipEncoding       *encoding);
 

@@ -19,7 +19,7 @@
 #ifndef __OGMJOB_QUEUE_H__
 #define __OGMJOB_QUEUE_H__
 
-#include <ogmjob-list.h>
+#include <ogmjob-container.h>
 
 G_BEGIN_DECLS
 
@@ -36,18 +36,18 @@ typedef struct _OGMJobQueueClass OGMJobQueueClass;
 
 struct _OGMJobQueue
 {
-  OGMJobList parent_instance;
+  OGMJobContainer parent_instance;
 
   OGMJobQueuePriv *priv;
 };
 
 struct _OGMJobQueueClass
 {
-  OGMJobListClass parent_class;
+  OGMJobContainerClass parent_class;
 };
 
-GType         ogmjob_queue_get_type (void);
-OGMJobSpawn * ogmjob_queue_new      (void);
+GType        ogmjob_queue_get_type (void);
+OGMJobTask * ogmjob_queue_new      (void);
 
 G_END_DECLS
 

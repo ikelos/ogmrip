@@ -46,9 +46,9 @@ struct _OGMRipCopyClass
   OGMJobSpawnClass parent_class;
 };
 
-GType         ogmrip_copy_get_type (void);
-OGMJobSpawn * ogmrip_copy_new      (OGMRipMedia *media,
-                                    const gchar *path);
+GType        ogmrip_copy_get_type (void);
+OGMJobTask * ogmrip_copy_new      (OGMRipMedia *media,
+                                   const gchar *path);
 
 G_END_DECLS
 

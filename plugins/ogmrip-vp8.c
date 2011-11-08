@@ -61,18 +61,20 @@ enum
   PROP_PASSES,
 };
 
-static GType ogmrip_vp8_get_type    (void);
-static void  ogmrip_vp8_notify      (GObject      *gobject,
-                                     GParamSpec   *pspec);
-static void ogmrip_vp8_get_property (GObject      *gobject,
-                                     guint        property_id,
-                                     GValue       *value,
-                                     GParamSpec   *pspec);
-static void ogmrip_vp8_set_property (GObject      *gobject,
-                                     guint        property_id,
-                                     const GValue *value,
-                                     GParamSpec   *pspec);
-static gint  ogmrip_vp8_run         (OGMJobSpawn  *spawn);
+static GType    ogmrip_vp8_get_type     (void);
+static void     ogmrip_vp8_notify       (GObject      *gobject,
+                                         GParamSpec   *pspec);
+static void     ogmrip_vp8_get_property (GObject      *gobject,
+                                         guint        property_id,
+                                         GValue       *value,
+                                         GParamSpec   *pspec);
+static void     ogmrip_vp8_set_property (GObject      *gobject,
+                                         guint        property_id,
+                                         const GValue *value,
+                                         GParamSpec   *pspec);
+static gboolean ogmrip_vp8_run          (OGMJobTask   *task,
+                                         GCancellable *cancellable,
+                                         GError       **error);
 
 static gboolean have_vpxenc = FALSE;
 
@@ -198,26 +200,26 @@ ogmrip_vp8_command (OGMRipVideoCodec *video, const gchar *fifo, guint pass, guin
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
-static OGMJobSpawn *
-ogmrip_vp8_pipeline (OGMJobSpawn *spawn, const gchar *fifo, guint pass, guint passes, const gchar *log_file)
+static OGMJobTask *
+ogmrip_vp8_pipeline (OGMJobTask *task, const gchar *fifo, guint pass, guint passes, const gchar *log_file)
 {
-  OGMJobSpawn *pipeline, *child;
+  OGMJobTask *pipeline, *child;
   gchar **argv;
 
   pipeline = ogmjob_pipeline_new ();
 
-  argv = ogmrip_yuv4mpeg_command (OGMRIP_VIDEO_CODEC (spawn), fifo);
+  argv = ogmrip_yuv4mpeg_command (OGMRIP_VIDEO_CODEC (task), fifo);
   if (argv)
   {
-    child = ogmjob_exec_newv (argv);
-    ogmjob_exec_add_watch_full (OGMJOB_EXEC (child), (OGMJobWatch) ogmrip_mplayer_video_watch, spawn, TRUE, FALSE, FALSE);
+    child = ogmjob_spawn_newv (argv);
+    ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child), (OGMJobWatch) ogmrip_mplayer_video_watch, task);
     ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
     g_object_unref (child);
 
-    argv = ogmrip_vp8_command (OGMRIP_VIDEO_CODEC (spawn), fifo, pass + 1, passes, log_file);
+    argv = ogmrip_vp8_command (OGMRIP_VIDEO_CODEC (task), fifo, pass + 1, passes, log_file);
     if (argv)
     {
-      child = ogmjob_exec_newv (argv);
+      child = ogmjob_spawn_newv (argv);
       ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
       g_object_unref (child);
     }
@@ -232,15 +234,15 @@ static void
 ogmrip_vp8_class_init (OGMRipVp8Class *klass)
 {
   GObjectClass *gobject_class;
-  OGMJobSpawnClass *spawn_class;
+  OGMJobTaskClass *task_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->notify = ogmrip_vp8_notify;
   gobject_class->get_property = ogmrip_vp8_get_property;
   gobject_class->set_property = ogmrip_vp8_set_property;
 
-  spawn_class = OGMJOB_SPAWN_CLASS (klass);
-  spawn_class->run = ogmrip_vp8_run;
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_vp8_run;
 
   g_object_class_install_property (gobject_class, PROP_PASSES,
       g_param_spec_uint ("passes", "Passes property", "Set the number of passes",
@@ -335,41 +337,42 @@ ogmrip_vp8_set_property (GObject *gobject, guint property_id, const GValue *valu
   }
 }
 
-static gint
-ogmrip_vp8_run (OGMJobSpawn *spawn)
+static gboolean
+ogmrip_vp8_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
-  GError *error = NULL;
-  OGMJobSpawn *queue, *pipeline;
-  gint pass, passes, result;
+  OGMJobTask *queue, *pipeline;
   gchar *fifo, *log_file;
+  gint pass, passes;
+  gboolean result;
 
-  result = OGMJOB_RESULT_ERROR;
-
-  fifo = ogmrip_fs_mkftemp ("fifo.XXXXXX", &error);
+  fifo = ogmrip_fs_mkftemp ("fifo.XXXXXX", error);
   if (!fifo)
-  {
-    ogmjob_spawn_propagate_error (spawn, error);
-    return OGMJOB_RESULT_ERROR;
-  }
+    return FALSE;
 
   queue = ogmjob_queue_new ();
-  ogmjob_container_add (OGMJOB_CONTAINER (spawn), queue);
+  ogmjob_container_add (OGMJOB_CONTAINER (task), queue);
   g_object_unref (queue);
 
-  passes = ogmrip_video_codec_get_passes (OGMRIP_VIDEO_CODEC (spawn));
+  passes = ogmrip_video_codec_get_passes (OGMRIP_VIDEO_CODEC (task));
 
-  log_file = passes > 1 ? ogmrip_fs_mktemp ("log.XXXXXX", NULL) : NULL;
+  log_file = NULL;
+  if (passes > 1)
+  {
+    log_file = ogmrip_fs_mktemp ("log.XXXXXX", error);
+    if (!log_file)
+      return FALSE;
+  }
 
   for (pass = 0; pass < passes; pass ++)
   {
-    pipeline = ogmrip_vp8_pipeline (spawn, fifo, pass, passes, log_file);
+    pipeline = ogmrip_vp8_pipeline (task, fifo, pass, passes, log_file);
     ogmjob_container_add (OGMJOB_CONTAINER (queue), pipeline);
     g_object_unref (pipeline);
   }
 
-  result = OGMJOB_SPAWN_CLASS (ogmrip_vp8_parent_class)->run (spawn);
+  result = OGMJOB_TASK_CLASS (ogmrip_vp8_parent_class)->run (task, cancellable, error);
 
-  ogmjob_container_remove (OGMJOB_CONTAINER (spawn), queue);
+  ogmjob_container_remove (OGMJOB_CONTAINER (task), queue);
 
   if (g_file_test (fifo, G_FILE_TEST_EXISTS))
     g_unlink (fifo);

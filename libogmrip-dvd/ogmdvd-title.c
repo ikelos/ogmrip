@@ -625,17 +625,17 @@ ogmdvd_title_analyze_command (OGMDvdTitle *title, gulong nframes)
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
-static gdouble
-ogmdvd_title_analyze_watch (OGMJobExec *exec, const gchar *buffer, OGMDvdAnalyze *info)
+static gboolean
+ogmdvd_title_analyze_watch (OGMJobTask *spawn, const gchar *buffer, OGMDvdAnalyze *info, GError **error)
 {
   if (g_str_has_prefix (buffer, "V: "))
   {
     info->frames ++;
 
-    if (info->frames == info->nframes)
-      return 1.0;
-
-    return info->frames / (gdouble) info->nframes;
+    if (info->frames < info->nframes)
+      ogmjob_task_set_progress (spawn, info->frames / (gdouble) info->nframes);
+    else
+      ogmjob_task_set_progress (spawn, 1.0);
   }
   else
   {
@@ -676,7 +676,7 @@ ogmdvd_title_analyze_watch (OGMJobExec *exec, const gchar *buffer, OGMDvdAnalyze
     }
   }
 
-  return -1.0;
+  return TRUE;
 }
 
 typedef struct
@@ -687,6 +687,7 @@ typedef struct
   GSList *h;
   guint nframes;
   guint frames;
+  guint total;
 } OGMDvdCrop;
 
 static gchar **
@@ -745,12 +746,10 @@ ogmdvd_title_crop_command (OGMDvdTitle *title, gdouble start, gulong nframes)
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
-static gdouble
-ogmdvd_title_crop_watch (OGMJobExec *exec, const gchar *buffer, OGMDvdCrop *info)
+static gboolean
+ogmdvd_title_crop_watch (OGMJobTask *spawn, const gchar *buffer, OGMDvdCrop *info, GError **error)
 {
   gchar *str;
-
-  static guint frame = 0;
 
   str = strstr (buffer, "-vf crop=");
   if (str)
@@ -769,14 +768,11 @@ ogmdvd_title_crop_watch (OGMJobExec *exec, const gchar *buffer, OGMDvdCrop *info
         info->y = g_ulist_add_max (info->y, y);
     }
 
-    frame ++;
-    if (frame == info->nframes - 2)
-    {
-      frame = 0;
-      return 1.0;
-    }
-
-    return frame / (gdouble) (info->nframes - 2);
+    info->frames ++;
+    if (info->frames < info->nframes - 2)
+      ogmjob_task_set_progress (spawn, info->frames / (gdouble) (info->nframes - 2));
+    else
+      ogmjob_task_set_progress (spawn, 1.0);
   }
   else
   {
@@ -784,44 +780,38 @@ ogmdvd_title_crop_watch (OGMJobExec *exec, const gchar *buffer, OGMDvdCrop *info
 
     if (sscanf (buffer, "V: %lf", &d))
     {
-      info->frames ++;
-
-      if (info->frames >= 100)
-        ogmjob_spawn_cancel (OGMJOB_SPAWN (exec));
+      info->total ++;
+/*
+      if (info->total >= 100)
+        ogmjob_task_cancel (spawn);
+*/
     }
   }
 
-  return -1.0;
+  return TRUE;
 }
 
 static void
-ogmdvd_title_analyze_progress_cb (OGMJobSpawn *spawn, gdouble fraction, OGMDvdProgress *progress)
+ogmdvd_title_analyze_progress_cb (OGMJobTask *spawn, GParamSpec *pspec, OGMDvdProgress *progress)
 {
-  progress->callback (progress->title, fraction / 2, progress->user_data);
+  progress->callback (progress->title, ogmjob_task_get_progress (spawn) / 2, progress->user_data);
 }
 
 static void
-ogmdvd_title_crop_progress_cb (OGMJobSpawn *spawn, gdouble fraction, OGMDvdProgress *progress)
+ogmdvd_title_crop_progress_cb (OGMJobTask *spawn, GParamSpec *pspec, OGMDvdProgress *progress)
 {
-  progress->callback (progress->title, 0.5 + fraction / 2, progress->user_data);
-}
-
-static void
-ogmdvd_title_analyze_cancel_cb (GCancellable *cancellable, OGMJobSpawn *spawn)
-{
-  ogmjob_spawn_cancel (spawn);
+  progress->callback (progress->title, 0.5 + ogmjob_task_get_progress (spawn) / 2, progress->user_data);
 }
 
 static gboolean
 ogmdvd_title_analyze (OGMRipTitle *title, GCancellable *cancellable, OGMRipTitleCallback callback, gpointer user_data, GError **error)
 {
   OGMDvdTitle *dtitle = OGMDVD_TITLE (title);
-  OGMJobSpawn *spawn, *queue;
+  OGMJobTask *spawn, *queue;
   OGMDvdProgress progress;
   OGMDvdAnalyze analyze;
   OGMDvdCrop crop;
 
-  gulong handler_id;
   gdouble length, start, step;
   gboolean is_open;
   gchar **argv;
@@ -846,27 +836,22 @@ ogmdvd_title_analyze (OGMRipTitle *title, GCancellable *cancellable, OGMRipTitle
 
   argv = ogmdvd_title_analyze_command (dtitle, analyze.nframes);
 
-  spawn = ogmjob_exec_newv (argv);
-  ogmjob_exec_add_watch_full (OGMJOB_EXEC (spawn),
-      (OGMJobWatch) ogmdvd_title_analyze_watch, &analyze, TRUE, FALSE, FALSE);
-
-  handler_id = cancellable ? g_cancellable_connect (cancellable,
-      G_CALLBACK (ogmdvd_title_analyze_cancel_cb), spawn, NULL) : 0;
+  spawn = ogmjob_spawn_newv (argv);
+  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (spawn),
+      (OGMJobWatch) ogmdvd_title_analyze_watch, &analyze);
 
   if (callback)
-    g_signal_connect (spawn, "progress",
+    g_signal_connect (spawn, "notify::progress",
         G_CALLBACK (ogmdvd_title_analyze_progress_cb), &progress);
 
-  result = ogmjob_spawn_run (spawn, error);
+  result = ogmjob_task_run (spawn, cancellable, error);
   g_object_unref (spawn);
 
-  if (handler_id)
-    g_cancellable_disconnect (cancellable, handler_id);
-
-  if (result != OGMJOB_RESULT_SUCCESS)
+  if (!result)
   {
     if (!is_open)
       ogmdvd_title_close (title);
+
     return FALSE;
   }
 
@@ -920,35 +905,30 @@ ogmdvd_title_analyze (OGMRipTitle *title, GCancellable *cancellable, OGMRipTitle
 
   queue = ogmjob_queue_new ();
 
-  handler_id = cancellable ? g_cancellable_connect (cancellable,
-      G_CALLBACK (ogmdvd_title_analyze_cancel_cb), spawn, NULL) : 0;
-
   if (callback)
-    g_signal_connect (queue, "progress",
+    g_signal_connect (queue, "notify::progress",
         G_CALLBACK (ogmdvd_title_crop_progress_cb), &progress);
 
   for (start = step; start < length; start += step)
   {
     argv = ogmdvd_title_crop_command (dtitle, start, crop.nframes);
 
-    spawn = ogmjob_exec_newv (argv);
-    ogmjob_exec_add_watch_full (OGMJOB_EXEC (spawn),
-        (OGMJobWatch) ogmdvd_title_crop_watch, &crop, TRUE, FALSE, FALSE);
+    spawn = ogmjob_spawn_newv (argv);
+    ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (spawn),
+        (OGMJobWatch) ogmdvd_title_crop_watch, &crop);
 
     ogmjob_container_add (OGMJOB_CONTAINER (queue), spawn);
     g_object_unref (spawn);
   }
 
-  result = ogmjob_spawn_run (queue, error);
+  result = ogmjob_task_run (queue, cancellable, error);
   g_object_unref (queue);
 
-  if (handler_id)
-    g_cancellable_disconnect (cancellable, handler_id);
-
-  if (result != OGMJOB_RESULT_SUCCESS)
+  if (!result)
   {
     if (!is_open)
       ogmdvd_title_close (title);
+
     return FALSE;
   }
 

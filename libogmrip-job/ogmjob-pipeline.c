@@ -20,7 +20,7 @@
  * SECTION:ogmjob-pipeline
  * @title: OGMJobPipeline
  * @include: ogmjob-pipeline.h
- * @short_description: A container to run spawns together
+ * @short_description: A container to run tasks together
  */
 
 #include "ogmjob-pipeline.h"
@@ -30,25 +30,28 @@
 
 struct _OGMJobPipelinePriv
 {
-  gdouble fraction;
+  GList *children;
+  gdouble progress;
 };
 
-static gint ogmjob_pipeline_run    (OGMJobSpawn     *spawn);
-static void ogmjob_pipeline_add    (OGMJobContainer *container, 
-                                    OGMJobSpawn     *child);
-static void ogmjob_pipeline_remove (OGMJobContainer *container, 
-                                    OGMJobSpawn     *child);
+static gboolean ogmjob_pipeline_run    (OGMJobTask      *task,
+                                        GCancellable    *cancellable,
+                                        GError          **error);
+static void     ogmjob_pipeline_add    (OGMJobContainer *container, 
+                                        OGMJobTask      *task);
+static void     ogmjob_pipeline_remove (OGMJobContainer *container, 
+                                        OGMJobTask      *task);
 
-G_DEFINE_TYPE (OGMJobPipeline, ogmjob_pipeline, OGMJOB_TYPE_LIST)
+G_DEFINE_TYPE (OGMJobPipeline, ogmjob_pipeline, OGMJOB_TYPE_CONTAINER)
 
 static void
 ogmjob_pipeline_class_init (OGMJobPipelineClass *klass)
 {
-  OGMJobSpawnClass *spawn_class;
+  OGMJobTaskClass *task_class;
   OGMJobContainerClass *container_class;
 
-  spawn_class = OGMJOB_SPAWN_CLASS (klass);
-  spawn_class->run = ogmjob_pipeline_run;
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmjob_pipeline_run;
 
   container_class = OGMJOB_CONTAINER_CLASS (klass);
   container_class->add = ogmjob_pipeline_add;
@@ -63,71 +66,70 @@ ogmjob_pipeline_init (OGMJobPipeline *pipeline)
   pipeline->priv = OGMJOB_PIPELINE_GET_PRIVATE (pipeline);
 }
 
-static gint
-ogmjob_pipeline_run (OGMJobSpawn *spawn)
+static gboolean
+ogmjob_pipeline_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
-  OGMJobPipeline *pipeline;
-  GList *children, *child;
+  OGMJobPipeline *pipeline = OGMJOB_PIPELINE (task);
+  GList *child;
+  gboolean result;
 
-  GError *tmp_error = NULL;
-  gint result = OGMJOB_RESULT_SUCCESS;
+  if (!pipeline->priv->children)
+    return TRUE;
 
-  pipeline = OGMJOB_PIPELINE (spawn);
+  pipeline->priv->progress = 0.0;
 
-  children = ogmjob_list_get_children (OGMJOB_LIST (spawn));
-  pipeline->priv->fraction = 0.0;
-
-  for (child = children; child; child = child->next)
+  for (child = pipeline->priv->children; child; child = child->next)
   {
-    if (result != OGMJOB_RESULT_SUCCESS)
-      break;
-
-    ogmjob_spawn_set_async (OGMJOB_SPAWN (child->data), child->next != NULL);
-    result = ogmjob_spawn_run (OGMJOB_SPAWN (child->data), &tmp_error);
-
-    if (result == OGMJOB_RESULT_ERROR && tmp_error)
-      ogmjob_spawn_propagate_error (spawn, tmp_error);
+    if (child->next)
+      ogmjob_task_run_async (OGMJOB_TASK (child->data), cancellable, NULL, NULL);
+    else
+      result = ogmjob_task_run (OGMJOB_TASK (child->data), cancellable, error);
   }
-  g_list_free (children);
 
   return result;
 }
 
 static void
-ogmjob_pipeline_child_progress (OGMJobPipeline *pipeline, gdouble fraction, OGMJobSpawn *child)
+ogmjob_pipeline_child_progress (OGMJobPipeline *pipeline, GParamSpec *pspec, OGMJobTask *task)
 {
-  if (fraction < 0.0)
-    g_signal_emit_by_name (pipeline, "progress", fraction);
-  else if (fraction > pipeline->priv->fraction)
-  {
-    pipeline->priv->fraction = fraction;
-    g_signal_emit_by_name (pipeline, "progress", fraction);
-  }
+  gdouble progress;
+
+  progress = ogmjob_task_get_progress (task);
+  pipeline->priv->progress = MAX (pipeline->priv->progress, progress);
+
+  ogmjob_task_set_progress (OGMJOB_TASK (pipeline), pipeline->priv->progress);
 }
 
 static void
-ogmjob_pipeline_add (OGMJobContainer *container, OGMJobSpawn *child)
+ogmjob_pipeline_add (OGMJobContainer *container, OGMJobTask *task)
 {
-  guint handler;
+  OGMJobPipeline *pipeline = OGMJOB_PIPELINE (container);
 
-  handler = g_signal_connect_swapped (child, "progress", 
+  pipeline->priv->children = g_list_append (pipeline->priv->children, g_object_ref (task));
+
+  g_signal_connect_swapped (task, "notify::progress", 
       G_CALLBACK (ogmjob_pipeline_child_progress), container);
-  g_object_set_data (G_OBJECT (child), "__child_progress_handler__", 
-      GUINT_TO_POINTER (handler));
 
-  OGMJOB_CONTAINER_CLASS (ogmjob_pipeline_parent_class)->add (container, child);
+  OGMJOB_CONTAINER_CLASS (ogmjob_pipeline_parent_class)->add (container, task);
 }
 
 static void
-ogmjob_pipeline_remove (OGMJobContainer *container, OGMJobSpawn *child)
+ogmjob_pipeline_remove (OGMJobContainer *container, OGMJobTask *task)
 {
-  gpointer handler;
+  OGMJobPipeline *pipeline = OGMJOB_PIPELINE (container);
+  GList *link;
 
-  handler = g_object_get_data (G_OBJECT (child), "__child_progress_handler__");
-  if (handler)
-    g_signal_handler_disconnect (child, GPOINTER_TO_UINT (handler));
+  link = g_list_find (pipeline->priv->children, task);
+  if (link)
+  {
+    g_signal_handlers_disconnect_by_func (task, ogmjob_pipeline_child_progress, container);
 
-  OGMJOB_CONTAINER_CLASS (ogmjob_pipeline_parent_class)->remove (container, child);
+    g_object_unref (task);
+    pipeline->priv->children = g_list_remove_link (pipeline->priv->children, link);
+    g_list_free (link);
+  }
+
+  OGMJOB_CONTAINER_CLASS (ogmjob_pipeline_parent_class)->remove (container, task);
 }
 
 /**
@@ -137,7 +139,7 @@ ogmjob_pipeline_remove (OGMJobContainer *container, OGMJobSpawn *child)
  *
  * Returns: The new #OGMJobPipeline
  */
-OGMJobSpawn *
+OGMJobTask *
 ogmjob_pipeline_new (void)
 {
   return g_object_new (OGMJOB_TYPE_PIPELINE, NULL);

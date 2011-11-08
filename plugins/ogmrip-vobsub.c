@@ -49,8 +49,10 @@ struct _OGMRipVobSubClass
   OGMRipSubpCodecClass parent_class;
 };
 
-static gint ogmrip_vobsub_run      (OGMJobSpawn *spawn);
-static void ogmrip_vobsub_finalize (GObject     *gobject);
+static void     ogmrip_vobsub_finalize (GObject      *gobject);
+static gboolean ogmrip_vobsub_run      (OGMJobTask   *task,
+                                        GCancellable *cancellable,
+                                        GError       **error);
 
 static gchar **
 ogmrip_vobsub_command (OGMRipSubpCodec *subp)
@@ -69,13 +71,13 @@ static void
 ogmrip_vobsub_class_init (OGMRipVobSubClass *klass)
 {
   GObjectClass *gobject_class;
-  OGMJobSpawnClass *spawn_class;
+  OGMJobTaskClass *task_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
-  spawn_class = OGMJOB_SPAWN_CLASS (klass);
+  task_class = OGMJOB_TASK_CLASS (klass);
 
   gobject_class->finalize = ogmrip_vobsub_finalize;
-  spawn_class->run = ogmrip_vobsub_run;
+  task_class->run = ogmrip_vobsub_run;
 }
 
 static void
@@ -113,19 +115,16 @@ ogmrip_vobsub_finalize (GObject *gobject)
 }
 
 static gboolean
-ogmrip_vobsub_set_foo (OGMJobSpawn *spawn, const gchar *filename)
+ogmrip_vobsub_set_foo (OGMJobTask *task, const gchar *filename, GError **error)
 {
-  GError *error;
   gssize w;
   gint fd;
 
   fd = g_open (filename, O_WRONLY);
   if (fd < 0)
   {
-    error = g_error_new (G_FILE_ERROR, g_file_error_from_errno (errno),
+    g_set_error (error, G_FILE_ERROR, g_file_error_from_errno (errno),
         "Cannot open file '%s': %s", filename, g_strerror (errno));
-    ogmjob_spawn_propagate_error (spawn, error);
-
     return FALSE;
   }
 
@@ -134,10 +133,8 @@ ogmrip_vobsub_set_foo (OGMJobSpawn *spawn, const gchar *filename)
 
   if (w != 3)
   {
-    error = g_error_new (G_FILE_ERROR, g_file_error_from_errno (errno),
+    g_set_error (error, G_FILE_ERROR, g_file_error_from_errno (errno),
         "Cannot write to file '%s': %s", filename, g_strerror (errno));
-    ogmjob_spawn_propagate_error (spawn, error);
-
     return FALSE;
   }
 
@@ -147,17 +144,12 @@ ogmrip_vobsub_set_foo (OGMJobSpawn *spawn, const gchar *filename)
 #define FORCED_SUBS_LINE "forced subs: ON"
 
 static gboolean
-ogmrip_vobsub_set_forced (OGMJobSpawn *spawn, const gchar *filename)
+ogmrip_vobsub_set_forced (OGMJobTask *task, const gchar *filename, GError **error)
 {
-  GError *error = NULL;
   gchar *content, **vline;
 
-  if (!g_file_get_contents (filename, &content, NULL, &error))
-  {
-    ogmjob_spawn_propagate_error (spawn, error);
-
+  if (!g_file_get_contents (filename, &content, NULL, error))
     return FALSE;
-  }
 
   vline = g_strsplit_set (content, "\r\n", -1);
   g_free (content);
@@ -169,10 +161,8 @@ ogmrip_vobsub_set_forced (OGMJobSpawn *spawn, const gchar *filename)
     fd = g_open (filename, O_WRONLY);
     if (fd < 0)
     {
-      error = g_error_new (G_FILE_ERROR, g_file_error_from_errno (errno),
+      g_set_error (error, G_FILE_ERROR, g_file_error_from_errno (errno),
           "Cannot open file '%s': %s", filename, g_strerror (errno));
-      ogmjob_spawn_propagate_error (spawn, error);
-
       return FALSE;
     }
 
@@ -194,10 +184,8 @@ ogmrip_vobsub_set_forced (OGMJobSpawn *spawn, const gchar *filename)
         close (fd);
         g_strfreev (vline);
 
-        error = g_error_new (G_FILE_ERROR, g_file_error_from_errno (errno),
+        g_set_error (error, G_FILE_ERROR, g_file_error_from_errno (errno),
             "Cannot write to file '%s': %s", filename, g_strerror (errno));
-        ogmjob_spawn_propagate_error (spawn, error);
-
         return FALSE;
       }
     }
@@ -210,30 +198,30 @@ ogmrip_vobsub_set_forced (OGMJobSpawn *spawn, const gchar *filename)
   return TRUE;
 }
 
-static gint
-ogmrip_vobsub_run (OGMJobSpawn *spawn)
+static gboolean
+ogmrip_vobsub_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
-  OGMJobSpawn *child;
+  OGMJobTask *child;
   gchar **argv;
-  gint result;
+  gboolean result;
 
-  argv = ogmrip_vobsub_command (OGMRIP_SUBP_CODEC (spawn));
+  argv = ogmrip_vobsub_command (OGMRIP_SUBP_CODEC (task));
   if (!argv)
-    return OGMJOB_RESULT_ERROR;
+    return FALSE;
 
-  child = ogmjob_exec_newv (argv);
-  ogmjob_exec_add_watch_full (OGMJOB_EXEC (child), (OGMJobWatch) ogmrip_mencoder_vobsub_watch, spawn, TRUE, FALSE, FALSE);
-  ogmjob_container_add (OGMJOB_CONTAINER (spawn), child);
+  child = ogmjob_spawn_newv (argv);
+  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child), (OGMJobWatch) ogmrip_mencoder_vobsub_watch, task);
+  ogmjob_container_add (OGMJOB_CONTAINER (task), child);
   g_object_unref (child);
 
-  result = OGMJOB_SPAWN_CLASS (ogmrip_vobsub_parent_class)->run (spawn);
-  if (result == OGMJOB_RESULT_SUCCESS)
+  result = OGMJOB_TASK_CLASS (ogmrip_vobsub_parent_class)->run (task, cancellable, error);
+  if (result)
   {
     struct stat buf; 
     const gchar *basename;
     gchar *idxname, *subname;
 
-    basename = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (spawn)));
+    basename = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (task)));
     idxname = g_strconcat (basename, ".idx", NULL);
     subname = g_strconcat (basename, ".sub", NULL);
 
@@ -242,19 +230,19 @@ ogmrip_vobsub_run (OGMJobSpawn *spawn)
         (g_file_test (subname, G_FILE_TEST_IS_REGULAR) &&
          g_stat (subname, &buf) == 0 && buf.st_size > 0))
     {
-      if (!ogmrip_vobsub_set_foo (spawn, basename))
-        return OGMJOB_RESULT_ERROR;
+      if (!ogmrip_vobsub_set_foo (task, basename, error))
+        return FALSE;
 
-      if (ogmrip_subp_codec_get_forced_only (OGMRIP_SUBP_CODEC (spawn)) &&
-          !ogmrip_vobsub_set_forced (spawn, idxname))
-        return OGMJOB_RESULT_ERROR;
+      if (ogmrip_subp_codec_get_forced_only (OGMRIP_SUBP_CODEC (task)) &&
+          !ogmrip_vobsub_set_forced (task, idxname, error))
+        return FALSE;
     }
 
     g_free (idxname);
     g_free (subname);
   }
 
-  ogmjob_container_remove (OGMJOB_CONTAINER (spawn), child);
+  ogmjob_container_remove (OGMJOB_CONTAINER (task), child);
 
   return result;
 }

@@ -171,7 +171,7 @@ spell_check_cleanup:
   }
 
   if (retval)
-    retval = ogmrip_fs_rename (new_file, filename, NULL);
+    g_rename (new_file, filename);
   else
     g_unlink (new_file);
 
@@ -279,7 +279,7 @@ ogmrip_main_load (OGMRipData *data, OGMRipMedia *media)
 
   if (data->media)
     g_object_unref (data->media);
-  data->media = media;
+  data->media = g_object_ref (media);
 
   ogmrip_title_chooser_set_media (OGMRIP_TITLE_CHOOSER (data->title_chooser), media);
 
@@ -414,7 +414,6 @@ ogmrip_main_display_error (OGMRipData *data, OGMRipEncoding *encoding, GError *e
     widget = gtk_expander_new_with_mnemonic ("_Show the log file");
     gtk_expander_set_expanded (GTK_EXPANDER (widget), FALSE);
     gtk_container_add (GTK_CONTAINER (area), widget);
-    gtk_widget_show (widget);
 
     area = gtk_scrolled_window_new (NULL, NULL);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (area), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
@@ -443,6 +442,8 @@ ogmrip_main_display_error (OGMRipData *data, OGMRipEncoding *encoding, GError *e
 
       while ((n = g_input_stream_read (G_INPUT_STREAM (stream), text, 2048, NULL, NULL)) > 0)
         gtk_text_buffer_insert (buffer, &iter, text, n);
+
+      gtk_widget_set_visible (widget, gtk_text_buffer_get_char_count (buffer));
 
       g_object_unref (stream);
     }
@@ -520,7 +521,13 @@ ogmrip_main_progress_dialog_response (GtkWidget *parent, gint response_id, OGMRi
           GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
           _("Are you sure you want to cancel the encoding process?"));
       if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES)
-        ogmrip_encoding_cancel (encoding);
+      {
+        GCancellable *cancellable;
+
+        cancellable = g_object_get_data (G_OBJECT (encoding), "cancellable");
+        if (cancellable)
+          g_cancellable_cancel (cancellable);
+      }
       gtk_widget_destroy (dialog);
       break;
   }
@@ -535,8 +542,10 @@ ogmrip_main_encode (OGMRipData *data, OGMRipEncoding *encoding)
   if (ogmrip_open_title (GTK_WINDOW (data->window), ogmrip_encoding_get_title (encoding)))
   {
     GError *error = NULL;
+    GCancellable *cancellable;
     GtkWidget *dialog;
-    gint result, cookie;
+    gboolean result;
+    gint cookie;
 
     cookie = ogmrip_main_dbus_inhibit (data);
 
@@ -557,7 +566,10 @@ ogmrip_main_encode (OGMRipData *data, OGMRipEncoding *encoding)
     g_signal_connect (encoding, "progress",
         G_CALLBACK (ogmrip_main_encoding_spawn_progress), dialog);
 
-    result = ogmrip_encoding_encode (encoding, &error);
+    cancellable = g_cancellable_new ();
+    g_object_set_data_full (G_OBJECT (encoding), "cancellable", cancellable, g_object_unref);
+
+    result = ogmrip_encoding_encode (encoding, cancellable, &error);
 
     g_signal_handlers_disconnect_by_func (encoding,
         ogmrip_main_encoding_spawn_run, dialog);
@@ -571,13 +583,13 @@ ogmrip_main_encode (OGMRipData *data, OGMRipEncoding *encoding)
 
     ogmrip_title_close (ogmrip_encoding_get_title (encoding));
 
-    if (result == OGMJOB_RESULT_ERROR || error != NULL)
-    {
+    if (!result && (!error || error->code != G_IO_ERROR_CANCELLED))
       ogmrip_main_display_error (data, encoding, error);
-      g_clear_error (&error);
-    }
 
-    ogmrip_main_clean (data, encoding, result == OGMJOB_RESULT_ERROR);
+    ogmrip_main_clean (data, encoding, !result && (!error || error->code != G_IO_ERROR_CANCELLED));
+
+    if (error)
+      g_error_free (error);
   }
 }
 
@@ -590,8 +602,10 @@ ogmrip_main_test (OGMRipData *data, OGMRipEncoding *encoding, guint *width, guin
   if (ogmrip_open_title (GTK_WINDOW (data->window), ogmrip_encoding_get_title (encoding)))
   {
     GError *error = NULL;
+    GCancellable *cancellable;
     GtkWidget *dialog;
-    gint result, cookie;
+    gboolean result;
+    gint cookie;
 
     cookie = ogmrip_main_dbus_inhibit (data);
 
@@ -612,7 +626,10 @@ ogmrip_main_test (OGMRipData *data, OGMRipEncoding *encoding, guint *width, guin
     g_signal_connect (encoding, "progress",
         G_CALLBACK (ogmrip_main_encoding_spawn_progress), dialog);
 
-    result = ogmrip_encoding_test (encoding, &error);
+    cancellable = g_cancellable_new ();
+    g_object_set_data_full (G_OBJECT (encoding), "cancellable", cancellable, g_object_unref);
+
+    result = ogmrip_encoding_test (encoding, cancellable, &error);
 
     g_signal_handlers_disconnect_by_func (encoding,
         ogmrip_main_encoding_spawn_run, dialog);
@@ -626,7 +643,7 @@ ogmrip_main_test (OGMRipData *data, OGMRipEncoding *encoding, guint *width, guin
 
     ogmrip_title_close (ogmrip_encoding_get_title (encoding));
 
-    if (result == OGMJOB_RESULT_SUCCESS)
+    if (result)
     {
       OGMRipCodec *codec;
 
@@ -634,13 +651,13 @@ ogmrip_main_test (OGMRipData *data, OGMRipEncoding *encoding, guint *width, guin
       ogmrip_video_codec_get_scale_size (OGMRIP_VIDEO_CODEC (codec), width, height);
     }
 
-    if (result == OGMJOB_RESULT_ERROR || error != NULL)
-    {
+    if (!result && (!error || error->code == G_IO_ERROR_CANCELLED))
       ogmrip_main_display_error (data, encoding, error);
-      g_clear_error (&error);
-    }
 
-    ogmrip_main_clean (data, encoding, result == OGMJOB_RESULT_ERROR);
+    ogmrip_main_clean (data, encoding, !result && (!error || error->code == G_IO_ERROR_CANCELLED));
+
+    if (error)
+      g_error_free (error);
   }
 
   ogmrip_encoding_clear (encoding);
@@ -791,7 +808,7 @@ ogmrip_main_export_simple_chapters (OGMRipData *data, const gchar *filename)
       g_free (label);
     }
 
-    if (ogmjob_spawn_run (OGMJOB_SPAWN (chapters), &error) != OGMJOB_RESULT_SUCCESS)
+    if (!ogmjob_task_run (OGMJOB_TASK (chapters), NULL, &error))
     {
 /*
       ogmrip_message_dialog (GTK_WINDOW (data->window), GTK_MESSAGE_ERROR, "<b>%s</b>\n\n%s",
@@ -1215,9 +1232,9 @@ ogmrip_main_set_filename (OGMRipData *data, OGMRipEncoding *encoding)
  * When an encoding has completed
  */
 static void
-ogmrip_main_encoding_completed (OGMRipData *data, OGMJobSpawn *spawn, guint result, OGMRipEncoding *encoding)
+ogmrip_main_encoding_completed (OGMRipData *data, OGMJobSpawn *spawn, gboolean result, OGMRipEncoding *encoding)
 {
-  if (result == OGMJOB_RESULT_SUCCESS && spawn != NULL)
+  if (result && spawn != NULL)
   {
     if (OGMRIP_IS_SUBP_CODEC (spawn))
     {
