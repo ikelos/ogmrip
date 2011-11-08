@@ -4,8 +4,8 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: ogmrip-encode-gtk
-Description: ogmrip-encode-gtk is a collection of widgets for OGMRip.
-Requires: ogmrip-dvd-gtk ogmrip-file-gtk ogmrip-encode
+Description: A collection of widgets for OGMRip.
+Requires: ogmrip-media-gtk ogmrip-file-gtk ogmrip-module ogmrip-dvd ogmrip-file ogmrip_job ogmrip-encode
 Version: @VERSION@
 Libs: -L${libdir} -logmrip-encode-gtk
 Cflags: -I${includedir}/ogmrip-encode

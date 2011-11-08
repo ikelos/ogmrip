@@ -4,8 +4,8 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: ogmrip-media
-Description: ogmrip-media is a media library for OGMRip
-Requires: glib-2.0
+Description: A media library for OGMRip
+Requires: glib-2.0 gobject-2.0 gio-2.0
 Version: @VERSION@
 Libs: -L${libdir} -logmrip-media
 Cflags: -I${includedir}/ogmrip-media

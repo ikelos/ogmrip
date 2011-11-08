@@ -4,8 +4,8 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: ogmrip-file
-Description: ogmrip-file is a library for reading media files informations.
-Requires: ogmrip-media
+Description: A library for reading media files informations.
+Requires: ogmrip-media ogmrip-module
 Version: @VERSION@
 Libs: -L${libdir} -logmrip-file
 Cflags: -I${includedir}/ogmrip-file

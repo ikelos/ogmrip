@@ -4,8 +4,8 @@ libdir=@libdir@
 includedir=@includedir@
 
 Name: ogmrip-media-gtk
-Description: ogmrip-media-gtk is a collection of widgets to display media informations.
-Requires: gtk+-2.0 ogmrip-media
+Description: A collection of widgets to display media informations.
+Requires: gtk+-2.0 ogmrip-media ogmrip-drive ogmrip-module
 Version: @VERSION@
 Libs: -L${libdir} -logmrip-media-gtk
 Cflags: -I${includedir}/ogmrip-media
