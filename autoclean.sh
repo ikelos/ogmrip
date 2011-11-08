@@ -20,6 +20,8 @@ rm -f mkinstalldirs
 
 rm -f po/Makefile.in.in
 
+rm -f m4/*.m4
+
 rm -rf autom4te.cache
 
 find . -name "Makefile.in" -exec rm -f '{}' ';'
