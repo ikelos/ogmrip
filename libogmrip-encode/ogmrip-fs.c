@@ -82,32 +82,6 @@ ogmrip_fs_set_tmp_dir (const gchar *dir)
 }
 
 /**
- * ogmrip_fs_mkdir:
- * @path: A path of directories
- * @mode: The file mode
- * @error: A location to return an error of type #G_FILE_ERROR
- *
- * Create the all the directories in @path, if they do not already exist.
- *
- * Returns: %TRUE on success, %FALSE if an error was set
- */
-gboolean
-ogmrip_fs_mkdir (const gchar *path, mode_t mode, GError **error)
-{
-  g_return_val_if_fail (path && *path, FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-
-  if (g_mkdir_with_parents (path, mode) < 0)
-  {
-    g_set_error (error, G_FILE_ERROR, g_file_error_from_errno (errno),
-        _("Failed to create directory '%s': %s"), path, g_strerror (errno));
-    return FALSE;
-  }
-
-  return TRUE;
-}
-
-/**
  * ogmrip_fs_rmdir:
  * @path: A path to a directory
  * @recursive: %TRUE to remove the directory and its content recursively
@@ -252,105 +226,6 @@ ogmrip_fs_mkftemp (const gchar *tmpl, GError **error)
   }
 
   return name;
-}
-
-#ifndef HAVE_MKDTEMP
-static gchar *
-mkdtemp (gchar *template)
-{
-  gchar *path;
-
-  path = mktemp (template);
-  if (path == NULL || path[0] == '\0')
-    return NULL;
-
-  if (mkdir (path, 0700) < 0)
-    return NULL;
-
-  return path;
-}
-#endif
-
-/**
- * ogmrip_fs_mkdtemp:
- * @tmpl: Template for directory name, basename only
- * @error: A location to return an error of type #G_FILE_ERROR
- *
- * Creates a directory in OGMRip's temporary directory (as returned by
- * ogmrip_fs_get_tmp_dir()).
- *
- * Returns: The actual name used, or NULL
- */
-gchar *
-ogmrip_fs_mkdtemp (const gchar *tmpl, GError **error)
-{
-  gchar *path;
-
-  g_return_val_if_fail (tmpl && *tmpl, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
-
-  path = g_build_filename (ogmrip_fs_get_tmp_dir (), tmpl, NULL);
-
-  if (!mkdtemp (path))
-  {
-    g_set_error (error, G_FILE_ERROR, g_file_error_from_errno (errno), 
-        _("Failed to create directory '%s': %s"), path, g_strerror (errno));
-    g_free (path);
-    return NULL;
-  }
-
-  return path;
-}
-
-/**
- * ogmrip_fs_lntemp:
- * @oldpath: A path to an existing file
- * @newtmpl: Template for link name, basename only
- * @symln: %TRUE to create a symbolic link
- * @error: A location to return an error of type #G_FILE_ERROR
- *
- * Creates a link in OGMRip's temporary directory (as * returned by
- * ogmrip_fs_get_tmp_dir()) to æn existing file.
- *
- * Returns: The actual name used, or NULL
- */
-gchar *
-ogmrip_fs_lntemp (const gchar *oldpath, const gchar *newtmpl, gboolean symln, GError **error)
-{
-  GError *tmp_error = NULL;
-  gchar *newpath;
-  gint ret;
-
-  g_return_val_if_fail (oldpath && *oldpath, NULL);
-  g_return_val_if_fail (g_file_test (oldpath, G_FILE_TEST_EXISTS), NULL);
-
-  g_return_val_if_fail (newtmpl && *newtmpl, NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
-
-  ret = ogmrip_fs_open_tmp (newtmpl, &newpath, &tmp_error);
-  if (ret < 0)
-  {
-    g_propagate_error (error, tmp_error);
-    return NULL;
-  }
-
-  close (ret);
-  g_unlink (newpath);
-
-  if (symln)
-    ret = symlink (oldpath, newpath);
-  else
-    ret = link (oldpath, newpath);
-
-  if (ret < 0)
-  {
-    g_free (newpath);
-    g_set_error (error, G_FILE_ERROR, g_file_error_from_errno (errno), 
-        _("Failed to link '%s': %s"), oldpath, g_strerror (errno));
-    return NULL;
-  }
-
-  return newpath;
 }
 
 /**
@@ -551,72 +426,6 @@ done:
   return mp;
 }
 
-void
-ogmrip_fs_unlink (const gchar *filename)
-{
-  if (g_file_test (filename, G_FILE_TEST_IS_DIR))
-    g_unlink (filename);
-}
-
-/**
- * ogmrip_fs_unref:
- * @filename: A path to a filename
- * @do_unlink: %TRUE to also remove the file
- *
- * If @do_unlink is %TRUE, recursively removes @filename then frees the memory
- * pointed to by @filename. 
- */
-void
-ogmrip_fs_unref (gchar *filename, gboolean do_unlink)
-{
-  if (filename)
-  {
-    if (do_unlink)
-    {
-      if (g_file_test (filename, G_FILE_TEST_IS_DIR))
-        ogmrip_fs_rmdir (filename, TRUE, NULL);
-      else if (g_file_test (filename, G_FILE_TEST_EXISTS))
-        g_unlink (filename);
-    }
-    g_free (filename);
-  }
-}
-
-/**
- * ogmrip_fs_rename:
- * @old_name: The path to an existing filename
- * @new_name: The new name of the file
- * @error: A location to return an error of type #G_FILE_ERROR
- *
- * If @recusive is %FALSE, removes the directory of @path if it is empty. If
- * @recusive is %TRUE, also removes its content recursively.
- * 
- * Returns: %TRUE on success, %FALSE if an error was set
- */
-gboolean
-ogmrip_fs_rename (const gchar *old_name, const gchar *new_name, GError **error)
-{
-  g_return_val_if_fail (old_name != NULL, FALSE);
-  g_return_val_if_fail (new_name != NULL, FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-
-  if (strcmp (old_name, new_name) == 0)
-    return TRUE;
-
-  if (g_file_test (new_name, G_FILE_TEST_EXISTS))
-  {
-    if (!g_file_test (new_name, G_FILE_TEST_IS_REGULAR))
-      return FALSE;
-    if (g_unlink (new_name) < 0)
-      return FALSE;
-  }
-
-  if (g_rename (old_name, new_name) < 0)
-    return FALSE;
-
-  return TRUE;
-}
-
 /**
  * ogmrip_fs_get_extension:
  * @filename: The path to an existing filename
@@ -690,40 +499,5 @@ ogmrip_fs_set_extension (const gchar *filename, const gchar *extension)
 
     return name;
   }
-}
-
-/**
- * ogmrip_fs_get_full_path:
- * @filename: The path to an existing filename
- *
- * Return the full absolute path of @filename.
- * 
- * Returns: the full path, or NULL
- */
-gchar *
-ogmrip_fs_get_full_path (const gchar *filename)
-{
-  gchar *fullname, *dirname, *basename, *cwd;
-
-  g_return_val_if_fail (filename != NULL, NULL);
-
-  if (g_path_is_absolute (filename))
-    return g_strdup (filename);
-
-  cwd = g_get_current_dir ();
-
-  dirname = g_path_get_dirname (filename);
-  g_chdir (dirname);
-  g_free (dirname);
-
-  dirname = g_get_current_dir ();
-  g_chdir (cwd);
-  g_free (cwd);
-
-  basename = g_path_get_basename (filename);
-  fullname = g_build_filename (dirname, basename, NULL);
-  g_free (basename);
-
-  return fullname;
 }
 
