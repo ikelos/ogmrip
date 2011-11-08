@@ -125,14 +125,14 @@ ogmrip_profile_engine_check (OGMRipProfileEngine *engine, OGMRipProfile *profile
   codec = ogmrip_type_from_name (str);
   g_free (str);
 
-  if (codec != G_TYPE_NONE && !ogmrip_container_contains (container, ogmrip_codec_format (codec)))
+  if (codec == G_TYPE_NONE || !ogmrip_container_contains (container, ogmrip_codec_format (codec)))
     return FALSE;
 
   ogmrip_profile_get (profile, OGMRIP_PROFILE_SUBP, OGMRIP_PROFILE_CODEC, "s", &str);
   codec = ogmrip_type_from_name(str);
   g_free (str);
 
-  if (codec != G_TYPE_NONE && !ogmrip_container_contains(container, ogmrip_codec_format (codec)))
+  if (codec == G_TYPE_NONE || !ogmrip_container_contains(container, ogmrip_codec_format (codec)))
     return FALSE;
 
   return TRUE;
