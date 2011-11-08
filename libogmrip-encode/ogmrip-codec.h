@@ -66,6 +66,12 @@ gdouble        ogmrip_codec_get_start_position (OGMRipCodec   *codec);
 void           ogmrip_codec_set_start_position (OGMRipCodec   *codec,
                                                 gdouble       start);
 
+void           ogmrip_register_codec           (GType         gtype,
+                                                const gchar   *name,
+                                                const gchar   *description,
+                                                OGMRipFormat  format);
+OGMRipFormat   ogmrip_codec_format             (GType         gtype);
+
 G_END_DECLS
 
 #endif /* __OGMRIP_CODEC_H__ */

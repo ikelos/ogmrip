@@ -5,7 +5,7 @@ includedir=@includedir@
 
 Name: ogmrip-dvd
 Description: A library for reading DVD informations.
-Requires: ogmrip-media ogmrip-module ogmrip-job
+Requires: ogmrip-base ogmrip-media ogmrip-job
 Version: @VERSION@
 Libs: -L${libdir} -logmrip-dvd -ldvdread
 Cflags: -I${includedir}/ogmrip-dvd

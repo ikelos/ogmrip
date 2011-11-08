@@ -29,7 +29,6 @@
 
 #include "ogmrip-fs.h"
 #include "ogmrip-lavc.h"
-#include "ogmrip-type.h"
 #include "ogmrip-version.h"
 #include "ogmrip-mplayer.h"
 #include "ogmrip-configurable.h"

@@ -24,7 +24,6 @@
  */
 
 #include "ogmjob-task.h"
-#include "ogmjob-log.h"
 
 #define OGMJOB_TASK_GET_CLASS(obj) \
   (G_TYPE_INSTANCE_GET_CLASS ((obj), OGMJOB_TYPE_TASK, OGMJobTaskClass))

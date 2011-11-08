@@ -117,7 +117,7 @@ ogmrip_application_local_cmdline (GApplication *application, gchar ***argv, gint
   }
 
   if (debug)
-    ogmjob_log_set_print_stdout (TRUE);
+    ogmrip_log_set_print_stdout (TRUE);
 
   *status = 0;
 

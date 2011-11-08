@@ -3,7 +3,6 @@ ogmrip-media.c
 
 ogmrip-encoding.c
 - vérifier que la destination n'existe pas déjà
-- vérifier que la destination est accessible en écriture
 
 ogmrip-encoding-manager.c
 - comment connaitre les encodages non faits ?

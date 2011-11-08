@@ -35,12 +35,12 @@ libogmrip_media_gtk_la_LDFLAGS = \
   -version-info $(OGMRIP_MEDIA_LT_VERSION)
 
 libogmrip_media_gtk_la_LIBADD = \
+  $(top_builddir)/libogmrip-base/libogmrip-base.la   \
   $(top_builddir)/libogmrip-media/libogmrip-media.la \
-  $(top_builddir)/libogmrip-drive/libogmrip-drive.la \
-  $(top_builddir)/libogmrip-module/libogmrip-module.la
+  $(top_builddir)/libogmrip-drive/libogmrip-drive.la
 
 INCLUDES = \
+  -I$(top_srcdir)/libogmrip-base  \
   -I$(top_srcdir)/libogmrip-media \
-  -I$(top_srcdir)/libogmrip-drive \
-  -I$(top_srcdir)/libogmrip-module
+  -I$(top_srcdir)/libogmrip-drive
 

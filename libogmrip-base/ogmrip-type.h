@@ -16,8 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef __OGMRIP_MODULE_TYPE_H__
-#define __OGMRIP_MODULE_TYPE_H__
+#ifndef __OGMRIP_TYPE_H__
+#define __OGMRIP_TYPE_H__
 
 #include <glib-object.h>
 
@@ -64,5 +64,5 @@ GType            ogmrip_type_get_extension (GType          gtype,
 
 G_END_DECLS
 
-#endif /* __OGMRIP_MODULE_TYPE_H__ */
+#endif /* __OGMRIP_TYPE_H__ */
 

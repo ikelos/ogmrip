@@ -28,7 +28,6 @@
 #include <ogmrip-encoding.h>
 #include <ogmrip-encoding-manager.h>
 #include <ogmrip-enums.h>
-#include <ogmrip-fs.h>
 #include <ogmrip-hardsub.h>
 #include <ogmrip-marshal.h>
 #include <ogmrip-novideo.h>
@@ -37,9 +36,7 @@
 #include <ogmrip-profile-keys.h>
 #include <ogmrip-subp-codec.h>
 #include <ogmrip-test.h>
-#include <ogmrip-type.h>
 #include <ogmrip-version.h>
 #include <ogmrip-video-codec.h>
-#include <ogmrip-xml.h>
 
 #endif /* __OGMRIP_ENCODE_H__ */

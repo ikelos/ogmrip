@@ -22,6 +22,7 @@
 
 #include "ogmrip-xvid.h"
 
+#include <ogmrip-base.h>
 #include <ogmrip-job.h>
 #include <ogmrip-mplayer.h>
 #include <ogmrip-module.h>

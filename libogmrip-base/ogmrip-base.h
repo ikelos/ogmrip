@@ -1,4 +1,4 @@
-/* OGMRipModule - A module library for OGMRip
+/* OGMRipBase - A module library for OGMRip
  * Copyright (C) 2011 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,11 +16,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef __OGMRIP_MODULE_H__
-#define __OGMRIP_MODULE_H__
+#ifndef __OGMRIP_BASE_H__
+#define __OGMRIP_BASE_H__
 
-#include <ogmrip-module-engine.h>
-#include <ogmrip-module-object.h>
+#include <ogmrip-fs.h>
+#include <ogmrip-log.h>
+#include <ogmrip-type.h>
+#include <ogmrip-xml.h>
 
-#endif /* __OGMRIP_MODULE_H__ */
+#endif /* __OGMRIP_BASE_H__ */
 

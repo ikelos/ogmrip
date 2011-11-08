@@ -20,6 +20,7 @@ EXTRA_DIST = \
   ogmrip-spell-dialog.h
 
 ogmrip_LDADD = \
+  $(top_builddir)/libogmrip-base/libogmrip-base.la             \
   $(top_builddir)/libogmrip-job/libogmrip-job.la               \
   $(top_builddir)/libogmrip-media/libogmrip-media.la           \
   $(top_builddir)/libogmrip-media-gtk/libogmrip-media-gtk.la   \
@@ -32,6 +33,7 @@ ogmrip_LDADD = \
   $(top_builddir)/libogmrip-module/libogmrip-module.la
 
 INCLUDES = \
+  -I$(top_srcdir)/libogmrip-base       \
   -I$(top_srcdir)/libogmrip-job        \
   -I$(top_srcdir)/libogmrip-media      \
   -I$(top_srcdir)/libogmrip-media-gtk  \

@@ -18,21 +18,19 @@ libogmrip_encode_la_SOURCES = \
   ogmrip-encoding.c         \
   ogmrip-encoding-manager.c \
   ogmrip-encoding-parser.c  \
-  ogmrip-fs.c               \
   ogmrip-hardsub.c          \
   ogmrip-marshal.c          \
   ogmrip-novideo.c          \
   ogmrip-player.c           \
+  ogmrip-plugin.c           \
   ogmrip-profile.c          \
   ogmrip-profile-engine.c   \
   ogmrip-profile-parser.c   \
   ogmrip-stub.c             \
   ogmrip-subp-codec.c       \
   ogmrip-test.c             \
-  ogmrip-type.c             \
   ogmrip-version.c          \
-  ogmrip-video-codec.c      \
-  ogmrip-xml.c
+  ogmrip-video-codec.c
 
 libogmrip_encode_ladir = \
   $(includedir)/ogmrip-encode
@@ -49,7 +47,6 @@ libogmrip_encode_la_HEADERS = \
   ogmrip-encoding-manager.h \
   ogmrip-encoding-parser.h  \
   ogmrip-enums.h            \
-  ogmrip-fs.h               \
   ogmrip-hardsub.h          \
   ogmrip-marshal.h          \
   ogmrip-novideo.h          \
@@ -60,20 +57,18 @@ libogmrip_encode_la_HEADERS = \
   ogmrip-profile-parser.h   \
   ogmrip-subp-codec.h       \
   ogmrip-test.h             \
-  ogmrip-type.h             \
   ogmrip-version.h          \
   ogmrip-video-codec.h      \
-  ogmrip-xml.h              \
   ogmrip-encode.h
 
 libogmrip_encode_la_LDFLAGS = \
   -version-info $(OGMRIP_ENCODE_LT_VERSION)
 
 libogmrip_encode_la_LIBADD = \
-  $(top_builddir)/libogmrip-job/libogmrip-job.la \
-  $(top_builddir)/libogmrip-module/libogmrip-module.la \
+  $(top_builddir)/libogmrip-base/libogmrip-base.la   \
+  $(top_builddir)/libogmrip-job/libogmrip-job.la     \
   $(top_builddir)/libogmrip-media/libogmrip-media.la \
-  $(top_builddir)/libogmrip-file/libogmrip-file.la \
+  $(top_builddir)/libogmrip-file/libogmrip-file.la   \
   $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la
 
 ogmrip-marshal.h: ogmrip-marshal.list $(GLIB_GENMARSHAL)
@@ -128,8 +123,8 @@ EXTRA_DIST = \
   ogmrip-version.h.in
 
 INCLUDES = \
+  -I$(top_srcdir)/libogmrip-base   \
   -I$(top_srcdir)/libogmrip-job    \
-  -I$(top_srcdir)/libogmrip-module \
   -I$(top_srcdir)/libogmrip-media  \
   -I$(top_srcdir)/libogmrip-file   \
   -I$(top_srcdir)/libogmrip-dvd    \

@@ -5,7 +5,7 @@ includedir=@includedir@
 
 Name: ogmrip-encode-gtk
 Description: A collection of widgets for OGMRip.
-Requires: ogmrip-media-gtk ogmrip-file-gtk ogmrip-module ogmrip-dvd ogmrip-file ogmrip_job ogmrip-encode
+Requires: ogmrip-base ogmrip-job ogmrip-file ogmrip-dvd ogmrip-encode ogmrip-media-gtk ogmrip-file-gtk
 Version: @VERSION@
 Libs: -L${libdir} -logmrip-encode-gtk
 Cflags: -I${includedir}/ogmrip-encode

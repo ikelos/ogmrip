@@ -19,8 +19,8 @@
 #ifndef __OGMRIP_PROFILE_PARSER_H__
 #define __OGMRIP_PROFILE_PARSER_H__
 
+#include <ogmrip-base.h>
 #include <ogmrip-profile.h>
-#include <ogmrip-xml.h>
 
 G_BEGIN_DECLS
 

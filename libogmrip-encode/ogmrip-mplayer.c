@@ -26,7 +26,6 @@
 #include "ogmrip-mplayer.h"
 #include "ogmrip-version.h"
 #include "ogmrip-enums.h"
-#include "ogmrip-type.h"
 #include "ogmrip-fs.h"
 
 #include <stdio.h>

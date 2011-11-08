@@ -1,4 +1,5 @@
 SUBDIRS = \
+  libogmrip-base   \
   libogmrip-drive  \
   libogmrip-job    \
   libogmrip-media  \

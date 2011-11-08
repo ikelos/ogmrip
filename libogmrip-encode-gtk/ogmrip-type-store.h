@@ -20,7 +20,7 @@
 #define __OGMRIP_TYPE_STORE_H__
 
 #include <gtk/gtk.h>
-#include <ogmrip-encode.h>
+#include <ogmrip-base.h>
 
 G_BEGIN_DECLS
 

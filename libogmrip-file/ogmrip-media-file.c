@@ -20,7 +20,7 @@
 #include "ogmrip-media-info.h"
 #include "ogmrip-file-priv.h"
 
-#include <ogmrip-module.h>
+#include <ogmrip-base.h>
 
 #include <stdio.h>
 #include <stdlib.h>

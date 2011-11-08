@@ -443,6 +443,7 @@ endif
 #
 
 INCLUDES = \
+  -I$(top_srcdir)/libogmrip-base \
   -I$(top_srcdir)/libogmrip-job \
   -I$(top_srcdir)/libogmrip-media \
   -I$(top_srcdir)/libogmrip-media-gtk \

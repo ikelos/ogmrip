@@ -16,12 +16,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "ogmrip-type.h"
 #include "ogmrip-container.h"
 #include "ogmrip-video-codec.h"
 #include "ogmrip-audio-codec.h"
 #include "ogmrip-subp-codec.h"
 
+#include <ogmrip-base.h>
 #include <ogmrip-media.h>
 
 #define OGMRIP_TYPE_PLUGIN_INFO            (ogmrip_plugin_info_get_type ())

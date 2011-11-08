@@ -82,6 +82,13 @@ void          ogmrip_container_get_split    (OGMRipContainer     *container,
                                              guint               *size);
 glong         ogmrip_container_get_sync     (OGMRipContainer     *container);
 
+void          ogmrip_register_container     (GType               gtype,
+                                             const gchar         *name,
+                                             const gchar         *description,
+                                             OGMRipFormat        *format);
+gboolean      ogmrip_container_contains     (GType               gtype,
+                                             OGMRipFormat        format);
+
 G_END_DECLS
 
 #endif /* __OGMRIP_CONTAINER_H__ */

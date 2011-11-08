@@ -29,9 +29,9 @@
 
 #include "ogmrip-media-chooser-widget.h"
 
+#include <ogmrip-base.h>
 #include <ogmrip-media.h>
 #include <ogmrip-drive.h>
-#include <ogmrip-module.h>
 
 #include <glib/gi18n-lib.h>
 

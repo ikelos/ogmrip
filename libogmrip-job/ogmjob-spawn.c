@@ -28,7 +28,8 @@
 #endif
 
 #include "ogmjob-spawn.h"
-#include "ogmjob-log.h"
+
+#include <ogmrip-base.h>
 
 #include <glib/gi18n-lib.h>
 
@@ -204,7 +205,7 @@ task_watch (GIOChannel *channel, GIOCondition condition, TaskAsyncData *data, OG
     return status == G_IO_STATUS_AGAIN;
   }
 
-  ogmjob_log_write (buffer);
+  ogmrip_log_write (buffer);
 /*
 #ifdef G_ENABLE_DEBUG
   g_print ("%s", buffer);
@@ -275,8 +276,8 @@ ogmjob_spawn_run_async (OGMJobTask *task, GCancellable *cancellable, GAsyncReady
       callback, user_data, ogmjob_spawn_run_async);
 
   for (i = 0; data->spawn->priv->argv[i]; i++)
-    ogmjob_log_printf ("%s ", data->spawn->priv->argv[i]);
-  ogmjob_log_write ("\n");
+    ogmrip_log_printf ("%s ", data->spawn->priv->argv[i]);
+  ogmrip_log_write ("\n");
 
   if (!g_spawn_async_with_pipes (NULL, data->spawn->priv->argv, NULL,
         G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD, NULL, NULL, 

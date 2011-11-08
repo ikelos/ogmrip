@@ -21,6 +21,7 @@
 #endif
 
 #include <ogmrip-encode.h>
+#include <ogmrip-module.h>
 #include <ogmrip-lavc.h>
 
 #include <glib/gstdio.h>

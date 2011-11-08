@@ -19,8 +19,8 @@
 #ifndef __OGMRIP_ENCODING_PARSER_H__
 #define __OGMRIP_ENCODING_PARSER_H__
 
+#include <ogmrip-base.h>
 #include <ogmrip-encoding.h>
-#include <ogmrip-xml.h>
 
 G_BEGIN_DECLS
 

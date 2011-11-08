@@ -1,4 +1,4 @@
-/* OGMJob - A library to spawn processes
+/* OGMRip - A library to spawn processes
  * Copyright (C) 2004-2011 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -16,28 +16,28 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef __OGMJOB_LOG_H__
-#define __OGMJOB_LOG_H__
+#ifndef __OGMRIP_LOG_H__
+#define __OGMRIP_LOG_H__
 
 #include <glib.h>
 
 G_BEGIN_DECLS
 
-gboolean ogmjob_log_open             (const gchar *filename,
+gboolean ogmrip_log_open             (const gchar *filename,
                                       GError      **error);
-gboolean ogmjob_log_close            (GError      **error);
+gboolean ogmrip_log_close            (GError      **error);
 
-void     ogmjob_log_write            (const gchar *str);
-void     ogmjob_log_printf           (const gchar *format,
+void     ogmrip_log_write            (const gchar *str);
+void     ogmrip_log_printf           (const gchar *format,
                                       ...) G_GNUC_PRINTF (1, 2);
 
-void     ogmjob_log_set_print_stdout (gboolean    log_stdout);
-gboolean ogmjob_log_get_print_stdout (void);
+void     ogmrip_log_set_print_stdout (gboolean    log_stdout);
+gboolean ogmrip_log_get_print_stdout (void);
 
-void     ogmjob_log_set_print_stderr (gboolean    log_stderr);
-gboolean ogmjob_log_get_print_stderr (void);
+void     ogmrip_log_set_print_stderr (gboolean    log_stderr);
+gboolean ogmrip_log_get_print_stderr (void);
 
 G_END_DECLS
 
-#endif /* __OGMJOB_LOG_H__ */
+#endif /* __OGMRIP_LOG_H__ */
 

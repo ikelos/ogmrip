@@ -21,7 +21,7 @@
 #endif
 
 #include "ogmrip-novideo.h"
-#include "ogmrip-type.h"
+#include "ogmrip-codec.h"
 
 #include <glib/gi18n-lib.h>
 

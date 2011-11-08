@@ -36,9 +36,9 @@
 #include "ogmrip-analyze.h"
 #include "ogmrip-copy.h"
 #include "ogmrip-test.h"
-#include "ogmrip-type.h"
 #include "ogmrip-fs.h"
 
+#include <ogmrip-base.h>
 #include <ogmrip-dvd.h>
 
 #include <glib/gstdio.h>
@@ -127,7 +127,7 @@ ogmrip_encoding_open_log (OGMRipEncoding *encoding)
 {
   if (!encoding->priv->log_open)
   {
-    ogmjob_log_open (encoding->priv->log_file, NULL);
+    ogmrip_log_open (encoding->priv->log_file, NULL);
     encoding->priv->log_open = TRUE;
   }
 }
@@ -137,7 +137,7 @@ ogmrip_encoding_close_log (OGMRipEncoding *encoding)
 {
   if (encoding->priv->log_open)
   {
-    ogmjob_log_close (NULL);
+    ogmrip_log_close (NULL);
     encoding->priv->log_open = FALSE;
   }
 }
@@ -1311,7 +1311,7 @@ ogmrip_encoding_copy (OGMRipEncoding *encoding, GCancellable *cancellable, GErro
 
   media = ogmrip_title_get_media (encoding->priv->title);
 
-  ogmjob_log_printf ("Copying %s\n\n", ogmrip_media_get_label (media));
+  ogmrip_log_printf ("Copying %s\n\n", ogmrip_media_get_label (media));
 
   output = g_build_filename (ogmrip_fs_get_tmp_dir (), ogmrip_media_get_id (media), NULL);
   task = ogmrip_copy_new (media, output);
@@ -1335,8 +1335,8 @@ ogmrip_encoding_analyze (OGMRipEncoding *encoding, GCancellable *cancellable, GE
   OGMJobTask *task;
   gboolean result;
 
-  ogmjob_log_printf ("\nAnalyzing video title %d\n", ogmrip_title_get_nr (encoding->priv->title) + 1);
-  ogmjob_log_printf ("-----------------------\n\n");
+  ogmrip_log_printf ("\nAnalyzing video title %d\n", ogmrip_title_get_nr (encoding->priv->title) + 1);
+  ogmrip_log_printf ("-----------------------\n\n");
 
   task = ogmrip_analyze_new (encoding->priv->title);
   g_signal_connect_swapped (task, "notify::progress",
@@ -1350,11 +1350,11 @@ ogmrip_encoding_analyze (OGMRipEncoding *encoding, GCancellable *cancellable, GE
 
   if (result)
   {
-    ogmjob_log_printf ("\nTelecine: %s\n",
+    ogmrip_log_printf ("\nTelecine: %s\n",
         ogmrip_title_get_telecine (encoding->priv->title) ? "true" : "false");
-    ogmjob_log_printf ("Progressive: %s\n\n",
+    ogmrip_log_printf ("Progressive: %s\n\n",
         ogmrip_title_get_progressive (encoding->priv->title) ? "true" : "false");
-    ogmjob_log_printf ("Interlaced: %s\n\n",
+    ogmrip_log_printf ("Interlaced: %s\n\n",
         ogmrip_title_get_interlaced (encoding->priv->title) ? "true" : "false");
   }
 
@@ -1389,20 +1389,20 @@ ogmrip_encoding_run_codec (OGMRipEncoding *encoding, OGMRipCodec *codec, GCancel
   stream = ogmrip_codec_get_input (codec);
   if (OGMRIP_IS_SUBP_CODEC (codec))
   {
-    ogmjob_log_printf ("\nEncoding subp stream %02d\n",
+    ogmrip_log_printf ("\nEncoding subp stream %02d\n",
         ogmrip_subp_stream_get_nr (OGMRIP_SUBP_STREAM (stream)) + 1);
-    ogmjob_log_printf ("-----------------------\n\n");
+    ogmrip_log_printf ("-----------------------\n\n");
   }
   else if (OGMRIP_IS_AUDIO_CODEC (codec))
   {
-    ogmjob_log_printf ("\nEncoding audio stream %02d\n",
+    ogmrip_log_printf ("\nEncoding audio stream %02d\n",
         ogmrip_audio_stream_get_nr (OGMRIP_AUDIO_STREAM (stream)) + 1);
-    ogmjob_log_printf ("------------------------\n\n");
+    ogmrip_log_printf ("------------------------\n\n");
   }
   else if (OGMRIP_IS_VIDEO_CODEC (codec))
   {
-    ogmjob_log_printf ("\nEncoding video stream\n");
-    ogmjob_log_printf ("---------------------\n\n");
+    ogmrip_log_printf ("\nEncoding video stream\n");
+    ogmrip_log_printf ("---------------------\n\n");
   }
 
   if (OGMRIP_IS_CONFIGURABLE (codec) &&
@@ -1430,8 +1430,8 @@ ogmrip_encoding_merge (OGMRipEncoding *encoding, GCancellable *cancellable, GErr
 {
   gboolean result;
 
-  ogmjob_log_printf ("\nMerging\n");
-  ogmjob_log_printf ("-------\n\n");
+  ogmrip_log_printf ("\nMerging\n");
+  ogmrip_log_printf ("-------\n\n");
 
   g_signal_connect_swapped (encoding->priv->container, "notify::progress",
       G_CALLBACK (ogmrip_encoding_task_progressed), encoding);
@@ -1477,7 +1477,7 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GCancellable *cancellable, GEr
 
   ogmrip_encoding_open_log (encoding);
 /*
-  ogmjob_log_printf ("ENCODING: %s\n\n", ogmrip_encoding_get_label (encoding));
+  ogmrip_log_printf ("ENCODING: %s\n\n", ogmrip_encoding_get_label (encoding));
 */
   g_signal_emit (encoding, signals[RUN], 0, NULL);
 
@@ -1550,8 +1550,8 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GCancellable *cancellable, GEr
 
   if (encoding->priv->video_codec)
   {
-    ogmjob_log_printf ("\nSetting video parameters");
-    ogmjob_log_printf ("\n------------------------\n");
+    ogmrip_log_printf ("\nSetting video parameters");
+    ogmrip_log_printf ("\n------------------------\n");
 
     /*
      * Compute bitrate if encoding by size
@@ -1561,15 +1561,15 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GCancellable *cancellable, GEr
       case OGMRIP_ENCODING_SIZE:
         ogmrip_video_codec_set_bitrate (encoding->priv->video_codec,
             ogmrip_encoding_autobitrate (encoding));
-        ogmjob_log_printf ("Automatic bitrate: %d bps\n\n",
+        ogmrip_log_printf ("Automatic bitrate: %d bps\n\n",
             ogmrip_video_codec_get_bitrate (encoding->priv->video_codec));
         break;
       case OGMRIP_ENCODING_BITRATE:
-        ogmjob_log_printf ("Constant bitrate: %d bps\n\n",
+        ogmrip_log_printf ("Constant bitrate: %d bps\n\n",
             ogmrip_video_codec_get_bitrate (encoding->priv->video_codec));
         break;
       case OGMRIP_ENCODING_QUANTIZER:
-        ogmjob_log_printf ("Constant quantizer: %lf\n\n",
+        ogmrip_log_printf ("Constant quantizer: %lf\n\n",
             ogmrip_video_codec_get_quantizer (encoding->priv->video_codec));
         break;
     }

@@ -1,4 +1,4 @@
-/* OGMJob - A library to spawn processes
+/* OGMRip - A library to spawn processes
  * Copyright (C) 2004-2011 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -17,13 +17,13 @@
  */
 
 /**
- * SECTION:ogmjob-log
+ * SECTION:ogmrip-log
  * @title: Logs
- * @include: ogmjob-log.h
+ * @include: ogmrip-log.h
  * @short_description: Support for logging the output of spawns
  */
 
-#include "ogmjob-log.h"
+#include "ogmrip-log.h"
 
 #include <string.h>
 
@@ -32,7 +32,7 @@ static gboolean   print_stdout = FALSE;
 static gboolean   print_stderr = FALSE;
 
 /**
- * ogmjob_log_open:
+ * ogmrip_log_open:
  * @filename: A filename
  * @error: Location to store the error occuring, or NULL to ignore errors.
  *
@@ -41,14 +41,14 @@ static gboolean   print_stderr = FALSE;
  * Returns: %TRUE, when no error
  */
 gboolean
-ogmjob_log_open (const gchar *filename, GError **error)
+ogmrip_log_open (const gchar *filename, GError **error)
 {
   GError *tmp_error = NULL;
 
   g_return_val_if_fail (filename != NULL, FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  if (!ogmjob_log_close (&tmp_error))
+  if (!ogmrip_log_close (&tmp_error))
   {
     g_propagate_error (error, tmp_error);
     return FALSE;
@@ -67,7 +67,7 @@ ogmjob_log_open (const gchar *filename, GError **error)
 }
 
 /**
- * ogmjob_log_close:
+ * ogmrip_log_close:
  * @error: Location to store the error occuring, or NULL to ignore errors.
  *
  * Closes the log file. 
@@ -75,7 +75,7 @@ ogmjob_log_open (const gchar *filename, GError **error)
  * Returns: %TRUE, when no error
  */
 gboolean
-ogmjob_log_close (GError **error)
+ogmrip_log_close (GError **error)
 {
   GError *tmp_error = NULL;
   GIOStatus status;
@@ -96,13 +96,13 @@ ogmjob_log_close (GError **error)
 }
 
 /**
- * ogmjob_log_write:
+ * ogmrip_log_write:
  * @str: A string to log
  *
  * Logs some information on stdout, stderr, and/or a file.
  */
 void
-ogmjob_log_write (const gchar *str)
+ogmrip_log_write (const gchar *str)
 {
   g_return_if_fail (str != NULL);
 
@@ -128,14 +128,14 @@ ogmjob_log_write (const gchar *str)
 }
 
 /**
- * ogmjob_log_printf:
+ * ogmrip_log_printf:
  * @format: A message format
  * @...: The parameters of the format string
  *
  * Logs some formatted information on stdout, stderr, and/or a file.
  */
 void
-ogmjob_log_printf (const gchar *format, ...)
+ogmrip_log_printf (const gchar *format, ...)
 {
   va_list args;
   gchar *str;
@@ -146,57 +146,57 @@ ogmjob_log_printf (const gchar *format, ...)
   str = g_strdup_vprintf (format, args);
   va_end (args);
 
-  ogmjob_log_write (str);
+  ogmrip_log_write (str);
 
   g_free (str);
 }
 
 /**
- * ogmjob_log_set_print_stdout:
+ * ogmrip_log_set_print_stdout:
  * @log_stdout: %TRUE to log on stdout
  *
  * Sets whether to log information on stdout.
  */
 void
-ogmjob_log_set_print_stdout (gboolean log_stdout)
+ogmrip_log_set_print_stdout (gboolean log_stdout)
 {
   print_stdout = log_stdout;
 }
 
 /**
- * ogmjob_log_get_print_stdout:
+ * ogmrip_log_get_print_stdout:
  *
  * Gets whether to log information on stdout.
  *
  * Returns: %TRUE if log on stdout
  */
 gboolean 
-ogmjob_log_get_print_stdout (void)
+ogmrip_log_get_print_stdout (void)
 {
   return print_stdout;
 }
 
 /**
- * ogmjob_log_set_print_stderr:
+ * ogmrip_log_set_print_stderr:
  * @log_stderr: %TRUE to log on stderr
  *
  * Sets whether to log information on stderr.
  */
 void
-ogmjob_log_set_print_stderr (gboolean log_stderr)
+ogmrip_log_set_print_stderr (gboolean log_stderr)
 {
   print_stderr = log_stderr;
 }
 
 /**
- * ogmjob_log_get_print_stderr:
+ * ogmrip_log_get_print_stderr:
  *
  * Gets whether to log information on stderr.
  *
  * Returns: %TRUE if log on stderr
  */
 gboolean 
-ogmjob_log_get_print_stderr (void)
+ogmrip_log_get_print_stderr (void)
 {
   return print_stderr;
 }

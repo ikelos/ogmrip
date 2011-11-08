@@ -21,7 +21,6 @@
 #endif
 
 #include "ogmrip-hardsub.h"
-#include "ogmrip-type.h"
 
 #include <glib/gi18n-lib.h>
 

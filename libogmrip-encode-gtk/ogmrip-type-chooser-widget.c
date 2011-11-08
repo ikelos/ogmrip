@@ -18,6 +18,8 @@
 
 #include "ogmrip-type-chooser-widget.h"
 
+#include <ogmrip-encode.h>
+
 void
 ogmrip_type_chooser_widget_construct (GtkComboBox *chooser, GType gtype)
 {

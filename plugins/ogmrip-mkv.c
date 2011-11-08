@@ -20,6 +20,7 @@
 #include "config.h"
 #endif
 
+#include <ogmrip-base.h>
 #include <ogmrip-encode.h>
 #include <ogmrip-module.h>
 

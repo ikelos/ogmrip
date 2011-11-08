@@ -23,15 +23,15 @@ libogmrip_file_la_LDFLAGS = \
   -version-info $(OGMRIP_MEDIA_LT_VERSION)
 
 libogmrip_file_la_LIBADD = \
-  $(top_builddir)/libogmrip-media/libogmrip-media.la \
-  $(top_builddir)/libogmrip-module/libogmrip-module.la
+  $(top_builddir)/libogmrip-base/libogmrip-base.la \
+  $(top_builddir)/libogmrip-media/libogmrip-media.la
 
 libogmrip_file_ladir = \
   $(includedir)/ogmrip-file
 
 INCLUDES = \
-  -I$(top_srcdir)/libogmrip-media \
-  -I$(top_srcdir)/libogmrip-module
+  -I$(top_srcdir)/libogmrip-base \
+  -I$(top_srcdir)/libogmrip-media
 
 EXTRA_DIST = \
   ogmrip-file-priv.h

@@ -4,7 +4,6 @@ lib_LTLIBRARIES = \
 libogmrip_job_la_SOURCES = \
   ogmjob-bin.c       \
   ogmjob-container.c \
-  ogmjob-log.c       \
   ogmjob-pipeline.c  \
   ogmjob-queue.c     \
   ogmjob-spawn.c     \
@@ -16,7 +15,6 @@ libogmrip_job_ladir = \
 libogmrip_job_la_HEADERS = \
   ogmjob-bin.h       \
   ogmjob-container.h \
-  ogmjob-log.h       \
   ogmjob-pipeline.h  \
   ogmjob-queue.h     \
   ogmjob-spawn.h     \
@@ -25,6 +23,12 @@ libogmrip_job_la_HEADERS = \
 
 libogmrip_job_la_LDFLAGS = \
   -version-info $(OGMRIP_JOB_LT_VERSION)
+
+libogmrip_job_la_LIBADD = \
+  $(top_builddir)/libogmrip-base/libogmrip-base.la
+
+INCLUDES = \
+  -I$(top_srcdir)/libogmrip-base
 
 if MAINTAINER_MODE
 INCLUDES = \

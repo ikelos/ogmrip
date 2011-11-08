@@ -21,7 +21,6 @@
 
 #include <ogmjob-bin.h>
 #include <ogmjob-container.h>
-#include <ogmjob-log.h>
 #include <ogmjob-pipeline.h>
 #include <ogmjob-queue.h>
 #include <ogmjob-spawn.h>

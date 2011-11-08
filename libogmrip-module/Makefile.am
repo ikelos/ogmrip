@@ -3,13 +3,11 @@ lib_LTLIBRARIES = \
 
 libogmrip_module_la_SOURCES = \
   ogmrip-module-engine.c \
-  ogmrip-module-object.c \
-  ogmrip-module-type.c
+  ogmrip-module-object.c
 
 libogmrip_module_la_HEADERS = \
   ogmrip-module-engine.h \
   ogmrip-module-object.h \
-  ogmrip-module-type.h \
   ogmrip-module.h
 
 libogmrip_module_la_LDFLAGS = \

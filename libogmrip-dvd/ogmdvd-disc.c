@@ -33,8 +33,8 @@
 #include "ogmdvd-audio.h"
 #include "ogmdvd-subp.h"
 
+#include <ogmrip-base.h>
 #include <ogmrip-job.h>
-#include <ogmrip-module.h>
 
 #include <sys/ioctl.h>
 #include <sys/types.h>

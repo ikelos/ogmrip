@@ -19,8 +19,10 @@
 #include "ogmrip-profile-engine.h"
 #include "ogmrip-profile-keys.h"
 #include "ogmrip-marshal.h"
-#include "ogmrip-type.h"
-#include "ogmrip-xml.h"
+#include "ogmrip-container.h"
+#include "ogmrip-codec.h"
+
+#include <ogmrip-base.h>
 
 #include <string.h>
 

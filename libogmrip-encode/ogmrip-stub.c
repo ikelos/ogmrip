@@ -21,7 +21,6 @@
 #include "ogmrip-audio-codec.h"
 #include "ogmrip-subp-codec.h"
 #include "ogmrip-chapters.h"
-#include "ogmrip-type.h"
 
 #include <glib/gstdio.h>
 
