@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OGMRip\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-27 19:07+0200\n"
+"POT-Creation-Date: 2011-11-09 21:57+0100\n"
 "PO-Revision-Date: 2008-01-11 21:30+0100\n"
 "Last-Translator: Olivier Rolland <billl@users.sourceforge.net>\n"
 "Language-Team: French <fr@li.org>\n"
@@ -193,20 +193,20 @@ msgstr "<b>Piste _video :</b>"
 msgid "Angle:"
 msgstr "Angle :"
 
-#: ../data/ui/ogmrip-main.glade.h:7 ../src/ogmrip-main.c:1922
-#: ../src/ogmrip-options-dialog.c:646
+#: ../data/ui/ogmrip-main.glade.h:7 ../src/ogmrip-main.c:1939
+#: ../src/ogmrip-options-dialog.c:651
 msgid "E_xtract"
 msgstr "E_xtraire"
 
-#: ../data/ui/ogmrip-main.glade.h:8 ../src/ogmrip-main.c:1922
+#: ../data/ui/ogmrip-main.glade.h:8 ../src/ogmrip-main.c:1939
 msgid "Extract selected streams"
 msgstr "Extrait les pistes sélectionnées"
 
-#: ../data/ui/ogmrip-main.glade.h:9 ../src/ogmrip-main.c:1921
+#: ../data/ui/ogmrip-main.glade.h:9 ../src/ogmrip-main.c:1938
 msgid "Load a DVD disk, an ISO file, or a DVD structure"
 msgstr "Charger un DVD, une image ISO ou une structure DVD"
 
-#: ../data/ui/ogmrip-main.glade.h:10 ../src/ogmrip-main.c:2293
+#: ../data/ui/ogmrip-main.glade.h:10 ../src/ogmrip-main.c:2310
 msgid "OGMRip"
 msgstr "OGMRip"
 
@@ -216,7 +216,7 @@ msgstr "Sélectionner une structure de DVD"
 
 #: ../data/ui/ogmrip-main.glade.h:12
 #: ../libogmrip-media-gtk/ogmrip-media-chooser-dialog.c:166
-#: ../src/ogmrip-main.c:1921
+#: ../src/ogmrip-main.c:1938
 msgid "_Load"
 msgstr "_Charger"
 
@@ -496,7 +496,7 @@ msgstr "_Codec :"
 msgid "_Crop image"
 msgstr "_Découpage de l'image"
 
-#: ../data/ui/ogmrip-profile-editor.glade.h:35 ../src/ogmrip-main.c:1926
+#: ../data/ui/ogmrip-profile-editor.glade.h:35 ../src/ogmrip-main.c:1943
 msgid "_Edit"
 msgstr "_Éditer"
 
@@ -920,6 +920,66 @@ msgstr "Un encodeur de DVD"
 msgid "DVD Encoder OGMRip"
 msgstr "Encodeur de DVD OGMRip"
 
+#: ../libogmrip-base/ogmrip-fs.c:134
+#, c-format
+msgid "Failed to unlink file '%s': %s"
+msgstr "Impossible de supprimer le lien '%s': %s"
+
+#: ../libogmrip-base/ogmrip-fs.c:148
+#, c-format
+msgid "Failed to remove directory '%s': %s"
+msgstr "Impossible de supprimer le répertoire '%s': %s"
+
+#: ../libogmrip-base/ogmrip-fs.c:179 ../libogmrip-base/ogmrip-fs.c:282
+#, c-format
+msgid "Failed to create file '%s': %s"
+msgstr "Impossible de créer le fichier '%s': %s"
+
+#: ../libogmrip-base/ogmrip-fs.c:223
+#, c-format
+msgid "Failed to create fifo '%s': %s"
+msgstr "Impossible de créer la fifo '%s': %s"
+
+#: ../libogmrip-base/ogmrip-fs.c:260
+#, c-format
+msgid "Template '%s' doesn't end with XXXXXX"
+msgstr "Le gabarit '%s' ne se termine pas par XXXXXX"
+
+#: ../libogmrip-base/ogmrip-fs.c:271
+#, c-format
+msgid "Template '%s' invalid, should not contain a '/'"
+msgstr "Gabarit '%s' invalide, ne peut contenir de '/'"
+
+#: ../libogmrip-base/ogmrip-fs.c:340
+#, c-format
+msgid "Failed to stat the file system containing '%s': %s"
+msgstr "Impossible d'évaluer le système de fichiers contenant '%s': %s"
+
+#: ../libogmrip-base/ogmrip-fs.c:383
+#, c-format
+msgid "Failed to stat '%s': %s"
+msgstr "Impossible d'évaluer '%s': %s"
+
+#: ../libogmrip-base/ogmrip-fs.c:390
+#, c-format
+msgid "Failed to change to directory '%s': %s"
+msgstr "Impossible de changer vers le répertoire '%s': %s"
+
+#: ../libogmrip-base/ogmrip-fs.c:399
+#, c-format
+msgid "Failed to stat '..': %s"
+msgstr "Impossible d'évaluer '..': %s"
+
+#: ../libogmrip-base/ogmrip-fs.c:409
+#, c-format
+msgid "Failed to change to directory '..': %s"
+msgstr "Impossible de changer vers le répertoire '..': %s"
+
+#: ../libogmrip-base/ogmrip-xml.c:109
+#, c-format
+msgid "'%s' is not a valid XML file"
+msgstr "'%s' n'est pas un fichier XML valide"
+
 #: ../libogmrip-dvd/ogmdvd-disc.c:146
 #, c-format
 msgid "No such file or directory"
@@ -986,83 +1046,13 @@ msgid "Not enough space to store the temporary files (%s needed)."
 msgstr ""
 "Pas assez d'espace pour stocker les fichiers temporaires (%sMo nécessaires)."
 
-#: ../libogmrip-encode/ogmrip-fs.c:103 ../libogmrip-encode/ogmrip-fs.c:297
-#, c-format
-msgid "Failed to create directory '%s': %s"
-msgstr "Impossible de créer le répertoire '%s': %s"
-
-#: ../libogmrip-encode/ogmrip-fs.c:160
-#, c-format
-msgid "Failed to unlink file '%s': %s"
-msgstr "Impossible de supprimer le lien '%s': %s"
-
-#: ../libogmrip-encode/ogmrip-fs.c:174
-#, c-format
-msgid "Failed to remove directory '%s': %s"
-msgstr "Impossible de supprimer le répertoire '%s': %s"
-
-#: ../libogmrip-encode/ogmrip-fs.c:205 ../libogmrip-encode/ogmrip-fs.c:407
-#, c-format
-msgid "Failed to create file '%s': %s"
-msgstr "Impossible de créer le fichier '%s': %s"
-
-#: ../libogmrip-encode/ogmrip-fs.c:249
-#, c-format
-msgid "Failed to create fifo '%s': %s"
-msgstr "Impossible de créer la fifo '%s': %s"
-
-#: ../libogmrip-encode/ogmrip-fs.c:349
-#, c-format
-msgid "Failed to link '%s': %s"
-msgstr "Impossible de créer un lien sur '%s': %s"
-
-#: ../libogmrip-encode/ogmrip-fs.c:385
-#, c-format
-msgid "Template '%s' doesn't end with XXXXXX"
-msgstr "Le gabarit '%s' ne se termine pas par XXXXXX"
-
-#: ../libogmrip-encode/ogmrip-fs.c:396
-#, c-format
-msgid "Template '%s' invalid, should not contain a '/'"
-msgstr "Gabarit '%s' invalide, ne peut contenir de '/'"
-
-#: ../libogmrip-encode/ogmrip-fs.c:465
-#, c-format
-msgid "Failed to stat the file system containing '%s': %s"
-msgstr "Impossible d'évaluer le système de fichiers contenant '%s': %s"
-
-#: ../libogmrip-encode/ogmrip-fs.c:508
-#, c-format
-msgid "Failed to stat '%s': %s"
-msgstr "Impossible d'évaluer '%s': %s"
-
-#: ../libogmrip-encode/ogmrip-fs.c:515
-#, c-format
-msgid "Failed to change to directory '%s': %s"
-msgstr "Impossible de changer vers le répertoire '%s': %s"
-
-#: ../libogmrip-encode/ogmrip-fs.c:524
-#, c-format
-msgid "Failed to stat '..': %s"
-msgstr "Impossible d'évaluer '..': %s"
-
-#: ../libogmrip-encode/ogmrip-fs.c:534
-#, c-format
-msgid "Failed to change to directory '..': %s"
-msgstr "Impossible de changer vers le répertoire '..': %s"
-
-#: ../libogmrip-encode/ogmrip-hardsub.c:44
+#: ../libogmrip-encode/ogmrip-hardsub.c:43
 msgid "Hardcoded subtitle"
 msgstr "Sous-titres incrustés"
 
 #: ../libogmrip-encode/ogmrip-novideo.c:32
 msgid "No Video"
 msgstr "Pas de vidéo"
-
-#: ../libogmrip-encode/ogmrip-xml.c:109
-#, c-format
-msgid "'%s' is not a valid XML file"
-msgstr "'%s' n'est pas un fichier XML valide"
 
 #: ../libogmrip-media-gtk/ogmrip-chapter-store.c:198
 #: ../libogmrip-media-gtk/ogmrip-chapter-view.c:133
@@ -1162,7 +1152,7 @@ msgstr "_Langue :"
 #: ../libogmrip-file-gtk/ogmrip-file-chooser-dialog.c:86
 #: ../libogmrip-encode-gtk/ogmrip-audio-options-dialog.c:256
 #: ../libogmrip-encode-gtk/ogmrip-subp-options-dialog.c:259
-#: ../src/ogmrip-options-dialog.c:616
+#: ../src/ogmrip-options-dialog.c:621
 msgid "None"
 msgstr "Aucun"
 
@@ -1364,174 +1354,174 @@ msgstr "Voulez-vous supprimer la copie du DVD ?"
 msgid "Encoding failed"
 msgstr "L'encodage a échoué"
 
-#: ../src/ogmrip-main.c:466
+#: ../src/ogmrip-main.c:467
 msgid "Encoding video title"
 msgstr "Encodage du titre vidéo"
 
-#: ../src/ogmrip-main.c:468
+#: ../src/ogmrip-main.c:469
 msgid "Extracting chapters information"
 msgstr "Extraction du chapitrage"
 
-#: ../src/ogmrip-main.c:470
+#: ../src/ogmrip-main.c:471
 msgid "Merging audio and video streams"
 msgstr "Fusion des pistes audio et vidéo"
 
-#: ../src/ogmrip-main.c:472
+#: ../src/ogmrip-main.c:473
 msgid "DVD backup"
 msgstr "Copie du DVD"
 
-#: ../src/ogmrip-main.c:474 ../src/ogmrip-options-dialog.c:487
+#: ../src/ogmrip-main.c:475 ../src/ogmrip-options-dialog.c:488
 msgid "Analyzing video stream"
 msgstr "Analyse du flux vidéo"
 
-#: ../src/ogmrip-main.c:476
+#: ../src/ogmrip-main.c:477
 msgid "Running the compressibility test"
 msgstr "Test de la compressibilité"
 
-#: ../src/ogmrip-main.c:480
+#: ../src/ogmrip-main.c:481
 #, c-format
 msgid "Extracting audio stream %d"
 msgstr "Extraction de la piste audio %d"
 
-#: ../src/ogmrip-main.c:488
+#: ../src/ogmrip-main.c:489
 #, c-format
 msgid "Extracting subtitle stream %d"
 msgstr "Extraction du sous-titre %d"
 
-#: ../src/ogmrip-main.c:521
+#: ../src/ogmrip-main.c:522
 msgid "Are you sure you want to cancel the encoding process?"
 msgstr "Etes-vous sûr de vouloir interrompre l'encodage ?"
 
-#: ../src/ogmrip-main.c:1546
+#: ../src/ogmrip-main.c:1563
 msgid "Can't play DVD title"
 msgstr "Impossible de jouer le DVD"
 
-#: ../src/ogmrip-main.c:1560
+#: ../src/ogmrip-main.c:1577
 msgid "Select a chapters file"
 msgstr "Sélectionner un fichier de chapitrage"
 
-#: ../src/ogmrip-main.c:1582
+#: ../src/ogmrip-main.c:1599
 #, c-format
 msgid "Could not open the chapters file '%s'"
 msgstr "Impossible d'ouvrir le fichier de chapitrage '%s'"
 
-#: ../src/ogmrip-main.c:1599
+#: ../src/ogmrip-main.c:1616
 msgid "Select a file"
 msgstr "Sélectionner un fichier"
 
-#: ../src/ogmrip-main.c:1700
+#: ../src/ogmrip-main.c:1717
 msgid "translator-credits"
 msgstr "Olivier Rolland <billl@users.sourceforge.net>"
 
-#: ../src/ogmrip-main.c:1717
+#: ../src/ogmrip-main.c:1734
 msgid "A DVD Encoder for GNOME"
 msgstr "Un encodeur de DVD pour GNOME"
 
-#: ../src/ogmrip-main.c:1920
+#: ../src/ogmrip-main.c:1937
 msgid "_File"
 msgstr "_Fichier"
 
-#: ../src/ogmrip-main.c:1923
+#: ../src/ogmrip-main.c:1940
 msgid "_Import Chapters..."
 msgstr "_Importer le chapitrage..."
 
-#: ../src/ogmrip-main.c:1923
+#: ../src/ogmrip-main.c:1940
 msgid "Import chapter information"
 msgstr "Importe un fichier de chapitrage"
 
-#: ../src/ogmrip-main.c:1924
+#: ../src/ogmrip-main.c:1941
 msgid "_Export Chapters..."
 msgstr "_Exporter le chapitrage..."
 
-#: ../src/ogmrip-main.c:1924
+#: ../src/ogmrip-main.c:1941
 msgid "Export chapter information"
 msgstr "Exporte le chapitrage"
 
-#: ../src/ogmrip-main.c:1925
+#: ../src/ogmrip-main.c:1942
 msgid "Exit OGMRip"
 msgstr "Quitte OGMRip"
 
-#: ../src/ogmrip-main.c:1927
+#: ../src/ogmrip-main.c:1944
 msgid "Select _All"
 msgstr "Séléctionner _tout"
 
-#: ../src/ogmrip-main.c:1927
+#: ../src/ogmrip-main.c:1944
 msgid "Select all chapters"
 msgstr "Sélectionne tous les chapitres"
 
-#: ../src/ogmrip-main.c:1928
+#: ../src/ogmrip-main.c:1945
 msgid "_Deselect All"
 msgstr "_Déselectionner tout"
 
-#: ../src/ogmrip-main.c:1928
+#: ../src/ogmrip-main.c:1945
 msgid "Deselect all chapters"
 msgstr "Désélectionne tous les chapitres"
 
-#: ../src/ogmrip-main.c:1929
+#: ../src/ogmrip-main.c:1946
 msgid "Pro_files"
 msgstr "Pro_fils"
 
-#: ../src/ogmrip-main.c:1929
+#: ../src/ogmrip-main.c:1946
 msgid "Edit the profiles"
 msgstr "Éditer les profils"
 
-#: ../src/ogmrip-main.c:1930
+#: ../src/ogmrip-main.c:1947
 msgid "Edit the preferences"
 msgstr "Edite les préférences"
 
-#: ../src/ogmrip-main.c:1931
+#: ../src/ogmrip-main.c:1948
 msgid "_Encodings"
 msgstr "_Encodages"
 
-#: ../src/ogmrip-main.c:1931
+#: ../src/ogmrip-main.c:1948
 msgid "Edit the encodings"
 msgstr "Édite les encodages"
 
-#: ../src/ogmrip-main.c:1932
+#: ../src/ogmrip-main.c:1949
 msgid "_Help"
 msgstr "_Aide"
 
-#: ../src/ogmrip-main.c:1933
+#: ../src/ogmrip-main.c:1950
 msgid "_About"
 msgstr "À _propos"
 
-#: ../src/ogmrip-main.c:1933
+#: ../src/ogmrip-main.c:1950
 msgid "About OGMRip"
 msgstr "À propos de OGMRip"
 
-#: ../src/ogmrip-options-dialog.c:616
+#: ../src/ogmrip-options-dialog.c:621
 msgid "Extra Small"
 msgstr "Très petit"
 
-#: ../src/ogmrip-options-dialog.c:616
+#: ../src/ogmrip-options-dialog.c:621
 msgid "Small"
 msgstr "Petit"
 
-#: ../src/ogmrip-options-dialog.c:616
+#: ../src/ogmrip-options-dialog.c:621
 msgid "Medium"
 msgstr "Moyen"
 
-#: ../src/ogmrip-options-dialog.c:617
+#: ../src/ogmrip-options-dialog.c:622
 msgid "Large"
 msgstr "Grand"
 
-#: ../src/ogmrip-options-dialog.c:617
+#: ../src/ogmrip-options-dialog.c:622
 msgid "Extra Large"
 msgstr "Très grand"
 
-#: ../src/ogmrip-options-dialog.c:617
+#: ../src/ogmrip-options-dialog.c:622
 msgid "Full"
 msgstr "Complet"
 
-#: ../src/ogmrip-options-dialog.c:617
+#: ../src/ogmrip-options-dialog.c:622
 msgid "User Defined"
 msgstr "Personnalisé"
 
-#: ../src/ogmrip-options-dialog.c:626
+#: ../src/ogmrip-options-dialog.c:631
 msgid "Options"
 msgstr "Options"
 
-#: ../src/ogmrip-options-dialog.c:637
+#: ../src/ogmrip-options-dialog.c:642
 msgid "En_queue"
 msgstr ""
 
@@ -1555,53 +1545,53 @@ msgstr "Aucune"
 msgid "Spell Checking"
 msgstr "Vérification orthographique"
 
-#: ../plugins/ogmrip-aac.c:183
+#: ../plugins/ogmrip-aac.c:182
 msgid "MPlayer and FAAC are missing"
 msgstr "MPlayer et FAAC sont manquants"
 
-#: ../plugins/ogmrip-aac.c:189 ../plugins/ogmrip-dirac.c:136
-#: ../plugins/ogmrip-flac.c:185 ../plugins/ogmrip-mp3.c:201
-#: ../plugins/ogmrip-theora.c:260 ../plugins/ogmrip-vorbis.c:186
-#: ../plugins/ogmrip-wav.c:109
+#: ../plugins/ogmrip-aac.c:188 ../plugins/ogmrip-dirac.c:137
+#: ../plugins/ogmrip-flac.c:185 ../plugins/ogmrip-mp3.c:200
+#: ../plugins/ogmrip-theora.c:259 ../plugins/ogmrip-vorbis.c:185
+#: ../plugins/ogmrip-wav.c:111
 msgid "MPlayer is missing"
 msgstr "MPlayer est manquant"
 
-#: ../plugins/ogmrip-aac.c:195
+#: ../plugins/ogmrip-aac.c:194
 msgid "FAAC is missing"
 msgstr "FAAC est manquant"
 
-#: ../plugins/ogmrip-aac.c:200
+#: ../plugins/ogmrip-aac.c:199
 msgid "Advanced Audio Coding (AAC)"
 msgstr "Advanced Audio Coding (AAC)"
 
-#: ../plugins/ogmrip-avi.c:323
+#: ../plugins/ogmrip-avi.c:320
 msgid "avibox is missing"
 msgstr "avibox est manquant"
 
-#: ../plugins/ogmrip-avi.c:326
+#: ../plugins/ogmrip-avi.c:323
 msgid "Audio-Video Interlace (AVI)"
 msgstr "Audio-Video Interlace (AVI)"
 
-#: ../plugins/ogmrip-copy.c:272 ../plugins/ogmrip-dirac.c:129
-#: ../plugins/ogmrip-lavc-mpeg.c:150 ../plugins/ogmrip-srt.c:522
-#: ../plugins/ogmrip-vobsub.c:267 ../plugins/ogmrip-x264.c:1003
-#: ../plugins/ogmrip-xvid.c:931
+#: ../plugins/ogmrip-copy.c:276 ../plugins/ogmrip-dirac.c:130
+#: ../plugins/ogmrip-lavc-mpeg.c:152 ../plugins/ogmrip-srt.c:526
+#: ../plugins/ogmrip-vobsub.c:255 ../plugins/ogmrip-x264.c:1011
+#: ../plugins/ogmrip-xvid.c:916
 msgid "MEncoder is missing"
 msgstr "MEncoder est manquant"
 
-#: ../plugins/ogmrip-copy.c:276
+#: ../plugins/ogmrip-copy.c:280
 msgid "Copy (for AC3 or DTS)"
 msgstr "Copie (pour l'AC3 ou le DTS)"
 
-#: ../plugins/ogmrip-copy.c:278
+#: ../plugins/ogmrip-copy.c:282
 msgid "Video Copy"
 msgstr "Copie Vidéo"
 
-#: ../plugins/ogmrip-dirac.c:150
+#: ../plugins/ogmrip-dirac.c:151
 msgid "MPlayer is built without Dirac support"
 msgstr "MPlayer est compilé sans support Dirac"
 
-#: ../plugins/ogmrip-dirac.c:155
+#: ../plugins/ogmrip-dirac.c:156
 msgid "Dirac"
 msgstr "Dirac"
 
@@ -1617,19 +1607,19 @@ msgstr "FLAC est manquant"
 msgid "Free Lossless Audio Codec (FLAC)"
 msgstr "Free Lossless Audio Codec (FLAC)"
 
-#: ../plugins/ogmrip-lavc-mpeg.c:159
+#: ../plugins/ogmrip-lavc-mpeg.c:161
 msgid "MEncoder is built without LAVC support"
 msgstr "MEncoder est compilé sans support LAVC"
 
-#: ../plugins/ogmrip-lavc-mpeg.c:164
+#: ../plugins/ogmrip-lavc-mpeg.c:166
 msgid "Lavc Mpeg-1"
 msgstr "Lavc Mpeg-1"
 
-#: ../plugins/ogmrip-lavc-mpeg.c:167
+#: ../plugins/ogmrip-lavc-mpeg.c:169
 msgid "Lavc Mpeg-2"
 msgstr "Lavc Mpeg-2"
 
-#: ../plugins/ogmrip-lavc-mpeg.c:170
+#: ../plugins/ogmrip-lavc-mpeg.c:172
 msgid "Lavc Mpeg-4"
 msgstr "Lavc Mpeg-4"
 
@@ -1637,107 +1627,107 @@ msgstr "Lavc Mpeg-4"
 msgid "Lavc Options"
 msgstr "Lavc Options"
 
-#: ../plugins/ogmrip-mkv.c:455
+#: ../plugins/ogmrip-mkv.c:458
 msgid "mkvmerge is missing"
 msgstr "mkvmerge est manquant"
 
-#: ../plugins/ogmrip-mkv.c:476
+#: ../plugins/ogmrip-mkv.c:479
 msgid "Matroska Media (MKV)"
 msgstr "Matroska Media (MKV)"
 
-#: ../plugins/ogmrip-mkv.c:480
+#: ../plugins/ogmrip-mkv.c:483
 msgid "WebM Media (webm)"
 msgstr "WebM Media (webm)"
 
-#: ../plugins/ogmrip-mp3.c:195
+#: ../plugins/ogmrip-mp3.c:194
 msgid "MPlayer and LAME are missing"
 msgstr "MPlayer et LAME sont manquants"
 
-#: ../plugins/ogmrip-mp3.c:207
+#: ../plugins/ogmrip-mp3.c:206
 msgid "LAME is missing"
 msgstr "LAME est manquant"
 
-#: ../plugins/ogmrip-mp3.c:212
+#: ../plugins/ogmrip-mp3.c:211
 msgid "MPEG-1 layer III (MP3)"
 msgstr "MPEG-1 layer III (MP3)"
 
-#: ../plugins/ogmrip-mp4.c:570
+#: ../plugins/ogmrip-mp4.c:572
 msgid "MP4Box is missing"
 msgstr "MP4Box est manquant"
 
-#: ../plugins/ogmrip-mp4.c:601
+#: ../plugins/ogmrip-mp4.c:603
 msgid "Mpeg-4 Media (MP4)"
 msgstr "Mpeg-4 Media (MP4)"
 
-#: ../plugins/ogmrip-ogg.c:365
+#: ../plugins/ogmrip-ogg.c:369
 msgid "ogmmerge and ogmsplit are missing"
 msgstr "ogmmerge et ogmsplit sont manquants"
 
-#: ../plugins/ogmrip-ogg.c:371
+#: ../plugins/ogmrip-ogg.c:375
 msgid "ogmmerge is missing"
 msgstr "ogmmerge est manquant"
 
-#: ../plugins/ogmrip-ogg.c:377
+#: ../plugins/ogmrip-ogg.c:381
 msgid "ogmsplit is missing"
 msgstr "ogmsplit est manquant"
 
-#: ../plugins/ogmrip-ogg.c:382
+#: ../plugins/ogmrip-ogg.c:386
 msgid "Ogg Media (OGM)"
 msgstr "Ogg Media (OGM)"
 
-#: ../plugins/ogmrip-srt.c:559
+#: ../plugins/ogmrip-srt.c:563
 msgid "GOCR, Ocrad and Tesseract are missing"
 msgstr "GOCR, Ocrad et Tesseract sont manquants"
 
-#: ../plugins/ogmrip-srt.c:564
+#: ../plugins/ogmrip-srt.c:568
 msgid "SRT text"
 msgstr "SRT texte"
 
-#: ../plugins/ogmrip-theora.c:254
+#: ../plugins/ogmrip-theora.c:253
 msgid "MPlayer and theoraenc are missing"
 msgstr "MPlayer et theoraenc sont manquants"
 
-#: ../plugins/ogmrip-theora.c:266
+#: ../plugins/ogmrip-theora.c:265
 msgid "theoraenc is missing"
 msgstr "theoraenc est manquant"
 
-#: ../plugins/ogmrip-theora.c:271
+#: ../plugins/ogmrip-theora.c:270
 msgid "Ogg Theora"
 msgstr "Ogg Theora"
 
-#: ../plugins/ogmrip-vobsub.c:272
+#: ../plugins/ogmrip-vobsub.c:260
 msgid "VobSub"
 msgstr "VobSub"
 
-#: ../plugins/ogmrip-vorbis.c:180
+#: ../plugins/ogmrip-vorbis.c:179
 msgid "MPlayer and OggEnc are missing"
 msgstr "MPlayer et OggEnc sont manquants"
 
-#: ../plugins/ogmrip-vorbis.c:192
+#: ../plugins/ogmrip-vorbis.c:191
 msgid "OggEnc is missing"
 msgstr "OggEnc est manquant"
 
-#: ../plugins/ogmrip-vorbis.c:197
+#: ../plugins/ogmrip-vorbis.c:196
 msgid "Ogg Vorbis"
 msgstr "Ogg Vorbis"
 
-#: ../plugins/ogmrip-vp8.c:398
+#: ../plugins/ogmrip-vp8.c:403
 msgid "vpxenc is missing"
 msgstr "vpxenc est manquant"
 
-#: ../plugins/ogmrip-vp8.c:405
+#: ../plugins/ogmrip-vp8.c:410
 msgid "Vp8"
 msgstr "Vp8"
 
-#: ../plugins/ogmrip-wav.c:112
+#: ../plugins/ogmrip-wav.c:114
 msgid "Wave (uncompressed PCM)"
 msgstr "Wave (PCM non compressé)"
 
-#: ../plugins/ogmrip-x264.c:1015
+#: ../plugins/ogmrip-x264.c:1023
 msgid "MEncoder is build without X264 support"
 msgstr "MEncoder est compilé sans support X264"
 
-#: ../plugins/ogmrip-x264.c:1036
+#: ../plugins/ogmrip-x264.c:1044
 msgid "X264"
 msgstr "X264"
 
@@ -1749,17 +1739,23 @@ msgstr "X264 Options"
 msgid "Transformed Exhaustive search (tesa - even slower)"
 msgstr "Recherche exhaustive transformée (tesa - encore plus lent)"
 
-#: ../plugins/ogmrip-xvid.c:943
+#: ../plugins/ogmrip-xvid.c:928
 msgid "MEncoder is built without XviD support"
 msgstr "MEncoder est compilé sans support XviD"
 
-#: ../plugins/ogmrip-xvid.c:948
+#: ../plugins/ogmrip-xvid.c:933
 msgid "XviD"
 msgstr "XviD"
 
 #: ../plugins/ogmrip-xvid-options.c:269
 msgid "XviD Options"
 msgstr "XviD Options"
+
+#~ msgid "Failed to create directory '%s': %s"
+#~ msgstr "Impossible de créer le répertoire '%s': %s"
+
+#~ msgid "Failed to link '%s': %s"
+#~ msgstr "Impossible de créer un lien sur '%s': %s"
 
 #~ msgid "Open media"
 #~ msgstr "Sélectionner un média"

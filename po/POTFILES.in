@@ -14,15 +14,16 @@ data/ui/ogmrip-x264.glade
 data/ui/ogmrip-xvid.glade
 data/ui/ogmrip.desktop.in
 
+libogmrip-base/ogmrip-fs.c
+libogmrip-base/ogmrip-xml.c
+
 libogmrip-dvd/ogmdvd-disc.c
 libogmrip-dvd/ogmdvd-title.c
 
 libogmrip-encode/ogmrip-encoding.c
-libogmrip-encode/ogmrip-fs.c
 libogmrip-encode/ogmrip-hardsub.c
 libogmrip-encode/ogmrip-novideo.c
 libogmrip-encode/ogmrip-profile.c
-libogmrip-encode/ogmrip-xml.c
 
 libogmrip-media-gtk/ogmrip-chapter-store.c
 libogmrip-media-gtk/ogmrip-chapter-view.c
