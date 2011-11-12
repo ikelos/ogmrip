@@ -24,7 +24,7 @@ OGMRip
 Requirements
 ------------
 
-    glib         >= 2.28.0: http://www.gtk.org
+    glib         >= 2.30.0: http://www.gtk.org
     dvdread      >= 0.9.4:  http://www.dtek.chalmers.se/groups/dvd
     mplayer      >= 0.92:   http://www.mplayerhq.hu
     mencoder     >= 0.92:   http://www.mplayerhq.hu
@@ -39,7 +39,7 @@ Optional
 
     For the GUI:
 
-        gtk+     >= 2.24.0: http://www.gtk.org
+        GTK+ >= 2.24.0: http://www.gtk.org
 
     For notification support:
         
@@ -49,39 +49,55 @@ Optional
 
         ogmtools >= 1.0: http://www.bunkus.org/videotools/ogmtools
 
-    For matroska support:
+    For Matroska support:
 
         mkvtoolnix >= 0.9.5: http://www.bunkus.org/videotools/mkvtoolnix
 
-    For mp4 support:
+    For WebM support:
+
+        mkvtoolnix built with WebM support
+
+    For MP4 support:
 
         gpac >= 0.4.2: http://gpac.sourceforge.net
 
     For x264 suport:
 
-        mplayer must be built with x264 support
+        mencoder built with x264 support
 
-    For theora support:
+    For VP8 support:
+
+        vpxenc: http://www.webmproject.org
+
+    For Theora support:
 
         libtheora >= 1.0alpha5: http://www.theora.org
 
-    For dts support:
+    For Dirac support:
 
-        mplayer must be built with dts support
+        mencoder built with Dirac support
 
-    For mp3 support:
+    For DTS support:
+
+        mplayer built with dts support
+
+    For MP3 support:
 
         lame >= 3.96: http://lame.sourceforge.net
 
-    For aac support:
+    For AAC support:
 
-        faac >= 1.24: http://www.audiocoding.com
+        faac: http://www.audiocoding.com
 
     For Ogg Vorbis support:
 
         vorbistools >= 1.0: http://www.xiph.org/ogg/vorbis
 
-    For srt support:
+    For FLAC support:
+
+        flac >= 1.0: http://flac.sourceforge.net
+
+    For SRT support:
 
         gocr  >= 0.39:    http://jocr.sourceforge.net/
       or
