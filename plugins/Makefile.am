@@ -130,7 +130,8 @@ ogmrip_dirac_la_LIBTOOLFLAGS = \
 ogmrip_dirac_la_LIBADD = \
   $(top_builddir)/libogmrip-job/libogmrip-job.la \
   $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
-  $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
+  $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-lavc.la
 endif
 
 #
