@@ -473,7 +473,6 @@ libogmrip-media-gtk/Makefile
 libogmrip-file/Makefile
 libogmrip-file-gtk/Makefile
 libogmrip-dvd/Makefile
-libogmrip-drive/Makefile
 libogmrip-module/Makefile
 libogmrip-encode/Makefile
 libogmrip-encode/ogmrip-version.h
@@ -482,7 +481,6 @@ plugins/Makefile
 data/Makefile
 data/pkgconfig/Makefile
 data/pkgconfig/ogmrip-base.pc
-data/pkgconfig/ogmrip-drive.pc
 data/pkgconfig/ogmrip-dvd.pc
 data/pkgconfig/ogmrip-encode-gtk.pc
 data/pkgconfig/ogmrip-encode.pc

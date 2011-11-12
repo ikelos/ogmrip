@@ -28,7 +28,6 @@
 #endif
 
 #include "ogmrip-helper.h"
-#include "ogmrip-profile-store.h"
 
 #include <glib/gi18n-lib.h>
 
@@ -36,10 +35,6 @@
 #include <locale.h>
 
 #include <ogmrip-dvd.h>
-#include <ogmrip-drive.h>
-
-extern const gchar *ogmdvd_languages[][3];
-extern const guint  ogmdvd_nlanguages;
 
 static void
 gtk_dialog_response_accept (GtkDialog *dialog)
@@ -47,20 +42,36 @@ gtk_dialog_response_accept (GtkDialog *dialog)
   gtk_dialog_response (dialog, GTK_RESPONSE_ACCEPT);
 }
 
-static gboolean
-ogmrip_drive_eject_idle (OGMRipDrive *drive)
+static GVolume *
+g_volume_monitor_get_volume_for_device (GVolumeMonitor *monitor, const gchar *device)
 {
-  ogmrip_drive_eject (drive);
+  GList *volumes, *volume;
+  gboolean found = FALSE;
+  gchar *dev;
 
-  return FALSE;
+  volumes = g_volume_monitor_get_volumes (monitor);
+  for (volume = volumes; !found && volume; volume = volume->next)
+  {
+    dev = g_volume_get_identifier (volume->data, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE);
+    found = g_str_equal (dev, device);
+    g_free (dev);
+  }
+
+  if (found)
+    g_object_ref (volume->data);
+
+  g_list_foreach (volumes, (GFunc) g_object_unref, NULL);
+  g_list_free (volumes);
+
+  return volume ? volume->data : NULL;
 }
 
 gboolean
-ogmrip_open_title (GtkWindow *parent, OGMRipTitle *title)
+ogmrip_open_title (GtkWindow *parent, OGMRipTitle *title, GError **error)
 {
-  GError *error = NULL;
-  OGMRipMonitor *monitor;
-  OGMRipDrive *drive;
+  GVolumeMonitor *monitor;
+  GVolume *volume;
+
   GtkWidget *dialog;
   const gchar *uri;
 
@@ -70,48 +81,48 @@ ogmrip_open_title (GtkWindow *parent, OGMRipTitle *title)
   if (ogmrip_title_is_open (title))
     return TRUE;
 
-  if (ogmrip_title_open (title, &error))
+  if (ogmrip_title_open (title, NULL))
     return TRUE;
-
-  uri = ogmrip_media_get_uri (ogmrip_title_get_media (title));
-
-  monitor = ogmrip_monitor_get_default ();
-  drive = ogmrip_monitor_get_drive (monitor, uri + 6);
-  g_object_unref (monitor);
-
-  if (!drive)
-    return FALSE;
 
   dialog = gtk_message_dialog_new_with_markup (parent,
       GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
       GTK_MESSAGE_INFO, GTK_BUTTONS_CANCEL, "<b>%s</b>\n\n%s",
       ogmrip_media_get_label (ogmrip_title_get_media (title)),
       _("Please insert the DVD required to encode this title."));
-
   g_signal_connect (dialog, "delete-event",
       G_CALLBACK (gtk_widget_hide_on_delete), NULL);
-  g_signal_connect_swapped (drive, "medium-added",
+
+  monitor = g_volume_monitor_get ();
+  g_signal_connect_swapped (monitor, "volume-added",
       G_CALLBACK (gtk_dialog_response_accept), dialog);
+
+  uri = ogmrip_media_get_uri (ogmrip_title_get_media (title));
 
   do
   {
-    g_clear_error (&error);
-    if (ogmrip_title_open (title, &error))
-      break;
-
-    if (error && error->code != OGMDVD_DISC_ERROR_ID)
-      break;
-
-    g_idle_add ((GSourceFunc) ogmrip_drive_eject_idle, drive);
+    volume = g_volume_monitor_get_volume_for_device (monitor, uri + 6);
+    if (volume)
+    {
+      g_volume_eject_with_operation (volume, G_MOUNT_UNMOUNT_NONE, NULL, NULL, NULL, NULL);
+      g_object_unref (volume);
+    }
 
     if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_CANCEL)
       break;
+
+    if (ogmrip_title_open (title, error))
+      break;
+
+    if (*error && (*error)->code != OGMDVD_DISC_ERROR_ID)
+      break;
+
+    g_clear_error (error);
   }
   while (1);
 
-  g_object_unref (drive);
+  g_object_unref (monitor);
+
   gtk_widget_destroy (dialog);
-  g_clear_error (&error);
 
   return ogmrip_title_is_open (title);
 }

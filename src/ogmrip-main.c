@@ -539,12 +539,13 @@ ogmrip_main_progress_dialog_response (GtkWidget *parent, gint response_id, OGMRi
 static void
 ogmrip_main_encode (OGMRipData *data, OGMRipEncoding *encoding)
 {
-  if (ogmrip_open_title (GTK_WINDOW (data->window), ogmrip_encoding_get_title (encoding)))
+  GError *error = NULL;
+  gboolean result = FALSE;
+
+  if (ogmrip_open_title (GTK_WINDOW (data->window), ogmrip_encoding_get_title (encoding), &error))
   {
-    GError *error = NULL;
     GCancellable *cancellable;
     GtkWidget *dialog;
-    gboolean result;
     gint cookie;
 
     cookie = ogmrip_main_dbus_inhibit (data);
@@ -582,15 +583,15 @@ ogmrip_main_encode (OGMRipData *data, OGMRipEncoding *encoding)
       ogmrip_main_dbus_uninhibit (data, cookie);
 
     ogmrip_title_close (ogmrip_encoding_get_title (encoding));
-
-    if (!result && (!error || error->code != G_IO_ERROR_CANCELLED))
-      ogmrip_main_display_error (data, encoding, error);
-
-    ogmrip_main_clean (data, encoding, !result && (!error || error->code != G_IO_ERROR_CANCELLED));
-
-    if (error)
-      g_error_free (error);
   }
+
+  if (!result && (!error || error->code != G_IO_ERROR_CANCELLED))
+    ogmrip_main_display_error (data, encoding, error);
+
+  ogmrip_main_clean (data, encoding, !result && (!error || error->code != G_IO_ERROR_CANCELLED));
+
+  if (error)
+    g_error_free (error);
 }
 
 /*
@@ -599,12 +600,13 @@ ogmrip_main_encode (OGMRipData *data, OGMRipEncoding *encoding)
 static void
 ogmrip_main_test (OGMRipData *data, OGMRipEncoding *encoding, guint *width, guint *height)
 {
-  if (ogmrip_open_title (GTK_WINDOW (data->window), ogmrip_encoding_get_title (encoding)))
+  GError *error = NULL;
+  gboolean result = FALSE;
+
+  if (ogmrip_open_title (GTK_WINDOW (data->window), ogmrip_encoding_get_title (encoding), &error))
   {
-    GError *error = NULL;
     GCancellable *cancellable;
     GtkWidget *dialog;
-    gboolean result;
     gint cookie;
 
     cookie = ogmrip_main_dbus_inhibit (data);
@@ -650,15 +652,15 @@ ogmrip_main_test (OGMRipData *data, OGMRipEncoding *encoding, guint *width, guin
       codec = ogmrip_encoding_get_video_codec (encoding);
       ogmrip_video_codec_get_scale_size (OGMRIP_VIDEO_CODEC (codec), width, height);
     }
-
-    if (!result && (!error || error->code == G_IO_ERROR_CANCELLED))
-      ogmrip_main_display_error (data, encoding, error);
-
-    ogmrip_main_clean (data, encoding, !result && (!error || error->code == G_IO_ERROR_CANCELLED));
-
-    if (error)
-      g_error_free (error);
   }
+
+  if (!result && (!error || error->code == G_IO_ERROR_CANCELLED))
+    ogmrip_main_display_error (data, encoding, error);
+
+  ogmrip_main_clean (data, encoding, !result && (!error || error->code == G_IO_ERROR_CANCELLED));
+
+  if (error)
+    g_error_free (error);
 
   ogmrip_encoding_clear (encoding);
 }

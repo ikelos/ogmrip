@@ -437,7 +437,9 @@ ogmrip_options_dialog_edit_profiles_button_clicked (OGMRipOptionsDialog *parent)
 static void
 ogmrip_options_dialog_crop_button_clicked (OGMRipOptionsDialog *parent)
 {
-  if (ogmrip_open_title (GTK_WINDOW (parent), parent->priv->title))
+  GError *error = NULL;
+
+  if (ogmrip_open_title (GTK_WINDOW (parent), parent->priv->title, &error))
   {
     GtkWidget *dialog;
     guint l, t, r, b;
@@ -461,6 +463,9 @@ ogmrip_options_dialog_crop_button_clicked (OGMRipOptionsDialog *parent)
 
     ogmrip_title_close (parent->priv->title);
   }
+
+  if (error)
+    g_error_free (error);
 }
 
 static void
@@ -472,7 +477,9 @@ ogmrip_progress_dialog_response_cb (OGMRipProgressDialog *dialog, gint response_
 static void
 ogmrip_options_dialog_autocrop_button_clicked (OGMRipOptionsDialog *parent)
 {
-  if (ogmrip_open_title (GTK_WINDOW (parent), parent->priv->title))
+  GError *error = NULL;
+
+  if (ogmrip_open_title (GTK_WINDOW (parent), parent->priv->title, &error))
   {
     GCancellable *cancellable;
     GtkWidget *dialog;
@@ -515,6 +522,9 @@ ogmrip_options_dialog_autocrop_button_clicked (OGMRipOptionsDialog *parent)
 
     ogmrip_title_close (parent->priv->title);
   }
+
+  if (error)
+    g_error_free (error);
 }
 
 static void

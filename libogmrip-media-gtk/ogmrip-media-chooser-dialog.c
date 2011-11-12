@@ -31,7 +31,6 @@
 #include "ogmrip-media-chooser-widget.h"
 
 #include <ogmrip-media.h>
-#include <ogmrip-drive.h>
 
 #include <glib/gi18n-lib.h>
 
@@ -67,45 +66,30 @@ ogmrip_media_chooser_dialog_get_media (OGMRipMediaChooser *chooser)
 static void
 ogmrip_media_chooser_dialog_media_changed (OGMRipMediaChooserDialog *dialog, OGMRipMedia *media, GtkWidget *chooser)
 {
-  /*
-   * TODO insensitive if not block device
-   */
-  gtk_widget_set_sensitive (dialog->priv->eject_button, media != NULL/* && type == OGMRIP_DEVICE_BLOCK*/);
+  GVolume *volume;
+
+  volume = ogmrip_media_chooser_widget_get_volume (OGMRIP_MEDIA_CHOOSER_WIDGET (dialog->priv->chooser));
+
+  gtk_widget_set_sensitive (dialog->priv->eject_button, media != NULL && volume != NULL && g_volume_can_eject (volume));
   gtk_widget_set_sensitive (dialog->priv->load_button, media != NULL);
 }
 
 static void
-ogmrip_media_chooser_dialog_eject_clicked (GtkDialog *dialog)
+ogmrip_media_chooser_dialog_eject_ready (GVolume *volume, GAsyncResult *res, OGMRipMediaChooserDialog *dialog)
 {
-  OGMRipMedia *media;
+  if (g_volume_eject_with_operation_finish (volume, res, NULL))
+    g_signal_emit (dialog, signals[EJECT], 0);
+}
 
-  media = ogmrip_media_chooser_get_media (OGMRIP_MEDIA_CHOOSER (OGMRIP_MEDIA_CHOOSER_DIALOG (dialog)->priv->chooser));
-  if (media)
-  {
-    OGMRipMonitor *monitor;
-    OGMRipDrive *drive;
-    const gchar *uri;
-    gchar *device;
+static void
+ogmrip_media_chooser_dialog_eject_clicked (OGMRipMediaChooserDialog *dialog)
+{
+  GVolume *volume;
 
-    uri = ogmrip_media_get_uri (media);
-
-    monitor = ogmrip_monitor_get_default ();
-
-    device = strstr (uri, "://");
-    if (device)
-      drive = ogmrip_monitor_get_drive (monitor, device + 3);
-    else
-      drive = ogmrip_monitor_get_drive (monitor, uri);
-
-    g_object_unref (monitor);
-
-    if (drive)
-    {
-      g_signal_emit (dialog, signals[EJECT], 0, NULL);
-      ogmrip_drive_eject (drive);
-      g_object_unref (drive);
-    }
-  }
+  volume = ogmrip_media_chooser_widget_get_volume (OGMRIP_MEDIA_CHOOSER_WIDGET (dialog->priv->chooser));
+  if (volume)
+    g_volume_eject_with_operation (volume, G_MOUNT_UNMOUNT_NONE, NULL, NULL,
+        (GAsyncReadyCallback) ogmrip_media_chooser_dialog_eject_ready, dialog);
 }
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipMediaChooserDialog, ogmrip_media_chooser_dialog, GTK_TYPE_DIALOG,

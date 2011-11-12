@@ -44,8 +44,9 @@ struct _OGMRipMediaChooserWidgetClass
   GtkComboBoxClass parent_class;
 };
 
-GType       ogmrip_media_chooser_widget_get_type (void);
-GtkWidget * ogmrip_media_chooser_widget_new      (void);
+GType       ogmrip_media_chooser_widget_get_type   (void);
+GtkWidget * ogmrip_media_chooser_widget_new        (void);
+GVolume *   ogmrip_media_chooser_widget_get_volume (OGMRipMediaChooserWidget *chooser);
 
 G_END_DECLS
 

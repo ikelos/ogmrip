@@ -31,7 +31,8 @@ G_BEGIN_DECLS
     (GtkWidget *) gtk_builder_get_object ((builder), (name))
 
 gboolean ogmrip_open_title (GtkWindow   *parent,
-                            OGMRipTitle *title);
+                            OGMRipTitle *title,
+                            GError      **error);
 
 G_END_DECLS
 

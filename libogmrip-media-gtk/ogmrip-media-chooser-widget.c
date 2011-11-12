@@ -31,7 +31,6 @@
 
 #include <ogmrip-base.h>
 #include <ogmrip-media.h>
-#include <ogmrip-drive.h>
 
 #include <glib/gi18n-lib.h>
 
@@ -43,7 +42,7 @@ enum
   TEXT_COLUMN,
   TYPE_COLUMN,
   MEDIA_COLUMN,
-  DRIVE_COLUMN,
+  VOLUME_COLUMN,
   N_COLUMNS
 };
 
@@ -61,16 +60,12 @@ enum
 
 struct _OGMRipMediaChooserWidgetPriv
 {
+  GVolumeMonitor *monitor;
   GtkTreeRowReference *last_row;
 };
 
-typedef struct
-{
-  OGMRipDrive *drive;
-  gulong handler;
-} OGMRipDisconnector;
-
 static void ogmrip_media_chooser_init (OGMRipMediaChooserInterface *iface);
+static void ogmrip_media_chooser_widget_dispose (GObject     *gobject);
 static void ogmrip_media_chooser_widget_changed (GtkComboBox *combo);
 
 OGMRipMedia *
@@ -97,16 +92,6 @@ ogmrip_media_new (const gchar *path)
   g_free (types);
 
   return media;
-}
-
-static void
-ogmrip_signal_disconnector (gpointer data, GObject *gobject)
-{
-  OGMRipDisconnector *disconnector = data;
-
-  g_signal_handler_disconnect (disconnector->drive, disconnector->handler);
-
-  g_free (disconnector);
 }
 
 static OGMRipMedia *
@@ -144,7 +129,7 @@ ogmrip_media_chooser_widget_sep_func (GtkTreeModel *model, GtkTreeIter *iter, gp
 }
 
 static void
-ogmrip_media_chooser_widget_medium_removed (OGMRipMediaChooserWidget *chooser, OGMRipDrive *drive1)
+ogmrip_media_chooser_widget_volume_removed (OGMRipMediaChooserWidget *chooser, GVolume *volume1)
 {
   GtkTreeModel *model;
   GtkTreeIter iter;
@@ -153,13 +138,18 @@ ogmrip_media_chooser_widget_medium_removed (OGMRipMediaChooserWidget *chooser, O
   model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
   if (gtk_tree_model_get_iter_first (model, &iter))
   {
-    OGMRipDrive *drive2;
+    GVolume *volume2;
 
     do
     {
-      gtk_tree_model_get (model, &iter, TYPE_COLUMN, &type, DRIVE_COLUMN, &drive2, -1);
-      if (type == DEVICE_ROW && drive1 == drive2)
+      gtk_tree_model_get (model, &iter, TYPE_COLUMN, &type, VOLUME_COLUMN, &volume2, -1);
+      if (volume2)
+        g_object_unref (volume2);
+
+      if (type == DEVICE_ROW && volume1 == volume2)
       {
+        g_signal_handlers_disconnect_by_func (volume1,
+            ogmrip_media_chooser_widget_volume_removed, chooser);
         gtk_list_store_remove (GTK_LIST_STORE (model), &iter);
         break;
       }
@@ -185,78 +175,94 @@ ogmrip_media_chooser_widget_medium_removed (OGMRipMediaChooserWidget *chooser, O
 }
 
 static void
-ogmrip_media_chooser_widget_medium_added (OGMRipMediaChooserWidget *chooser, OGMRipDrive *drive)
+ogmrip_media_chooser_widget_volume_added (OGMRipMediaChooserWidget *chooser, GVolume *volume, GVolumeMonitor *monitor)
 {
-  OGMRipMedia *media;
+  GDrive *drive;
 
-  media = ogmrip_media_new (ogmrip_drive_get_device (drive));
-  if (!media)
-    ogmrip_media_chooser_widget_medium_removed (chooser, drive);
-  else
+  drive = g_volume_get_drive (volume);
+  if (drive && g_drive_has_media (drive))
   {
-    GtkTreeModel *model;
-    GtkTreeIter sibling, iter;
-    gchar *text, *name, *title;
+    OGMRipMedia *media;
+    gchar *str;
 
-    name = ogmrip_drive_get_name (drive);
-    if (!name)
-      name = g_strdup (_("Unknown media"));
+    str = g_volume_get_identifier (volume, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE);
+    media = ogmrip_media_new (str);
+    g_free (str);
 
-    title = g_markup_escape_text (ogmrip_media_get_label (media), -1);
-    text = g_strdup_printf ("<b>%s</b>\n%s", title, name);
-    g_free (title);
-
-    g_free (name);
-
-    model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
-    if (gtk_tree_model_get_iter_first (model, &sibling))
+    if (!media)
+      ogmrip_media_chooser_widget_volume_removed (chooser, volume);
+    else
     {
-      gint type;
+      GtkTreeModel *model;
+      GtkTreeIter sibling, iter;
+      gchar *text, *name, *title;
 
-      do
+      name = g_volume_get_name (volume);
+      if (!name)
+        name = g_strdup (_("Unknown media"));
+
+      title = g_markup_escape_text (ogmrip_media_get_label (media), -1);
+      text = g_strdup_printf ("<b>%s</b>\n%s", title, name);
+      g_free (title);
+
+      g_free (name);
+
+      model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
+      if (gtk_tree_model_get_iter_first (model, &sibling))
       {
-        gtk_tree_model_get (model, &sibling, TYPE_COLUMN, &type, -1);
-        if (type != DEVICE_ROW)
-          break;
+        gint type;
+
+        do
+        {
+          gtk_tree_model_get (model, &sibling, TYPE_COLUMN, &type, -1);
+          if (type != DEVICE_ROW)
+            break;
+        }
+        while (gtk_tree_model_iter_next (model, &sibling));
+
+        if (type == NONE_ROW)
+          iter = sibling;
+        else
+          gtk_list_store_insert_before (GTK_LIST_STORE (model), &iter, &sibling);
       }
-      while (gtk_tree_model_iter_next (model, &sibling));
-
-      if (type == NONE_ROW)
-        iter = sibling;
       else
-        gtk_list_store_insert_before (GTK_LIST_STORE (model), &iter, &sibling);
-    }
-    else
-      gtk_list_store_append (GTK_LIST_STORE (model), &iter);
+        gtk_list_store_append (GTK_LIST_STORE (model), &iter);
 
-    gtk_list_store_set (GTK_LIST_STORE (model), &iter, TEXT_COLUMN, text,
-        TYPE_COLUMN, DEVICE_ROW, MEDIA_COLUMN, media, DRIVE_COLUMN, drive, -1);
-    g_free (text);
+      gtk_list_store_set (GTK_LIST_STORE (model), &iter, TEXT_COLUMN, text,
+          TYPE_COLUMN, DEVICE_ROW, MEDIA_COLUMN, media, VOLUME_COLUMN, volume, -1);
+      g_free (text);
 
-    g_object_unref (media);
+      g_object_unref (media);
 
-    if (gtk_combo_box_get_active (GTK_COMBO_BOX (chooser)) == -1)
-      gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), 0);
-    else
-    {
-      if (gtk_combo_box_get_active_iter (GTK_COMBO_BOX (chooser), &sibling))
+      g_signal_connect_swapped (volume, "removed",
+          G_CALLBACK (ogmrip_media_chooser_widget_volume_removed), chooser);
+
+      if (gtk_combo_box_get_active (GTK_COMBO_BOX (chooser)) == -1)
+        gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), 0);
+      else
       {
-        GtkTreePath *path1, *path2;
+        if (gtk_combo_box_get_active_iter (GTK_COMBO_BOX (chooser), &sibling))
+        {
+          GtkTreePath *path1, *path2;
 
-        path1 = gtk_tree_model_get_path (model, &iter);
-        path2 = gtk_tree_model_get_path (model, &sibling);
+          path1 = gtk_tree_model_get_path (model, &iter);
+          path2 = gtk_tree_model_get_path (model, &sibling);
 
-        if (path1 && path2 && gtk_tree_path_compare (path1, path2) == 0)
-          ogmrip_media_chooser_widget_changed (GTK_COMBO_BOX (chooser));
+          if (path1 && path2 && gtk_tree_path_compare (path1, path2) == 0)
+            ogmrip_media_chooser_widget_changed (GTK_COMBO_BOX (chooser));
 
-        if (path1)
-          gtk_tree_path_free (path1);
+          if (path1)
+            gtk_tree_path_free (path1);
 
-        if (path2)
-          gtk_tree_path_free (path2);
+          if (path2)
+            gtk_tree_path_free (path2);
+        }
       }
     }
   }
+
+  if (drive)
+    g_object_unref (drive);
 }
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipMediaChooserWidget, ogmrip_media_chooser_widget, GTK_TYPE_COMBO_BOX,
@@ -265,7 +271,11 @@ G_DEFINE_TYPE_WITH_CODE (OGMRipMediaChooserWidget, ogmrip_media_chooser_widget, 
 static void
 ogmrip_media_chooser_widget_class_init (OGMRipMediaChooserWidgetClass *klass)
 {
+  GObjectClass *gobject_class;
   GtkComboBoxClass *combo_box_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->dispose = ogmrip_media_chooser_widget_dispose;
 
   combo_box_class = GTK_COMBO_BOX_CLASS (klass);
   combo_box_class->changed = ogmrip_media_chooser_widget_changed;
@@ -286,14 +296,11 @@ ogmrip_media_chooser_widget_init (OGMRipMediaChooserWidget *chooser)
   GtkListStore *store;
   GtkTreeIter iter;
 
-  GSList *drives, *drive;
-
-  OGMRipMonitor *monitor;
-  OGMRipDisconnector *disconnector;
+  GList *volumes, *volume;
 
   chooser->priv = OGMRIP_MEDIA_CHOOSER_WIDGET_GET_PRIVATE (chooser);
 
-  store = gtk_list_store_new (N_COLUMNS, G_TYPE_STRING, G_TYPE_INT, G_TYPE_OBJECT, G_TYPE_POINTER);
+  store = gtk_list_store_new (N_COLUMNS, G_TYPE_STRING, G_TYPE_INT, OGMRIP_TYPE_MEDIA, G_TYPE_VOLUME);
   gtk_combo_box_set_model (GTK_COMBO_BOX (chooser), GTK_TREE_MODEL (store));
   g_object_unref (store);
 
@@ -304,34 +311,16 @@ ogmrip_media_chooser_widget_init (OGMRipMediaChooserWidget *chooser)
   gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (chooser), cell, TRUE);
   gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (chooser), cell, "markup", TEXT_COLUMN, NULL);
 
-  monitor = ogmrip_monitor_get_default ();
-  drives = ogmrip_monitor_get_drives (monitor);
-  g_object_unref (monitor);
+  chooser->priv->monitor = g_volume_monitor_get ();
+  g_signal_connect_swapped (chooser->priv->monitor, "volume-added",
+      G_CALLBACK (ogmrip_media_chooser_widget_volume_added), chooser);
 
-  for (drive = drives; drive; drive = drive->next)
-  {
-    if (ogmrip_drive_get_drive_type (OGMRIP_DRIVE (drive->data)) & OGMRIP_DRIVE_DVD)
-    {
-      disconnector = g_new0 (OGMRipDisconnector, 1);
+  volumes = g_volume_monitor_get_volumes (chooser->priv->monitor);
+  for (volume = volumes; volume; volume = volume->next)
+    ogmrip_media_chooser_widget_volume_added (chooser, volume->data, chooser->priv->monitor);
 
-      disconnector->drive = drive->data;
-      disconnector->handler = g_signal_connect_swapped (drive->data, "medium-added",
-          G_CALLBACK (ogmrip_media_chooser_widget_medium_added), chooser);
-
-      g_object_weak_ref (G_OBJECT (chooser), ogmrip_signal_disconnector, disconnector);
-
-      disconnector = g_new0 (OGMRipDisconnector, 1);
-
-      disconnector->drive = drive->data;
-      disconnector->handler = g_signal_connect_swapped (drive->data, "medium-removed", 
-          G_CALLBACK (ogmrip_media_chooser_widget_medium_removed), chooser);
-
-      g_object_weak_ref (G_OBJECT (chooser), ogmrip_signal_disconnector, disconnector);
-    }
-  }
-
-  g_slist_foreach (drives, (GFunc) g_object_unref, NULL);
-  g_slist_free (drives);
+  g_list_foreach (volumes, (GFunc) g_object_unref, NULL);
+  g_list_free (volumes);
 
   if (gtk_tree_model_iter_n_children (GTK_TREE_MODEL (store), NULL) == 0)
   {
@@ -352,6 +341,28 @@ ogmrip_media_chooser_widget_init (OGMRipMediaChooserWidget *chooser)
   gtk_list_store_set (store, &iter,
       TEXT_COLUMN, _("Select a media file..."), TYPE_COLUMN, FILE_SEL_ROW, -1);
 
+}
+
+static void
+ogmrip_media_chooser_widget_dispose (GObject *gobject)
+{
+  OGMRipMediaChooserWidget *chooser = OGMRIP_MEDIA_CHOOSER_WIDGET (gobject);
+
+  if (chooser->priv->monitor)
+  {
+    g_signal_handlers_disconnect_by_func (chooser->priv->monitor,
+        ogmrip_media_chooser_widget_volume_added, chooser);
+    g_object_unref (chooser->priv->monitor);
+    chooser->priv->monitor = NULL;
+  }
+
+  if (chooser->priv->last_row)
+  {
+    gtk_tree_row_reference_free (chooser->priv->last_row);
+    chooser->priv->last_row = NULL;
+  }
+
+  G_OBJECT_CLASS (ogmrip_media_chooser_widget_parent_class)->dispose (gobject);
 }
 
 static gboolean
@@ -400,7 +411,7 @@ ogmrip_media_chooser_widget_add_media (GtkComboBox *combo, OGMRipMedia *media, g
   g_free (title);
 
   gtk_list_store_set (GTK_LIST_STORE (model), &iter, TEXT_COLUMN, text,
-      TYPE_COLUMN, file ? FILE_ROW : DIR_ROW, MEDIA_COLUMN, media, DRIVE_COLUMN, NULL, -1);
+      TYPE_COLUMN, file ? FILE_ROW : DIR_ROW, MEDIA_COLUMN, media, VOLUME_COLUMN, NULL, -1);
   g_free (text);
 
   gtk_combo_box_set_active_iter (combo, &iter);
@@ -544,10 +555,26 @@ ogmrip_media_chooser_widget_changed (GtkComboBox *combo)
 GtkWidget *
 ogmrip_media_chooser_widget_new (void)
 {
-  GtkWidget *widget;
+  return g_object_new (OGMRIP_TYPE_MEDIA_CHOOSER_WIDGET, NULL);
+}
 
-  widget = g_object_new (OGMRIP_TYPE_MEDIA_CHOOSER_WIDGET, NULL);
+GVolume *
+ogmrip_media_chooser_widget_get_volume (OGMRipMediaChooserWidget *chooser)
+{
+  GtkTreeModel *model;
+  GtkTreeIter iter;
+  GVolume *volume;
 
-  return widget;
+  g_return_val_if_fail (OGMRIP_IS_MEDIA_CHOOSER_WIDGET (chooser), NULL);
+
+  if (!gtk_combo_box_get_active_iter (GTK_COMBO_BOX (chooser), &iter))
+    return NULL;
+
+  model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
+  gtk_tree_model_get (model, &iter, VOLUME_COLUMN, &volume, -1);
+  if (volume)
+    g_object_unref (volume);
+
+  return volume;
 }
 
