@@ -28,9 +28,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-#define OGMJOB_QUEUE_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMJOB_TYPE_QUEUE, OGMJobQueuePriv))
-
 struct _OGMJobQueuePriv
 {
   GList *children;
@@ -68,7 +65,7 @@ ogmjob_queue_class_init (OGMJobQueueClass *klass)
 static void
 ogmjob_queue_init (OGMJobQueue *queue)
 {
-  queue->priv = OGMJOB_QUEUE_GET_PRIVATE (queue);
+  queue->priv = G_TYPE_INSTANCE_GET_PRIVATE (queue, OGMJOB_TYPE_QUEUE, OGMJobQueuePriv);
 }
 
 static gboolean

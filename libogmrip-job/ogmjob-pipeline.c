@@ -25,9 +25,6 @@
 
 #include "ogmjob-pipeline.h"
 
-#define OGMJOB_PIPELINE_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMJOB_TYPE_PIPELINE, OGMJobPipelinePriv))
-
 struct _OGMJobPipelinePriv
 {
   GList *children;
@@ -63,7 +60,7 @@ ogmjob_pipeline_class_init (OGMJobPipelineClass *klass)
 static void
 ogmjob_pipeline_init (OGMJobPipeline *pipeline)
 {
-  pipeline->priv = OGMJOB_PIPELINE_GET_PRIVATE (pipeline);
+  pipeline->priv = G_TYPE_INSTANCE_GET_PRIVATE (pipeline, OGMJOB_TYPE_PIPELINE, OGMJobPipelinePriv);
 }
 
 static gboolean

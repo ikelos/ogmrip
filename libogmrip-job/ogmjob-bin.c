@@ -25,9 +25,6 @@
 
 #include "ogmjob-bin.h"
 
-#define OGMJOB_BIN_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMJOB_TYPE_BIN, OGMJobBinPriv))
-
 struct _OGMJobBinPriv
 {
   OGMJobTask *child;
@@ -134,8 +131,7 @@ ogmjob_bin_class_init (OGMJobBinClass *klass)
 static void
 ogmjob_bin_init (OGMJobBin *bin)
 {
-  bin->priv = OGMJOB_BIN_GET_PRIVATE (bin);
-  bin->priv->child = NULL;
+  bin->priv = G_TYPE_INSTANCE_GET_PRIVATE (bin, OGMJOB_TYPE_BIN, OGMJobBinPriv);
 }
 
 /**

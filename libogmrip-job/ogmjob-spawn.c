@@ -41,9 +41,6 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#define OGMJOB_SPAWN_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMJOB_TYPE_SPAWN, OGMJobSpawnPriv))
-
 struct _OGMJobSpawnPriv
 {
   GPid pid;
@@ -419,7 +416,7 @@ ogmjob_spawn_class_init (OGMJobSpawnClass *klass)
 static void
 ogmjob_spawn_init (OGMJobSpawn *spawn)
 {
-  spawn->priv = OGMJOB_SPAWN_GET_PRIVATE (spawn);
+  spawn->priv = G_TYPE_INSTANCE_GET_PRIVATE (spawn, OGMJOB_TYPE_SPAWN, OGMJobSpawnPriv);
 }
 
 OGMJobTask *

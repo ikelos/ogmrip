@@ -31,7 +31,7 @@ INCLUDES = \
   -I$(top_srcdir)/libogmrip-base
 
 if MAINTAINER_MODE
-INCLUDES = \
+INCLUDES += \
   -DG_ENABLE_DEBUG
 endif
 
