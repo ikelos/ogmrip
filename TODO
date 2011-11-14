@@ -1,20 +1,26 @@
 ogmrip-media.c
 - vérifier que les médias sont correctement déréférencés
 
+ogmrip-video-codec.c
+- un conteneur peut imposer la présence d'un flux vidéo
+
 ogmrip-encoding.c
 - vérifier que la destination n'existe pas déjà
 
 ogmrip-encoding-manager.c
 - comment connaitre les encodages non faits ?
 
-ogmrip-mp4.c
-- comment savoir si la vidéo a été encodée avec global_header ?
-
 ogmrip-video-file.c
 - ajouter delai
 
+ogmrip-mp4.c
+- comment savoir si la vidéo a été encodée avec global_header ?
+
 ogmrip-avi.c
 - limiter le nombre de pistes audio (8) et subp (1)
+
+ogmrip-novideo.c
+- comment faire ?
 
 ogmrip-x264.glade
 - ajouter partitions (analysis)
