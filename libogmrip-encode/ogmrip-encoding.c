@@ -1352,7 +1352,7 @@ ogmrip_encoding_analyze (OGMRipEncoding *encoding, GCancellable *cancellable, GE
   {
     ogmrip_log_printf ("\nTelecine: %s\n",
         ogmrip_title_get_telecine (encoding->priv->title) ? "true" : "false");
-    ogmrip_log_printf ("Progressive: %s\n\n",
+    ogmrip_log_printf ("Progressive: %s\n",
         ogmrip_title_get_progressive (encoding->priv->title) ? "true" : "false");
     ogmrip_log_printf ("Interlaced: %s\n\n",
         ogmrip_title_get_interlaced (encoding->priv->title) ? "true" : "false");
