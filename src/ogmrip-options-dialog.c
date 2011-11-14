@@ -98,6 +98,7 @@ static void ogmrip_options_dialog_set_property (GObject      *gobject,
                                                 const GValue *value,
                                                 GParamSpec   *pspec);
 static void ogmrip_options_dialog_dispose      (GObject      *gobject);
+static void ogmrip_options_dialog_destroy      (GtkWidget    *widget);
 static void ogmrip_options_dialog_response     (GtkDialog    *dialog,
                                                 gint         response_id);
 
@@ -589,6 +590,7 @@ static void
 ogmrip_options_dialog_class_init (OGMRipOptionsDialogClass *klass)
 {
   GObjectClass *gobject_class;
+  GtkWidgetClass *widget_class;
   GtkDialogClass *dialog_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
@@ -596,6 +598,9 @@ ogmrip_options_dialog_class_init (OGMRipOptionsDialogClass *klass)
   gobject_class->get_property = ogmrip_options_dialog_get_property;
   gobject_class->set_property = ogmrip_options_dialog_set_property;
   gobject_class->dispose = ogmrip_options_dialog_dispose;
+
+  widget_class = GTK_WIDGET_CLASS (klass);
+  widget_class->destroy = ogmrip_options_dialog_destroy;
 
   dialog_class = GTK_DIALOG_CLASS (klass);
   dialog_class->response = ogmrip_options_dialog_response;
@@ -838,6 +843,15 @@ ogmrip_options_dialog_dispose (GObject *gobject)
   }
 
   G_OBJECT_CLASS (ogmrip_options_dialog_parent_class)->dispose (gobject);
+}
+
+static void
+ogmrip_options_dialog_destroy (GtkWidget *widget)
+{
+  g_signal_handlers_disconnect_by_func (settings,
+      ogmrip_options_dialog_profile_setting_changed, widget);
+
+  GTK_WIDGET_CLASS (ogmrip_options_dialog_parent_class)->destroy (widget);
 }
 
 static void
