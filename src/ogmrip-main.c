@@ -322,7 +322,8 @@ ogmrip_main_clean (OGMRipData *data, OGMRipEncoding *encoding, gboolean error)
     GList *list, *link;
 
     codec = ogmrip_encoding_get_video_codec (encoding);
-    g_unlink (ogmrip_file_get_path (ogmrip_codec_get_output (codec)));
+    if (codec)
+      g_unlink (ogmrip_file_get_path (ogmrip_codec_get_output (codec)));
 
     list = ogmrip_encoding_get_audio_codecs (encoding);
     for (link = list; link; link = link->next)
