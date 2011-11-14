@@ -78,7 +78,7 @@ ogmrip_register_codec (GType gtype, const gchar *name, const gchar *description,
 {
   OGMRipPluginInfo *info;
 
-  g_return_if_fail (gtype == G_TYPE_NONE || g_type_is_a (gtype, OGMRIP_TYPE_CODEC));
+  g_return_if_fail (g_type_is_a (gtype, OGMRIP_TYPE_CODEC));
   g_return_if_fail (name != NULL);
 
   info = g_object_new (OGMRIP_TYPE_PLUGIN_INFO, "name", name, "description", description, NULL);
@@ -138,9 +138,6 @@ ogmrip_container_contains (GType gtype, OGMRipFormat format)
   info = ogmrip_type_info_lookup (gtype);
   if (!info)
     return FALSE;
-
-  if (format == OGMRIP_FORMAT_UNDEFINED)
-    return TRUE;
 
   formats = (OGMRipFormat *) OGMRIP_PLUGIN_INFO (info)->formats->data;
   for (i = 0; i < OGMRIP_PLUGIN_INFO (info)->formats->len; i ++)

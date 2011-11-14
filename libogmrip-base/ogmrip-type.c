@@ -203,6 +203,9 @@ ogmrip_type_name (GType gtype)
 {
   OGMRipTypeInfo *info;
 
+  if (gtype == G_TYPE_NONE)
+    return "none";
+
   info = ogmrip_type_info_lookup (gtype);
   if (!info)
     return NULL;
