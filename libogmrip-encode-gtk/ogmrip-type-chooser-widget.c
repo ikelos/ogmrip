@@ -20,6 +20,26 @@
 
 #include <ogmrip-encode.h>
 
+static gboolean
+ogmrip_type_chooser_widget_filter (GtkTreeModel *model, GtkTreeIter *iter, GtkTreeModelFilter *filter)
+{
+  GType container, gtype;
+
+  container = (GType) g_object_get_data (G_OBJECT (filter), "filter-type");
+  if (container == G_TYPE_NONE)
+    return TRUE;
+
+  gtype = ogmrip_type_store_get_gtype (OGMRIP_TYPE_STORE (model), iter);
+
+  if (gtype == G_TYPE_NONE)
+    return FALSE;
+
+  if (gtype == OGMRIP_TYPE_HARDSUB)
+    return TRUE;
+
+  return ogmrip_container_contains (container, ogmrip_codec_format (gtype));
+}
+
 void
 ogmrip_type_chooser_widget_construct (GtkComboBox *chooser, GType gtype)
 {
@@ -35,6 +55,11 @@ ogmrip_type_chooser_widget_construct (GtkComboBox *chooser, GType gtype)
 
   gtk_combo_box_set_model (chooser, GTK_TREE_MODEL (filter));
   g_object_unref (filter);
+
+  g_object_set_data (G_OBJECT (filter), "filter-type", GUINT_TO_POINTER (G_TYPE_NONE));
+
+  gtk_tree_model_filter_set_visible_func (GTK_TREE_MODEL_FILTER (filter),
+      (GtkTreeModelFilterVisibleFunc) ogmrip_type_chooser_widget_filter, filter, NULL);
 
   cell = gtk_cell_renderer_text_new ();
   gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (chooser), cell, TRUE);
@@ -94,33 +119,17 @@ ogmrip_type_chooser_widget_set_active (GtkComboBox *chooser, GType gtype)
   }
 }
 
-static gboolean
-ogmrip_type_chooser_widget_filter (GtkTreeModel *model, GtkTreeIter *iter, GType container)
-{
-  GType gtype;
-
-  gtype = ogmrip_type_store_get_gtype (OGMRIP_TYPE_STORE (model), iter);
-
-  if (gtype == G_TYPE_NONE)
-    return FALSE;
-
-  if (gtype == OGMRIP_TYPE_HARDSUB)
-    return TRUE;
-
-  return ogmrip_container_contains (container, ogmrip_codec_format (gtype));
-}
-
 void
 ogmrip_type_chooser_widget_set_filter (GtkComboBox *chooser, GType gtype)
 {
-  GtkTreeModel *model;
+  GtkTreeModel *filter;
 
   g_return_if_fail (GTK_IS_COMBO_BOX (chooser));
   g_return_if_fail (g_type_is_a (gtype, OGMRIP_TYPE_CONTAINER));
 
-  model = gtk_combo_box_get_model (chooser);
-  gtk_tree_model_filter_set_visible_func (GTK_TREE_MODEL_FILTER (model),
-      (GtkTreeModelFilterVisibleFunc) ogmrip_type_chooser_widget_filter, GUINT_TO_POINTER (gtype), NULL);
-  gtk_tree_model_filter_refilter (GTK_TREE_MODEL_FILTER (model));
+  filter = gtk_combo_box_get_model (chooser);
+  g_object_set_data (G_OBJECT (filter), "filter-type", GUINT_TO_POINTER (gtype));
+
+  gtk_tree_model_filter_refilter (GTK_TREE_MODEL_FILTER (filter));
 }
 
