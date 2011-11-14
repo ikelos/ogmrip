@@ -101,8 +101,16 @@ ogmrip_profile_editor_dialog_update_codecs (OGMRipProfileEditorDialog *editor)
   if (type != G_TYPE_NONE)
   {
     ogmrip_type_chooser_widget_set_filter (GTK_COMBO_BOX (editor->priv->video_chooser), type);
+    if (gtk_combo_box_get_active (GTK_COMBO_BOX (editor->priv->video_chooser)) < 0)
+      gtk_combo_box_set_active (GTK_COMBO_BOX (editor->priv->video_chooser), 0);
+
     ogmrip_type_chooser_widget_set_filter (GTK_COMBO_BOX (editor->priv->audio_chooser), type);
+    if (gtk_combo_box_get_active (GTK_COMBO_BOX (editor->priv->audio_chooser)) < 0)
+      gtk_combo_box_set_active (GTK_COMBO_BOX (editor->priv->audio_chooser), 0);
+
     ogmrip_type_chooser_widget_set_filter (GTK_COMBO_BOX (editor->priv->subp_chooser), type);
+    if (gtk_combo_box_get_active (GTK_COMBO_BOX (editor->priv->subp_chooser)) < 0)
+      gtk_combo_box_set_active (GTK_COMBO_BOX (editor->priv->subp_chooser), 0);
   }
 }
 
@@ -230,8 +238,6 @@ ogmrip_profile_editor_dialog_codec_chooser_changed (GtkWidget *chooser, GSetting
       ogmrip_profile_editor_dialog_codec_setting_changed, chooser);
 
   type = ogmrip_type_chooser_widget_get_active (GTK_COMBO_BOX (chooser));
-  g_assert (type != G_TYPE_NONE);
-
   g_settings_set_string (settings, OGMRIP_PROFILE_CODEC, ogmrip_type_name (type));
 
   g_signal_handlers_unblock_by_func (settings,
