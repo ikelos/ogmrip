@@ -109,8 +109,6 @@ ogmjob_queue_add (OGMJobContainer *container, OGMJobTask *task)
 
   g_signal_connect_swapped (task, "notify::progress", 
       G_CALLBACK (ogmjob_queue_child_progress), container);
-
-  OGMJOB_CONTAINER_CLASS (ogmjob_queue_parent_class)->add (container, task);
 }
 
 static void
@@ -128,8 +126,6 @@ ogmjob_queue_remove (OGMJobContainer *container, OGMJobTask *task)
     queue->priv->children = g_list_remove_link (queue->priv->children, link);
     g_list_free (link);
   }
-
-  OGMJOB_CONTAINER_CLASS (ogmjob_queue_parent_class)->remove (container, task);
 }
 
 /**
