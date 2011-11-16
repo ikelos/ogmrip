@@ -26,10 +26,6 @@
 
 G_BEGIN_DECLS
 
-#if ! GLIB_CHECK_VERSION(2,8,0)
-#define g_chdir chdir
-#endif
-
 const gchar * ogmrip_fs_get_tmp_dir      (void);
 void          ogmrip_fs_set_tmp_dir      (const gchar  *dir);
 
