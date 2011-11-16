@@ -30,10 +30,6 @@
 #include "ogmrip-helper.h"
 
 #include <glib/gi18n-lib.h>
-
-#include <stdlib.h>
-#include <locale.h>
-
 #include <ogmrip-dvd.h>
 
 static void
