@@ -39,6 +39,8 @@
 
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
+
+#include <locale.h>
 #include <stdlib.h>
 
 #ifdef HAVE_LIBNOTIFY_SUPPORT
@@ -2221,6 +2223,29 @@ ogmrip_startup_thread (GIOSchedulerJob *job, GCancellable *cancellable, GApplica
   return FALSE;
 }
 
+static guint
+ogmrip_get_locale (void)
+{
+  static guint code = 0;
+
+  if (!code)
+  {
+    gchar *locale;
+
+    locale = setlocale (LC_ALL, NULL);
+    if (locale && strlen (locale) > 2)
+    {
+      code = locale[0];
+      code = (code << 8) | locale[1];
+
+      if (!ogmrip_language_get_label (code))
+        code = 0;
+    }
+  }
+
+  return code;
+}
+
 /*
  * When the application starts
  */
@@ -2231,6 +2256,12 @@ ogmrip_application_startup_cb (GApplication *app)
 
   settings = g_settings_new ("org.ogmrip.preferences");
   g_object_set_data_full (G_OBJECT (app), "settings", settings, g_object_unref);
+
+  if (!g_settings_get_uint (settings, OGMRIP_SETTINGS_PREF_AUDIO))
+    g_settings_set_uint (settings, OGMRIP_SETTINGS_PREF_AUDIO, ogmrip_get_locale ());
+
+  if (!g_settings_get_uint (settings, OGMRIP_SETTINGS_CHAPTER_LANG))
+    g_settings_set_uint (settings, OGMRIP_SETTINGS_CHAPTER_LANG, ogmrip_get_locale ());
 
   path = g_settings_get_string (settings, OGMRIP_SETTINGS_OUTPUT_DIR);
   if (!strlen (path))
