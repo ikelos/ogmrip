@@ -440,23 +440,20 @@ ogmdvd_title_get_n_audio_streams (OGMRipTitle *title)
   return OGMDVD_TITLE (title)->priv->nr_of_audio_streams;
 }
 
-static gint
-ogmdvd_audio_stream_find_by_nr (OGMDvdAudioStream *audio, guint nr)
-{
-  return audio->priv->nr - nr;
-}
-
 static OGMRipAudioStream *
 ogmdvd_title_get_nth_audio_stream (OGMRipTitle *title, guint nr)
 {
   GList *link;
 
-  link = g_list_find_custom (OGMDVD_TITLE (title)->priv->audio_streams,
-      GUINT_TO_POINTER (nr), (GCompareFunc) ogmdvd_audio_stream_find_by_nr);
-  if (!link)
-    return NULL;
+  for (link = OGMDVD_TITLE (title)->priv->audio_streams; link; link = link->next)
+  {
+    OGMDvdAudioStream *stream = link->data;
 
-  return link->data;
+    if (stream->priv->nr == nr)
+      return link->data;
+  }
+
+  return NULL;
 }
 
 static gint
@@ -465,23 +462,20 @@ ogmdvd_title_get_n_subp_streams (OGMRipTitle *title)
   return OGMDVD_TITLE (title)->priv->nr_of_subp_streams;
 }
 
-static gint
-ogmdvd_subp_stream_find_by_nr (OGMDvdSubpStream *audio, guint nr)
-{
-  return audio->priv->nr - nr;
-}
-
 static OGMRipSubpStream *
 ogmdvd_title_get_nth_subp_stream (OGMRipTitle *title, guint nr)
 {
   GList *link;
 
-  link = g_list_find_custom (OGMDVD_TITLE (title)->priv->subp_streams,
-      GUINT_TO_POINTER (nr), (GCompareFunc) ogmdvd_subp_stream_find_by_nr);
-  if (!link)
-    return NULL;
+  for (link = OGMDVD_TITLE (title)->priv->subp_streams; link; link = link->next)
+  {
+    OGMDvdSubpStream *stream = link->data;
 
-  return link->data;
+    if (stream->priv->nr == nr)
+      return link->data;
+  }
+
+  return NULL;
 }
 
 /**

@@ -23,10 +23,10 @@
 static gboolean
 ogmrip_type_chooser_widget_filter (GtkTreeModel *model, GtkTreeIter *iter, GtkTreeModelFilter *filter)
 {
-  GType container, gtype;
+  GType *container, gtype;
 
-  container = (GType) g_object_get_data (G_OBJECT (filter), "filter-type");
-  if (container == G_TYPE_NONE)
+  container = g_object_get_data (G_OBJECT (filter), "filter-type");
+  if (!container)
     return TRUE;
 
   gtype = ogmrip_type_store_get_gtype (OGMRIP_TYPE_STORE (model), iter);
@@ -37,7 +37,7 @@ ogmrip_type_chooser_widget_filter (GtkTreeModel *model, GtkTreeIter *iter, GtkTr
   if (gtype == OGMRIP_TYPE_HARDSUB)
     return TRUE;
 
-  return ogmrip_container_contains (container, ogmrip_codec_format (gtype));
+  return ogmrip_container_contains (*container, ogmrip_codec_format (gtype));
 }
 
 void
@@ -55,8 +55,6 @@ ogmrip_type_chooser_widget_construct (GtkComboBox *chooser, GType gtype)
 
   gtk_combo_box_set_model (chooser, GTK_TREE_MODEL (filter));
   g_object_unref (filter);
-
-  g_object_set_data (G_OBJECT (filter), "filter-type", GUINT_TO_POINTER (G_TYPE_NONE));
 
   gtk_tree_model_filter_set_visible_func (GTK_TREE_MODEL_FILTER (filter),
       (GtkTreeModelFilterVisibleFunc) ogmrip_type_chooser_widget_filter, filter, NULL);
@@ -123,12 +121,16 @@ void
 ogmrip_type_chooser_widget_set_filter (GtkComboBox *chooser, GType gtype)
 {
   GtkTreeModel *filter;
+  GType *container;
 
   g_return_if_fail (GTK_IS_COMBO_BOX (chooser));
   g_return_if_fail (g_type_is_a (gtype, OGMRIP_TYPE_CONTAINER));
 
+  container = g_new0 (GType, 1);
+  *container = gtype;
+
   filter = gtk_combo_box_get_model (chooser);
-  g_object_set_data (G_OBJECT (filter), "filter-type", GUINT_TO_POINTER (gtype));
+  g_object_set_data_full (G_OBJECT (filter), "filter-type", container, (GDestroyNotify) g_free);
 
   gtk_tree_model_filter_refilter (GTK_TREE_MODEL_FILTER (filter));
 }

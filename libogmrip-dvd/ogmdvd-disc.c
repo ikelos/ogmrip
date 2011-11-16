@@ -843,22 +843,20 @@ ogmdvd_disc_get_n_titles (OGMRipMedia *media)
   return OGMDVD_DISC (media)->priv->ntitles;
 }
 
-static gint
-ogmdvd_title_find_by_nr (OGMDvdTitle *title, guint nr)
-{
-  return title->priv->nr - nr;
-}
-
 static OGMRipTitle *
 ogmdvd_disc_get_nth_title (OGMRipMedia *media, guint nr)
 {
   GList *link;
 
-  link = g_list_find_custom (OGMDVD_DISC (media)->priv->titles, GUINT_TO_POINTER (nr), (GCompareFunc) ogmdvd_title_find_by_nr);
-  if (!link)
-    return NULL;
+  for (link = OGMDVD_DISC (media)->priv->titles; link; link = link->next)
+  {
+    OGMDvdTitle *title = link->data;
 
-  return link->data;
+    if (title->priv->nr == nr)
+      return link->data;
+  }
+
+  return NULL;
 }
 
 static gchar **

@@ -20,7 +20,7 @@
 
 struct _OGMRipTypeInfoPriv
 {
-  GType gtype;
+  GType *gtype;
   gpointer klass;
 
   gchar *name;
@@ -60,6 +60,7 @@ ogmrip_type_info_finalize (GObject *gobject)
 {
   OGMRipTypeInfo *info = OGMRIP_TYPE_INFO (gobject);
 
+  g_free (info->priv->gtype);
   g_free (info->priv->name);
   g_free (info->priv->description);
 
@@ -133,7 +134,22 @@ ogmrip_type_info_init (OGMRipTypeInfo *info)
 {
   info->priv = G_TYPE_INSTANCE_GET_PRIVATE (info, OGMRIP_TYPE_TYPE_INFO, OGMRipTypeInfoPriv);
 
+  info->priv->gtype = g_new0 (GType, 1);
+  *(info->priv->gtype) = G_TYPE_NONE;
+
   info->priv->extensions = g_array_new (FALSE, FALSE, sizeof (GType));
+}
+
+static guint
+g_type_hash (gconstpointer v)
+{
+  return (guint) *(const GType *) v;
+}
+
+static gboolean
+g_type_equal (gconstpointer v1, gconstpointer v2)
+{
+  return *((const GType *) v1) == *((const GType *) v2);
 }
 
 void
@@ -145,11 +161,11 @@ ogmrip_type_register (GType gtype, OGMRipTypeInfo *info)
   G_LOCK (table);
 
   if (!table)
-    table = g_hash_table_new_full (g_direct_hash, g_direct_equal, NULL, (GDestroyNotify) g_object_unref);
+    table = g_hash_table_new_full (g_type_hash, g_type_equal, NULL, (GDestroyNotify) g_object_unref);
 
-  info->priv->gtype = gtype;
+  *(info->priv->gtype) = gtype;
 
-  g_hash_table_insert (table, GUINT_TO_POINTER (gtype), g_object_ref_sink (info));
+  g_hash_table_insert (table, info->priv->gtype, g_object_ref_sink (info));
 
   G_UNLOCK (table);
 }
@@ -163,7 +179,7 @@ ogmrip_type_info_lookup (GType gtype)
     return NULL;
 
   G_LOCK (table);
-  info = g_hash_table_lookup (table, GUINT_TO_POINTER (gtype));
+  info = g_hash_table_lookup (table, &gtype);
   G_UNLOCK (table);
 
   return info;
@@ -248,7 +264,7 @@ ogmrip_type_from_name (const gchar *name)
   if (!info)
     return G_TYPE_NONE;
 
-  return info->priv->gtype;
+  return *(info->priv->gtype);
 }
 
 GType *
@@ -267,8 +283,8 @@ ogmrip_type_children (GType gtype, guint *n)
 
   g_hash_table_iter_init (&iter, table);
   while (g_hash_table_iter_next (&iter, NULL, (gpointer*) &info))
-    if (g_type_is_a (info->priv->gtype, gtype))
-      g_array_append_val (types, info->priv->gtype);
+    if (g_type_is_a (*(info->priv->gtype), gtype))
+      g_array_append_val (types, *(info->priv->gtype));
 
   gtype = G_TYPE_NONE;
   g_array_append_val (types, gtype);

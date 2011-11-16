@@ -51,12 +51,6 @@ typedef struct
 } UInfo;
 
 static gint
-g_ulist_compare (UInfo *info, gint val)
-{
-  return info->val - val;
-}
-
-static gint
 g_ulist_min (UInfo *info1, UInfo *info2)
 {
   return info2->val - info1->val;
@@ -74,7 +68,14 @@ g_ulist_add (GSList *ulist, GCompareFunc func, gint val)
   GSList *ulink;
   UInfo *info;
 
-  ulink = g_slist_find_custom (ulist, GINT_TO_POINTER (val), (GCompareFunc) g_ulist_compare);
+  for (ulink = ulist; ulink; ulink = ulink->next)
+  {
+    info = ulink->data;
+
+    if (info->val == val)
+      break;
+  }
+
   if (ulink)
   {
     info = ulink->data;
