@@ -79,25 +79,30 @@ ogmrip_profile_manager_dialog_run_profile_dialog (GtkWindow *parent, const gchar
 
   area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
 
-  vbox = gtk_vbox_new (FALSE, 6);
+  vbox = gtk_grid_new ();
+  gtk_grid_set_row_spacing (GTK_GRID (vbox), 6);
+  gtk_grid_set_column_spacing (GTK_GRID (vbox), 6);
   gtk_container_set_border_width (GTK_CONTAINER (vbox), 6);
   gtk_container_add (GTK_CONTAINER (area), vbox);
   gtk_widget_show (vbox);
 
-  label = gtk_label_new (_("_Profile name:"));
+  label = gtk_label_new (_("<b>_Profile name:</b>"));
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
   gtk_label_set_use_underline (GTK_LABEL (label), TRUE);
-  gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 0);
+  gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
+  gtk_grid_attach (GTK_GRID (vbox), label, 0, 0, 1, 1);
   gtk_widget_show (label);
 
   frame = gtk_frame_new (NULL);
   gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_IN);
-  gtk_box_pack_start (GTK_BOX (vbox), frame, TRUE, TRUE, 0);
+  gtk_grid_attach (GTK_GRID (vbox), frame, 0, 1, 1, 1);
   gtk_widget_show (frame);
 
   entry = gtk_text_view_new ();
   gtk_text_view_set_accepts_tab (GTK_TEXT_VIEW (entry), FALSE);
   gtk_container_add (GTK_CONTAINER (frame), entry);
+  gtk_widget_set_hexpand (entry, TRUE);
+  gtk_widget_set_vexpand (entry, TRUE);
   gtk_widget_show (entry);
 
   buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (entry));
@@ -371,7 +376,6 @@ ogmrip_profile_manager_dialog_init (OGMRipProfileManagerDialog *dialog)
 
   gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE);
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
-  gtk_container_set_border_width (GTK_CONTAINER (dialog), 5);
   gtk_window_set_default_size (GTK_WINDOW (dialog), 450, -1);
   gtk_window_set_title (GTK_WINDOW (dialog), _("Edit Profiles"));
 

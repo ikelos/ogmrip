@@ -506,7 +506,7 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
       GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
       NULL);
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
-  gtk_container_set_border_width (GTK_CONTAINER (dialog), 5);
+  gtk_container_set_border_width (GTK_CONTAINER (dialog), 6);
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
 
   builder = gtk_builder_new ();

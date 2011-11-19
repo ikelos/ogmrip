@@ -35,14 +35,14 @@ typedef struct _OGMRipListItemPriv  OGMRipListItemPriv;
 
 struct _OGMRipListItem
 {
-  GtkHBox parent_instance;
+  GtkBox parent_instance;
 
   OGMRipListItemPriv *priv;
 };
 
 struct _OGMRipListItemClass
 {
-  GtkHBoxClass parent_class;
+  GtkBoxClass parent_class;
 
   void (* add_clicked)    (OGMRipListItem *item);
   void (* remove_clicked) (OGMRipListItem *item);
@@ -54,5 +54,5 @@ GtkSizeGroup * ogmrip_list_item_get_size_group (OGMRipListItem *list);
 
 G_END_DECLS
 
-#endif /* __OGMRIP_Stream_CHOOSER_WIDGET_H__ */
+#endif /* __OGMRIP_LIST_ITEM_H__ */
 

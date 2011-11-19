@@ -489,7 +489,6 @@ ogmrip_encoding_manager_dialog_init (OGMRipEncodingManagerDialog *dialog)
   gtk_window_set_default_size (GTK_WINDOW (dialog), 500, 300);
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
   gtk_dialog_set_response_sensitive (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT, FALSE);
-  gtk_container_set_border_width (GTK_CONTAINER (dialog), 5);
 
   action_group = gtk_action_group_new ("MenuActions");
   gtk_action_group_set_translation_domain (action_group, GETTEXT_PACKAGE);
@@ -504,7 +503,7 @@ ogmrip_encoding_manager_dialog_init (OGMRipEncodingManagerDialog *dialog)
   area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
 
   widget = gtk_builder_get_widget (builder, OGMRIP_GLADE_ROOT);
-  gtk_box_pack_start (GTK_BOX (area), widget, TRUE, TRUE, 0);
+  gtk_container_add (GTK_CONTAINER (area), widget);
   gtk_widget_show (widget);
 
   widget = gtk_builder_get_widget (builder, "treeview");

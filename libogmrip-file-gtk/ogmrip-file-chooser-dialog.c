@@ -68,16 +68,17 @@ ogmrip_file_chooser_dialog_constructed (GObject *gobject)
   gtk_file_chooser_set_extra_widget (GTK_FILE_CHOOSER (dialog), alignment);
   gtk_widget_show (alignment);
 
-  hbox = gtk_hbox_new (FALSE, 6);
+  hbox = gtk_grid_new ();
+  gtk_grid_set_row_spacing (GTK_GRID (hbox), 6);
   gtk_container_add (GTK_CONTAINER (alignment), hbox);
   gtk_widget_show (hbox);
 
   label = gtk_label_new_with_mnemonic (_("_Language:"));
-  gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
+  gtk_grid_attach (GTK_GRID (hbox), label, 0, 0, 1, 1);
   gtk_widget_show (label);
 
   dialog->priv->lang_chooser = ogmrip_language_chooser_widget_new ();
-  gtk_box_pack_start (GTK_BOX (hbox), dialog->priv->lang_chooser, TRUE, TRUE, 0);
+  gtk_grid_attach (GTK_GRID (hbox), dialog->priv->lang_chooser, 1, 0, 1, 1);
   gtk_widget_show (dialog->priv->lang_chooser);
 
   model = gtk_combo_box_get_model (GTK_COMBO_BOX (dialog->priv->lang_chooser));
@@ -85,6 +86,7 @@ ogmrip_file_chooser_dialog_constructed (GObject *gobject)
   gtk_list_store_set (GTK_LIST_STORE (model), &iter,
       OGMRIP_LANGUAGE_STORE_NAME_COLUMN, _("None"),
       OGMRIP_LANGUAGE_STORE_CODE_COLUMN, 0, -1);
+  gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->lang_chooser), 0);
 
   G_OBJECT_CLASS (ogmrip_file_chooser_dialog_parent_class)->constructed (gobject);
 }

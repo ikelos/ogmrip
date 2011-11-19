@@ -769,7 +769,7 @@ ogmrip_options_dialog_constructed (GObject *gobject)
 
   gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->scale_combo), 0);
 
-  widget = gtk_builder_get_widget (builder, "scale-user-hbox");
+  widget = gtk_builder_get_widget (builder, "scale-user-box");
   g_object_bind_property_full (dialog->priv->scale_combo, "active",
       widget, "sensitive", G_BINDING_SYNC_CREATE,
       ogmrip_options_dialog_set_scale_box_sensitivity, NULL, NULL, NULL);

@@ -177,7 +177,7 @@ ogmrip_audio_options_dialog_init (OGMRipAudioOptionsDialog *dialog)
 {
   GError *error = NULL;
 
-  GtkWidget *root, *area, *vbox, *vbox1, *vbox2, *alignment, *table, *label;
+  GtkWidget *area, *grid1, *grid2, *label;
   GtkBuilder *builder;
 
   GtkTreeModel *model;
@@ -192,62 +192,47 @@ ogmrip_audio_options_dialog_init (OGMRipAudioOptionsDialog *dialog)
 
   gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE);
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
+  gtk_container_set_border_width (GTK_CONTAINER (dialog), 6);
 
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
   gtk_window_set_title (GTK_WINDOW (dialog), _("Audio Track Options"));
 
   area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
 
-  vbox = gtk_vbox_new (FALSE, 12);
-  gtk_container_add (GTK_CONTAINER (area), vbox);
-  gtk_widget_show (vbox);
-
-  vbox1 = gtk_vbox_new (FALSE, 12);
-  gtk_container_set_border_width (GTK_CONTAINER (vbox1), 6);
-  gtk_box_pack_start (GTK_BOX (vbox), vbox1, FALSE, FALSE, 0);
-  gtk_widget_show (vbox1);
-
-  vbox2 = gtk_vbox_new (FALSE, 6);
-  gtk_box_pack_start (GTK_BOX (vbox1), vbox2, FALSE, FALSE, 0);
-  gtk_widget_show (vbox2);
+  grid1 = gtk_grid_new ();
+  gtk_grid_set_row_spacing (GTK_GRID (grid1), 6);
+  gtk_grid_set_column_spacing (GTK_GRID (grid1), 6);
+  gtk_container_add (GTK_CONTAINER (area), grid1);
+  gtk_widget_show (grid1);
 
   label = gtk_label_new (_("<b>Track</b>"));
   gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
-  gtk_box_pack_start (GTK_BOX (vbox2), label, FALSE, FALSE, 0);
+  gtk_grid_attach (GTK_GRID (grid1), label, 0, 0, 2, 1);
   gtk_widget_show (label);
 
-  alignment = gtk_alignment_new (0.5, 0.5, 1.0, 1.0);
-  gtk_alignment_set_padding (GTK_ALIGNMENT (alignment), 0, 0, 12, 0);
-  gtk_box_pack_start (GTK_BOX (vbox2), alignment, FALSE, FALSE, 0);
-  gtk_widget_show (alignment);
-
-  table = gtk_table_new (3, 2, FALSE);
-  gtk_table_set_row_spacings (GTK_TABLE (table), 6);
-  gtk_table_set_col_spacings (GTK_TABLE (table), 6);
-  gtk_container_add (GTK_CONTAINER (alignment), table);
-  gtk_widget_show (table);
-
   label = gtk_label_new_with_mnemonic (_("_Name:"));
-  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 0, 1, GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
+  gtk_grid_attach (GTK_GRID (grid1), label, 0, 1, 1, 1);
+  gtk_widget_set_margin_left (label, 12);
   gtk_widget_show (label);
 
   dialog->priv->label_entry = gtk_entry_new ();
   gtk_entry_set_activates_default (GTK_ENTRY (dialog->priv->label_entry), TRUE);
-  gtk_table_attach (GTK_TABLE (table), dialog->priv->label_entry, 1, 2, 0, 1, GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0);
+  gtk_grid_attach (GTK_GRID (grid1), dialog->priv->label_entry, 1, 1, 1, 1);
   gtk_widget_show (dialog->priv->label_entry);
 
   gtk_label_set_mnemonic_widget (GTK_LABEL (label), dialog->priv->label_entry);
 
   label = gtk_label_new_with_mnemonic (_("_Language:"));
-  gtk_table_attach (GTK_TABLE (table), label, 0, 1, 1, 2, GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0);
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
+  gtk_grid_attach (GTK_GRID (grid1), label, 0, 2, 1, 1);
+  gtk_widget_set_margin_left (label, 12);
   gtk_widget_show (label);
 
   dialog->priv->lang_chooser = ogmrip_language_chooser_widget_new ();
   gtk_label_set_mnemonic_widget (GTK_LABEL (label), dialog->priv->lang_chooser);
-  gtk_table_attach (GTK_TABLE (table), dialog->priv->lang_chooser, 1, 2, 1, 2, GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0);
+  gtk_grid_attach (GTK_GRID (grid1), dialog->priv->lang_chooser, 1, 2, 1, 1);
   gtk_widget_show (dialog->priv->lang_chooser);
 
   model = gtk_combo_box_get_model (GTK_COMBO_BOX (dialog->priv->lang_chooser));
@@ -257,16 +242,18 @@ ogmrip_audio_options_dialog_init (OGMRipAudioOptionsDialog *dialog)
       OGMRIP_LANGUAGE_STORE_CODE_COLUMN, 0, -1);
 
   dialog->priv->default_check = gtk_check_button_new_with_mnemonic (_("Use _profile settings"));
-  gtk_table_attach (GTK_TABLE (table), dialog->priv->default_check, 0, 2, 2, 3, GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 0, 0);
+  gtk_grid_attach (GTK_GRID (grid1), dialog->priv->default_check, 0, 3, 2, 1);
+  gtk_widget_set_margin_left (dialog->priv->default_check, 12);
   gtk_widget_show (dialog->priv->default_check);
 
-  root = gtk_builder_get_widget (builder, OGMRIP_GLADE_ROOT);
-  gtk_widget_reparent (root, vbox);
-  gtk_widget_show (root);
+  grid2 = gtk_builder_get_widget (builder, OGMRIP_GLADE_ROOT);
+  gtk_container_set_border_width (GTK_CONTAINER (grid2), 0);
+  gtk_widget_reparent (grid2, grid1);
+  gtk_widget_show (grid2);
 
-  gtk_box_set_child_packing (GTK_BOX (vbox), root, TRUE, TRUE, 0, GTK_PACK_START);
+  gtk_container_child_set (GTK_CONTAINER (grid1), grid2, "left-attach", 0, "top-attach", 4, "width", 2, NULL);
 
-  g_object_bind_property (dialog->priv->default_check, "active", root, "visible", G_BINDING_INVERT_BOOLEAN);
+  g_object_bind_property (dialog->priv->default_check, "active", grid2, "visible", G_BINDING_INVERT_BOOLEAN);
 
   dialog->priv->codec_combo = gtk_builder_get_widget (builder, "audio-codec-combo");
   ogmrip_type_chooser_widget_construct (GTK_COMBO_BOX (dialog->priv->codec_combo), OGMRIP_TYPE_AUDIO_CODEC);
@@ -283,9 +270,9 @@ ogmrip_audio_options_dialog_init (OGMRipAudioOptionsDialog *dialog)
   dialog->priv->normalize_check = gtk_builder_get_widget (builder, "normalize-check");
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->normalize_check), TRUE);
 
-  table = gtk_builder_get_widget (builder, "audio-options-table");
+  grid2 = gtk_builder_get_widget (builder, "audio-options-table");
   g_signal_connect (dialog->priv->codec_combo, "changed",
-      G_CALLBACK (ogmrip_audio_options_dialog_codec_changed), table);
+      G_CALLBACK (ogmrip_audio_options_dialog_codec_changed), grid2);
 
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->default_check), TRUE);
   gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->codec_combo), 0);

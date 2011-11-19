@@ -156,8 +156,10 @@ ogmrip_media_chooser_dialog_init (OGMRipMediaChooserDialog *dialog)
 
   area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
 
-  vbox = gtk_vbox_new (FALSE, 6);
-  gtk_container_set_border_width (GTK_CONTAINER (vbox), 12);
+  vbox = gtk_grid_new ();
+  gtk_grid_set_row_spacing (GTK_GRID (vbox), 6);
+  gtk_grid_set_column_spacing (GTK_GRID (vbox), 6);
+  gtk_container_set_border_width (GTK_CONTAINER (vbox), 6);
   gtk_container_add (GTK_CONTAINER (area), vbox);
   gtk_widget_show (vbox);
 
@@ -165,11 +167,12 @@ ogmrip_media_chooser_dialog_init (OGMRipMediaChooserDialog *dialog)
   gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
   gtk_label_set_use_underline (GTK_LABEL (label), TRUE);
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
-  gtk_box_pack_start (GTK_BOX (vbox), label, FALSE, FALSE, 0);
+  gtk_grid_attach (GTK_GRID (vbox), label, 0, 0, 1, 1);
   gtk_widget_show (label);
 
   dialog->priv->chooser = ogmrip_media_chooser_widget_new ();
-  gtk_box_pack_start (GTK_BOX (vbox), dialog->priv->chooser, TRUE, TRUE, 0);
+  gtk_grid_attach (GTK_GRID (vbox), dialog->priv->chooser, 0, 1, 1, 1);
+  gtk_widget_set_hexpand (dialog->priv->chooser, TRUE);
   gtk_widget_show (dialog->priv->chooser);
 
   gtk_label_set_mnemonic_widget (GTK_LABEL (label), dialog->priv->chooser);

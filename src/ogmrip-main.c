@@ -1770,7 +1770,7 @@ ogmrip_main_title_chooser_changed (OGMRipData *data)
   angles = title ? ogmrip_title_get_n_angles (title) : 1;
   gtk_spin_button_set_value (GTK_SPIN_BUTTON (data->angle_spin), 1);
   gtk_spin_button_set_range (GTK_SPIN_BUTTON (data->angle_spin), 1, angles);
-  gtk_widget_set_visible (data->angle_spin, angles > 1);
+  gtk_widget_set_visible (gtk_widget_get_parent (data->angle_spin), angles > 1);
 }
 
 /*
@@ -2004,8 +2004,7 @@ ogmrip_main_new (GApplication *app)
   child = gtk_bin_get_child (GTK_BIN (data->window));
 
   widget = gtk_ui_manager_get_widget (ui_manager, "/Menubar");
-  gtk_box_pack_start (GTK_BOX (child), widget, FALSE, FALSE, 0);
-  gtk_box_reorder_child (GTK_BOX (child), widget, 0);
+  gtk_grid_attach (GTK_GRID (child), widget, 0, -1, 1, 1);
 
   action = gtk_action_group_get_action (action_group, "Quit");
   g_signal_connect_swapped (action, "activate",
@@ -2030,7 +2029,8 @@ ogmrip_main_new (GApplication *app)
   widget = gtk_builder_get_widget (builder, "hbox");
 
   data->title_chooser = ogmrip_title_chooser_widget_new ();
-  gtk_box_pack_start (GTK_BOX (widget), data->title_chooser, TRUE, TRUE, 0);
+  gtk_grid_attach (GTK_GRID (widget), data->title_chooser, -1, 0, 1, 1);
+  gtk_widget_set_hexpand (data->title_chooser, TRUE);
   gtk_widget_show (data->title_chooser);
 
   g_signal_connect_swapped (data->title_chooser, "changed",
@@ -2077,19 +2077,11 @@ ogmrip_main_new (GApplication *app)
   g_signal_connect (data->player, "stop",
       G_CALLBACK (ogmrip_main_player_stop), widget);
 
-  widget = gtk_builder_get_widget (builder, "table");
-
-  data->audio_list = gtk_vbox_new (TRUE, 6);
-  gtk_table_attach (GTK_TABLE (widget), data->audio_list, 1, 3, 2, 3, GTK_EXPAND | GTK_FILL, 0, 0, 0);
-  gtk_widget_show (data->audio_list);
-
+  data->audio_list = gtk_builder_get_widget (builder, "audio-list");
   g_object_bind_property (data->title_chooser, "sensitive",
       data->audio_list, "sensitive", G_BINDING_SYNC_CREATE);
 
-  data->subp_list = gtk_vbox_new (TRUE, 6);
-  gtk_table_attach (GTK_TABLE (widget), data->subp_list, 1, 3, 3, 4, GTK_EXPAND | GTK_FILL, 0, 0, 0);
-  gtk_widget_show (data->subp_list);
-
+  data->subp_list = gtk_builder_get_widget (builder, "subp-list");
   g_object_bind_property (data->title_chooser, "sensitive",
       data->subp_list, "sensitive", G_BINDING_SYNC_CREATE);
 

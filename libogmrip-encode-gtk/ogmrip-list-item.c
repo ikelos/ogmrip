@@ -88,7 +88,7 @@ ogmrip_list_item_rem_button_clicked_cb (OGMRipListItem *item)
   g_signal_emit (G_OBJECT (item), signals[REMOVE], 0);
 }
 
-G_DEFINE_TYPE (OGMRipListItem, ogmrip_list_item, GTK_TYPE_HBOX)
+G_DEFINE_TYPE (OGMRipListItem, ogmrip_list_item, GTK_TYPE_BOX)
 
 static void
 ogmrip_list_item_class_init (OGMRipListItemClass *klass)
@@ -127,6 +127,8 @@ ogmrip_list_item_init (OGMRipListItem *item)
 {
   item->priv = OGMRIP_LIST_ITEM_GET_PRIVATE (item);
 
+  gtk_widget_set_vexpand (GTK_WIDGET (item), FALSE);
+
   item->priv->group = gtk_size_group_new (GTK_SIZE_GROUP_BOTH);
 }
 
@@ -142,14 +144,15 @@ ogmrip_list_item_constructed (GObject *gobject)
   if (!item->priv->remove_tooltip)
     item->priv->remove_tooltip = g_strdup (_("Remove the item"));
 
-  hbox = gtk_hbox_new (TRUE, 0);
+  hbox = gtk_grid_new ();
   gtk_box_pack_end (GTK_BOX (item), hbox, FALSE, FALSE, 0);
   gtk_widget_show (hbox);
 
   item->priv->add_button = gtk_button_new ();
   gtk_widget_set_no_show_all (item->priv->add_button, TRUE);
-  gtk_box_pack_start (GTK_BOX (hbox), item->priv->add_button, FALSE, FALSE, 0);
+  gtk_grid_attach (GTK_GRID (hbox), item->priv->add_button, 0, 0, 1, 1);
   gtk_widget_set_tooltip_text (item->priv->add_button, item->priv->add_tooltip);
+  gtk_widget_set_vexpand (item->priv->add_button, TRUE);
   gtk_widget_show (item->priv->add_button);
 
   gtk_size_group_add_widget (item->priv->group, item->priv->add_button);
@@ -163,8 +166,9 @@ ogmrip_list_item_constructed (GObject *gobject)
 
   item->priv->remove_button = gtk_button_new ();
   gtk_widget_set_no_show_all (item->priv->remove_button, TRUE);
-  gtk_box_pack_start (GTK_BOX (hbox), item->priv->remove_button, FALSE, FALSE, 0);
+  gtk_grid_attach (GTK_GRID (hbox), item->priv->remove_button, 1, 0, 1, 1);
   gtk_widget_set_tooltip_text (item->priv->remove_button, item->priv->remove_tooltip);
+  gtk_widget_set_vexpand (item->priv->remove_button, TRUE);
 
   gtk_size_group_add_widget (item->priv->group, item->priv->remove_button);
 
@@ -230,7 +234,7 @@ ogmrip_list_item_set_property (GObject *gobject, guint prop_id, const GValue *va
 GtkWidget *
 ogmrip_list_item_new (void)
 {
-  return g_object_new (OGMRIP_TYPE_LIST_ITEM, NULL);
+  return g_object_new (OGMRIP_TYPE_LIST_ITEM, "orientation", GTK_ORIENTATION_HORIZONTAL, NULL);
 }
 
 GtkSizeGroup *
