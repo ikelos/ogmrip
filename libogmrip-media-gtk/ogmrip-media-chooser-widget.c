@@ -237,9 +237,7 @@ ogmrip_media_chooser_widget_volume_added (OGMRipMediaChooserWidget *chooser, GVo
       g_signal_connect_swapped (volume, "removed",
           G_CALLBACK (ogmrip_media_chooser_widget_volume_removed), chooser);
 
-      if (gtk_combo_box_get_active (GTK_COMBO_BOX (chooser)) == -1)
-        gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), 0);
-      else
+      if (gtk_combo_box_get_active (GTK_COMBO_BOX (chooser)) >= 0)
       {
         if (gtk_combo_box_get_active_iter (GTK_COMBO_BOX (chooser), &sibling))
         {
@@ -340,7 +338,6 @@ ogmrip_media_chooser_widget_init (OGMRipMediaChooserWidget *chooser)
   gtk_list_store_append (store, &iter);
   gtk_list_store_set (store, &iter,
       TEXT_COLUMN, _("Select a media file..."), TYPE_COLUMN, FILE_SEL_ROW, -1);
-
 }
 
 static void
