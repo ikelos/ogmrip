@@ -14,40 +14,14 @@
         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
         <property name="hexpand">True</property>
         <property name="xalign">0</property>
-        <property name="label" translatable="yes">_Profiles:</property>
+        <property name="label" translatable="yes">&lt;b&gt;_Profiles:&lt;/b&gt;</property>
+        <property name="use_markup">True</property>
         <property name="use_underline">True</property>
       </object>
       <packing>
         <property name="left_attach">0</property>
         <property name="top_attach">0</property>
         <property name="width">2</property>
-        <property name="height">1</property>
-      </packing>
-    </child>
-    <child>
-      <object class="GtkScrolledWindow" id="swin">
-        <property name="visible">True</property>
-        <property name="can_focus">True</property>
-        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-        <property name="shadow_type">in</property>
-        <child>
-          <object class="GtkTreeView" id="treeview">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-            <property name="hexpand">True</property>
-            <property name="vexpand">True</property>
-            <property name="headers_visible">False</property>
-            <child internal-child="selection">
-              <object class="GtkTreeSelection" id="treeview-selection"/>
-            </child>
-          </object>
-        </child>
-      </object>
-      <packing>
-        <property name="left_attach">0</property>
-        <property name="top_attach">1</property>
-        <property name="width">1</property>
         <property name="height">1</property>
       </packing>
     </child>
@@ -186,6 +160,33 @@
       </object>
       <packing>
         <property name="left_attach">1</property>
+        <property name="top_attach">1</property>
+        <property name="width">1</property>
+        <property name="height">1</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkScrolledWindow" id="swin">
+        <property name="visible">True</property>
+        <property name="can_focus">True</property>
+        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+        <property name="hexpand">True</property>
+        <property name="vexpand">True</property>
+        <property name="shadow_type">in</property>
+        <child>
+          <object class="GtkTreeView" id="treeview">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+            <property name="headers_visible">False</property>
+            <child internal-child="selection">
+              <object class="GtkTreeSelection" id="treeview-selection"/>
+            </child>
+          </object>
+        </child>
+      </object>
+      <packing>
+        <property name="left_attach">0</property>
         <property name="top_attach">1</property>
         <property name="width">1</property>
         <property name="height">1</property>
