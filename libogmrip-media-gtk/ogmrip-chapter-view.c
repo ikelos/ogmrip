@@ -34,28 +34,6 @@ struct _OGMRipChapterViewPriv
 
 static void ogmrip_chapter_view_dispose (GObject *gobject);
 
-#if !GTK_CHECK_VERSION(3, 0, 0)
-static gboolean
-gtk_tree_model_iter_previous (GtkTreeModel *model, GtkTreeIter  *iter)
-{
-  GtkTreePath *path;
-  gboolean retval;
-
-  path = gtk_tree_model_get_path (model, iter);
-  if (!path)
-    return FALSE;
-
-  retval = gtk_tree_path_prev (path) &&
-    gtk_tree_model_get_iter (model, iter, path);
-  if (!retval)
-    iter->stamp = 0;
-
-  gtk_tree_path_free (path);
-
-  return retval;
-}
-#endif
-
 G_DEFINE_TYPE (OGMRipChapterView, ogmrip_chapter_view, GTK_TYPE_TREE_VIEW)
 
 static void

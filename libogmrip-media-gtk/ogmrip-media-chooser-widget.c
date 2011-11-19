@@ -439,11 +439,7 @@ ogmrip_media_chooser_widget_select_file (GtkComboBox *combo, gboolean file)
     gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
   }
 
-#if GTK_CHECK_VERSION(3,0,0)
   pixbuf = gtk_widget_render_icon_pixbuf (GTK_WIDGET (dialog), GTK_STOCK_OPEN, GTK_ICON_SIZE_DIALOG);
-#else
-  pixbuf = gtk_widget_render_icon (GTK_WIDGET (dialog), GTK_STOCK_OPEN, GTK_ICON_SIZE_DIALOG, NULL);
-#endif
   if (pixbuf)
   {
     gtk_window_set_icon (GTK_WINDOW (dialog), pixbuf);

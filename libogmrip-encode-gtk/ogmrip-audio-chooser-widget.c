@@ -52,11 +52,7 @@ static void ogmrip_audio_chooser_widget_set_property (GObject        *gobject,
                                                       guint          property_id,
                                                       const GValue   *value,
                                                       GParamSpec     *pspec);
-#if GTK_CHECK_VERSION(3,0,0)
 static void ogmrip_audio_chooser_widget_destroy      (GtkWidget      *widget);
-#else
-static void ogmrip_audio_chooser_widget_destroy      (GtkObject      *object);
-#endif
 
 static OGMRipStream *
 ogmrip_audio_chooser_widget_get_active (OGMRipSourceChooser *chooser)
@@ -142,23 +138,14 @@ static void
 ogmrip_audio_chooser_widget_class_init (OGMRipAudioChooserWidgetClass *klass)
 {
   GObjectClass *gobject_class;
-#if GTK_CHECK_VERSION(3,0,0)
   GtkWidgetClass *widget_class;
-#else
-  GtkObjectClass *object_class;
-#endif
 
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->get_property = ogmrip_audio_chooser_widget_get_property;
   gobject_class->set_property = ogmrip_audio_chooser_widget_set_property;
 
-#if GTK_CHECK_VERSION(3,0,0)
   widget_class = GTK_WIDGET_CLASS (klass);
   widget_class->destroy = ogmrip_audio_chooser_widget_destroy;
-#else
-  object_class = GTK_OBJECT_CLASS (klass);
-  object_class->destroy = ogmrip_audio_chooser_widget_destroy;
-#endif
 
   g_object_class_override_property (gobject_class, PROP_TITLE, "title");
 
@@ -243,7 +230,6 @@ ogmrip_audio_chooser_widget_set_property (GObject *gobject, guint property_id, c
   }
 }
 
-#if GTK_CHECK_VERSION(3,0,0)
 static void
 ogmrip_audio_chooser_widget_destroy (GtkWidget *widget)
 {
@@ -257,21 +243,6 @@ ogmrip_audio_chooser_widget_destroy (GtkWidget *widget)
 
   GTK_WIDGET_CLASS (ogmrip_audio_chooser_widget_parent_class)->destroy (widget);
 }
-#else
-static void
-ogmrip_audio_chooser_widget_destroy (GtkObject *object)
-{
-  OGMRipAudioChooserWidget *chooser = OGMRIP_AUDIO_CHOOSER_WIDGET (object);
-
-  if (chooser->priv->dialog)
-  {
-    gtk_widget_destroy (chooser->priv->dialog);
-    chooser->priv->dialog = NULL;
-  }
-
-  GTK_OBJECT_CLASS (ogmrip_audio_chooser_widget_parent_class)->destroy (object);
-}
-#endif
 
 GtkWidget *
 ogmrip_audio_chooser_widget_new (void)

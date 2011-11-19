@@ -78,11 +78,7 @@ ogmrip_progress_dialog_get_visibility (OGMRipProgressDialog *dialog)
 {
   GdkWindowState state;
 
-#if GTK_CHECK_VERSION(2,19,0)
   if (!gtk_widget_get_realized (GTK_WIDGET (dialog)))
-#else
-  if (!GTK_WIDGET_REALIZED (dialog))
-#endif
     return FALSE;
 
   if (dialog->priv->iconified)
