@@ -135,28 +135,6 @@ ogmrip_encoding_manager_dialog_remove_encoding (OGMRipEncodingManagerDialog *dia
     gtk_list_store_remove (dialog->priv->store, &iter);
 }
 
-#if !GTK_CHECK_VERSION(3, 0, 0)
-static gboolean
-gtk_tree_model_iter_previous (GtkTreeModel *model, GtkTreeIter  *iter)
-{
-  GtkTreePath *path;
-  gboolean retval;
-
-  path = gtk_tree_model_get_path (model, iter);
-  if (!path)
-    return FALSE;
-
-  retval = gtk_tree_path_prev (path) &&
-    gtk_tree_model_get_iter (model, iter, path);
-  if (!retval)
-    iter->stamp = 0;
-
-  gtk_tree_path_free (path);
-
-  return retval;
-}
-#endif
-
 static void
 ogmrip_encoding_manager_dialog_move_encoding (OGMRipEncodingManagerDialog *dialog, OGMRipEncoding *encoding, OGMRipDirection direction)
 {

@@ -85,11 +85,7 @@ static void ogmrip_source_chooser_widget_set_property (GObject      *gobject,
                                                        guint        property_id,
                                                        const GValue *value,
                                                        GParamSpec   *pspec);
-#if GTK_CHECK_VERSION(3,0,0)
 static void ogmrip_source_chooser_widget_destroy      (GtkWidget    *widget);
-#else
-static void ogmrip_source_chooser_widget_destroy      (GtkObject    *object);
-#endif
 static void ogmrip_source_chooser_widget_changed      (GtkComboBox  *combo);
 
 static gboolean
@@ -290,11 +286,7 @@ static void
 ogmrip_source_chooser_widget_class_init (OGMRipSourceChooserWidgetClass *klass)
 {
   GObjectClass *gobject_class;
-#if GTK_CHECK_VERSION(3,0,0)
   GtkWidgetClass *widget_class;
-#else
-  GtkObjectClass *object_class;
-#endif
   GtkComboBoxClass *combo_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
@@ -304,13 +296,8 @@ ogmrip_source_chooser_widget_class_init (OGMRipSourceChooserWidgetClass *klass)
   gobject_class->get_property = ogmrip_source_chooser_widget_get_property;
   gobject_class->set_property = ogmrip_source_chooser_widget_set_property;
 
-#if GTK_CHECK_VERSION(3,0,0)
   widget_class = GTK_WIDGET_CLASS (klass);
   widget_class->destroy = ogmrip_source_chooser_widget_destroy;
-#else
-  object_class = GTK_OBJECT_CLASS (klass);
-  object_class->destroy = ogmrip_source_chooser_widget_destroy;
-#endif
 
   combo_class = GTK_COMBO_BOX_CLASS (klass);
   combo_class->changed = ogmrip_source_chooser_widget_changed;
@@ -427,7 +414,6 @@ ogmrip_source_chooser_widget_set_property (GObject *gobject, guint property_id, 
   }
 }
 
-#if GTK_CHECK_VERSION(3,0,0)
 static void
 ogmrip_source_chooser_widget_destroy (GtkWidget *widget)
 {
@@ -441,21 +427,6 @@ ogmrip_source_chooser_widget_destroy (GtkWidget *widget)
 
   GTK_WIDGET_CLASS (ogmrip_source_chooser_widget_parent_class)->destroy (widget);
 }
-#else
-static void
-ogmrip_source_chooser_widget_destroy (GtkObject *object)
-{
-  OGMRipSourceChooserWidget *chooser = OGMRIP_SOURCE_CHOOSER_WIDGET (object);
-
-  if (chooser->priv->dialog)
-  {
-    gtk_widget_destroy (chooser->priv->dialog);
-    chooser->priv->dialog = NULL;
-  }
-
-  GTK_OBJECT_CLASS (ogmrip_source_chooser_widget_parent_class)->destroy (object);
-}
-#endif
 
 static OGMRipStream *
 ogmrip_source_chooser_widget_get_active (OGMRipSourceChooser *chooser)
