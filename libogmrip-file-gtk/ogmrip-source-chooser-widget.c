@@ -541,47 +541,45 @@ ogmrip_source_chooser_widget_add_audio_stream (OGMRipSourceChooserWidget *choose
   }
   else
   {
-    gint aid, channels, format, lang, content, bitrate;
-    gchar *str;
+    GString *string;
+    const gchar *lang;
+    gint aid, channels, format, content, bitrate;
 
     g_object_ref (stream);
 
-    aid = ogmrip_audio_stream_get_nr (stream);
-    bitrate = ogmrip_audio_stream_get_bitrate (stream);
-    channels = ogmrip_audio_stream_get_channels (stream);
-    content = ogmrip_audio_stream_get_content (stream);
-    lang = ogmrip_audio_stream_get_language (stream);
-    format = ogmrip_stream_get_format (OGMRIP_STREAM (stream));
+    string = g_string_new (NULL);
 
+    aid = ogmrip_audio_stream_get_nr (stream);
+    g_string_printf (string, "%s %02d", _("Track"), aid + 1);
+
+    content = ogmrip_audio_stream_get_content (stream);
     if (content > 0)
-    {
-      if (bitrate > 0)
-        str = g_strdup_printf ("%s %02d: %s (%s, %s, %s, %d kbps)", _("Track"), aid + 1, 
-            ogmrip_audio_content_get_label (content), ogmrip_language_get_label (lang), 
-            ogmrip_format_get_label (format), ogmrip_channels_get_label (channels),
-            bitrate / 1000);
-      else
-        str = g_strdup_printf ("%s %02d: %s (%s, %s, %s)", _("Track"), aid + 1, 
-            ogmrip_audio_content_get_label (content), ogmrip_language_get_label (lang), 
-            ogmrip_format_get_label (format), ogmrip_channels_get_label (channels));
-    }
-    else
-    {
-      if (bitrate > 0)
-        str = g_strdup_printf ("%s %02d (%s, %s, %s, %d kbps)", _("Track"), aid + 1, 
-            ogmrip_language_get_label (lang), ogmrip_format_get_label (format), 
-            ogmrip_channels_get_label (channels), bitrate / 1000);
-      else
-        str = g_strdup_printf ("%s %02d (%s, %s, %s)", _("Track"), aid + 1, 
-            ogmrip_language_get_label (lang), ogmrip_format_get_label (format), 
-            ogmrip_channels_get_label (channels));
-    }
+      g_string_append_printf (string, ": %s", ogmrip_audio_content_get_label (content));
+
+    g_string_append (string, " (");
+
+    lang = ogmrip_language_get_label (ogmrip_audio_stream_get_language (stream));
+    if (!g_str_equal (lang, "Undetermined"))
+      g_string_append_printf (string, "%s, ", lang);
+
+    format = ogmrip_stream_get_format (OGMRIP_STREAM (stream));
+    g_string_append (string, ogmrip_format_get_label (format));
+
+    channels = ogmrip_audio_stream_get_channels (stream);
+    if (channels != OGMRIP_CHANNELS_UNDEFINED)
+      g_string_append_printf (string, ", %s", ogmrip_channels_get_label (channels));
+
+    bitrate = ogmrip_audio_stream_get_bitrate (stream);
+    if (bitrate > 0)
+      g_string_append_printf (string, ", %d kbps", bitrate / 1000);
+
+    g_string_append_c (string, ')');
 
     ogmrip_source_chooser_widget_get_stream_iter (chooser, &iter);
     gtk_list_store_set (chooser->priv->store, &iter,
-        TEXT_COLUMN, str, TYPE_COLUMN, ROW_TYPE_STREAM, LANG_COLUMN, lang, SOURCE_COLUMN, stream, -1);
+        TEXT_COLUMN, string->str, TYPE_COLUMN, ROW_TYPE_STREAM, LANG_COLUMN, lang, SOURCE_COLUMN, stream, -1);
 
-    g_free (str);
+    g_string_free (string, TRUE);
   }
 }
 
@@ -600,27 +598,30 @@ ogmrip_source_chooser_widget_add_subp_stream (OGMRipSourceChooserWidget *chooser
   }
   else
   {
-    gint sid, lang, content;
-    gchar *str;
+    GString *string;
+    gint sid, content;
+    const gchar *lang;
 
     g_object_ref (stream);
 
-    sid = ogmrip_subp_stream_get_nr (stream);
-    lang = ogmrip_subp_stream_get_language (stream);
-    content = ogmrip_subp_stream_get_content (stream);
+    string = g_string_new (NULL);
 
+    sid = ogmrip_subp_stream_get_nr (stream);
+    g_string_append_printf (string, "%s %02d", _("Subtitle"), sid + 1);
+
+    content = ogmrip_subp_stream_get_content (stream);
     if (content > 0)
-      str = g_strdup_printf ("%s %02d: %s (%s)", _("Subtitle"), sid + 1, 
-          ogmrip_subp_content_get_label (content), ogmrip_language_get_label (lang));
-    else
-      str = g_strdup_printf ("%s %02d (%s)", _("Subtitle"), sid + 1, 
-          ogmrip_language_get_label (lang));
+      g_string_append_printf (string, ": %s", ogmrip_subp_content_get_label (content));
+
+    lang = ogmrip_language_get_label (ogmrip_subp_stream_get_language (stream));
+    if (!g_str_equal (lang, "Undetermined"))
+      g_string_append_printf (string, " (%s)", lang);
 
     ogmrip_source_chooser_widget_get_stream_iter (chooser, &iter);
     gtk_list_store_set (chooser->priv->store, &iter,
-        TEXT_COLUMN, str, TYPE_COLUMN, ROW_TYPE_STREAM, LANG_COLUMN, lang, SOURCE_COLUMN, stream, -1);
+        TEXT_COLUMN, string->str, TYPE_COLUMN, ROW_TYPE_STREAM, LANG_COLUMN, lang, SOURCE_COLUMN, stream, -1);
 
-    g_free (str);
+    g_string_free (string, TRUE);
   }
 }
 

@@ -72,10 +72,10 @@ ogmrip_title_chooser_widget_set_disc (OGMRipTitleChooserWidget *chooser, OGMRipM
 
   OGMRipTitle *title;
   OGMRipTime time_;
+  GString *string;
 
   gint vid, nvid, standard, aspect;
   glong length, longest;
-  gchar *str, *str_time;
 
   if (media)
     g_object_ref (media);
@@ -100,25 +100,30 @@ ogmrip_title_chooser_widget_set_disc (OGMRipTitleChooserWidget *chooser, OGMRipM
       {
         stream = ogmrip_title_get_video_stream (title);
 
-        standard = ogmrip_video_stream_get_standard (stream);
-        aspect = ogmrip_video_stream_get_aspect (stream);
+        string = g_string_new (NULL);
+        g_string_printf (string, "%s %02d", _("Title"), vid + 1);
+
         length = ogmrip_title_get_length (title, &time_);
-
         if (time_.hour > 0)
-          str_time = g_strdup_printf ("%02lu:%02lu %s", time_.hour, time_.min, _("hours"));
+          g_string_append_printf (string, " (%02lu:%02lu %s", time_.hour, time_.min, _("hours"));
         else if (time_.min > 0)
-          str_time = g_strdup_printf ("%02lu:%02lu %s", time_.min, time_.sec, _("minutes"));
+          g_string_append_printf (string, " (%02lu:%02lu %s", time_.min, time_.sec, _("minutes"));
         else
-          str_time = g_strdup_printf ("%02lu %s", time_.sec, _("seconds"));
+          g_string_append_printf (string, " (%02lu %s", time_.sec, _("seconds"));
 
-        str = g_strdup_printf ("%s %02d (%s, %s, %s)", _("Title"), vid + 1, str_time,
-            ogmrip_standard_get_label (standard), 
-            ogmrip_aspect_get_label (aspect)); 
-        g_free (str_time);
+        standard = ogmrip_video_stream_get_standard (stream);
+        if (standard != OGMRIP_STANDARD_UNDEFINED)
+          g_string_append_printf (string, ", %s", ogmrip_standard_get_label (standard));
+
+        aspect = ogmrip_video_stream_get_aspect (stream);
+        if (aspect != OGMRIP_ASPECT_UNDEFINED)
+          g_string_append_printf (string, ", %s", ogmrip_aspect_get_label (aspect));
+
+        g_string_append_c (string, ')');
 
         gtk_list_store_append (GTK_LIST_STORE (model), &iter);
-        gtk_list_store_set (GTK_LIST_STORE (model), &iter, TEXT_COLUMN, str, NR_COLUMN, vid, -1);
-        g_free (str);
+        gtk_list_store_set (GTK_LIST_STORE (model), &iter, TEXT_COLUMN, string->str, NR_COLUMN, vid, -1);
+        g_string_free (string, TRUE);
 
         if (length > longest)
         {
