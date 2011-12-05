@@ -361,9 +361,10 @@ ogmrip_profile_manager_dialog_init (OGMRipProfileManagerDialog *dialog)
 {
   GError *error = NULL;
 
-  GtkWidget *area, *widget, *image;
+  GtkWidget *area, *widget;
   GtkBuilder *builder;
 
+  GtkStyleContext *context;
   GtkTreeViewColumn *column;
   GtkCellRenderer *cell;
 
@@ -384,6 +385,14 @@ ogmrip_profile_manager_dialog_init (OGMRipProfileManagerDialog *dialog)
   widget = gtk_builder_get_widget (builder, OGMRIP_GLADE_ROOT);
   gtk_container_add (GTK_CONTAINER (area), widget);
   gtk_widget_show (widget);
+
+  widget = gtk_builder_get_widget (builder, "swin");
+  context = gtk_widget_get_style_context (widget);
+  gtk_style_context_set_junction_sides (context, GTK_JUNCTION_BOTTOM);
+
+  widget = gtk_builder_get_widget (builder, "toolbar");
+  context = gtk_widget_get_style_context (widget);
+  gtk_style_context_set_junction_sides (context, GTK_JUNCTION_TOP);
 
   widget = gtk_builder_get_widget (builder, "treeview");
 
@@ -431,24 +440,15 @@ ogmrip_profile_manager_dialog_init (OGMRipProfileManagerDialog *dialog)
   g_signal_connect (dialog->priv->selection, "changed",
       G_CALLBACK (ogmrip_profile_manager_dialog_set_button_sensitivity), widget);
 
-  image = gtk_image_new_from_stock (GTK_STOCK_REFRESH, GTK_ICON_SIZE_BUTTON);
-  gtk_button_set_image (GTK_BUTTON (widget), image);
-
   widget = gtk_builder_get_widget (builder, "export-button");
   g_signal_connect_swapped (widget, "clicked",
       G_CALLBACK (ogmrip_profile_manager_dialog_export_button_clicked), dialog);
   g_signal_connect (dialog->priv->selection, "changed",
       G_CALLBACK (ogmrip_profile_manager_dialog_set_button_sensitivity), widget);
 
-  image = gtk_image_new_from_stock (GTK_STOCK_SAVE, GTK_ICON_SIZE_BUTTON);
-  gtk_button_set_image (GTK_BUTTON (widget), image);
-
   widget = gtk_builder_get_widget (builder, "import-button");
   g_signal_connect_swapped (widget, "clicked",
       G_CALLBACK (ogmrip_profile_manager_dialog_import_button_clicked), dialog);
-
-  image = gtk_image_new_from_stock (GTK_STOCK_OPEN, GTK_ICON_SIZE_BUTTON);
-  gtk_button_set_image (GTK_BUTTON (widget), image);
 
   g_object_unref (builder);
 }
