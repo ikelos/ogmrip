@@ -278,6 +278,7 @@ static void
 ogmrip_main_load (OGMRipData *data, OGMRipMedia *media)
 {
   gint nvid;
+  const gchar *label = NULL;
 
   if (data->media)
     g_object_unref (data->media);
@@ -286,8 +287,11 @@ ogmrip_main_load (OGMRipData *data, OGMRipMedia *media)
   ogmrip_title_chooser_set_media (OGMRIP_TITLE_CHOOSER (data->title_chooser), media);
 
   nvid = ogmrip_media_get_n_titles (media);
+  if (nvid > 0)
+    label = ogmrip_media_get_label (media);
+
   gtk_entry_set_text (GTK_ENTRY (data->title_entry),
-      nvid > 0 ? ogmrip_media_get_label (media) : "");
+      label ? label : _("Untitled"));
 
   gtk_action_set_sensitive (data->extract_action, data->prepared);
 }
@@ -1940,8 +1944,8 @@ ogmrip_main_new (GApplication *app)
   GtkActionEntry action_entries[] =
   {
     { "FileMenu",     NULL,                  N_("_File"),               NULL,          NULL,                             NULL },
-    { "Load",         GTK_STOCK_CDROM,       N_("_Load"),               "<ctl>L",      N_("Load a DVD disk, an ISO file, or a DVD structure"), NULL },
-    { "Extract",      GTK_STOCK_CONVERT,     N_("E_xtract"),            "<ctl>Return", N_("Extract selected streams"),   NULL },
+    { "Load",         GTK_STOCK_CDROM,       N_("_Load"),               "<ctl>L",      N_("Load a media"),               NULL },
+    { "Extract",      GTK_STOCK_CONVERT,     N_("E_xtract"),            "<ctl>Return", N_("Extract selected title"),     NULL },
     { "OpenChapters", NULL,                  N_("_Import Chapters..."), NULL,          N_("Import chapter information"), NULL },
     { "SaveChapters", NULL,                  N_("_Export Chapters..."), NULL,          N_("Export chapter information"), NULL },
     { "Quit",         GTK_STOCK_QUIT,        NULL,                      NULL,          N_("Exit OGMRip"),                NULL },
