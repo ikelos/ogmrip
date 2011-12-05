@@ -29,7 +29,7 @@ ogmrip_media_info_get_file_info (OGMRipMediaInfo *info, OGMRipFilePriv *file)
   const gchar *str;
 
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "Duration");
-  file->length = str ? atoi (str) / 1000. : -1.0;
+  file->length = str ? atoi (str) : -1.0;
 
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "FileSize");
   file->media_size = str ? atoll (str) : -1;
@@ -205,12 +205,37 @@ void
 ogmrip_media_info_get_audio_info (OGMRipMediaInfo *info, guint track, OGMRipAudioFilePriv *audio)
 {
   const gchar *str;
+  gint channels;
 
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_AUDIO, track, "BitRate");
   audio->bitrate = str ? atoi (str) : -1;
 
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_AUDIO, track, "Channel(s)");
-  audio->channels = str ? atoi (str) : -1;
+  channels = str ? atoi (str) : -1;
+  switch (channels)
+  {
+    case 1:
+      audio->channels = OGMRIP_CHANNELS_MONO;
+      break;
+    case 2:
+      audio->channels = OGMRIP_CHANNELS_STEREO;
+      break;
+    case 4:
+      audio->channels = OGMRIP_CHANNELS_SURROUND;
+      break;
+    case 6:
+      audio->channels = OGMRIP_CHANNELS_5_1;
+      break;
+    case 7:
+      audio->channels = OGMRIP_CHANNELS_6_1;
+      break;
+    case 8:
+      audio->channels = OGMRIP_CHANNELS_7_1;
+      break;
+    default:
+      audio->channels = OGMRIP_CHANNELS_UNDEFINED;
+      break;
+  }
 
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_AUDIO, track, "SamplingRate");
   audio->samplerate = str ? atoi (str) : -1;

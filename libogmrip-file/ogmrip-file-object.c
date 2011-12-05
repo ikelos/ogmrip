@@ -99,12 +99,22 @@ static void
 ogmrip_file_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
 {
   OGMRipFile *file = OGMRIP_FILE (gobject);
+  const gchar *str;
 
   switch (property_id)
   {
     case PROP_URI:
-      file->priv->uri = g_value_dup_string (value);
-      file->priv->path = g_filename_from_uri (file->priv->uri, NULL, NULL);
+      str = g_value_get_string (value);
+      if (g_str_has_prefix (str, "file://"))
+      {
+        file->priv->uri = g_strdup (str);
+        file->priv->path = g_filename_from_uri (file->priv->uri, NULL, NULL);
+      }
+      else
+      {
+        file->priv->uri = g_strdup_printf ("file://%s", str);
+        file->priv->path = g_strdup (str);
+      }
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);

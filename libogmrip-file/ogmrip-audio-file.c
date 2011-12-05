@@ -55,6 +55,7 @@ ogmrip_audio_file_constructor (GType type, guint n_properties, GObjectConstructP
 {
   GObject *gobject;
   OGMRipMediaInfo *info;
+  const gchar *str;
 
   gobject = G_OBJECT_CLASS (ogmrip_audio_file_parent_class)->constructor (type, n_properties, properties);
 
@@ -65,33 +66,34 @@ ogmrip_audio_file_constructor (GType type, guint n_properties, GObjectConstructP
     return NULL;
   }
 
-  if (ogmrip_media_info_open (info, OGMRIP_FILE (gobject)->priv->path))
+  if (!ogmrip_media_info_open (info, OGMRIP_FILE (gobject)->priv->path))
   {
-    const gchar *str;
-
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "AudioCount");
-    if (!str || !g_str_equal (str, "1"))
-    {
-      g_object_unref (info);
-      g_object_unref (gobject);
-      return NULL;
-    }
-
-    OGMRIP_FILE (gobject)->priv->format = ogmrip_media_info_get_audio_format (info, 0);
-    if (OGMRIP_FILE (gobject)->priv->format < 0)
-    {
-      g_object_unref (info);
-      g_object_unref (gobject);
-      return NULL;
-    }
-
-    ogmrip_media_info_get_file_info (info, OGMRIP_FILE (gobject)->priv);
-    ogmrip_media_info_get_audio_info (info, 0, OGMRIP_AUDIO_FILE (gobject)->priv);
-
-    OGMRIP_FILE (gobject)->priv->title_size = OGMRIP_AUDIO_FILE (gobject)->priv->size;
-
-    ogmrip_media_info_close (info);
+    g_object_unref (gobject);
+    return NULL;
   }
+
+  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "AudioCount");
+  if (!str || !g_str_equal (str, "1"))
+  {
+    g_object_unref (info);
+    g_object_unref (gobject);
+    return NULL;
+  }
+
+  OGMRIP_FILE (gobject)->priv->format = ogmrip_media_info_get_audio_format (info, 0);
+  if (OGMRIP_FILE (gobject)->priv->format < 0)
+  {
+    g_object_unref (info);
+    g_object_unref (gobject);
+    return NULL;
+  }
+
+  ogmrip_media_info_get_file_info (info, OGMRIP_FILE (gobject)->priv);
+  ogmrip_media_info_get_audio_info (info, 0, OGMRIP_AUDIO_FILE (gobject)->priv);
+
+  OGMRIP_FILE (gobject)->priv->title_size = OGMRIP_AUDIO_FILE (gobject)->priv->size;
+
+  ogmrip_media_info_close (info);
 
   return gobject;
 }

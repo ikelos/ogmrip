@@ -234,6 +234,10 @@ ogmrip_media_file_constructor (GType type, guint n_properties, GObjectConstructP
 {
   GObject *gobject;
   OGMRipMediaInfo *info;
+  OGMRipMediaFile *media;
+  OGMRipMediaFileStream *stream;
+  const gchar *str;
+  gint i, n;
 
   gobject = G_OBJECT_CLASS (ogmrip_media_file_parent_class)->constructor (type, n_properties, properties);
   if (!gobject)
@@ -246,40 +250,45 @@ ogmrip_media_file_constructor (GType type, guint n_properties, GObjectConstructP
     return NULL;
   }
 
-  if (ogmrip_media_info_open (info, OGMRIP_FILE (gobject)->priv->path))
+  if (!ogmrip_media_info_open (info, OGMRIP_FILE (gobject)->priv->path))
   {
-    OGMRipMediaFileStream *stream;
-    const gchar *str;
-    gint i, n;
-
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "AudioCount");
-
-    n = str ? atoi (str) : 0;
-    for (i = 0; i < n; i ++)
-    {
-      stream = g_object_new (OGMRIP_TYPE_MEDIA_FILE_AUDIO, 0);
-      stream->title = OGMRIP_TITLE (gobject);
-      stream->format = ogmrip_media_info_get_audio_format (info, i);
-
-      ogmrip_media_info_get_audio_info (info, i, OGMRIP_MEDIA_FILE_AUDIO (stream)->priv);
-      OGMRIP_FILE (gobject)->priv->title_size += OGMRIP_MEDIA_FILE_AUDIO (stream)->priv->size;
-    }
-
-    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "TextCount");
-
-    n = str ? atoi (str) : 0;
-    for (i = 0; i < n; i ++)
-    {
-      stream = g_object_new (OGMRIP_TYPE_MEDIA_FILE_SUBP, 0);
-      stream->title = OGMRIP_TITLE (gobject);
-      stream->format = ogmrip_media_info_get_subp_format (info, i);
-
-      ogmrip_media_info_get_subp_info (info, i, OGMRIP_MEDIA_FILE_SUBP (stream)->priv);
-      OGMRIP_FILE (gobject)->priv->title_size += OGMRIP_MEDIA_FILE_SUBP (stream)->priv->size;
-    }
-
-    ogmrip_media_info_close (info);
+    g_object_unref (gobject);
+    return NULL;
   }
+
+  media = OGMRIP_MEDIA_FILE (gobject);
+
+  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "AudioCount");
+
+  n = str ? atoi (str) : 0;
+  for (i = 0; i < n; i ++)
+  {
+    stream = g_object_new (OGMRIP_TYPE_MEDIA_FILE_AUDIO, 0);
+    stream->title = OGMRIP_TITLE (gobject);
+    stream->format = ogmrip_media_info_get_audio_format (info, i);
+
+    ogmrip_media_info_get_audio_info (info, i, OGMRIP_MEDIA_FILE_AUDIO (stream)->priv);
+    OGMRIP_FILE (gobject)->priv->title_size += OGMRIP_MEDIA_FILE_AUDIO (stream)->priv->size;
+
+    media->priv->audio_streams = g_list_append (media->priv->audio_streams, stream);
+  }
+
+  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "TextCount");
+
+  n = str ? atoi (str) : 0;
+  for (i = 0; i < n; i ++)
+  {
+    stream = g_object_new (OGMRIP_TYPE_MEDIA_FILE_SUBP, 0);
+    stream->title = OGMRIP_TITLE (gobject);
+    stream->format = ogmrip_media_info_get_subp_format (info, i);
+
+    ogmrip_media_info_get_subp_info (info, i, OGMRIP_MEDIA_FILE_SUBP (stream)->priv);
+    OGMRIP_FILE (gobject)->priv->title_size += OGMRIP_MEDIA_FILE_SUBP (stream)->priv->size;
+
+    media->priv->subp_streams = g_list_append (media->priv->subp_streams, stream);
+  }
+
+  ogmrip_media_info_close (info);
 
   return gobject;
 }
