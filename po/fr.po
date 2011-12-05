@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OGMRip\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-12-05 18:48+0100\n"
+"POT-Creation-Date: 2011-12-05 19:21+0100\n"
 "PO-Revision-Date: 2008-01-11 21:30+0100\n"
 "Last-Translator: Olivier Rolland <billl@users.sourceforge.net>\n"
 "Language-Team: French <fr@li.org>\n"
@@ -1411,12 +1411,12 @@ msgid "_File"
 msgstr "_Fichier"
 
 #: ../src/ogmrip-main.c:1943
-msgid "Load a DVD disk, an ISO file, or a DVD structure"
-msgstr "Charger un DVD, une image ISO ou une structure DVD"
+msgid "Load a media"
+msgstr "Charger un fichier multimedia"
 
 #: ../src/ogmrip-main.c:1944
-msgid "Extract selected streams"
-msgstr "Extrait les pistes sélectionnées"
+msgid "Extract selected title"
+msgstr "Extrait le titre sélectionné"
 
 #: ../src/ogmrip-main.c:1945
 msgid "_Import Chapters..."
@@ -1747,6 +1747,9 @@ msgstr "XviD"
 #: ../plugins/ogmrip-xvid-options.c:269
 msgid "XviD Options"
 msgstr "XviD Options"
+
+#~ msgid "Load a DVD disk, an ISO file, or a DVD structure"
+#~ msgstr "Charger un DVD, une image ISO ou une structure DVD"
 
 #~ msgid "Clear"
 #~ msgstr "Supprimer tout"
@@ -2330,9 +2333,6 @@ msgstr "XviD Options"
 
 #~ msgid "%s: %02.0lf%% done"
 #~ msgstr "%s: %02.0lf%% effectué"
-
-#~ msgid "Load encoding"
-#~ msgstr "Charger un encodage"
 
 #~ msgid "Cannot load encoding from '%s'"
 #~ msgstr "Impossible de charger un encodage depuis '%s'"
