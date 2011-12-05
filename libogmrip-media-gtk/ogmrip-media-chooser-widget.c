@@ -421,7 +421,6 @@ ogmrip_media_chooser_widget_select_file (GtkComboBox *combo, gboolean file)
 {
   OGMRipMedia *media = NULL;
   GtkWidget *dialog, *toplevel;
-  GdkPixbuf *pixbuf;
 
   dialog = gtk_file_chooser_dialog_new (file ? _("Select an media file") : _("Select a media directory"),
       NULL, file ? GTK_FILE_CHOOSER_ACTION_OPEN : GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
@@ -431,16 +430,7 @@ ogmrip_media_chooser_widget_select_file (GtkComboBox *combo, gboolean file)
   if (gtk_widget_is_toplevel (toplevel) && GTK_IS_WINDOW (toplevel))
   {
     gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (toplevel));
-    gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_CENTER_ON_PARENT);
-    gtk_window_set_gravity (GTK_WINDOW (dialog), GDK_GRAVITY_CENTER);
     gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
-  }
-
-  pixbuf = gtk_widget_render_icon_pixbuf (GTK_WIDGET (dialog), GTK_STOCK_OPEN, GTK_ICON_SIZE_DIALOG);
-  if (pixbuf)
-  {
-    gtk_window_set_icon (GTK_WINDOW (dialog), pixbuf);
-    g_object_unref (pixbuf);
   }
 
   if (file)
@@ -448,9 +438,10 @@ ogmrip_media_chooser_widget_select_file (GtkComboBox *combo, gboolean file)
     GtkFileFilter *filter;
 
     filter = gtk_file_filter_new ();
-    gtk_file_filter_set_name (filter, _("ISO images"));
-    gtk_file_chooser_add_filter (GTK_FILE_CHOOSER (dialog), filter);
+    gtk_file_filter_set_name (filter, _("Supported files"));
+    gtk_file_filter_add_mime_type (filter, "video/*");
     gtk_file_filter_add_mime_type (filter, "application/x-cd-image");
+    gtk_file_chooser_add_filter (GTK_FILE_CHOOSER (dialog), filter);
   }
 
   if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_OK)

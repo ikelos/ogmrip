@@ -82,7 +82,7 @@ ogmrip_audio_file_chooser_dialog_constructed (GObject *gobject)
   gtk_window_set_title (GTK_WINDOW (dialog), _("Select an audio file"));
 
   filter = gtk_file_filter_new ();
-  gtk_file_filter_add_mime_type (filter, "audio/?*");
+  gtk_file_filter_add_mime_type (filter, "audio/*");
   gtk_file_filter_add_mime_type (filter, "application/ogg");
   gtk_file_chooser_set_filter (GTK_FILE_CHOOSER (dialog), filter);
 
