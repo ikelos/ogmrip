@@ -136,7 +136,7 @@ ogmrip_media_info_get_video_info (OGMRipMediaInfo *info, guint track, OGMRipVide
     }
   }
 
-  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, track, "DisplayAspectRatio");
+  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, track, "DisplayAspectRatio/String");
   if (str)
   {
     if (sscanf (str, "%u:%u", &video->aspect_num, &video->aspect_denom) != 2)
