@@ -121,10 +121,7 @@ AC_ARG_ENABLE(gtk-support,
   [have_gtk_support="$enableval"], [have_gtk_support="yes"])
 
 if test x"$have_gtk_support" != x"no"; then
-  PKG_CHECK_MODULES(GTK, [gtk+-2.0 >= $GTK_REQUIRED], [have_gtk_support=yes], [have_gtk_support=no])
-  if test x"$have_gtk_support" = x"no"; then
-    PKG_CHECK_MODULES(GTK, [gtk+-3.0 >= 3.0], [have_gtk_support=yes], [have_gtk_support=no])
-  fi
+  PKG_CHECK_MODULES(GTK, [gtk+-3.0 >= 3.0], [have_gtk_support=yes], [have_gtk_support=no])
 fi
 
 if test x"$have_gtk_support" = x"yes"; then
