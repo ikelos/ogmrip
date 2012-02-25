@@ -194,6 +194,7 @@ ogmrip_media_info_get (OGMRipMediaInfo *info, OGMRipCategoryType category, guint
 #if defined(UNICODE) || defined (_UNICODE)
   wchar_t *wstr1;
   const wchar_t *wstr2;
+  char *str;
 
   wstr1 = g_locale_to_wstring (name);
   wstr2 = MediaInfo_Get (info->priv->handle, category, stream, wstr1, MediaInfo_Info_Text, MediaInfo_Info_Name);
@@ -202,7 +203,9 @@ ogmrip_media_info_get (OGMRipMediaInfo *info, OGMRipCategoryType category, guint
   if (info->priv->value)
     g_free (info->priv->value);
 
-  value = info->priv->value = g_locale_from_wstring (wstr2);
+  str = g_locale_from_wstring (wstr2);
+  value = info->priv->value = g_locale_to_utf8 (str, -1, NULL, NULL, NULL);
+  g_free (str);
 #else
   value = MediaInfo_Get (info->priv->handle, category, stream, name, MediaInfo_Info_Text, MediaInfo_Info_Name);
 #endif
