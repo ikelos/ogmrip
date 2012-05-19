@@ -78,8 +78,6 @@ static gboolean ogmrip_vp8_run          (OGMJobTask   *task,
                                          GCancellable *cancellable,
                                          GError       **error);
 
-static gboolean have_vpxenc = FALSE;
-
 static gchar **
 ogmrip_yuv4mpeg_command (OGMRipVideoCodec *video, const gchar *fifo)
 {
@@ -121,10 +119,7 @@ ogmrip_vp8_command (OGMRipVideoCodec *video, const gchar *fifo, guint pass, guin
 
   argv = g_ptr_array_new ();
 
-  if (have_vpxenc)
-    g_ptr_array_add (argv, g_strdup ("vpxenc"));
-  else
-    g_ptr_array_add (argv, g_strdup ("ivfenc"));
+  g_ptr_array_add (argv, g_strdup ("vpxenc"));
 
   ogmrip_video_codec_get_scale_size (video, &width, &height);
   g_ptr_array_add (argv, g_strdup_printf ("--width=%u", width));
@@ -192,10 +187,11 @@ ogmrip_vp8_command (OGMRipVideoCodec *video, const gchar *fifo, guint pass, guin
   if (OGMRIP_VP8 (video)->cpu_used >= 0)
     g_ptr_array_add (argv, g_strdup_printf ("--cpu-used=%u", OGMRIP_VP8 (video)->cpu_used));
 
-  g_ptr_array_add (argv, g_strdup (fifo));
-
   output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (video)));
+  g_ptr_array_add (argv, g_strdup ("-o"));
   g_ptr_array_add (argv, g_strdup (output));
+
+  g_ptr_array_add (argv, g_strdup (fifo));
 
   g_ptr_array_add (argv, NULL);
 
@@ -393,16 +389,10 @@ ogmrip_module_load (OGMRipModule *module)
   gchar *filename;
 
   filename = g_find_program_in_path ("vpxenc");
-  if (filename)
-    have_vpxenc = TRUE;
-  else
+  if (!filename)
   {
-    filename = g_find_program_in_path ("ivfenc");
-    if (!filename)
-    {
-      g_warning (_("vpxenc is missing"));
-      return;
-    }
+    g_warning (_("vpxenc is missing"));
+    return;
   }
   g_free (filename);
 
