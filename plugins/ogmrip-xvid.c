@@ -383,7 +383,7 @@ ogmrip_xvid_configure (OGMRipConfigurable *configurable, OGMRipProfile *profile)
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
     g_settings_bind (settings, "max-iquant", configurable, OGMRIP_XVID_PROP_MAX_IQUANT,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
-    g_settings_bind (settings, "max-keyint", configurable, OGMRIP_XVID_PROP_MAX_KEYINT,
+    g_settings_bind (settings, "max-key-interval", configurable, OGMRIP_XVID_PROP_MAX_KEYINT,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
     g_settings_bind (settings, "max-pquant", configurable, OGMRIP_XVID_PROP_MAX_PQUANT,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
@@ -467,27 +467,27 @@ ogmrip_xvid_class_init (OGMRipXvidClass *klass)
 
   g_object_class_install_property (gobject_class, PROP_MIN_IQUANT,
       g_param_spec_uint (OGMRIP_XVID_PROP_MIN_IQUANT, NULL, NULL,
-        0, 31, OGMRIP_XVID_DEFAULT_MIN_IQUANT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+        1, 31, OGMRIP_XVID_DEFAULT_MIN_IQUANT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_MAX_IQUANT,
       g_param_spec_uint (OGMRIP_XVID_PROP_MAX_IQUANT, NULL, NULL,
-        0, 31, OGMRIP_XVID_DEFAULT_MAX_IQUANT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+        1, 31, OGMRIP_XVID_DEFAULT_MAX_IQUANT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_MIN_PQUANT,
       g_param_spec_uint (OGMRIP_XVID_PROP_MIN_PQUANT, NULL, NULL,
-        0, 31, OGMRIP_XVID_DEFAULT_MIN_PQUANT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+        1, 31, OGMRIP_XVID_DEFAULT_MIN_PQUANT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_MAX_PQUANT,
       g_param_spec_uint (OGMRIP_XVID_PROP_MAX_PQUANT, NULL, NULL,
-        0, 31, OGMRIP_XVID_DEFAULT_MAX_PQUANT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+        1, 31, OGMRIP_XVID_DEFAULT_MAX_PQUANT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_MIN_BQUANT,
       g_param_spec_uint (OGMRIP_XVID_PROP_MIN_BQUANT, NULL, NULL,
-        0, 31, OGMRIP_XVID_DEFAULT_MIN_BQUANT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+        1, 31, OGMRIP_XVID_DEFAULT_MIN_BQUANT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_MAX_BQUANT,
       g_param_spec_uint (OGMRIP_XVID_PROP_MAX_BQUANT, NULL, NULL,
-        0, 31, OGMRIP_XVID_DEFAULT_MAX_BQUANT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+        1, 31, OGMRIP_XVID_DEFAULT_MAX_BQUANT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_MAX_BFRAMES,
       g_param_spec_uint (OGMRIP_XVID_PROP_MAX_BFRAMES, NULL, NULL,
@@ -646,10 +646,10 @@ ogmrip_xvid_get_property (GObject *gobject, guint property_id, GValue *value, GP
   switch (property_id) 
   {
     case PROP_PROFILE:
-      g_value_set_int (value, xvid->profile);
+      g_value_set_uint (value, xvid->profile);
       break;
     case PROP_QUANT_TYPE:
-      g_value_set_int (value, xvid->quant_type);
+      g_value_set_uint (value, xvid->quant_type);
       break;
     case PROP_GMC:
       g_value_set_boolean (value, xvid->gmc);
@@ -658,28 +658,28 @@ ogmrip_xvid_get_property (GObject *gobject, guint property_id, GValue *value, GP
       g_value_set_boolean (value, xvid->interlacing);
       break;
     case PROP_MIN_IQUANT:
-      g_value_set_int (value, xvid->min_iquant);
+      g_value_set_uint (value, xvid->min_iquant);
       break;
     case PROP_MAX_IQUANT:
-      g_value_set_int (value, xvid->max_iquant);
+      g_value_set_uint (value, xvid->max_iquant);
       break;
     case PROP_MIN_PQUANT:
-      g_value_set_int (value, xvid->min_pquant);
+      g_value_set_uint (value, xvid->min_pquant);
       break;
     case PROP_MAX_PQUANT:
-      g_value_set_int (value, xvid->min_pquant);
+      g_value_set_uint (value, xvid->min_pquant);
       break;
     case PROP_MIN_BQUANT:
-      g_value_set_int (value, xvid->min_bquant);
+      g_value_set_uint (value, xvid->min_bquant);
       break;
     case PROP_MAX_BQUANT:
-      g_value_set_int (value, xvid->min_bquant);
+      g_value_set_uint (value, xvid->min_bquant);
       break;
     case PROP_MAX_BFRAMES:
-      g_value_set_int (value, xvid->max_bframes);
+      g_value_set_uint (value, xvid->max_bframes);
       break;
     case PROP_MAX_KEYINT:
-      g_value_set_int (value, xvid->max_keyint);
+      g_value_set_uint (value, xvid->max_keyint);
       break;
     case PROP_CHROMA_ME:
       g_value_set_boolean (value, xvid->chroma_me);
@@ -688,16 +688,16 @@ ogmrip_xvid_get_property (GObject *gobject, guint property_id, GValue *value, GP
       g_value_set_boolean (value, xvid->chroma_opt);
       break;
     case PROP_ME_QUALITY:
-      g_value_set_int (value, xvid->me_quality);
+      g_value_set_uint (value, xvid->me_quality);
       break;
     case PROP_VHQ:
-      g_value_set_int (value, xvid->vhq);
+      g_value_set_uint (value, xvid->vhq);
       break;
     case PROP_BVHQ:
-      g_value_set_int (value, xvid->bvhq);
+      g_value_set_uint (value, xvid->bvhq);
       break;
     case PROP_FRAME_DROP_RATIO:
-      g_value_set_int (value, xvid->frame_drop_ratio);
+      g_value_set_uint (value, xvid->frame_drop_ratio);
       break;
     case PROP_PACKED:
       g_value_set_boolean (value, xvid->packed);
@@ -706,19 +706,19 @@ ogmrip_xvid_get_property (GObject *gobject, guint property_id, GValue *value, GP
       g_value_set_boolean (value, xvid->closed_gop);
       break;
     case PROP_BQUANT_RATIO:
-      g_value_set_int (value, xvid->bquant_ratio);
+      g_value_set_uint (value, xvid->bquant_ratio);
       break;
     case PROP_BQUANT_OFFSET:
       g_value_set_int (value, xvid->bquant_offset);
       break;
     case PROP_PAR:
-      g_value_set_int (value, xvid->par);
+      g_value_set_uint (value, xvid->par);
       break;
     case PROP_PAR_WIDTH:
-      g_value_set_int (value, xvid->par_width);
+      g_value_set_uint (value, xvid->par_width);
       break;
     case PROP_PAR_HEIGHT:
-      g_value_set_int (value, xvid->par_height);
+      g_value_set_uint (value, xvid->par_height);
       break;
     case PROP_CARTOON:
       g_value_set_boolean (value, xvid->cartoon);
@@ -754,10 +754,10 @@ ogmrip_xvid_set_property (GObject *gobject, guint property_id, const GValue *val
   switch (property_id) 
   {
     case PROP_PROFILE:
-      xvid->profile = g_value_get_int (value);
+      xvid->profile = g_value_get_uint (value);
       break;
     case PROP_QUANT_TYPE:
-      xvid->quant_type = g_value_get_int (value);
+      xvid->quant_type = g_value_get_uint (value);
       break;
     case PROP_GMC:
       xvid->gmc = g_value_get_boolean (value);
@@ -766,28 +766,29 @@ ogmrip_xvid_set_property (GObject *gobject, guint property_id, const GValue *val
       xvid->interlacing = g_value_get_boolean (value);
       break;
     case PROP_MIN_IQUANT:
-      xvid->min_iquant = g_value_get_int (value);
+      xvid->min_iquant = g_value_get_uint (value);
+      g_debug ("toto %d", xvid->min_iquant);
       break;
     case PROP_MAX_IQUANT:
-      xvid->max_iquant = g_value_get_int (value);
+      xvid->max_iquant = g_value_get_uint (value);
       break;
     case PROP_MIN_PQUANT:
-      xvid->min_pquant = g_value_get_int (value);
+      xvid->min_pquant = g_value_get_uint (value);
       break;
     case PROP_MAX_PQUANT:
-      xvid->max_pquant = g_value_get_int (value);
+      xvid->max_pquant = g_value_get_uint (value);
       break;
     case PROP_MIN_BQUANT:
-      xvid->min_bquant = g_value_get_int (value);
+      xvid->min_bquant = g_value_get_uint (value);
       break;
     case PROP_MAX_BQUANT:
-      xvid->max_bquant = g_value_get_int (value);
+      xvid->max_bquant = g_value_get_uint (value);
       break;
     case PROP_MAX_BFRAMES:
-      xvid->max_bframes = g_value_get_int (value);
+      xvid->max_bframes = g_value_get_uint (value);
       break;
     case PROP_MAX_KEYINT:
-      xvid->max_keyint = g_value_get_int (value);
+      xvid->max_keyint = g_value_get_uint (value);
       break;
     case PROP_CHROMA_ME:
       xvid->chroma_me = g_value_get_boolean (value);
@@ -796,16 +797,16 @@ ogmrip_xvid_set_property (GObject *gobject, guint property_id, const GValue *val
       xvid->chroma_opt = g_value_get_boolean (value);
       break;
     case PROP_ME_QUALITY:
-      xvid->me_quality = g_value_get_int (value);
+      xvid->me_quality = g_value_get_uint (value);
       break;
     case PROP_VHQ:
-      xvid->vhq = g_value_get_int (value);
+      xvid->vhq = g_value_get_uint (value);
       break;
     case PROP_BVHQ:
-      xvid->bvhq = g_value_get_int (value);
+      xvid->bvhq = g_value_get_uint (value);
       break;
     case PROP_FRAME_DROP_RATIO:
-      xvid->frame_drop_ratio = g_value_get_int (value);
+      xvid->frame_drop_ratio = g_value_get_uint (value);
       break;
     case PROP_PACKED:
       xvid->packed = g_value_get_boolean (value);
@@ -814,19 +815,19 @@ ogmrip_xvid_set_property (GObject *gobject, guint property_id, const GValue *val
       xvid->closed_gop = g_value_get_boolean (value);
       break;
     case PROP_BQUANT_RATIO:
-      xvid->bquant_ratio = g_value_get_int (value);
+      xvid->bquant_ratio = g_value_get_uint (value);
       break;
     case PROP_BQUANT_OFFSET:
       xvid->bquant_offset = g_value_get_int (value);
       break;
     case PROP_PAR:
-      xvid->par = g_value_get_int (value);
+      xvid->par = g_value_get_uint (value);
       break;
     case PROP_PAR_WIDTH:
-      xvid->par_width = g_value_get_int (value);
+      xvid->par_width = g_value_get_uint (value);
       break;
     case PROP_PAR_HEIGHT:
-      xvid->par_height = g_value_get_int (value);
+      xvid->par_height = g_value_get_uint (value);
       break;
     case PROP_CARTOON:
       xvid->cartoon = g_value_get_boolean (value);
