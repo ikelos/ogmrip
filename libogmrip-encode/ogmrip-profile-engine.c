@@ -20,7 +20,7 @@
 #include "ogmrip-profile-keys.h"
 #include "ogmrip-marshal.h"
 #include "ogmrip-container.h"
-#include "ogmrip-codec.h"
+#include "ogmrip-hardsub.h"
 
 #include <ogmrip-base.h>
 
@@ -134,7 +134,7 @@ ogmrip_profile_engine_check (OGMRipProfileEngine *engine, OGMRipProfile *profile
   codec = ogmrip_type_from_name(str);
   g_free (str);
 
-  if (codec == G_TYPE_NONE || !ogmrip_container_contains(container, ogmrip_codec_format (codec)))
+  if (codec == G_TYPE_NONE || (codec != OGMRIP_TYPE_HARDSUB && !ogmrip_container_contains(container, ogmrip_codec_format (codec))))
     return FALSE;
 
   return TRUE;
