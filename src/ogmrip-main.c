@@ -2265,8 +2265,13 @@ ogmrip_application_startup_cb (GApplication *app)
   g_free (path);
 
   path = g_settings_get_string (settings, OGMRIP_SETTINGS_TMP_DIR);
-  if (!strlen (path))
+  if (strlen (path) > 0)
+    ogmrip_fs_set_tmp_dir (path);
+  else
+  {
     g_settings_set_string (settings, OGMRIP_SETTINGS_TMP_DIR, g_get_tmp_dir ());
+    ogmrip_fs_set_tmp_dir (g_get_tmp_dir ());
+  }
   g_free (path);
 
   g_signal_connect (settings, "changed::" OGMRIP_SETTINGS_TMP_DIR,
