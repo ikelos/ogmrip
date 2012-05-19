@@ -1440,7 +1440,7 @@
                 <property name="hexpand">True</property>
                 <items>
                   <item translatable="yes">UTF-8</item>
-                  <item translatable="yes">ISO-9959-1</item>
+                  <item translatable="yes">ISO-8859-1</item>
                   <item translatable="yes">ASCII</item>
                 </items>
               </object>

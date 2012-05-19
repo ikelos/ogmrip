@@ -447,7 +447,7 @@
                       <item translatable="yes">Disabled</item>
                       <item translatable="yes">Mpeg-4 reference decoder</item>
                       <item translatable="yes">Libavcodec specific extensions</item>
-                      <item translatable="yes">Experimental  codecs and features</item>
+                      <item translatable="yes">Experimental codecs and features</item>
                     </items>
                   </object>
                   <packing>
