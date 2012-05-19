@@ -752,6 +752,9 @@ ogmrip_video_codec_get_passes (OGMRipVideoCodec *video)
 {
   g_return_val_if_fail (OGMRIP_IS_VIDEO_CODEC (video), -1);
 
+  if (!video->priv->bitrate)
+    return 1;
+
   return video->priv->passes;
 }
 
