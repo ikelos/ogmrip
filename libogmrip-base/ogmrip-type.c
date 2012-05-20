@@ -1,5 +1,5 @@
-/* OGMRipModule - A module library for OGMRip
- * Copyright (C) 2011 Olivier Rolland <billl@users.sourceforge.net>
+/* OGMRipBase - A foundation library for OGMRip
+ * Copyright (C) 2012 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public

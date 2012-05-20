@@ -1,6 +1,6 @@
 /* srttool-2 - Various manipulations of srtfiles
  * Copyright (C) 2002-2006 Arne Driescher <driescher@users.sf.net>
- * Copyright (C) 2006-2011 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2006-2012 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

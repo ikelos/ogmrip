@@ -1,5 +1,5 @@
 /* OGMRipDirac - A plugin for OGMRip adding support for Dirac
- * Copyright (C) 2004-2009 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2012 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
