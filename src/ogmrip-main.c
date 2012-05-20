@@ -1381,7 +1381,6 @@ ogmrip_main_run_options_dialog (OGMRipData *data, OGMRipEncoding *encoding, guin
   if (vcodec)
   {
     guint x, y, w, h;
-    glong t;
     gint d;
 
     ogmrip_options_dialog_get_crop_size (OGMRIP_OPTIONS_DIALOG (dialog), &x, &y, &w, &h);
@@ -1395,13 +1394,6 @@ ogmrip_main_run_options_dialog (OGMRipData *data, OGMRipEncoding *encoding, guin
 
     ogmrip_encoding_set_video_codec (encoding, OGMRIP_VIDEO_CODEC (vcodec));
     g_object_unref (vcodec);
-
-    t = g_settings_get_uint (settings, OGMRIP_SETTINGS_THREADS);
-#ifdef HAVE_SYSCONF_NPROC
-    if (!t)
-      t = sysconf (_SC_NPROCESSORS_ONLN);
-#endif
-    ogmrip_video_codec_set_threads (OGMRIP_VIDEO_CODEC (vcodec), t ? t : 1);
   }
 
   gtk_widget_destroy (dialog);

@@ -33,6 +33,7 @@
 #include "ogmrip-mplayer.h"
 #include "ogmrip-configurable.h"
 
+#include <ogmrip-base.h>
 #include <ogmrip-job.h>
 
 #include <stdio.h>
@@ -238,6 +239,8 @@ ogmrip_lavc_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   }
 
   threads = ogmrip_video_codec_get_threads (video);
+  if (!threads)
+    threads = ogmrip_get_nprocessors ();
   if (threads > 0)
     g_string_append_printf (options, ":threads=%u", CLAMP (threads, 1, 8));
 

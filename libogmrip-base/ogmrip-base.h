@@ -22,6 +22,7 @@
 #include <ogmrip-fs.h>
 #include <ogmrip-log.h>
 #include <ogmrip-type.h>
+#include <ogmrip-utils.h>
 #include <ogmrip-xml.h>
 
 #endif /* __OGMRIP_BASE_H__ */

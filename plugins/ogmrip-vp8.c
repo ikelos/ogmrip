@@ -172,6 +172,8 @@ ogmrip_vp8_command (OGMRipVideoCodec *video, const gchar *fifo, guint pass, guin
   g_ptr_array_add (argv, g_strdup (OGMRIP_VP8 (video)->best ? "--best" : "--good"));
 
   threads = ogmrip_video_codec_get_threads (video);
+  if (!threads)
+    threads = ogmrip_get_nprocessors ();
   if (threads > 0)
     g_ptr_array_add (argv, g_strdup_printf ("--threads=%u", threads));
 

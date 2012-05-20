@@ -318,6 +318,8 @@ ogmrip_xvid_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   }
 
   threads = ogmrip_video_codec_get_threads (video);
+  if (!threads)
+    threads = ogmrip_get_nprocessors ();
   if (threads > 0)
   {
     guint height;
