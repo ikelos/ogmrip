@@ -59,7 +59,7 @@ ogmrip_profile_add_name (const gchar *key, OGMRipProfile *profile, GArray *array
 {
   gchar *name;
 
-  name = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_NAME);
+  g_object_get (profile, "name", &name, NULL);
   g_array_append_val (array, name);
 }
 
@@ -263,6 +263,10 @@ ogmrip_profile_engine_init (OGMRipProfileEngine *engine)
 
   engine->priv->settings = g_settings_new_with_path ("org.ogmrip.profiles", "/apps/ogmrip/preferences/");
   engine->priv->profiles = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
+
+  g_settings_bind (engine->priv->settings, "profiles",
+      engine, "profiles", G_SETTINGS_BIND_GET | G_SETTINGS_BIND_SET | G_SETTINGS_BIND_GET_NO_CHANGES);
+
 }
 
 static void
