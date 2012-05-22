@@ -42,11 +42,6 @@ gint          ogmrip_fs_open_tmp         (const gchar  *tmpl,
                                           gchar        **name_used,
                                           GError       **error);
 
-gint64        ogmrip_fs_get_left_space   (const gchar  *filename,
-                                          GError       **error);
-gchar *       ogmrip_fs_get_mount_point  (const gchar  *filename,
-                                          GError       **error);
-
 const gchar * ogmrip_fs_get_extension    (const gchar  *filename);
 gchar *       ogmrip_fs_set_extension    (const gchar  *filename,
                                           const gchar  *extension);
