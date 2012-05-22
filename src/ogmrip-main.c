@@ -1606,7 +1606,7 @@ ogmrip_main_import_chapters_activated (OGMRipData *data)
         {
           gchar *path;
 
-          path = g_file_get_path (file);
+          path = g_file_get_parse_name (file);
           ogmrip_run_error_dialog (GTK_WINDOW (data->window), NULL,
               _("Could not open the chapters file '%s'"), path);
           g_free (path);
