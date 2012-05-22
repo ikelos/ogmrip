@@ -540,6 +540,37 @@ ogmrip_main_progress_dialog_response (GtkWidget *parent, gint response_id, OGMRi
   }
 }
 
+static gboolean
+ogmrip_main_delete_output (OGMRipData *data, OGMRipEncoding *encoding, GCancellable *cancellable, GError **error)
+{
+  GtkWidget *dialog;
+  GFile *output;
+
+  gboolean response;
+  gchar *filename;
+
+  output = ogmrip_container_get_output (ogmrip_encoding_get_container (encoding));
+
+  filename = g_file_get_parse_name (output);
+  dialog = gtk_message_dialog_new_with_markup (GTK_WINDOW (data->window),
+      GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+      GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, _("A file named '%s' already exists."), filename);
+  g_free (filename);
+
+  gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog), _("Do you want to replace it?"));
+
+  response = gtk_dialog_run (GTK_DIALOG (dialog));
+  gtk_widget_destroy (dialog);
+
+  if (response != GTK_RESPONSE_YES)
+    return FALSE;
+
+  if (!g_file_delete (output, cancellable, error))
+    return FALSE;
+
+  return TRUE;
+}
+
 /*
  * Encodes an encoding
  */
@@ -578,6 +609,19 @@ ogmrip_main_encode (OGMRipData *data, OGMRipEncoding *encoding)
     g_object_set_data_full (G_OBJECT (encoding), "cancellable", cancellable, g_object_unref);
 
     result = ogmrip_encoding_encode (encoding, cancellable, &error);
+    if (!result && error && error->code == G_IO_ERROR_EXISTS)
+    {
+      gtk_widget_hide (dialog);
+
+      g_clear_error (&error);
+      if (ogmrip_main_delete_output (data, encoding, cancellable, &error))
+      {
+        gtk_widget_show (dialog);
+        result = ogmrip_encoding_encode (encoding, cancellable, &error);
+      }
+      else if (!error)
+        result = TRUE;
+    }
 
     g_signal_handlers_disconnect_by_func (encoding,
         ogmrip_main_encoding_spawn_run, dialog);

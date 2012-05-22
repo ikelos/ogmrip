@@ -1256,6 +1256,13 @@ ogmrip_encoding_check_output (OGMRipEncoding *encoding, GCancellable *cancellabl
 
   g_object_unref (info);
 
+  if (g_file_query_exists (output, cancellable))
+  {
+    g_set_error (error, G_IO_ERROR, G_IO_ERROR_EXISTS,
+        "Output file already exists");
+    return FALSE;
+  }
+
   return TRUE;
 }
 

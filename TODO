@@ -4,9 +4,6 @@ ogmrip-media.c
 ogmrip-video-codec.c
 - un conteneur peut imposer la présence d'un flux vidéo
 
-ogmrip-encoding.c
-- vérifier que la destination n'existe pas déjà
-
 ogmrip-encoding-manager.c
 - comment connaitre les encodages non faits ?
 
