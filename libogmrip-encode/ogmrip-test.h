@@ -24,6 +24,15 @@
 
 G_BEGIN_DECLS
 
+#define OGMRIP_TEST_ERROR ogmrip_test_error_quark ()
+
+typedef enum
+{
+  OGMRIP_TEST_ERROR_QUANTIZER
+} OGMRipTestError;
+
+GQuark ogmrip_test_error_quark (void);
+
 #define OGMRIP_TYPE_TEST          (ogmrip_test_get_type ())
 #define OGMRIP_TEST(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_TEST, OGMRipTest))
 #define OGMRIP_TEST_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_TEST, OGMRipTestClass))

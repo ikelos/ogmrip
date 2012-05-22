@@ -25,6 +25,15 @@ G_BEGIN_DECLS
 
 #define OGMRIP_PROFILE_PATH "/apps/ogmrip/profiles/"
 
+#define OGMRIP_PROFILE_ERROR ogmrip_profile_error_quark ()
+
+typedef enum
+{
+  OGMRIP_PROFILE_ERROR_INVALID
+} OGMRipProfileError;
+
+GQuark ogmrip_profile_error_quark (void);
+
 #define OGMRIP_TYPE_PROFILE          (ogmrip_profile_get_type ())
 #define OGMRIP_PROFILE(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_PROFILE, OGMRipProfile))
 #define OGMRIP_PROFILE_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_PROFILE, OGMRipProfileClass))

@@ -64,6 +64,17 @@ static void ogmrip_profile_get_property (GObject      *gobject,
                                          GValue       *value,
                                          GParamSpec   *pspec);
 
+GQuark
+ogmrip_profile_error_quark (void)
+{
+  static GQuark quark = 0;
+
+  if (quark == 0)
+    quark = g_quark_from_static_string ("ogmrip-profile-error-quark");
+
+  return quark;
+}
+
 static gboolean
 ogmrip_profile_has_schema (const gchar *schema)
 {
@@ -365,7 +376,8 @@ ogmrip_profile_new_from_file (GFile *file, GError **error)
     gchar *filename;
 
     filename = g_file_get_basename (file);
-    g_set_error (error, 0, 0, _("'%s' does not contain a valid encoding"), filename);
+    g_set_error (error, OGMRIP_PROFILE_ERROR, OGMRIP_PROFILE_ERROR_INVALID,
+        _("'%s' does not contain a valid profile"), filename);
     g_free (filename);
   }
 

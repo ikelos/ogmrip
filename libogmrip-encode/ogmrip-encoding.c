@@ -36,7 +36,6 @@
 #include "ogmrip-analyze.h"
 #include "ogmrip-copy.h"
 #include "ogmrip-test.h"
-#include "ogmrip-fs.h"
 
 #include <ogmrip-base.h>
 #include <ogmrip-dvd.h>
@@ -121,6 +120,17 @@ static void   ogmrip_encoding_complete      (OGMRipEncoding *encoding,
                                              gboolean       result);
 
 guint signals[LAST_SIGNAL] = { 0 };
+
+GQuark
+ogmrip_encoding_error_quark (void)
+{
+  static GQuark quark = 0;
+
+  if (quark == 0)
+    quark = g_quark_from_static_string ("ogmrip-encoding-error-quark");
+
+  return quark;
+}
 
 static void
 ogmrip_encoding_open_log (OGMRipEncoding *encoding)
@@ -527,7 +537,8 @@ ogmrip_encoding_new_from_file (GFile *file, GError **error)
     gchar *filename;
 
     filename = g_file_get_basename (file);
-    g_set_error (error, 0, 0, _("'%s' does not contain a valid encoding"), filename);
+    g_set_error (error, OGMRIP_ENCODING_ERROR, OGMRIP_ENCODING_ERROR_INVALID,
+        _("'%s' does not contain a valid encoding"), filename);
     g_free (filename);
   }
 

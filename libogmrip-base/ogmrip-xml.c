@@ -106,7 +106,7 @@ ogmrip_xml_new_from_file (GFile *file, GError **error)
     gchar *filename;
 
     filename = g_file_get_basename (file);
-    g_set_error (error, 0, 0, _("'%s' is not a valid XML file"), filename);
+    g_set_error (error, OGMRIP_XML_ERROR, OGMRIP_XML_ERROR_INVALID, _("'%s' is not a valid XML file"), filename);
     g_free (filename);
 
     ogmrip_xml_free (xml);
@@ -440,5 +440,16 @@ ogmrip_xml_set_string (OGMRipXML *xml, const gchar *property, const gchar *value
       xmlNodeSetContent (xml->node, escaped);
     xmlFree (escaped);
   }
+}
+
+GQuark
+ogmrip_xml_error_quark (void)
+{
+  static GQuark quark = 0;
+
+  if (quark == 0)
+    quark = g_quark_from_static_string ("ogmrip-xml-error-quark");
+
+  return quark;
 }
 

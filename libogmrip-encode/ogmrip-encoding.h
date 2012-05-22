@@ -28,6 +28,15 @@
 
 G_BEGIN_DECLS
 
+#define OGMRIP_ENCODING_ERROR ogmrip_encoding_error_quark ()
+
+typedef enum
+{
+  OGMRIP_ENCODING_ERROR_INVALID
+} OGMRipEncodingError;
+
+GQuark ogmrip_encoding_error_quark (void);
+
 #define OGMRIP_TYPE_ENCODING           (ogmrip_encoding_get_type ())
 #define OGMRIP_ENCODING(obj)           (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_ENCODING, OGMRipEncoding))
 #define OGMRIP_ENCODING_CLASS(klass)   (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_ENCODING, OGMRipEncodingClass))

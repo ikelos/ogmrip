@@ -23,6 +23,15 @@
 
 G_BEGIN_DECLS
 
+typedef enum
+{
+  OGMRIP_XML_ERROR_INVALID
+} OGMRipXmlError;
+
+#define OGMRIP_XML_ERROR ogmrip_xml_error_quark ()
+
+GQuark ogmrip_xml_error_quark (void);
+
 typedef struct _OGMRipXML     OGMRipXML;
 
 OGMRipXML *     ogmrip_xml_new           (void);

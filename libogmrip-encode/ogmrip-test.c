@@ -23,10 +23,14 @@
  * @include: ogmrip-test.h
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "ogmrip-test.h"
 #include "ogmrip-profile-keys.h"
-#include "ogmrip-fs.h"
 
+#include <glib/gi18n-lib.h>
 #include <glib/gstdio.h>
 
 #define SAMPLE_LENGTH  10.0
@@ -64,6 +68,17 @@ static void     ogmrip_test_set_property (GObject      *gobject,
 static gboolean ogmrip_test_run          (OGMJobTask   *task,
                                           GCancellable *cancellable,
                                           GError       **error);
+
+GQuark
+ogmrip_test_error_quark (void)
+{
+  static GQuark quark = 0;
+
+  if (quark == 0)
+    quark = g_quark_from_static_string ("ogmrip-test-error-quark");
+
+  return quark;
+}
 
 G_DEFINE_TYPE (OGMRipTest, ogmrip_test, OGMJOB_TYPE_TASK)
 
@@ -365,9 +380,8 @@ ogmrip_test_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 
   if (ogmrip_encoding_get_method (test->priv->encoding) == OGMRIP_ENCODING_QUANTIZER)
   {
-/*
-    g_set_error (error, G_FILE_ERROR, G_FILE_ERROR_TOTO, "Cannot open file '%s': %s", filename);
-*/
+    g_set_error (error, OGMRIP_TEST_ERROR, OGMRIP_TEST_ERROR_QUANTIZER,
+        _("Cannot perform a compressibility test when encoding at fixed quantizer"));
     return FALSE;
   }
 
