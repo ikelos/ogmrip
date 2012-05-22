@@ -819,10 +819,18 @@ ogmrip_main_export_simple_chapters (OGMRipData *data, const gchar *filename)
 
     if (!ogmjob_task_run (OGMJOB_TASK (chapters), NULL, &error))
     {
-/*
-      ogmrip_message_dialog (GTK_WINDOW (data->window), GTK_MESSAGE_ERROR, "<b>%s</b>\n\n%s",
-          _("Could not export the chapters"), error->message);
-*/
+      GtkWidget *dialog;
+
+      dialog = gtk_message_dialog_new_with_markup (GTK_WINDOW (data->window),
+          GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+          GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "<b>%s</b>", _("Could not export the chapters"));
+
+      if (error)
+        gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog), "%s", error->message);
+
+      gtk_dialog_run (GTK_DIALOG (dialog));
+      gtk_widget_destroy (dialog);
+
       g_clear_error (&error);
     }
   }
