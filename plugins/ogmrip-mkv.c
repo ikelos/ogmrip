@@ -300,15 +300,14 @@ gchar **
 ogmrip_matroska_command (OGMRipContainer *matroska)
 {
   GPtrArray *argv;
-  const gchar *output, *label, *fourcc;
+  const gchar *label, *fourcc;
   guint tsize, tnumber;
 
   argv = g_ptr_array_new ();
   g_ptr_array_add (argv, g_strdup (MKVMERGE));
 
-  output = ogmrip_container_get_output (matroska);
   g_ptr_array_add (argv, g_strdup ("-o"));
-  g_ptr_array_add (argv, g_strdup (output));
+  g_ptr_array_add (argv, g_file_get_path (ogmrip_container_get_output (matroska)));
 
   fourcc = ogmrip_container_get_fourcc (matroska);
   if (fourcc)

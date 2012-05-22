@@ -1183,6 +1183,7 @@ ogmrip_main_create_chapters_codec (OGMRipData *data, OGMRipVideoStream *stream, 
 static void
 ogmrip_main_set_filename (OGMRipData *data, OGMRipEncoding *encoding)
 {
+  GFile *file;
   GString *filename;
   OGMRipContainer *container;
   OGMRipCodec *codec;
@@ -1228,7 +1229,9 @@ ogmrip_main_set_filename (OGMRipData *data, OGMRipEncoding *encoding)
   g_string_free (filename, TRUE);
   g_free (path);
 
-  ogmrip_container_set_output (container, str);
+  file = g_file_new_for_path (str);
+  ogmrip_container_set_output (container, file);
+  g_object_unref (file);
 
   path = ogmrip_fs_set_extension (str, "log");
   g_free (str);

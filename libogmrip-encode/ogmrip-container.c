@@ -36,12 +36,12 @@
 struct _OGMRipContainerPriv
 {
   gchar *label;
-  gchar *output;
   gchar *fourcc;
 
   guint tsize;
   guint tnumber;
 
+  GFile *output;
   GList *files;
 };
 
@@ -56,6 +56,7 @@ enum
   PROP_OVERHEAD
 };
 
+static void ogmrip_container_dispose      (GObject      *gobject);
 static void ogmrip_container_finalize     (GObject      *gobject);
 static void ogmrip_container_set_property (GObject      *gobject,
                                            guint        property_id,
@@ -74,13 +75,14 @@ ogmrip_container_class_init (OGMRipContainerClass *klass)
   GObjectClass *gobject_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->dispose = ogmrip_container_dispose;
   gobject_class->finalize = ogmrip_container_finalize;
   gobject_class->set_property = ogmrip_container_set_property;
   gobject_class->get_property = ogmrip_container_get_property;
 
   g_object_class_install_property (gobject_class, PROP_OUTPUT, 
-        g_param_spec_string ("output", "Output property", "Set output file", 
-           NULL, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+        g_param_spec_object ("output", "Output property", "Set output file", 
+           G_TYPE_FILE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_LABEL, 
         g_param_spec_string ("label", "Label property", "Set label", 
@@ -114,12 +116,30 @@ ogmrip_container_init (OGMRipContainer *container)
 }
 
 static void
-ogmrip_container_finalize (GObject *gobject)
+ogmrip_container_dispose (GObject *gobject)
 {
   OGMRipContainer *container = OGMRIP_CONTAINER (gobject);
 
-  g_list_foreach (container->priv->files, (GFunc) g_object_unref, NULL);
-  g_list_free (container->priv->files);
+  if (container->priv->output)
+  {
+    g_object_unref (container->priv->output);
+    container->priv->output = NULL;
+  }
+
+  if (container->priv->files)
+  {
+    g_list_foreach (container->priv->files, (GFunc) g_object_unref, NULL);
+    g_list_free (container->priv->files);
+    container->priv->files = NULL;
+  }
+
+  G_OBJECT_CLASS (ogmrip_container_parent_class)->dispose (gobject);
+}
+
+static void
+ogmrip_container_finalize (GObject *gobject)
+{
+  OGMRipContainer *container = OGMRIP_CONTAINER (gobject);
 
   g_free (container->priv->label);
   g_free (container->priv->output);
@@ -136,7 +156,7 @@ ogmrip_container_set_property (GObject *gobject, guint property_id, const GValue
   switch (property_id) 
   {
     case PROP_OUTPUT:
-      ogmrip_container_set_output (container, g_value_get_string (value));
+      ogmrip_container_set_output (container, g_value_get_object (value));
       break;
     case PROP_LABEL: 
       ogmrip_container_set_label (container, g_value_get_string (value));
@@ -164,7 +184,7 @@ ogmrip_container_get_property (GObject *gobject, guint property_id, GValue *valu
   switch (property_id) 
   {
     case PROP_OUTPUT:
-      g_value_set_string (value, container->priv->output);
+      g_value_set_object (value, container->priv->output);
       break;
     case PROP_LABEL:
       g_value_set_string (value, container->priv->label);
@@ -191,11 +211,11 @@ ogmrip_container_get_property (GObject *gobject, guint property_id, GValue *valu
  * ogmrip_container_get_output:
  * @container: An #OGMRipContainer
  *
- * Gets the name of the output file.
+ * Gets the output file.
  *
- * Returns: The filename, or NULL
+ * Returns: A #GFile, or NULL
  */
-const gchar *
+GFile *
 ogmrip_container_get_output (OGMRipContainer *container)
 {
   g_return_val_if_fail (OGMRIP_IS_CONTAINER (container), NULL);
@@ -206,18 +226,20 @@ ogmrip_container_get_output (OGMRipContainer *container)
 /**
  * ogmrip_container_set_output:
  * @container: an #OGMRipContainer
- * @output: the name of the output file
+ * @output: a #GFile
  *
- * Sets the name of the output file.
+ * Sets the output file.
  */
 void
-ogmrip_container_set_output (OGMRipContainer *container, const gchar *output)
+ogmrip_container_set_output (OGMRipContainer *container, GFile *output)
 {
   g_return_if_fail (OGMRIP_IS_CONTAINER (container));
-  g_return_if_fail (output && *output);
+  g_return_if_fail (G_IS_FILE (output));
 
-  g_free (container->priv->output);
-  container->priv->output = g_strdup (output);
+  g_object_ref (output);
+  if (container->priv->output)
+    g_object_unref (container->priv->output);
+  container->priv->output = output;
 
   g_object_notify (G_OBJECT (container), "output");
 }

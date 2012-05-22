@@ -1214,16 +1214,48 @@ ogmrip_encoding_autoscale (OGMRipEncoding *encoding, gdouble bpp, guint *width, 
 }
 
 static gboolean
-get_space_left (const gchar *path, guint64 *space, gchar **id, GError **error)
+ogmrip_encoding_check_output (OGMRipEncoding *encoding, GCancellable *cancellable, GError **error)
 {
-  GFile *file;
+  GFile *output, *path;
   GFileInfo *info;
 
-  file = g_file_new_for_path (path);
+  output = ogmrip_container_get_output (encoding->priv->container);
+
+  path = g_file_get_parent (output);
+  info = g_file_query_info (path,
+      G_FILE_ATTRIBUTE_ACCESS_CAN_READ "," G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE,
+      G_FILE_QUERY_INFO_NONE, cancellable, error);
+  g_object_unref (path);
+
+  if (!g_file_info_get_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_READ))
+  {
+    g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+        "Output directory is not readable");
+    g_object_unref (info);
+    return FALSE;
+  }
+
+  if (!g_file_info_get_attribute_boolean (info, G_FILE_ATTRIBUTE_ACCESS_CAN_WRITE))
+  {
+    g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
+        "Output directory is not writeable");
+    g_object_unref (info);
+    return FALSE;
+  }
+
+  g_object_unref (info);
+
+  return TRUE;
+}
+
+static gboolean
+get_space_left_for_file (GFile *file, guint64 *space, gchar **id, GCancellable *cancellable, GError **error)
+{
+  GFileInfo *info;
+
   info = g_file_query_info (file,
       G_FILE_ATTRIBUTE_FILESYSTEM_FREE "," G_FILE_ATTRIBUTE_ID_FILESYSTEM,
-      G_FILE_QUERY_INFO_NONE, NULL, error);
-  g_object_unref (file);
+      G_FILE_QUERY_INFO_NONE, cancellable, error);
 
   *space = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE);
   *id = g_strdup (g_file_info_get_attribute_string (info, G_FILE_ATTRIBUTE_ID_FILESYSTEM));
@@ -1234,7 +1266,20 @@ get_space_left (const gchar *path, guint64 *space, gchar **id, GError **error)
 }
 
 static gboolean
-ogmrip_encoding_check_space (OGMRipEncoding *encoding, guint64 output_size, guint64 tmp_size, GError **error)
+get_space_left (const gchar *path, guint64 *space, gchar **id, GCancellable *cancellable, GError **error)
+{
+  GFile *file;
+  gboolean retval;
+
+  file = g_file_new_for_path (path);
+  retval = get_space_left_for_file (file, space, id, cancellable, error);
+  g_object_unref (file);
+
+  return retval;
+}
+
+static gboolean
+ogmrip_encoding_check_space (OGMRipEncoding *encoding, guint64 output_size, guint64 tmp_size, GCancellable *cancellable, GError **error)
 {
   OGMRipContainer *container;
   guint64 output_space, tmp_space;
@@ -1246,10 +1291,10 @@ ogmrip_encoding_check_space (OGMRipEncoding *encoding, guint64 output_size, guin
 
   container = ogmrip_encoding_get_container (encoding);
 
-  if (!get_space_left (ogmrip_container_get_output (container), &output_space, &output_id, error))
+  if (!get_space_left_for_file (ogmrip_container_get_output (container), &output_space, &output_id, cancellable, error))
     return FALSE;
 
-  if (!get_space_left (ogmrip_fs_get_tmp_dir (), &tmp_space, &tmp_id, error))
+  if (!get_space_left (ogmrip_fs_get_tmp_dir (), &tmp_space, &tmp_id, cancellable, error))
   {
     g_free (tmp_id);
     return FALSE;
@@ -1456,24 +1501,8 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GCancellable *cancellable, GEr
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
   g_return_val_if_fail (ogmrip_title_is_open (encoding->priv->title), FALSE);
 
-  {
-    const gchar *filename;
-    gboolean retval;
-    gchar *path;
-
-    filename = ogmrip_container_get_output (encoding->priv->container);
-
-    path = g_path_get_dirname (filename);
-    retval = g_access (path, R_OK | W_OK);
-    g_free (path);
-
-    if (retval < 0)
-    {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED,
-          "Output directory is not readable and/or writeable");
-      return FALSE;
-    }
-  }
+  if (!ogmrip_encoding_check_output (encoding, cancellable, error))
+    return FALSE;
 
   ogmrip_encoding_open_log (encoding);
 /*
@@ -1481,7 +1510,7 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GCancellable *cancellable, GEr
 */
   g_signal_emit (encoding, signals[RUN], 0, NULL);
 
-  if (!ogmrip_encoding_check_space (encoding, 0, 0, error))
+  if (!ogmrip_encoding_check_space (encoding, 0, 0, cancellable, error))
     return FALSE;
 
   /*

@@ -199,15 +199,11 @@ ogmrip_ogg_merge_command (OGMRipContainer *ogg, const gchar *output)
   GPtrArray *argv;
   const gchar *label, *fourcc;
 
-  if (!output)
-    output = ogmrip_container_get_output (ogg);
-  g_return_val_if_fail (output != NULL, NULL);
-
   argv = g_ptr_array_new ();
   g_ptr_array_add (argv, g_strdup ("ogmmerge"));
 
   g_ptr_array_add (argv, g_strdup ("-o"));
-  g_ptr_array_add (argv, g_strdup (output));
+  g_ptr_array_add (argv, output ? g_strdup (output) : g_file_get_path (ogmrip_container_get_output (ogg)));
 
   fourcc = ogmrip_container_get_fourcc (ogg);
   if (fourcc)
@@ -235,10 +231,8 @@ static gchar **
 ogmrip_ogg_split_command (OGMRipContainer *ogg, const gchar *input)
 {
   GPtrArray *argv;
-  const gchar *output;
   guint tsize;
 
-  output = ogmrip_container_get_output (ogg);
   ogmrip_container_get_split (OGMRIP_CONTAINER (ogg), NULL, &tsize);
 
   argv = g_ptr_array_new ();
@@ -247,7 +241,7 @@ ogmrip_ogg_split_command (OGMRipContainer *ogg, const gchar *input)
   g_ptr_array_add (argv, g_strdup ("-s"));
   g_ptr_array_add (argv, g_strdup_printf ("%d", tsize));
   g_ptr_array_add (argv, g_strdup ("-o"));
-  g_ptr_array_add (argv, g_strdup (output));
+  g_ptr_array_add (argv, g_file_get_path (ogmrip_container_get_output (ogg)));
   g_ptr_array_add (argv, g_strdup (input));
   g_ptr_array_add (argv, NULL);
 

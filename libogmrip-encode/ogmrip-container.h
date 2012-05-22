@@ -53,9 +53,9 @@ typedef void (* OGMRipContainerFunc) (OGMRipContainer  *container,
                                       gpointer         data);
 
 GType         ogmrip_container_get_type     (void);
-const gchar * ogmrip_container_get_output   (OGMRipContainer     *container);
+GFile *       ogmrip_container_get_output   (OGMRipContainer     *container);
 void          ogmrip_container_set_output   (OGMRipContainer     *container,
-                                             const gchar         *filename);
+                                             GFile               *file);
 const gchar * ogmrip_container_get_label    (OGMRipContainer     *container);
 void          ogmrip_container_set_label    (OGMRipContainer     *container,
                                              const gchar         *label);
