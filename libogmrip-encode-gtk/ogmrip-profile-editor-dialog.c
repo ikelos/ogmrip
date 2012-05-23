@@ -324,9 +324,8 @@ ogmrip_profile_editor_set_quality_options_sensitivity (GBinding *binding, const 
   chooser = (GtkWidget *) g_binding_get_source (binding);
   
   type = ogmrip_type_chooser_widget_get_active (GTK_COMBO_BOX (chooser));
-  g_assert (type != G_TYPE_NONE);
 
-  format = ogmrip_codec_format (type);
+  format = type != G_TYPE_NONE ? ogmrip_codec_format (type) : OGMRIP_FORMAT_UNDEFINED;
   g_value_set_boolean (target_value, format != OGMRIP_FORMAT_UNDEFINED && format != OGMRIP_FORMAT_COPY && format != OGMRIP_FORMAT_PCM);
 
   return TRUE;
@@ -342,9 +341,8 @@ ogmrip_profile_editor_set_audio_options_sensitivity (GBinding *binding, const GV
   chooser = (GtkWidget *) g_binding_get_source (binding);
 
   type = ogmrip_type_chooser_widget_get_active (GTK_COMBO_BOX (chooser));
-  g_assert (type != G_TYPE_NONE);
 
-  format = ogmrip_codec_format (type);
+  format = type != G_TYPE_NONE ? ogmrip_codec_format (type) : OGMRIP_FORMAT_UNDEFINED;
   g_value_set_boolean (target_value, format != OGMRIP_FORMAT_UNDEFINED && format != OGMRIP_FORMAT_COPY);
 
   return TRUE;
@@ -359,9 +357,7 @@ ogmrip_profile_editor_set_text_options_sensitivity (GBinding *binding, const GVa
   chooser = (GtkWidget *) g_binding_get_source (binding);
 
   type = ogmrip_type_chooser_widget_get_active (GTK_COMBO_BOX (chooser));
-  g_assert (type != G_TYPE_NONE);
-
-  g_value_set_boolean (target_value, ogmrip_codec_format (type) != OGMRIP_FORMAT_VOBSUB);
+  g_value_set_boolean (target_value, type != G_TYPE_NONE && ogmrip_codec_format (type) != OGMRIP_FORMAT_VOBSUB);
 
   return TRUE;
 }
@@ -425,7 +421,7 @@ ogmrip_profile_editor_set_passes_spin_adjustment (GBinding *binding, const GValu
   {
     GtkAdjustment *adj;
     GParamSpec *pspec;
-    gint value, lower, upper;
+    guint value, lower, upper;
 
     widget = (GtkWidget *) g_binding_get_target (binding);
 
