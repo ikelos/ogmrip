@@ -94,6 +94,20 @@ enum
 static void ogmrip_options_editable_init (OGMRipOptionsEditableInterface *iface);
 
 static gboolean
+ogmrip_xvid_get_bvhq (GValue *value, GVariant *variant, gpointer user_data)
+{
+  g_value_set_boolean (value, g_variant_get_uint32 (variant) != 0);
+
+  return TRUE;
+}
+
+static GVariant *
+ogmrip_xvid_set_bvhq (const GValue *value, const GVariantType *type, gpointer user_data)
+{
+  return g_variant_new_uint32 (g_value_get_boolean (value) ? TRUE : FALSE);
+}
+
+static gboolean
 ogmrip_xvid_dialog_set_frame_drop_ratio_sensitivity (GBinding *binding,
     const GValue *source_value, GValue *target_value, gpointer data)
 {
@@ -139,8 +153,9 @@ ogmrip_xvid_dialog_set_profile (OGMRipXvidDialog *dialog, OGMRipProfile *profile
         dialog->bquant_offset_spin, "value", G_SETTINGS_BIND_DEFAULT);
     g_settings_bind (settings, OGMRIP_XVID_PROP_BQUANT_RATIO,
         dialog->bquant_ratio_spin, "value", G_SETTINGS_BIND_DEFAULT);
-    g_settings_bind (settings, OGMRIP_XVID_PROP_BVHQ,
-        dialog->bvhq_check, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind_with_mapping (settings, OGMRIP_XVID_PROP_BVHQ,
+        dialog->bvhq_check, "active", G_SETTINGS_BIND_DEFAULT,
+        ogmrip_xvid_get_bvhq, ogmrip_xvid_set_bvhq, NULL, NULL);
     g_settings_bind (settings, OGMRIP_XVID_PROP_CARTOON,
         dialog->cartoon_check, "active", G_SETTINGS_BIND_DEFAULT);
     g_settings_bind (settings, OGMRIP_XVID_PROP_CHROMA_ME,
