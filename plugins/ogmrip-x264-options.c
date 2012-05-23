@@ -116,7 +116,7 @@ static void ogmrip_options_editable_init (OGMRipOptionsEditableInterface *iface)
 static gboolean
 ogmrip_x264_get_me (GValue *value, GVariant *variant, gpointer user_data)
 {
-  g_value_set_uint (value, g_variant_get_uint32 (variant) - 1);
+  g_value_set_int (value, g_variant_get_uint32 (variant) - 1);
 
   return TRUE;
 }
@@ -124,7 +124,7 @@ ogmrip_x264_get_me (GValue *value, GVariant *variant, gpointer user_data)
 static GVariant *
 ogmrip_x264_set_me (const GValue *value, const GVariantType *type, gpointer user_data)
 {
-  return g_variant_new_uint32 (g_value_get_uint (value) + 1);
+  return g_variant_new_uint32 (g_value_get_int (value) + 1);
 }
 
 static void
@@ -250,8 +250,10 @@ ogmrip_x264_dialog_set_profile (OGMRipX264Dialog *dialog, OGMRipProfile *profile
         dialog->global_header_check, "active", G_SETTINGS_BIND_DEFAULT);
     g_settings_bind (settings, OGMRIP_X264_PROP_WEIGHT_B,
         dialog->weight_b_check, "active", G_SETTINGS_BIND_DEFAULT);
+/*
     g_settings_bind (settings, OGMRIP_X264_PROP_PARTITIONS,
         dialog->partitions_check, "active", G_SETTINGS_BIND_DEFAULT);
+*/
     g_settings_bind (settings, OGMRIP_X264_PROP_WEIGHT_P,
         dialog->weight_p_combo, "active", G_SETTINGS_BIND_DEFAULT);
     g_settings_bind (settings, OGMRIP_X264_PROP_FRAMEREF,

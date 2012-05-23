@@ -129,5 +129,10 @@
       <default>2</default>
       <summary>Weighted P-frame prediction mode</summary>
     </key>
+    <key name="profile" type="u">
+      <range min="0" max="2"/>
+      <default>2</default>
+      <summary>Constrain options to be compatible with an H.264 profile</summary>
+    </key>
   </schema>
 </schemalist>
