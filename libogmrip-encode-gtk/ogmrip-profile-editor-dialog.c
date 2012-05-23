@@ -261,15 +261,17 @@ ogmrip_profile_editor_dialog_codec_setting_changed (GtkWidget *chooser, GSetting
 }
 
 static void
-ogmrip_profile_editor_dialog_set_user_entry_visibility (GtkWidget *chooser, GtkTreeRowReference *ref)
+ogmrip_profile_editor_dialog_set_user_entry_visibility (GtkWidget *chooser, GtkWidget *combo)
 {
   GType type;
 
   type = ogmrip_type_chooser_widget_get_active (GTK_COMBO_BOX (chooser));
   if (type != G_TYPE_NONE)
   {
+    GtkTreeRowReference *ref;
     GtkTreeIter iter;
 
+    ref = g_object_get_data (G_OBJECT (combo), "row-reference");
     if (gtk_tree_row_reference_get_iter (ref, &iter))
     {
       GtkTreeModel *model; 
@@ -278,6 +280,9 @@ ogmrip_profile_editor_dialog_set_user_entry_visibility (GtkWidget *chooser, GtkT
       gtk_list_store_set (GTK_LIST_STORE (model), &iter,
           1, ogmrip_type_get_extension (type, GTK_TYPE_DIALOG) != G_TYPE_NONE, -1);
     }
+
+    if (gtk_combo_box_get_active (GTK_COMBO_BOX (combo)) < 0)
+      gtk_combo_box_set_active (GTK_COMBO_BOX (combo), 0);
   }
 }
 
@@ -624,9 +629,9 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
   g_object_set_data_full (G_OBJECT (misc), "row-reference", ref,
       (GDestroyNotify) gtk_tree_row_reference_free);
 
-  ogmrip_profile_editor_dialog_set_user_entry_visibility (dialog->priv->video_chooser, ref);
+  ogmrip_profile_editor_dialog_set_user_entry_visibility (dialog->priv->video_chooser, misc);
   g_signal_connect (dialog->priv->video_chooser, "changed",
-      G_CALLBACK (ogmrip_profile_editor_dialog_set_user_entry_visibility), ref);
+      G_CALLBACK (ogmrip_profile_editor_dialog_set_user_entry_visibility), misc);
 
   g_settings_bind (settings, OGMRIP_PROFILE_QUALITY, misc, "active", G_SETTINGS_BIND_DEFAULT);
 
