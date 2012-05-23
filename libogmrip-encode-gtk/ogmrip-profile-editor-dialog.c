@@ -128,6 +128,7 @@ ogmrip_profile_editor_container_options_button_clicked (OGMRipProfileEditorDialo
     GtkWidget *dialog;
 
     dialog = g_object_new (type, "profile", editor->priv->profile, NULL);
+    gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (editor));
     gtk_dialog_run (GTK_DIALOG (dialog));
     gtk_widget_destroy (dialog);
   }
@@ -147,6 +148,7 @@ ogmrip_profile_editor_video_options_button_clicked (OGMRipProfileEditorDialog *e
     GtkWidget *dialog;
 
     dialog = g_object_new (type, "profile", editor->priv->profile, NULL);
+    gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (editor));
     gtk_dialog_run (GTK_DIALOG (dialog));
     gtk_widget_destroy (dialog);
   }
@@ -166,6 +168,7 @@ ogmrip_profile_editor_audio_options_button_clicked (OGMRipProfileEditorDialog *e
     GtkWidget *dialog;
 
     dialog = g_object_new (type, "profile", editor->priv->profile, NULL);
+    gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (editor));
     gtk_dialog_run (GTK_DIALOG (dialog));
     gtk_widget_destroy (dialog);
   }
@@ -185,6 +188,7 @@ ogmrip_profile_editor_subp_options_button_clicked (OGMRipProfileEditorDialog *ed
     GtkWidget *dialog;
 
     dialog = g_object_new (type, "profile", editor->priv->profile, NULL);
+    gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (editor));
     gtk_dialog_run (GTK_DIALOG (dialog));
     gtk_widget_destroy (dialog);
   }
