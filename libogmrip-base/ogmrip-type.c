@@ -188,11 +188,21 @@ ogmrip_type_info_lookup (GType gtype)
 void
 ogmrip_type_add_extension (GType gtype, GType extension)
 {
-  OGMRipTypeInfo *info;
+  GList *values, *link;
 
-  info = ogmrip_type_info_lookup (gtype);
-  if (info)
-    g_array_append_val (info->priv->extensions, extension);
+  G_LOCK (table);
+  values = g_hash_table_get_values (table);
+  G_UNLOCK (table);
+
+  for (link = values; link; link = link->next)
+  {
+    OGMRipTypeInfo *info = link->data;
+
+    if (g_type_is_a (*(info->priv->gtype), gtype))
+      g_array_append_val (info->priv->extensions, extension);
+  }
+
+  g_list_free (values);
 }
 
 GType
