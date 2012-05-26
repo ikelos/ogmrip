@@ -46,6 +46,9 @@ struct _OGMRipContainer
 struct _OGMRipContainerClass
 {
   OGMJobBinClass parent_class;
+
+  /* vtable */
+  gint (* get_overhead) (OGMRipContainer *container);
 };
 
 typedef void (* OGMRipContainerFunc) (OGMRipContainer  *container,

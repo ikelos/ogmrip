@@ -102,7 +102,7 @@ ogmrip_container_class_init (OGMRipContainerClass *klass)
 
   g_object_class_install_property (gobject_class, PROP_OVERHEAD, 
         g_param_spec_uint ("overhead", "Overhead property", "Get overhead", 
-           0, G_MAXUINT, 6, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+           0, G_MAXUINT, DEFAULT_OVERHEAD, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipContainerPriv));
 }
@@ -199,7 +199,7 @@ ogmrip_container_get_property (GObject *gobject, guint property_id, GValue *valu
       g_value_set_uint (value, container->priv->tnumber);
       break;
     case PROP_OVERHEAD:
-      g_value_set_uint (value, 6);
+      g_value_set_uint (value, ogmrip_container_get_overhead (container));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -333,13 +333,15 @@ ogmrip_container_set_fourcc (OGMRipContainer *container, const gchar *fourcc)
 gint
 ogmrip_container_get_overhead (OGMRipContainer *container)
 {
-  gint overhead;
+  OGMRipContainerClass *klass;
 
   g_return_val_if_fail (OGMRIP_IS_CONTAINER (container), -1);
 
-  g_object_get (container, "overhead", &overhead, NULL);
+  klass = OGMRIP_CONTAINER_GET_CLASS (container);
+  if (klass->get_overhead)
+    return klass->get_overhead (container);
 
-  return overhead;
+  return DEFAULT_OVERHEAD;
 }
 
 /**

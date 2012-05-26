@@ -64,19 +64,9 @@ struct _OGMRipWebmClass
   OGMRipMatroskaClass parent_class;
 };
 
-enum
-{
-  PROP_0,
-  PROP_OVERHEAD
-};
-
-static void     ogmrip_matroska_get_property (GObject      *gobject,
-                                              guint        property_id,
-                                              GValue       *value,
-                                              GParamSpec   *pspec);
-static gboolean ogmrip_matroska_run          (OGMJobTask   *task,
-                                              GCancellable *cancellable,
-                                              GError       **error);
+static gboolean ogmrip_matroska_run (OGMJobTask   *task,
+                                     GCancellable *cancellable,
+                                     GError       **error);
 
 static gboolean
 ogmrip_matroska_watch (OGMJobTask *task, const gchar *buffer, OGMRipContainer *matroska, GError **error)
@@ -338,42 +328,30 @@ ogmrip_matroska_command (OGMRipContainer *matroska)
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
+static gint
+ogmrip_matroska_get_overhead (OGMRipContainer *container)
+{
+  return MKV_OVERHEAD;
+}
+
 G_DEFINE_TYPE (OGMRipMatroska, ogmrip_matroska, OGMRIP_TYPE_CONTAINER)
 
 static void
 ogmrip_matroska_class_init (OGMRipMatroskaClass *klass)
 {
-  GObjectClass *gobject_class;
   OGMJobTaskClass *task_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->get_property = ogmrip_matroska_get_property;
+  OGMRipContainerClass *container_class;
 
   task_class = OGMJOB_TASK_CLASS (klass);
   task_class->run = ogmrip_matroska_run;
 
-  g_object_class_install_property (gobject_class, PROP_OVERHEAD, 
-        g_param_spec_uint ("overhead", "Overhead property", "Get overhead", 
-           0, G_MAXUINT, MKV_OVERHEAD, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+  container_class = OGMRIP_CONTAINER_CLASS (klass);
+  container_class->get_overhead = ogmrip_matroska_get_overhead;
 }
 
 static void
 ogmrip_matroska_init (OGMRipMatroska *matroska)
 {
-}
-
-static void
-ogmrip_matroska_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
-{
-  switch (property_id)
-  {
-    case PROP_OVERHEAD:
-      g_value_set_uint (value, MKV_OVERHEAD);
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
-      break;
-  }
 }
 
 static gboolean
