@@ -393,6 +393,7 @@ ogmrip_profile_manager_dialog_init (OGMRipProfileManagerDialog *dialog)
   widget = gtk_builder_get_widget (builder, "toolbar");
   context = gtk_widget_get_style_context (widget);
   gtk_style_context_set_junction_sides (context, GTK_JUNCTION_TOP);
+  gtk_style_context_add_class (context, GTK_STYLE_CLASS_INLINE_TOOLBAR);
 
   widget = gtk_builder_get_widget (builder, "treeview");
 
