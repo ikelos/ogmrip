@@ -407,22 +407,15 @@ ogmrip_x264_get_merange (GValue *value, GVariant *variant, gpointer user_data)
 static gboolean
 ogmrip_x264_get_partitions (GValue *value, GVariant *variant, gpointer user_data)
 {
-  GVariantIter *iter;
-  GString *partitions;
-  gchar *str;
+  const gchar **strv;
+  gsize len;
 
-  partitions = g_string_new (NULL);
-
-  g_variant_get (variant, "as", &iter);
-  while (g_variant_iter_loop (iter, "s", &str))
-  {
-    if (partitions->len > 0)
-      g_string_append_c (partitions, ',');
-    g_string_append (partitions, str);
-  }
-  g_variant_iter_free (iter);
-
-  g_value_take_string (value, g_string_free (partitions, FALSE));
+  strv = g_variant_get_strv (variant, &len);
+  if (len == 0)
+    g_value_set_string (value, "none");
+  else
+    g_value_take_string (value, g_strjoinv (",", (gchar **) strv));
+  g_free (strv);
 
   return TRUE;
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="2.22"/>
+  <!-- interface-requires gtk+ 3.0 -->
   <object class="GtkAdjustment" id="b_adapt-adj">
     <property name="upper">2</property>
     <property name="value">1</property>
@@ -56,8 +56,13 @@
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
-  <object class="GtkSizeGroup" id="sizegroup1">
+  <object class="GtkSizeGroup" id="sizegroup2">
     <widgets>
+      <widget name="level_idc-spin"/>
+      <widget name="merange-spin"/>
+      <widget name="subq-spin"/>
+      <widget name="psy_rd-spin"/>
+      <widget name="psy_trellis-spin"/>
       <widget name="bframes-spin"/>
       <widget name="frameref-spin"/>
       <widget name="b_adapt-spin"/>
@@ -65,25 +70,25 @@
       <widget name="vbv_maxrate-spin"/>
       <widget name="vbv_bufsize-spin"/>
       <widget name="rc_lookahead-spin"/>
-      <widget name="level_idc-spin"/>
-      <widget name="merange-spin"/>
-      <widget name="subq-spin"/>
-      <widget name="psy_rd-spin"/>
-      <widget name="psy_trellis-spin"/>
     </widgets>
   </object>
-  <object class="GtkAdjustment" id="subq-adj">
-    <property name="upper">10</property>
-    <property name="value">5</property>
+  <object class="GtkAdjustment" id="vbv_bufsize-adj">
+    <property name="upper">50000</property>
+    <property name="value">10</property>
     <property name="step_increment">1</property>
-    <property name="page_increment">1</property>
+    <property name="page_increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="vbv_maxrate-adj">
+    <property name="upper">50000</property>
+    <property name="step_increment">1</property>
+    <property name="page_increment">10</property>
   </object>
   <object class="GtkNotebook" id="root">
     <property name="visible">True</property>
     <property name="can_focus">True</property>
     <property name="border_width">5</property>
     <child>
-      <object class="GtkGrid" id="grid3">
+      <object class="GtkGrid" id="grid1">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="border_width">6</property>
@@ -139,6 +144,8 @@
           <object class="GtkComboBoxText" id="profile-combo">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="entry_text_column">0</property>
+            <property name="id_column">1</property>
             <items>
               <item translatable="yes">Baseline</item>
               <item translatable="yes">Main</item>
@@ -170,12 +177,11 @@
           </packing>
         </child>
         <child>
-          <object class="GtkLabel" id="label2">
+          <object class="GtkLabel" id="label26">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_top">6</property>
             <property name="xalign">0</property>
-            <property name="label" translatable="yes">&lt;b&gt;Analysis&lt;/b&gt;</property>
+            <property name="label" translatable="yes">&lt;b&gt;Motion&lt;/b&gt;</property>
             <property name="use_markup">True</property>
           </object>
           <packing>
@@ -202,16 +208,22 @@
           </packing>
         </child>
         <child>
-          <object class="GtkLabel" id="label24">
+          <object class="GtkComboBoxText" id="me-combo">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_left">12</property>
-            <property name="xalign">0</property>
-            <property name="label" translatable="yes">Trellis searched quantization (trellis)</property>
+            <property name="hexpand">True</property>
+            <property name="entry_text_column">0</property>
+            <property name="id_column">1</property>
+            <items>
+              <item translatable="yes">Diamond search, radius 1 (dia - fast)</item>
+              <item translatable="yes">Hexagon search, radius 2 (hex)</item>
+              <item translatable="yes">Uneven multi-hexagon search (umh - slow)</item>
+              <item translatable="yes">Exhaustive search (esa - very slow)</item>
+            </items>
           </object>
           <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">5</property>
+            <property name="left_attach">1</property>
+            <property name="top_attach">4</property>
             <property name="width">1</property>
             <property name="height">1</property>
           </packing>
@@ -223,6 +235,325 @@
             <property name="margin_left">12</property>
             <property name="xalign">0</property>
             <property name="label" translatable="yes">Prediction mode for 'direct' motion vectors (direct)</property>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">5</property>
+            <property name="width">1</property>
+            <property name="height">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkComboBoxText" id="direct-combo">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="entry_text_column">0</property>
+            <property name="id_column">1</property>
+            <items>
+              <item translatable="yes">None</item>
+              <item translatable="yes">Spatial</item>
+              <item translatable="yes">Temporal</item>
+              <item translatable="yes">Auto</item>
+            </items>
+          </object>
+          <packing>
+            <property name="left_attach">1</property>
+            <property name="top_attach">5</property>
+            <property name="width">1</property>
+            <property name="height">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="label12">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="margin_left">12</property>
+            <property name="xalign">0</property>
+            <property name="label" translatable="yes">Maximum motion vector search range (merange)</property>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">6</property>
+            <property name="width">1</property>
+            <property name="height">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkSpinButton" id="merange-spin">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="halign">start</property>
+            <property name="invisible_char">●</property>
+            <property name="invisible_char_set">True</property>
+            <property name="adjustment">merange-adj</property>
+          </object>
+          <packing>
+            <property name="left_attach">1</property>
+            <property name="top_attach">6</property>
+            <property name="width">1</property>
+            <property name="height">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkCheckButton" id="mixed_refs-check">
+            <property name="label" translatable="yes">Allows each 8x8 or 16x8 motion partition to independently select a reference frame (mixed_refs)</property>
+            <property name="use_action_appearance">False</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">False</property>
+            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+            <property name="margin_left">12</property>
+            <property name="use_action_appearance">False</property>
+            <property name="xalign">0</property>
+            <property name="draw_indicator">True</property>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">7</property>
+            <property name="width">2</property>
+            <property name="height">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="label18">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="margin_top">6</property>
+            <property name="xalign">0</property>
+            <property name="label" translatable="yes">&lt;b&gt;Other&lt;/b&gt;</property>
+            <property name="use_markup">True</property>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">8</property>
+            <property name="width">2</property>
+            <property name="height">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkCheckButton" id="brdo-check">
+            <property name="label" translatable="yes">Enables rate-distortion optimization of macroblock types in B-frames (brdo)</property>
+            <property name="use_action_appearance">False</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">False</property>
+            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+            <property name="margin_left">12</property>
+            <property name="use_action_appearance">False</property>
+            <property name="xalign">0</property>
+            <property name="draw_indicator">True</property>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">9</property>
+            <property name="width">2</property>
+            <property name="height">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkCheckButton" id="global_header-check">
+            <property name="label" translatable="yes">Use global header (global_header)</property>
+            <property name="use_action_appearance">False</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">False</property>
+            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+            <property name="margin_left">12</property>
+            <property name="use_action_appearance">False</property>
+            <property name="xalign">0</property>
+            <property name="draw_indicator">True</property>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">10</property>
+            <property name="width">2</property>
+            <property name="height">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkCheckButton" id="aud-check">
+            <property name="label" translatable="yes">Use access unit delimiters (aud)</property>
+            <property name="use_action_appearance">False</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">False</property>
+            <property name="margin_left">12</property>
+            <property name="use_action_appearance">False</property>
+            <property name="xalign">0</property>
+            <property name="draw_indicator">True</property>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">11</property>
+            <property name="width">2</property>
+            <property name="height">1</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+    <child type="tab">
+      <object class="GtkLabel" id="label28">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">General</property>
+      </object>
+      <packing>
+        <property name="tab_fill">False</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkGrid" id="grid3">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="border_width">6</property>
+        <property name="row_spacing">6</property>
+        <property name="column_spacing">6</property>
+        <child>
+          <object class="GtkLabel" id="label2">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="margin_top">6</property>
+            <property name="xalign">0</property>
+            <property name="label" translatable="yes">&lt;b&gt;Analysis&lt;/b&gt;</property>
+            <property name="use_markup">True</property>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">0</property>
+            <property name="width">2</property>
+            <property name="height">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="label21">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="margin_left">12</property>
+            <property name="xalign">0</property>
+            <property name="label" translatable="yes">Weighted prediction for P-frames (weightp)</property>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">1</property>
+            <property name="width">1</property>
+            <property name="height">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="label8">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+            <property name="margin_left">12</property>
+            <property name="xalign">0</property>
+            <property name="label" translatable="yes">Subpel refinement quality (subq)</property>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">2</property>
+            <property name="width">1</property>
+            <property name="height">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkCheckButton" id="weight_b-check">
+            <property name="label" translatable="yes">Use weighted prediction in B-frames (weightb)</property>
+            <property name="use_action_appearance">False</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">False</property>
+            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+            <property name="margin_left">12</property>
+            <property name="use_action_appearance">False</property>
+            <property name="xalign">0</property>
+            <property name="draw_indicator">True</property>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">3</property>
+            <property name="width">2</property>
+            <property name="height">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkCheckButton" id="dct8x8-check">
+            <property name="label" translatable="yes">Adaptive spatial transform size (8x8dct)</property>
+            <property name="use_action_appearance">False</property>
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="receives_default">False</property>
+            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+            <property name="margin_left">12</property>
+            <property name="use_action_appearance">False</property>
+            <property name="xalign">0</property>
+            <property name="draw_indicator">True</property>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">4</property>
+            <property name="width">2</property>
+            <property name="height">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkComboBoxText" id="weight_p-combo">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="hexpand">True</property>
+            <property name="entry_text_column">0</property>
+            <property name="id_column">1</property>
+            <items>
+              <item translatable="yes">Disabled</item>
+              <item translatable="yes">Blind offset</item>
+              <item translatable="yes">Smart analysis</item>
+            </items>
+          </object>
+          <packing>
+            <property name="left_attach">1</property>
+            <property name="top_attach">1</property>
+            <property name="width">1</property>
+            <property name="height">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkSpinButton" id="subq-spin">
+            <property name="visible">True</property>
+            <property name="can_focus">True</property>
+            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+            <property name="halign">start</property>
+            <property name="invisible_char">●</property>
+            <property name="invisible_char_set">True</property>
+            <property name="adjustment">subq-adj</property>
+          </object>
+          <packing>
+            <property name="left_attach">1</property>
+            <property name="top_attach">2</property>
+            <property name="width">1</property>
+            <property name="height">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="label27">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="xalign">0</property>
+            <property name="label" translatable="yes">&lt;b&gt;Quantization&lt;/b&gt;</property>
+            <property name="use_markup">True</property>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">5</property>
+            <property name="width">2</property>
+            <property name="height">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="label24">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="margin_left">12</property>
+            <property name="xalign">0</property>
+            <property name="label" translatable="yes">Trellis searched quantization (trellis)</property>
           </object>
           <packing>
             <property name="left_attach">0</property>
@@ -247,52 +578,6 @@
           </packing>
         </child>
         <child>
-          <object class="GtkLabel" id="label21">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="margin_left">12</property>
-            <property name="xalign">0</property>
-            <property name="label" translatable="yes">Weighted prediction for P-frames (weightp)</property>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">8</property>
-            <property name="width">1</property>
-            <property name="height">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkLabel" id="label12">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="margin_left">12</property>
-            <property name="xalign">0</property>
-            <property name="label" translatable="yes">Maximum motion vector search range (merange)</property>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">9</property>
-            <property name="width">1</property>
-            <property name="height">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkLabel" id="label8">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-            <property name="margin_left">12</property>
-            <property name="xalign">0</property>
-            <property name="label" translatable="yes">Subpel refinement quality (subq)</property>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">10</property>
-            <property name="width">1</property>
-            <property name="height">1</property>
-          </packing>
-        </child>
-        <child>
           <object class="GtkLabel" id="label10">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
@@ -302,7 +587,7 @@
           </object>
           <packing>
             <property name="left_attach">0</property>
-            <property name="top_attach">11</property>
+            <property name="top_attach">8</property>
             <property name="width">1</property>
             <property name="height">1</property>
           </packing>
@@ -317,120 +602,7 @@
           </object>
           <packing>
             <property name="left_attach">0</property>
-            <property name="top_attach">12</property>
-            <property name="width">1</property>
-            <property name="height">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkCheckButton" id="partitions-check">
-            <property name="label" translatable="yes">Use small macroblocks (partitions)</property>
-            <property name="use_action_appearance">False</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">False</property>
-            <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
-            <property name="xalign">0</property>
-            <property name="draw_indicator">True</property>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">13</property>
-            <property name="width">2</property>
-            <property name="height">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkCheckButton" id="weight_b-check">
-            <property name="label" translatable="yes">Use weighted prediction in B-frames (weightb)</property>
-            <property name="use_action_appearance">False</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">False</property>
-            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-            <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
-            <property name="xalign">0</property>
-            <property name="draw_indicator">True</property>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">14</property>
-            <property name="width">2</property>
-            <property name="height">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkCheckButton" id="mixed_refs-check">
-            <property name="label" translatable="yes">Allows each 8x8 or 16x8 motion partition to independently select a reference frame (mixed_refs)</property>
-            <property name="use_action_appearance">False</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">False</property>
-            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-            <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
-            <property name="xalign">0</property>
-            <property name="draw_indicator">True</property>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">15</property>
-            <property name="width">2</property>
-            <property name="height">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkCheckButton" id="dct8x8-check">
-            <property name="label" translatable="yes">Adaptive spatial transform size (8x8dct)</property>
-            <property name="use_action_appearance">False</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">False</property>
-            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-            <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
-            <property name="xalign">0</property>
-            <property name="draw_indicator">True</property>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">16</property>
-            <property name="width">2</property>
-            <property name="height">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkComboBoxText" id="cqm-combo">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <items>
-              <item translatable="yes">Flat</item>
-              <item translatable="yes">JVM</item>
-            </items>
-          </object>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="top_attach">7</property>
-            <property name="width">1</property>
-            <property name="height">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkComboBoxText" id="direct-combo">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <items>
-              <item translatable="yes">None</item>
-              <item translatable="yes">Spatial</item>
-              <item translatable="yes">Temporal</item>
-              <item translatable="yes">Auto</item>
-            </items>
-          </object>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="top_attach">6</property>
+            <property name="top_attach">9</property>
             <property name="width">1</property>
             <property name="height">1</property>
           </packing>
@@ -441,6 +613,8 @@
             <property name="can_focus">False</property>
             <property name="hexpand">True</property>
             <property name="active">1</property>
+            <property name="entry_text_column">0</property>
+            <property name="id_column">1</property>
             <items>
               <item translatable="yes">Disabled</item>
               <item translatable="yes">Only for the final encode</item>
@@ -449,76 +623,25 @@
           </object>
           <packing>
             <property name="left_attach">1</property>
-            <property name="top_attach">5</property>
+            <property name="top_attach">6</property>
             <property name="width">1</property>
             <property name="height">1</property>
           </packing>
         </child>
         <child>
-          <object class="GtkComboBoxText" id="me-combo">
+          <object class="GtkComboBoxText" id="cqm-combo">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="hexpand">True</property>
+            <property name="entry_text_column">0</property>
+            <property name="id_column">1</property>
             <items>
-              <item translatable="yes">Diamond search, radius 1 (dia - fast)</item>
-              <item translatable="yes">Hexagon search, radius 2 (hex)</item>
-              <item translatable="yes">Uneven multi-hexagon search (umh - slow)</item>
-              <item translatable="yes">Exhaustive search (esa - very slow)</item>
+              <item translatable="yes">Flat</item>
+              <item translatable="yes">JVM</item>
             </items>
           </object>
           <packing>
             <property name="left_attach">1</property>
-            <property name="top_attach">4</property>
-            <property name="width">1</property>
-            <property name="height">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkComboBoxText" id="weight_p-combo">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <items>
-              <item translatable="yes">Disabled</item>
-              <item translatable="yes">Blind offset</item>
-              <item translatable="yes">Smart analysis</item>
-            </items>
-          </object>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="top_attach">8</property>
-            <property name="width">1</property>
-            <property name="height">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkSpinButton" id="merange-spin">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="halign">start</property>
-            <property name="invisible_char">●</property>
-            <property name="invisible_char_set">True</property>
-            <property name="adjustment">merange-adj</property>
-          </object>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="top_attach">9</property>
-            <property name="width">1</property>
-            <property name="height">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkSpinButton" id="subq-spin">
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-            <property name="halign">start</property>
-            <property name="invisible_char">●</property>
-            <property name="invisible_char_set">True</property>
-            <property name="adjustment">subq-adj</property>
-          </object>
-          <packing>
-            <property name="left_attach">1</property>
-            <property name="top_attach">10</property>
+            <property name="top_attach">7</property>
             <property name="width">1</property>
             <property name="height">1</property>
           </packing>
@@ -535,7 +658,7 @@
           </object>
           <packing>
             <property name="left_attach">1</property>
-            <property name="top_attach">11</property>
+            <property name="top_attach">8</property>
             <property name="width">1</property>
             <property name="height">1</property>
           </packing>
@@ -552,12 +675,137 @@
           </object>
           <packing>
             <property name="left_attach">1</property>
-            <property name="top_attach">12</property>
+            <property name="top_attach">9</property>
             <property name="width">1</property>
             <property name="height">1</property>
           </packing>
         </child>
+        <child>
+          <object class="GtkLabel" id="label25">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="xalign">0</property>
+            <property name="label" translatable="yes">&lt;b&gt;Partitions&lt;/b&gt;</property>
+            <property name="use_markup">True</property>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">10</property>
+            <property name="width">2</property>
+            <property name="height">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkGrid" id="grid4">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="row_spacing">6</property>
+            <property name="column_spacing">6</property>
+            <child>
+              <object class="GtkCheckButton" id="b8x8-check">
+                <property name="label" translatable="yes">Enable types b16x8, b8x16, b8x8 (b8x8)</property>
+                <property name="use_action_appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">False</property>
+                <property name="margin_left">12</property>
+                <property name="use_action_appearance">False</property>
+                <property name="xalign">0</property>
+                <property name="draw_indicator">True</property>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">0</property>
+                <property name="width">1</property>
+                <property name="height">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkCheckButton" id="i8x8-check">
+                <property name="label" translatable="yes">Enable type i8x8 (i8x8)</property>
+                <property name="use_action_appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">False</property>
+                <property name="use_action_appearance">False</property>
+                <property name="xalign">0</property>
+                <property name="draw_indicator">True</property>
+              </object>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="top_attach">0</property>
+                <property name="width">1</property>
+                <property name="height">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkCheckButton" id="p8x8-check">
+                <property name="label" translatable="yes">Enable types p16x8, p8x16, p8x8 (p8x8)</property>
+                <property name="use_action_appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">False</property>
+                <property name="margin_left">12</property>
+                <property name="use_action_appearance">False</property>
+                <property name="xalign">0</property>
+                <property name="draw_indicator">True</property>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">1</property>
+                <property name="width">1</property>
+                <property name="height">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkCheckButton" id="p4x4-check">
+                <property name="label" translatable="yes">Enable types p8x4, p4x8, p4x4 (p4x4)</property>
+                <property name="use_action_appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">False</property>
+                <property name="margin_left">12</property>
+                <property name="use_action_appearance">False</property>
+                <property name="xalign">0</property>
+                <property name="draw_indicator">True</property>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">2</property>
+                <property name="width">2</property>
+                <property name="height">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkCheckButton" id="i4x4-check">
+                <property name="label" translatable="yes">Enable type i4x4 (i4x4)</property>
+                <property name="use_action_appearance">False</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">False</property>
+                <property name="use_action_appearance">False</property>
+                <property name="xalign">0</property>
+                <property name="draw_indicator">True</property>
+              </object>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="top_attach">1</property>
+                <property name="width">1</property>
+                <property name="height">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">11</property>
+            <property name="width">2</property>
+            <property name="height">1</property>
+          </packing>
+        </child>
       </object>
+      <packing>
+        <property name="position">1</property>
+      </packing>
     </child>
     <child type="tab">
       <object class="GtkLabel" id="label3">
@@ -566,6 +814,7 @@
         <property name="label" translatable="yes">Analysis</property>
       </object>
       <packing>
+        <property name="position">1</property>
         <property name="tab_fill">False</property>
       </packing>
     </child>
@@ -903,84 +1152,9 @@
             <property name="height">1</property>
           </packing>
         </child>
-        <child>
-          <object class="GtkLabel" id="label18">
-            <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="margin_top">6</property>
-            <property name="xalign">0</property>
-            <property name="label" translatable="yes">&lt;b&gt;Other&lt;/b&gt;</property>
-            <property name="use_markup">True</property>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">12</property>
-            <property name="width">2</property>
-            <property name="height">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkCheckButton" id="brdo-check">
-            <property name="label" translatable="yes">Enables rate-distortion optimization of macroblock types in B-frames (brdo)</property>
-            <property name="use_action_appearance">False</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">False</property>
-            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-            <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
-            <property name="xalign">0</property>
-            <property name="draw_indicator">True</property>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">13</property>
-            <property name="width">2</property>
-            <property name="height">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkCheckButton" id="global_header-check">
-            <property name="label" translatable="yes">Use global header (global_header)</property>
-            <property name="use_action_appearance">False</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">False</property>
-            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-            <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
-            <property name="xalign">0</property>
-            <property name="draw_indicator">True</property>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">14</property>
-            <property name="width">2</property>
-            <property name="height">1</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkCheckButton" id="aud-check">
-            <property name="label" translatable="yes">Use access unit delimiters (aud)</property>
-            <property name="use_action_appearance">False</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="receives_default">False</property>
-            <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
-            <property name="xalign">0</property>
-            <property name="draw_indicator">True</property>
-          </object>
-          <packing>
-            <property name="left_attach">0</property>
-            <property name="top_attach">15</property>
-            <property name="width">2</property>
-            <property name="height">1</property>
-          </packing>
-        </child>
       </object>
       <packing>
-        <property name="position">1</property>
+        <property name="position">2</property>
       </packing>
     </child>
     <child type="tab">
@@ -990,20 +1164,16 @@
         <property name="label" translatable="yes">Encoding</property>
       </object>
       <packing>
-        <property name="position">1</property>
+        <property name="position">2</property>
         <property name="tab_fill">False</property>
       </packing>
     </child>
   </object>
-  <object class="GtkAdjustment" id="vbv_bufsize-adj">
-    <property name="upper">50000</property>
-    <property name="value">10</property>
+  <object class="GtkSizeGroup" id="sizegroup1"/>
+  <object class="GtkAdjustment" id="subq-adj">
+    <property name="upper">10</property>
+    <property name="value">5</property>
     <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
-  </object>
-  <object class="GtkAdjustment" id="vbv_maxrate-adj">
-    <property name="upper">50000</property>
-    <property name="step_increment">1</property>
-    <property name="page_increment">10</property>
+    <property name="page_increment">1</property>
   </object>
 </interface>

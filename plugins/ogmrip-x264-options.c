@@ -40,7 +40,7 @@
 #define OGMRIP_IS_X264_DIALOG_CLASS(obj) (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_X264_DIALOG))
 
 #define OGMRIP_X264_PROP_PROFILE      "profile"
-#define OGMRIP_X264_DEFAULT_PROFILE   OGMRIP_X264_PROFILE_HIGH
+#define OGMRIP_X264_DEFAULT_PROFILE   HIGH
 
 typedef struct _OGMRipX264Dialog      OGMRipX264Dialog;
 typedef struct _OGMRipX264DialogClass OGMRipX264DialogClass;
@@ -69,7 +69,6 @@ struct _OGMRipX264Dialog
   GtkWidget *me_combo;
   GtkWidget *merange_spin;
   GtkWidget *mixed_refs_check;
-  GtkWidget *partitions_check;
   GtkWidget *profile_combo;
   GtkWidget *psy_rd_spin;
   GtkWidget *psy_trellis_spin;
@@ -80,6 +79,7 @@ struct _OGMRipX264Dialog
   GtkWidget *vbv_maxrate_spin;
   GtkWidget *weight_b_check;
   GtkWidget *weight_p_combo;
+  GtkWidget *partitions_check[5];
 };
 
 struct _OGMRipX264DialogClass
@@ -95,9 +95,19 @@ enum
 
 enum
 {
-  OGMRIP_X264_PROFILE_BASELINE,
-  OGMRIP_X264_PROFILE_MAIN,
-  OGMRIP_X264_PROFILE_HIGH
+  BASELINE,
+  MAIN,
+  HIGH
+};
+
+enum
+{
+  B8X8,
+  I8X8,
+  P8X8,
+  I4X4,
+  P4X4,
+  LAST
 };
 
 static gboolean x264_have_8x8dct     = FALSE;
@@ -112,6 +122,109 @@ static gboolean x264_have_psy        = FALSE;
 static gboolean x264_have_weight_p   = FALSE;
 
 static void ogmrip_options_editable_init (OGMRipOptionsEditableInterface *iface);
+
+static const gchar *partitions[] =
+{
+  "b8x8",
+  "i8x8",
+  "p8x8",
+  "i4x4",
+  "p4x4"
+};
+
+static gboolean
+ogmrip_x264_get_b8x8 (GValue *value, GVariant *variant, gpointer user_data)
+{
+  const gchar **strv;
+  guint i;
+
+  strv = g_variant_get_strv (variant, NULL);
+  for (i = 0; strv[i]; i ++)
+    if (g_str_equal (strv[i], "b8x8"))
+      break;
+
+  g_value_set_boolean (value, strv[i] != NULL);
+
+  return TRUE;
+}
+
+static gboolean
+ogmrip_x264_get_i8x8 (GValue *value, GVariant *variant, gpointer user_data)
+{
+  const gchar **strv;
+  guint i;
+
+  strv = g_variant_get_strv (variant, NULL);
+  for (i = 0; strv[i]; i ++)
+    if (g_str_equal (strv[i], "i8x8"))
+      break;
+
+  g_value_set_boolean (value, strv[i] != NULL);
+
+  return TRUE;
+}
+
+static gboolean
+ogmrip_x264_get_p8x8 (GValue *value, GVariant *variant, gpointer user_data)
+{
+  const gchar **strv;
+  guint i;
+
+  strv = g_variant_get_strv (variant, NULL);
+  for (i = 0; strv[i]; i ++)
+    if (g_str_equal (strv[i], "p8x8"))
+      break;
+
+  g_value_set_boolean (value, strv[i] != NULL);
+
+  return TRUE;
+}
+
+static gboolean
+ogmrip_x264_get_i4x4 (GValue *value, GVariant *variant, gpointer user_data)
+{
+  const gchar **strv;
+  guint i;
+
+  strv = g_variant_get_strv (variant, NULL);
+  for (i = 0; strv[i]; i ++)
+    if (g_str_equal (strv[i], "i4x4"))
+      break;
+
+  g_value_set_boolean (value, strv[i] != NULL);
+
+  return TRUE;
+}
+
+static gboolean
+ogmrip_x264_get_p4x4 (GValue *value, GVariant *variant, gpointer user_data)
+{
+  const gchar **strv;
+  guint i;
+
+  strv = g_variant_get_strv (variant, NULL);
+  for (i = 0; strv[i]; i ++)
+    if (g_str_equal (strv[i], "p4x4"))
+      break;
+
+  g_value_set_boolean (value, strv[i] != NULL);
+
+  return TRUE;
+}
+
+static GVariant *
+ogmrip_x264_set_partitions (const GValue *value, const GVariantType *type, gpointer user_data)
+{
+  GtkWidget **checks = user_data;
+  const gchar *strv[LAST];
+  guint i, j;
+
+  for (i = 0, j = 0; i < LAST; i ++)
+    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (checks[i])))
+      strv[j ++] = partitions[i];
+
+  return g_variant_new_strv (strv, j);
+}
 
 static gboolean
 ogmrip_x264_get_me (GValue *value, GVariant *variant, gpointer user_data)
@@ -134,25 +247,25 @@ ogmrip_x264_dialog_profile_changed (OGMRipX264Dialog *dialog)
 
   profile = gtk_combo_box_get_active (GTK_COMBO_BOX (dialog->profile_combo));
 
-  if (profile != OGMRIP_X264_PROFILE_HIGH)
+  if (profile != HIGH)
   {
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->dct8x8_check), FALSE);
     gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->cqm_combo), 0);
   }
 
-  gtk_widget_set_sensitive (dialog->dct8x8_check, x264_have_8x8dct && profile == OGMRIP_X264_PROFILE_HIGH);
-  gtk_widget_set_sensitive (dialog->cqm_combo, profile == OGMRIP_X264_PROFILE_HIGH);
+  gtk_widget_set_sensitive (dialog->dct8x8_check, x264_have_8x8dct && profile == HIGH);
+  gtk_widget_set_sensitive (dialog->cqm_combo, profile == HIGH);
 
-  if (profile == OGMRIP_X264_PROFILE_BASELINE)
+  if (profile == BASELINE)
   {
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->cabac_check), FALSE);
     gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->weight_p_combo), 0);
     gtk_spin_button_set_value (GTK_SPIN_BUTTON (dialog->bframes_spin), 0);
   }
 
-  gtk_widget_set_sensitive (dialog->cabac_check, profile != OGMRIP_X264_PROFILE_BASELINE);
-  gtk_widget_set_sensitive (dialog->weight_p_combo, x264_have_weight_p && profile != OGMRIP_X264_PROFILE_BASELINE);
-  gtk_widget_set_sensitive (dialog->bframes_spin, profile != OGMRIP_X264_PROFILE_BASELINE);
+  gtk_widget_set_sensitive (dialog->cabac_check, profile != BASELINE);
+  gtk_widget_set_sensitive (dialog->weight_p_combo, x264_have_weight_p && profile != BASELINE);
+  gtk_widget_set_sensitive (dialog->bframes_spin, profile != BASELINE);
 }
 
 static void
@@ -250,10 +363,23 @@ ogmrip_x264_dialog_set_profile (OGMRipX264Dialog *dialog, OGMRipProfile *profile
         dialog->global_header_check, "active", G_SETTINGS_BIND_DEFAULT);
     g_settings_bind (settings, OGMRIP_X264_PROP_WEIGHT_B,
         dialog->weight_b_check, "active", G_SETTINGS_BIND_DEFAULT);
-/*
-    g_settings_bind (settings, OGMRIP_X264_PROP_PARTITIONS,
-        dialog->partitions_check, "active", G_SETTINGS_BIND_DEFAULT);
-*/
+
+    g_settings_bind_with_mapping (settings, OGMRIP_X264_PROP_PARTITIONS,
+        dialog->partitions_check[B8X8], "active", G_SETTINGS_BIND_DEFAULT,
+        ogmrip_x264_get_b8x8, ogmrip_x264_set_partitions, dialog->partitions_check, NULL);
+    g_settings_bind_with_mapping (settings, OGMRIP_X264_PROP_PARTITIONS,
+        dialog->partitions_check[I8X8], "active", G_SETTINGS_BIND_DEFAULT,
+        ogmrip_x264_get_i8x8, ogmrip_x264_set_partitions, dialog->partitions_check, NULL);
+    g_settings_bind_with_mapping (settings, OGMRIP_X264_PROP_PARTITIONS,
+        dialog->partitions_check[P8X8], "active", G_SETTINGS_BIND_DEFAULT,
+        ogmrip_x264_get_p8x8, ogmrip_x264_set_partitions, dialog->partitions_check, NULL);
+    g_settings_bind_with_mapping (settings, OGMRIP_X264_PROP_PARTITIONS,
+        dialog->partitions_check[I4X4], "active", G_SETTINGS_BIND_DEFAULT,
+        ogmrip_x264_get_i4x4, ogmrip_x264_set_partitions, dialog->partitions_check, NULL);
+    g_settings_bind_with_mapping (settings, OGMRIP_X264_PROP_PARTITIONS,
+        dialog->partitions_check[P4X4], "active", G_SETTINGS_BIND_DEFAULT,
+        ogmrip_x264_get_p4x4, ogmrip_x264_set_partitions, dialog->partitions_check, NULL);
+
     g_settings_bind (settings, OGMRIP_X264_PROP_WEIGHT_P,
         dialog->weight_p_combo, "active", G_SETTINGS_BIND_DEFAULT);
     g_settings_bind (settings, OGMRIP_X264_PROP_FRAMEREF,
@@ -401,7 +527,12 @@ ogmrip_x264_dialog_init (OGMRipX264Dialog *dialog)
 
   dialog->global_header_check = gtk_builder_get_widget (builder, "global_header-check");
   dialog->weight_b_check = gtk_builder_get_widget (builder, "weight_b-check");
-  dialog->partitions_check = gtk_builder_get_widget (builder, "partitions-check");
+
+  dialog->partitions_check[B8X8] = gtk_builder_get_widget (builder, "b8x8-check");
+  dialog->partitions_check[I8X8] = gtk_builder_get_widget (builder, "i8x8-check");
+  dialog->partitions_check[P8X8] = gtk_builder_get_widget (builder, "p8x8-check");
+  dialog->partitions_check[I4X4] = gtk_builder_get_widget (builder, "i4x4-check");
+  dialog->partitions_check[P4X4] = gtk_builder_get_widget (builder, "p4x4-check");
 
   dialog->weight_p_combo = gtk_builder_get_widget (builder, "weight_p-combo");
   gtk_widget_set_sensitive (dialog->weight_p_combo, x264_have_weight_p);
