@@ -769,7 +769,6 @@ ogmrip_xvid_set_property (GObject *gobject, guint property_id, const GValue *val
       break;
     case PROP_MIN_IQUANT:
       xvid->min_iquant = g_value_get_uint (value);
-      g_debug ("toto %d", xvid->min_iquant);
       break;
     case PROP_MAX_IQUANT:
       xvid->max_iquant = g_value_get_uint (value);
@@ -932,7 +931,7 @@ ogmrip_module_load (OGMRipModule *module)
     return;
   }
 
-  ogmrip_register_codec (OGMRIP_TYPE_XVID,
-      "xvid", _("XviD"), OGMRIP_FORMAT_MPEG4);
+  ogmrip_register_codec (OGMRIP_TYPE_XVID, "xvid", _("XviD"), OGMRIP_FORMAT_MPEG4,
+      "schema-id", "org.ogmrip.xvid", NULL);
 }
 

@@ -257,6 +257,6 @@ ogmrip_module_load (OGMRipModule *module)
   }
 
   ogmrip_register_codec (OGMRIP_TYPE_VOBSUB,
-      "vobsub", _("VobSub"), OGMRIP_FORMAT_VOBSUB);
+      "vobsub", _("VobSub"), OGMRIP_FORMAT_VOBSUB, NULL);
 }
 

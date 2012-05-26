@@ -42,6 +42,17 @@ G_LOCK_DEFINE_STATIC (table);
 G_DEFINE_TYPE (OGMRipTypeInfo, ogmrip_type_info, G_TYPE_INITIALLY_UNOWNED);
 
 static void
+ogmrip_type_info_constructed (GObject *gobject)
+{
+  OGMRipTypeInfo *info = OGMRIP_TYPE_INFO (gobject);
+
+  if (!info->priv->name)
+    g_error ("No name specified");
+
+  G_OBJECT_CLASS (ogmrip_type_info_parent_class)->constructed (gobject);
+}
+
+static void
 ogmrip_type_info_dispose (GObject *gobject)
 {
   OGMRipTypeInfo *info = OGMRIP_TYPE_INFO (gobject);
@@ -113,6 +124,7 @@ ogmrip_type_info_class_init (OGMRipTypeInfoClass *klass)
   GObjectClass *gobject_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->constructed = ogmrip_type_info_constructed;
   gobject_class->dispose = ogmrip_type_info_dispose;
   gobject_class->finalize = ogmrip_type_info_finalize;
   gobject_class->get_property = ogmrip_type_info_get_property;

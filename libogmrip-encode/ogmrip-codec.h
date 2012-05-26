@@ -69,8 +69,13 @@ void           ogmrip_codec_set_start_position (OGMRipCodec   *codec,
 void           ogmrip_register_codec           (GType         gtype,
                                                 const gchar   *name,
                                                 const gchar   *description,
-                                                OGMRipFormat  format);
+                                                OGMRipFormat  format,
+                                                const gchar   *property,
+                                                ...);
 OGMRipFormat   ogmrip_codec_format             (GType         gtype);
+gboolean       ogmrip_codec_get_schema         (GType         gtype,
+                                                const gchar   **id,
+                                                const gchar   **name);
 
 G_END_DECLS
 

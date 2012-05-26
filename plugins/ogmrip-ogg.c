@@ -377,6 +377,6 @@ ogmrip_module_load (OGMRipModule *module)
   }
 
   ogmrip_register_container (OGMRIP_TYPE_OGG,
-      "ogm", _("Ogg Media (OGM)"), formats);
+      "ogm", _("Ogg Media (OGM)"), formats, NULL);
 }
 

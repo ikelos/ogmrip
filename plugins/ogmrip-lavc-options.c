@@ -92,12 +92,16 @@ static void
 ogmrip_lavc_dialog_set_profile (OGMRipLavcDialog *dialog, OGMRipProfile *profile)
 {
   GSettings *settings;
+  gchar *str;
 
   if (dialog->profile)
     g_object_unref (dialog->profile);
   dialog->profile = g_object_ref (profile);
 
-  settings = ogmrip_profile_get_child (profile, "lavc");
+  ogmrip_profile_get (profile, OGMRIP_PROFILE_VIDEO, OGMRIP_PROFILE_CODEC, "s", &str, NULL);
+  settings = ogmrip_profile_get_child (profile, str);
+  g_free (str);
+
   g_assert (settings != NULL);
 
   g_settings_bind (settings, OGMRIP_LAVC_PROP_BUF_SIZE,

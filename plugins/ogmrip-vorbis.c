@@ -193,6 +193,6 @@ ogmrip_module_load (OGMRipModule *module)
   }
 
   ogmrip_register_codec (OGMRIP_TYPE_VORBIS,
-      "vorbis", _("Ogg Vorbis"), OGMRIP_FORMAT_VORBIS);
+      "vorbis", _("Ogg Vorbis"), OGMRIP_FORMAT_VORBIS, NULL);
 }
 

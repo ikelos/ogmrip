@@ -193,6 +193,6 @@ ogmrip_module_load (OGMRipModule *module)
   }
 
   ogmrip_register_codec (OGMRIP_TYPE_FLAC,
-      "flac", _("Free Lossless Audio Codec (FLAC)"), OGMRIP_FORMAT_FLAC);
+      "flac", _("Free Lossless Audio Codec (FLAC)"), OGMRIP_FORMAT_FLAC, NULL);
 }
 

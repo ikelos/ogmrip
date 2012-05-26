@@ -481,11 +481,11 @@ ogmrip_module_load (OGMRipModule *module)
     g_free (output);
 
     ogmrip_register_container (OGMRIP_TYPE_MATROSKA,
-        "mkv", _("Matroska Media (MKV)"), mkv_formats);
+        "mkv", _("Matroska Media (MKV)"), mkv_formats, NULL);
 
     if (have_webm)
       ogmrip_register_container (ogmrip_webm_get_type (),
-          "webm", _("WebM Media (webm)"), webm_formats);
+          "webm", _("WebM Media (webm)"), webm_formats, NULL);
   }
 }
 

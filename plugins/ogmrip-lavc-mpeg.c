@@ -163,12 +163,15 @@ ogmrip_module_load (OGMRipModule *module)
   }
 
   ogmrip_register_codec (ogmrip_lavc_mpeg1_get_type (),
-      "lavc-mpeg1", _("Lavc Mpeg-1"), OGMRIP_FORMAT_MPEG1);
+      "lavc-mpeg1", _("Lavc Mpeg-1"), OGMRIP_FORMAT_MPEG1,
+      "schema-id", "org.ogmrip.lavc", "schema-name", "lavc", NULL);
 
   ogmrip_register_codec (ogmrip_lavc_mpeg2_get_type (),
-      "lavc-mpeg2", _("Lavc Mpeg-2"), OGMRIP_FORMAT_MPEG2);
+      "lavc-mpeg2", _("Lavc Mpeg-2"), OGMRIP_FORMAT_MPEG2,
+      "schema-id", "org.ogmrip.lavc", "schema-name", "lavc", NULL);
 
   ogmrip_register_codec (ogmrip_lavc_mpeg4_get_type (),
-      "lavc-mpeg4", _("Lavc Mpeg-4"), OGMRIP_FORMAT_MPEG4);
+      "lavc-mpeg4", _("Lavc Mpeg-4"), OGMRIP_FORMAT_MPEG4,
+      "schema-id", "org.ogmrip.lavc", "schema-name", "lavc", NULL);
 }
 

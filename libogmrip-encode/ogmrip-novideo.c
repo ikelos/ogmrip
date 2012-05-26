@@ -29,6 +29,6 @@ void
 ogmrip_novideo_register_codec (void)
 {
   ogmrip_register_codec (G_TYPE_NONE,
-      "novideo", N_("No Video"), OGMRIP_FORMAT_UNDEFINED);
+      "novideo", N_("No Video"), OGMRIP_FORMAT_UNDEFINED, NULL);
 }
 

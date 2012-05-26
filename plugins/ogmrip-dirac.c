@@ -153,6 +153,6 @@ ogmrip_module_load (OGMRipModule *module)
   }
 
   ogmrip_register_codec (ogmrip_dirac_get_type (),
-      "dirac", _("Dirac"), OGMRIP_FORMAT_DIRAC);
+      "dirac", _("Dirac"), OGMRIP_FORMAT_DIRAC, NULL);
 }
 

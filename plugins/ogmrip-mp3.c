@@ -208,6 +208,6 @@ ogmrip_module_load (OGMRipModule *module)
   }
 
   ogmrip_register_codec (OGMRIP_TYPE_MP3,
-      "mp3", _("MPEG-1 layer III (MP3)"), OGMRIP_FORMAT_MP3);
+      "mp3", _("MPEG-1 layer III (MP3)"), OGMRIP_FORMAT_MP3, NULL);
 }
 

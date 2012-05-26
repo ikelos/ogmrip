@@ -25,6 +25,8 @@
 #include "ogmrip-profile-keys.h"
 #include "ogmrip-profile-parser.h"
 #include "ogmrip-marshal.h"
+#include "ogmrip-codec.h"
+#include "ogmrip-container.h"
 
 #include <glib/gi18n-lib.h>
 
@@ -452,23 +454,41 @@ ogmrip_profile_set (OGMRipProfile *profile, const gchar *section, const gchar *k
 }
 
 static GSettings *
-ogmrip_profile_get_child_for_codec (OGMRipProfile *profile, const gchar *name)
+ogmrip_profile_get_child_internal (OGMRipProfile *profile, const gchar *id, const gchar *name)
 {
-  GSettings *settings = NULL;
-  gchar *schema;
+  GSettings *settings;
+  gchar *path;
 
-  schema = g_strconcat ("org.ogmrip.", name, NULL);
-  if (ogmrip_profile_has_schema (schema))
-  {
-    gchar *path;
+  if (!ogmrip_profile_has_schema (id))
+    return NULL;
 
-    path = g_strconcat (profile->priv->path, name, "/", NULL);
-    settings = g_settings_new_with_path (schema, path);
-    g_free (path);
-  }
-  g_free (schema);
+  path = g_strconcat (profile->priv->path, name, "/", NULL);
+  settings = g_settings_new_with_path (id, path);
+  g_free (path);
 
   return settings;
+}
+
+static GSettings *
+ogmrip_profile_get_child_for_codec (OGMRipProfile *profile, const gchar *codec)
+{
+  const gchar *id, *name;
+
+  if (!ogmrip_codec_get_schema (ogmrip_type_from_name (codec), &id, &name))
+    return NULL;
+
+  return ogmrip_profile_get_child_internal (profile, id, name);
+}
+
+static GSettings *
+ogmrip_profile_get_child_for_container (OGMRipProfile *profile, const gchar *container)
+{
+  const gchar *id, *name;
+
+  if (!ogmrip_container_get_schema (ogmrip_type_from_name (container), &id, &name))
+    return NULL;
+
+  return ogmrip_profile_get_child_internal (profile, id, name);
 }
 
 GSettings *
@@ -487,7 +507,7 @@ ogmrip_profile_get_child (OGMRipProfile *profile, const gchar *name)
     return g_object_ref (profile->priv->subp_settings);
 
   if (g_str_equal (name, profile->priv->container))
-    return ogmrip_profile_get_child_for_codec (profile, name);
+    return ogmrip_profile_get_child_for_container (profile, name);
 
   if (g_str_equal (name, profile->priv->video_codec))
     return ogmrip_profile_get_child_for_codec (profile, name);

@@ -196,6 +196,6 @@ ogmrip_module_load (OGMRipModule *module)
   }
 
   ogmrip_register_codec (OGMRIP_TYPE_AAC,
-      "aac", _("Advanced Audio Coding (AAC)"), OGMRIP_FORMAT_AAC);
+      "aac", _("Advanced Audio Coding (AAC)"), OGMRIP_FORMAT_AAC, NULL);
 }
 

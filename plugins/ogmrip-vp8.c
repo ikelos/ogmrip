@@ -399,6 +399,6 @@ ogmrip_module_load (OGMRipModule *module)
   g_free (filename);
 
   ogmrip_register_codec (OGMRIP_TYPE_VP8,
-      "vp8", _("Vp8"), OGMRIP_FORMAT_VP8);
+      "vp8", _("Vp8"), OGMRIP_FORMAT_VP8, NULL);
 }
 

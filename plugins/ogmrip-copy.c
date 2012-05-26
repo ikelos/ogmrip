@@ -277,9 +277,9 @@ ogmrip_module_load (OGMRipModule *module)
   else
   {
     ogmrip_register_codec (ogmrip_audio_copy_get_type (),
-        "audio-copy", _("Copy (for AC3 or DTS)"), OGMRIP_FORMAT_COPY);
+        "audio-copy", _("Copy (for AC3 or DTS)"), OGMRIP_FORMAT_COPY, NULL);
     ogmrip_register_codec (ogmrip_video_copy_get_type (),
-        "video-copy", _("Video Copy"), OGMRIP_FORMAT_COPY);
+        "video-copy", _("Video Copy"), OGMRIP_FORMAT_COPY, NULL);
   }
 }
 
