@@ -21,7 +21,7 @@
 
 #include <gtk/gtk.h>
 
-#include <ogmrip-encoding-manager.h>
+#include <ogmrip-encode.h>
 
 G_BEGIN_DECLS
 

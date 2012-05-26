@@ -477,7 +477,7 @@ ogmrip_main_encoding_spawn_run (OGMRipEncoding *encoding, OGMJobSpawn *spawn, OG
     else if (OGMRIP_IS_CONTAINER (spawn))
       ogmrip_progress_dialog_set_message (dialog, _("Merging audio and video streams"));
     else if (OGMRIP_IS_COPY (spawn))
-      ogmrip_progress_dialog_set_message (dialog, _("DVD backup"));
+      ogmrip_progress_dialog_set_message (dialog, _("Copying media"));
     else if (OGMRIP_IS_ANALYZE (spawn))
       ogmrip_progress_dialog_set_message (dialog, _("Analyzing video stream"));
     else if (OGMRIP_IS_TEST (spawn))
@@ -1296,9 +1296,9 @@ ogmrip_main_set_filename (OGMRipData *data, OGMRipEncoding *encoding)
  * When an encoding has completed
  */
 static void
-ogmrip_main_encoding_completed (OGMRipData *data, OGMJobSpawn *spawn, gboolean result, OGMRipEncoding *encoding)
+ogmrip_main_encoding_completed (OGMRipData *data, OGMJobSpawn *spawn, OGMRipEncodingStatus status, OGMRipEncoding *encoding)
 {
-  if (result && spawn != NULL)
+  if (spawn != NULL && status == OGMRIP_ENCODING_SUCCESS)
   {
     if (OGMRIP_IS_SUBP_CODEC (spawn))
     {
@@ -1730,12 +1730,13 @@ ogmrip_main_encodings_responsed (OGMRipData *data, gint response_id, GtkWidget *
     gtk_widget_destroy (dialog);
   else
   {
-    GList *list, *link;
+    GSList *list, *link;
 
     list = ogmrip_encoding_manager_get_list (data->manager);
     for (link = list; link; link = link->next)
-      ogmrip_main_encode (data, g_object_ref (link->data));
-    g_list_free (list);
+      if (ogmrip_encoding_manager_get_status (data->manager, link->data) != OGMRIP_ENCODING_SUCCESS)
+        ogmrip_main_encode (data, g_object_ref (link->data));
+    g_slist_free (list);
   }
 }
 

@@ -49,6 +49,9 @@
 #define OGMRIP_ENCODING_GET_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_ENCODING, OGMRipEncodingPriv))
 
+#define OGMRIP_ENCODING_STATUS(result, cancellable) \
+  ((result) ? OGMRIP_ENCODING_SUCCESS : g_cancellable_is_cancelled (cancellable) ? OGMRIP_ENCODING_CANCELLED : OGMRIP_ENCODING_FAILURE)
+
 struct _OGMRipEncodingPriv
 {
   OGMRipTitle *title;
@@ -102,22 +105,22 @@ enum
   LAST_SIGNAL
 };
 
-static void   ogmrip_encoding_constructed   (GObject        *gobject);
-static void   ogmrip_encoding_dispose       (GObject        *gobject);
-static void   ogmrip_encoding_finalize      (GObject        *gobject);
-static void   ogmrip_encoding_get_property  (GObject        *gobject,
-                                             guint          property_id,
-                                             GValue         *value,
-                                             GParamSpec     *pspec);
-static void   ogmrip_encoding_set_property  (GObject        *gobject,
-                                             guint          property_id,
-                                             const GValue   *value,
-                                             GParamSpec     *pspec);
-static void   ogmrip_encoding_run           (OGMRipEncoding *encoding,
-                                             OGMJobTask    *task);
-static void   ogmrip_encoding_complete      (OGMRipEncoding *encoding,
-                                             OGMJobTask    *task,
-                                             gboolean       result);
+static void   ogmrip_encoding_constructed   (GObject              *gobject);
+static void   ogmrip_encoding_dispose       (GObject              *gobject);
+static void   ogmrip_encoding_finalize      (GObject              *gobject);
+static void   ogmrip_encoding_get_property  (GObject              *gobject,
+                                             guint                property_id,
+                                             GValue               *value,
+                                             GParamSpec           *pspec);
+static void   ogmrip_encoding_set_property  (GObject              *gobject,
+                                             guint                property_id,
+                                             const GValue         *value,
+                                             GParamSpec           *pspec);
+static void   ogmrip_encoding_run           (OGMRipEncoding       *encoding,
+                                             OGMJobTask           *task);
+static void   ogmrip_encoding_complete      (OGMRipEncoding       *encoding,
+                                             OGMJobTask           *task,
+                                             OGMRipEncodingStatus result);
 
 guint signals[LAST_SIGNAL] = { 0 };
 
@@ -182,7 +185,7 @@ ogmrip_encoding_class_init (OGMRipEncodingClass *klass)
   signals[COMPLETE] = g_signal_new ("complete", G_TYPE_FROM_CLASS (klass),
       G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
       G_STRUCT_OFFSET (OGMRipEncodingClass, complete), NULL, NULL,
-      ogmrip_cclosure_marshal_VOID__OBJECT_BOOLEAN, G_TYPE_NONE, 2, OGMJOB_TYPE_TASK, G_TYPE_BOOLEAN);
+      ogmrip_cclosure_marshal_VOID__OBJECT_UINT, G_TYPE_NONE, 2, OGMJOB_TYPE_TASK, G_TYPE_UINT);
 /*
   g_object_class_install_property (gobject_class, PROP_AUDIO_CODECS, 
         g_param_spec_boxed ("audio-codecs", "Audio codecs property", "Set audio codecs", 
@@ -427,7 +430,7 @@ ogmrip_encoding_run (OGMRipEncoding *encoding, OGMJobTask *task)
 }
 
 static void
-ogmrip_encoding_complete (OGMRipEncoding *encoding, OGMJobTask *task, gboolean result)
+ogmrip_encoding_complete (OGMRipEncoding *encoding, OGMJobTask *task, OGMRipEncodingStatus status)
 {
   encoding->priv->task = NULL;
 }
@@ -1385,7 +1388,7 @@ ogmrip_encoding_copy (OGMRipEncoding *encoding, GCancellable *cancellable, GErro
 
   g_signal_emit (encoding, signals[RUN], 0, task);
   result = ogmjob_task_run (task, cancellable, error);
-  g_signal_emit (encoding, signals[COMPLETE], 0, task, result);
+  g_signal_emit (encoding, signals[COMPLETE], 0, task, OGMRIP_ENCODING_STATUS (result, cancellable));
 
   g_object_unref (task);
 
@@ -1407,7 +1410,7 @@ ogmrip_encoding_analyze (OGMRipEncoding *encoding, GCancellable *cancellable, GE
 
   g_signal_emit (encoding, signals[RUN], 0, task);
   result = ogmjob_task_run (task, cancellable, error);
-  g_signal_emit (encoding, signals[COMPLETE], 0, task, result);
+  g_signal_emit (encoding, signals[COMPLETE], 0, task, OGMRIP_ENCODING_STATUS (result, cancellable));
 
   g_object_unref (task);
 
@@ -1436,7 +1439,7 @@ ogmrip_encoding_test (OGMRipEncoding *encoding, GCancellable *cancellable, GErro
 
   g_signal_emit (encoding, signals[RUN], 0, task);
   result = ogmjob_task_run (task, cancellable, error);
-  g_signal_emit (encoding, signals[COMPLETE], 0, task, result);
+  g_signal_emit (encoding, signals[COMPLETE], 0, task, OGMRIP_ENCODING_STATUS (result, cancellable));
 
   g_object_unref (task);
 
@@ -1477,7 +1480,7 @@ ogmrip_encoding_run_codec (OGMRipEncoding *encoding, OGMRipCodec *codec, GCancel
 
   g_signal_emit (encoding, signals[RUN], 0, codec);
   result = ogmjob_task_run (OGMJOB_TASK (codec), cancellable, error);
-  g_signal_emit (encoding, signals[COMPLETE], 0, codec, result);
+  g_signal_emit (encoding, signals[COMPLETE], 0, codec, OGMRIP_ENCODING_STATUS (result, cancellable));
 
   g_signal_handlers_disconnect_by_func (codec,
       ogmrip_encoding_task_progressed, encoding);
@@ -1501,7 +1504,7 @@ ogmrip_encoding_merge (OGMRipEncoding *encoding, GCancellable *cancellable, GErr
 
   g_signal_emit (encoding, signals[RUN], 0, encoding->priv->container);
   result = ogmjob_task_run (OGMJOB_TASK (encoding->priv->container), cancellable, error);
-  g_signal_emit (encoding, signals[COMPLETE], 0, encoding->priv->container, result);
+  g_signal_emit (encoding, signals[COMPLETE], 0, encoding->priv->container, OGMRIP_ENCODING_STATUS (result, cancellable));
 
   g_signal_handlers_disconnect_by_func (encoding->priv->container,
       ogmrip_encoding_task_progressed, encoding);
@@ -1681,7 +1684,7 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GCancellable *cancellable, GEr
   result = ogmrip_encoding_merge (encoding, cancellable, error);
 
 encode_cleanup:
-  g_signal_emit (encoding, signals[COMPLETE], 0, NULL, result);
+  g_signal_emit (encoding, signals[COMPLETE], 0, NULL, OGMRIP_ENCODING_STATUS (result, cancellable));
 
   ogmrip_encoding_close_log (encoding);
 

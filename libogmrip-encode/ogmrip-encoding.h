@@ -74,6 +74,14 @@ typedef enum
   OGMRIP_ENCODING_QUANTIZER
 } OGMRipEncodingMethod;
 
+typedef enum
+{
+  OGMRIP_ENCODING_NOT_RUN,
+  OGMRIP_ENCODING_FAILURE,
+  OGMRIP_ENCODING_CANCELLED,
+  OGMRIP_ENCODING_SUCCESS
+} OGMRipEncodingStatus;
+
 typedef struct _OGMRipEncoding      OGMRipEncoding;
 typedef struct _OGMRipEncodingPriv  OGMRipEncodingPriv;
 typedef struct _OGMRipEncodingClass OGMRipEncodingClass;
@@ -89,14 +97,14 @@ struct _OGMRipEncodingClass
 {
   GObjectClass parent_class;
 
-  void (* run)      (OGMRipEncoding *encoding,
-                     OGMJobTask     *task);
-  void (* progress) (OGMRipEncoding *encoding,
-                     OGMJobTask     *task,
-                     gdouble        fraction);
-  void (* complete) (OGMRipEncoding *encoding,
-                     OGMJobTask     *task,
-                     gboolean       result);
+  void (* run)      (OGMRipEncoding       *encoding,
+                     OGMJobTask           *task);
+  void (* progress) (OGMRipEncoding       *encoding,
+                     OGMJobTask           *task,
+                     gdouble              fraction);
+  void (* complete) (OGMRipEncoding       *encoding,
+                     OGMJobTask           *task,
+                     OGMRipEncodingStatus status);
 };
 
 GType              ogmrip_encoding_get_type            (void);

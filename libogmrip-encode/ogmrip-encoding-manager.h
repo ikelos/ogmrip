@@ -62,16 +62,18 @@ struct _OGMRipEncodingManagerClass
                    OGMRipDirection       direction);
 };
 
-GType                   ogmrip_encoding_manager_get_type (void);
-OGMRipEncodingManager * ogmrip_encoding_manager_new      (void);
-void                    ogmrip_encoding_manager_add      (OGMRipEncodingManager *manager,
-                                                          OGMRipEncoding        *encoding);
-void                    ogmrip_encoding_manager_remove   (OGMRipEncodingManager *manager,
-                                                          OGMRipEncoding        *encoding);
-void                    ogmrip_encoding_manager_move     (OGMRipEncodingManager *manager,
-                                                          OGMRipEncoding        *encoding,
-                                                          OGMRipDirection       direction);
-GList *                 ogmrip_encoding_manager_get_list (OGMRipEncodingManager *manager);
+GType                   ogmrip_encoding_manager_get_type   (void);
+OGMRipEncodingManager * ogmrip_encoding_manager_new        (void);
+void                    ogmrip_encoding_manager_add        (OGMRipEncodingManager *manager,
+                                                            OGMRipEncoding        *encoding);
+void                    ogmrip_encoding_manager_remove     (OGMRipEncodingManager *manager,
+                                                            OGMRipEncoding        *encoding);
+void                    ogmrip_encoding_manager_move       (OGMRipEncodingManager *manager,
+                                                            OGMRipEncoding        *encoding,
+                                                            OGMRipDirection       direction);
+OGMRipEncodingStatus    ogmrip_encoding_manager_get_status (OGMRipEncodingManager *manager,
+                                                            OGMRipEncoding        *encoding);
+GSList *                ogmrip_encoding_manager_get_list   (OGMRipEncodingManager *manager);
 
 
 G_END_DECLS

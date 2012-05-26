@@ -37,6 +37,13 @@
 #define OGMRIP_ENCODING_MANAGER_GET_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_ENCODING_MANAGER, OGMRipEncodingManagerPriv))
 
+typedef struct
+{
+  OGMRipEncoding *encoding;
+  OGMRipEncodingStatus status;
+  gulong id;
+} OGMRipEncodingData;
+
 struct _OGMRipEncodingManagerPriv
 {
   GList *encodings;
@@ -60,6 +67,42 @@ static void ogmrip_encoding_manager_move_internal   (OGMRipEncodingManager *mana
                                                      OGMRipDirection       direction);
 
 static guint signals[LAST_SIGNAL] = { 0 };
+
+static void
+ogmrip_encoding_complete_cb (OGMRipEncoding *encoding, OGMJobTask *task, OGMRipEncodingStatus status, OGMRipEncodingData *data)
+{
+  if (!task)
+    data->status = status;
+}
+
+static OGMRipEncodingData *
+ogmrip_encoding_data_new (OGMRipEncoding *encoding)
+{
+  OGMRipEncodingData *data;
+
+  data = g_new0 (OGMRipEncodingData, 1);
+  data->encoding = g_object_ref (encoding);
+  data->status = OGMRIP_ENCODING_NOT_RUN;
+
+  data->id = g_signal_connect (encoding, "complete",
+      G_CALLBACK (ogmrip_encoding_complete_cb), data);
+
+  return data;
+}
+
+static void
+ogmrip_encoding_data_free (OGMRipEncodingData *data)
+{
+  g_signal_handler_disconnect (data->encoding, data->id);
+  g_object_unref (data->encoding);
+  g_free (data);
+}
+
+static gint
+ogmrip_encoding_data_compare_with_encoding (OGMRipEncodingData *data, OGMRipEncoding *encoding)
+{
+  return data->encoding - encoding;
+}
 
 G_DEFINE_TYPE (OGMRipEncodingManager, ogmrip_encoding_manager, G_TYPE_OBJECT)
 
@@ -108,7 +151,7 @@ ogmrip_encoding_manager_dispose (GObject *gobject)
 
   if (manager->priv->encodings)
   {
-    g_list_foreach (manager->priv->encodings, (GFunc) g_object_unref, NULL);
+    g_list_foreach (manager->priv->encodings, (GFunc) ogmrip_encoding_data_free, NULL);
     g_list_free (manager->priv->encodings);
     manager->priv->encodings = NULL;
   }
@@ -119,7 +162,15 @@ ogmrip_encoding_manager_dispose (GObject *gobject)
 static void
 ogmrip_encoding_manager_add_internal (OGMRipEncodingManager *manager, OGMRipEncoding *encoding)
 {
-  manager->priv->encodings = g_list_append (manager->priv->encodings, g_object_ref (encoding));
+  manager->priv->encodings = g_list_append (manager->priv->encodings,
+      ogmrip_encoding_data_new (encoding));
+}
+
+static GList *
+ogmrip_encoding_manager_get_data (OGMRipEncodingManager *manager, OGMRipEncoding *encoding)
+{
+  return g_list_find_custom (manager->priv->encodings, encoding,
+      (GCompareFunc) ogmrip_encoding_data_compare_with_encoding);
 }
 
 static void
@@ -127,11 +178,11 @@ ogmrip_encoding_manager_remove_internal (OGMRipEncodingManager *manager, OGMRipE
 {
   GList *link;
 
-  link = g_list_find (manager->priv->encodings, encoding);
+  link = ogmrip_encoding_manager_get_data (manager, encoding);
   if (link)
   {
+    ogmrip_encoding_data_free (link->data);
     manager->priv->encodings = g_list_delete_link (manager->priv->encodings, link);
-    g_object_unref (encoding);
   }
 }
 
@@ -141,42 +192,36 @@ ogmrip_encoding_manager_move_internal (OGMRipEncodingManager *manager, OGMRipEnc
   GList *link;
   gpointer data;
 
-  switch (direction)
+  link = ogmrip_encoding_manager_get_data (manager, encoding);
+  if (link)
   {
-    case OGMRIP_DIRECTION_UP:
-      link = g_list_find (manager->priv->encodings, encoding);
-      if (link && link->prev)
-      {
-        data = link->prev->data;
-        link->prev->data = link->data;
-        link->data = data;
-      }
-      break;
-    case OGMRIP_DIRECTION_DOWN:
-      link = g_list_find (manager->priv->encodings, encoding);
-      if (link && link->next)
-      {
-        data = link->next->data;
-        link->next->data = link->data;
-        link->data = data;
-      }
-      break;
-    case OGMRIP_DIRECTION_TOP:
-      link = g_list_find (manager->priv->encodings, encoding);
-      if (link)
-      {
+    switch (direction)
+    {
+      case OGMRIP_DIRECTION_UP:
+        if (link->prev)
+        {
+          data = link->prev->data;
+          link->prev->data = link->data;
+          link->data = data;
+        }
+        break;
+      case OGMRIP_DIRECTION_DOWN:
+        if (link->next)
+        {
+          data = link->next->data;
+          link->next->data = link->data;
+          link->data = data;
+        }
+        break;
+      case OGMRIP_DIRECTION_TOP:
         manager->priv->encodings = g_list_delete_link (manager->priv->encodings, link);
         manager->priv->encodings = g_list_prepend (manager->priv->encodings, encoding);
-      }
-      break;
-    case OGMRIP_DIRECTION_BOTTOM:
-      link = g_list_find (manager->priv->encodings, encoding);
-      if (link)
-      {
+        break;
+      case OGMRIP_DIRECTION_BOTTOM:
         manager->priv->encodings = g_list_delete_link (manager->priv->encodings, link);
         manager->priv->encodings = g_list_append (manager->priv->encodings, encoding);
-      }
-      break;
+        break;
+    }
   }
 }
 
@@ -234,11 +279,39 @@ ogmrip_encoding_manager_move (OGMRipEncodingManager *manager, OGMRipEncoding *en
   g_signal_emit (manager, signals[MOVE], 0, encoding, direction);
 }
 
-GList *
+OGMRipEncodingStatus
+ogmrip_encoding_manager_get_status (OGMRipEncodingManager *manager, OGMRipEncoding *encoding)
+{
+  OGMRipEncodingData *data;
+  GList *link;
+
+  g_return_val_if_fail (OGMRIP_IS_ENCODING_MANAGER (manager), OGMRIP_ENCODING_FAILURE);
+  g_return_val_if_fail (OGMRIP_IS_ENCODING (encoding), OGMRIP_ENCODING_FAILURE);
+
+  link = ogmrip_encoding_manager_get_data (manager, encoding);
+  if (!link)
+    return OGMRIP_ENCODING_FAILURE;
+
+  data = link->data;
+
+  return data->status;
+}
+
+GSList *
 ogmrip_encoding_manager_get_list (OGMRipEncodingManager *manager)
 {
+  GSList *list = NULL;
+  GList *link;
+
   g_return_val_if_fail (OGMRIP_IS_ENCODING_MANAGER (manager), NULL);
 
-  return g_list_copy (manager->priv->encodings);
+  for (link = manager->priv->encodings; link; link = link->next)
+  {
+    OGMRipEncodingData *data = link->data;
+
+    list = g_slist_prepend (list, data->encoding);
+  }
+
+  return g_slist_reverse (list);
 }
 

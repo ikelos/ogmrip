@@ -40,12 +40,13 @@ enum
 
 enum
 {
-  COL_PIXBUF,
   COL_NAME,
   COL_TITLE,
   COL_PROFILE,
   COL_ENCODING,
-  COL_STRIKE,
+  COL_STEP,
+  COL_PROGRESS,
+  COL_COLOR,
   COL_LAST
 };
 
@@ -72,20 +73,109 @@ ogmrip_encoding_manager_dialog_get_iter (OGMRipEncodingManagerDialog *dialog, OG
 {
   if (gtk_tree_model_get_iter_first (GTK_TREE_MODEL (dialog->priv->store), iter))
   {
-    OGMRipEncoding *e;
+    OGMRipEncoding *current_encoding;
 
     do
     {
-      gtk_tree_model_get (GTK_TREE_MODEL (dialog->priv->store), iter, COL_ENCODING, &e, -1);
-      g_object_unref (e);
+      gtk_tree_model_get (GTK_TREE_MODEL (dialog->priv->store), iter, COL_ENCODING, &current_encoding, -1);
+      g_object_unref (current_encoding);
 
-      if (e == encoding)
+      if (current_encoding == encoding)
         return TRUE;
     }
     while (gtk_tree_model_iter_next (GTK_TREE_MODEL (dialog->priv->store), iter));
   }
 
   return FALSE;
+}
+
+static void
+ogmrip_encoding_manager_dialog_encoding_run_cb (OGMRipEncodingManagerDialog *dialog, OGMJobTask *spawn, OGMRipEncoding *encoding)
+{
+  GtkTreeIter iter;
+
+  if (ogmrip_encoding_manager_dialog_get_iter (dialog, encoding, &iter))
+  {
+    OGMRipStream *stream;
+    gchar *message;
+
+    gtk_list_store_set (dialog->priv->store, &iter, COL_STEP, NULL, COL_PROGRESS, 0, COL_COLOR, "rgb(0,0,0)", -1);
+
+    if (spawn)
+    {
+      if (OGMRIP_IS_VIDEO_CODEC (spawn))
+        gtk_list_store_set (dialog->priv->store, &iter, COL_STEP, _("Encoding video title"), -1);
+      else if (OGMRIP_IS_CHAPTERS (spawn))
+        gtk_list_store_set (dialog->priv->store, &iter, COL_STEP, _("Extracting chapters information"), -1);
+      else if (OGMRIP_IS_CONTAINER (spawn))
+        gtk_list_store_set (dialog->priv->store, &iter, COL_STEP, _("Merging audio and video streams"), -1);
+      else if (OGMRIP_IS_COPY (spawn))
+        gtk_list_store_set (dialog->priv->store, &iter, COL_STEP, _("Copying media"), -1);
+      else if (OGMRIP_IS_ANALYZE (spawn))
+        gtk_list_store_set (dialog->priv->store, &iter, COL_STEP, _("Analyzing video stream"), -1);
+      else if (OGMRIP_IS_TEST (spawn))
+        gtk_list_store_set (dialog->priv->store, &iter, COL_STEP, _("Running the compressibility test"), -1);
+      else if (OGMRIP_IS_AUDIO_CODEC (spawn))
+      {
+        stream = ogmrip_codec_get_input (OGMRIP_CODEC (spawn));
+        message = g_strdup_printf (_("Extracting audio stream %d"),
+            ogmrip_audio_stream_get_nr (OGMRIP_AUDIO_STREAM (stream)) + 1);
+        gtk_list_store_set (dialog->priv->store, &iter, COL_STEP, message, -1);
+        g_free (message);
+      }
+      else if (OGMRIP_IS_SUBP_CODEC (spawn))
+      {
+        stream = ogmrip_codec_get_input (OGMRIP_CODEC (spawn));
+        message = g_strdup_printf (_("Extracting subtitle stream %d"),
+            ogmrip_subp_stream_get_nr (OGMRIP_SUBP_STREAM (stream)) + 1);
+        gtk_list_store_set (dialog->priv->store, &iter, COL_STEP, message, -1);
+        g_free (message);
+      }
+    }
+  }
+}
+
+static void
+ogmrip_encoding_manager_dialog_encoding_progress_cb (OGMRipEncodingManagerDialog *dialog, OGMJobTask *spawn, gdouble fraction, OGMRipEncoding *encoding)
+{
+  GtkTreeIter iter;
+
+  if (ogmrip_encoding_manager_dialog_get_iter (dialog, encoding, &iter))
+  {
+    gint percent = fraction * 100;
+
+    gtk_list_store_set (dialog->priv->store, &iter, COL_PROGRESS, CLAMP (percent, 0, 100), -1);
+  }
+}
+
+static void
+ogmrip_encoding_manager_dialog_encoding_complete_cb (OGMRipEncodingManagerDialog *dialog, OGMJobTask *spawn, OGMRipEncodingStatus status, OGMRipEncoding *encoding)
+{
+  if (!spawn)
+  {
+    GtkTreeIter iter;
+
+    if (ogmrip_encoding_manager_dialog_get_iter (dialog, encoding, &iter))
+    {
+      gtk_list_store_set (dialog->priv->store, &iter, COL_PROGRESS, 100, COL_COLOR, "rgb(211,211,211)", -1);
+
+      switch (status)
+      {
+        case OGMRIP_ENCODING_SUCCESS:
+          gtk_list_store_set (dialog->priv->store, &iter, COL_STEP, _("Encoding completed successfully"), -1);
+          break;
+        case OGMRIP_ENCODING_CANCELLED:
+          gtk_list_store_set (dialog->priv->store, &iter, COL_STEP, _("Encoding cancelled by user"), -1);
+          break;
+        case OGMRIP_ENCODING_FAILURE:
+          gtk_list_store_set (dialog->priv->store, &iter, COL_STEP, _("Encoding failed"), -1);
+          break;
+        default:
+          gtk_list_store_set (dialog->priv->store, &iter, COL_STEP, NULL, -1);
+          break;
+      }
+    }
+  }
 }
 
 static void
@@ -104,6 +194,15 @@ ogmrip_encoding_manager_dialog_add_encoding (OGMRipEncodingManagerDialog *dialog
       COL_TITLE, ogmrip_title_get_nr (ogmrip_encoding_get_title (encoding)) + 1,
       COL_PROFILE, str, COL_ENCODING, encoding, -1);
 
+  g_signal_connect_swapped (encoding, "run",
+      G_CALLBACK (ogmrip_encoding_manager_dialog_encoding_run_cb), dialog);
+  g_signal_connect_swapped (encoding, "progress",
+      G_CALLBACK (ogmrip_encoding_manager_dialog_encoding_progress_cb), dialog);
+  g_signal_connect_swapped (encoding, "complete",
+      G_CALLBACK (ogmrip_encoding_manager_dialog_encoding_complete_cb), dialog);
+
+  gtk_dialog_set_response_sensitive (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT, TRUE);
+
   g_free (str);
 }
 
@@ -113,7 +212,19 @@ ogmrip_encoding_manager_dialog_remove_encoding (OGMRipEncodingManagerDialog *dia
   GtkTreeIter iter;
 
   if (ogmrip_encoding_manager_dialog_get_iter (dialog, encoding, &iter))
+  {
+    g_signal_handlers_disconnect_by_func (encoding,
+        ogmrip_encoding_manager_dialog_encoding_run_cb, dialog);
+    g_signal_handlers_disconnect_by_func (encoding,
+        ogmrip_encoding_manager_dialog_encoding_progress_cb, dialog);
+    g_signal_handlers_disconnect_by_func (encoding,
+        ogmrip_encoding_manager_dialog_encoding_complete_cb, dialog);
+
     gtk_list_store_remove (dialog->priv->store, &iter);
+  }
+
+  gtk_dialog_set_response_sensitive (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT,
+      gtk_tree_model_iter_n_children (GTK_TREE_MODEL (dialog->priv->store), NULL) > 0);
 }
 
 static void
@@ -148,14 +259,14 @@ ogmrip_encoding_manager_dialog_move_encoding (OGMRipEncodingManagerDialog *dialo
 static void
 ogmrip_encoding_manager_dialog_set_manager (OGMRipEncodingManagerDialog *dialog, OGMRipEncodingManager *manager)
 {
-  GList *list, *link;
+  GSList *list, *link;
 
   dialog->priv->manager = g_object_ref (manager);
 
   list = ogmrip_encoding_manager_get_list (manager);
   for (link = list; link; link = link->next)
     ogmrip_encoding_manager_dialog_add_encoding (dialog, link->data);
-  g_list_free (list);
+  g_slist_free (list);
 
   g_signal_connect_swapped (manager, "add",
       G_CALLBACK (ogmrip_encoding_manager_dialog_add_encoding), dialog);
@@ -226,18 +337,17 @@ ogmrip_encoding_manager_dialog_clear_clicked (OGMRipEncodingManagerDialog *dialo
   if (gtk_tree_model_get_iter_first (GTK_TREE_MODEL (dialog->priv->store), &iter))
   {
     OGMRipEncoding *encoding;
-    gboolean strike, valid;
+    gboolean valid;
 
     g_signal_handlers_block_by_func (dialog->priv->manager,
         ogmrip_encoding_manager_dialog_remove_encoding, dialog);
 
     do
     {
-      gtk_tree_model_get (GTK_TREE_MODEL (dialog->priv->store), &iter,
-          COL_ENCODING, &encoding, COL_STRIKE, &strike, -1);
+      gtk_tree_model_get (GTK_TREE_MODEL (dialog->priv->store), &iter, COL_ENCODING, &encoding, -1);
       g_object_unref (encoding);
 
-      if (!strike)
+      if (ogmrip_encoding_manager_get_status (dialog->priv->manager, encoding) != OGMRIP_ENCODING_SUCCESS)
         valid = gtk_tree_model_iter_next (GTK_TREE_MODEL (dialog->priv->store), &iter);
       else
       {
@@ -440,27 +550,26 @@ ogmrip_encoding_manager_dialog_init (OGMRipEncodingManagerDialog *dialog)
 
   widget = gtk_builder_get_widget (builder, "treeview");
 
-  dialog->priv->store = gtk_list_store_new (COL_LAST, G_TYPE_STRING, G_TYPE_STRING, G_TYPE_INT,
-      G_TYPE_STRING, OGMRIP_TYPE_ENCODING, G_TYPE_BOOLEAN);
+  dialog->priv->store = gtk_list_store_new (COL_LAST, G_TYPE_STRING, G_TYPE_INT,
+      G_TYPE_STRING, OGMRIP_TYPE_ENCODING, G_TYPE_STRING, G_TYPE_INT, G_TYPE_STRING);
   gtk_tree_view_set_model (GTK_TREE_VIEW (widget), GTK_TREE_MODEL (dialog->priv->store));
 
   dialog->priv->selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (widget));
 
-  renderer = gtk_cell_renderer_pixbuf_new ();
-  column = gtk_tree_view_column_new_with_attributes (_("Run"), renderer, "stock-id", COL_PIXBUF, NULL);
-  gtk_tree_view_append_column (GTK_TREE_VIEW (widget), column);
-  g_object_set (renderer, "stock-size", GTK_ICON_SIZE_SMALL_TOOLBAR, NULL);
-
   renderer = gtk_cell_renderer_text_new ();
-  column = gtk_tree_view_column_new_with_attributes (_("Name"), renderer, "text", COL_NAME, "strikethrough", COL_STRIKE, NULL);
+  column = gtk_tree_view_column_new_with_attributes (_("Name"), renderer, "text", COL_NAME, "foreground", COL_COLOR, NULL);
   gtk_tree_view_append_column (GTK_TREE_VIEW (widget), column);
 
   renderer = gtk_cell_renderer_text_new ();
-  column = gtk_tree_view_column_new_with_attributes (_("Title"), renderer, "text", COL_TITLE, "strikethrough", COL_STRIKE, NULL);
+  column = gtk_tree_view_column_new_with_attributes (_("Title"), renderer, "text", COL_TITLE, "foreground", COL_COLOR, NULL);
   gtk_tree_view_append_column (GTK_TREE_VIEW (widget), column);
 
   renderer = gtk_cell_renderer_text_new ();
-  column = gtk_tree_view_column_new_with_attributes (_("Profile"), renderer, "markup", COL_PROFILE, "strikethrough", COL_STRIKE, NULL);
+  column = gtk_tree_view_column_new_with_attributes (_("Profile"), renderer, "markup", COL_PROFILE, "foreground", COL_COLOR, NULL);
+  gtk_tree_view_append_column (GTK_TREE_VIEW (widget), column);
+
+  renderer = gtk_cell_renderer_progress_new ();
+  column = gtk_tree_view_column_new_with_attributes (_("Progress"), renderer, "text", COL_STEP, "value", COL_PROGRESS, NULL);
   gtk_tree_view_append_column (GTK_TREE_VIEW (widget), column);
 
   widget = gtk_builder_get_widget (builder, "clear-button");
