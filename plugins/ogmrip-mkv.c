@@ -397,8 +397,14 @@ ogmrip_matroska_run (OGMJobTask *task, GCancellable *cancellable, GError **error
   /*
    * If mkvmerge returns 1, it's only a warning
    */
-  if (ogmjob_spawn_get_status (OGMJOB_SPAWN (child)) == 1)
-    result = TRUE;
+  if (!result)
+  {
+    gint status;
+
+    status = ogmjob_spawn_get_status (OGMJOB_SPAWN (child));
+    if (WIFEXITED (status) && WEXITSTATUS (status) == 1)
+      result = TRUE;
+  }
 
   ogmjob_container_remove (OGMJOB_CONTAINER (task), child);
 
