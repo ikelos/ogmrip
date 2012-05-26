@@ -397,7 +397,7 @@ ogmrip_main_clean (OGMRipData *data, OGMRipEncoding *encoding, gboolean error)
 static void
 ogmrip_main_display_error (OGMRipData *data, OGMRipEncoding *encoding, GError *error)
 {
-  GtkWidget *dialog, *area, *widget;
+  GtkWidget *dialog, *area, *expander, *widget;
   const gchar *filename;
 
   dialog = gtk_message_dialog_new_with_markup (GTK_WINDOW (data->window),
@@ -418,14 +418,14 @@ ogmrip_main_display_error (OGMRipData *data, OGMRipEncoding *encoding, GError *e
 
     area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
 
-    widget = gtk_expander_new_with_mnemonic ("_Show the log file");
-    gtk_expander_set_expanded (GTK_EXPANDER (widget), FALSE);
-    gtk_container_add (GTK_CONTAINER (area), widget);
+    expander = gtk_expander_new_with_mnemonic ("_Show the log file");
+    gtk_expander_set_expanded (GTK_EXPANDER (expander), FALSE);
+    gtk_container_add (GTK_CONTAINER (area), expander);
 
     area = gtk_scrolled_window_new (NULL, NULL);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (area), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (area), GTK_SHADOW_IN);
-    gtk_container_add (GTK_CONTAINER (widget), area);
+    gtk_container_add (GTK_CONTAINER (expander), area);
     gtk_widget_show (area);
 
     widget = gtk_text_view_new ();
@@ -450,7 +450,7 @@ ogmrip_main_display_error (OGMRipData *data, OGMRipEncoding *encoding, GError *e
       while ((n = g_input_stream_read (G_INPUT_STREAM (stream), text, 2048, NULL, NULL)) > 0)
         gtk_text_buffer_insert (buffer, &iter, text, n);
 
-      gtk_widget_set_visible (widget, gtk_text_buffer_get_char_count (buffer));
+      gtk_widget_set_visible (expander, gtk_text_buffer_get_char_count (buffer) > 0);
 
       g_object_unref (stream);
     }
