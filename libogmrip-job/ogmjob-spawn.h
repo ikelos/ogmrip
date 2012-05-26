@@ -21,6 +21,9 @@
 
 #include <ogmjob-task.h>
 
+#include <sys/types.h>
+#include <sys/wait.h>
+
 G_BEGIN_DECLS
 
 #define OGMJOB_TYPE_SPAWN          (ogmjob_spawn_get_type ())

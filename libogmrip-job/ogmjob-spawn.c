@@ -33,8 +33,6 @@
 
 #include <glib/gi18n-lib.h>
 
-#include <sys/types.h>
-#include <sys/wait.h>
 #include <signal.h>
 #include <string.h>
 #include <unistd.h>
@@ -153,10 +151,12 @@ task_pid_watch (GPid pid, gint status, TaskAsyncData *data)
 
   g_spawn_close_pid (spawn->priv->pid);
   spawn->priv->pid = 0;
-
+/*
   data->spawn->priv->status = -1;
   if (WIFEXITED (status))
     data->spawn->priv->status = WEXITSTATUS (status);
+*/
+  data->spawn->priv->status = status;
 
   if (!data->error)
     g_cancellable_set_error_if_cancelled (data->cancellable, &data->error);
@@ -167,7 +167,7 @@ task_pid_watch (GPid pid, gint status, TaskAsyncData *data)
     data->error = NULL;
   }
 
-  g_simple_async_result_set_op_res_gboolean (data->simple, WIFEXITED (status));
+  g_simple_async_result_set_op_res_gboolean (data->simple, WIFEXITED (status) && WEXITSTATUS (status) == 0);
 }
 
 static void
