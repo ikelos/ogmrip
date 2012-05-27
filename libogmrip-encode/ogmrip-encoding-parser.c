@@ -96,9 +96,10 @@ ogmrip_encoding_parse_properties (OGMRipXML *xml, gpointer gobject, gpointer kla
   }
 }
 
-static void
-ogmrip_encoding_parse_container (OGMRipEncoding *encoding, OGMRipXML *xml)
+static gboolean
+ogmrip_encoding_parse_container (OGMRipEncoding *encoding, OGMRipXML *xml, GError **error)
 {
+  gboolean retval = FALSE;
   gchar *name;
 
   name = ogmrip_xml_get_string (xml, "type");
@@ -113,20 +114,26 @@ ogmrip_encoding_parse_container (OGMRipEncoding *encoding, OGMRipXML *xml)
       OGMRipContainerClass *klass;
 
       container = g_object_new (type, NULL);
-      ogmrip_encoding_set_container (encoding, container);
+      retval = ogmrip_encoding_set_container (encoding, container, error);
       g_object_unref (container);
 
-      klass = OGMRIP_CONTAINER_GET_CLASS (container);
-      ogmrip_encoding_parse_properties (xml, container, klass);
+      if (retval)
+      {
+        klass = OGMRIP_CONTAINER_GET_CLASS (container);
+        ogmrip_encoding_parse_properties (xml, container, klass);
+      }
     }
     
     g_free (name);
   }
+
+  return retval;
 }
 
-static void
-ogmrip_encoding_parse_video_codec (OGMRipEncoding *encoding, OGMRipXML *xml)
+static gboolean
+ogmrip_encoding_parse_video_codec (OGMRipEncoding *encoding, OGMRipXML *xml, GError **error)
 {
+  gboolean retval = FALSE;
   gchar *name;
 
   name = ogmrip_xml_get_string (xml, "type");
@@ -144,20 +151,26 @@ ogmrip_encoding_parse_video_codec (OGMRipEncoding *encoding, OGMRipXML *xml)
       title = ogmrip_encoding_get_title (encoding);
 
       codec = g_object_new (type, "input", ogmrip_title_get_video_stream (title), NULL);
-      ogmrip_encoding_set_video_codec (encoding, OGMRIP_VIDEO_CODEC (codec));
+      retval = ogmrip_encoding_set_video_codec (encoding, OGMRIP_VIDEO_CODEC (codec), error);
       g_object_unref (codec);
 
-      klass = OGMRIP_VIDEO_CODEC_GET_CLASS (codec);
-      ogmrip_encoding_parse_properties (xml, codec, klass);
+      if (retval)
+      {
+        klass = OGMRIP_VIDEO_CODEC_GET_CLASS (codec);
+        ogmrip_encoding_parse_properties (xml, codec, klass);
+      }
     }
     
     g_free (name);
   }
+
+  return retval;
 }
 
-static void
-ogmrip_encoding_parse_audio_codec (OGMRipEncoding *encoding, OGMRipXML *xml)
+static gboolean
+ogmrip_encoding_parse_audio_codec (OGMRipEncoding *encoding, OGMRipXML *xml, GError **error)
 {
+  gboolean retval = FALSE;
   gchar *name;
 
   name = ogmrip_xml_get_string (xml, "type");
@@ -181,37 +194,46 @@ ogmrip_encoding_parse_audio_codec (OGMRipEncoding *encoding, OGMRipXML *xml)
 
 
         codec = g_object_new (type, "input", stream, NULL);
-        ogmrip_encoding_add_audio_codec (encoding, OGMRIP_AUDIO_CODEC (codec));
+        retval = ogmrip_encoding_add_audio_codec (encoding, OGMRIP_AUDIO_CODEC (codec), error);
         g_object_unref (codec);
 
-        klass = OGMRIP_AUDIO_CODEC_GET_CLASS (codec);
-        ogmrip_encoding_parse_properties (xml, codec, klass);
+        if (retval)
+        {
+          klass = OGMRIP_AUDIO_CODEC_GET_CLASS (codec);
+          ogmrip_encoding_parse_properties (xml, codec, klass);
+        }
       }
     }
     
     g_free (name);
   }
+
+  return retval;
 }
 
-static void
-ogmrip_encoding_parse_audio_codecs (OGMRipEncoding *encoding, OGMRipXML *xml)
+static gboolean
+ogmrip_encoding_parse_audio_codecs (OGMRipEncoding *encoding, OGMRipXML *xml, GError **error)
 {
   if (ogmrip_xml_children (xml))
   {
     do
     {
-      if (g_str_equal (ogmrip_xml_get_name (xml), "audio-codec"))
-        ogmrip_encoding_parse_audio_codec (encoding, xml);
+      if (g_str_equal (ogmrip_xml_get_name (xml), "audio-codec") &&
+          !ogmrip_encoding_parse_audio_codec (encoding, xml, error))
+        return FALSE;
     }
     while (ogmrip_xml_next (xml));
 
     ogmrip_xml_parent (xml);
   }
+
+  return TRUE;
 }
 
-static void
-ogmrip_encoding_parse_subp_codec (OGMRipEncoding *encoding, OGMRipXML *xml)
+static gboolean
+ogmrip_encoding_parse_subp_codec (OGMRipEncoding *encoding, OGMRipXML *xml, GError **error)
 {
+  gboolean retval = FALSE;
   gchar *name;
 
   name = ogmrip_xml_get_string (xml, "type");
@@ -234,32 +256,40 @@ ogmrip_encoding_parse_subp_codec (OGMRipEncoding *encoding, OGMRipXML *xml)
         OGMRipSubpCodecClass *klass;
 
         codec = g_object_new (type, "input", stream, NULL);
-        ogmrip_encoding_add_subp_codec (encoding, OGMRIP_SUBP_CODEC (codec));
+        retval = ogmrip_encoding_add_subp_codec (encoding, OGMRIP_SUBP_CODEC (codec), error);
         g_object_unref (codec);
 
-        klass = OGMRIP_SUBP_CODEC_GET_CLASS (codec);
-        ogmrip_encoding_parse_properties (xml, codec, klass);
+        if (retval)
+        {
+          klass = OGMRIP_SUBP_CODEC_GET_CLASS (codec);
+          ogmrip_encoding_parse_properties (xml, codec, klass);
+        }
       }
     }
     
     g_free (name);
   }
+
+  return retval;
 }
 
-static void
-ogmrip_encoding_parse_subp_codecs (OGMRipEncoding *encoding, OGMRipXML *xml)
+static gboolean
+ogmrip_encoding_parse_subp_codecs (OGMRipEncoding *encoding, OGMRipXML *xml, GError **error)
 {
   if (ogmrip_xml_children (xml))
   {
     do
     {
-      if (g_str_equal (ogmrip_xml_get_name (xml), "subp-codec"))
-        ogmrip_encoding_parse_subp_codec (encoding, xml);
+      if (g_str_equal (ogmrip_xml_get_name (xml), "subp-codec") &&
+          !ogmrip_encoding_parse_subp_codec (encoding, xml, error))
+        return FALSE;
     }
     while (ogmrip_xml_next (xml));
 
     ogmrip_xml_parent (xml);
   }
+
+  return TRUE;
 }
 
 static void
@@ -316,8 +346,8 @@ ogmrip_encoding_parse_chapters (OGMRipEncoding *encoding, OGMRipXML *xml)
   }
 }
 
-static void
-ogmrip_encoding_parse_files (OGMRipEncoding *encoding, OGMRipXML *xml)
+static gboolean
+ogmrip_encoding_parse_files (OGMRipEncoding *encoding, OGMRipXML *xml, GError **error)
 {
   if (ogmrip_xml_children (xml))
   {
@@ -345,8 +375,13 @@ ogmrip_encoding_parse_files (OGMRipEncoding *encoding, OGMRipXML *xml)
 
           if (file)
           {
-            ogmrip_encoding_add_file (encoding, OGMRIP_FILE (file));
+            gboolean retval;
+
+            retval = ogmrip_encoding_add_file (encoding, OGMRIP_FILE (file), error);
             g_object_unref (file);
+
+            if (!retval)
+              return FALSE;
           }
 
           g_free (type);
@@ -358,6 +393,8 @@ ogmrip_encoding_parse_files (OGMRipEncoding *encoding, OGMRipXML *xml)
 
     ogmrip_xml_parent (xml);
   }
+
+  return TRUE;
 }
 
 gboolean
@@ -369,6 +406,8 @@ ogmrip_encoding_parse (OGMRipEncoding *encoding, OGMRipXML *xml, GError **error)
 
   if (ogmrip_xml_children (xml))
   {
+    gboolean retval = TRUE;
+
     OGMRipEncodingClass *klass;
     const gchar *name;
 
@@ -381,17 +420,20 @@ ogmrip_encoding_parse (OGMRipEncoding *encoding, OGMRipXML *xml, GError **error)
       if (g_str_equal (name, "property"))
         ogmrip_encoding_parse_property (xml, encoding, klass);
       else if (g_str_equal (name, "container"))
-        ogmrip_encoding_parse_container (encoding, xml);
+        retval = ogmrip_encoding_parse_container (encoding, xml, error);
       else if (g_str_equal (name, "video-codec"))
-        ogmrip_encoding_parse_video_codec (encoding, xml);
+        retval = ogmrip_encoding_parse_video_codec (encoding, xml, error);
       else if (g_str_equal (name, "audio-codecs"))
-        ogmrip_encoding_parse_audio_codecs (encoding, xml);
+        retval = ogmrip_encoding_parse_audio_codecs (encoding, xml, error);
       else if (g_str_equal (name, "subp-codecs"))
-        ogmrip_encoding_parse_subp_codecs (encoding, xml);
+        retval = ogmrip_encoding_parse_subp_codecs (encoding, xml, error);
       else if (g_str_equal (name, "chapters"))
         ogmrip_encoding_parse_chapters (encoding, xml);
       else if (g_str_equal (name, "files"))
-        ogmrip_encoding_parse_files (encoding, xml);
+        retval = ogmrip_encoding_parse_files (encoding, xml, error);
+
+      if (!retval)
+        return FALSE;
     }
     while (ogmrip_xml_next (xml));
 

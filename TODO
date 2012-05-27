@@ -10,9 +10,6 @@ ogmrip-encoding-manager.c
 ogmrip-video-file.c
 - ajouter delai
 
-ogmrip-avi.c
-- limiter le nombre de pistes audio (8) et subp (1)
-
 ogmrip-novideo.c
 - comment faire ?
 

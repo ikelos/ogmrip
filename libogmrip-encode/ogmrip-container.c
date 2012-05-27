@@ -23,10 +23,16 @@
  * @include: ogmrip-container.h
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "ogmrip-container.h"
+#include "ogmrip-encoding.h"
 
 #include <unistd.h>
 #include <glib/gstdio.h>
+#include <glib/gi18n-lib.h>
 
 #define DEFAULT_OVERHEAD 6
 
@@ -41,6 +47,10 @@ struct _OGMRipContainerPriv
   guint tsize;
   guint tnumber;
 
+  guint nvideo;
+  guint naudio;
+  guint nsubp;
+
   GFile *output;
   GList *files;
 };
@@ -53,7 +63,10 @@ enum
   PROP_FOURCC,
   PROP_TSIZE,
   PROP_TNUMBER,
-  PROP_OVERHEAD
+  PROP_OVERHEAD,
+  PROP_NVIDEO,
+  PROP_NAUDIO,
+  PROP_NSUBP
 };
 
 static void ogmrip_container_dispose      (GObject      *gobject);
@@ -103,6 +116,18 @@ ogmrip_container_class_init (OGMRipContainerClass *klass)
   g_object_class_install_property (gobject_class, PROP_OVERHEAD, 
         g_param_spec_uint ("overhead", "Overhead property", "Get overhead", 
            0, G_MAXUINT, DEFAULT_OVERHEAD, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_NVIDEO, 
+        g_param_spec_uint ("nvideo", "Number of video streams property", "Get number of video streams", 
+           0, 1, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_NAUDIO, 
+        g_param_spec_uint ("naudio", "Number of audio streams property", "Get number of audio streams", 
+           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_NSUBP, 
+        g_param_spec_uint ("nsubp", "Number of subp streams property", "Get number of subp streams", 
+           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipContainerPriv));
 }
@@ -200,6 +225,15 @@ ogmrip_container_get_property (GObject *gobject, guint property_id, GValue *valu
       break;
     case PROP_OVERHEAD:
       g_value_set_uint (value, ogmrip_container_get_overhead (container));
+      break;
+    case PROP_NVIDEO:
+      g_value_set_uint (value, container->priv->naudio);
+      break;
+    case PROP_NAUDIO:
+      g_value_set_uint (value, container->priv->nsubp);
+      break;
+    case PROP_NSUBP:
+      g_value_set_uint (value, container->priv->nvideo);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -351,13 +385,58 @@ ogmrip_container_get_overhead (OGMRipContainer *container)
  *
  * Adds @file to the rip.
  */
-void
-ogmrip_container_add_file (OGMRipContainer *container, OGMRipFile *file)
+gboolean
+ogmrip_container_add_file (OGMRipContainer *container, OGMRipFile *file, GError **error)
 {
-  g_return_if_fail (OGMRIP_IS_CONTAINER (container));
-  g_return_if_fail (OGMRIP_IS_FILE (file));
+  GParamSpec *pspec;
+
+  g_return_val_if_fail (OGMRIP_IS_CONTAINER (container), FALSE);
+  g_return_val_if_fail (OGMRIP_IS_FILE (file), FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  if (OGMRIP_IS_VIDEO_FILE (file))
+  {
+    pspec = g_object_class_find_property (G_OBJECT_GET_CLASS (container), "nvideo");
+    if (container->priv->nvideo + 1 > G_PARAM_SPEC_UINT (pspec)->maximum)
+    {
+      g_set_error (error, OGMRIP_ENCODING_ERROR, OGMRIP_ENCODING_ERROR_VIDEO,
+          _("The container cannot contain more than %d video codecs and files"),
+          G_PARAM_SPEC_UINT (pspec)->maximum);
+      return FALSE;
+    }
+
+    container->priv->nvideo ++;
+  }
+  else if (OGMRIP_IS_AUDIO_FILE (file))
+  {
+    pspec = g_object_class_find_property (G_OBJECT_GET_CLASS (container), "naudio");
+    if (container->priv->naudio + 1 > G_PARAM_SPEC_UINT (pspec)->maximum)
+    {
+      g_set_error (error, OGMRIP_ENCODING_ERROR, OGMRIP_ENCODING_ERROR_AUDIO,
+          _("The container cannot contain more than %d audio codecs and files"),
+          G_PARAM_SPEC_UINT (pspec)->maximum);
+      return FALSE;
+    }
+
+    container->priv->naudio ++;
+  }
+  else if (OGMRIP_IS_SUBP_FILE (file))
+  {
+    pspec = g_object_class_find_property (G_OBJECT_GET_CLASS (container), "nsubp");
+    if (container->priv->nsubp + 1 > G_PARAM_SPEC_UINT (pspec)->maximum)
+    {
+      g_set_error (error, OGMRIP_ENCODING_ERROR, OGMRIP_ENCODING_ERROR_AUDIO,
+          _("The container cannot contain more than %d subp codecs and files"),
+          G_PARAM_SPEC_UINT (pspec)->maximum);
+      return FALSE;
+    }
+
+    container->priv->nsubp ++;
+  }
 
   container->priv->files = g_list_append (container->priv->files, g_object_ref (file));
+
+  return TRUE;
 }
 
 /**

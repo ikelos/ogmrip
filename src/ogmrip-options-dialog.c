@@ -548,7 +548,7 @@ ogmrip_options_dialog_autoscale_button_clicked (OGMRipOptionsDialog *dialog)
   encoding = ogmrip_encoding_new (dialog->priv->title);
 
   spawn = g_object_new (codec, "input", ogmrip_title_get_video_stream (dialog->priv->title), NULL);
-  ogmrip_encoding_set_video_codec (encoding, OGMRIP_VIDEO_CODEC (spawn));
+  ogmrip_encoding_set_video_codec (encoding, OGMRIP_VIDEO_CODEC (spawn), NULL);
   g_object_unref (spawn);
 
   ogmrip_options_dialog_get_crop_full (dialog, &x, &y, &w, &h);

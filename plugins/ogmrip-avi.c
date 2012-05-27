@@ -48,9 +48,21 @@ struct _OGMRipAviClass
   OGMRipContainerClass parent_class;
 };
 
-static gboolean ogmrip_avi_run (OGMJobTask   *task,
-                                GCancellable *cancellable,
-                                GError       **error);
+enum
+{
+  PROP_0,
+  PROP_NVIDEO,
+  PROP_NAUDIO,
+  PROP_NSUBP
+};
+
+static void     ogmrip_avi_get_property (GObject      *gobject,
+                                         guint        property_id,
+                                         GValue       *value,
+                                         GParamSpec   *pspec);
+static gboolean ogmrip_avi_run          (OGMJobTask   *task,
+                                         GCancellable *cancellable,
+                                         GError       **error);
 
 static void
 ogmrip_avi_add_file (OGMRipContainer *avi, OGMRipFile *file, gboolean video, GPtrArray *argv)
@@ -176,18 +188,35 @@ G_DEFINE_TYPE (OGMRipAvi, ogmrip_avi, OGMRIP_TYPE_CONTAINER)
 static void
 ogmrip_avi_class_init (OGMRipAviClass *klass)
 {
+  GObjectClass *gobject_class;
   OGMJobTaskClass *task_class;
   OGMRipContainerClass *container_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->get_property = ogmrip_avi_get_property;
 
   task_class = OGMJOB_TASK_CLASS (klass);
   task_class->run = ogmrip_avi_run;
 
   container_class = OGMRIP_CONTAINER_CLASS (klass);
   container_class->get_overhead = ogmrip_avi_get_overhead;
+
+  g_object_class_install_property (G_OBJECT_CLASS (klass), PROP_NAUDIO, 
+        g_param_spec_uint ("naudio", "Number of audio streams property", "Get number of audio streams", 
+           0, 8, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (G_OBJECT_CLASS (klass), PROP_NSUBP, 
+        g_param_spec_uint ("nsubp", "Number of subp streams property", "Get number of subp streams", 
+           0, 1, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 }
 
 static void
 ogmrip_avi_init (OGMRipAvi *avi)
+{
+}
+
+static void
+ogmrip_avi_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
 {
 }
 

@@ -1378,8 +1378,8 @@ ogmrip_main_load_activated (OGMRipData *data)
   gtk_widget_destroy (dialog);
 }
 
-static void
-ogmrip_main_run_options_dialog (OGMRipData *data, OGMRipEncoding *encoding, guint width, guint height)
+static gboolean
+ogmrip_main_run_options_dialog (OGMRipData *data, OGMRipEncoding *encoding, guint width, guint height, GError **error)
 {
   GtkWidget *dialog;
   OGMRipTitle *title;
@@ -1391,6 +1391,7 @@ ogmrip_main_run_options_dialog (OGMRipData *data, OGMRipEncoding *encoding, guin
 
   guint start_chap;
   gint end_chap, response;
+  gboolean status;
 
   GList *list, *link;
 
@@ -1416,7 +1417,7 @@ ogmrip_main_run_options_dialog (OGMRipData *data, OGMRipEncoding *encoding, guin
   {
     gtk_widget_destroy (dialog);
     g_object_unref (encoding);
-    return;
+    return FALSE;
   }
 
   profile = ogmrip_encoding_get_profile (encoding);
@@ -1425,8 +1426,15 @@ ogmrip_main_run_options_dialog (OGMRipData *data, OGMRipEncoding *encoding, guin
       g_settings_get_boolean (settings, OGMRIP_SETTINGS_COPY_DVD));
 
   container = ogmrip_main_create_container (data, profile);
-  ogmrip_encoding_set_container (encoding, container);
+  status = ogmrip_encoding_set_container (encoding, container, error);
   g_object_unref (container);
+
+  if (!status)
+  {
+    gtk_widget_destroy (dialog);
+    g_object_unref (encoding);
+    return FALSE;
+  }
 
   ogmrip_chapter_store_get_selection (OGMRIP_CHAPTER_STORE (data->chapter_store), &start_chap, &end_chap);
 
@@ -1447,20 +1455,27 @@ ogmrip_main_run_options_dialog (OGMRipData *data, OGMRipEncoding *encoding, guin
     d = ogmrip_options_dialog_get_deinterlacer (OGMRIP_OPTIONS_DIALOG (dialog));
     ogmrip_video_codec_set_deinterlacer (OGMRIP_VIDEO_CODEC (vcodec), d);
 
-    ogmrip_encoding_set_video_codec (encoding, OGMRIP_VIDEO_CODEC (vcodec));
+    status = ogmrip_encoding_set_video_codec (encoding, OGMRIP_VIDEO_CODEC (vcodec), error);
     g_object_unref (vcodec);
+
+    if (!status)
+    {
+      gtk_widget_destroy (dialog);
+      g_object_unref (encoding);
+      return FALSE;
+    }
   }
 
   gtk_widget_destroy (dialog);
 
   list = gtk_container_get_children (GTK_CONTAINER (data->audio_list));
-  for (link = list; link; link = link->next)
+  for (link = list; link && status; link = link->next)
   {
     stream = ogmrip_source_chooser_get_active (link->data);
     if (stream)
     {
       if (OGMRIP_IS_FILE (stream))
-        ogmrip_encoding_add_file (encoding, OGMRIP_FILE (stream));
+        status = ogmrip_encoding_add_file (encoding, OGMRIP_FILE (stream), error);
       else
       {
         codec = ogmrip_main_create_audio_codec (data, profile,
@@ -1468,7 +1483,7 @@ ogmrip_main_run_options_dialog (OGMRipData *data, OGMRipEncoding *encoding, guin
 
         if (codec)
         {
-          ogmrip_encoding_add_audio_codec (encoding, OGMRIP_AUDIO_CODEC (codec));
+          status = ogmrip_encoding_add_audio_codec (encoding, OGMRIP_AUDIO_CODEC (codec), error);
           g_object_unref (codec);
         }
       }
@@ -1476,14 +1491,20 @@ ogmrip_main_run_options_dialog (OGMRipData *data, OGMRipEncoding *encoding, guin
   }
   g_list_free (list);
 
+  if (!status)
+  {
+    g_object_unref (encoding);
+    return FALSE;
+  }
+
   list = gtk_container_get_children (GTK_CONTAINER (data->subp_list));
-  for (link = list; link; link = link->next)
+  for (link = list; link && status; link = link->next)
   {
     stream = ogmrip_source_chooser_get_active (link->data);
     if (stream)
     {
       if (OGMRIP_IS_FILE (stream))
-        ogmrip_encoding_add_file (encoding, OGMRIP_FILE (stream));
+        status = ogmrip_encoding_add_file (encoding, OGMRIP_FILE (stream), error);
       else
       {
         codec = ogmrip_main_create_subp_codec (data, profile,
@@ -1492,7 +1513,7 @@ ogmrip_main_run_options_dialog (OGMRipData *data, OGMRipEncoding *encoding, guin
         if (codec)
         {
           if (G_OBJECT_TYPE (codec) != OGMRIP_TYPE_HARDSUB)
-            ogmrip_encoding_add_subp_codec (encoding, OGMRIP_SUBP_CODEC (codec));
+            status = ogmrip_encoding_add_subp_codec (encoding, OGMRIP_SUBP_CODEC (codec), error);
           else if (vcodec)
             ogmrip_video_codec_set_hard_subp (OGMRIP_VIDEO_CODEC (vcodec), OGMRIP_SUBP_STREAM (stream),
                 ogmrip_subp_codec_get_forced_only (OGMRIP_SUBP_CODEC (codec)));
@@ -1502,6 +1523,12 @@ ogmrip_main_run_options_dialog (OGMRipData *data, OGMRipEncoding *encoding, guin
     }
   }
   g_list_free (list);
+
+  if (!status)
+  {
+    g_object_unref (encoding);
+    return FALSE;
+  }
 
   codec = ogmrip_main_create_chapters_codec (data,
       ogmrip_title_get_video_stream (title), start_chap, end_chap);
@@ -1549,9 +1576,15 @@ ogmrip_main_run_options_dialog (OGMRipData *data, OGMRipEncoding *encoding, guin
   {
     guint width, height;
 
+    /*
+     * TODO check again
+     */
+
     ogmrip_main_test (data, encoding, &width, &height);
-    ogmrip_main_run_options_dialog (data, encoding, width, height);
+    status = ogmrip_main_run_options_dialog (data, encoding, width, height, error);
   }
+
+  return status;
 }
 
 /*
@@ -1560,7 +1593,13 @@ ogmrip_main_run_options_dialog (OGMRipData *data, OGMRipEncoding *encoding, guin
 static void
 ogmrip_main_extract_activated (OGMRipData *data)
 {
-  ogmrip_main_run_options_dialog (data, NULL, 0, 0);
+  GError *error = NULL;
+
+  if (!ogmrip_main_run_options_dialog (data, NULL, 0, 0, &error))
+  {
+    ogmrip_run_error_dialog (GTK_WINDOW (data->window), error, _("Cannot encode media"));
+    g_error_free (error);
+  }
 }
 
 /*

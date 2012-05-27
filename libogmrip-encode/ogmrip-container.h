@@ -66,8 +66,9 @@ const gchar * ogmrip_container_get_fourcc   (OGMRipContainer     *container);
 void          ogmrip_container_set_fourcc   (OGMRipContainer     *container,
                                              const gchar         *fourcc);
 gint          ogmrip_container_get_overhead (OGMRipContainer     *container);
-void          ogmrip_container_add_file     (OGMRipContainer     *container,
-                                             OGMRipFile          *file);
+gboolean      ogmrip_container_add_file     (OGMRipContainer     *container,
+                                             OGMRipFile          *file,
+                                             GError              **error);
 void          ogmrip_container_remove_file  (OGMRipContainer     *container,
                                              OGMRipFile          *file);
 GList *       ogmrip_container_get_files    (OGMRipContainer     *container);

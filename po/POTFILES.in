@@ -20,6 +20,7 @@ libogmrip-base/ogmrip-xml.c
 libogmrip-dvd/ogmdvd-disc.c
 libogmrip-dvd/ogmdvd-title.c
 
+libogmrip-encode/ogmrip-container.c
 libogmrip-encode/ogmrip-encoding.c
 libogmrip-encode/ogmrip-hardsub.c
 libogmrip-encode/ogmrip-novideo.c
