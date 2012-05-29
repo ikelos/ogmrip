@@ -218,6 +218,18 @@ ogmrip_avi_init (OGMRipAvi *avi)
 static void
 ogmrip_avi_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
 {
+  switch (property_id)
+  {
+    case PROP_NAUDIO:
+      G_OBJECT_CLASS (ogmrip_avi_parent_class)->get_property (gobject, property_id, value, pspec);
+      break;
+    case PROP_NSUBP:
+      G_OBJECT_CLASS (ogmrip_avi_parent_class)->get_property (gobject, property_id, value, pspec);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
+      break;
+  }
 }
 
 static void
