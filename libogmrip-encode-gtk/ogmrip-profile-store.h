@@ -55,7 +55,8 @@ struct _OGMRipProfileStoreClass
 };
 
 GType                ogmrip_profile_store_get_type    (void);
-OGMRipProfileStore * ogmrip_profile_store_new         (OGMRipProfileEngine *engine);
+OGMRipProfileStore * ogmrip_profile_store_new         (OGMRipProfileEngine *engine,
+                                                       gboolean    available_only);
 void                 ogmrip_profile_store_reload      (OGMRipProfileStore  *store);
 OGMRipProfile *      ogmrip_profile_store_get_profile (OGMRipProfileStore  *store,
                                                        GtkTreeIter         *iter);

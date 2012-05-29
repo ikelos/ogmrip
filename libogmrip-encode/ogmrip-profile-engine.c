@@ -20,7 +20,6 @@
 #include "ogmrip-profile-keys.h"
 #include "ogmrip-marshal.h"
 #include "ogmrip-container.h"
-#include "ogmrip-hardsub.h"
 
 #include <ogmrip-base.h>
 
@@ -93,7 +92,7 @@ ogmrip_profile_engine_set_profiles (OGMRipProfileEngine *engine, const gchar **p
     g_object_unref (profile);
   }
 }
-
+/*
 static gboolean
 compare_by_name (const gchar *key, OGMRipProfile *value, const gchar *name)
 {
@@ -139,7 +138,7 @@ ogmrip_profile_engine_check (OGMRipProfileEngine *engine, OGMRipProfile *profile
 
   return TRUE;
 }
-
+*/
 G_DEFINE_TYPE (OGMRipProfileEngine, ogmrip_profile_engine, G_TYPE_OBJECT)
 
 static GObject *
@@ -231,7 +230,9 @@ ogmrip_profile_engine_add_internal (OGMRipProfileEngine *engine, OGMRipProfile *
   gchar *name;
 
   g_object_get (profile, "name", &name, NULL);
+/*
   if (ogmrip_profile_engine_check (engine, profile, name))
+*/
   {
     g_hash_table_insert (engine->priv->profiles, g_strdup (name), g_object_ref (profile));
     g_object_notify (G_OBJECT (engine), "profiles");

@@ -683,7 +683,7 @@ ogmrip_options_dialog_constructed (GObject *gobject)
 
   dialog->priv->profile_combo = gtk_builder_get_widget (builder, "profile-combo");
 
-  store = (GtkListStore *) ogmrip_profile_store_new (NULL);
+  store = (GtkListStore *) ogmrip_profile_store_new (NULL, TRUE);
   gtk_combo_box_set_model (GTK_COMBO_BOX (dialog->priv->profile_combo), GTK_TREE_MODEL (store));
   g_object_unref (store);
 

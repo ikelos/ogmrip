@@ -397,7 +397,7 @@ ogmrip_profile_manager_dialog_init (OGMRipProfileManagerDialog *dialog)
 
   widget = gtk_builder_get_widget (builder, "treeview");
 
-  dialog->priv->store = ogmrip_profile_store_new (NULL);
+  dialog->priv->store = ogmrip_profile_store_new (NULL, TRUE);
   gtk_tree_view_set_model (GTK_TREE_VIEW (widget), GTK_TREE_MODEL (dialog->priv->store));
 
   column = gtk_tree_view_column_new ();

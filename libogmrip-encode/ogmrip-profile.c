@@ -27,6 +27,7 @@
 #include "ogmrip-marshal.h"
 #include "ogmrip-codec.h"
 #include "ogmrip-container.h"
+#include "ogmrip-hardsub.h"
 
 #include <glib/gi18n-lib.h>
 
@@ -37,6 +38,8 @@
 
 struct _OGMRipProfilePriv
 {
+  gboolean available;
+
   GSettings *general_settings;
   gchar *container;
 
@@ -103,6 +106,30 @@ ogmrip_profile_codec_changed (GSettings *settings, const gchar *key, gchar **nam
   *name = g_settings_get_string (settings, key);
 }
 
+static gboolean
+ogmrip_profile_check (OGMRipProfile *profile)
+{
+  GType container, codec;
+
+  container = ogmrip_type_from_name (profile->priv->container);
+  if (container == G_TYPE_NONE)
+    return FALSE;
+
+  codec = ogmrip_type_from_name (profile->priv->video_codec);
+  if (codec == G_TYPE_NONE || !ogmrip_container_contains (container, ogmrip_codec_format (codec)))
+    return FALSE;
+
+  codec = ogmrip_type_from_name (profile->priv->audio_codec);
+  if (codec == G_TYPE_NONE || !ogmrip_container_contains (container, ogmrip_codec_format (codec)))
+    return FALSE;
+
+  codec = ogmrip_type_from_name (profile->priv->subp_codec);
+  if (codec == G_TYPE_NONE || (codec != OGMRIP_TYPE_HARDSUB && !ogmrip_container_contains(container, ogmrip_codec_format (codec))))
+    return FALSE;
+
+  return TRUE;
+}
+
 G_DEFINE_TYPE (OGMRipProfile, ogmrip_profile, G_TYPE_SETTINGS)
 
 static void
@@ -166,6 +193,8 @@ ogmrip_profile_constructed (GObject *gobject)
   str = g_path_get_dirname (profile->priv->path);
   profile->priv->name = g_path_get_basename (str);
   g_free (str);
+
+  profile->priv->available = ogmrip_profile_check (profile);
 }
 
 static void
@@ -520,4 +549,13 @@ ogmrip_profile_get_child (OGMRipProfile *profile, const gchar *name)
 
   return NULL;
 }
+
+gboolean
+ogmrip_profile_is_available (OGMRipProfile *profile)
+{
+  g_return_val_if_fail (OGMRIP_IS_PROFILE (profile), FALSE);
+
+  return profile->priv->available;
+}
+
 
