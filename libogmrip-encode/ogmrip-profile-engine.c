@@ -92,53 +92,12 @@ ogmrip_profile_engine_set_profiles (OGMRipProfileEngine *engine, const gchar **p
     g_object_unref (profile);
   }
 }
-/*
 static gboolean
 compare_by_name (const gchar *key, OGMRipProfile *value, const gchar *name)
 {
   return g_str_equal (key, name);
 }
 
-static gboolean
-ogmrip_profile_engine_check (OGMRipProfileEngine *engine, OGMRipProfile *profile, const gchar *name)
-{
-  GType container, codec;
-  gchar *str;
-
-  if (g_hash_table_find (engine->priv->profiles, (GHRFunc) compare_by_name, (gpointer) name))
-    return FALSE;
-
-  ogmrip_profile_get (profile, OGMRIP_PROFILE_GENERAL, OGMRIP_PROFILE_CONTAINER, "s", &str);
-  container = ogmrip_type_from_name (str);
-  g_free (str);
-
-  if (container == G_TYPE_NONE)
-    return FALSE;
-
-  ogmrip_profile_get (profile, OGMRIP_PROFILE_VIDEO, OGMRIP_PROFILE_CODEC, "s", &str);
-  codec = ogmrip_type_from_name (str);
-  g_free (str);
-
-  if (codec == G_TYPE_NONE || !ogmrip_container_contains (container, ogmrip_codec_format (codec)))
-    return FALSE;
-
-  ogmrip_profile_get (profile, OGMRIP_PROFILE_AUDIO, OGMRIP_PROFILE_CODEC, "s", &str);
-  codec = ogmrip_type_from_name (str);
-  g_free (str);
-
-  if (codec == G_TYPE_NONE || !ogmrip_container_contains (container, ogmrip_codec_format (codec)))
-    return FALSE;
-
-  ogmrip_profile_get (profile, OGMRIP_PROFILE_SUBP, OGMRIP_PROFILE_CODEC, "s", &str);
-  codec = ogmrip_type_from_name(str);
-  g_free (str);
-
-  if (codec == G_TYPE_NONE || (codec != OGMRIP_TYPE_HARDSUB && !ogmrip_container_contains(container, ogmrip_codec_format (codec))))
-    return FALSE;
-
-  return TRUE;
-}
-*/
 G_DEFINE_TYPE (OGMRipProfileEngine, ogmrip_profile_engine, G_TYPE_OBJECT)
 
 static GObject *
@@ -230,9 +189,7 @@ ogmrip_profile_engine_add_internal (OGMRipProfileEngine *engine, OGMRipProfile *
   gchar *name;
 
   g_object_get (profile, "name", &name, NULL);
-/*
-  if (ogmrip_profile_engine_check (engine, profile, name))
-*/
+  if (!g_hash_table_find (engine->priv->profiles, (GHRFunc) compare_by_name, (gpointer) name))
   {
     g_hash_table_insert (engine->priv->profiles, g_strdup (name), g_object_ref (profile));
     g_object_notify (G_OBJECT (engine), "profiles");

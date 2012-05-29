@@ -13,9 +13,6 @@ ogmrip-video-file.c
 ogmrip-novideo.c
 - comment faire ?
 
-ogmrip-x264.glade
-- ajouter partitions (analysis)
-
 dvdcpy.c
 - vérifier que l'id est préservé
 

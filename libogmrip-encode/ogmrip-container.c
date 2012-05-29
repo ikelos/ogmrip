@@ -406,6 +406,8 @@ ogmrip_container_add_file (OGMRipContainer *container, OGMRipFile *file, GError 
     }
 
     container->priv->nvideo ++;
+
+    g_object_notify (G_OBJECT (container), "nvideo");
   }
   else if (OGMRIP_IS_AUDIO_FILE (file))
   {
@@ -419,6 +421,8 @@ ogmrip_container_add_file (OGMRipContainer *container, OGMRipFile *file, GError 
     }
 
     container->priv->naudio ++;
+
+    g_object_notify (G_OBJECT (container), "naudio");
   }
   else if (OGMRIP_IS_SUBP_FILE (file))
   {
@@ -432,6 +436,8 @@ ogmrip_container_add_file (OGMRipContainer *container, OGMRipFile *file, GError 
     }
 
     container->priv->nsubp ++;
+
+    g_object_notify (G_OBJECT (container), "nsubp");
   }
 
   container->priv->files = g_list_append (container->priv->files, g_object_ref (file));
@@ -460,6 +466,22 @@ ogmrip_container_remove_file (OGMRipContainer *container, OGMRipFile *file)
 
   if (link)
   {
+    if (OGMRIP_IS_VIDEO_FILE (file))
+    {
+      container->priv->nvideo --;
+      g_object_notify (G_OBJECT (container), "nvideo");
+    }
+    else if (OGMRIP_IS_AUDIO_FILE (file))
+    {
+      container->priv->naudio --;
+      g_object_notify (G_OBJECT (container), "naudio");
+    }
+    else if (OGMRIP_IS_SUBP_FILE (file))
+    {
+      container->priv->nsubp --;
+      g_object_notify (G_OBJECT (container), "nsubp");
+    }
+
     container->priv->files = g_list_remove_link (container->priv->files, link);
     g_object_unref (link->data);
     g_list_free (link);

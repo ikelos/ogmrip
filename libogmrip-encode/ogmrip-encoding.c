@@ -1652,6 +1652,7 @@ ogmrip_encoding_copy (OGMRipEncoding *encoding, GCancellable *cancellable, GErro
   OGMJobTask *task;
   gboolean result;
   gchar *output;
+  gulong id;
 
   media = ogmrip_title_get_media (encoding->priv->title);
 
@@ -1661,13 +1662,14 @@ ogmrip_encoding_copy (OGMRipEncoding *encoding, GCancellable *cancellable, GErro
   task = ogmrip_copy_new (media, output);
   g_free (output);
 
-  g_signal_connect_swapped (task, "notify::progress",
+  id = g_signal_connect_swapped (task, "notify::progress",
       G_CALLBACK (ogmrip_encoding_task_progressed), encoding);
 
   g_signal_emit (encoding, signals[RUN], 0, task);
   result = ogmjob_task_run (task, cancellable, error);
   g_signal_emit (encoding, signals[COMPLETE], 0, task, OGMRIP_ENCODING_STATUS (result, cancellable));
 
+  g_signal_handler_disconnect (task, id);
   g_object_unref (task);
 
   return result;
@@ -1678,18 +1680,20 @@ ogmrip_encoding_analyze (OGMRipEncoding *encoding, GCancellable *cancellable, GE
 {
   OGMJobTask *task;
   gboolean result;
+  gulong id;
 
   ogmrip_log_printf ("\nAnalyzing video title %d\n", ogmrip_title_get_nr (encoding->priv->title) + 1);
   ogmrip_log_printf ("-----------------------\n\n");
 
   task = ogmrip_analyze_new (encoding->priv->title);
-  g_signal_connect_swapped (task, "notify::progress",
+  id = g_signal_connect_swapped (task, "notify::progress",
       G_CALLBACK (ogmrip_encoding_task_progressed), encoding);
 
   g_signal_emit (encoding, signals[RUN], 0, task);
   result = ogmjob_task_run (task, cancellable, error);
   g_signal_emit (encoding, signals[COMPLETE], 0, task, OGMRIP_ENCODING_STATUS (result, cancellable));
 
+  g_signal_handler_disconnect (task, id);
   g_object_unref (task);
 
   if (result)
@@ -1710,15 +1714,17 @@ ogmrip_encoding_test (OGMRipEncoding *encoding, GCancellable *cancellable, GErro
 {
   OGMJobTask *task;
   gboolean result;
+  gulong id;
 
   task = ogmrip_test_new (encoding);
-  g_signal_connect_swapped (task, "notify::progress",
+  id = g_signal_connect_swapped (task, "notify::progress",
       G_CALLBACK (ogmrip_encoding_task_progressed), encoding);
 
   g_signal_emit (encoding, signals[RUN], 0, task);
   result = ogmjob_task_run (task, cancellable, error);
   g_signal_emit (encoding, signals[COMPLETE], 0, task, OGMRIP_ENCODING_STATUS (result, cancellable));
 
+  g_signal_handler_disconnect (task, id);
   g_object_unref (task);
 
   return result;
@@ -1729,6 +1735,7 @@ ogmrip_encoding_run_codec (OGMRipEncoding *encoding, OGMRipCodec *codec, GCancel
 {
   OGMRipStream *stream;
   gboolean result;
+  gulong id;
 
   stream = ogmrip_codec_get_input (codec);
   if (OGMRIP_IS_SUBP_CODEC (codec))
@@ -1753,15 +1760,14 @@ ogmrip_encoding_run_codec (OGMRipEncoding *encoding, OGMRipCodec *codec, GCancel
       ogmrip_video_codec_get_quality (OGMRIP_VIDEO_CODEC (codec)) == OGMRIP_QUALITY_USER)
     ogmrip_configurable_configure (OGMRIP_CONFIGURABLE (codec), encoding->priv->profile);
 
-  g_signal_connect_swapped (codec, "notify::progress",
+  id = g_signal_connect_swapped (codec, "notify::progress",
       G_CALLBACK (ogmrip_encoding_task_progressed), encoding);
 
   g_signal_emit (encoding, signals[RUN], 0, codec);
   result = ogmjob_task_run (OGMJOB_TASK (codec), cancellable, error);
   g_signal_emit (encoding, signals[COMPLETE], 0, codec, OGMRIP_ENCODING_STATUS (result, cancellable));
 
-  g_signal_handlers_disconnect_by_func (codec,
-      ogmrip_encoding_task_progressed, encoding);
+  g_signal_handler_disconnect (codec, id);
 
   if (result)
     ogmrip_container_add_file (encoding->priv->container, ogmrip_codec_get_output (codec), NULL);
@@ -1773,19 +1779,19 @@ static gboolean
 ogmrip_encoding_merge (OGMRipEncoding *encoding, GCancellable *cancellable, GError **error)
 {
   gboolean result;
+  gulong id;
 
   ogmrip_log_printf ("\nMerging\n");
   ogmrip_log_printf ("-------\n\n");
 
-  g_signal_connect_swapped (encoding->priv->container, "notify::progress",
+  id = g_signal_connect_swapped (encoding->priv->container, "notify::progress",
       G_CALLBACK (ogmrip_encoding_task_progressed), encoding);
 
   g_signal_emit (encoding, signals[RUN], 0, encoding->priv->container);
   result = ogmjob_task_run (OGMJOB_TASK (encoding->priv->container), cancellable, error);
   g_signal_emit (encoding, signals[COMPLETE], 0, encoding->priv->container, OGMRIP_ENCODING_STATUS (result, cancellable));
 
-  g_signal_handlers_disconnect_by_func (encoding->priv->container,
-      ogmrip_encoding_task_progressed, encoding);
+  g_signal_handler_disconnect (encoding->priv->container, id);
 
   return result;
 }

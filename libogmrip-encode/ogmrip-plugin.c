@@ -169,10 +169,7 @@ ogmrip_plugin_info_new (const gchar *name, const gchar *description, const gchar
 
     property = va_arg (args, gchar *);
   }
-/*
-  if (info->schema_id && !info->schema_name)
-    g_object_get (info, "name", &info->schema_name, NULL);
-*/
+
   return info;
 }
 

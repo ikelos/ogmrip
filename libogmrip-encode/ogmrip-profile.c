@@ -558,4 +558,3 @@ ogmrip_profile_is_available (OGMRipProfile *profile)
   return profile->priv->available;
 }
 
-
