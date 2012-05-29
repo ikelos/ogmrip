@@ -46,6 +46,8 @@
 #include <math.h>
 #include <string.h>
 
+#define OGMRIP_TYPE_CODEC_ARRAY (ogmrip_codec_array_get_type ())
+
 #define OGMRIP_ENCODING_GET_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_ENCODING, OGMRipEncodingPriv))
 
@@ -81,9 +83,7 @@ struct _OGMRipEncodingPriv
 enum
 {
   PROP_0,
-/*
   PROP_AUDIO_CODECS,
-*/
   PROP_AUTOCROP,
   PROP_AUTOSCALE,
   PROP_CONTAINER,
@@ -93,9 +93,7 @@ enum
   PROP_LOG_FILE,
   PROP_PROFILE,
   PROP_RELATIVE,
-/*
   PROP_SUBP_CODECS,
-*/
   PROP_TEST,
   PROP_TITLE,
   PROP_VIDEO_CODEC
@@ -128,6 +126,44 @@ static void   ogmrip_encoding_complete      (OGMRipEncoding       *encoding,
 
 guint signals[LAST_SIGNAL] = { 0 };
 
+static OGMRipCodec **
+ogmrip_codec_array_copy (OGMRipCodec **array)
+{
+  OGMRipCodec **new_array;
+  guint i = 0;
+
+  if (!array)
+    return NULL;
+
+  while (array[i])
+    i ++;
+
+  new_array = g_new0 (OGMRipCodec *, i + 1);
+
+  for (i = 0; array[i]; i ++)
+    new_array[i] = g_object_ref (array[i]);
+  new_array[i] = NULL;
+
+  return new_array;
+}
+
+static void
+ogmrip_codec_array_free (OGMRipCodec **array)
+{
+  if (array)
+  {
+    guint i;
+
+    for (i = 0; array[i]; i ++)
+      g_object_unref (array[i]);
+    g_free (array);
+  }
+}
+
+typedef OGMRipCodec * OGMRipCodecArray;
+
+G_DEFINE_BOXED_TYPE (OGMRipCodecArray, ogmrip_codec_array, ogmrip_codec_array_copy, ogmrip_codec_array_free)
+
 GQuark
 ogmrip_encoding_error_quark (void)
 {
@@ -157,6 +193,26 @@ ogmrip_encoding_close_log (OGMRipEncoding *encoding)
     ogmrip_log_close (NULL);
     encoding->priv->log_open = FALSE;
   }
+}
+
+static OGMRipCodec **
+ogmrip_encoding_get_codec_array (OGMRipEncoding *encoding, GList *codecs)
+{
+  OGMRipCodec **array;
+  guint n;
+
+  n = g_list_length (codecs) + 1;
+  array = g_new0 (OGMRipCodec *, n);
+
+  n = 0;
+  while (codecs)
+  {
+    array[n ++] = g_object_ref (codecs->data);
+    codecs = codecs->next;
+  }
+  array[n] = NULL;
+
+  return array;
 }
 
 G_DEFINE_TYPE (OGMRipEncoding, ogmrip_encoding, G_TYPE_OBJECT)
@@ -190,11 +246,11 @@ ogmrip_encoding_class_init (OGMRipEncodingClass *klass)
       G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
       G_STRUCT_OFFSET (OGMRipEncodingClass, complete), NULL, NULL,
       ogmrip_cclosure_marshal_VOID__OBJECT_UINT, G_TYPE_NONE, 2, OGMJOB_TYPE_TASK, G_TYPE_UINT);
-/*
+
   g_object_class_install_property (gobject_class, PROP_AUDIO_CODECS, 
         g_param_spec_boxed ("audio-codecs", "Audio codecs property", "Set audio codecs", 
-           G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-*/
+           OGMRIP_TYPE_CODEC_ARRAY, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_property (gobject_class, PROP_AUTOCROP, 
         g_param_spec_boolean ("autocrop", "Autocrop property", "Set autocrop", 
            TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
@@ -231,11 +287,11 @@ ogmrip_encoding_class_init (OGMRipEncodingClass *klass)
   g_object_class_install_property (gobject_class, PROP_RELATIVE, 
         g_param_spec_boolean ("relative", "Relative property", "Set relative", 
            FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-/*
+
   g_object_class_install_property (gobject_class, PROP_SUBP_CODECS, 
         g_param_spec_boxed ("subp-codecs", "Subp codecs property", "Set subp codecs", 
-           G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-*/
+           OGMRIP_TYPE_CODEC_ARRAY, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_property (gobject_class, PROP_TEST, 
         g_param_spec_boolean ("test", "Test property", "Set test", 
            TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
@@ -316,11 +372,9 @@ ogmrip_encoding_get_property (GObject *gobject, guint property_id, GValue *value
 
   switch (property_id) 
   {
-/*
     case PROP_AUDIO_CODECS:
-      g_value_set_boxed (value, encoding->priv->audio_codecs);
+      g_value_take_boxed (value, (gconstpointer) ogmrip_encoding_get_codec_array (encoding, encoding->priv->audio_codecs));
       break;
-*/
     case PROP_AUTOCROP:
       g_value_set_boolean (value, encoding->priv->autocrop);
       break;
@@ -348,11 +402,9 @@ ogmrip_encoding_get_property (GObject *gobject, guint property_id, GValue *value
     case PROP_RELATIVE:
       g_value_set_boolean (value, encoding->priv->relative);
       break;
-/*
     case PROP_SUBP_CODECS:
-      g_value_set_boxed (value, encoding->priv->subp_codecs);
+      g_value_take_boxed (value, (gconstpointer) ogmrip_encoding_get_codec_array (encoding, encoding->priv->subp_codecs));
       break;
-*/
     case PROP_TEST:
       g_value_set_boolean (value, encoding->priv->test);
       break;
@@ -696,7 +748,7 @@ ogmrip_encoding_add_audio_codec (OGMRipEncoding *encoding, OGMRipAudioCodec *cod
 
   encoding->priv->audio_codecs = g_list_append (encoding->priv->audio_codecs, g_object_ref (codec));
 
-  // g_object_notify (G_OBJECT (encoding), "audio-codecs");
+  g_object_notify (G_OBJECT (encoding), "audio-codecs");
 
   return TRUE;
 }
@@ -747,7 +799,7 @@ ogmrip_encoding_add_subp_codec (OGMRipEncoding *encoding, OGMRipSubpCodec *codec
 
   encoding->priv->subp_codecs = g_list_append (encoding->priv->subp_codecs, g_object_ref (codec));
 
-  // g_object_notify (G_OBJECT (encoding), "subp-codecs");
+  g_object_notify (G_OBJECT (encoding), "subp-codecs");
 
   return TRUE;
 }
@@ -903,9 +955,9 @@ ogmrip_encoding_set_container (OGMRipEncoding *encoding, OGMRipContainer *contai
   if (encoding->priv->container)
     g_object_unref (encoding->priv->container);
   encoding->priv->container = container;
-/*
+
   g_object_notify (G_OBJECT (encoding), "container");
-*/
+
   return TRUE;
 }
 
@@ -1076,9 +1128,9 @@ ogmrip_encoding_set_video_codec (OGMRipEncoding *encoding, OGMRipVideoCodec *cod
   if (encoding->priv->video_codec)
     g_object_unref (encoding->priv->video_codec);
   encoding->priv->video_codec = codec;
-/*
+
   g_object_notify (G_OBJECT (encoding), "video-codec");
-*/
+
   return TRUE;
 }
 
