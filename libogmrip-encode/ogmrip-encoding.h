@@ -125,6 +125,9 @@ gboolean           ogmrip_encoding_set_video_codec     (OGMRipEncoding       *en
 gboolean           ogmrip_encoding_add_audio_codec     (OGMRipEncoding       *encoding,
                                                         OGMRipAudioCodec     *codec,
                                                         GError               **error);
+void               ogmrip_encoding_remove_audio_codec  (OGMRipEncoding       *encoding,
+                                                        OGMRipAudioCodec     *codec);
+void               ogmrip_encoding_clear_audio_codecs  (OGMRipEncoding       *encoding);
 OGMRipCodec *      ogmrip_encoding_get_nth_audio_codec (OGMRipEncoding       *encoding,
                                                         gint                 n);
 gint               ogmrip_encoding_get_n_audio_codecs  (OGMRipEncoding       *encoding);
@@ -132,16 +135,25 @@ GList *            ogmrip_encoding_get_audio_codecs    (OGMRipEncoding       *en
 gboolean           ogmrip_encoding_add_subp_codec      (OGMRipEncoding       *encoding,
                                                         OGMRipSubpCodec      *codec,
                                                         GError               **error);
+void               ogmrip_encoding_remove_subp_codec   (OGMRipEncoding       *encoding,
+                                                        OGMRipSubpCodec      *codec);
+void               ogmrip_encoding_clear_subp_codecs   (OGMRipEncoding       *encoding);
 OGMRipCodec *      ogmrip_encoding_get_nth_subp_codec  (OGMRipEncoding       *encoding,
                                                         gint                 n);
 gint               ogmrip_encoding_get_n_subp_codecs   (OGMRipEncoding       *encoding);
 GList *            ogmrip_encoding_get_subp_codecs     (OGMRipEncoding       *encoding);
 void               ogmrip_encoding_add_chapters        (OGMRipEncoding       *encoding,
                                                         OGMRipChapters       *chapters);
+void               ogmrip_encoding_remove_chapters     (OGMRipEncoding       *encoding,
+                                                        OGMRipChapters       *chapters);
+void               ogmrip_encoding_clear_chapters      (OGMRipEncoding       *encoding);
 GList *            ogmrip_encoding_get_chapters        (OGMRipEncoding       *encoding);
 gboolean           ogmrip_encoding_add_file            (OGMRipEncoding       *encoding,
                                                         OGMRipFile           *file,
                                                         GError               **error);
+void               ogmrip_encoding_remove_file         (OGMRipEncoding       *encoding,
+                                                        OGMRipFile           *file);
+void               ogmrip_encoding_clear_files         (OGMRipEncoding       *encoding);
 GList *            ogmrip_encoding_get_files           (OGMRipEncoding       *encoding);
 gboolean           ogmrip_encoding_get_autocrop        (OGMRipEncoding       *encoding);
 void               ogmrip_encoding_set_autocrop        (OGMRipEncoding       *encoding,

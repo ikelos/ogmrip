@@ -1398,7 +1398,14 @@ ogmrip_main_run_options_dialog (OGMRipData *data, OGMRipEncoding *encoding, guin
   title = ogmrip_title_chooser_get_active (OGMRIP_TITLE_CHOOSER (data->title_chooser));
 
   if (encoding)
+  {
+    ogmrip_encoding_clear_audio_codecs (encoding);
+    ogmrip_encoding_clear_subp_codecs (encoding);
+    ogmrip_encoding_clear_files (encoding);
+    ogmrip_encoding_clear_chapters (encoding);
+
     dialog = ogmrip_options_dialog_new_at_scale (encoding, width, height);
+  }
   else
   {
     encoding = ogmrip_encoding_new (title);

@@ -753,6 +753,33 @@ ogmrip_encoding_add_audio_codec (OGMRipEncoding *encoding, OGMRipAudioCodec *cod
   return TRUE;
 }
 
+void
+ogmrip_encoding_remove_audio_codec (OGMRipEncoding *encoding, OGMRipAudioCodec *codec)
+{
+  GList *link;
+
+  g_return_if_fail (OGMRIP_IS_ENCODING (encoding));
+  g_return_if_fail (OGMRIP_IS_AUDIO_CODEC (codec));
+
+  link = g_list_find (encoding->priv->audio_codecs, codec);
+  if (link)
+  {
+    encoding->priv->audio_codecs = g_list_remove_link (encoding->priv->audio_codecs, link);
+    g_object_unref (link->data);
+    g_list_free (link);
+  }
+}
+
+void
+ogmrip_encoding_clear_audio_codecs (OGMRipEncoding *encoding)
+{
+  g_return_if_fail (OGMRIP_IS_ENCODING (encoding));
+
+  g_list_foreach (encoding->priv->audio_codecs, (GFunc) g_object_unref, NULL);
+  g_list_free (encoding->priv->audio_codecs);
+  encoding->priv->audio_codecs = NULL;
+}
+
 OGMRipCodec *
 ogmrip_encoding_get_nth_audio_codec (OGMRipEncoding *encoding, gint n)
 {
@@ -804,6 +831,33 @@ ogmrip_encoding_add_subp_codec (OGMRipEncoding *encoding, OGMRipSubpCodec *codec
   return TRUE;
 }
 
+void
+ogmrip_encoding_remove_subp_codec (OGMRipEncoding *encoding, OGMRipSubpCodec *codec)
+{
+  GList *link;
+
+  g_return_if_fail (OGMRIP_IS_ENCODING (encoding));
+  g_return_if_fail (OGMRIP_IS_SUBP_CODEC (codec));
+
+  link = g_list_find (encoding->priv->subp_codecs, codec);
+  if (link)
+  {
+    encoding->priv->subp_codecs = g_list_remove_link (encoding->priv->subp_codecs, link);
+    g_object_unref (link->data);
+    g_list_free (link);
+  }
+}
+
+void
+ogmrip_encoding_clear_subp_codecs (OGMRipEncoding *encoding)
+{
+  g_return_if_fail (OGMRIP_IS_ENCODING (encoding));
+
+  g_list_foreach (encoding->priv->subp_codecs, (GFunc) g_object_unref, NULL);
+  g_list_free (encoding->priv->subp_codecs);
+  encoding->priv->subp_codecs = NULL;
+}
+
 OGMRipCodec *
 ogmrip_encoding_get_nth_subp_codec (OGMRipEncoding *encoding, gint n)
 {
@@ -847,6 +901,33 @@ ogmrip_encoding_add_chapters (OGMRipEncoding *encoding, OGMRipChapters *chapters
   encoding->priv->chapters = g_list_append (encoding->priv->chapters, g_object_ref (chapters));
 }
 
+void
+ogmrip_encoding_remove_chapters (OGMRipEncoding *encoding, OGMRipChapters *chapters)
+{
+  GList *link;
+
+  g_return_if_fail (OGMRIP_IS_ENCODING (encoding));
+  g_return_if_fail (OGMRIP_IS_CHAPTERS (chapters));
+
+  link = g_list_find (encoding->priv->chapters, chapters);
+  if (link)
+  {
+    encoding->priv->chapters = g_list_remove_link (encoding->priv->chapters, link);
+    g_object_unref (link->data);
+    g_list_free (link);
+  }
+}
+
+void
+ogmrip_encoding_clear_chapters (OGMRipEncoding *encoding)
+{
+  g_return_if_fail (OGMRIP_IS_ENCODING (encoding));
+
+  g_list_foreach (encoding->priv->chapters, (GFunc) g_object_unref, NULL);
+  g_list_free (encoding->priv->chapters);
+  encoding->priv->chapters = NULL;
+}
+
 GList *
 ogmrip_encoding_get_chapters (OGMRipEncoding *encoding)
 {
@@ -881,6 +962,33 @@ ogmrip_encoding_add_file (OGMRipEncoding *encoding, OGMRipFile *file, GError **e
   encoding->priv->files = g_list_append (encoding->priv->files, g_object_ref (file));
 
   return TRUE;
+}
+
+void
+ogmrip_encoding_remove_file (OGMRipEncoding *encoding, OGMRipFile *file)
+{
+  GList *link;
+
+  g_return_if_fail (OGMRIP_IS_ENCODING (encoding));
+  g_return_if_fail (OGMRIP_IS_FILE (file));
+
+  link = g_list_find (encoding->priv->files, file);
+  if (link)
+  {
+    encoding->priv->files = g_list_remove_link (encoding->priv->files, link);
+    g_object_unref (link->data);
+    g_list_free (link);
+  }
+}
+
+void
+ogmrip_encoding_clear_files (OGMRipEncoding *encoding)
+{
+  g_return_if_fail (OGMRIP_IS_ENCODING (encoding));
+
+  g_list_foreach (encoding->priv->files, (GFunc) g_object_unref, NULL);
+  g_list_free (encoding->priv->files);
+  encoding->priv->files = NULL;
 }
 
 GList *
