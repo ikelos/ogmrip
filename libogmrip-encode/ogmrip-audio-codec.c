@@ -34,7 +34,6 @@ struct _OGMRipAudioCodecPriv
 {
   guint srate;
   guint quality;
-  guint samples_per_frame;
 
   gboolean fast;
   gboolean normalize;
