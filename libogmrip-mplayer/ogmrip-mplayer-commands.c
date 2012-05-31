@@ -26,6 +26,8 @@
 #include "ogmrip-mplayer-commands.h"
 #include "ogmrip-mplayer-version.h"
 
+#include <ogmrip-base.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1144,6 +1146,87 @@ ogmrip_mencoder_container_command (OGMRipContainer *container)
 
   ogmrip_container_foreach_file (container, 
       (OGMRipContainerFunc) ogmrip_mencoder_container_foreach_file, argv);
+
+  return argv;
+}
+
+GPtrArray *
+ogmrip_mplayer_grab_frame_command (OGMRipTitle *title, guint position, gboolean deint)
+{
+  GPtrArray *argv;
+  const gchar *uri;
+  gint vid;
+
+  argv = g_ptr_array_new ();
+  g_ptr_array_add (argv, g_strdup ("mplayer"));
+  g_ptr_array_add (argv, g_strdup ("-nolirc"));
+  g_ptr_array_add (argv, g_strdup ("-nocache"));
+  g_ptr_array_add (argv, g_strdup ("-nosound"));
+  g_ptr_array_add (argv, g_strdup ("-nozoom"));
+
+  if (ogmrip_check_mplayer_nosub ())
+    g_ptr_array_add (argv, g_strdup ("-nosub"));
+
+  g_ptr_array_add (argv, g_strdup ("-vo"));
+
+  if (MPLAYER_CHECK_VERSION (1,0,0,6))
+    g_ptr_array_add (argv, g_strdup_printf ("jpeg:outdir=%s", ogmrip_fs_get_tmp_dir ()));
+  else
+  {
+    g_ptr_array_add (argv, g_strdup ("jpeg"));
+    g_ptr_array_add (argv, g_strdup ("-jpeg"));
+    g_ptr_array_add (argv, g_strdup_printf ("outdir=%s", ogmrip_fs_get_tmp_dir ()));
+  }
+
+  if (MPLAYER_CHECK_VERSION (1,0,0,8))
+  {
+    g_ptr_array_add (argv, g_strdup ("-vc"));
+    g_ptr_array_add (argv, g_strdup ("ffmpeg12"));
+    g_ptr_array_add (argv, g_strdup ("-frames"));
+    g_ptr_array_add (argv, g_strdup ("1"));
+  }
+  else
+  {
+    g_ptr_array_add (argv, g_strdup ("-frames"));
+    g_ptr_array_add (argv, g_strdup ("3"));
+    g_ptr_array_add (argv, g_strdup ("-sstep"));
+    g_ptr_array_add (argv, g_strdup ("1"));
+  }
+
+  g_ptr_array_add (argv, g_strdup ("-speed"));
+  g_ptr_array_add (argv, g_strdup ("100"));
+
+  if (deint)
+  {
+    g_ptr_array_add (argv, g_strdup ("-vf"));
+    g_ptr_array_add (argv, g_strdup ("pp=lb"));
+  }
+/*
+  time_ = (gint) (frame * dialog->priv->rate_denominator / (gdouble) dialog->priv->rate_numerator);
+*/
+  g_ptr_array_add (argv, g_strdup ("-ss"));
+  g_ptr_array_add (argv, g_strdup_printf ("%u", position));
+
+  uri = ogmrip_media_get_uri (ogmrip_title_get_media (title));
+  if (!g_str_has_prefix (uri, "dvd://"))
+    g_warning ("Unknown scheme for '%s'", uri);
+  else
+  {
+    g_ptr_array_add (argv, g_strdup ("-dvd-device"));
+    g_ptr_array_add (argv, g_strdup (uri + 6));
+  }
+
+  vid = ogmrip_title_get_nr (title);
+
+  if (MPLAYER_CHECK_VERSION (1,0,0,1))
+    g_ptr_array_add (argv, g_strdup_printf ("dvd://%d", vid + 1));
+  else
+  {
+    g_ptr_array_add (argv, g_strdup ("-dvd"));
+    g_ptr_array_add (argv, g_strdup_printf ("%d", vid + 1));
+  }
+
+  g_ptr_array_add (argv, NULL);
 
   return argv;
 }

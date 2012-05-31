@@ -77,6 +77,9 @@ gboolean    ogmrip_mplayer_video_watch       (OGMJobTask        *task,
                                               OGMRipVideoCodec  *video,
                                               GError            **error);
 
+GPtrArray * ogmrip_mplayer_grab_frame_command (OGMRipTitle *title,
+                                               guint       position,
+                                               gboolean    deint);
 G_END_DECLS
 
 #endif /* __OGMRIP_MPLAYER_COMMANDS_H__ */

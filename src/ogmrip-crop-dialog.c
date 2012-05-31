@@ -88,95 +88,17 @@ ogmrip_crop_dialog_crop_frame (OGMRipCropDialog *dialog)
   }
 }
 
-static gchar **
-ogmrip_crop_dialog_grab_command (OGMRipCropDialog *dialog, gulong frame)
-{
-  GPtrArray *argv;
-  const gchar *uri;
-  gint vid, time_;
-
-  argv = g_ptr_array_new ();
-  g_ptr_array_add (argv, g_strdup ("mplayer"));
-  g_ptr_array_add (argv, g_strdup ("-nolirc"));
-  g_ptr_array_add (argv, g_strdup ("-nocache"));
-  g_ptr_array_add (argv, g_strdup ("-nosound"));
-  g_ptr_array_add (argv, g_strdup ("-nozoom"));
-
-  if (ogmrip_check_mplayer_nosub ())
-    g_ptr_array_add (argv, g_strdup ("-nosub"));
-
-  g_ptr_array_add (argv, g_strdup ("-vo"));
-
-  if (MPLAYER_CHECK_VERSION (1,0,0,6))
-    g_ptr_array_add (argv, g_strdup_printf ("jpeg:outdir=%s", ogmrip_fs_get_tmp_dir ()));
-  else
-  {
-    g_ptr_array_add (argv, g_strdup ("jpeg"));
-    g_ptr_array_add (argv, g_strdup ("-jpeg"));
-    g_ptr_array_add (argv, g_strdup_printf ("outdir=%s", ogmrip_fs_get_tmp_dir ()));
-  }
-
-  if (MPLAYER_CHECK_VERSION (1,0,0,8))
-  {
-    g_ptr_array_add (argv, g_strdup ("-vc"));
-    g_ptr_array_add (argv, g_strdup ("ffmpeg12"));
-    g_ptr_array_add (argv, g_strdup ("-frames"));
-    g_ptr_array_add (argv, g_strdup ("1"));
-  }
-  else
-  {
-    g_ptr_array_add (argv, g_strdup ("-frames"));
-    g_ptr_array_add (argv, g_strdup ("3"));
-    g_ptr_array_add (argv, g_strdup ("-sstep"));
-    g_ptr_array_add (argv, g_strdup ("1"));
-  }
-
-  g_ptr_array_add (argv, g_strdup ("-speed"));
-  g_ptr_array_add (argv, g_strdup ("100"));
-
-  if (dialog->priv->deint)
-  {
-    g_ptr_array_add (argv, g_strdup ("-vf"));
-    g_ptr_array_add (argv, g_strdup ("pp=lb"));
-  }
-
-  time_ = (gint) (frame * dialog->priv->rate_denominator / (gdouble) dialog->priv->rate_numerator);
-  g_ptr_array_add (argv, g_strdup ("-ss"));
-  g_ptr_array_add (argv, g_strdup_printf ("%u", time_));
-
-  uri = ogmrip_media_get_uri (ogmrip_title_get_media (dialog->priv->title));
-  if (!g_str_has_prefix (uri, "dvd://"))
-    g_warning ("Unknown scheme for '%s'", uri);
-  else
-  {
-    g_ptr_array_add (argv, g_strdup ("-dvd-device"));
-    g_ptr_array_add (argv, g_strdup (uri + 6));
-  }
-
-  vid = ogmrip_title_get_nr (dialog->priv->title);
-
-  if (MPLAYER_CHECK_VERSION (1,0,0,1))
-    g_ptr_array_add (argv, g_strdup_printf ("dvd://%d", vid + 1));
-  else
-  {
-    g_ptr_array_add (argv, g_strdup ("-dvd"));
-    g_ptr_array_add (argv, g_strdup_printf ("%d", vid + 1));
-  }
-
-  g_ptr_array_add (argv, NULL);
-
-  return (gchar **) g_ptr_array_free (argv, FALSE);
-}
-
 static void
 ogmrip_crop_dialog_grab_frame (OGMRipCropDialog *dialog, gulong frame)
 {
   OGMJobTask *task;
-  gchar **cmd;
+  GPtrArray *argv;
+  guint position;
 
-  cmd = ogmrip_crop_dialog_grab_command (dialog, frame);
+  position = (guint) (frame * dialog->priv->rate_denominator / (gdouble) dialog->priv->rate_numerator);
+  argv = ogmrip_mplayer_grab_frame_command (dialog->priv->title, position, dialog->priv->deint);
 
-  task = ogmjob_spawn_newv (cmd);
+  task = ogmjob_spawn_newv ((gchar **) g_ptr_array_free (argv, FALSE));
   if (ogmjob_task_run (task, NULL, NULL))
   {
     gchar *filename;
