@@ -27,8 +27,8 @@
 #include "config.h"
 #endif
 
-#include "ogmrip-player.h"
-#include "ogmrip-version.h"
+#include "ogmrip-mplayer-player.h"
+#include "ogmrip-mplayer-version.h"
 
 #include <unistd.h>
 

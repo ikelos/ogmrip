@@ -16,26 +16,19 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef __OGMRIP_ENCODE_H__
-#define __OGMRIP_ENCODE_H__
+#ifndef __OGMRIP_MPLAYER_H__
+#define __OGMRIP_MPLAYER_H__
 
-#include <ogmrip-analyze.h>
-#include <ogmrip-audio-codec.h>
-#include <ogmrip-chapters.h>
-#include <ogmrip-configurable.h>
-#include <ogmrip-container.h>
-#include <ogmrip-copy.h>
-#include <ogmrip-encoding.h>
-#include <ogmrip-encoding-manager.h>
-#include <ogmrip-enums.h>
-#include <ogmrip-hardsub.h>
-#include <ogmrip-marshal.h>
-#include <ogmrip-novideo.h>
-#include <ogmrip-profile-engine.h>
-#include <ogmrip-profile-keys.h>
-#include <ogmrip-subp-codec.h>
-#include <ogmrip-test.h>
-#include <ogmrip-version.h>
-#include <ogmrip-video-codec.h>
+#include <glib.h>
 
-#endif /* __OGMRIP_ENCODE_H__ */
+G_BEGIN_DECLS
+
+#include <ogmrip-mplayer-commands.h>
+#include <ogmrip-mplayer-lavc.h>
+#include <ogmrip-mplayer-player.h>
+#include <ogmrip-mplayer-version.h>
+
+G_END_DECLS
+
+#endif /* __OGMRIP_MPLAYER_H__ */
+

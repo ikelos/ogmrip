@@ -40,29 +40,6 @@ G_BEGIN_DECLS
    (OGMRIP_MAJOR_VERSION == (major) && OGMRIP_MINOR_VERSION > (minor)) || \
    (OGMRIP_MAJOR_VERSION == (major) && OGMRIP_MINOR_VERSION == (minor) && OGMRIP_MICRO_VERSION >= (micro)))
 
-/**
- * MPLAYER_CHECK_VERSION:
- * @major: A major version number
- * @minor: A minor version number
- * @rc: An rc version number
- * @pre: A pre version number
- *
- * Check if version is equal or greather than major.minor, major.minor-rc or
- * major.minor-pre, in that order
- */
-#define MPLAYER_CHECK_VERSION(major,minor,rc,pre) \
-  (ogmrip_check_mplayer_version (major, minor, rc, pre))
-
-gboolean ogmrip_check_mplayer         (void);
-gboolean ogmrip_check_mencoder        (void);
-
-gboolean ogmrip_check_mplayer_version (gint major,
-                                       gint minor,
-                                       gint rc,
-                                       gint pre);
-gboolean ogmrip_check_mplayer_dts     (void);
-gboolean ogmrip_check_mplayer_nosub   (void);
-
 G_END_DECLS
 
 #endif /* __OGMRIP_VERSION_H__ */

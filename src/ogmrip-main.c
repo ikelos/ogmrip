@@ -26,6 +26,7 @@
 #include <ogmrip-encode-gtk.h>
 #include <ogmrip-media-gtk.h>
 #include <ogmrip-module.h>
+#include <ogmrip-mplayer.h>
 
 #include "ogmrip-helper.h"
 #include "ogmrip-settings.h"
@@ -1582,10 +1583,6 @@ ogmrip_main_run_options_dialog (OGMRipData *data, OGMRipEncoding *encoding, guin
   else if (response == OGMRIP_RESPONSE_TEST)
   {
     guint width, height;
-
-    /*
-     * TODO check again
-     */
 
     ogmrip_main_test (data, encoding, &width, &height);
     status = ogmrip_main_run_options_dialog (data, encoding, width, height, error);

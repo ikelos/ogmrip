@@ -1,7 +1,5 @@
 lib_LTLIBRARIES =   \
-  libogmrip-encode.la \
-  libogmrip-mplayer.la \
-  libogmrip-lavc.la
+  libogmrip-encode.la
 
 BUILT_SOURCES = \
   ogmrip-marshal.c \
@@ -21,7 +19,6 @@ libogmrip_encode_la_SOURCES = \
   ogmrip-hardsub.c          \
   ogmrip-marshal.c          \
   ogmrip-novideo.c          \
-  ogmrip-player.c           \
   ogmrip-plugin.c           \
   ogmrip-profile.c          \
   ogmrip-profile-engine.c   \
@@ -29,7 +26,6 @@ libogmrip_encode_la_SOURCES = \
   ogmrip-stub.c             \
   ogmrip-subp-codec.c       \
   ogmrip-test.c             \
-  ogmrip-version.c          \
   ogmrip-video-codec.c
 
 libogmrip_encode_ladir = \
@@ -50,7 +46,6 @@ libogmrip_encode_la_HEADERS = \
   ogmrip-hardsub.h          \
   ogmrip-marshal.h          \
   ogmrip-novideo.h          \
-  ogmrip-player.h           \
   ogmrip-profile.h          \
   ogmrip-profile-engine.h   \
   ogmrip-profile-keys.h     \
@@ -77,45 +72,6 @@ ogmrip-marshal.h: ogmrip-marshal.list $(GLIB_GENMARSHAL)
 ogmrip-marshal.c: ogmrip-marshal.list $(GLIB_GENMARSHAL)
 	echo "#include \"ogmrip-marshal.h\"" > $@ && \
 	$(GLIB_GENMARSHAL) $< --body --prefix=ogmrip_cclosure_marshal >> $@
-
-#
-# Common
-#
-
-libogmrip_mplayer_la_SOURCES = \
-  ogmrip-mplayer.c
-  
-libogmrip_mplayer_la_LDFLAGS = \
-  -version-info $(OGMRIP_ENCODE_LT_VERSION)
-
-libogmrip_mplayer_la_LIBADD = \
-  $(top_builddir)/libogmrip-job/libogmrip-job.la \
-  $(top_builddir)/libogmrip-media/libogmrip-media.la \
-  $(top_builddir)/libogmrip-encode/libogmrip-encode.la
-
-libogmrip_mplayer_ladir = \
-  $(includedir)/ogmrip-encode
-
-libogmrip_mplayer_la_HEADERS = \
-  ogmrip-mplayer.h
-
-libogmrip_lavc_la_SOURCES = \
-  ogmrip-lavc.c
-  
-libogmrip_lavc_la_LDFLAGS = \
-  -version-info $(OGMRIP_ENCODE_LT_VERSION)
-
-libogmrip_lavc_la_LIBADD = \
-  $(top_builddir)/libogmrip-job/libogmrip-job.la \
-  $(top_builddir)/libogmrip-media/libogmrip-media.la \
-  $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
-  $(top_builddir)/libogmrip-encode/libogmrip-mplayer.la
-
-libogmrip_lavc_ladir = \
-  $(includedir)/ogmrip-encode
-
-libogmrip_lavc_la_HEADERS = \
-  ogmrip-lavc.h
 
 EXTRA_DIST = \
   ogmrip-marshal.list \

@@ -455,6 +455,9 @@ AC_SUBST(OGMRIP_MODULE_LT_VERSION)
 OGMRIP_ENCODE_LT_VERSION=1:0:0
 AC_SUBST(OGMRIP_ENCODE_LT_VERSION)
 
+OGMRIP_MPLAYER_LT_VERSION=1:0:0
+AC_SUBST(OGMRIP_MPLAYER_LT_VERSION)
+
 dnl **************************************************************
 
 AC_OUTPUT([
@@ -474,6 +477,7 @@ libogmrip-module/Makefile
 libogmrip-encode/Makefile
 libogmrip-encode/ogmrip-version.h
 libogmrip-encode-gtk/Makefile
+libogmrip-mplayer/Makefile
 plugins/Makefile
 data/Makefile
 data/pkgconfig/Makefile

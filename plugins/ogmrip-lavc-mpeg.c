@@ -20,7 +20,7 @@
 #include "config.h"
 #endif
 
-#include <ogmrip-lavc.h>
+#include <ogmrip-mplayer.h>
 #include <ogmrip-encode.h>
 #include <ogmrip-module.h>
 

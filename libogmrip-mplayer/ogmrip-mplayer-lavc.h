@@ -16,10 +16,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef __OGMRIP_LAVC_H__
-#define __OGMRIP_LAVC_H__
+#ifndef __OGMRIP_MPLAYER_LAVC_H__
+#define __OGMRIP_MPLAYER_LAVC_H__
 
-#include <ogmrip-video-codec.h>
+#include <ogmrip-encode.h>
 
 G_BEGIN_DECLS
 
@@ -167,5 +167,5 @@ gboolean      ogmrip_lavc_get_v4mv        (OGMRipLavc           *lavc);
 
 G_END_DECLS
 
-#endif /* __OGMRIP_LAVC_H__ */
+#endif /* __OGMRIP_MPLAYER_LAVC_H__ */
 

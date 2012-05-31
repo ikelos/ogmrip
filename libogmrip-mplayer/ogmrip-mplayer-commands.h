@@ -16,18 +16,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef __OGMRIP_MPLAYER_H__
-#define __OGMRIP_MPLAYER_H__
+#ifndef __OGMRIP_MPLAYER_COMMANDS_H__
+#define __OGMRIP_MPLAYER_COMMANDS_H__
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
-#include <ogmrip-job.h>
-#include <ogmrip-container.h>
-#include <ogmrip-video-codec.h>
-#include <ogmrip-audio-codec.h>
-#include <ogmrip-subp-codec.h>
+#include <ogmrip-encode.h>
 
 G_BEGIN_DECLS
 
@@ -87,5 +79,5 @@ gboolean    ogmrip_mplayer_video_watch       (OGMJobTask        *task,
 
 G_END_DECLS
 
-#endif /* __OGMRIP_MPLAYER_H__ */
+#endif /* __OGMRIP_MPLAYER_COMMANDS_H__ */
 

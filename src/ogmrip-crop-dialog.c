@@ -24,6 +24,7 @@
 #include "ogmrip-helper.h"
 
 #include <ogmrip-job.h>
+#include <ogmrip-mplayer.h>
 
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>

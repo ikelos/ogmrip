@@ -22,7 +22,7 @@
 
 #include <ogmrip-encode.h>
 #include <ogmrip-module.h>
-#include <ogmrip-lavc.h>
+#include <ogmrip-mplayer.h>
 
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>

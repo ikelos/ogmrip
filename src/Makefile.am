@@ -29,6 +29,7 @@ ogmrip_LDADD = \
   $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la               \
   $(top_builddir)/libogmrip-encode/libogmrip-encode.la         \
   $(top_builddir)/libogmrip-encode-gtk/libogmrip-encode-gtk.la \
+  $(top_builddir)/libogmrip-mplayer/libogmrip-mplayer.la       \
   $(top_builddir)/libogmrip-module/libogmrip-module.la
 
 INCLUDES = \
@@ -43,6 +44,7 @@ INCLUDES = \
   -I$(top_srcdir)/libogmrip-encode-gtk \
   -I$(top_srcdir)/libogmrip-module     \
   -I$(top_builddir)/libogmrip-encode   \
+  -I$(top_builddir)/libogmrip-mplayer  \
   -DOGMRIP_DATA_DIR=\""$(datadir)"\"   \
   -DOGMRIP_LIB_DIR=\""$(libdir)"\"
 

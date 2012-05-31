@@ -23,10 +23,8 @@
  * @include: ogmrip-mplayer.h
  */
 
-#include "ogmrip-mplayer.h"
-#include "ogmrip-version.h"
-#include "ogmrip-enums.h"
-#include "ogmrip-fs.h"
+#include "ogmrip-mplayer-commands.h"
+#include "ogmrip-mplayer-version.h"
 
 #include <stdio.h>
 #include <stdlib.h>

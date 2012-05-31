@@ -27,14 +27,11 @@
 #include "config.h"
 #endif
 
-#include "ogmrip-fs.h"
-#include "ogmrip-lavc.h"
-#include "ogmrip-version.h"
-#include "ogmrip-mplayer.h"
-#include "ogmrip-configurable.h"
+#include "ogmrip-mplayer-lavc.h"
+#include "ogmrip-mplayer-commands.h"
+#include "ogmrip-mplayer-version.h"
 
 #include <ogmrip-base.h>
-#include <ogmrip-job.h>
 
 #include <stdio.h>
 #include <glib/gstdio.h>
