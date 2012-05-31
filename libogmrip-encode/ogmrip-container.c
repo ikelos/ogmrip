@@ -488,6 +488,34 @@ ogmrip_container_remove_file (OGMRipContainer *container, OGMRipFile *file)
   }
 }
 
+void
+ogmrip_container_clear_files (OGMRipContainer *container)
+{
+  g_return_if_fail (OGMRIP_IS_CONTAINER (container));
+
+  g_list_foreach (container->priv->files, (GFunc) g_object_unref, NULL);
+  g_list_free (container->priv->files);
+  container->priv->files = 0;
+
+  if (container->priv->nvideo > 0)
+  {
+    container->priv->nvideo = 0;
+    g_object_notify (G_OBJECT (container), "nvideo");
+  }
+
+  if (container->priv->naudio)
+  {
+    container->priv->naudio = 0;
+    g_object_notify (G_OBJECT (container), "naudio");
+  }
+
+  if (container->priv->nsubp > 0)
+  {
+    container->priv->nsubp = 0;
+    g_object_notify (G_OBJECT (container), "nsubp");
+  }
+}
+
 /**
  * ogmrip_container_get_files:
  * @container: An #OGMRipContainer

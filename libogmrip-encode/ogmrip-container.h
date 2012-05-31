@@ -71,6 +71,7 @@ gboolean      ogmrip_container_add_file     (OGMRipContainer     *container,
                                              GError              **error);
 void          ogmrip_container_remove_file  (OGMRipContainer     *container,
                                              OGMRipFile          *file);
+void          ogmrip_container_clear_files  (OGMRipContainer     *container);
 GList *       ogmrip_container_get_files    (OGMRipContainer     *container);
 OGMRipFile *  ogmrip_container_get_nth_file (OGMRipContainer     *container,
                                              gint                n);

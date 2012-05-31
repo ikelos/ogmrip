@@ -1709,12 +1709,15 @@ ogmrip_encoding_analyze (OGMRipEncoding *encoding, GCancellable *cancellable, GE
   return result;
 }
 
-gboolean
-ogmrip_encoding_test (OGMRipEncoding *encoding, GCancellable *cancellable, GError **error)
+static gboolean
+ogmrip_encoding_test_internal (OGMRipEncoding *encoding, GCancellable *cancellable, GError **error)
 {
   OGMJobTask *task;
   gboolean result;
   gulong id;
+
+  ogmrip_log_printf ("\nTesting video title %d\n", ogmrip_title_get_nr (encoding->priv->title) + 1);
+  ogmrip_log_printf ("----------------------\n\n");
 
   task = ogmrip_test_new (encoding);
   id = g_signal_connect_swapped (task, "notify::progress",
@@ -1800,23 +1803,23 @@ gboolean
 ogmrip_encoding_encode (OGMRipEncoding *encoding, GCancellable *cancellable, GError **error)
 {
   gboolean result = FALSE;
-  GList *list, *link;
+  GList *link;
 
   g_return_val_if_fail (OGMRIP_IS_ENCODING (encoding), FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
   g_return_val_if_fail (ogmrip_title_is_open (encoding->priv->title), FALSE);
 
-  if (!ogmrip_encoding_check_output (encoding, cancellable, error))
-    return FALSE;
-
   ogmrip_encoding_open_log (encoding);
-/*
-  ogmrip_log_printf ("ENCODING: %s\n\n", ogmrip_encoding_get_label (encoding));
-*/
+
+  ogmrip_log_printf ("ENCODING: %s\n\n", ogmrip_container_get_label (encoding->priv->container));
+
   g_signal_emit (encoding, signals[RUN], 0, NULL);
 
+  if (!ogmrip_encoding_check_output (encoding, cancellable, error))
+    goto encode_cleanup;
+
   if (!ogmrip_encoding_check_space (encoding, 0, 0, cancellable, error))
-    return FALSE;
+    goto encode_cleanup;
 
   /*
    * Copy the media
@@ -1841,13 +1844,7 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GCancellable *cancellable, GEr
   /*
    * Clear the container
    */
-  list = ogmrip_container_get_files (encoding->priv->container);
-  for (link = list; link; link = link->next)
-  {
-    ogmrip_container_remove_file (encoding->priv->container, link->data);
-    g_free (link->data);
-  }
-  g_list_free (list);
+  ogmrip_container_clear_files (encoding->priv->container);
 
   /*
    * Extract all chapters
@@ -1952,7 +1949,7 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GCancellable *cancellable, GEr
      */
     if (encoding->priv->test)
     {
-      result = ogmrip_encoding_test (encoding, cancellable, error);
+      result = ogmrip_encoding_test_internal (encoding, cancellable, error);
       if (!result)
         goto encode_cleanup;
     }
@@ -1968,6 +1965,34 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GCancellable *cancellable, GEr
   result = ogmrip_encoding_merge (encoding, cancellable, error);
 
 encode_cleanup:
+  g_signal_emit (encoding, signals[COMPLETE], 0, NULL, OGMRIP_ENCODING_STATUS (result, cancellable));
+
+  ogmrip_encoding_close_log (encoding);
+
+  return result;
+}
+
+gboolean
+ogmrip_encoding_test (OGMRipEncoding *encoding, GCancellable *cancellable, GError **error)
+{
+  gboolean result = FALSE;
+
+  g_return_val_if_fail (OGMRIP_IS_ENCODING (encoding), FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (ogmrip_title_is_open (encoding->priv->title), FALSE);
+
+  ogmrip_encoding_open_log (encoding);
+
+  ogmrip_log_printf ("TESTING: %s\n\n", ogmrip_container_get_label (encoding->priv->container));
+
+  g_signal_emit (encoding, signals[RUN], 0, NULL);
+
+  if (!ogmrip_encoding_check_output (encoding, cancellable, error))
+    goto test_cleanup;
+
+  result = ogmrip_encoding_test_internal (encoding, cancellable, error);
+
+test_cleanup:
   g_signal_emit (encoding, signals[COMPLETE], 0, NULL, OGMRIP_ENCODING_STATUS (result, cancellable));
 
   ogmrip_encoding_close_log (encoding);
