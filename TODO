@@ -1,18 +1,43 @@
-ogmrip-media.c
-- vérifier que les médias sont correctement déréférencés
+ogmrip-mp4.c
+- (no)global_header ?
+
+ogmrip-encoding-manager-dialog.c
+- import/export one encoding
+- import/export all encodings
 
 ogmrip-video-codec.c
-- un conteneur peut imposer la présence d'un flux vidéo
-
-ogmrip-encoding-manager.c
-- comment connaitre les encodages non faits ?
-
-ogmrip-video-file.c
-- ajouter delai
+- a container can require a video stream (ie avi)
 
 ogmrip-novideo.c
-- comment faire ?
+- how to do ?
+
+ogmrip-media.c
+- check that OGMRipMedia are correctly unrefed
+
+ogmrip-profile-editor-dialog.c
+- reset profile
+
+ogmrip-options-dialog.c
+- check options edition
 
 dvdcpy.c
-- vérifier que l'id est préservé
+- check that the id is preserved
+
+profile-ios.xml
+- todo
+
+profile-android.xml
+- todo
+
+profile-ps3.xml
+- todo
+
+profile-psp.xml
+- todo
+
+profile-xbox.xml
+- todo
+
+profile-dvd.xml
+- todo
 
