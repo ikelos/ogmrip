@@ -1759,7 +1759,7 @@ ogmrip_encoding_run_codec (OGMRipEncoding *encoding, OGMRipCodec *codec, GCancel
     ogmrip_log_printf ("---------------------\n\n");
   }
 
-  if (OGMRIP_IS_CONFIGURABLE (codec) &&
+  if (encoding->priv->profile && OGMRIP_IS_CONFIGURABLE (codec) &&
       ogmrip_video_codec_get_quality (OGMRIP_VIDEO_CODEC (codec)) == OGMRIP_QUALITY_USER)
     ogmrip_configurable_configure (OGMRIP_CONFIGURABLE (codec), encoding->priv->profile);
 
@@ -1786,6 +1786,9 @@ ogmrip_encoding_merge (OGMRipEncoding *encoding, GCancellable *cancellable, GErr
 
   ogmrip_log_printf ("\nMerging\n");
   ogmrip_log_printf ("-------\n\n");
+
+  if (encoding->priv->profile && OGMRIP_IS_CONFIGURABLE (encoding->priv->container))
+    ogmrip_configurable_configure (OGMRIP_CONFIGURABLE (encoding->priv->container), encoding->priv->profile);
 
   id = g_signal_connect_swapped (encoding->priv->container, "notify::progress",
       G_CALLBACK (ogmrip_encoding_task_progressed), encoding);
