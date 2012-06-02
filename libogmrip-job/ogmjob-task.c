@@ -191,6 +191,7 @@ gboolean
 ogmjob_task_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
   OGMJobTaskClass *klass;
+  gboolean result;
 
   g_return_val_if_fail (OGMJOB_IS_TASK (task), FALSE);
   g_return_val_if_fail (cancellable == NULL || G_IS_CANCELLABLE (cancellable), FALSE);
@@ -204,8 +205,10 @@ ogmjob_task_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
     return TRUE;
 
   ogmjob_task_set_state (task, OGMJOB_STATE_RUNNING);
+  result = klass->run (task, cancellable, error);
+  ogmjob_task_set_state (task, OGMJOB_STATE_IDLE);
 
-  return klass->run (task, cancellable, error);
+  return result;
 }
 
 void
