@@ -3,6 +3,7 @@
 data/ui/ogmrip-crop.glade
 data/ui/ogmrip-lavc.glade
 data/ui/ogmrip-main.glade
+data/ui/ogmrip-mp4.glade
 data/ui/ogmrip-options.glade
 data/ui/ogmrip-pref.glade
 data/ui/ogmrip-profile-editor.glade
@@ -64,6 +65,7 @@ plugins/ogmrip-lavc-options.c
 plugins/ogmrip-mkv.c
 plugins/ogmrip-mp3.c
 plugins/ogmrip-mp4.c
+plugins/ogmrip-mp4-options.c
 plugins/ogmrip-ogg.c
 plugins/ogmrip-srt.c
 plugins/ogmrip-theora.c
