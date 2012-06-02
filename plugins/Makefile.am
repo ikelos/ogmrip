@@ -374,6 +374,9 @@ ogmrip_mp4_la_LIBADD = \
   $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la \
   $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
   $(top_builddir)/libogmrip-mplayer/libogmrip-mplayer.la
+
+plugin_include_HEADERS += \
+  ogmrip-mp4.h
 endif
 
 #
@@ -441,6 +444,26 @@ ogmrip_x264_options_la_LIBTOOLFLAGS = \
   --tag=disable-static
 
 ogmrip_x264_options_la_LIBADD = \
+  $(top_builddir)/libogmrip-base/libogmrip-base.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
+  $(top_builddir)/libogmrip-module/libogmrip-module.la \
+  $(top_builddir)/libogmrip-encode-gtk/libogmrip-encode-gtk.la
+endif
+
+if HAVE_MP4_SUPPORT
+extensions_LTLIBRARIES += \
+  ogmrip-mp4-options.la
+
+ogmrip_mp4_options_la_SOURCES = \
+  ogmrip-mp4-options.c
+
+ogmrip_mp4_options_la_LDFLAGS = \
+  -export-dynamic -module -avoid-version
+
+ogmrip_mp4_options_la_LIBTOOLFLAGS = \
+  --tag=disable-static
+
+ogmrip_mp4_options_la_LIBADD = \
   $(top_builddir)/libogmrip-base/libogmrip-base.la \
   $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
   $(top_builddir)/libogmrip-module/libogmrip-module.la \

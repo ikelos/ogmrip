@@ -20,6 +20,8 @@
 #include "config.h"
 #endif
 
+#include "ogmrip-mp4.h"
+
 #include <ogmrip-base.h>
 #include <ogmrip-encode.h>
 #include <ogmrip-mplayer.h>
@@ -59,6 +61,9 @@ struct _OGMRipMp4
   guint nsplits;
   guint splits;
   guint split_percent;
+
+  guint format;
+  gboolean hint;
 };
 
 struct _OGMRipMp4Class
@@ -66,10 +71,32 @@ struct _OGMRipMp4Class
   OGMRipContainerClass parent_class;
 };
 
-GType           ogmrip_mp4_get_type (void);
-static gboolean ogmrip_mp4_run      (OGMJobTask   *task,
-                                     GCancellable *cancellable,
-                                     GError       **error);
+enum
+{
+  PROP_0,
+  PROP_FORMAT,
+  PROP_HINT
+};
+
+enum
+{
+  FORMAT_STANDARD,
+  FORMAT_ISMA,
+  FORMAT_IPOD,
+  FORMAT_PSP
+};
+
+static void     ogmrip_mp4_get_property (GObject      *gobject,
+                                         guint        property_id,
+                                         GValue       *value,
+                                         GParamSpec   *pspec);
+static void     ogmrip_mp4_set_property (GObject      *gobject,
+                                         guint        property_id,
+                                         const GValue *value,
+                                         GParamSpec   *pspec);
+static gboolean ogmrip_mp4_run          (OGMJobTask   *task,
+                                         GCancellable *cancellable,
+                                         GError       **error);
 
 static void
 ogmrip_mp4_append_audio_file (OGMRipContainer *mp4, OGMRipFile *file, GPtrArray *argv)
@@ -188,34 +215,6 @@ ogmrip_mp4_append_file (OGMRipContainer *mp4, OGMRipFile *file, GPtrArray *argv)
 }
 
 static gchar **
-ogmrip_mp4box_extract_command (const gchar *input)
-{
-  GPtrArray *argv;
-
-  argv = g_ptr_array_new ();
-  g_ptr_array_add (argv, g_strdup (MP4BOX));
-  g_ptr_array_add (argv, g_strdup ("-aviraw"));
-  g_ptr_array_add (argv, g_strdup ("video"));
-  g_ptr_array_add (argv, g_strdup (input));
-
-  g_ptr_array_add (argv, NULL);
-
-  return (gchar **) g_ptr_array_free (argv, FALSE);
-}
-
-static gboolean
-ogmrip_mp4box_extract_watch (OGMJobTask *task, const gchar *buffer, OGMRipContainer *mp4, GError **error)
-{
-  gchar *sep;
-  guint percent;
-
-  if ((sep = strrchr (buffer, '(')) && sscanf (sep, "(%u/100)", &percent) == 1)
-    ogmjob_task_set_progress (task, percent / 100.0);
-
-  return TRUE;
-}
-
-static gchar **
 ogmrip_mencoder_extract_command (const gchar *input, const gchar *output)
 {
   GPtrArray *argv;
@@ -240,9 +239,7 @@ ogmrip_mencoder_extract_command (const gchar *input, const gchar *output)
   g_ptr_array_add (argv, g_strdup ("copy"));
 
   g_ptr_array_add (argv, g_strdup ("-of"));
-  g_ptr_array_add (argv, g_strdup ("lavf"));
-  g_ptr_array_add (argv, g_strdup ("-lavfopts"));
-  g_ptr_array_add (argv, g_strdup ("format=mp4"));
+  g_ptr_array_add (argv, g_strdup ("rawvideo"));
 
   g_ptr_array_add (argv, g_strdup ("-o"));
   g_ptr_array_add (argv, g_strdup (output));
@@ -255,13 +252,14 @@ ogmrip_mencoder_extract_command (const gchar *input, const gchar *output)
 }
 
 static gchar **
-ogmrip_mp4_create_command (OGMRipContainer *mp4, const gchar *input)
+ogmrip_mp4_create_command (OGMRipContainer *container, const gchar *input)
 {
+  OGMRipMp4 *mp4 = OGMRIP_MP4 (container);
   GPtrArray *argv;
   const gchar *label, *fmt = NULL;
   gchar fps[8];
 
-  switch (ogmrip_stream_get_format (OGMRIP_STREAM (OGMRIP_MP4 (mp4)->video)))
+  switch (ogmrip_stream_get_format (OGMRIP_STREAM (mp4->video)))
   {
     case OGMRIP_FORMAT_MPEG4:
       fmt = "mpeg4-video";
@@ -286,8 +284,21 @@ ogmrip_mp4_create_command (OGMRipContainer *mp4, const gchar *input)
   argv = g_ptr_array_new ();
   g_ptr_array_add (argv, g_strdup (MP4BOX));
 
-  if (OGMRIP_MP4 (mp4)->naudio <= 1 && OGMRIP_MP4 (mp4)->nsubp < 1)
-    g_ptr_array_add (argv, g_strdup ("-isma"));
+  switch (mp4->format)
+  {
+    case FORMAT_IPOD:
+      g_ptr_array_add (argv, g_strdup ("-ipod"));
+      break;
+    case FORMAT_PSP:
+      break;
+    case FORMAT_ISMA:
+      if (mp4->naudio <= 1 && mp4->nsubp < 1)
+        g_ptr_array_add (argv, g_strdup ("-isma"));
+      break;
+  }
+
+  if (mp4->hint)
+    g_ptr_array_add (argv, g_strdup ("-hint"));
 
   g_ptr_array_add (argv, g_strdup ("-nodrop"));
   g_ptr_array_add (argv, g_strdup ("-new"));
@@ -298,7 +309,7 @@ ogmrip_mp4_create_command (OGMRipContainer *mp4, const gchar *input)
   g_ptr_array_add (argv, g_strdup ("-tmp"));
   g_ptr_array_add (argv, g_strdup (ogmrip_fs_get_tmp_dir ()));
 
-  label = ogmrip_container_get_label (mp4);
+  label = ogmrip_container_get_label (container);
   if (label)
   {
     g_ptr_array_add (argv, g_strdup ("-itags"));
@@ -310,19 +321,19 @@ ogmrip_mp4_create_command (OGMRipContainer *mp4, const gchar *input)
     guint num, denom;
 
     if (!input)
-      input = ogmrip_file_get_path (OGMRIP_MP4 (mp4)->video);
+      input = ogmrip_file_get_path (mp4->video);
 
-    ogmrip_video_stream_get_framerate (OGMRIP_VIDEO_STREAM (OGMRIP_MP4 (mp4)->video), &num, &denom);
+    ogmrip_video_stream_get_framerate (OGMRIP_VIDEO_STREAM (mp4->video), &num, &denom);
     g_ascii_formatd (fps, 8, "%.3f", num / (gdouble) denom);
 
     g_ptr_array_add (argv, g_strdup ("-add"));
     g_ptr_array_add (argv, g_strdup_printf ("%s:fmt=%s:fps=%s#video", input, fmt, fps));
   }
 
-  ogmrip_container_foreach_file (mp4, 
+  ogmrip_container_foreach_file (container, 
       (OGMRipContainerFunc) ogmrip_mp4_append_file, argv);
 
-  g_ptr_array_add (argv, g_file_get_path (ogmrip_container_get_output (mp4)));
+  g_ptr_array_add (argv, g_file_get_path (ogmrip_container_get_output (container)));
 
   g_ptr_array_add (argv, NULL);
 
@@ -397,20 +408,6 @@ ogmrip_mp4_split_watch (OGMJobTask *task, const gchar *buffer, OGMRipMp4 *mp4, G
   return TRUE;
 }
 
-static gchar *
-ogmrip_mp4_get_h264_filename (const gchar *input)
-{
-  gchar *dot, *filename;
-
-  dot = strrchr (input, '.');
-
-  filename = g_new0 (gchar, dot - input + 12);
-  strncpy (filename, input, dot - input);
-  strcat (filename, "_video.h264");
-
-  return filename;
-}
-
 static void
 ogmrip_mp4_get_info (OGMRipMp4 *mp4, OGMRipFile *file)
 {
@@ -426,20 +423,96 @@ ogmrip_mp4_get_info (OGMRipMp4 *mp4, OGMRipFile *file)
   }
 }
 
-G_DEFINE_TYPE (OGMRipMp4, ogmrip_mp4, OGMRIP_TYPE_CONTAINER)
+static void
+ogmrip_mp4_configure (OGMRipConfigurable *configurable, OGMRipProfile *profile)
+{
+  GSettings *settings;
+
+  settings = ogmrip_profile_get_child (profile, "mp4");
+  if (settings)
+  {
+    g_settings_bind (settings, "format", configurable, OGMRIP_MP4_PROP_FORMAT,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "hint", configurable, OGMRIP_MP4_PROP_HINT,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_object_unref (settings);
+  }
+}
+
+static void
+ogmrip_configurable_iface_init (OGMRipConfigurableInterface *iface)
+{
+  iface->configure = ogmrip_mp4_configure;
+}
+
+G_DEFINE_TYPE_EXTENDED (OGMRipMp4, ogmrip_mp4, OGMRIP_TYPE_CONTAINER, 0,
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_CONFIGURABLE, ogmrip_configurable_iface_init))
 
 static void
 ogmrip_mp4_class_init (OGMRipMp4Class *klass)
 {
+  GObjectClass *gobject_class;
   OGMJobTaskClass *task_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->get_property = ogmrip_mp4_get_property;
+  gobject_class->set_property = ogmrip_mp4_set_property;
 
   task_class = OGMJOB_TASK_CLASS (klass);
   task_class->run = ogmrip_mp4_run;
+
+  g_object_class_install_property (gobject_class, PROP_HINT,
+      g_param_spec_boolean (OGMRIP_MP4_PROP_HINT, "hint property", "Set hint",
+        OGMRIP_MP4_DEFAULT_HINT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_FORMAT,
+      g_param_spec_uint (OGMRIP_MP4_PROP_FORMAT, "Format property", "Set format",
+        0, 3, OGMRIP_MP4_DEFAULT_FORMAT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 }
 
 static void
 ogmrip_mp4_init (OGMRipMp4 *mp4)
 {
+  mp4->format = OGMRIP_MP4_DEFAULT_FORMAT;
+  mp4->hint = OGMRIP_MP4_DEFAULT_HINT;
+}
+
+static void
+ogmrip_mp4_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
+{
+  OGMRipMp4 *mp4 = OGMRIP_MP4 (gobject);
+
+  switch (property_id) 
+  {
+    case PROP_FORMAT:
+      g_value_set_uint (value, mp4->format);
+      break;
+    case PROP_HINT:
+      g_value_set_boolean (value, mp4->hint);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
+      break;
+  }
+}
+
+static void
+ogmrip_mp4_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
+{
+  OGMRipMp4 *mp4 = OGMRIP_MP4 (gobject);
+
+  switch (property_id) 
+  {
+    case PROP_FORMAT:
+      mp4->format = g_value_get_uint (value);
+      break;
+    case PROP_HINT:
+      mp4->hint = g_value_get_boolean (value);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
+      break;
+  }
 }
 
 static gboolean
@@ -464,36 +537,17 @@ ogmrip_mp4_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 
   if (ogmrip_stream_get_format (OGMRIP_STREAM (mp4->video)) == OGMRIP_FORMAT_H264)
   {
-    gboolean global_header = FALSE;
-/*
-    if (g_object_class_find_property (G_OBJECT_GET_CLASS (video), "global_header"))
-      g_object_get (video, "global_header", &global_header, NULL);
-*/
-    if (global_header)
+    filename = ogmrip_fs_mktemp ("video.XXXXXX", NULL);
+
+    argv = ogmrip_mencoder_extract_command (ogmrip_file_get_path (mp4->video), filename);
+    if (!argv)
     {
-      filename = ogmrip_fs_mktemp ("video.XXXXXX", NULL);
-
-      argv = ogmrip_mencoder_extract_command (ogmrip_file_get_path (mp4->video), filename);
-      if (!argv)
-      {
-        g_free (filename);
-        return FALSE;
-      }
-
-      child = ogmjob_spawn_newv (argv);
-      ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child), (OGMJobWatch) ogmrip_mencoder_container_watch, task);
+      g_free (filename);
+      return FALSE;
     }
-    else
-    {
-      argv = ogmrip_mp4box_extract_command (ogmrip_file_get_path (mp4->video));
-      if (!argv)
-        return FALSE;
 
-      child = ogmjob_spawn_newv (argv);
-      ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child), (OGMJobWatch) ogmrip_mp4box_extract_watch, task);
-
-      filename = ogmrip_mp4_get_h264_filename (ogmrip_file_get_path (mp4->video));
-    }
+    child = ogmjob_spawn_newv (argv);
+    ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child), (OGMJobWatch) ogmrip_mencoder_container_watch, task);
 
     ogmjob_container_add (OGMJOB_CONTAINER (queue), child);
     g_object_unref (child);
@@ -598,6 +652,7 @@ ogmrip_module_load (OGMRipModule *module)
   }
 
   ogmrip_register_container (OGMRIP_TYPE_MP4,
-      "mp4", _("Mpeg-4 Media (MP4)"), formats, NULL);
+      "mp4", _("Mpeg-4 Media (MP4)"), formats,
+      "schema-id", "org.ogmrip.mp4", NULL);
 }
 

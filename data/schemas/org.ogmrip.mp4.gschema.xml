@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<schemalist>
+  <schema id="org.ogmrip.mp4">
+    <key name="format" type="u">
+      <range min="0" max="3"/>
+      <default>0</default>
+      <summary>Format</summary>
+    </key>
+    <key name="hint" type="b">
+      <default>false</default>
+      <summary>Hint</summary>
+    </key>
+  </schema>
+</schemalist>

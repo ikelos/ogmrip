@@ -14,7 +14,8 @@ ui_DATA = \
   ogmrip-spell.glade          \
   ogmrip-lavc.glade           \
   ogmrip-x264.glade           \
-  ogmrip-xvid.glade
+  ogmrip-xvid.glade           \
+	ogmrip-mp4.glade
 
 pixmapdir = \
   $(datadir)/pixmaps
