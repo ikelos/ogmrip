@@ -235,6 +235,9 @@ ogmrip_test_encode_audio (OGMRipTest *test, gdouble start_position, gdouble play
   gboolean result = FALSE;
 
   list = ogmrip_encoding_get_audio_codecs (test->priv->encoding);
+  if (!list)
+    return TRUE;
+
   for (link = list; link; link = link->next)
   {
     OGMRipCodecInfo info;
@@ -263,6 +266,9 @@ ogmrip_test_encode_subp (OGMRipTest *test, gdouble start_position, gdouble play_
   gboolean result = FALSE;
 
   list = ogmrip_encoding_get_subp_codecs (test->priv->encoding);
+  if (!list)
+    return TRUE;
+
   for (link = list; link; link = link->next)
   {
     OGMRipCodecInfo info;
@@ -302,7 +308,7 @@ ogmrip_test_encode_video (OGMRipTest *test, gdouble start_position, gdouble play
   ogmrip_codec_set_start_position  (codec, start_position);
   ogmrip_codec_set_play_length (codec, play_length);
 
-  result  = ogmjob_task_run (OGMJOB_TASK (codec), cancellable, error);
+  result = ogmjob_task_run (OGMJOB_TASK (codec), cancellable, error);
 
   ogmrip_test_restore_codec_info (codec, &info);
 
@@ -390,7 +396,7 @@ ogmrip_test_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   test->priv->fraction = 0.0;
   test->priv->step = SAMPLE_LENGTH / info.length;
   if (info.method == OGMRIP_ENCODING_SIZE)
-    test->priv->step += 1 +
+    test->priv->step /= 1 +
       ogmrip_encoding_get_n_audio_codecs (test->priv->encoding) +
       ogmrip_encoding_get_n_subp_codecs (test->priv->encoding);
 

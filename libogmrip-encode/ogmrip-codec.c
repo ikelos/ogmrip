@@ -394,7 +394,6 @@ void
 ogmrip_codec_set_play_length (OGMRipCodec *codec, gdouble length)
 {
   g_return_if_fail (OGMRIP_IS_CODEC (codec));
-  g_return_if_fail (length > 0.0);
 
   codec->priv->play_length = length;
 }
