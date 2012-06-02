@@ -1390,7 +1390,7 @@ ogmrip_main_run_options_dialog (OGMRipData *data, OGMRipEncoding *encoding, guin
   OGMRipCodec *vcodec, *codec;
   OGMRipStream *stream;
 
-  guint start_chap;
+  guint start_chap, method;
   gint end_chap, response;
   gboolean status;
 
@@ -1425,13 +1425,19 @@ ogmrip_main_run_options_dialog (OGMRipData *data, OGMRipEncoding *encoding, guin
   {
     gtk_widget_destroy (dialog);
     g_object_unref (encoding);
-    return FALSE;
+    return TRUE;
   }
 
   profile = ogmrip_encoding_get_profile (encoding);
 
   ogmrip_encoding_set_copy (encoding,
       g_settings_get_boolean (settings, OGMRIP_SETTINGS_COPY_DVD));
+
+  ogmrip_profile_get (profile, OGMRIP_PROFILE_GENERAL, OGMRIP_PROFILE_ENCODING_METHOD, "u", &method);
+  ogmrip_encoding_set_method (encoding, method);
+
+  ogmrip_profile_get (profile, OGMRIP_PROFILE_GENERAL, OGMRIP_PROFILE_ENSURE_SYNC, "b", &status);
+  ogmrip_encoding_set_ensure_sync (encoding, status);
 
   container = ogmrip_main_create_container (data, profile);
   status = ogmrip_encoding_set_container (encoding, container, error);
