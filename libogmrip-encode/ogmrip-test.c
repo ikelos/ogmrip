@@ -378,14 +378,14 @@ ogmrip_test_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   guint files, optimal_bitrate = 0, user_bitrate = 0;
   gdouble start;
 
-  if (ogmrip_encoding_get_method (test->priv->encoding) == OGMRIP_ENCODING_QUANTIZER)
+  ogmrip_test_save_encoding_info (test->priv->encoding, &info);
+
+  if (info.method == OGMRIP_ENCODING_QUANTIZER)
   {
     g_set_error (error, OGMRIP_TEST_ERROR, OGMRIP_TEST_ERROR_QUANTIZER,
         _("Cannot perform a compressibility test when encoding at fixed quantizer"));
     return FALSE;
   }
-
-  ogmrip_test_save_encoding_info (test->priv->encoding, &info);
 
   test->priv->fraction = 0.0;
   test->priv->step = SAMPLE_LENGTH / info.length;
