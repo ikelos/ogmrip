@@ -227,7 +227,7 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   g_ptr_array_add (argv, g_strdup ("-ovc"));
   g_ptr_array_add (argv, g_strdup ("x264"));
 
-  options = g_string_new (cartoon ? "deblock=1,1:aq_strength=0.6" : "deblock=-1,-1");
+  options = g_string_new (cartoon ? "deblock=1,1:aq_strength=0.6" : "deblock");
   g_string_append_printf (options, ":subq=%u:direct_pred=%s",
       x264_have_brdo ? CLAMP (x264->subq, 1, 6) : x264->subq,
       direct_name[CLAMP (x264->direct, DIRECT_NONE, DIRECT_AUTO)]);
@@ -268,17 +268,19 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
       g_string_append (options, turbo ? ":turbo=2" : ":turbo=1");
   }
 
-  if (x264->trellis)
-    g_string_append (options, quality == OGMRIP_QUALITY_EXTREME ? ":trellis=2" : ":trellis=1");
+  if (quality == OGMRIP_QUALITY_USER)
+    g_string_append_printf (options, ":trellis=%u", x264->trellis);
+  else if (quality == OGMRIP_QUALITY_EXTREME)
+    g_string_append (options, ":trellis=2");
   else
-    g_string_append (options, ":trellis=0");
+    g_string_append (options, ":trellis=1");
 
   quality = ogmrip_video_codec_get_quality (video);
   if (quality == OGMRIP_QUALITY_USER)
   {
     g_string_append_printf (options, ":keyint=%u", x264->keyint);
     g_string_append_printf (options, ":cqm=%s", cqm_name[CLAMP (x264->cqm, 0, 1)]);
-    g_string_append_printf (options, "aq_mode=%u", x264->aq_mode);
+    g_string_append_printf (options, ":aq_mode=%u", x264->aq_mode);
 
     g_string_append (options, x264->weight_b ? ":weight_b" : ":noweight_b");
     g_string_append (options, x264->cabac ? ":cabac" : ":nocabac");
