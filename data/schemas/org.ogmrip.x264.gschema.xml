@@ -5,6 +5,11 @@
       <default>true</default>
       <summary>8x8 dct</summary>
     </key>
+    <key name="aq-mode" type="u">
+      <range min="0" max="2"/>
+      <default>2</default>
+      <summary>Adaptative quantization mode</summary>
+    </key>
     <key name="aud" type="b">
       <default>false</default>
       <summary>Access unit delimiters</summary>
@@ -37,19 +42,27 @@
       <default>0</default>
       <summary>Custom quantization matrix</summary>
     </key>
+    <key name="dct-decimate" type="b">
+      <default>true</default>
+      <summary>Eliminate dct blocks in P-frames containing only a small single coefficient</summary>
+    </key>
     <key name="direct" type="u">
       <range min="0" max="3"/>
       <default>3</default>
       <summary>Type of motion prediction used for direct macroblocks in B-frames</summary>
     </key>
+    <key name="fast-pskip" type="b">
+      <default>true</default>
+      <summary>Performs early skip detection in P-frames</summary>
+    </key>
+    <key name="force-cfr" type="b">
+      <default>false</default>
+      <summary>Forces generation of timecodes</summary>
+    </key>
     <key name="frameref" type="u">
       <range min="1" max="16"/>
       <default>3</default>
       <summary>Number of previous frames used as predictors in B- and  P-frames</summary>
-    </key>
-    <key name="global-header" type="b">
-      <default>false</default>
-      <summary>Causes SPS and PPS to appear only once, at the beginning of the bitstream</summary>
     </key>
     <key name="keyint" type="u">
       <default>250</default>

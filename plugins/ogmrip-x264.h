@@ -24,6 +24,7 @@
 G_BEGIN_DECLS
 
 #define OGMRIP_X264_PROP_8X8DCT           "dct8x8"
+#define OGMRIP_X264_PROP_AQ_MODE          "aq-mode"
 #define OGMRIP_X264_PROP_AUD              "aud"
 #define OGMRIP_X264_PROP_B_ADAPT          "b-adapt"
 #define OGMRIP_X264_PROP_B_FRAMES         "b-frames"
@@ -31,9 +32,11 @@ G_BEGIN_DECLS
 #define OGMRIP_X264_PROP_BRDO             "brdo"
 #define OGMRIP_X264_PROP_CABAC            "cabac"
 #define OGMRIP_X264_PROP_CQM              "cqm"
+#define OGMRIP_X264_PROP_DCT_DECIMATE     "dct-decimate"
 #define OGMRIP_X264_PROP_DIRECT           "direct"
+#define OGMRIP_X264_PROP_FORCE_CFR        "force-cfr"
+#define OGMRIP_X264_PROP_FAST_PSKIP       "fast-pskip"
 #define OGMRIP_X264_PROP_FRAMEREF         "frameref"
-#define OGMRIP_X264_PROP_GLOBAL_HEADER    "global-header"
 #define OGMRIP_X264_PROP_KEYINT           "keyint"
 #define OGMRIP_X264_PROP_LEVEL_IDC        "level-idc"
 #define OGMRIP_X264_PROP_ME               "me"
@@ -51,6 +54,7 @@ G_BEGIN_DECLS
 #define OGMRIP_X264_PROP_WEIGHT_P         "weight-p"
 
 #define OGMRIP_X264_DEFAULT_8X8DCT        TRUE
+#define OGMRIP_X264_DEFAULT_AQ_MODE       2
 #define OGMRIP_X264_DEFAULT_AUD           FALSE
 #define OGMRIP_X264_DEFAULT_B_ADAPT       1
 #define OGMRIP_X264_DEFAULT_B_FRAMES      3
@@ -58,9 +62,11 @@ G_BEGIN_DECLS
 #define OGMRIP_X264_DEFAULT_BRDO          FALSE
 #define OGMRIP_X264_DEFAULT_CABAC         TRUE
 #define OGMRIP_X264_DEFAULT_CQM           0
+#define OGMRIP_X264_DEFAULT_DCT_DECIMATE  TRUE
 #define OGMRIP_X264_DEFAULT_DIRECT        3
+#define OGMRIP_X264_DEFAULT_FAST_PSKIP    TRUE
+#define OGMRIP_X264_DEFAULT_FORCE_CFR     FALSE
 #define OGMRIP_X264_DEFAULT_FRAMEREF      3
-#define OGMRIP_X264_DEFAULT_GLOBAL_HEADER FALSE
 #define OGMRIP_X264_DEFAULT_KEYINT        250
 #define OGMRIP_X264_DEFAULT_LEVEL_IDC     51
 #define OGMRIP_X264_DEFAULT_ME            2

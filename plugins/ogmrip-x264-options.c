@@ -51,6 +51,7 @@ struct _OGMRipX264Dialog
 
   OGMRipProfile *profile;
 
+  GtkWidget *aq_mode_combo;
   GtkWidget *aud_check;
   GtkWidget *b_adapt_spin;
   GtkWidget *bframes_spin;
@@ -61,9 +62,11 @@ struct _OGMRipX264Dialog
   GtkWidget *cabac_check;
   GtkWidget *cqm_combo;
   GtkWidget *dct8x8_check;
+  GtkWidget *dct_decimate_check;
   GtkWidget *direct_combo;
+  GtkWidget *fast_pskip_check;
+  GtkWidget *force_cfr_check;
   GtkWidget *frameref_spin;
-  GtkWidget *global_header_check;
   GtkWidget *keyint_spin;
   GtkWidget *level_idc_spin;
   GtkWidget *me_combo;
@@ -359,10 +362,14 @@ ogmrip_x264_dialog_set_profile (OGMRipX264Dialog *dialog, OGMRipProfile *profile
         dialog->cqm_combo, "active", G_SETTINGS_BIND_DEFAULT);
     g_settings_bind (settings, OGMRIP_X264_PROP_SUBQ,
         dialog->subq_spin, "value", G_SETTINGS_BIND_DEFAULT);
-    g_settings_bind (settings, OGMRIP_X264_PROP_GLOBAL_HEADER,
-        dialog->global_header_check, "active", G_SETTINGS_BIND_DEFAULT);
     g_settings_bind (settings, OGMRIP_X264_PROP_WEIGHT_B,
         dialog->weight_b_check, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_DCT_DECIMATE,
+        dialog->dct_decimate_check, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_FAST_PSKIP,
+        dialog->fast_pskip_check, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_FORCE_CFR,
+        dialog->force_cfr_check, "active", G_SETTINGS_BIND_DEFAULT);
 
     g_settings_bind_with_mapping (settings, OGMRIP_X264_PROP_PARTITIONS,
         dialog->partitions_check[B8X8], "active", G_SETTINGS_BIND_DEFAULT,
@@ -417,6 +424,8 @@ ogmrip_x264_dialog_set_profile (OGMRipX264Dialog *dialog, OGMRipProfile *profile
         dialog->rc_lookahead_spin, "value", G_SETTINGS_BIND_DEFAULT);
     g_settings_bind (settings, OGMRIP_X264_PROP_TRELLIS,
         dialog->trellis_combo, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_AQ_MODE,
+        dialog->aq_mode_combo, "active", G_SETTINGS_BIND_DEFAULT);
 
     if (x264_have_b_pyramid)
       g_settings_bind (settings, OGMRIP_X264_PROP_B_PYRAMID,
@@ -525,9 +534,7 @@ ogmrip_x264_dialog_init (OGMRipX264Dialog *dialog)
   g_signal_connect_swapped (dialog->subq_spin, "value-changed",
       G_CALLBACK (ogmrip_x264_dialog_subq_changed), dialog);
 
-  dialog->global_header_check = gtk_builder_get_widget (builder, "global_header-check");
   dialog->weight_b_check = gtk_builder_get_widget (builder, "weight_b-check");
-
   dialog->partitions_check[B8X8] = gtk_builder_get_widget (builder, "b8x8-check");
   dialog->partitions_check[I8X8] = gtk_builder_get_widget (builder, "i8x8-check");
   dialog->partitions_check[P8X8] = gtk_builder_get_widget (builder, "p8x8-check");
@@ -580,6 +587,10 @@ ogmrip_x264_dialog_init (OGMRipX264Dialog *dialog)
   dialog->direct_combo = gtk_builder_get_widget (builder, "direct-combo");
   dialog->b_adapt_spin = gtk_builder_get_widget (builder, "b_adapt-spin");
   dialog->keyint_spin = gtk_builder_get_widget (builder, "keyint-spin");
+  dialog->aq_mode_combo = gtk_builder_get_widget (builder, "aq_mode-combo");
+  dialog->dct_decimate_check = gtk_builder_get_widget (builder, "dct_decimate-check");
+  dialog->fast_pskip_check = gtk_builder_get_widget (builder, "fast_pskip-check");
+  dialog->force_cfr_check = gtk_builder_get_widget (builder, "force_cfr-check");
 
   dialog->psy_rd_spin = gtk_builder_get_widget (builder, "psy_rd-spin");
   gtk_widget_set_sensitive (dialog->psy_rd_spin, x264_have_psy);
