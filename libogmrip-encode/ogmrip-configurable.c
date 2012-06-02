@@ -17,9 +17,10 @@
  */
 
 #include "ogmrip-configurable.h"
-#include "ogmrip-codec.h"
 
-G_DEFINE_INTERFACE (OGMRipConfigurable, ogmrip_configurable, OGMRIP_TYPE_CODEC);
+#include <ogmrip-job.h>
+
+G_DEFINE_INTERFACE (OGMRipConfigurable, ogmrip_configurable, OGMJOB_TYPE_BIN);
 
 static void
 ogmrip_configurable_default_init (OGMRipConfigurableInterface *iface)
