@@ -30,6 +30,8 @@
 #include "ogmrip-test.h"
 #include "ogmrip-profile-keys.h"
 
+#include <ogmrip-base.h>
+
 #include <glib/gi18n-lib.h>
 #include <glib/gstdio.h>
 
@@ -343,15 +345,29 @@ ogmrip_test_set_scale_size (OGMRipTest *test, guint optimal_bitrate, guint user_
   codec = ogmrip_encoding_get_video_codec (test->priv->encoding);
 
   ogmrip_video_codec_get_raw_size (OGMRIP_VIDEO_CODEC (codec), &raw_w, &raw_h);
+  ogmrip_log_printf ("Raw size: %ux%u\n", raw_w, raw_h);
+
   ogmrip_video_codec_get_crop_size (OGMRIP_VIDEO_CODEC (codec), &crop_x, &crop_y, &crop_w, &crop_h);
+  ogmrip_log_printf ("Crop size: %u, %u %ux%u\n\n", crop_x, crop_y, crop_w, crop_h);
+
   ogmrip_video_codec_get_scale_size (OGMRIP_VIDEO_CODEC (codec), &scale_w, &scale_h);
+
   ogmrip_video_codec_get_aspect_ratio (OGMRIP_VIDEO_CODEC (codec), &anum, &adenom);
   ogmrip_video_codec_get_framerate (OGMRIP_VIDEO_CODEC (codec), &fnum, &fdenom);
 
   ratio = crop_w / (gdouble) crop_h * raw_h / raw_w * anum / adenom;
   optimal_quality = optimal_bitrate / (gdouble) scale_w / scale_h / fnum * fdenom;
+
+  ogmrip_log_printf ("User bitrate: %d\n", user_bitrate);
+  ogmrip_log_printf ("Optimal bitrate: %d\n", optimal_bitrate);
+  ogmrip_log_printf ("Optimal quality: %.02lf\n\n", optimal_quality);
+
   user_quality = user_bitrate / (gdouble) scale_w / scale_h / fnum * fdenom;
   cfactor = user_quality / optimal_quality * 100;
+
+  ogmrip_log_printf ("Scale size: %ux%u\n", scale_w, scale_h);
+  ogmrip_log_printf ("User quality: %.02lf\n", user_quality);
+  ogmrip_log_printf ("Compressibility factor: %.0lf%%\n\n", cfactor);
 
   while (cfactor > 65.0)
   {
@@ -360,6 +376,10 @@ ogmrip_test_set_scale_size (OGMRipTest *test, guint optimal_bitrate, guint user_
 
     user_quality = user_bitrate / (gdouble) scale_w / scale_h / fnum * fdenom;
     cfactor = user_quality / optimal_quality * 100;
+
+    ogmrip_log_printf ("Scale size: %ux%u\n", scale_w, scale_h);
+    ogmrip_log_printf ("User quality: %.02lf\n", user_quality);
+    ogmrip_log_printf ("Compressibility factor: %.0lf%%\n\n", cfactor);
   }
 
   while (cfactor < 35.0)
@@ -369,6 +389,10 @@ ogmrip_test_set_scale_size (OGMRipTest *test, guint optimal_bitrate, guint user_
 
     user_quality = user_bitrate / (gdouble) scale_w / scale_h / fnum * fdenom;
     cfactor = user_quality / optimal_quality * 100;
+
+    ogmrip_log_printf ("Scale size: %ux%u\n", scale_w, scale_h);
+    ogmrip_log_printf ("User quality: %.02lf\n", user_quality);
+    ogmrip_log_printf ("Compressibility factor: %.0lf%%\n\n", cfactor);
   }
 
   ogmrip_video_codec_set_scale_size (OGMRIP_VIDEO_CODEC (codec), scale_w, scale_h);
