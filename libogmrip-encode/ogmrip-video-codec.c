@@ -605,7 +605,7 @@ ogmrip_video_codec_set_bitrate (OGMRipVideoCodec *video, guint bitrate)
 {
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
 
-  if (video->priv->bitrate > 0)
+  if (bitrate > 0)
   {
     video->priv->bitrate = bitrate;
     video->priv->quantizer = 0.0;
