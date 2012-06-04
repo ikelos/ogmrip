@@ -137,11 +137,16 @@ complete_task (TaskAsyncData *data)
   }
 }
 
-static void
+static gboolean
 watch_task (TaskAsyncData *data, OGMJobWatch watch_func, gpointer watch_data, const gchar *line)
 {
   if (!watch_func (data->spawn, line, watch_data, &data->error))
+  {
     task_kill (data);
+    return FALSE;
+  }
+
+  return TRUE;
 }
 
 static void
@@ -187,10 +192,14 @@ task_stderr_notify (TaskAsyncData *data)
 static gboolean
 task_watch (GIOChannel *channel, GIOCondition condition, TaskAsyncData *data, OGMJobWatch watch_func, gpointer watch_data)
 {
+  gboolean retval = TRUE;
   GIOStatus status;
   gsize size, bytes_read;
   gchar *buffer, *line;
   guint i, j;
+
+  if (data->error)
+    return FALSE;
 
   size = g_io_channel_get_buffer_size (channel);
   buffer = g_new0 (char, size + 1);
@@ -214,12 +223,12 @@ task_watch (GIOChannel *channel, GIOCondition condition, TaskAsyncData *data, OG
     return TRUE;
   }
 
-  for (i = 0, j = 0; buffer[i + j] != '\0'; j++)
+  for (i = 0, j = 0; retval && buffer[i + j] != '\0'; j++)
   {
     if (buffer[i + j] == '\n' || buffer[i + j] == '\r')
     {
       line = g_strndup (buffer + i, j + 1);
-      watch_task (data, watch_func, watch_data, line);
+      retval = watch_task (data, watch_func, watch_data, line);
       g_free (line);
 
       i += j + 1;
@@ -227,16 +236,16 @@ task_watch (GIOChannel *channel, GIOCondition condition, TaskAsyncData *data, OG
     }
   }
 
-  if (buffer[i + j] == '\0')
+  if (retval && buffer[i + j] == '\0')
   {
     line = g_strndup (buffer + i, j);
-    watch_task (data, watch_func, watch_data, line);
+    retval = watch_task (data, watch_func, watch_data, line);
     g_free (line);
   }
 
   g_free (buffer);
 
-  return TRUE;
+  return retval;
 }
 
 static gboolean
