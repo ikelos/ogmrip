@@ -1096,7 +1096,7 @@
         </child>
         <child>
           <object class="GtkCheckButton" id="brdo-check">
-            <property name="label" translatable="yes">Enable rate-distortion optimization of macroblock types in B-frames (brdo</property>
+            <property name="label" translatable="yes">Enable rate-distortion optimization of macroblock types in B-frames (brdo)</property>
             <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>

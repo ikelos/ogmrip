@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OGMRip\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-02 17:16+0200\n"
+"POT-Creation-Date: 2012-06-03 21:03+0200\n"
 "PO-Revision-Date: 2008-01-11 21:30+0100\n"
 "Last-Translator: Olivier Rolland <billl@users.sourceforge.net>\n"
 "Language-Team: French <fr@li.org>\n"
@@ -231,7 +231,7 @@ msgstr "Toujours"
 msgid "Motion _Estimation"
 msgstr "_Estimation de mouvement"
 
-#: ../data/ui/ogmrip-main.glade.h:1 ../src/ogmrip-main.c:2436
+#: ../data/ui/ogmrip-main.glade.h:1 ../src/ogmrip-main.c:2442
 msgid "OGMRip"
 msgstr "OGMRip"
 
@@ -261,11 +261,11 @@ msgstr "Mode _relatif"
 
 #: ../data/ui/ogmrip-main.glade.h:8
 #: ../libogmrip-media-gtk/ogmrip-media-chooser-dialog.c:150
-#: ../src/ogmrip-main.c:2038
+#: ../src/ogmrip-main.c:2044
 msgid "_Load"
 msgstr "_Charger"
 
-#: ../data/ui/ogmrip-main.glade.h:9 ../src/ogmrip-main.c:2039
+#: ../data/ui/ogmrip-main.glade.h:9 ../src/ogmrip-main.c:2045
 #: ../src/ogmrip-options-dialog.c:666
 msgid "E_xtract"
 msgstr "E_xtraire"
@@ -656,7 +656,7 @@ msgstr "Bicubic Spline"
 msgid "<b>More Options</b>"
 msgstr "<b>Plus d'options</b>"
 
-#: ../data/ui/ogmrip-profile-editor.glade.h:51 ../src/ogmrip-main.c:2043
+#: ../data/ui/ogmrip-profile-editor.glade.h:51 ../src/ogmrip-main.c:2049
 msgid "_Edit"
 msgstr "_Éditer"
 
@@ -1605,7 +1605,7 @@ msgstr "Pas de vidéo"
 msgid "'%s' does not contain a valid profile"
 msgstr "'%s' ne contient pas un profil valide"
 
-#: ../libogmrip-encode/ogmrip-test.c:384
+#: ../libogmrip-encode/ogmrip-test.c:416
 #, c-format
 msgid "Cannot perform a compressibility test when encoding at fixed quantizer"
 msgstr ""
@@ -1952,112 +1952,112 @@ msgstr "Voulez-vous le remplacer ?"
 msgid "Could not export the chapters"
 msgstr "Impossible d'exporter le chapitrage"
 
-#: ../src/ogmrip-main.c:1604
+#: ../src/ogmrip-main.c:1610
 msgid "Cannot encode media"
 msgstr "Impossible d'encoder le média"
 
-#: ../src/ogmrip-main.c:1662
+#: ../src/ogmrip-main.c:1668
 msgid "Can't play DVD title"
 msgstr "Impossible de jouer le DVD"
 
-#: ../src/ogmrip-main.c:1676
+#: ../src/ogmrip-main.c:1682
 msgid "Select a chapters file"
 msgstr "Sélectionner un fichier de chapitrage"
 
-#: ../src/ogmrip-main.c:1698
+#: ../src/ogmrip-main.c:1704
 #, c-format
 msgid "Could not open the chapters file '%s'"
 msgstr "Impossible d'ouvrir le fichier de chapitrage '%s'"
 
-#: ../src/ogmrip-main.c:1715
+#: ../src/ogmrip-main.c:1721
 msgid "Select a file"
 msgstr "Sélectionner un fichier"
 
-#: ../src/ogmrip-main.c:1817
+#: ../src/ogmrip-main.c:1823
 msgid "translator-credits"
 msgstr "Olivier Rolland <billl@users.sourceforge.net>"
 
-#: ../src/ogmrip-main.c:1834
+#: ../src/ogmrip-main.c:1840
 msgid "A DVD Encoder for GNOME"
 msgstr "Un encodeur de DVD pour GNOME"
 
-#: ../src/ogmrip-main.c:2037
+#: ../src/ogmrip-main.c:2043
 msgid "_File"
 msgstr "_Fichier"
 
-#: ../src/ogmrip-main.c:2038
+#: ../src/ogmrip-main.c:2044
 msgid "Load a media"
 msgstr "Charger un fichier multimedia"
 
-#: ../src/ogmrip-main.c:2039
+#: ../src/ogmrip-main.c:2045
 msgid "Extract selected title"
 msgstr "Extrait le titre sélectionné"
 
-#: ../src/ogmrip-main.c:2040
+#: ../src/ogmrip-main.c:2046
 msgid "_Import Chapters..."
 msgstr "_Importer le chapitrage..."
 
-#: ../src/ogmrip-main.c:2040
+#: ../src/ogmrip-main.c:2046
 msgid "Import chapter information"
 msgstr "Importe un fichier de chapitrage"
 
-#: ../src/ogmrip-main.c:2041
+#: ../src/ogmrip-main.c:2047
 msgid "_Export Chapters..."
 msgstr "_Exporter le chapitrage..."
 
-#: ../src/ogmrip-main.c:2041
+#: ../src/ogmrip-main.c:2047
 msgid "Export chapter information"
 msgstr "Exporte le chapitrage"
 
-#: ../src/ogmrip-main.c:2042
+#: ../src/ogmrip-main.c:2048
 msgid "Exit OGMRip"
 msgstr "Quitte OGMRip"
 
-#: ../src/ogmrip-main.c:2044
+#: ../src/ogmrip-main.c:2050
 msgid "Select _All"
 msgstr "Séléctionner _tout"
 
-#: ../src/ogmrip-main.c:2044
+#: ../src/ogmrip-main.c:2050
 msgid "Select all chapters"
 msgstr "Sélectionne tous les chapitres"
 
-#: ../src/ogmrip-main.c:2045
+#: ../src/ogmrip-main.c:2051
 msgid "_Deselect All"
 msgstr "_Déselectionner tout"
 
-#: ../src/ogmrip-main.c:2045
+#: ../src/ogmrip-main.c:2051
 msgid "Deselect all chapters"
 msgstr "Désélectionne tous les chapitres"
 
-#: ../src/ogmrip-main.c:2046
+#: ../src/ogmrip-main.c:2052
 msgid "Pro_files"
 msgstr "Pro_fils"
 
-#: ../src/ogmrip-main.c:2046
+#: ../src/ogmrip-main.c:2052
 msgid "Edit the profiles"
 msgstr "Éditer les profils"
 
-#: ../src/ogmrip-main.c:2047
+#: ../src/ogmrip-main.c:2053
 msgid "Edit the preferences"
 msgstr "Edite les préférences"
 
-#: ../src/ogmrip-main.c:2048
+#: ../src/ogmrip-main.c:2054
 msgid "_Encodings"
 msgstr "_Encodages"
 
-#: ../src/ogmrip-main.c:2048
+#: ../src/ogmrip-main.c:2054
 msgid "Edit the encodings"
 msgstr "Édite les encodages"
 
-#: ../src/ogmrip-main.c:2049
+#: ../src/ogmrip-main.c:2055
 msgid "_Help"
 msgstr "_Aide"
 
-#: ../src/ogmrip-main.c:2050
+#: ../src/ogmrip-main.c:2056
 msgid "_About"
 msgstr "À _propos"
 
-#: ../src/ogmrip-main.c:2050
+#: ../src/ogmrip-main.c:2056
 msgid "About OGMRip"
 msgstr "À propos de OGMRip"
 
@@ -2146,7 +2146,7 @@ msgstr "Audio-Video Interlace (AVI)"
 
 #: ../plugins/ogmrip-copy.c:276 ../plugins/ogmrip-dirac.c:130
 #: ../plugins/ogmrip-lavc-mpeg.c:152 ../plugins/ogmrip-srt.c:526
-#: ../plugins/ogmrip-vobsub.c:255 ../plugins/ogmrip-x264.c:1052
+#: ../plugins/ogmrip-vobsub.c:255 ../plugins/ogmrip-x264.c:1054
 #: ../plugins/ogmrip-xvid.c:918
 msgid "MEncoder is missing"
 msgstr "MEncoder est manquant"
@@ -2299,11 +2299,11 @@ msgstr "Vp8"
 msgid "Wave (uncompressed PCM)"
 msgstr "Wave (PCM non compressé)"
 
-#: ../plugins/ogmrip-x264.c:1064
+#: ../plugins/ogmrip-x264.c:1066
 msgid "MEncoder is build without X264 support"
 msgstr "MEncoder est compilé sans support X264"
 
-#: ../plugins/ogmrip-x264.c:1084
+#: ../plugins/ogmrip-x264.c:1086
 msgid "X264"
 msgstr "X264"
 
