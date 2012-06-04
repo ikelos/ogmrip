@@ -423,18 +423,19 @@ ogmrip_main_display_error (OGMRipData *data, OGMRipEncoding *encoding, GError *e
     gtk_expander_set_expanded (GTK_EXPANDER (expander), FALSE);
     gtk_container_add (GTK_CONTAINER (area), expander);
 
+    g_object_bind_property (expander, "expanded", dialog, "resizable", G_BINDING_DEFAULT);
+
     area = gtk_scrolled_window_new (NULL, NULL);
     gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (area), GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
     gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (area), GTK_SHADOW_IN);
     gtk_container_add (GTK_CONTAINER (expander), area);
+    gtk_widget_set_vexpand (area, TRUE);
     gtk_widget_show (area);
 
     widget = gtk_text_view_new ();
     gtk_text_view_set_editable (GTK_TEXT_VIEW (widget), FALSE);
     gtk_container_add (GTK_CONTAINER (area), widget);
     gtk_widget_show (widget);
-
-    gtk_widget_set_size_request (widget, 700, 400);
 
     file = g_file_new_for_path (filename);
 
