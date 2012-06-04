@@ -141,7 +141,10 @@ ogmrip_aac_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   if (argv)
   {
     child = ogmjob_spawn_newv (argv);
-    ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child), (OGMJobWatch) ogmrip_mplayer_wav_watch, task);
+    ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child),
+        (OGMJobWatch) ogmrip_mplayer_wav_watch, task);
+    ogmjob_spawn_set_watch_stderr (OGMJOB_SPAWN (child),
+        (OGMJobWatch) ogmrip_mplayer_watch_stderr, task);
     ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
     g_object_unref (child);
 

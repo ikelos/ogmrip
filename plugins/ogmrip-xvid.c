@@ -883,7 +883,10 @@ ogmrip_xvid_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
       return FALSE;
 
     child = ogmjob_spawn_newv (argv);
-    ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child), (OGMJobWatch) ogmrip_mencoder_codec_watch, task);
+    ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child),
+        (OGMJobWatch) ogmrip_mencoder_codec_watch, task);
+    ogmjob_spawn_set_watch_stderr (OGMJOB_SPAWN (child),
+        (OGMJobWatch) ogmrip_mplayer_watch_stderr, task);
     ogmjob_container_add (OGMJOB_CONTAINER (queue), child);
     g_object_unref (child);
   }

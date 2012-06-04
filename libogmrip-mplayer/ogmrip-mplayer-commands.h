@@ -77,6 +77,11 @@ gboolean    ogmrip_mplayer_video_watch       (OGMJobTask        *task,
                                               OGMRipVideoCodec  *video,
                                               GError            **error);
 
+gboolean    ogmrip_mplayer_watch_stderr      (OGMJobTask        *task,
+                                              const gchar       *buffer,
+                                              OGMRipVideoCodec  *video,
+                                              GError            **error);
+
 GPtrArray * ogmrip_mplayer_grab_frame_command (OGMRipTitle *title,
                                                guint       position,
                                                gboolean    deint);

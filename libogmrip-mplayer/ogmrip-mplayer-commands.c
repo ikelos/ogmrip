@@ -1150,6 +1150,18 @@ ogmrip_mencoder_container_command (OGMRipContainer *container)
   return argv;
 }
 
+gboolean
+ogmrip_mplayer_watch_stderr (OGMJobTask *task, const gchar *buffer, OGMRipVideoCodec *video, GError **error)
+{
+  if (g_str_equal (buffer, "Error while decoding frame!"))
+  {
+    g_set_error (error, OGMRIP_ENCODING_ERROR, OGMRIP_ENCODING_ERROR_INVALID, "Error while decoding frame!");
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
 GPtrArray *
 ogmrip_mplayer_grab_frame_command (OGMRipTitle *title, guint position, gboolean deint)
 {
