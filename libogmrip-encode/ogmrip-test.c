@@ -402,7 +402,7 @@ static gboolean
 ogmrip_test_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
   OGMRipTest *test = OGMRIP_TEST (task);
-  gboolean result = FALSE;
+  gboolean result = TRUE;
 
   OGMRipEncodingInfo info;
   guint files, optimal_bitrate = 0, user_bitrate = 0;
@@ -424,7 +424,11 @@ ogmrip_test_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
       ogmrip_encoding_get_n_audio_codecs (test->priv->encoding) +
       ogmrip_encoding_get_n_subp_codecs (test->priv->encoding);
 
-  for (start = 0.0, files = 0; start + SAMPLE_LENGTH * SAMPLE_PERCENT < info.length; start += SAMPLE_LENGTH, files ++)
+  /*
+   * If at least one file has been decoded, an error is non-blocking
+   */
+
+  for (start = 0.0, files = 0; start + SAMPLE_LENGTH * SAMPLE_PERCENT < info.length; start += SAMPLE_LENGTH)
   {
     gint bitrate;
 
@@ -434,51 +438,61 @@ ogmrip_test_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
        * Encode subtitles
        */
       result = ogmrip_test_encode_subp (test, start, SAMPLE_LENGTH * SAMPLE_PERCENT, cancellable, error);
-      if (!result)
+      if (!result && (!files || g_cancellable_is_cancelled (cancellable)))
         break;
+      g_clear_error (error);
 
       /*
        * Encoding audio
        */
-      result = ogmrip_test_encode_audio (test, start, SAMPLE_LENGTH * SAMPLE_PERCENT, cancellable, error);
-      if (!result)
-        break;
+      if (result)
+      {
+        result = ogmrip_test_encode_audio (test, start, SAMPLE_LENGTH * SAMPLE_PERCENT, cancellable, error);
+        if (!result && (!files || g_cancellable_is_cancelled (cancellable)))
+          break;
+        g_clear_error (error);
+      }
     }
 
     /*
      * Encode video
      */
-    result = ogmrip_test_encode_video (test, start, SAMPLE_LENGTH * SAMPLE_PERCENT, &bitrate, cancellable, error);
-    if (!result)
-      break;
+    if (result)
+    {
+      result = ogmrip_test_encode_video (test, start, SAMPLE_LENGTH * SAMPLE_PERCENT, &bitrate, cancellable, error);
+      if (!result && (!files || g_cancellable_is_cancelled (cancellable)))
+        break;
+      g_clear_error (error);
+    }
 
     /*
      * Compute optimal and user bitrate
      */
-    if (bitrate > 0)
+    if (result && bitrate > 0)
     {
       optimal_bitrate += bitrate;
 
       if (info.method == OGMRIP_ENCODING_SIZE)
         user_bitrate += ogmrip_encoding_autobitrate (test->priv->encoding);
+
+      files ++;
     }
+
+    result = TRUE;
   }
 
-  if (result)
+  if (result && files > 0)
   {
-    if (files > 0)
+    optimal_bitrate /= files;
+
+    if (info.method == OGMRIP_ENCODING_SIZE)
+      user_bitrate /= files;
+    else
     {
-      optimal_bitrate /= files;
+      OGMRipCodec *codec;
 
-      if (info.method == OGMRIP_ENCODING_SIZE)
-        user_bitrate /= files;
-      else
-      {
-        OGMRipCodec *codec;
-
-        codec = ogmrip_encoding_get_video_codec (test->priv->encoding);
-        user_bitrate = ogmrip_video_codec_get_bitrate (OGMRIP_VIDEO_CODEC (codec));
-      }
+      codec = ogmrip_encoding_get_video_codec (test->priv->encoding);
+      user_bitrate = ogmrip_video_codec_get_bitrate (OGMRIP_VIDEO_CODEC (codec));
     }
 
     /*
