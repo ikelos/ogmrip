@@ -25,6 +25,15 @@
 
 G_BEGIN_DECLS
 
+#define OGMRIP_CODEC_ERROR (ogmrip_codec_error_quark ())
+
+typedef enum
+{
+  OGMRIP_CODEC_ERROR_DECODE
+} OGMRipCodecError;
+
+GQuark ogmrip_codec_error_quark (void);
+
 #define OGMRIP_TYPE_CODEC           (ogmrip_codec_get_type ())
 #define OGMRIP_CODEC(obj)           (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_CODEC, OGMRipCodec))
 #define OGMRIP_CODEC_CLASS(klass)   (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_CODEC, OGMRipCodecClass))

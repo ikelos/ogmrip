@@ -23,6 +23,10 @@
  * @include: ogmrip-mplayer.h
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "ogmrip-mplayer-commands.h"
 #include "ogmrip-mplayer-version.h"
 
@@ -33,6 +37,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <glib/gi18n-lib.h>
 #include <glib/gstdio.h>
 
 static const gchar *deinterlacer[] = { "lb", "li", "ci", "md", "fd", "l5", "kerndeint", "yadif" };
@@ -1155,7 +1160,7 @@ ogmrip_mplayer_watch_stderr (OGMJobTask *task, const gchar *buffer, OGMRipVideoC
 {
   if (g_str_equal (buffer, "Error while decoding frame!"))
   {
-    g_set_error (error, OGMRIP_ENCODING_ERROR, OGMRIP_ENCODING_ERROR_INVALID, "Error while decoding frame!");
+    g_set_error (error, OGMRIP_CODEC_ERROR, OGMRIP_CODEC_ERROR_DECODE, _("Error while decoding frame"));
     return FALSE;
   }
 

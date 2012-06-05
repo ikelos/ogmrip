@@ -71,6 +71,17 @@ static gboolean ogmrip_codec_run          (OGMJobTask   *task,
                                            GCancellable *cancellable,
                                            GError       **error);
 
+GQuark
+ogmrip_codec_error_quark (void)
+{
+  static GQuark quark = 0;
+
+  if (quark == 0)
+    quark = g_quark_from_static_string ("ogmrip-codec-error-quark");
+
+  return quark;
+}
+
 static void
 ogmrip_codec_set_input (OGMRipCodec *codec, OGMRipStream *input)
 {

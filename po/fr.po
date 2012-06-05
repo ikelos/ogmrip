@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OGMRip\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-03 21:03+0200\n"
+"POT-Creation-Date: 2012-06-05 09:44+0200\n"
 "PO-Revision-Date: 2008-01-11 21:30+0100\n"
 "Last-Translator: Olivier Rolland <billl@users.sourceforge.net>\n"
 "Language-Team: French <fr@li.org>\n"
@@ -492,7 +492,7 @@ msgstr "_Options"
 msgid "Automatic"
 msgstr "Automatique"
 
-#: ../data/ui/ogmrip-profile-editor.glade.h:12 ../plugins/ogmrip-xvid.c:934
+#: ../data/ui/ogmrip-profile-editor.glade.h:12 ../plugins/ogmrip-xvid.c:937
 msgid "XviD"
 msgstr "XviD"
 
@@ -1125,7 +1125,7 @@ msgstr "<b>Mouvements</b>"
 
 #: ../data/ui/ogmrip-x264.glade.h:56
 msgid ""
-"Enable rate-distortion optimization of macroblock types in B-frames (brdo"
+"Enable rate-distortion optimization of macroblock types in B-frames (brdo)"
 msgstr ""
 
 #: ../data/ui/ogmrip-x264.glade.h:57
@@ -1902,6 +1902,10 @@ msgstr "Continuer"
 msgid "Subtitles Options"
 msgstr "Options des sous-titres"
 
+#: ../libogmrip-mplayer/ogmrip-mplayer-commands.c:1163
+msgid "Error while decoding frame"
+msgstr "Erreur de décodage d'une trame"
+
 #: ../src/ogmrip-crop-dialog.c:150
 #, c-format
 msgid "Frame %lu of %lu"
@@ -2117,22 +2121,22 @@ msgstr "Aucune"
 msgid "Spell Checking"
 msgstr "Vérification orthographique"
 
-#: ../plugins/ogmrip-aac.c:182
+#: ../plugins/ogmrip-aac.c:185
 msgid "MPlayer and FAAC are missing"
 msgstr "MPlayer et FAAC sont manquants"
 
-#: ../plugins/ogmrip-aac.c:188 ../plugins/ogmrip-dirac.c:137
-#: ../plugins/ogmrip-flac.c:185 ../plugins/ogmrip-mp3.c:200
-#: ../plugins/ogmrip-theora.c:259 ../plugins/ogmrip-vorbis.c:185
-#: ../plugins/ogmrip-wav.c:111
+#: ../plugins/ogmrip-aac.c:191 ../plugins/ogmrip-dirac.c:137
+#: ../plugins/ogmrip-flac.c:187 ../plugins/ogmrip-mp3.c:202
+#: ../plugins/ogmrip-theora.c:262 ../plugins/ogmrip-vorbis.c:188
+#: ../plugins/ogmrip-wav.c:114
 msgid "MPlayer is missing"
 msgstr "MPlayer est manquant"
 
-#: ../plugins/ogmrip-aac.c:194
+#: ../plugins/ogmrip-aac.c:197
 msgid "FAAC is missing"
 msgstr "FAAC est manquant"
 
-#: ../plugins/ogmrip-aac.c:199
+#: ../plugins/ogmrip-aac.c:202
 msgid "Advanced Audio Coding (AAC)"
 msgstr "Advanced Audio Coding (AAC)"
 
@@ -2144,18 +2148,18 @@ msgstr "avibox est manquant"
 msgid "Audio-Video Interlace (AVI)"
 msgstr "Audio-Video Interlace (AVI)"
 
-#: ../plugins/ogmrip-copy.c:276 ../plugins/ogmrip-dirac.c:130
-#: ../plugins/ogmrip-lavc-mpeg.c:152 ../plugins/ogmrip-srt.c:526
-#: ../plugins/ogmrip-vobsub.c:255 ../plugins/ogmrip-x264.c:1054
-#: ../plugins/ogmrip-xvid.c:918
+#: ../plugins/ogmrip-copy.c:279 ../plugins/ogmrip-dirac.c:130
+#: ../plugins/ogmrip-lavc-mpeg.c:152 ../plugins/ogmrip-srt.c:529
+#: ../plugins/ogmrip-vobsub.c:258 ../plugins/ogmrip-x264.c:1057
+#: ../plugins/ogmrip-xvid.c:921
 msgid "MEncoder is missing"
 msgstr "MEncoder est manquant"
 
-#: ../plugins/ogmrip-copy.c:280
+#: ../plugins/ogmrip-copy.c:283
 msgid "Copy (for AC3 or DTS)"
 msgstr "Copie (pour l'AC3 ou le DTS)"
 
-#: ../plugins/ogmrip-copy.c:282
+#: ../plugins/ogmrip-copy.c:285
 msgid "Video Copy"
 msgstr "Copie Vidéo"
 
@@ -2167,15 +2171,15 @@ msgstr "MPlayer est compilé sans support Dirac"
 msgid "Dirac"
 msgstr "Dirac"
 
-#: ../plugins/ogmrip-flac.c:179
+#: ../plugins/ogmrip-flac.c:181
 msgid "MPlayer and FLAC are missing"
 msgstr "MPlayer et FLAC sont manquants"
 
-#: ../plugins/ogmrip-flac.c:191
+#: ../plugins/ogmrip-flac.c:193
 msgid "FLAC is missing"
 msgstr "FLAC est manquant"
 
-#: ../plugins/ogmrip-flac.c:196
+#: ../plugins/ogmrip-flac.c:198
 msgid "Free Lossless Audio Codec (FLAC)"
 msgstr "Free Lossless Audio Codec (FLAC)"
 
@@ -2211,15 +2215,15 @@ msgstr "Matroska Media (MKV)"
 msgid "WebM Media (webm)"
 msgstr "WebM Media (webm)"
 
-#: ../plugins/ogmrip-mp3.c:194
+#: ../plugins/ogmrip-mp3.c:196
 msgid "MPlayer and LAME are missing"
 msgstr "MPlayer et LAME sont manquants"
 
-#: ../plugins/ogmrip-mp3.c:206
+#: ../plugins/ogmrip-mp3.c:208
 msgid "LAME is missing"
 msgstr "LAME est manquant"
 
-#: ../plugins/ogmrip-mp3.c:211
+#: ../plugins/ogmrip-mp3.c:213
 msgid "MPEG-1 layer III (MP3)"
 msgstr "MPEG-1 layer III (MP3)"
 
@@ -2251,59 +2255,59 @@ msgstr "ogmsplit est manquant"
 msgid "Ogg Media (OGM)"
 msgstr "Ogg Media (OGM)"
 
-#: ../plugins/ogmrip-srt.c:563
+#: ../plugins/ogmrip-srt.c:566
 msgid "GOCR, Ocrad and Tesseract are missing"
 msgstr "GOCR, Ocrad et Tesseract sont manquants"
 
-#: ../plugins/ogmrip-srt.c:568
+#: ../plugins/ogmrip-srt.c:571
 msgid "SRT text"
 msgstr "SRT texte"
 
-#: ../plugins/ogmrip-theora.c:253
+#: ../plugins/ogmrip-theora.c:256
 msgid "MPlayer and theoraenc are missing"
 msgstr "MPlayer et theoraenc sont manquants"
 
-#: ../plugins/ogmrip-theora.c:265
+#: ../plugins/ogmrip-theora.c:268
 msgid "theoraenc is missing"
 msgstr "theoraenc est manquant"
 
-#: ../plugins/ogmrip-theora.c:270
+#: ../plugins/ogmrip-theora.c:273
 msgid "Ogg Theora"
 msgstr "Ogg Theora"
 
-#: ../plugins/ogmrip-vobsub.c:260
+#: ../plugins/ogmrip-vobsub.c:263
 msgid "VobSub"
 msgstr "VobSub"
 
-#: ../plugins/ogmrip-vorbis.c:179
+#: ../plugins/ogmrip-vorbis.c:182
 msgid "MPlayer and OggEnc are missing"
 msgstr "MPlayer et OggEnc sont manquants"
 
-#: ../plugins/ogmrip-vorbis.c:191
+#: ../plugins/ogmrip-vorbis.c:194
 msgid "OggEnc is missing"
 msgstr "OggEnc est manquant"
 
-#: ../plugins/ogmrip-vorbis.c:196
+#: ../plugins/ogmrip-vorbis.c:199
 msgid "Ogg Vorbis"
 msgstr "Ogg Vorbis"
 
-#: ../plugins/ogmrip-vp8.c:396
+#: ../plugins/ogmrip-vp8.c:399
 msgid "vpxenc is missing"
 msgstr "vpxenc est manquant"
 
-#: ../plugins/ogmrip-vp8.c:402
+#: ../plugins/ogmrip-vp8.c:405
 msgid "Vp8"
 msgstr "Vp8"
 
-#: ../plugins/ogmrip-wav.c:114
+#: ../plugins/ogmrip-wav.c:117
 msgid "Wave (uncompressed PCM)"
 msgstr "Wave (PCM non compressé)"
 
-#: ../plugins/ogmrip-x264.c:1066
+#: ../plugins/ogmrip-x264.c:1069
 msgid "MEncoder is build without X264 support"
 msgstr "MEncoder est compilé sans support X264"
 
-#: ../plugins/ogmrip-x264.c:1086
+#: ../plugins/ogmrip-x264.c:1089
 msgid "X264"
 msgstr "X264"
 
@@ -2315,7 +2319,7 @@ msgstr "X264 Options"
 msgid "Transformed Exhaustive search (tesa - even slower)"
 msgstr "Recherche exhaustive transformée (tesa - encore plus lent)"
 
-#: ../plugins/ogmrip-xvid.c:930
+#: ../plugins/ogmrip-xvid.c:933
 msgid "MEncoder is built without XviD support"
 msgstr "MEncoder est compilé sans support XviD"
 
@@ -2641,9 +2645,6 @@ msgstr "XviD Options"
 
 #~ msgid "More options"
 #~ msgstr "Plus d'options"
-
-#~ msgid "Unknown error while opening file"
-#~ msgstr "Erreur indéterminée lors de l'ouverture du fichier"
 
 #~ msgid ""
 #~ "Please, check http://ogmrip.sourceforge.net to see if this is a known "

@@ -47,6 +47,8 @@ libogmrip-encode-gtk/ogmrip-profile-manager-dialog.c
 libogmrip-encode-gtk/ogmrip-progress-dialog.c
 libogmrip-encode-gtk/ogmrip-subp-options-dialog.c
 
+libogmrip-mplayer/ogmrip-mplayer-commands.c
+
 src/ogmrip-application.c
 src/ogmrip-crop-dialog.c
 src/ogmrip-helper.c
