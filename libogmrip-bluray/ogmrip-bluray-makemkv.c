@@ -972,7 +972,7 @@ ogmbr_makemkv_open_disc (OGMBrMakeMKV *mmkv, OGMBrDisc *disc, GCancellable *canc
 
   mmkv->priv->opened = drive->id;
 
-  makemkv_get_info (mmkv, disc->priv->handle, ap_iaDiscSizeBytes);
+  makemkv_get_info (mmkv, disc->priv->handle, ap_iaDiskSizeBytes);
 
   for (link1 = disc->priv->titles; link1; link1 = link1->next)
   {
