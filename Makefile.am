@@ -4,6 +4,7 @@ SUBDIRS = \
   libogmrip-media   \
   libogmrip-module  \
   libogmrip-dvd     \
+  libogmrip-bluray  \
   libogmrip-file    \
   libogmrip-encode  \
 	libogmrip-mplayer \
