@@ -23,6 +23,14 @@
 
 G_BEGIN_DECLS
 
+typedef enum
+{
+  OGMBR_DIR_UNKNOWN  = 0,
+  OGMBR_DISC_DVD     = 6206,
+  OGMBR_DISC_BLURAY  = 6209,
+  OGMBR_DISC_HDDVD   = 6212
+} OGMBrDiscType;
+
 #define OGMBR_TYPE_DISC             (ogmbr_disc_get_type ())
 #define OGMBR_DISC(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMBR_TYPE_DISC, OGMBrDisc))
 #define OGMBR_IS_DISC(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), OGMBR_TYPE_DISC))

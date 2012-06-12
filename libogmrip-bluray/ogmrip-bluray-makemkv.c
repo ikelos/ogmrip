@@ -1,4 +1,4 @@
-/* OGMRipBluray - A bluray library for OGMBr
+/* OGMRipBluray - A bluray library for OGMRip
  * Copyright (C) 2012 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -23,6 +23,7 @@
 #include "ogmrip-bluray-title.h"
 
 #include <fcntl.h>
+#include <stdio.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
@@ -42,6 +43,14 @@
 
 #define MAKEMKV_IS_RUNNING(mmkv) \
   (g_main_loop_is_running ((mmkv)->priv->loop))
+
+typedef struct
+{
+  guint id;
+  gchar *name;
+  gchar *device;
+  gchar *title;
+} OGMBrDrive;
 
 typedef enum
 {
@@ -178,15 +187,60 @@ struct _OGMBrMakeMKVPriv
 
 typedef struct
 {
-  OGMBrMakeMKVProgress callback;
+  OGMBrProgress callback;
   gpointer user_data;
   gdouble fraction;
 } ProgressData;
 
 static OGMBrMakeMKV *default_mmkv = NULL;
 
+static void
+makemkv_parse_duration (OGMBrTitle *title, const gchar *duration)
+{
+  guint h, m, s;
+
+  if (sscanf (duration, "%u:%u:%u", &h, &m, &s) == 3)
+    title->priv->length = h * 3600 + m * 60 + s;
+}
+
+static void
+makemkv_parse_aspect_ratio (OGMBrTitle *title, const gchar *aspect)
+{
+  guint num, denom;
+
+  if (sscanf (aspect, "%u:%u", &num, &denom) == 2)
+  {
+    title->priv->aspect_num = num;
+    title->priv->aspect_denom = denom;
+  }
+}
+
+static void
+makemkv_parse_framerate (OGMBrTitle *title, const gchar *rate)
+{
+  guint a, b, num, denom;
+
+  if (sscanf (rate, "%u.%u (%u/%u)", &a, &b, &num, &denom) == 4)
+  {
+    title->priv->rate_num = num;
+    title->priv->rate_denom = denom;
+  }
+}
+
+static void
+makemkv_parse_raw_size (OGMBrTitle *title, const gchar *size)
+{
+  guint width, height;
+
+  if (sscanf (size, "%ux%u", &width, &height) == 2)
+  {
+    title->priv->raw_width = width;
+    title->priv->raw_height = height;
+  }
+}
+
 static ProgressData *
-progress_data_new (OGMBrMakeMKVProgress callback, gpointer user_data, gdouble fraction)
+progress_data_new (OGMBrProgress callback, gpointer user_data, gdouble fraction)
 {
   ProgressData *data;
 
@@ -220,10 +274,36 @@ makemkv_free_drives (OGMBrMakeMKV *mmkv)
   }
 }
 
-static gint
-makemkv_compare_drive_by_device (OGMBrDrive *drive, const gchar *device)
+static OGMBrTitle *
+makemkv_get_title_by_id (OGMBrDisc *disc, guint id)
 {
-  return strcmp (drive->device, device);
+  GList *link;
+
+  for (link = disc->priv->titles; link; link = link->next)
+  {
+    OGMBrTitle *title = link->data;
+
+    if (title->priv->id == id)
+      return title;
+  }
+
+  return NULL;
+}
+
+static OGMBrDrive *
+makemkv_get_drive_by_device (OGMBrMakeMKV *mmkv, const gchar *device)
+{
+  GList *link;
+
+  for (link = mmkv->priv->drives; link; link = link->next)
+  {
+    OGMBrDrive *drive = link->data;
+
+    if (g_str_equal (drive->device, device))
+      return drive;
+  }
+
+  return NULL;
 }
 
 static gboolean
@@ -352,7 +432,7 @@ makemkv_check_version (OGMBrMakeMKV *mmkv, const gchar *available_versions)
 static void
 makemkv_exit (OGMBrMakeMKV *mmkv)
 {
-  g_message ("Exit");
+  g_debug ("Exit");
 
   mmkv->priv->m_shutdown = TRUE;
 }
@@ -360,7 +440,7 @@ makemkv_exit (OGMBrMakeMKV *mmkv)
 static void
 makemkv_enter_job (OGMBrMakeMKV *mmkv)
 {
-  g_message ("Enter");
+  g_debug ("Enter");
 
   g_main_loop_run (mmkv->priv->loop);
 }
@@ -368,7 +448,7 @@ makemkv_enter_job (OGMBrMakeMKV *mmkv)
 static void
 makemkv_leave_job (OGMBrMakeMKV *mmkv)
 {
-  g_message ("Leave");
+  g_debug ("Leave");
 
   g_main_loop_quit (mmkv->priv->loop);
 }
@@ -381,8 +461,6 @@ makemkv_update_drive (OGMBrMakeMKV *mmkv)
     OGMBrDrive *drive;
     const gunichar2 *str;
     glong len;
-
-    g_message ("Update drive");
 
     drive = g_new0 (OGMBrDrive, 1);
     drive->id = mmkv->priv->m_mem->args[0];
@@ -405,6 +483,8 @@ makemkv_update_drive (OGMBrMakeMKV *mmkv)
       drive->device = g_utf16_to_utf8 (str, -1, &len, NULL, NULL);
       str += len + 1;
     }
+
+    g_debug ("Update drive (%s, %s)", drive->name, drive->device);
 
     mmkv->priv->drives = g_list_prepend (mmkv->priv->drives, drive);
   }
@@ -438,66 +518,20 @@ makemkv_update_total (OGMBrMakeMKV *mmkv)
 }
 
 static void
-makemkv_set_total_name (OGMBrMakeMKV *mmkv)
-{
-/*
-  g_message ("Set total name : %lu", (gulong) mmkv->priv->m_mem->args[0]);
-*/
-}
-
-static void
-makemkv_update_layout (OGMBrMakeMKV *mmkv)
-{
-/*
-  guint index = (guint) mmkv->priv->m_mem->args[1], flags = (guint) mmkv->priv->m_mem->args[2], size = (guint) mmkv->priv->m_mem->args[3], i;
-  gulong name = (gulong) mmkv->priv->m_mem->args[0];
-
-  g_message ("Update layout : %lu, %u, %u, %u", name, index, flags, size);
-
-  for (i = 0; i < size; i ++)
-    g_message ("  name %u : %lu", i, (gulong) mmkv->priv->m_mem->args[4 + i]);
-*/
-}
-
-static void
-makemkv_current_info (OGMBrMakeMKV *mmkv)
-{
-/*
-  guint index = (guint) mmkv->priv->m_mem->args[0];
-  gchar *str;
-
-  str = g_utf16_to_utf8 ((gunichar2 *) mmkv->priv->m_mem->strbuf, -1, NULL, NULL, NULL);
-  g_message ("Update current info : %u, %s", index, str);
-  g_free (str);
-*/
-}
-
-static void
-makemkv_report_message (OGMBrMakeMKV *mmkv)
-{
-/*
-  gulong code = (gulong) mmkv->priv->m_mem->args[0], flags = (gulong) mmkv->priv->m_mem->args[2];
-  gchar *str;
-
-  str = g_utf16_to_utf8 ((gunichar2 *) mmkv->priv->m_mem->strbuf, -1, NULL, NULL, NULL);
-  g_message ("Report ui message : %lu, %lu, %s", code, flags, str);
-  g_free (str);
-*/
-  mmkv->priv->m_mem->args[0] = 0;
-}
-
-static void
 makemkv_collection_info (OGMBrMakeMKV *mmkv)
 {
-  OGMBrDisc *disc;
+  if (mmkv->priv->m_mem->args[0] > 0)
+  {
+    OGMBrDisc *disc;
 
-  disc = g_object_get_data (G_OBJECT (mmkv), "disc");
-  g_assert (disc != NULL);
+    disc = g_object_get_data (G_OBJECT (mmkv), "disc");
+    g_assert (disc != NULL);
 
-  disc->priv->handle = mmkv->priv->m_mem->args[0];
-  disc->priv->ntitles = (guint) mmkv->priv->m_mem->args[1];
+    disc->priv->handle = mmkv->priv->m_mem->args[0];
+    disc->priv->ntitles = (guint) mmkv->priv->m_mem->args[1];
+  }
 /*
-  g_message ("Collection info : %llu, %u", handle, ntitles);
+  g_debug ("Collection info: %llu, %u", disc->priv->handle, disc->priv->ntitles);
 */
 }
 
@@ -506,6 +540,7 @@ makemkv_title_info (OGMBrMakeMKV *mmkv)
 {
   OGMBrDisc *disc;
   OGMBrTitle *title;
+  guint id = (guint) mmkv->priv->m_mem->args[0];
 
   disc = g_object_get_data (G_OBJECT (mmkv), "disc");
   g_assert (disc != NULL);
@@ -514,22 +549,22 @@ makemkv_title_info (OGMBrMakeMKV *mmkv)
   disc->priv->titles = g_list_append (disc->priv->titles, title);
 
   title->priv->media = OGMRIP_MEDIA (disc);
-  title->priv->id = (guint) mmkv->priv->m_mem->args[0];
+  title->priv->id = id;
   title->priv->handle = mmkv->priv->m_mem->args[1];
 /*
-  g_message ("Title info : %u, %llu, %u", id, handle, ntracks);
+  g_debug ("Title info: %u", id);
 */
 }
 
 static void
-makemkv_video_track_info (OGMBrMakeMKV *mmkv, OGMBrDisc *disc, OGMBrTitle *title)
+makemkv_video_track_info (OGMBrMakeMKV *mmkv, OGMBrTitle *title)
 {
-  title->priv->video_id = (guint) mmkv->priv->m_mem->args[1];
-  title->priv->video_handle = mmkv->priv->m_mem->args[2];
+  title->priv->vid = (guint) mmkv->priv->m_mem->args[1];
+  title->priv->vhandle = mmkv->priv->m_mem->args[2];
 }
 
 static void
-makemkv_audio_track_info (OGMBrMakeMKV *mmkv, OGMBrDisc *disc, OGMBrTitle *title)
+makemkv_audio_track_info (OGMBrMakeMKV *mmkv, OGMBrTitle *title)
 {
   OGMBrAudioStream *audio;
 
@@ -543,7 +578,7 @@ makemkv_audio_track_info (OGMBrMakeMKV *mmkv, OGMBrDisc *disc, OGMBrTitle *title
 }
 
 static void
-makemkv_subp_track_info (OGMBrMakeMKV *mmkv, OGMBrDisc *disc, OGMBrTitle *title)
+makemkv_subp_track_info (OGMBrMakeMKV *mmkv, OGMBrTitle *title)
 {
   OGMBrSubpStream *subp;
 
@@ -561,31 +596,30 @@ makemkv_track_info (OGMBrMakeMKV *mmkv)
 {
   OGMBrDisc *disc;
   OGMBrTitle *title;
-
-  guint id = (guint) mmkv->priv->m_mem->args[0], type = (guint) mmkv->priv->m_mem->args[3];
+  guint id = (guint) mmkv->priv->m_mem->args[0];
 
   disc = g_object_get_data (G_OBJECT (mmkv), "disc");
   g_assert (disc != NULL);
 
-  title = g_list_nth_data (disc->priv->titles, id);
+  title = makemkv_get_title_by_id (disc, id);
   g_assert (title != NULL);
 
-  switch (type)
+  switch (mmkv->priv->m_mem->args[3])
   {
     case mttVideo:
-      makemkv_video_track_info (mmkv, disc, title);
+      makemkv_video_track_info (mmkv, title);
       break;
     case mttAudio:
-      makemkv_audio_track_info (mmkv, disc, title);
+      makemkv_audio_track_info (mmkv, title);
       break;
     case mttSubtitle:
-      makemkv_subp_track_info (mmkv, disc, title);
+      makemkv_subp_track_info (mmkv, title);
       break;
     default:
       break;
   }
 /*
-  g_message ("Track info : %u, %u, %llu, %u", id, track, handle, type);
+  g_debug ("Track info: %u, %u, %u", id, tr, disc->priv->titles[id].tracks[tr].type);
 */
 }
 
@@ -625,20 +659,6 @@ makemkv_run_command (OGMBrMakeMKV *mmkv, AP_CMD cmd, GCancellable *cancellable, 
       case apBackUpdateDrive:
         makemkv_update_drive (mmkv);
         break;
-      case apBackSetTotalName:
-        makemkv_set_total_name (mmkv);
-        break;
-      case apBackUpdateLayout:
-        makemkv_update_layout (mmkv);
-        break;
-      case apBackUpdateCurrentInfo:
-        makemkv_current_info (mmkv);
-        break;
-      case apBackReportUiMesaage:
-        makemkv_report_message (mmkv);
-        break;
-      case apBackUpdateCurrentBar:
-        break;
       case apBackUpdateTotalBar:
         makemkv_update_total (mmkv);
         break;
@@ -661,28 +681,55 @@ makemkv_run_command (OGMBrMakeMKV *mmkv, AP_CMD cmd, GCancellable *cancellable, 
 
   return TRUE;
 }
-
-static gchar *
+/*
+static void
 makemkv_get_info (OGMBrMakeMKV *mmkv, guint64 handle, guint info)
 {
-  g_return_val_if_fail (OGMBR_IS_MAKEMKV (mmkv), NULL);
-
   mmkv->priv->m_mem->args[0] = handle;
   mmkv->priv->m_mem->args[1] = info;
   makemkv_run_command (mmkv, apCallGetUiItemInfo, NULL, NULL);
 
   if (mmkv->priv->m_mem->args[0] != 0)
-    g_message ("info: %d", (unsigned int) mmkv->priv->m_mem->args[0]);
+    g_debug ("%s: %llu", info_str[info], mmkv->priv->m_mem->args[0]);
   else if (mmkv->priv->m_mem->args[1] != 0)
   {
     gchar *str;
 
     str = g_utf16_to_utf8 ((gunichar2 *) mmkv->priv->m_mem->strbuf, -1, NULL, NULL, NULL);
-    g_message ("info: %s", str);
+    g_debug ("%s: %s", info_str[info], str);
     g_free (str);
   }
 
-  return NULL;
+  if (mmkv->priv->m_mem->args[2] != 0)
+  {
+  }
+}
+*/
+static gint64
+makemkv_get_info_num (OGMBrMakeMKV *mmkv, guint64 handle, guint info)
+{
+  mmkv->priv->m_mem->args[0] = handle;
+  mmkv->priv->m_mem->args[1] = info;
+
+  if (!makemkv_run_command (mmkv, apCallGetUiItemInfo, NULL, NULL))
+    return -1;
+
+  return mmkv->priv->m_mem->args[0];
+}
+
+static gchar *
+makemkv_get_info_str (OGMBrMakeMKV *mmkv, guint64 handle, guint info)
+{
+  mmkv->priv->m_mem->args[0] = handle;
+  mmkv->priv->m_mem->args[1] = info;
+
+  if (!makemkv_run_command (mmkv, apCallGetUiItemInfo, NULL, NULL))
+    return NULL;
+
+  if (mmkv->priv->m_mem->args[0] != 0 || mmkv->priv->m_mem->args[1] == 0)
+    return NULL;
+
+  return g_utf16_to_utf8 ((gunichar2 *) mmkv->priv->m_mem->strbuf, -1, NULL, NULL, NULL);
 }
 
 static gboolean
@@ -779,7 +826,7 @@ ogmbr_makemkv_constructor (GType type, guint n_params, GObjectConstructParam *pa
   GObject *gobject;
 
   if (default_mmkv)
-    return g_object_ref (default_mmkv);
+    return G_OBJECT (default_mmkv);
 
   gobject = G_OBJECT_CLASS (ogmbr_makemkv_parent_class)->constructor (type, n_params, params);
 
@@ -853,7 +900,13 @@ ogmbr_makemkv_get_default (void)
   return g_object_new (OGMBR_TYPE_MAKEMKV, NULL);
 }
 
-GList *
+gboolean
+ogmbr_makemkv_has_drive (OGMBrMakeMKV *mmkv, const gchar *device)
+{
+  return makemkv_get_drive_by_device (mmkv, device) != NULL;
+}
+
+gboolean 
 ogmbr_makemkv_update_drives (OGMBrMakeMKV *mmkv, GCancellable *cancellable, GError **error)
 {
   g_return_val_if_fail (OGMBR_IS_MAKEMKV (mmkv), FALSE);
@@ -866,15 +919,15 @@ ogmbr_makemkv_update_drives (OGMBrMakeMKV *mmkv, GCancellable *cancellable, GErr
   makemkv_free_drives (mmkv);
 
   if (!makemkv_run_command (mmkv, apCallUpdateAvailableDrives, cancellable, error))
-    return NULL;
+    return FALSE;
 
   if (mmkv->priv->m_mem->args[0] == 0)
   {
     makemkv_free_drives (mmkv);
-    return NULL;
+    return FALSE;
   }
 
-  return g_list_copy (mmkv->priv->drives);
+  return TRUE;
 }
 
 static gboolean
@@ -882,14 +935,14 @@ ogmbr_makemkv_update_drives_thread (GIOSchedulerJob *job, GCancellable *cancella
 {
   GError *error = NULL;
   OGMBrMakeMKV *mmkv;
-  GList *drives;
+  gboolean res;
 
   mmkv = g_simple_async_result_get_op_res_gpointer (simple);
 
-  drives = ogmbr_makemkv_update_drives (mmkv, cancellable, &error);
-  g_simple_async_result_set_op_res_gpointer (simple, drives, NULL);
+  res = ogmbr_makemkv_update_drives (mmkv, cancellable, &error);
+  g_simple_async_result_set_op_res_gboolean (simple, res);
 
-  if (!drives && error)
+  if (!res && error)
     g_simple_async_result_take_error (simple, error);
 
   g_simple_async_result_complete_in_idle (simple);
@@ -912,7 +965,7 @@ ogmbr_makemkv_update_drives_async (OGMBrMakeMKV *mmkv, GCancellable *cancellable
       simple, g_object_unref, G_PRIORITY_DEFAULT, cancellable);
 }
 
-GList *
+gboolean
 ogmbr_makemkv_update_drives_finish (OGMBrMakeMKV *mmkv, GSimpleAsyncResult *res, GError **error)
 {
   g_return_val_if_fail (OGMBR_IS_MAKEMKV (mmkv), FALSE);
@@ -922,14 +975,14 @@ ogmbr_makemkv_update_drives_finish (OGMBrMakeMKV *mmkv, GSimpleAsyncResult *res,
   g_warn_if_fail (g_simple_async_result_get_source_tag (res) == ogmbr_makemkv_update_drives_async);
 
   if (g_simple_async_result_propagate_error (res, error))
-    return NULL;
+    return FALSE;
 
-  return g_simple_async_result_get_op_res_gpointer (res);
+  return g_simple_async_result_get_op_res_gboolean (res);
 }
 
 gboolean
 ogmbr_makemkv_open_disc (OGMBrMakeMKV *mmkv, OGMBrDisc *disc, GCancellable *cancellable,
-    OGMBrMakeMKVProgress progress_cb, gpointer progress_data, GError **error)
+    OGMBrProgress progress_cb, gpointer progress_data, GError **error)
 {
   GList *link1, *link2;
   OGMBrDrive *drive;
@@ -939,11 +992,9 @@ ogmbr_makemkv_open_disc (OGMBrMakeMKV *mmkv, OGMBrDisc *disc, GCancellable *canc
   g_return_val_if_fail (cancellable == NULL || G_IS_CANCELLABLE (cancellable), FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  link1 = g_list_find_custom (mmkv->priv->drives, disc->priv->device,
-      (GCompareFunc) makemkv_compare_drive_by_device);
-  if (!link1)
+  drive = makemkv_get_drive_by_device (mmkv, disc->priv->device);
+  if (!drive)
     return FALSE;
-  drive = link1->data;
 
   if (mmkv->priv->opened >= 0)
     return mmkv->priv->opened == drive->id;
@@ -951,58 +1002,99 @@ ogmbr_makemkv_open_disc (OGMBrMakeMKV *mmkv, OGMBrDisc *disc, GCancellable *canc
   if (MAKEMKV_IS_RUNNING (mmkv) || !MAKEMKV_IS_READY (mmkv, error))
     return FALSE;
 
-  g_object_set_data_full (G_OBJECT (mmkv), "disc",
-      g_object_ref (disc), g_object_unref);
-
   g_object_set_data_full (G_OBJECT (mmkv), "progress",
       progress_data_new (progress_cb, progress_data, 0.0),
       (GDestroyNotify) progress_data_free);
+  g_object_set_data_full (G_OBJECT (mmkv), "disc", g_object_ref (disc), g_object_unref);
 
   mmkv->priv->m_mem->args[0] = drive->id;
   res = makemkv_run_command (mmkv, apCallOpenCdDisk, cancellable, error);
 
-  g_object_set_data (G_OBJECT (mmkv), "disc", NULL);
   g_object_set_data (G_OBJECT (mmkv), "progress", NULL);
+  g_object_set_data (G_OBJECT (mmkv), "disc", NULL);
 
   if (!res || mmkv->priv->m_mem->args[0] == 0)
+  {
+    g_set_error (error, OGMBR_MAKEMKV_ERROR, OGMBR_MAKEMKV_ERROR_NO_DISC,
+        "Device does not contain a valid Bluray");
     return FALSE;
-
-  if (!disc->priv->label)
-    disc->priv->label = g_strdup (drive->title);
+  }
 
   mmkv->priv->opened = drive->id;
 
-  makemkv_get_info (mmkv, disc->priv->handle, ap_iaDiskSizeBytes);
+  disc->priv->label = makemkv_get_info_str (mmkv, disc->priv->handle, ap_iaDiskSizeBytes);
+  disc->priv->type = makemkv_get_info_num (mmkv, disc->priv->handle, ap_iaType);
 
   for (link1 = disc->priv->titles; link1; link1 = link1->next)
   {
     OGMBrTitle *title = link1->data;
+    gchar *str;
 
-    makemkv_get_info (mmkv, title->priv->handle, ap_iaVideoSize);
-    makemkv_get_info (mmkv, title->priv->handle, ap_iaDuration);
-    makemkv_get_info (mmkv, title->priv->handle, ap_iaAngleInfo);
-    makemkv_get_info (mmkv, title->priv->handle, ap_iaChapterCount);
+    title->priv->nchapters = makemkv_get_info_num (mmkv, title->priv->handle, ap_iaChapterCount);
+    title->priv->size = makemkv_get_info_num (mmkv, title->priv->handle, ap_iaDiskSizeBytes);
 
-    makemkv_get_info (mmkv, title->priv->video_handle, ap_iaVideoFrameRate);
-    makemkv_get_info (mmkv, title->priv->video_handle, ap_iaVideoAspectRatio);
+    str = makemkv_get_info_str (mmkv, title->priv->handle, ap_iaDuration);
+    makemkv_parse_duration (title, str);
+    g_free (str);
+
+    /* CodecId: V_MPEG2, V_MPEG4/ISO/AVC, V_MS/VFW/FOURCC */
+    str = makemkv_get_info_str (mmkv, title->priv->vhandle, ap_iaCodecId);
+    g_free (str);
+
+    /* CodecShort: Mpeg2, Mpeg4, VC-1 */
+    str = makemkv_get_info_str (mmkv, title->priv->vhandle, ap_iaCodecShort);
+    g_free (str);
+
+    str = makemkv_get_info_str (mmkv, title->priv->vhandle, ap_iaVideoAspectRatio);
+    makemkv_parse_aspect_ratio (title, str);
+    g_free (str);
+
+    str = makemkv_get_info_str (mmkv, title->priv->vhandle, ap_iaVideoFrameRate);
+    makemkv_parse_framerate (title, str);
+    g_free (str);
+
+    str = makemkv_get_info_str (mmkv, title->priv->vhandle, ap_iaVideoSize);
+    makemkv_parse_raw_size (title, str);
+    g_free (str);
 
     for (link2 = title->priv->audio_streams; link2; link2 = link2->next)
     {
       OGMBrAudioStream *audio = link2->data;
 
-      makemkv_get_info (mmkv, audio->priv->handle, ap_iaCodecId);
-      makemkv_get_info (mmkv, audio->priv->handle, ap_iaBitrate);
-      makemkv_get_info (mmkv, audio->priv->handle, ap_iaAudioChannelsCount);
-      makemkv_get_info (mmkv, audio->priv->handle, ap_iaLangCode);
-      makemkv_get_info (mmkv, audio->priv->handle, ap_iaAudioSampleRate);
+      audio->priv->channels = makemkv_get_info_num (mmkv, audio->priv->handle, ap_iaAudioChannelsCount);
+      audio->priv->samplerate = makemkv_get_info_num (mmkv, audio->priv->handle, ap_iaAudioSampleRate);
+      audio->priv->flags = makemkv_get_info_num (mmkv, audio->priv->handle, ap_iaStreamFlags);
+
+      /* Bitrate: 192 Kb/s */
+      str = makemkv_get_info_str (mmkv, audio->priv->handle, ap_iaBitrate);
+      g_free (str);
+
+      /* CodecId: A_AC3, A_DTS */
+      str = makemkv_get_info_str (mmkv, audio->priv->handle, ap_iaCodecId);
+      g_free (str);
+
+      /* CodecShort: DD, DTS, DTS_HD */
+      str = makemkv_get_info_str (mmkv, audio->priv->handle, ap_iaCodecShort);
+      g_free (str);
+
+      /* LangCode: dan, deu, ell, eng, fin fra, ita, jpn, kor, nld, nor, por, spa, swe, zho */
+      str = makemkv_get_info_str (mmkv, audio->priv->handle, ap_iaLangCode);
+      g_free (str);
     }
 
     for (link2 = title->priv->subp_streams; link2; link2 = link2->next)
     {
       OGMBrSubpStream *subp = link2->data;
 
-      makemkv_get_info (mmkv, subp->priv->handle, ap_iaCodecId);
-      makemkv_get_info (mmkv, subp->priv->handle, ap_iaLangCode);
+      subp->priv->flags = makemkv_get_info_num (mmkv, subp->priv->handle, ap_iaStreamFlags);
+
+      /* CodecId: S_HDMV/PGS */
+      str = makemkv_get_info_str (mmkv, subp->priv->handle, ap_iaCodecId);
+      g_free (str);
+
+      /* LangCode: dan, deu, ell, eng, fin fra, ita, jpn, kor, nld, nor, por, spa, swe, zho */
+      str = makemkv_get_info_str (mmkv, subp->priv->handle, ap_iaLangCode);
+      g_free (str);
     }
   }
 
@@ -1057,7 +1149,7 @@ ogmbr_makemkv_open_disc_thread (GIOSchedulerJob *job, GCancellable *cancellable,
 
 void
 ogmbr_makemkv_open_disc_async (OGMBrMakeMKV *mmkv, OGMBrDisc *disc, GCancellable *cancellable,
-    OGMBrMakeMKVProgress progress_cb, gpointer progress_data, GAsyncReadyCallback callback, gpointer user_data)
+    OGMBrProgress progress_cb, gpointer progress_data, GAsyncReadyCallback callback, gpointer user_data)
 {
   GSimpleAsyncResult *simple;
 
@@ -1160,21 +1252,18 @@ ogmbr_makemkv_close_disc_finish (OGMBrMakeMKV *mmkv, GSimpleAsyncResult *res, GE
 gboolean
 ogmbr_makemkv_eject_disc (OGMBrMakeMKV *mmkv, OGMBrDisc *disc, GCancellable *cancellable, GError **error)
 {
-  GList *link;
   OGMBrDrive *drive;
 
   g_return_val_if_fail (OGMBR_IS_MAKEMKV (mmkv), FALSE);
   g_return_val_if_fail (cancellable == NULL || G_IS_CANCELLABLE (cancellable), FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  if (MAKEMKV_IS_RUNNING (mmkv) || !MAKEMKV_IS_READY (mmkv, error))
+  drive = makemkv_get_drive_by_device (mmkv, disc->priv->device);
+  if (!drive)
     return FALSE;
 
-  link = g_list_find_custom (mmkv->priv->drives, disc->priv->device,
-      (GCompareFunc) makemkv_compare_drive_by_device);
-  if (!link)
+  if (MAKEMKV_IS_RUNNING (mmkv) || !MAKEMKV_IS_READY (mmkv, error))
     return FALSE;
-  drive = link->data;
 
   if (mmkv->priv->opened == drive->id)
     ogmbr_makemkv_close_disc (mmkv, cancellable, error);
@@ -1238,9 +1327,8 @@ ogmbr_makemkv_eject_disc_finish (OGMBrMakeMKV *mmkv, GSimpleAsyncResult *res, GE
 
 gboolean
 ogmbr_makemkv_backup_disc (OGMBrMakeMKV *mmkv, OGMBrDisc *disc, const gchar *output, gboolean decrypt,
-    GCancellable *cancellable, OGMBrMakeMKVProgress progress_cb, gpointer progress_data, GError **error)
+    GCancellable *cancellable, OGMBrProgress progress_cb, gpointer progress_data, GError **error)
 {
-  GList *link;
   OGMBrDrive *drive;
   gboolean retval;
   gunichar2 *utf16;
@@ -1250,14 +1338,12 @@ ogmbr_makemkv_backup_disc (OGMBrMakeMKV *mmkv, OGMBrDisc *disc, const gchar *out
   g_return_val_if_fail (cancellable == NULL || G_IS_CANCELLABLE (cancellable), FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
-  if (MAKEMKV_IS_RUNNING (mmkv) || !MAKEMKV_IS_READY (mmkv, error))
+  drive = makemkv_get_drive_by_device (mmkv, disc->priv->device);
+  if (!drive)
     return FALSE;
 
-  link = g_list_find_custom (mmkv->priv->drives, disc->priv->device,
-      (GCompareFunc) makemkv_compare_drive_by_device);
-  if (!link)
+  if (MAKEMKV_IS_RUNNING (mmkv) || !MAKEMKV_IS_READY (mmkv, error))
     return FALSE;
-  drive = link->data;
 
   g_object_set_data_full (G_OBJECT (mmkv), "progress",
       progress_data_new (progress_cb, progress_data, 0.0),
@@ -1283,13 +1369,13 @@ typedef struct
   OGMBrDisc *disc;
   gchar *folder;
   gboolean decrypt;
-  OGMBrMakeMKVProgress progress_cb;
+  OGMBrProgress progress_cb;
   gpointer progress_data;
   GIOSchedulerJob *job;
 } BackupAsyncData;
 
 static BackupAsyncData *
-backup_async_data_new (OGMBrMakeMKV *mmkv, OGMBrDisc *disc, const gchar *folder, gboolean decrypt, OGMBrMakeMKVProgress progress_cb, gpointer progress_data)
+backup_async_data_new (OGMBrMakeMKV *mmkv, OGMBrDisc *disc, const gchar *folder, gboolean decrypt, OGMBrProgress progress_cb, gpointer progress_data)
 {
   BackupAsyncData *data;
 
@@ -1333,7 +1419,7 @@ ogmbr_makemkv_backup_disc_thread (GIOSchedulerJob *job, GCancellable *cancellabl
   data->job = job;
 
   res = ogmbr_makemkv_backup_disc (data->mmkv, data->disc, data->folder, data->decrypt, cancellable,
-      data->progress_cb ? (OGMBrMakeMKVProgress) ogmbr_makemkv_backup_progress_cb : NULL, data, &error);
+      data->progress_cb ? (OGMBrProgress) ogmbr_makemkv_backup_progress_cb : NULL, data, &error);
   g_simple_async_result_set_op_res_gboolean (simple, res);
 
   if (!res && error)
@@ -1346,7 +1432,7 @@ ogmbr_makemkv_backup_disc_thread (GIOSchedulerJob *job, GCancellable *cancellabl
 
 void
 ogmbr_makemkv_backup_disc_async (OGMBrMakeMKV *mmkv, OGMBrDisc *disc, const gchar *folder, gboolean decrypt,
-    GCancellable *cancellable, OGMBrMakeMKVProgress progress_cb, gpointer progress_data, GAsyncReadyCallback callback, gpointer user_data)
+    GCancellable *cancellable, OGMBrProgress progress_cb, gpointer progress_data, GAsyncReadyCallback callback, gpointer user_data)
 {
   GSimpleAsyncResult *simple;
 
@@ -1375,74 +1461,4 @@ ogmbr_makemkv_backup_disc_finish (OGMBrMakeMKV *mmkv, GSimpleAsyncResult *res, G
 
   return g_simple_async_result_get_op_res_gboolean (res);
 }
-/*
-void
-ogmbr_makemkv_set_output (OGMBrMakeMKV *mmkv, const gchar *name)
-{
-  gunichar2 *utf16;
-  glong len;
-
-  g_return_if_fail (OGMBR_IS_MAKEMKV (mmkv));
-
-  utf16 = g_utf8_to_utf16 (name, -1, NULL, &len, NULL);
-  memcpy ((void *) mmkv->priv->m_mem->strbuf, utf16, (len + 1) * sizeof (gunichar2));
-  g_free (utf16);
-
-  makemkv_run_command (mmkv, apCallSetOutputFolder, NULL, NULL);
-}
-
-gboolean
-ogmbr_makemkv_open_file (OGMBrMakeMKV *mmkv, const gchar *name)
-{
-  gunichar2 *utf16;
-  glong len;
-
-  g_return_val_if_fail (OGMBR_IS_MAKEMKV (mmkv), FALSE);
-
-  utf16 = g_utf8_to_utf16 (name, -1, NULL, &len, NULL);
-  memcpy ((void *) mmkv->priv->m_mem->strbuf, utf16, (len + 1) * sizeof (gunichar2));
-  g_free (utf16);
-
-  makemkv_run_command (mmkv, apCallOpenFile, NULL, NULL);
-
-  return mmkv->priv->m_mem->args[0] != 0;
-}
-
-gboolean
-ogmbr_makemkv_open_title_collection (OGMBrMakeMKV *mmkv, const gchar *source)
-{
-  gunichar2 *utf16;
-  glong len;
-
-  g_return_val_if_fail (OGMBR_IS_MAKEMKV (mmkv), FALSE);
-
-  utf16 = g_utf8_to_utf16 (source, -1, NULL, &len, NULL);
-  memcpy ((void *) mmkv->priv->m_mem->strbuf, utf16, (len + 1) * sizeof (gunichar2));
-  g_free (utf16);
-
-  makemkv_run_command (mmkv, apCallOpenTitleCollection, NULL, NULL);
-
-  return mmkv->priv->m_mem->args[0] != 0;
-}
-
-gboolean
-ogmbr_makemkv_save_all_selected_titles_to_mkv (OGMBrMakeMKV *mmkv)
-{
-  g_return_val_if_fail (OGMBR_IS_MAKEMKV (mmkv), FALSE);
-
-  makemkv_run_command (mmkv, apCallSaveAllSelectedTitlesToMkv, NULL, NULL);
-
-  return mmkv->priv->m_mem->args[0] != 0;
-}
-
-gboolean
-ogmbr_makemkv_start_streaming (OGMBrMakeMKV *mmkv)
-{
-  g_return_val_if_fail (OGMBR_IS_MAKEMKV (mmkv), FALSE);
-
-  makemkv_run_command (mmkv, apCallStartStreaming, NULL, NULL);
-
-  return mmkv->priv->m_mem->args[0] != 0;
-}
-*/
 

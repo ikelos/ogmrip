@@ -26,13 +26,14 @@ G_BEGIN_DECLS
 
 struct _OGMBrDiscPriv
 {
-  OGMBrMakeMKV *mmkv;
   gchar *uri;
   gchar *device;
-  gchar *label;
   guint64 handle;
   guint ntitles;
   GList *titles;
+
+  guint type;
+  gchar *label;
 };
 
 struct _OGMBrTitlePriv
@@ -45,9 +46,18 @@ struct _OGMBrTitlePriv
   guint naudio_streams;
   GList *subp_streams;
   guint nsubp_streams;
+  guint nchapters;
+  gdouble length;
+  guint64 size;
 
-  guint video_id;
-  guint64 video_handle;
+  guint vid;
+  guint64 vhandle;
+  guint aspect_num;
+  guint aspect_denom;
+  guint raw_width;
+  guint raw_height;
+  guint rate_num;
+  guint rate_denom;
 };
 
 struct _OGMBrAudioStreamPriv
@@ -55,6 +65,10 @@ struct _OGMBrAudioStreamPriv
   OGMRipTitle *title;
   guint id;
   guint64 handle;
+
+  guint channels;
+  guint samplerate;
+  guint flags;
 };
 
 struct _OGMBrSubpStreamPriv
@@ -62,6 +76,8 @@ struct _OGMBrSubpStreamPriv
   OGMRipTitle *title;
   guint id;
   guint64 handle;
+
+  guint flags;
 };
 
 G_END_DECLS

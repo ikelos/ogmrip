@@ -32,10 +32,7 @@ static void ogmbr_stream_iface_init       (OGMRipStreamInterface      *iface);
 static void ogmbr_video_stream_iface_init (OGMRipVideoStreamInterface *iface);
 static void ogmbr_title_iface_init        (OGMRipTitleInterface       *iface);
 static void ogmbr_title_dispose           (GObject                    *gobject);
-static void ogmbr_title_finalize          (GObject                    *gobject);
-/*
-static void ogmbr_title_close             (OGMRipTitle                *title);
-*/
+
 G_DEFINE_TYPE_WITH_CODE (OGMBrTitle, ogmbr_title, G_TYPE_OBJECT,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_TITLE, ogmbr_title_iface_init)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_STREAM, ogmbr_stream_iface_init)
@@ -54,7 +51,6 @@ ogmbr_title_class_init (OGMBrTitleClass *klass)
 
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->dispose = ogmbr_title_dispose;
-  gobject_class->finalize = ogmbr_title_finalize;
 
   g_type_class_add_private (klass, sizeof (OGMBrTitlePriv));
 }
@@ -80,30 +76,6 @@ ogmbr_title_dispose (GObject *gobject)
 
   G_OBJECT_CLASS (ogmbr_title_parent_class)->dispose (gobject);
 }
-
-static void
-ogmbr_title_finalize (GObject *gobject)
-{
-  OGMBrTitle *title = OGMBR_TITLE (gobject);
-/*
-  ogmbr_title_close (OGMRIP_TITLE (title));
-
-  if (title->priv->bitrates)
-  {
-    g_free (title->priv->bitrates);
-    title->priv->bitrates = NULL;
-  }
-
-  if (title->priv->length_of_chapters)
-  {
-    g_free (title->priv->length_of_chapters);
-    title->priv->length_of_chapters = NULL;
-  }
-*/
-  title->priv->media = NULL;
-
-  G_OBJECT_CLASS (ogmbr_title_parent_class)->dispose (gobject);
-}
 /*
 static gint
 ogmbr_title_get_format (OGMRipStream *stream)
@@ -125,64 +97,31 @@ ogmbr_stream_iface_init (OGMRipStreamInterface *iface)
 */
   iface->get_title  = ogmbr_title_get_title;
 }
-/*
+
 static void
 ogmbr_video_stream_get_framerate (OGMRipVideoStream *video, guint *numerator, guint *denominator)
 {
-  switch ((OGMBR_TITLE (video)->priv->playback_time.frame_u & 0xc0) >> 6)
-  {
-    case 1:
-      *numerator = 25;
-      *denominator = 1;
-      break;
-    case 3:
-      *numerator = 30000;
-      *denominator = 1001;
-      break;
-    default:
-      g_assert_not_reached ();
-      break;
-  }
+  OGMBrTitle *title = OGMBR_TITLE (video);
+
+  if (numerator)
+    *numerator = title->priv->rate_num;
+
+  if (denominator)
+    *denominator = title->priv->rate_denom;
 }
 
 static void
 ogmbr_video_stream_get_resolution (OGMRipVideoStream *video, guint *width, guint *height)
 {
   OGMBrTitle *title = OGMBR_TITLE (video);
-  guint w, h;
-
-  w = 0;
-  h = 480;
-  if (title->priv->video_format != 0)
-    h = 576;
-
-  switch (title->priv->picture_size)
-  {
-    case 0:
-      w = 720;
-      break;
-    case 1:
-      w = 704;
-      break;
-    case 2:
-      w = 352;
-      break;
-    case 3:
-      w = 352;
-      w /= 2;
-      break;
-    default:
-      g_assert_not_reached ();
-      break;
-  }
 
   if (width)
-    *width = w;
+    *width = title->priv->raw_width;;
 
   if (height)
-    *height = h;
+    *height = title->priv->raw_height;
 }
-
+/*
 static void
 ogmbr_video_stream_get_crop_size (OGMRipVideoStream *video, guint *x, guint *y, guint *width, guint *height)
 {
@@ -200,29 +139,19 @@ ogmbr_video_stream_get_crop_size (OGMRipVideoStream *video, guint *x, guint *y, 
   if (height)
     *height = title->priv->crop_h;
 }
-
+*/
 static void
 ogmbr_video_stream_get_aspect_ratio  (OGMRipVideoStream *video, guint *numerator, guint *denominator)
 {
   OGMBrTitle *title = OGMBR_TITLE (video);
 
-  switch (title->priv->display_aspect_ratio)
-  {
-    case 0:
-      *numerator = 4;
-      *denominator = 3;
-      break;
-    case 1:
-    case 3:
-      *numerator = 16;
-      *denominator = 9;
-      break;
-    default:
-      g_assert_not_reached ();
-      break;
-  }
-}
+  if (numerator)
+    *numerator = title->priv->aspect_num;
 
+  if (denominator)
+    *denominator = title->priv->aspect_denom;
+}
+/*
 static gint
 ogmbr_video_stream_get_aspect (OGMRipVideoStream *video)
 {
@@ -247,11 +176,13 @@ ogmbr_video_stream_get_standard (OGMRipVideoStream *video)
 static void
 ogmbr_video_stream_iface_init (OGMRipVideoStreamInterface *iface)
 {
-/*
   iface->get_framerate    = ogmbr_video_stream_get_framerate;
   iface->get_resolution   = ogmbr_video_stream_get_resolution;
+/*
   iface->get_crop_size    = ogmbr_video_stream_get_crop_size;
+*/
   iface->get_aspect_ratio = ogmbr_video_stream_get_aspect_ratio;
+/*
   iface->get_aspect       = ogmbr_video_stream_get_aspect;
   iface->get_standard     = ogmbr_video_stream_get_standard;
 */
@@ -263,51 +194,6 @@ typedef struct
   OGMRipTitleCallback callback;
   gpointer user_data;
 } OGMBrProgress;
-
-static gboolean
-ogmbr_title_open (OGMRipTitle *title, GError **error)
-{
-  OGMBrTitle *dtitle = OGMBR_TITLE (title);
-
-  dtitle->priv->close_disc = !ogmrip_media_is_open (OGMRIP_MEDIA (dtitle->priv->disc));
-
-  if (!ogmrip_media_open (OGMRIP_MEDIA (dtitle->priv->disc), error))
-    return FALSE;
-
-  dtitle->priv->vts_file = ifoOpen (OGMBR_DISC (dtitle->priv->disc)->priv->reader, dtitle->priv->title_set_nr);
-  if (!dtitle->priv->vts_file)
-  {
-    ogmrip_media_close (OGMRIP_MEDIA (dtitle->priv->disc));
-    g_set_error (error, OGMBR_DISC_ERROR, OGMBR_DISC_ERROR_VTS, _("Cannot open video titleset"));
-    return FALSE;
-  }
-
-  return TRUE;
-}
-
-static void
-ogmbr_title_close (OGMRipTitle *title)
-{
-  OGMBrTitle *dtitle = OGMBR_TITLE (title);
-
-  if (dtitle->priv->vts_file)
-  {
-    ifoClose (dtitle->priv->vts_file);
-    dtitle->priv->vts_file = NULL;
-  }
-
-  if (dtitle->priv->close_disc)
-  {
-    ogmrip_media_close (OGMRIP_MEDIA (dtitle->priv->disc));
-    dtitle->priv->close_disc = FALSE;
-  }
-}
-
-static gboolean
-ogmbr_title_is_open (OGMRipTitle *title)
-{
-  return OGMBR_TITLE (title)->priv->vts_file != NULL;
-}
 */
 static OGMRipMedia *
 ogmbr_title_get_media (OGMRipTitle *title)
@@ -340,45 +226,22 @@ ogmbr_title_get_interlaced (OGMRipTitle *title)
 {
   return OGMBR_TITLE (title)->priv->interlaced;
 }
-
+*/
 static gint64
-ogmbr_title_get_vts_size (OGMRipTitle *title)
+ogmbr_title_get_size (OGMRipTitle *title)
 {
-  return OGMBR_TITLE (title)->priv->vts_size;
+  return OGMBR_TITLE (title)->priv->size;
 }
 
 static gdouble
 ogmbr_title_get_length (OGMRipTitle *title, OGMRipTime  *length)
 {
-  dvd_time_t *dtime = &OGMBR_TITLE (title)->priv->playback_time;
-
-  if (length)
-  {
-    gulong frames;
-
-    length->hour   = ((dtime->hour    & 0xf0) >> 4) * 10 + (dtime->hour    & 0x0f);
-    length->min    = ((dtime->minute  & 0xf0) >> 4) * 10 + (dtime->minute  & 0x0f);
-    length->sec    = ((dtime->second  & 0xf0) >> 4) * 10 + (dtime->second  & 0x0f);
-
-    frames = ((dtime->frame_u & 0x30) >> 4) * 10 + (dtime->frame_u & 0x0f);
-
-    switch ((dtime->frame_u & 0xc0) >> 6)
-    {
-      case 1:
-        length->msec = frames * 40;
-        break;
-      case 3:
-        length->msec = frames * 1001 / 30;
-        break;
-      default:
-        g_assert_not_reached ();
-        break;
-    }
-  }
-
-  return ogmbr_time_to_msec (dtime) / 1000.0;
+  /*
+   * TODO OGMRipTitme
+   */
+  return OGMBR_TITLE (title)->priv->length;
 }
-
+/*
 static gdouble
 ogmbr_title_get_chapters_length (OGMRipTitle *title, guint start, gint end, OGMRipTime *length)
 {
@@ -411,13 +274,13 @@ ogmbr_title_get_n_angles (OGMRipTitle *title)
 {
   return OGMBR_TITLE (title)->priv->nr_of_angles;
 }
-
+*/
 static gint
 ogmbr_title_get_n_chapters (OGMRipTitle *title)
 {
-  return OGMBR_TITLE (title)->priv->nr_of_chapters;
+  return OGMBR_TITLE (title)->priv->nchapters;
 }
-*/
+
 static OGMRipVideoStream *
 ogmbr_title_get_video_stream (OGMRipTitle *title)
 {
@@ -844,22 +707,16 @@ ogmbr_title_analyze (OGMRipTitle *title, GCancellable *cancellable, OGMRipTitleC
 static void
 ogmbr_title_iface_init (OGMRipTitleInterface *iface)
 {
-/*
-  iface->open                 = ogmbr_title_open;
-  iface->close                = ogmbr_title_close;
-  iface->is_open              = ogmbr_title_is_open;
-*/
   iface->get_media            = ogmbr_title_get_media;
   iface->get_nr               = ogmbr_title_get_nr;
-/*
-  iface->get_ts_nr            = ogmbr_title_get_ts_nr;
-  iface->get_size             = ogmbr_title_get_vts_size;
+  iface->get_size             = ogmbr_title_get_size;
   iface->get_length           = ogmbr_title_get_length;
+/*
   iface->get_chapters_length  = ogmbr_title_get_chapters_length;
   iface->get_palette          = ogmbr_title_get_palette;
   iface->get_n_angles         = ogmbr_title_get_n_angles;
-  iface->get_n_chapters       = ogmbr_title_get_n_chapters;
 */
+  iface->get_n_chapters       = ogmbr_title_get_n_chapters;
   iface->get_video_stream     = ogmbr_title_get_video_stream;
   iface->get_n_audio_streams  = ogmbr_title_get_n_audio_streams;
   iface->get_nth_audio_stream = ogmbr_title_get_nth_audio_stream;

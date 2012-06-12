@@ -32,300 +32,22 @@ enum
   PROP_URI
 };
 
-static void      ogmrip_media_iface_init (OGMRipMediaInterface  *iface);
-static GObject * ogmbr_disc_constructor  (GType                 gtype,
-                                          guint                 n_properties,
-                                          GObjectConstructParam *properties);
-static void      ogmbr_disc_dispose      (GObject               *gobject);
-static void      ogmbr_disc_finalize     (GObject               *gobject);
-static void      ogmbr_disc_get_property (GObject               *gobject,
-                                          guint                 prop_id,
-                                          GValue                *value,
-                                          GParamSpec            *pspec);
-static void      ogmbr_disc_set_property (GObject               *gobject,
-                                          guint                 prop_id,
-                                          const GValue          *value,
-                                          GParamSpec            *pspec);
-/*
-static OGMBrDisc *
-ogmbr_disc_get_open (const gchar *device)
-{
-  if (!open_discs)
-    return NULL;
+static void ogmrip_media_iface_init (OGMRipMediaInterface *iface);
 
-  return g_hash_table_lookup (open_discs, device);
-}
-
-static gchar *
-ogmbr_disc_get_title_name (OGMBrDisc *disc)
-{
-  FILE *f = 0;
-  gchar label[33];
-  int  i;
-
-  f = fopen (disc->priv->device, "r");
-  if (!f)
-    return g_strdup ("Unknown");
-
-
-  if (fseek (f, 32808, SEEK_SET) < 0)
-  {
-    fclose (f);
-    return g_strdup ("Unknown");
-  }
-
-  if (32 != (i = fread (label, 1, 32, f)))
-  {
-    fclose (f);
-    return g_strdup ("Unknown");
-  }
-
-  fclose (f);
-
-  label[32] = '\0';
-  while (i-- > 2)
-  {
-    if (label[i] == ' ')
-      label[i] = '\0';
-  }
-
-  return g_convert (label, -1, "UTF8", "LATIN1", NULL, NULL, NULL);;
-}
-
-static OGMBrAudioStream *
-ogmbr_audio_stream_new (OGMBrTitle *title, ifo_handle_t *vts_file, guint nr, guint real_nr)
-{
-  OGMBrAudioStream *stream;
-
-  audio_attr_t *attr;
-
-  stream = g_object_new (OGMBR_TYPE_AUDIO_STREAM, NULL);
-  stream->priv->title = OGMRIP_TITLE (title);
-  stream->priv->nr = nr;
-
-  g_object_add_weak_pointer (G_OBJECT (title), (gpointer *) &stream->priv->title);
-
-  attr = &vts_file->vtsi_mat->vts_audio_attr[real_nr];
-  stream->priv->format = attr->audio_format;
-  stream->priv->channels = attr->channels;
-  stream->priv->quantization = attr->quantization;
-  stream->priv->code_extension = attr->code_extension;
-  stream->priv->lang_code = attr->lang_code;
-
-  stream->priv->id = vts_file->vts_pgcit->pgci_srp[title->priv->ttn - 1].pgc->audio_control[real_nr] >> 8 & 7;
-
-  return stream;
-}
-
-static OGMBrSubpStream *
-ogmbr_subp_stream_new (OGMBrTitle *title, ifo_handle_t *vts_file, guint nr, guint real_nr)
-{
-  OGMBrSubpStream *stream;
-  subp_attr_t *attr;
-
-  stream = g_object_new (OGMBR_TYPE_SUBP_STREAM, NULL);
-  stream->priv->title = OGMRIP_TITLE (title);
-  stream->priv->nr = nr;
-
-  g_object_add_weak_pointer (G_OBJECT (title), (gpointer *) &stream->priv->title);
-
-  attr = &vts_file->vtsi_mat->vts_subp_attr[real_nr];
-  stream->priv->lang_extension = attr->lang_extension;
-  stream->priv->lang_code = attr->lang_code;
-
-  stream->priv->id = nr;
-  if (title->priv->display_aspect_ratio == 0)
-    stream->priv->id = vts_file->vts_pgcit->pgci_srp[title->priv->ttn - 1].pgc->subp_control[real_nr] >> 24 & 31;
-  else if (title->priv->display_aspect_ratio == 3)
-    stream->priv->id = vts_file->vts_pgcit->pgci_srp[title->priv->ttn - 1].pgc->subp_control[real_nr] >> 8 & 31;
-
-  return stream;
-}
-
-static gulong
-ogmbr_title_get_chapter_length (OGMBrTitle *title, ifo_handle_t *vts_file, guint nr)
-{
-  glong total = 0;
-  guint8 first_cell, last_cell;
-  guint16 pgcn, pgn;
-  pgc_t *pgc;
-
-  pgcn = vts_file->vts_ptt_srpt->title[title->priv->ttn - 1].ptt[nr].pgcn;
-  pgn = vts_file->vts_ptt_srpt->title[title->priv->ttn - 1].ptt[nr].pgn;
-  pgc = vts_file->vts_pgcit->pgci_srp[pgcn - 1].pgc;
-
-  first_cell = pgc->program_map[pgn - 1];
-  if (pgn < pgc->nr_of_programs)
-    last_cell = pgc->program_map[pgn];
-  else
-    last_cell = 0;
-
-  do
-  {
-    if (pgc->cell_playback[first_cell - 1].block_type != BLOCK_TYPE_ANGLE_BLOCK ||
-        pgc->cell_playback[first_cell - 1].block_type == BLOCK_MODE_FIRST_CELL)
-      total += ogmbr_time_to_msec (&pgc->cell_playback[first_cell - 1].playback_time);
-
-    first_cell ++;
-  }
-  while (first_cell < last_cell);
-
-  return total;
-}
-
-static OGMBrTitle *
-ogmbr_title_new (OGMBrDisc *disc, dvd_reader_t *reader, ifo_handle_t *vmg_file, guint nr)
-{
-  OGMBrTitle *title;
-
-  ifo_handle_t *vts_file;
-  pgc_t *pgc;
-
-  guint16 pgcn;
-  guint8 i;
-
-  vts_file = ifoOpen (reader, vmg_file->tt_srpt->title[nr].title_set_nr);
-  if (!vts_file)
-    return NULL;
-
-  title = g_object_new (OGMBR_TYPE_TITLE, NULL);
-  title->priv->disc = OGMRIP_MEDIA (disc);
-  title->priv->ttn = vmg_file->tt_srpt->title[nr].vts_ttn;
-  title->priv->nr = nr;
-
-  g_object_add_weak_pointer (G_OBJECT (disc), (gpointer *) &title->priv->disc);
-
-  pgcn = vts_file->vts_ptt_srpt->title[title->priv->ttn - 1].ptt[0].pgcn;
-  pgc = vts_file->vts_pgcit->pgci_srp[pgcn - 1].pgc;
-
-  memcpy (title->priv->palette, pgc->palette, 16 * sizeof (uint32_t));
-  title->priv->playback_time = pgc->playback_time;
-
-  title->priv->nr_of_chapters = vts_file->vts_ptt_srpt->title[title->priv->ttn - 1].nr_of_ptts;
-  title->priv->nr_of_angles = vmg_file->tt_srpt->title[nr].nr_of_angles;
-  title->priv->title_set_nr = vmg_file->tt_srpt->title[nr].title_set_nr;
-  title->priv->vts_size = dvd_reader_get_vts_size (reader, title->priv->title_set_nr);
-
-  title->priv->video_format = vts_file->vtsi_mat->vts_video_attr.video_format;
-  title->priv->picture_size = vts_file->vtsi_mat->vts_video_attr.picture_size;
-  title->priv->display_aspect_ratio = vts_file->vtsi_mat->vts_video_attr.display_aspect_ratio;
-  title->priv->permitted_df = vts_file->vtsi_mat->vts_video_attr.permitted_df;
-
-  ogmrip_video_stream_get_resolution (OGMRIP_VIDEO_STREAM (title), &title->priv->crop_w, &title->priv->crop_h);
-
-  for (i = 0; i < vts_file->vtsi_mat->nr_of_vts_audio_streams; i++)
-  {
-    if (vts_file->vts_pgcit->pgci_srp[title->priv->ttn - 1].pgc->audio_control[i] & 0x8000)
-    {
-      OGMBrAudioStream *stream;
-
-      stream = ogmbr_audio_stream_new (title, vts_file, title->priv->nr_of_audio_streams, i);
-      if (stream)
-        title->priv->audio_streams = g_list_append (title->priv->audio_streams, stream);
-      title->priv->nr_of_audio_streams ++;
-    }
-  }
-
-  for (i = 0; i < vts_file->vtsi_mat->nr_of_vts_subp_streams; i++)
-  {
-    if (vts_file->vts_pgcit->pgci_srp[title->priv->ttn - 1].pgc->subp_control[i] & 0x80000000)
-    {
-      OGMBrSubpStream *stream;
-
-      stream = ogmbr_subp_stream_new (title, vts_file, title->priv->nr_of_subp_streams, i);
-      if (stream)
-        title->priv->subp_streams = g_list_append (title->priv->subp_streams, stream);
-      title->priv->nr_of_subp_streams ++;
-    }
-  }
-
-  title->priv->length_of_chapters = g_new0 (gulong, title->priv->nr_of_chapters);
-  for (i = 0; i < title->priv->nr_of_chapters; i ++)
-    title->priv->length_of_chapters[i] = ogmbr_title_get_chapter_length (title, vts_file, i);
-
-  ifoClose (vts_file);
-
-  return title;
-}
-*/
 G_DEFINE_TYPE_WITH_CODE (OGMBrDisc, ogmbr_disc, G_TYPE_OBJECT,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_MEDIA, ogmrip_media_iface_init));
 
 static void
-ogmbr_disc_init (OGMBrDisc *disc)
+ogmbr_disc_constructed (GObject *gobject)
 {
-  disc->priv = G_TYPE_INSTANCE_GET_PRIVATE (disc, OGMBR_TYPE_DISC, OGMBrDiscPriv);
-}
-
-static void
-ogmbr_disc_class_init (OGMBrDiscClass *klass)
-{
-  GObjectClass *gobject_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->constructor = ogmbr_disc_constructor;
-  gobject_class->dispose = ogmbr_disc_dispose;
-  gobject_class->finalize = ogmbr_disc_finalize;
-  gobject_class->set_property = ogmbr_disc_set_property;
-  gobject_class->get_property = ogmbr_disc_get_property;
-
-  g_object_class_override_property (gobject_class, PROP_URI, "uri");
-
-  g_type_class_add_private (klass, sizeof (OGMBrDiscPriv));
-}
-
-static GObject *
-ogmbr_disc_constructor (GType gtype, guint n_properties, GObjectConstructParam *properties)
-{
-  GObject *gobject;
-  OGMBrDisc *disc;
-
-  gobject = G_OBJECT_CLASS (ogmbr_disc_parent_class)->constructor (gtype, n_properties, properties);
-
-  disc = OGMBR_DISC (gobject);
+  OGMBrDisc *disc = OGMBR_DISC (gobject);
 
   if (!disc->priv->uri)
     disc->priv->uri = g_strdup ("br:///dev/dvd");
 
-  if (!g_str_has_prefix (disc->priv->uri, "br://"))
-  {
-    g_object_unref (disc);
-    return NULL;
-  }
-
   disc->priv->device = g_strdup (disc->priv->uri + 5);
 
-  disc->priv->mmkv = ogmbr_makemkv_get_default ();
-
-  return gobject;
-}
-
-static void
-ogmbr_disc_dispose (GObject *gobject)
-{
-  OGMBrDisc *disc = OGMBR_DISC (gobject);
-
-  if (disc->priv->mmkv)
-  {
-    g_object_unref (disc->priv->mmkv);
-    disc->priv->mmkv = NULL;
-  }
-
-  G_OBJECT_CLASS (ogmbr_disc_parent_class)->dispose (gobject);
-}
-
-static void
-ogmbr_disc_finalize (GObject *gobject)
-{
-  OGMBrDisc *disc = OGMBR_DISC (gobject);
-/*
-  ogmbr_disc_close (OGMRIP_MEDIA (disc));
-*/
-  g_free (disc->priv->uri);
-  g_free (disc->priv->device);
-  g_free (disc->priv->label);
-
-  G_OBJECT_CLASS (ogmbr_disc_parent_class)->finalize (gobject);
+  G_OBJECT_CLASS (ogmbr_disc_parent_class)->constructed (gobject);
 }
 
 static void
@@ -370,17 +92,69 @@ ogmbr_disc_set_property (GObject *gobject, guint prop_id, const GValue *value, G
 }
 
 static void
+ogmbr_disc_dispose (GObject *gobject)
+{
+  ogmrip_media_close (OGMRIP_MEDIA (gobject));
+
+  G_OBJECT_CLASS (ogmbr_disc_parent_class)->dispose (gobject);
+}
+
+static void
+ogmbr_disc_finalize (GObject *gobject)
+{
+  OGMBrDisc *disc = OGMBR_DISC (gobject);
+
+  g_free (disc->priv->device);
+  g_free (disc->priv->uri);
+
+  G_OBJECT_CLASS (ogmbr_disc_parent_class)->finalize (gobject);
+}
+
+static void
+ogmbr_disc_init (OGMBrDisc *disc)
+{
+  disc->priv = G_TYPE_INSTANCE_GET_PRIVATE (disc, OGMBR_TYPE_DISC, OGMBrDiscPriv);
+}
+
+static void
+ogmbr_disc_class_init (OGMBrDiscClass *klass)
+{
+  GObjectClass *gobject_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->constructed = ogmbr_disc_constructed;
+  gobject_class->get_property = ogmbr_disc_get_property;
+  gobject_class->set_property = ogmbr_disc_set_property;
+  gobject_class->dispose = ogmbr_disc_dispose;
+  gobject_class->finalize = ogmbr_disc_finalize;
+
+  g_object_class_override_property (gobject_class, PROP_URI, "uri");
+
+  g_type_class_add_private (klass, sizeof (OGMBrDiscPriv));
+}
+
+static void
 ogmbr_disc_close (OGMRipMedia *media)
 {
   OGMBrDisc *disc = OGMBR_DISC (media);
 
-  ogmbr_makemkv_close_disc (disc->priv->mmkv, NULL, NULL);
+  g_list_foreach (disc->priv->titles, (GFunc) g_object_unref, NULL);
+  g_list_free (disc->priv->titles);
+  disc->priv->titles = NULL;
+
+  g_free (disc->priv->label);
+  disc->priv->label = NULL;
+
+  disc->priv->ntitles = 0;
+  disc->priv->handle = 0;
+
+  ogmbr_makemkv_close_disc (ogmbr_makemkv_get_default (), NULL, NULL);
 }
 
 static gboolean
 ogmbr_disc_is_open (OGMRipMedia *media)
 {
-  return FALSE;
+  return OGMBR_DISC (media)->priv->handle != 0;
 }
 
 static gboolean
@@ -388,12 +162,10 @@ ogmbr_disc_open (OGMRipMedia *media, GError **error)
 {
   OGMBrDisc *disc = OGMBR_DISC (media);
 
-  if (ogmbr_disc_is_open (media))
+  if (disc->priv->handle)
     return TRUE;
 
-  ogmbr_disc_close (media);
-
-  if (!ogmbr_makemkv_open_disc (disc->priv->mmkv, disc, NULL, NULL, NULL, error))
+  if (!ogmbr_makemkv_open_disc (ogmbr_makemkv_get_default (), disc, NULL, NULL, NULL, error))
     return FALSE;
 
   return TRUE;

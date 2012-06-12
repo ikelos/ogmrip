@@ -96,25 +96,29 @@ ogmbr_audio_stream_get_bitrate (OGMRipAudioStream *audio)
 
   return 0;
 }
-
+*/
 static gint
 ogmbr_audio_stream_get_channels (OGMRipAudioStream *audio)
 {
   switch (OGMBR_AUDIO_STREAM (audio)->priv->channels)
   {
-    case 0:
-      return OGMRIP_CHANNELS_MONO;
     case 1:
+      return OGMRIP_CHANNELS_MONO;
+    case 2:
       return OGMRIP_CHANNELS_STEREO;
-    case 3:
+    case 4:
       return OGMRIP_CHANNELS_SURROUND;
-    case 5:
+    case 6:
       return OGMRIP_CHANNELS_5_1;
+    case 7:
+      return OGMRIP_CHANNELS_6_1;
+    case 8:
+      return OGMRIP_CHANNELS_7_1;
     default:
       return OGMRIP_CHANNELS_UNDEFINED;
   }
 }
-
+/*
 static gint
 ogmbr_audio_stream_get_content (OGMRipAudioStream *audio)
 {
@@ -140,26 +144,28 @@ ogmbr_audio_stream_get_quantization (OGMRipAudioStream *audio)
 {
   return OGMBR_AUDIO_STREAM (audio)->priv->quantization;
 }
-
+*/
 static gint
 ogmbr_audio_stream_get_sample_rate (OGMRipAudioStream *audio)
 {
-  return 48000;
+  return OGMBR_AUDIO_STREAM (audio)->priv->samplerate;
 }
-*/
+
 static void
 ogmrip_audio_stream_iface_init (OGMRipAudioStreamInterface *iface)
 {
 /*
   iface->get_bitrate      = ogmbr_audio_stream_get_bitrate;
+*/
   iface->get_channels     = ogmbr_audio_stream_get_channels;
+/*
   iface->get_content      = ogmbr_audio_stream_get_content;
   iface->get_language     = ogmbr_audio_stream_get_language;
 */
   iface->get_nr           = ogmbr_audio_stream_get_nr;
 /*
   iface->get_quantization = ogmbr_audio_stream_get_quantization;
-  iface->get_sample_rate  = ogmbr_audio_stream_get_sample_rate;
 */
+  iface->get_sample_rate  = ogmbr_audio_stream_get_sample_rate;
 }
 
