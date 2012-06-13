@@ -1,4 +1,4 @@
-/* OGMRipMedia - A media library for OGMRip
+/* OGMRipBase - A foundation library for OGMRip
  * Copyright (C) 2010-2012 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -16,22 +16,28 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef __OGMRIP_MEDIA_LABELS_H__
-#define __OGMRIP_MEDIA_LABELS_H__
+#ifndef __OGMRIP_LANG_H__
+#define __OGMRIP_LANG_H__
 
-#include <ogmrip-media-enums.h>
+#include <glib.h>
 
 G_BEGIN_DECLS
 
-const gchar * ogmrip_format_get_label        (OGMRipFormat       format);
-const gchar * ogmrip_standard_get_label      (OGMRipStandard     standard);
-const gchar * ogmrip_aspect_get_label        (OGMRipAspect       aspect);
-const gchar * ogmrip_channels_get_label      (OGMRipChannels     channels);
-const gchar * ogmrip_quantization_get_label  (OGMRipQuantization quantization);
-const gchar * ogmrip_audio_content_get_label (OGMRipAudioContent content);
-const gchar * ogmrip_subp_content_get_label  (OGMRipSubpContent  content);
+enum
+{
+  OGMRIP_LANGUAGE_ISO639_1,
+  OGMRIP_LANGUAGE_ISO639_2,
+  OGMRIP_LANGUAGE_NAME
+};
+
+const gchar * ogmrip_language_to_name       (gint        code);
+gint          ogmrip_language_from_name     (const gchar *name);
+const gchar * ogmrip_language_to_iso639_1   (gint        code);
+gint          ogmrip_language_from_iso639_1 (const gchar *iso639_1);
+const gchar * ogmrip_language_to_iso639_2   (gint        code);
+gint          ogmrip_language_from_iso639_2 (const gchar *iso639_2);
 
 G_END_DECLS
 
-#endif /* __OGMRIP_MEDIA_LABELS_H__ */
+#endif /* __OGMRIP_LANG_H__ */
 

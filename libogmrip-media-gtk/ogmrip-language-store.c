@@ -18,7 +18,7 @@
 
 #include "ogmrip-language-store.h"
 
-#include <ogmrip-media.h>
+#include <ogmrip-base.h>
 
 extern const gchar *ogmdvd_languages[][3];
 extern const guint  ogmdvd_nlanguages;

@@ -122,7 +122,7 @@ ogmrip_main_spell_check (OGMRipData *data, const gchar *filename, gint lang)
   if (!output)
     goto spell_check_cleanup;
 
-  dialog = ogmrip_spell_dialog_new (ogmrip_language_get_iso639_1 (lang));
+  dialog = ogmrip_spell_dialog_new (ogmrip_language_to_iso639_1 (lang));
   if (!dialog)
   {
     ogmrip_run_error_dialog (GTK_WINDOW (data->window), NULL,
@@ -1257,7 +1257,7 @@ ogmrip_main_set_filename (OGMRipData *data, OGMRipEncoding *encoding)
 
       lang = ogmrip_audio_codec_get_language (OGMRIP_AUDIO_CODEC (codec));
       if (lang >= 0)
-        g_string_append_printf (filename, " - %s", ogmrip_language_get_label (lang));
+        g_string_append_printf (filename, " - %s", ogmrip_language_to_name (lang));
     }
   }
 
@@ -2332,7 +2332,7 @@ ogmrip_get_locale (void)
       code = locale[0];
       code = (code << 8) | locale[1];
 
-      if (!ogmrip_language_get_label (code))
+      if (!ogmrip_language_to_name (code))
         code = 0;
     }
   }

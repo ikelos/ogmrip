@@ -138,7 +138,7 @@ ogmrip_mp4_append_audio_file (OGMRipContainer *mp4, OGMRipFile *file, GPtrArray 
 
       language = ogmrip_audio_stream_get_language (OGMRIP_AUDIO_STREAM (file));
       if (language > -1)
-        iso639_2 = ogmrip_language_get_iso639_2 (language);
+        iso639_2 = ogmrip_language_to_iso639_2 (language);
       if (iso639_2)
         g_ptr_array_add (argv, g_strdup_printf ("%s:fmt=%s:lang=%s:group=1:#audio", filename, fmt, iso639_2));
       else
@@ -180,7 +180,7 @@ ogmrip_mp4_append_subp_file (OGMRipContainer *mp4, OGMRipFile *file, GPtrArray *
 
       language = ogmrip_subp_stream_get_language (OGMRIP_SUBP_STREAM (file));
       if (language > -1)
-        iso639_2 = ogmrip_language_get_iso639_2 (language);
+        iso639_2 = ogmrip_language_to_iso639_2 (language);
       if (iso639_2)
         g_ptr_array_add (argv, g_strdup_printf ("%s:fmt=%s:lang=%s", filename, fmt, iso639_2));
       else

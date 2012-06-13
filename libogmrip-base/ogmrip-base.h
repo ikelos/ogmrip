@@ -20,6 +20,7 @@
 #define __OGMRIP_BASE_H__
 
 #include <ogmrip-fs.h>
+#include <ogmrip-lang.h>
 #include <ogmrip-log.h>
 #include <ogmrip-type.h>
 #include <ogmrip-utils.h>

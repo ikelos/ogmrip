@@ -113,7 +113,7 @@ ogmrip_matroska_append_audio_file (OGMRipContainer *matroska, OGMRipFile *file, 
     {
       const gchar *iso639_2;
 
-      iso639_2 = ogmrip_language_get_iso639_2 (language);
+      iso639_2 = ogmrip_language_to_iso639_2 (language);
       if (iso639_2)
       {
         g_ptr_array_add (argv, g_strdup ("--language"));
@@ -199,7 +199,7 @@ ogmrip_matroska_append_subp_file (OGMRipContainer *matroska, OGMRipFile *file, G
     {
       const gchar *iso639_2;
 
-      iso639_2 = ogmrip_language_get_iso639_2 (language);
+      iso639_2 = ogmrip_language_to_iso639_2 (language);
       if (iso639_2)
       {
         g_ptr_array_add (argv, g_strdup ("--language"));
@@ -257,7 +257,7 @@ ogmrip_matroska_append_chapters_file (OGMRipContainer *matroska, OGMRipFile *fil
     {
       const gchar *iso639_2;
 
-      iso639_2 = ogmrip_language_get_iso639_2 (language);
+      iso639_2 = ogmrip_language_to_iso639_2 (language);
       if (iso639_2)
       {
         g_ptr_array_add (argv, g_strdup ("--chapter-language"));
