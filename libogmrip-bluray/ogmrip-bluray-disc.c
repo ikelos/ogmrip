@@ -34,17 +34,28 @@ static void ogmbr_media_iface_init (OGMRipMediaInterface *iface);
 G_DEFINE_TYPE_WITH_CODE (OGMBrDisc, ogmbr_disc, G_TYPE_OBJECT,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_MEDIA, ogmbr_media_iface_init));
 
-static void
-ogmbr_disc_constructed (GObject *gobject)
+static GObject *
+ogmbr_disc_constructor (GType gtype, guint n_properties, GObjectConstructParam *properties)
 {
-  OGMBrDisc *disc = OGMBR_DISC (gobject);
+  GObject *gobject;
+  OGMBrDisc *disc;
+
+  gobject = G_OBJECT_CLASS (ogmbr_disc_parent_class)->constructor (gtype, n_properties, properties);
+
+  disc = OGMBR_DISC (gobject);
 
   if (!disc->priv->uri)
     disc->priv->uri = g_strdup ("br:///dev/dvd");
 
   disc->priv->device = g_strdup (disc->priv->uri + 5);
 
-  G_OBJECT_CLASS (ogmbr_disc_parent_class)->constructed (gobject);
+  if (!ogmbr_makemkv_has_drive (ogmbr_makemkv_get_default (), disc->priv->device))
+  {
+    g_object_unref (disc);
+    return NULL;
+  }
+
+  return gobject;
 }
 
 static void
@@ -119,7 +130,7 @@ ogmbr_disc_class_init (OGMBrDiscClass *klass)
   GObjectClass *gobject_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->constructed = ogmbr_disc_constructed;
+  gobject_class->constructor = ogmbr_disc_constructor;
   gobject_class->get_property = ogmbr_disc_get_property;
   gobject_class->set_property = ogmbr_disc_set_property;
   gobject_class->dispose = ogmbr_disc_dispose;

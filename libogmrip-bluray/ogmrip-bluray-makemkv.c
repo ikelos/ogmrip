@@ -157,6 +157,17 @@ enum
 
 enum
 {
+  AP_DskFsFlagDvdFilesPresent    = 1,
+  AP_DskFsFlagHdvdFilesPresent   = 2,
+  AP_DskFsFlagBlurayFilesPresent = 4,
+  AP_DskFsFlagAacsFilesPresent   = 8,
+  AP_DskFsFlagBdsvmFilesPresent  = 16,
+  AP_DskFsFlagDiskIsLoading      = 256,
+  AP_DskFsFlagDiskIsAbsent       = 512
+};
+
+enum
+{
   AP_AVStreamFlag_DirectorsComments          = 1,
   AP_AVStreamFlag_AlternateDirectorsComments = 2,
   AP_AVStreamFlag_ForVisuallyImpaired        = 4,
@@ -552,35 +563,40 @@ makemkv_update_drive (OGMBrMakeMKV *mmkv)
 {
   if (mmkv->priv->m_mem->args[3] != 0)
   {
-    OGMBrDrive *drive;
-    const gunichar2 *str;
-    glong len;
+    guint flags = mmkv->priv->m_mem->args[5];
 
-    drive = g_new0 (OGMBrDrive, 1);
-    drive->id = mmkv->priv->m_mem->args[0];
-
-    str = (gunichar2 *) mmkv->priv->m_mem->strbuf;
-    if (mmkv->priv->m_mem->args[1] != 0)
+    if ((flags & AP_DskFsFlagBlurayFilesPresent) != 0 || (flags & AP_DskFsFlagHdvdFilesPresent) != 0)
     {
-      drive->name = g_utf16_to_utf8 (str, -1, &len, NULL, NULL);
-      str += len + 1;
+      OGMBrDrive *drive;
+      const gunichar2 *str;
+      glong len;
+
+      drive = g_new0 (OGMBrDrive, 1);
+      drive->id = mmkv->priv->m_mem->args[0];
+
+      str = (gunichar2 *) mmkv->priv->m_mem->strbuf;
+      if (mmkv->priv->m_mem->args[1] != 0)
+      {
+        drive->name = g_utf16_to_utf8 (str, -1, &len, NULL, NULL);
+        str += len + 1;
+      }
+
+      if ((mmkv->priv->m_mem->args[4] & 1) != 0)
+      {
+        drive->title = g_utf16_to_utf8 (str, -1, &len, NULL, NULL);
+        str += len + 1;
+      }
+
+      if ((mmkv->priv->m_mem->args[4] & 2) != 0)
+      {
+        drive->device = g_utf16_to_utf8 (str, -1, &len, NULL, NULL);
+        str += len + 1;
+      }
+
+      g_debug ("Update drive (%s, %s)", drive->name, drive->device);
+
+      mmkv->priv->drives = g_list_prepend (mmkv->priv->drives, drive);
     }
-
-    if ((mmkv->priv->m_mem->args[4] & 1) != 0)
-    {
-      drive->title = g_utf16_to_utf8 (str, -1, &len, NULL, NULL);
-      str += len + 1;
-    }
-
-    if ((mmkv->priv->m_mem->args[4] & 2) != 0)
-    {
-      drive->device = g_utf16_to_utf8 (str, -1, &len, NULL, NULL);
-      str += len + 1;
-    }
-
-    g_debug ("Update drive (%s, %s)", drive->name, drive->device);
-
-    mmkv->priv->drives = g_list_prepend (mmkv->priv->drives, drive);
   }
 
   mmkv->priv->drives = g_list_reverse (mmkv->priv->drives);
