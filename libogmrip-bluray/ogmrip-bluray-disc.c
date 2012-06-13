@@ -236,7 +236,7 @@ ogmbr_media_iface_init (OGMRipMediaInterface *iface)
 }
 
 void
-ogmrip_dvd_register_media (void)
+ogmrip_bluray_register_media (void)
 {
   OGMRipTypeInfo *info;
   OGMBrMakeMKV *mmkv;

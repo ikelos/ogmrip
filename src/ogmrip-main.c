@@ -22,6 +22,7 @@
 
 #include <ogmrip-job.h>
 #include <ogmrip-dvd.h>
+#include <ogmrip-bluray.h>
 #include <ogmrip-file.h>
 #include <ogmrip-encode-gtk.h>
 #include <ogmrip-media-gtk.h>
@@ -2274,6 +2275,7 @@ ogmrip_startup_thread (GIOSchedulerJob *job, GCancellable *cancellable, GApplica
   gchar *path;
 
   ogmrip_dvd_register_media ();
+  ogmrip_bluray_register_media ();
   ogmrip_file_register_media ();
 
   ogmrip_hardsub_register_codec ();
