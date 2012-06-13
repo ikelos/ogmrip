@@ -147,11 +147,6 @@ ogmrip_media_info_get_video_info (OGMRipMediaInfo *info, guint track, OGMRipVide
       video->aspect_num = aspect * 1000;
       video->aspect_denom = 1000;
     }
-
-    if (video->aspect_num == 16 && video->aspect_denom == 9)
-      video->aspect = OGMRIP_ASPECT_16_9;
-    else if (video->aspect_num == 16 && video->aspect_denom == 9)
-      video->aspect = OGMRIP_ASPECT_4_3;
   }
 
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, track, "StreamSize");

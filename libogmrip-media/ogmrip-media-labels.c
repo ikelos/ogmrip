@@ -99,27 +99,6 @@ ogmrip_standard_get_label (OGMRipStandard standard)
 }
 
 /**
- * ogmrip_aspect_get_label:
- * @aspect: The aspect
- *
- * Returns a human readable aspect.
- *
- * Returns: A constant string, or NULL
- */
-const gchar *
-ogmrip_aspect_get_label (OGMRipAspect aspect)
-{
-  static const gchar *display_aspect[] =
-  {
-    "Undefined",
-    "4/3", 
-    "16/9",
-  };
-
-  return display_aspect[aspect + 1];
-}
-
-/**
  * ogmrip_channels_get_label:
  * @channels: The number of channels
  *

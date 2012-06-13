@@ -74,8 +74,9 @@ ogmrip_title_chooser_widget_set_disc (OGMRipTitleChooserWidget *chooser, OGMRipM
   OGMRipTime time_;
   GString *string;
 
-  gint vid, nvid, standard, aspect;
+  gint vid, nvid, standard;
   glong length, longest;
+  guint num, denom;
 
   if (media)
     g_object_ref (media);
@@ -115,9 +116,9 @@ ogmrip_title_chooser_widget_set_disc (OGMRipTitleChooserWidget *chooser, OGMRipM
         if (standard != OGMRIP_STANDARD_UNDEFINED)
           g_string_append_printf (string, ", %s", ogmrip_standard_get_label (standard));
 
-        aspect = ogmrip_video_stream_get_aspect (stream);
-        if (aspect != OGMRIP_ASPECT_UNDEFINED)
-          g_string_append_printf (string, ", %s", ogmrip_aspect_get_label (aspect));
+        ogmrip_video_stream_get_aspect_ratio (stream, &num, &denom);
+        if (num > 0 && denom > 0)
+          g_string_append_printf (string, ", %u/%u", num, denom);
 
         g_string_append_c (string, ')');
 

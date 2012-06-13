@@ -39,21 +39,6 @@ typedef enum
 } OGMRipStandard;
 
 /**
- * OGMRipAspect:
- * @OGMRIP_ASPECT_UNDEFINED: The display aspect is undefined
- * @OGMRIP_ASPECT_4_3: The title is 4/3
- * @OGMRIP_ASPECT_16_9: The title is 16/9
- *
- * The aspect of the title
- */
-typedef enum
-{
-  OGMRIP_ASPECT_UNDEFINED = -1,
-  OGMRIP_ASPECT_4_3,
-  OGMRIP_ASPECT_16_9
-} OGMRipAspect;
-
-/**
  * OGMRipChannels:
  * @OGMRIP_CHANNELS_UNDEFINED: Undefined number of channels
  * @OGMRIP_CHANNELS_MONO: The stream is mono

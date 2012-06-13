@@ -38,7 +38,6 @@ ogmrip_video_file_init (OGMRipVideoFile *stream)
   stream->priv->bitrate = -1;
   stream->priv->framerate_denom = 1;
   stream->priv->standard = OGMRIP_STANDARD_UNDEFINED;
-  stream->priv->aspect = OGMRIP_ASPECT_UNDEFINED;
 }
 
 static void
@@ -98,12 +97,6 @@ ogmrip_video_file_constructor (GType type, guint n_properties, GObjectConstructP
   ogmrip_media_info_close (info);
 
   return gobject;
-}
-
-static gint
-ogmrip_video_file_get_aspect (OGMRipVideoStream *video)
-{
-  return OGMRIP_VIDEO_FILE (video)->priv->aspect;
 }
 
 static void
@@ -167,7 +160,6 @@ ogmrip_video_file_get_resolution (OGMRipVideoStream *video, guint *w, guint *h)
 static void
 ogmrip_video_iface_init (OGMRipVideoStreamInterface *iface)
 {
-  iface->get_aspect = ogmrip_video_file_get_aspect;
   iface->get_aspect_ratio = ogmrip_video_file_get_aspect_ratio;
   iface->get_bitrate = ogmrip_video_file_get_bitrate;
   iface->get_crop_size = ogmrip_video_file_get_crop_size;
