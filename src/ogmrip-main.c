@@ -1,4 +1,4 @@
-/* OGMRip - A DVD Encoder for GNOME
+/* OGMRip - A media encoder for GNOME
  * Copyright (C) 2004-2012 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify

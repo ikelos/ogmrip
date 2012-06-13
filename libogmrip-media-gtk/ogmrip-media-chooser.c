@@ -24,7 +24,7 @@
  * SECTION:ogmrip-media-chooser
  * @title: OGMRipMediaChooser
  * @include: ogmrip-media-chooser.h
- * @short_description: DVD media chooser interface used by OGMRipMediaChooserDialog
+ * @short_description: Media chooser interface used by OGMRipMediaChooserDialog
  *                     and OGMRipMediaChooserWidget
  */
 

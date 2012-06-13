@@ -24,7 +24,7 @@
  * SECTION:ogmrip-media-chooser-dialog
  * @title: OGMRipMediaChooserDialog
  * @include: ogmrip-media-chooser-dialog.h
- * @short_description: A DVD media chooser dialog
+ * @short_description: A media chooser dialog
  */
 
 #include "ogmrip-media-chooser-dialog.h"

@@ -1,4 +1,4 @@
-/* OGMRip - A library for DVD ripping and encoding
+/* OGMRipLavcMpeg - Mpeg 1, 2 and 4 plugins for OGMRip
  * Copyright (C) 2004-2012 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or

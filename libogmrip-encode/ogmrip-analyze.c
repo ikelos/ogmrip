@@ -1,4 +1,4 @@
-/* OGMRip - A library for DVD ripping and encoding
+/* OGMRip - A library for media ripping and encoding
  * Analyzeright (C) 2004-2012 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -19,7 +19,7 @@
 /**
  * SECTION:ogmrip-analyze
  * @title: OGMRipAnalyze
- * @short_description: A codec to analyze a DVD
+ * @short_description: A codec to analyze a media
  * @include: ogmrip-analyze.h
  */
 

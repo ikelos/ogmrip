@@ -1,4 +1,4 @@
-/* OGMRip - A library for DVD ripping and encoding
+/* OGMRip - A library for media ripping and encoding
  * Copyright (C) 2004-2012 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -19,7 +19,7 @@
 /**
  * SECTION:ogmrip-test
  * @title: OGMRipTest
- * @short_description: A codec to test a DVD
+ * @short_description: A codec to test a media
  * @include: ogmrip-test.h
  */
 

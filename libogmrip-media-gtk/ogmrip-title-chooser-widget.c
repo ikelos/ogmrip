@@ -24,7 +24,7 @@
  * SECTION:ogmrip-title-chooser-widget
  * @title: OGMRipTitleChooserWidget
  * @include: ogmrip-title-chooser-widget.h
- * @short_description: DVD title chooser widget that can be embedded in other widgets
+ * @short_description: Title chooser widget that can be embedded in other widgets
  */
 
 #include "ogmrip-title-chooser-widget.h"

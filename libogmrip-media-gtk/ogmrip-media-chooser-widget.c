@@ -24,7 +24,7 @@
  * SECTION:ogmrip-media-chooser-widget
  * @title: OGMRipMediaChooserWidget
  * @include: ogmrip-media-chooser-widget.h
- * @short_description: DVD media chooser widget that can be embedded in other widgets
+ * @short_description: Media chooser widget that can be embedded in other widgets
  */
 
 #include "ogmrip-media-chooser-widget.h"
