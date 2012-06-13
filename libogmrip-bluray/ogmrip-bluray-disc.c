@@ -158,7 +158,7 @@ ogmbr_disc_is_open (OGMRipMedia *media)
 }
 
 static gboolean
-ogmbr_disc_open (OGMRipMedia *media, GError **error)
+ogmbr_disc_open (OGMRipMedia *media, GCancellable *cancellable, OGMRipMediaCallback callback, gpointer user_data, GError **error)
 {
   OGMBrDisc *disc = OGMBR_DISC (media);
 
