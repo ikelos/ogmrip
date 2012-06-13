@@ -20,7 +20,6 @@
 #define __OGMRIP_BLURAY_PRIV_H__
 
 #include <ogmrip-media.h>
-#include <ogmrip-bluray-makemkv.h>
 
 G_BEGIN_DECLS
 
@@ -52,6 +51,8 @@ struct _OGMBrTitlePriv
 
   guint vid;
   guint64 vhandle;
+
+  OGMRipFormat format;
   guint aspect_num;
   guint aspect_denom;
   guint raw_width;
@@ -63,21 +64,25 @@ struct _OGMBrTitlePriv
 struct _OGMBrAudioStreamPriv
 {
   OGMRipTitle *title;
+
   guint id;
   guint64 handle;
 
+  OGMRipFormat format;
   guint channels;
   guint samplerate;
-  guint flags;
+  guint content;
 };
 
 struct _OGMBrSubpStreamPriv
 {
   OGMRipTitle *title;
+
   guint id;
   guint64 handle;
 
-  guint flags;
+  OGMRipFormat format;
+  guint content;
 };
 
 G_END_DECLS

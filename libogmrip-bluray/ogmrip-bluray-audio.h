@@ -16,8 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef __OGMBR_AUDIO_H__
-#define __OGMBR_AUDIO_H__
+#ifndef __OGMRIP_BLURAY_AUDIO_H__
+#define __OGMRIP_BLURAY_AUDIO_H__
 
 #include <ogmrip-media.h>
 
@@ -50,5 +50,5 @@ GType ogmbr_audio_stream_get_type (void);
 
 G_END_DECLS
 
-#endif /* __OGMBR_AUDIO_H__ */
+#endif /* __OGMRIP_BLURAY_AUDIO_H__ */
 

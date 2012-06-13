@@ -16,25 +16,21 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include "ogmrip-bluray-audio.h"
-#include "ogmrip-bluray-priv.h"
 #include "ogmrip-bluray-title.h"
+#include "ogmrip-bluray-priv.h"
 
-static void ogmrip_stream_iface_init       (OGMRipStreamInterface      *iface);
-static void ogmrip_audio_stream_iface_init (OGMRipAudioStreamInterface *iface);
+static void ogmbr_stream_iface_init       (OGMRipStreamInterface      *iface);
+static void ogmbr_audio_stream_iface_init (OGMRipAudioStreamInterface *iface);
 
 G_DEFINE_TYPE_WITH_CODE (OGMBrAudioStream, ogmbr_audio_stream, G_TYPE_OBJECT,
-    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_STREAM, ogmrip_stream_iface_init)
-    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_AUDIO_STREAM, ogmrip_audio_stream_iface_init));
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_STREAM, ogmbr_stream_iface_init)
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_AUDIO_STREAM, ogmbr_audio_stream_iface_init));
 
 static void
-ogmbr_audio_stream_init (OGMBrAudioStream *stream)
+ogmbr_audio_stream_init (OGMBrAudioStream *audio)
 {
-  stream->priv = G_TYPE_INSTANCE_GET_PRIVATE (stream, OGMBR_TYPE_AUDIO_STREAM, OGMBrAudioStreamPriv);
+  audio->priv = G_TYPE_INSTANCE_GET_PRIVATE (audio, OGMBR_TYPE_AUDIO_STREAM, OGMBrAudioStreamPriv);
 }
 
 static void
@@ -42,61 +38,33 @@ ogmbr_audio_stream_class_init (OGMBrAudioStreamClass *klass)
 {
   g_type_class_add_private (klass, sizeof (OGMBrAudioStreamPriv));
 }
-/*
+
 static gint
 ogmbr_audio_stream_get_format (OGMRipStream *stream)
 {
-  switch (OGMBR_AUDIO_STREAM (stream)->priv->format)
-  {
-    case OGMBR_AUDIO_FORMAT_AC3:
-      return OGMRIP_FORMAT_AC3;
-    case OGMBR_AUDIO_FORMAT_LPCM:
-      return OGMRIP_FORMAT_PCM;
-    case OGMBR_AUDIO_FORMAT_DTS:
-      return OGMRIP_FORMAT_DTS;
-    default:
-      return OGMRIP_FORMAT_UNDEFINED;
-  }
+  return OGMBR_AUDIO_STREAM (stream)->priv->format;
 }
-*/
+
 static gint
 ogmbr_audio_stream_get_id (OGMRipStream *stream)
 {
   return OGMBR_AUDIO_STREAM (stream)->priv->id;
 }
 
-OGMRipTitle *
+static OGMRipTitle *
 ogmbr_audio_stream_get_title (OGMRipStream *stream)
 {
   return OGMBR_AUDIO_STREAM (stream)->priv->title;
 }
 
 static void
-ogmrip_stream_iface_init (OGMRipStreamInterface *iface)
+ogmbr_stream_iface_init (OGMRipStreamInterface *iface)
 {
-/*
   iface->get_format = ogmbr_audio_stream_get_format;
-*/
   iface->get_id     = ogmbr_audio_stream_get_id;
   iface->get_title  = ogmbr_audio_stream_get_title;
 }
-/*
-static gint
-ogmbr_audio_stream_get_bitrate (OGMRipAudioStream *audio)
-{
-  OGMBrAudioStream *stream = OGMBR_AUDIO_STREAM (audio);
 
-  if (stream->priv->title)
-  {
-    OGMBrTitle *title = OGMBR_TITLE (stream->priv->title);
-
-    if (title->priv->bitrates)
-      return title->priv->bitrates[stream->priv->nr];
-  }
-
-  return 0;
-}
-*/
 static gint
 ogmbr_audio_stream_get_channels (OGMRipAudioStream *audio)
 {
@@ -118,54 +86,39 @@ ogmbr_audio_stream_get_channels (OGMRipAudioStream *audio)
       return OGMRIP_CHANNELS_UNDEFINED;
   }
 }
-/*
+
 static gint
 ogmbr_audio_stream_get_content (OGMRipAudioStream *audio)
 {
-  return OGMBR_AUDIO_STREAM (audio)->priv->code_extension - 1;
+  return OGMBR_AUDIO_STREAM (audio)->priv->content;
 }
 
 static gint
-ogmbr_audio_stream_get_language (OGMRipAudioStream *audio)
+ogmbr_audio_stream_get_nr (OGMRipAudioStream *audio)
 {
-  return OGMBR_AUDIO_STREAM (audio)->priv->lang_code;
-}
-*/
-static gint
-ogmbr_audio_stream_get_nr (OGMRipAudioStream *stream)
-{
-  OGMBrTitle *title = OGMBR_TITLE (OGMBR_AUDIO_STREAM (stream)->priv->title);
+  OGMRipTitle *title = OGMBR_AUDIO_STREAM (audio)->priv->title;
 
-  return g_list_index (title->priv->audio_streams, stream);
+  return g_list_index (OGMBR_TITLE (title)->priv->audio_streams, audio);
 }
-/*
+
 static gint
-ogmbr_audio_stream_get_quantization (OGMRipAudioStream *audio)
-{
-  return OGMBR_AUDIO_STREAM (audio)->priv->quantization;
-}
-*/
-static gint
-ogmbr_audio_stream_get_sample_rate (OGMRipAudioStream *audio)
+ogmbr_audio_sterma_get_sample_rate (OGMRipAudioStream *audio)
 {
   return OGMBR_AUDIO_STREAM (audio)->priv->samplerate;
 }
 
 static void
-ogmrip_audio_stream_iface_init (OGMRipAudioStreamInterface *iface)
+ogmbr_audio_stream_iface_init (OGMRipAudioStreamInterface *iface)
 {
 /*
   iface->get_bitrate      = ogmbr_audio_stream_get_bitrate;
 */
-  iface->get_channels     = ogmbr_audio_stream_get_channels;
-/*
+  iface->get_channels    = ogmbr_audio_stream_get_channels;
   iface->get_content      = ogmbr_audio_stream_get_content;
+/*
   iface->get_language     = ogmbr_audio_stream_get_language;
 */
-  iface->get_nr           = ogmbr_audio_stream_get_nr;
-/*
-  iface->get_quantization = ogmbr_audio_stream_get_quantization;
-*/
-  iface->get_sample_rate  = ogmbr_audio_stream_get_sample_rate;
+  iface->get_nr          = ogmbr_audio_stream_get_nr;
+  iface->get_sample_rate = ogmbr_audio_sterma_get_sample_rate;
 }
 

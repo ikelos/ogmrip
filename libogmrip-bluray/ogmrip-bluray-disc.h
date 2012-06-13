@@ -1,4 +1,4 @@
-/* OGMRipBluray - A Bluray library for OGMBr
+/* OGMRipBluray - A bluray library for OGMRip
  * Copyright (C) 2012 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -16,8 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef __OGMBR_DISC_H__
-#define __OGMBR_DISC_H__
+#ifndef __OGMRIP_BLURAY_DISC_H__
+#define __OGMRIP_BLURAY_DISC_H__
 
 #include <ogmrip-media.h>
 
@@ -54,13 +54,11 @@ struct _OGMBrDiscClass
   GObjectClass parent_class;
 };
 
-void ogmrip_bluray_register_media  (void);
+void  ogmrip_bluray_register_media  (void);
 
-GType         ogmbr_disc_get_type  (void);
-OGMRipMedia * ogmbr_disc_new       (const gchar *device,
-                                    GError      **error);
+GType ogmbr_disc_get_type  (void);
 
 G_END_DECLS
 
-#endif /* __OGMBR_DISC_H__ */
+#endif /* __OGMRIP_BLURAY_DISC_H__ */
 

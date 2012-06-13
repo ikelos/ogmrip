@@ -1,4 +1,4 @@
-/* OGMRipBluray - A Bluray library for OGMRip
+/* OGMRipBluray - A bluray library for OGMRip
  * Copyright (C) 2012 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -16,11 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 #include "ogmrip-bluray-disc.h"
+#include "ogmrip-bluray-title.h"
 #include "ogmrip-bluray-makemkv.h"
 #include "ogmrip-bluray-priv.h"
 
@@ -32,10 +29,10 @@ enum
   PROP_URI
 };
 
-static void ogmrip_media_iface_init (OGMRipMediaInterface *iface);
+static void ogmbr_media_iface_init (OGMRipMediaInterface *iface);
 
 G_DEFINE_TYPE_WITH_CODE (OGMBrDisc, ogmbr_disc, G_TYPE_OBJECT,
-    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_MEDIA, ogmrip_media_iface_init));
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_MEDIA, ogmbr_media_iface_init));
 
 static void
 ogmbr_disc_constructed (GObject *gobject)
@@ -133,6 +130,23 @@ ogmbr_disc_class_init (OGMBrDiscClass *klass)
   g_type_class_add_private (klass, sizeof (OGMBrDiscPriv));
 }
 
+static gboolean
+ogmbr_disc_open (OGMRipMedia *media, GCancellable *cancellable, OGMRipMediaCallback callback, gpointer user_data, GError **error)
+{
+  OGMBrDisc *disc = OGMBR_DISC (media);
+
+  if (disc->priv->handle)
+    return TRUE;
+
+  return ogmbr_makemkv_open_disc (ogmbr_makemkv_get_default (), disc, NULL, NULL, NULL, error);
+}
+
+static gboolean
+ogmbr_disc_is_open (OGMRipMedia *media)
+{
+  return OGMBR_DISC (media)->priv->handle != 0;
+}
+
 static void
 ogmbr_disc_close (OGMRipMedia *media)
 {
@@ -151,50 +165,34 @@ ogmbr_disc_close (OGMRipMedia *media)
   ogmbr_makemkv_close_disc (ogmbr_makemkv_get_default (), NULL, NULL);
 }
 
-static gboolean
-ogmbr_disc_is_open (OGMRipMedia *media)
-{
-  return OGMBR_DISC (media)->priv->handle != 0;
-}
-
-static gboolean
-ogmbr_disc_open (OGMRipMedia *media, GCancellable *cancellable, OGMRipMediaCallback callback, gpointer user_data, GError **error)
-{
-  OGMBrDisc *disc = OGMBR_DISC (media);
-
-  if (disc->priv->handle)
-    return TRUE;
-
-  if (!ogmbr_makemkv_open_disc (ogmbr_makemkv_get_default (), disc, NULL, NULL, NULL, error))
-    return FALSE;
-
-  return TRUE;
-}
-
 static const gchar *
 ogmbr_disc_get_label (OGMRipMedia *media)
 {
   return OGMBR_DISC (media)->priv->label;
 }
-/*
-static const gchar *
-ogmbr_disc_get_id (OGMRipMedia *media)
-{
-  return OGMBR_DISC (media)->priv->id;
-}
-*/
+
 static const gchar *
 ogmbr_disc_get_uri (OGMRipMedia *media)
 {
   return OGMBR_DISC (media)->priv->uri;
 }
-/*
+
 static gint64
-ogmbr_disc_get_vmg_size (OGMRipMedia *media)
+ogmbr_disc_get_size (OGMRipMedia *media)
 {
-  return OGMBR_DISC (media)->priv->vmg_size;
+  GList *link;
+  guint64 size = 0;
+
+  for (link = OGMBR_DISC (media)->priv->titles; link; link = link->next)
+  {
+    OGMBrTitle *title = link->data;
+
+    size += title->priv->size;
+  }
+
+  return size;
 }
-*/
+
 static gint
 ogmbr_disc_get_n_titles (OGMRipMedia *media)
 {
@@ -206,157 +204,9 @@ ogmbr_disc_get_nth_title (OGMRipMedia *media, guint nr)
 {
   return g_list_nth_data (OGMBR_DISC (media)->priv->titles, nr);
 }
-/*
-static gchar **
-ogmbr_disc_copy_command (OGMBrDisc *disc, const gchar *path)
-{
-  GPtrArray *argv;
-
-  argv = g_ptr_array_new ();
-  g_ptr_array_add (argv, g_strdup ("dvdcpy"));
-  g_ptr_array_add (argv, g_strdup ("-s"));
-  g_ptr_array_add (argv, g_strdup ("skip"));
-  g_ptr_array_add (argv, g_strdup ("-o"));
-  g_ptr_array_add (argv, g_strdup (path));
-  g_ptr_array_add (argv, g_strdup ("-m"));
-
-  g_ptr_array_add (argv, g_strdup (disc->priv->device));
-
-  g_ptr_array_add (argv, NULL);
-
-  return (gchar **) g_ptr_array_free (argv, FALSE);
-}
-
-static gboolean
-ogmbr_disc_copy_watch (OGMJobTask *spawn, const gchar *buffer, gpointer data, GError **error)
-{
-  guint bytes, total, percent;
-
-  if (sscanf (buffer, "%u/%u blocks written (%u%%)", &bytes, &total, &percent) == 3)
-    ogmjob_task_set_progress (spawn, percent / 100.);
-
-  return TRUE;
-}
 
 static void
-ogmbr_disc_copy_progress_cb (OGMJobTask *spawn, GParamSpec *pspec, OGMBrProgress *progress)
-{
-  progress->callback (progress->disc, ogmjob_task_get_progress (spawn), progress->user_data);
-}
-
-static void
-ogmbr_disc_device_changed_cb (GFileMonitor *monitor, GFile *file, GFile *other_file, GFileMonitorEvent event_type, OGMBrDisc *disc)
-{
-  if (event_type == G_FILE_MONITOR_EVENT_DELETED)
-  {
-    g_free (disc->priv->device);
-    disc->priv->device = disc->priv->orig_device;
-    disc->priv->orig_device = NULL;
-
-    g_object_unref (monitor);
-  }
-}
-
-static gboolean
-ogmbr_disc_copy_exists (OGMBrDisc *disc, const gchar *path)
-{
-  OGMRipMedia *media;
-  const gchar *id1, *id2;
-  gboolean retval;
-
-  if (!g_file_test (path, G_FILE_TEST_IS_DIR))
-    return FALSE;
-
-  media = ogmbr_disc_new (path, NULL);
-  if (!media)
-    return FALSE;
-
-  id1 = ogmrip_media_get_id (OGMRIP_MEDIA (disc));
-  id2 = ogmrip_media_get_id (media);
-
-  retval = id1 && id2 && g_str_equal (id1, id2);
-
-  g_object_unref (media);
-
-  return retval;
-}
-
-static gboolean
-ogmbr_disc_copy (OGMRipMedia *media, const gchar *path, GCancellable *cancellable,
-    OGMRipMediaCallback callback, gpointer user_data, GError **error)
-{
-  OGMBrDisc *disc = OGMBR_DISC (media);
-  OGMJobTask *spawn;
-  GFile *file;
-
-  struct stat buf;
-  gboolean is_open;
-  gchar **argv;
-  gint result;
-
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
-    return FALSE;
-
-  if (g_stat (disc->priv->device, &buf) != 0)
-    return FALSE;
-
-  if (!S_ISBLK (buf.st_mode))
-    return TRUE;
-
-  if (!ogmbr_disc_copy_exists (disc, path))
-  {
-    is_open = ogmbr_disc_is_open (media);
-    if (!is_open && !ogmbr_disc_open (media, error))
-      return FALSE;
-
-    argv = ogmbr_disc_copy_command (disc, path);
-
-    spawn = ogmjob_spawn_newv (argv);
-    ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (spawn),
-        (OGMJobWatch) ogmbr_disc_copy_watch, NULL);
-
-    if (callback)
-    {
-      OGMBrProgress progress;
-
-      progress.disc = media;
-      progress.callback = callback;
-      progress.user_data = user_data;
-
-      g_signal_connect (spawn, "notify::progress",
-          G_CALLBACK (ogmbr_disc_copy_progress_cb), &progress);
-    }
-
-    result = ogmjob_task_run (spawn, cancellable, error);
-    g_object_unref (spawn);
-
-    if (!is_open)
-      ogmbr_disc_close (media);
-
-    if (!result)
-      return FALSE;
-  }
-
-  if (disc->priv->orig_device)
-    g_free (disc->priv->orig_device);
-  disc->priv->orig_device = disc->priv->device;
-  disc->priv->device = g_strdup (path);
-
-  if (disc->priv->monitor)
-    g_object_unref (disc->priv->monitor);
-
-  file = g_file_new_for_path (path);
-  disc->priv->monitor = g_file_monitor_file (file, G_FILE_MONITOR_NONE, NULL, NULL);
-  g_object_unref (file);
-
-  g_signal_connect (disc->priv->monitor, "changed",
-      G_CALLBACK (ogmbr_disc_device_changed_cb), disc);
-
-  return TRUE;
-}
-*/
-static void
-ogmrip_media_iface_init (OGMRipMediaInterface *iface)
+ogmbr_media_iface_init (OGMRipMediaInterface *iface)
 {
   iface->open          = ogmbr_disc_open;
   iface->close         = ogmbr_disc_close;
@@ -366,29 +216,12 @@ ogmrip_media_iface_init (OGMRipMediaInterface *iface)
   iface->get_id        = ogmbr_disc_get_id;
 */
   iface->get_uri       = ogmbr_disc_get_uri;
-/*
-  iface->get_size      = ogmbr_disc_get_vmg_size;
-*/
+  iface->get_size      = ogmbr_disc_get_size;
   iface->get_n_titles  = ogmbr_disc_get_n_titles;
   iface->get_nth_title = ogmbr_disc_get_nth_title;
 /*
   iface->copy          = ogmbr_disc_copy;
 */
-}
-
-OGMRipMedia *
-ogmbr_disc_new (const gchar *device, GError **error)
-{
-  OGMRipMedia *media;
-  gchar *uri;
-
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-
-  uri = g_strdup_printf ("br://%s", device);
-  media = g_object_new (OGMBR_TYPE_DISC, "uri", uri, NULL);
-  g_free (uri);
-
-  return media;
 }
 
 void

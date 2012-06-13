@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "ogmrip-bluray-audio.h"
 #include "ogmrip-bluray-makemkv.h"
-#include "ogmrip-bluray-priv.h"
-#include "ogmrip-bluray-subp.h"
 #include "ogmrip-bluray-title.h"
+#include "ogmrip-bluray-audio.h"
+#include "ogmrip-bluray-subp.h"
+#include "ogmrip-bluray-priv.h"
 
 #include <fcntl.h>
 #include <stdio.h>
@@ -155,6 +155,19 @@ enum
   ap_iaMaxValue
 };
 
+enum
+{
+  AP_AVStreamFlag_DirectorsComments          = 1,
+  AP_AVStreamFlag_AlternateDirectorsComments = 2,
+  AP_AVStreamFlag_ForVisuallyImpaired        = 4,
+  AP_AVStreamFlag_CoreAudio                  = 256,
+  AP_AVStreamFlag_SecondaryAudio             = 512,
+  AP_AVStreamFlag_HasCoreAudio               = 1024,
+  AP_AVStreamFlag_DerivedStream              = 2048,
+  AP_AVStreamFlag_ForcedSubtitles            = 4096,
+  AP_AVStreamFlag_ProfileSecondaryStream     = 16384
+};
+
 typedef struct
 {
   uint32_t cmd;
@@ -204,6 +217,20 @@ makemkv_parse_duration (OGMBrTitle *title, const gchar *duration)
 }
 
 static void
+makemkv_parse_video_format (OGMBrTitle *title, const gchar *codec)
+{
+  /*
+   * TODO V_MS/VFW/FOURCC
+  */
+  if (g_str_equal (codec, "V_MPEG4/ISO/AVC"))
+    title->priv->format = OGMRIP_FORMAT_H264;
+  else if (g_str_equal (codec, "V_MPEG2"))
+    title->priv->format = OGMRIP_FORMAT_MPEG2;
+  else
+    title->priv->format = OGMRIP_FORMAT_UNDEFINED;
+}
+
+static void
 makemkv_parse_aspect_ratio (OGMBrTitle *title, const gchar *aspect)
 {
   guint num, denom;
@@ -237,6 +264,73 @@ makemkv_parse_raw_size (OGMBrTitle *title, const gchar *size)
     title->priv->raw_width = width;
     title->priv->raw_height = height;
   }
+}
+
+static void
+makemkv_parse_audio_flags (OGMBrAudioStream *audio, gint flags)
+{
+  if (flags & AP_AVStreamFlag_DirectorsComments)
+    audio->priv->content = OGMRIP_AUDIO_CONTENT_COMMENTS1;
+  else if (flags & AP_AVStreamFlag_AlternateDirectorsComments)
+    audio->priv->content = OGMRIP_AUDIO_CONTENT_COMMENTS2;
+  else if (flags & AP_AVStreamFlag_ForVisuallyImpaired)
+    audio->priv->content = OGMRIP_AUDIO_CONTENT_IMPAIRED;
+  else
+    audio->priv->content = OGMRIP_AUDIO_CONTENT_UNDEFINED;
+}
+
+static void
+makemkv_parse_audio_bitrate (OGMBrAudioStream *audio, const gchar *bitrate)
+{
+  /* TODO %u.%u Mb/s, %u Mb/s, %u.%u Kb/s, %u Kb/s, %u b/s */
+}
+
+static void
+makemkv_parse_audio_format (OGMBrAudioStream *audio, const gchar *codec)
+{
+  /*
+   * TODO A_EAC3, A_TRUEHD, A_MS/ACM
+   */
+
+  if (g_str_equal (codec, "A_AC3"))
+    audio->priv->format = OGMRIP_FORMAT_AC3;
+  else if (g_str_equal (codec, "A_DTS"))
+    audio->priv->format = OGMRIP_FORMAT_DTS;
+  else if (g_str_equal (codec, "A_PCM/INT/LIT") || g_str_equal (codec, "A_PCM/INT/BIG"))
+    audio->priv->format = OGMRIP_FORMAT_PCM;
+  else if (g_str_equal (codec, "A_FLAC"))
+    audio->priv->format = OGMRIP_FORMAT_FLAC;
+  else
+    audio->priv->format = OGMRIP_FORMAT_UNDEFINED;
+}
+
+static void
+makemkv_parse_audio_language (OGMBrAudioStream *audio, const gchar *language)
+{
+  /* TODO audio->priv->language = ogmrip_language_from_iso639_2 (language); */
+}
+
+static void
+makemkv_parse_subp_flags (OGMBrSubpStream *subp, gint flags)
+{
+  subp->priv->content = OGMRIP_SUBP_CONTENT_UNDEFINED;
+}
+
+static void
+makemkv_parse_subp_format (OGMBrSubpStream *subp, const gchar *codec)
+{
+  if (g_str_equal (codec, "S_HDMV/PGS"))
+    subp->priv->format = OGMRIP_FORMAT_PGS;
+  else if (g_str_equal (codec, "S_VOBSUB"))
+    subp->priv->format = OGMRIP_FORMAT_VOBSUB;
+  else
+    subp->priv->format = OGMRIP_FORMAT_UNDEFINED;
+}
+
+static void
+makemkv_parse_subp_language (OGMBrSubpStream *subp, const gchar *language)
+{
+  /* TODO subp->priv->language = ogmrip_language_from_iso639_2 (language); */
 }
 
 static ProgressData *
@@ -1029,6 +1123,7 @@ ogmbr_makemkv_open_disc (OGMBrMakeMKV *mmkv, OGMBrDisc *disc, GCancellable *canc
   {
     OGMBrTitle *title = link1->data;
     gchar *str;
+    gint flags;
 
     title->priv->nchapters = makemkv_get_info_num (mmkv, title->priv->handle, ap_iaChapterCount);
     title->priv->size = makemkv_get_info_num (mmkv, title->priv->handle, ap_iaDiskSizeBytes);
@@ -1037,12 +1132,8 @@ ogmbr_makemkv_open_disc (OGMBrMakeMKV *mmkv, OGMBrDisc *disc, GCancellable *canc
     makemkv_parse_duration (title, str);
     g_free (str);
 
-    /* CodecId: V_MPEG2, V_MPEG4/ISO/AVC, V_MS/VFW/FOURCC */
     str = makemkv_get_info_str (mmkv, title->priv->vhandle, ap_iaCodecId);
-    g_free (str);
-
-    /* CodecShort: Mpeg2, Mpeg4, VC-1 */
-    str = makemkv_get_info_str (mmkv, title->priv->vhandle, ap_iaCodecShort);
+    makemkv_parse_video_format (title, str);
     g_free (str);
 
     str = makemkv_get_info_str (mmkv, title->priv->vhandle, ap_iaVideoAspectRatio);
@@ -1063,22 +1154,20 @@ ogmbr_makemkv_open_disc (OGMBrMakeMKV *mmkv, OGMBrDisc *disc, GCancellable *canc
 
       audio->priv->channels = makemkv_get_info_num (mmkv, audio->priv->handle, ap_iaAudioChannelsCount);
       audio->priv->samplerate = makemkv_get_info_num (mmkv, audio->priv->handle, ap_iaAudioSampleRate);
-      audio->priv->flags = makemkv_get_info_num (mmkv, audio->priv->handle, ap_iaStreamFlags);
 
-      /* Bitrate: 192 Kb/s */
+      flags = makemkv_get_info_num (mmkv, audio->priv->handle, ap_iaStreamFlags);
+      makemkv_parse_audio_flags (audio, flags);
+
       str = makemkv_get_info_str (mmkv, audio->priv->handle, ap_iaBitrate);
+      makemkv_parse_audio_bitrate (audio, str);
       g_free (str);
 
-      /* CodecId: A_AC3, A_DTS */
       str = makemkv_get_info_str (mmkv, audio->priv->handle, ap_iaCodecId);
+      makemkv_parse_audio_format (audio, str);
       g_free (str);
 
-      /* CodecShort: DD, DTS, DTS_HD */
-      str = makemkv_get_info_str (mmkv, audio->priv->handle, ap_iaCodecShort);
-      g_free (str);
-
-      /* LangCode: dan, deu, ell, eng, fin fra, ita, jpn, kor, nld, nor, por, spa, swe, zho */
       str = makemkv_get_info_str (mmkv, audio->priv->handle, ap_iaLangCode);
+      makemkv_parse_audio_language (audio, str);
       g_free (str);
     }
 
@@ -1086,14 +1175,15 @@ ogmbr_makemkv_open_disc (OGMBrMakeMKV *mmkv, OGMBrDisc *disc, GCancellable *canc
     {
       OGMBrSubpStream *subp = link2->data;
 
-      subp->priv->flags = makemkv_get_info_num (mmkv, subp->priv->handle, ap_iaStreamFlags);
+      flags = makemkv_get_info_num (mmkv, subp->priv->handle, ap_iaStreamFlags);
+      makemkv_parse_subp_flags (subp, flags);
 
-      /* CodecId: S_HDMV/PGS */
       str = makemkv_get_info_str (mmkv, subp->priv->handle, ap_iaCodecId);
+      makemkv_parse_subp_format (subp, str);
       g_free (str);
 
-      /* LangCode: dan, deu, ell, eng, fin fra, ita, jpn, kor, nld, nor, por, spa, swe, zho */
       str = makemkv_get_info_str (mmkv, subp->priv->handle, ap_iaLangCode);
+      makemkv_parse_subp_language (subp, str);
       g_free (str);
     }
   }

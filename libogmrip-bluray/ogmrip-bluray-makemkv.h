@@ -16,10 +16,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef __OGMBR_MAKEMKV_H__
-#define __OGMBR_MAKEMKV_H__
+#ifndef __OGMRIP_BLURAY_MAKEMKV_H__
+#define __OGMRIP_BLURAY_MAKEMKV_H__
 
 #include <ogmrip-bluray-disc.h>
+
+#include <gio/gio.h>
 
 G_BEGIN_DECLS
 
@@ -135,5 +137,5 @@ gboolean       ogmbr_makemkv_backup_disc_finish   (OGMBrMakeMKV        *mmkv,
 
 G_END_DECLS
 
-#endif /* __OGMBR_MAKEMKV_H__ */
+#endif /* __OGMRIP_BLURAY_MAKEMKV_H__ */
 
