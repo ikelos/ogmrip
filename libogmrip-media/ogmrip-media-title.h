@@ -36,6 +36,9 @@ struct _OGMRipTitleInterface
   GTypeInterface base_iface;
 
   gboolean            (* open)                 (OGMRipTitle         *title,
+                                                GCancellable        *cancellable,
+                                                OGMRipTitleCallback callback,
+                                                gpointer            user_data,
                                                 GError              **error);
   void                (* close)                (OGMRipTitle         *title);
   gboolean            (* is_open)              (OGMRipTitle         *title);
@@ -71,6 +74,9 @@ struct _OGMRipTitleInterface
 
 GType               ogmrip_title_get_type             (void) G_GNUC_CONST;
 gboolean            ogmrip_title_open                 (OGMRipTitle         *title,
+                                                       GCancellable        *cancellable,
+                                                       OGMRipTitleCallback callback,
+                                                       gpointer            user_data,
                                                        GError              **error);
 void                ogmrip_title_close                (OGMRipTitle         *title);
 gboolean            ogmrip_title_is_open              (OGMRipTitle         *title);

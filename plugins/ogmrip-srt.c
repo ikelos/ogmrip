@@ -1,4 +1,4 @@
-/* OGMRip - A library for DVD ripping and encoding
+/* OGMRipSrt - An SRT plugin for OGMRip
  * Copyright (C) 2004-2012 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -226,7 +226,7 @@ ogmrip_tesseract_command (OGMRipSubpCodec *subp, const gchar *input, gboolean la
     const gchar *language;
 
     stream = ogmrip_codec_get_input (OGMRIP_CODEC (subp));
-    language = ogmrip_language_get_iso639_2 (ogmrip_subp_stream_get_language (OGMRIP_SUBP_STREAM (stream)));
+    language = ogmrip_language_to_iso639_2 (ogmrip_subp_stream_get_language (OGMRIP_SUBP_STREAM (stream)));
 
     if (g_str_equal (language, "und"))
       OGMRIP_SRT (subp)->is_valid_lang = FALSE;

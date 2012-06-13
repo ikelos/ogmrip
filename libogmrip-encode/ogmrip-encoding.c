@@ -1,4 +1,4 @@
-/* OGMRip - A library for DVD ripping and encoding
+/* OGMRip - A library for media ripping and encoding
  * Copyright (C) 2004-2012 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,7 +19,7 @@
 /**
  * SECTION:ogmrip-encoding
  * @title: OGMRipEncoding
- * @short_description: An all-in-one component to encode DVD titles
+ * @short_description: An all-in-one component to encode media titles
  * @include: ogmrip-encoding.h
  */
 

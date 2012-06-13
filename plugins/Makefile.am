@@ -328,6 +328,7 @@ ogmrip_ogg_la_LIBTOOLFLAGS = \
   --tag=disable-static
 
 ogmrip_ogg_la_LIBADD = \
+  $(top_builddir)/libogmrip-base/libogmrip-base.la \
   $(top_builddir)/libogmrip-job/libogmrip-job.la \
   $(top_builddir)/libogmrip-media/libogmrip-media.la \
   $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la \
@@ -369,6 +370,7 @@ ogmrip_mp4_la_LIBTOOLFLAGS = \
   --tag=disable-static
 
 ogmrip_mp4_la_LIBADD = \
+  $(top_builddir)/libogmrip-base/libogmrip-base.la \
   $(top_builddir)/libogmrip-job/libogmrip-job.la \
   $(top_builddir)/libogmrip-media/libogmrip-media.la \
   $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la \

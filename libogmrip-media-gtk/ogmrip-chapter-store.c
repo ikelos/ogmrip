@@ -76,7 +76,7 @@ ogmrip_chapter_store_class_init (OGMRipChapterStoreClass *klass)
   gobject_class->set_property = ogmrip_chapter_store_set_property;
 
   g_object_class_install_property (gobject_class, PROP_TITLE,
-      g_param_spec_object ("title", "Title property", "The DVD title",
+      g_param_spec_object ("title", "Title property", "The media title",
         OGMRIP_TYPE_TITLE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   signals[SELECTION_CHANGED] = g_signal_new ("selection-changed", G_TYPE_FROM_CLASS (klass),

@@ -1,4 +1,4 @@
-/* OGMRip - A library for DVD ripping and encoding
+/* OGMRipOgg - An OGG plugin for OGMRip
  * Copyright (C) 2004-2012 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -103,7 +103,7 @@ ogmrip_ogg_merge_append_audio_file (OGMRipContainer *ogg, OGMRipFile *file, GPtr
     {
       g_ptr_array_add (argv, g_strdup ("-c"));
       g_ptr_array_add (argv, g_strdup_printf ("LANGUAGE=%s", 
-            g_strdup (ogmrip_language_get_label (language))));
+            g_strdup (ogmrip_language_to_name (language))));
     }
 
     sync = ogmrip_container_get_sync (ogg);
@@ -136,7 +136,7 @@ ogmrip_ogg_merge_append_subp_file (OGMRipContainer *ogg, OGMRipFile *file, GPtrA
     {
       g_ptr_array_add (argv, g_strdup ("-c"));
       g_ptr_array_add (argv, g_strdup_printf ("LANGUAGE=%s",
-            g_strdup (ogmrip_language_get_label (language))));
+            g_strdup (ogmrip_language_to_name (language))));
     }
 
     g_ptr_array_add (argv, g_strdup ("--novideo"));
@@ -163,7 +163,7 @@ ogmrip_ogg_merge_append_chapter_file (OGMRipContainer *ogg, OGMRipFile *file, GP
     {
       g_ptr_array_add (argv, g_strdup ("-c"));
       g_ptr_array_add (argv, g_strdup_printf ("LANGUAGE=%s",
-            g_strdup (ogmrip_language_get_label (language))));
+            g_strdup (ogmrip_language_to_name (language))));
     }
 
     g_ptr_array_add (argv, g_strdup ("--novideo"));

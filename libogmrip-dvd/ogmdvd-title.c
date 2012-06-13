@@ -232,21 +232,6 @@ ogmdvd_video_stream_get_aspect_ratio  (OGMRipVideoStream *video, guint *numerato
 }
 
 static gint
-ogmdvd_video_stream_get_aspect (OGMRipVideoStream *video)
-{
-  switch (OGMDVD_TITLE (video)->priv->display_aspect_ratio)
-  {
-    case 0:
-      return OGMRIP_ASPECT_4_3;
-    case 1:
-    case 3:
-      return OGMRIP_ASPECT_16_9;
-    default:
-      return OGMRIP_ASPECT_UNDEFINED;
-  }
-}
-
-static gint
 ogmdvd_video_stream_get_standard (OGMRipVideoStream *video)
 {
   return OGMDVD_TITLE (video)->priv->video_format;
@@ -259,7 +244,6 @@ ogmdvd_video_stream_iface_init (OGMRipVideoStreamInterface *iface)
   iface->get_resolution   = ogmdvd_video_stream_get_resolution;
   iface->get_crop_size    = ogmdvd_video_stream_get_crop_size;
   iface->get_aspect_ratio = ogmdvd_video_stream_get_aspect_ratio;
-  iface->get_aspect       = ogmdvd_video_stream_get_aspect;
   iface->get_standard     = ogmdvd_video_stream_get_standard;
 }
 
@@ -270,14 +254,23 @@ typedef struct
   gpointer user_data;
 } OGMDvdProgress;
 
+static void
+ogmrip_title_open_cb (OGMRipMedia *media, gdouble percent, gpointer user_data)
+{
+  OGMDvdProgress *progress = user_data;
+
+  progress->callback (progress->title, percent, progress->user_data);
+}
+
 static gboolean
-ogmdvd_title_open (OGMRipTitle *title, GError **error)
+ogmdvd_title_open (OGMRipTitle *title, GCancellable *cancellable, OGMRipTitleCallback callback, gpointer user_data, GError **error)
 {
   OGMDvdTitle *dtitle = OGMDVD_TITLE (title);
+  OGMDvdProgress progress = { title, callback, user_data };
 
   dtitle->priv->close_disc = !ogmrip_media_is_open (OGMRIP_MEDIA (dtitle->priv->disc));
 
-  if (!ogmrip_media_open (OGMRIP_MEDIA (dtitle->priv->disc), error))
+  if (!ogmrip_media_open (OGMRIP_MEDIA (dtitle->priv->disc), cancellable, callback ? ogmrip_title_open_cb : NULL, &progress, error))
     return FALSE;
 
   dtitle->priv->vts_file = ifoOpen (OGMDVD_DISC (dtitle->priv->disc)->priv->reader, dtitle->priv->title_set_nr);
@@ -818,7 +811,7 @@ ogmdvd_title_analyze (OGMRipTitle *title, GCancellable *cancellable, OGMRipTitle
     return TRUE;
 
   is_open = ogmdvd_title_is_open (title);
-  if (!is_open && !ogmdvd_title_open (title, error))
+  if (!is_open && !ogmdvd_title_open (title, cancellable, callback, user_data, error))
     return FALSE;
 
   progress.title = title;

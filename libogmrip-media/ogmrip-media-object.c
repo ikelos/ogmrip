@@ -29,11 +29,12 @@ ogmrip_media_default_init (OGMRipMediaInterface *iface)
 }
 
 gboolean
-ogmrip_media_open (OGMRipMedia *media, GError **error)
+ogmrip_media_open (OGMRipMedia *media, GCancellable *cancellable, OGMRipMediaCallback callback, gpointer user_data, GError **error)
 {
   OGMRipMediaInterface *iface;
 
   g_return_val_if_fail (OGMRIP_IS_MEDIA (media), FALSE);
+  g_return_val_if_fail (cancellable == NULL || G_IS_CANCELLABLE (cancellable), FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
   
   iface = OGMRIP_MEDIA_GET_IFACE (media);
@@ -41,7 +42,7 @@ ogmrip_media_open (OGMRipMedia *media, GError **error)
   if (!iface->open)
     return TRUE;
 
-  return iface->open (media, error);
+  return iface->open (media, cancellable, callback, user_data, error);
 }
 
 void

@@ -31,6 +31,8 @@
 #include "ogmrip-file-chooser-dialog.h"
 #include "ogmrip-error-dialog.h"
 
+#include <ogmrip-base.h>
+
 #include <glib/gi18n-lib.h>
 
 #define OGMRIP_SOURCE_CHOOSER_WIDGET_GET_PRIVATE(o) \
@@ -558,7 +560,7 @@ ogmrip_source_chooser_widget_add_audio_stream (OGMRipSourceChooserWidget *choose
 
     g_string_append (string, " (");
 
-    lang = ogmrip_language_get_label (ogmrip_audio_stream_get_language (stream));
+    lang = ogmrip_language_to_name (ogmrip_audio_stream_get_language (stream));
     if (!g_str_equal (lang, "Undetermined"))
       g_string_append_printf (string, "%s, ", lang);
 
@@ -613,7 +615,7 @@ ogmrip_source_chooser_widget_add_subp_stream (OGMRipSourceChooserWidget *chooser
     if (content > 0)
       g_string_append_printf (string, ": %s", ogmrip_subp_content_get_label (content));
 
-    lang = ogmrip_language_get_label (ogmrip_subp_stream_get_language (stream));
+    lang = ogmrip_language_to_name (ogmrip_subp_stream_get_language (stream));
     if (!g_str_equal (lang, "Undetermined"))
       g_string_append_printf (string, " (%s)", lang);
 

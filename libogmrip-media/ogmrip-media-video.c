@@ -103,21 +103,6 @@ ogmrip_video_stream_get_standard (OGMRipVideoStream *video)
   return iface->get_standard (video);
 }
 
-gint 
-ogmrip_video_stream_get_aspect (OGMRipVideoStream *video)
-{
-  OGMRipVideoStreamInterface *iface;
-
-  g_return_val_if_fail (OGMRIP_IS_VIDEO_STREAM (video), -1);
-
-  iface = OGMRIP_VIDEO_STREAM_GET_IFACE (video);
-
-  if (!iface->get_aspect)
-    return OGMRIP_ASPECT_UNDEFINED;
-
-  return iface->get_aspect (video);
-}
-
 void 
 ogmrip_video_stream_get_aspect_ratio (OGMRipVideoStream *video, guint *numerator, guint *denominator)
 {

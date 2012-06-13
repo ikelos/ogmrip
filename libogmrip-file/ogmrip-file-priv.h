@@ -39,7 +39,6 @@ struct _OGMRipFilePriv
 
 struct _OGMRipVideoFilePriv
 {
-  gint aspect;
   gint bitrate;
   gint standard;
   guint width;

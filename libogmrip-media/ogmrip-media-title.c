@@ -27,7 +27,7 @@ ogmrip_title_default_init (OGMRipTitleInterface *iface)
 }
 
 gboolean 
-ogmrip_title_open (OGMRipTitle *title, GError **error)
+ogmrip_title_open (OGMRipTitle *title, GCancellable *cancellable, OGMRipTitleCallback callback, gpointer user_data, GError **error)
 {
   OGMRipTitleInterface *iface;
 
@@ -39,7 +39,7 @@ ogmrip_title_open (OGMRipTitle *title, GError **error)
   if (!iface->open)
     return TRUE;
 
-  return iface->open (title, error);
+  return iface->open (title, cancellable, callback, user_data, error);
 }
 
 void 

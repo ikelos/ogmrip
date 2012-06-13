@@ -1,4 +1,4 @@
-/* OGMRip - A library for media ripping and encoding
+/* OGMRipBase - A foundation library for OGMRip
  * Copyright (C) 2010-2012 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -16,28 +16,28 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "ogmrip-configurable.h"
+#ifndef __OGMRIP_LANG_H__
+#define __OGMRIP_LANG_H__
 
-#include <ogmrip-job.h>
+#include <glib.h>
 
-G_DEFINE_INTERFACE (OGMRipConfigurable, ogmrip_configurable, OGMJOB_TYPE_BIN);
+G_BEGIN_DECLS
 
-static void
-ogmrip_configurable_default_init (OGMRipConfigurableInterface *iface)
+enum
 {
-}
+  OGMRIP_LANGUAGE_ISO639_1,
+  OGMRIP_LANGUAGE_ISO639_2,
+  OGMRIP_LANGUAGE_NAME
+};
 
-void
-ogmrip_configurable_configure (OGMRipConfigurable *configurable, OGMRipProfile *profile)
-{
-  OGMRipConfigurableInterface *iface;
+const gchar * ogmrip_language_to_name       (gint        code);
+gint          ogmrip_language_from_name     (const gchar *name);
+const gchar * ogmrip_language_to_iso639_1   (gint        code);
+gint          ogmrip_language_from_iso639_1 (const gchar *iso639_1);
+const gchar * ogmrip_language_to_iso639_2   (gint        code);
+gint          ogmrip_language_from_iso639_2 (const gchar *iso639_2);
 
-  g_return_if_fail (OGMRIP_IS_CONFIGURABLE (configurable));
-  g_return_if_fail (OGMRIP_IS_PROFILE (profile));
+G_END_DECLS
 
-  iface = OGMRIP_CONFIGURABLE_GET_IFACE (configurable);
-
-  if (iface->configure)
-    return iface->configure (configurable, profile);
-}
+#endif /* __OGMRIP_LANG_H__ */
 

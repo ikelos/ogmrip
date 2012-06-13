@@ -31,7 +31,7 @@ static void
 ogmrip_source_chooser_default_init (OGMRipSourceChooserInterface *iface)
 {
   g_object_interface_install_property (iface,
-      g_param_spec_object ("title", "Title property", "The DVD title",
+      g_param_spec_object ("title", "Title property", "The media title",
         OGMRIP_TYPE_TITLE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 }
 

@@ -34,7 +34,6 @@ struct _OGMRipVideoStreamInterface
 {
   GTypeInterface base_iface;
 
-  gint         (* get_aspect)       (OGMRipVideoStream   *video);
   void         (* get_aspect_ratio) (OGMRipVideoStream   *video,
                                      guint               *numerator,
                                      guint               *denominator);
@@ -55,7 +54,6 @@ struct _OGMRipVideoStreamInterface
 };
 
 GType        ogmrip_video_stream_get_type         (void) G_GNUC_CONST;
-gint         ogmrip_video_stream_get_aspect       (OGMRipVideoStream   *video);
 void         ogmrip_video_stream_get_aspect_ratio (OGMRipVideoStream   *video,
                                                    guint               *numerator,
                                                    guint               *denominator);
