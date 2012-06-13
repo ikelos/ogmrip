@@ -754,7 +754,7 @@ ogmdvd_disc_set_property (GObject *gobject, guint prop_id, const GValue *value, 
 }
 
 static gboolean
-ogmdvd_disc_open (OGMRipMedia *media, GError **error)
+ogmdvd_disc_open (OGMRipMedia *media, GCancellable *cancellable, OGMRipMediaCallback callback, gpointer user_data, GError **error)
 {
   OGMDvdDisc *disc = OGMDVD_DISC (media);
   dvd_reader_t *reader;
@@ -964,7 +964,7 @@ ogmdvd_disc_copy (OGMRipMedia *media, const gchar *path, GCancellable *cancellab
   if (!ogmdvd_disc_copy_exists (disc, path))
   {
     is_open = ogmdvd_disc_is_open (media);
-    if (!is_open && !ogmdvd_disc_open (media, error))
+    if (!is_open && !ogmdvd_disc_open (media, cancellable, callback, user_data, error))
       return FALSE;
 
     argv = ogmdvd_disc_copy_command (disc, path);

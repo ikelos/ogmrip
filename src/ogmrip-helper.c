@@ -77,7 +77,7 @@ ogmrip_open_title (GtkWindow *parent, OGMRipTitle *title, GError **error)
   if (ogmrip_title_is_open (title))
     return TRUE;
 
-  if (ogmrip_title_open (title, NULL))
+  if (ogmrip_title_open (title, NULL, NULL, NULL, NULL))
     return TRUE;
 
   dialog = gtk_message_dialog_new_with_markup (parent,
@@ -106,7 +106,7 @@ ogmrip_open_title (GtkWindow *parent, OGMRipTitle *title, GError **error)
     if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_CANCEL)
       break;
 
-    if (ogmrip_title_open (title, error))
+    if (ogmrip_title_open (title, NULL, NULL, NULL, error))
       break;
 
     if (*error && (*error)->code != OGMDVD_DISC_ERROR_ID)

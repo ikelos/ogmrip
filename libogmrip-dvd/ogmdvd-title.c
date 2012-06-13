@@ -254,14 +254,23 @@ typedef struct
   gpointer user_data;
 } OGMDvdProgress;
 
+static void
+ogmrip_title_open_cb (OGMRipMedia *media, gdouble percent, gpointer user_data)
+{
+  OGMDvdProgress *progress = user_data;
+
+  progress->callback (progress->title, percent, progress->user_data);
+}
+
 static gboolean
-ogmdvd_title_open (OGMRipTitle *title, GError **error)
+ogmdvd_title_open (OGMRipTitle *title, GCancellable *cancellable, OGMRipTitleCallback callback, gpointer user_data, GError **error)
 {
   OGMDvdTitle *dtitle = OGMDVD_TITLE (title);
+  OGMDvdProgress progress = { title, callback, user_data };
 
   dtitle->priv->close_disc = !ogmrip_media_is_open (OGMRIP_MEDIA (dtitle->priv->disc));
 
-  if (!ogmrip_media_open (OGMRIP_MEDIA (dtitle->priv->disc), error))
+  if (!ogmrip_media_open (OGMRIP_MEDIA (dtitle->priv->disc), cancellable, callback ? ogmrip_title_open_cb : NULL, &progress, error))
     return FALSE;
 
   dtitle->priv->vts_file = ifoOpen (OGMDVD_DISC (dtitle->priv->disc)->priv->reader, dtitle->priv->title_set_nr);
@@ -802,7 +811,7 @@ ogmdvd_title_analyze (OGMRipTitle *title, GCancellable *cancellable, OGMRipTitle
     return TRUE;
 
   is_open = ogmdvd_title_is_open (title);
-  if (!is_open && !ogmdvd_title_open (title, error))
+  if (!is_open && !ogmdvd_title_open (title, cancellable, callback, user_data, error))
     return FALSE;
 
   progress.title = title;

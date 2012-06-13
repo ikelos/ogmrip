@@ -35,6 +35,9 @@ struct _OGMRipMediaInterface
   GTypeInterface base_iface;
 
   gboolean      (* open)          (OGMRipMedia         *media,
+                                   GCancellable        *cancellable,
+                                   OGMRipMediaCallback callback,
+                                   gpointer            user_data,
                                    GError              **error);
   void          (* close)         (OGMRipMedia         *media);
   gboolean      (* is_open)       (OGMRipMedia         *media);
@@ -55,6 +58,9 @@ struct _OGMRipMediaInterface
 
 GType         ogmrip_media_get_type      (void) G_GNUC_CONST;
 gboolean      ogmrip_media_open          (OGMRipMedia         *media,
+                                          GCancellable        *cancellable,
+                                          OGMRipMediaCallback callback,
+                                          gpointer            user_data,
                                           GError              **error);
 void          ogmrip_media_close         (OGMRipMedia         *media);
 gboolean      ogmrip_media_is_open       (OGMRipMedia         *media);
