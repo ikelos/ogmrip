@@ -539,7 +539,6 @@ makemkv_check_version (OGMBrMakeMKV *mmkv, const gchar *available_versions)
 static void
 makemkv_exit (OGMBrMakeMKV *mmkv)
 {
-  g_debug ("Exit");
 
   mmkv->priv->m_shutdown = TRUE;
 }
@@ -642,9 +641,9 @@ makemkv_collection_info (OGMBrMakeMKV *mmkv)
     disc->priv->handle = mmkv->priv->m_mem->args[0];
     disc->priv->ntitles = (guint) mmkv->priv->m_mem->args[1];
   }
-/*
+  /*
   g_debug ("Collection info: %llu, %u", disc->priv->handle, disc->priv->ntitles);
-*/
+  */
 }
 
 static void
@@ -663,9 +662,9 @@ makemkv_title_info (OGMBrMakeMKV *mmkv)
   title->priv->media = OGMRIP_MEDIA (disc);
   title->priv->id = id;
   title->priv->handle = mmkv->priv->m_mem->args[1];
-/*
+  /*
   g_debug ("Title info: %u", id);
-*/
+  */
 }
 
 static void
@@ -730,9 +729,9 @@ makemkv_track_info (OGMBrMakeMKV *mmkv)
     default:
       break;
   }
-/*
+  /*
   g_debug ("Track info: %u, %u, %u", id, tr, disc->priv->titles[id].tracks[tr].type);
-*/
+  */
 }
 
 static gboolean
@@ -953,6 +952,8 @@ ogmbr_makemkv_finalize (GObject *gobject)
 {
   OGMBrMakeMKV *mmkv = OGMBR_MAKEMKV (gobject);
 
+  g_debug ("Finalize");
+
   makemkv_free_drives (mmkv);
 
   if (mmkv->priv->m_mem && mmkv->priv->m_mem->start == 1)
@@ -975,8 +976,8 @@ ogmbr_makemkv_finalize (GObject *gobject)
     g_source_unref (mmkv->priv->timeout);
   }
 
-  g_main_loop_unref (mmkv->priv->loop);
   g_main_context_unref (mmkv->priv->context);
+  g_main_loop_unref (mmkv->priv->loop);
 
   G_OBJECT_CLASS (ogmbr_makemkv_parent_class)->finalize (gobject);
 }
