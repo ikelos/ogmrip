@@ -22,6 +22,8 @@
 #include "ogmrip-bluray-subp.h"
 #include "ogmrip-bluray-priv.h"
 
+#include <ogmrip-base.h>
+
 #include <fcntl.h>
 #include <stdio.h>
 #include <stddef.h>
@@ -318,7 +320,7 @@ makemkv_parse_audio_format (OGMBrAudioStream *audio, const gchar *codec)
 static void
 makemkv_parse_audio_language (OGMBrAudioStream *audio, const gchar *language)
 {
-  /* TODO audio->priv->language = ogmrip_language_from_iso639_2 (language); */
+  audio->priv->language = ogmrip_language_from_iso639_2 (language);
 }
 
 static void
@@ -341,7 +343,7 @@ makemkv_parse_subp_format (OGMBrSubpStream *subp, const gchar *codec)
 static void
 makemkv_parse_subp_language (OGMBrSubpStream *subp, const gchar *language)
 {
-  /* TODO subp->priv->language = ogmrip_language_from_iso639_2 (language); */
+  subp->priv->language = ogmrip_language_from_iso639_2 (language);
 }
 
 static ProgressData *

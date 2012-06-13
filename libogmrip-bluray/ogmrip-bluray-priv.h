@@ -72,6 +72,7 @@ struct _OGMBrAudioStreamPriv
   guint channels;
   guint samplerate;
   guint content;
+  gint language;
 };
 
 struct _OGMBrSubpStreamPriv
@@ -83,6 +84,7 @@ struct _OGMBrSubpStreamPriv
 
   OGMRipFormat format;
   guint content;
+  gint language;
 };
 
 G_END_DECLS
