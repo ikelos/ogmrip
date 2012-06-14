@@ -238,14 +238,19 @@ ogmbr_media_iface_init (OGMRipMediaInterface *iface)
 void
 ogmrip_bluray_register_media (void)
 {
-  OGMRipTypeInfo *info;
   OGMBrMakeMKV *mmkv;
 
-  info = g_object_new (OGMRIP_TYPE_TYPE_INFO, "name", "Bluray", "description", "Bluray", NULL);
-
   mmkv = ogmbr_makemkv_get_default ();
-  g_object_set_data_full (G_OBJECT (info), "makemkv", mmkv, g_object_unref);
 
-  ogmrip_type_register (OGMBR_TYPE_DISC, info);
+  if (ogmbr_makemkv_update_drives (mmkv, NULL, NULL))
+  {
+    OGMRipTypeInfo *info;
+
+    info = g_object_new (OGMRIP_TYPE_TYPE_INFO, "name", "Bluray", "description", "Bluray", NULL);
+    g_object_set_data_full (G_OBJECT (info), "makemkv", mmkv, g_object_unref);
+    ogmrip_type_register (OGMBR_TYPE_DISC, info);
+  }
+  else
+    g_object_unref (mmkv);
 }
 
