@@ -301,6 +301,23 @@ ogmrip_profile_editor_set_expand_sensitivity (GValue *value, GVariant *variant, 
 }
 
 static gboolean
+ogmrip_profile_editor_set_video_options_sensitivity (GBinding *binding, const GValue *source_value, GValue *target_value, gpointer data)
+{
+  GtkWidget *chooser;
+  GType type;
+  gint format;
+
+  chooser = (GtkWidget *) g_binding_get_source (binding);
+
+  type = ogmrip_type_chooser_widget_get_active (GTK_COMBO_BOX (chooser));
+
+  format = type != G_TYPE_NONE ? ogmrip_codec_format (type) : OGMRIP_FORMAT_UNDEFINED;
+  g_value_set_boolean (target_value, format != OGMRIP_FORMAT_UNDEFINED && format != OGMRIP_FORMAT_COPY);
+
+  return TRUE;
+}
+
+static gboolean
 ogmrip_profile_editor_set_page_sensitivity (GBinding *binding, const GValue *source_value, GValue *target_value, gpointer data)
 {
   g_value_set_boolean (target_value, g_value_get_int (source_value) >= 0);
@@ -696,6 +713,25 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
       ogmrip_profile_editor_set_expand_sensitivity, NULL, settings, NULL);
   g_settings_bind_with_mapping (settings, OGMRIP_PROFILE_MAX_HEIGHT, widget, "sensitive", G_SETTINGS_BIND_GET,
       ogmrip_profile_editor_set_expand_sensitivity, NULL, settings, NULL);
+
+  widget = gtk_builder_get_widget (builder, "video-options-label");
+  g_object_bind_property_full (dialog->priv->video_chooser, "active", widget, "sensitive", G_BINDING_SYNC_CREATE,
+      ogmrip_profile_editor_set_video_options_sensitivity, NULL, NULL, NULL);
+
+  misc = gtk_builder_get_widget (builder, "video-options-table");
+  g_object_bind_property (widget, "sensitive", misc, "sensitive", G_BINDING_SYNC_CREATE);
+
+  misc = gtk_builder_get_widget (builder, "video-options-expander");
+  g_object_bind_property (widget, "sensitive", misc, "sensitive", G_BINDING_SYNC_CREATE);
+
+  misc = gtk_builder_get_widget (builder, "encoding-method-table");
+  g_object_bind_property (widget, "sensitive", misc, "sensitive", G_BINDING_SYNC_CREATE);
+
+  misc = gtk_builder_get_widget (builder, "video-quality-label");
+  g_object_bind_property (widget, "sensitive", misc, "sensitive", G_BINDING_SYNC_CREATE);
+
+  misc = gtk_builder_get_widget (builder, "video-quality-box");
+  g_object_bind_property (widget, "sensitive", misc, "sensitive", G_BINDING_SYNC_CREATE);
 
   g_object_unref (settings);
 
