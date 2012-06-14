@@ -268,7 +268,7 @@ ogmrip_options_dialog_update_scale_combo (OGMRipOptionsDialog *dialog)
 static void
 ogmrip_options_dialog_set_sensitivity (OGMRipOptionsDialog *dialog, OGMRipProfile *profile)
 {
-  GType video_codec = G_TYPE_NONE;
+  OGMRipFormat format = OGMRIP_FORMAT_UNDEFINED;
   OGMRipEncodingMethod method = 0;
   OGMRipScalerType scaler = 0;
   gboolean sensitive, can_crop = FALSE;
@@ -276,13 +276,20 @@ ogmrip_options_dialog_set_sensitivity (OGMRipOptionsDialog *dialog, OGMRipProfil
   if (profile)
   {
     GSettings *settings;
-    gchar *codec;
+    GType codec;
+    gchar *str;
 
     settings = ogmrip_profile_get_child (profile, OGMRIP_PROFILE_VIDEO);
 
-    codec = g_settings_get_string (settings, OGMRIP_PROFILE_CODEC);
-    video_codec = ogmrip_type_from_name (codec);
-    g_free (codec);
+    str = g_settings_get_string (settings, OGMRIP_PROFILE_CODEC);
+    codec = ogmrip_type_from_name (str);
+    g_free (str);
+
+    if (codec != G_TYPE_NONE)
+      format = ogmrip_codec_format (codec);
+
+    if (format == OGMRIP_FORMAT_COPY)
+      format = OGMRIP_FORMAT_UNDEFINED;
 
     scaler = g_settings_get_uint (settings, OGMRIP_PROFILE_SCALER);
     can_crop = g_settings_get_boolean (settings, OGMRIP_PROFILE_CAN_CROP);
@@ -296,9 +303,9 @@ ogmrip_options_dialog_set_sensitivity (OGMRipOptionsDialog *dialog, OGMRipProfil
 
   sensitive = gtk_widget_is_sensitive (dialog->priv->crop_check);
   gtk_widget_set_sensitive (dialog->priv->crop_check,
-      video_codec != G_TYPE_NONE && can_crop);
+      format != OGMRIP_FORMAT_UNDEFINED && can_crop);
 
-  if (video_codec == G_TYPE_NONE || !can_crop)
+  if (format == OGMRIP_FORMAT_UNDEFINED || !can_crop)
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->crop_check), FALSE);
   else if (!sensitive)
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->crop_check),
@@ -306,9 +313,9 @@ ogmrip_options_dialog_set_sensitivity (OGMRipOptionsDialog *dialog, OGMRipProfil
 
   sensitive = gtk_widget_is_sensitive (dialog->priv->scale_check);
   gtk_widget_set_sensitive (dialog->priv->scale_check,
-      video_codec != G_TYPE_NONE && scaler != OGMRIP_SCALER_NONE);
+      format != OGMRIP_FORMAT_UNDEFINED && scaler != OGMRIP_SCALER_NONE);
 
-  if (video_codec == G_TYPE_NONE || scaler == OGMRIP_SCALER_NONE)
+  if (format == OGMRIP_FORMAT_UNDEFINED || scaler == OGMRIP_SCALER_NONE)
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->scale_check), FALSE);
   else if (!sensitive)
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->scale_check),
@@ -316,15 +323,15 @@ ogmrip_options_dialog_set_sensitivity (OGMRipOptionsDialog *dialog, OGMRipProfil
 
   sensitive = gtk_widget_is_sensitive (dialog->priv->test_check);
   gtk_widget_set_sensitive (dialog->priv->test_check,
-      video_codec != G_TYPE_NONE && scaler != OGMRIP_SCALER_NONE && method != OGMRIP_ENCODING_QUANTIZER);
+      format != OGMRIP_FORMAT_UNDEFINED && scaler != OGMRIP_SCALER_NONE && method != OGMRIP_ENCODING_QUANTIZER);
 
-  if (video_codec == G_TYPE_NONE || scaler == OGMRIP_SCALER_NONE || method == OGMRIP_ENCODING_QUANTIZER)
+  if (format == OGMRIP_FORMAT_UNDEFINED || scaler == OGMRIP_SCALER_NONE || method == OGMRIP_ENCODING_QUANTIZER)
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->test_check), FALSE);
   else if (!sensitive)
     gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->test_check),
         !gtk_widget_get_visible (dialog->priv->test_box));
 
-  gtk_widget_set_sensitive (dialog->priv->deint_check, video_codec != G_TYPE_NONE);
+  gtk_widget_set_sensitive (dialog->priv->deint_check, format != OGMRIP_FORMAT_UNDEFINED);
 
   gtk_dialog_set_response_sensitive (GTK_DIALOG (dialog), OGMRIP_RESPONSE_ENQUEUE, profile != NULL);
   gtk_dialog_set_response_sensitive (GTK_DIALOG (dialog), OGMRIP_RESPONSE_EXTRACT, profile != NULL);
