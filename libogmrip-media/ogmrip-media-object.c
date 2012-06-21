@@ -176,10 +176,10 @@ ogmrip_media_get_nth_title (OGMRipMedia *media, guint nr)
   return iface->get_nth_title (media, nr);
 }
 
-GSList *
+GList *
 ogmrip_media_get_titles (OGMRipMedia *media)
 {
-  GSList *list = NULL;
+  GList *list = NULL;
   OGMRipTitle *title;
   gint i, n;
 
@@ -189,10 +189,10 @@ ogmrip_media_get_titles (OGMRipMedia *media)
   for (i = 0; i < n; i ++)
   {
     title = ogmrip_media_get_nth_title (media, i);
-    list = g_slist_prepend (list, title);
+    list = g_list_prepend (list, title);
   }
 
-  return g_slist_reverse (list);
+  return g_list_reverse (list);
 }
 
 gboolean
