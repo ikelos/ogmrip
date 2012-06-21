@@ -277,7 +277,7 @@ task_watch (GIOChannel *channel, TaskAsyncData *data, gchar **partial, OGMJobWat
     }
   }
 
-  if (retval && buffer[i + j] == '\0')
+  if (retval && j > 0 && buffer[i + j] == '\0')
   {
     line = g_strndup (buffer + i, j);
     retval = watch_task (data, watch_func, watch_data, line, partial);
