@@ -668,35 +668,12 @@ ogmdvd_disc_finalize (GObject *gobject)
 
   ogmdvd_disc_close (OGMRIP_MEDIA (disc));
 
-  if (disc->priv->uri)
-  {
-    g_free (disc->priv->uri);
-    disc->priv->uri = NULL;
-  }
-
-  if (disc->priv->device)
-  {
-    g_free (disc->priv->device);
-    disc->priv->device = NULL;
-  }
-
-  if (disc->priv->orig_device)
-  {
-    g_free (disc->priv->orig_device);
-    disc->priv->orig_device = NULL;
-  }
-
-  if (disc->priv->label)
-  {
-    g_free (disc->priv->label);
-    disc->priv->label = NULL;
-  }
-
-  if (disc->priv->id)
-  {
-    g_free (disc->priv->id);
-    disc->priv->id = NULL;
-  }
+  g_free (disc->priv->uri);
+  g_free (disc->priv->orig_uri);
+  g_free (disc->priv->device);
+  g_free (disc->priv->orig_device);
+  g_free (disc->priv->label);
+  g_free (disc->priv->id);
 
   G_OBJECT_CLASS (ogmdvd_disc_parent_class)->finalize (gobject);
 }
@@ -911,6 +888,10 @@ ogmdvd_disc_device_changed_cb (GFileMonitor *monitor, GFile *file, GFile *other_
     disc->priv->device = disc->priv->orig_device;
     disc->priv->orig_device = NULL;
 
+    g_free (disc->priv->uri);
+    disc->priv->uri = disc->priv->orig_uri;
+    disc->priv->orig_uri = NULL;
+
     g_object_unref (monitor);
   }
 }
@@ -995,10 +976,13 @@ ogmdvd_disc_copy (OGMRipMedia *media, const gchar *path, GCancellable *cancellab
       return FALSE;
   }
 
-  if (disc->priv->orig_device)
-    g_free (disc->priv->orig_device);
+  g_free (disc->priv->orig_device);
   disc->priv->orig_device = disc->priv->device;
   disc->priv->device = g_strdup (path);
+
+  g_free (disc->priv->orig_uri);
+  disc->priv->orig_uri = disc->priv->uri;
+  disc->priv->uri = g_strdup_printf ("dvd://%s", path);
 
   if (disc->priv->monitor)
     g_object_unref (disc->priv->monitor);
@@ -1045,14 +1029,7 @@ ogmdvd_error_quark (void)
 
   return quark;
 }
-/*
-static void
-ogmdvd_disc_free (OGMDvdDisc *disc)
-{
 
-  g_free (disc);
-}
-*/
 /**
  * ogmdvd_disc_new:
  * @device: A DVD device, or NULL to use /dev/dvd.

@@ -42,6 +42,7 @@ G_BEGIN_DECLS
 struct _OGMDvdDiscPriv
 {
   gchar *uri;
+  gchar *orig_uri;
   gchar *device;
   gchar *orig_device;
   gchar *label;
