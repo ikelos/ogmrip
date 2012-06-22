@@ -23,16 +23,26 @@
 
 G_BEGIN_DECLS
 
+struct _OGMBrMakeMKVPriv
+{
+  GList *drives;
+};
+
 struct _OGMBrDiscPriv
 {
+  gchar *id;
   gchar *uri;
+  gchar *orig_uri;
   gchar *device;
-  guint64 handle;
+  gchar *orig_device;
   guint ntitles;
   GList *titles;
 
   guint type;
   gchar *label;
+  gboolean is_open;
+
+  GFileMonitor *monitor;
 };
 
 struct _OGMBrTitlePriv
@@ -40,7 +50,7 @@ struct _OGMBrTitlePriv
   OGMRipMedia *media;
 
   guint id;
-  guint64 handle;
+  GList *streams;
   GList *audio_streams;
   guint naudio_streams;
   GList *subp_streams;
@@ -50,8 +60,6 @@ struct _OGMBrTitlePriv
   guint64 size;
 
   guint vid;
-  guint64 vhandle;
-
   OGMRipFormat format;
   guint aspect_num;
   guint aspect_denom;
@@ -59,6 +67,7 @@ struct _OGMBrTitlePriv
   guint raw_height;
   guint rate_num;
   guint rate_denom;
+  gint bitrate;
 };
 
 struct _OGMBrAudioStreamPriv
@@ -66,13 +75,12 @@ struct _OGMBrAudioStreamPriv
   OGMRipTitle *title;
 
   guint id;
-  guint64 handle;
-
   OGMRipFormat format;
   guint channels;
   guint samplerate;
   guint content;
   gint language;
+  gint bitrate;
 };
 
 struct _OGMBrSubpStreamPriv
@@ -80,8 +88,6 @@ struct _OGMBrSubpStreamPriv
   OGMRipTitle *title;
 
   guint id;
-  guint64 handle;
-
   OGMRipFormat format;
   guint content;
   gint language;

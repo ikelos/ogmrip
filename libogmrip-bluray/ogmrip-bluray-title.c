@@ -48,6 +48,9 @@ ogmbr_title_dispose (GObject *gobject)
     title->priv->subp_streams = NULL;
   }
 
+  g_list_free (title->priv->streams);
+  title->priv->streams = NULL;
+
   G_OBJECT_CLASS (ogmbr_title_parent_class)->dispose (gobject);
 }
 
@@ -142,6 +145,40 @@ ogmbr_video_stream_iface_init (OGMRipVideoStreamInterface *iface)
   iface->get_aspect_ratio = ogmbr_title_get_aspect_ratio;
 }
 
+typedef struct
+{
+  OGMRipTitle *title;
+  OGMRipTitleCallback callback;
+  gpointer user_data;
+} OpenData;
+
+static void
+ogmbr_media_open_cb (OGMRipMedia *media, gdouble percent, OpenData *data)
+{
+  data->callback (data->title, percent, data->user_data);
+}
+
+static gboolean
+ogmbr_title_open (OGMRipTitle *title, GCancellable *cancellable, OGMRipTitleCallback callback, gpointer user_data, GError **error)
+{
+  OGMRipMedia *media = OGMBR_TITLE (title)->priv->media;
+  OpenData data;
+
+  data.title = title;
+  data.callback = callback;
+  data.user_data = user_data;
+
+  return ogmrip_media_open (media, cancellable, callback ? (OGMRipMediaCallback) ogmbr_media_open_cb : NULL, &data, error);
+}
+
+static gboolean
+ogmbr_title_is_open (OGMRipTitle *title)
+{
+  OGMRipMedia *media = OGMBR_TITLE (title)->priv->media;
+
+  return OGMBR_DISC (media)->priv->is_open;
+}
+
 static OGMRipMedia *
 ogmbr_title_get_media (OGMRipTitle *title)
 {
@@ -212,6 +249,8 @@ ogmbr_title_get_nth_subp_stream (OGMRipTitle *title, guint nr)
 static void
 ogmbr_title_iface_init (OGMRipTitleInterface *iface)
 {
+  iface->open                 = ogmbr_title_open;
+  iface->is_open              = ogmbr_title_is_open;
   iface->get_media            = ogmbr_title_get_media;
   iface->get_size             = ogmbr_title_get_size;
   iface->get_nr               = ogmbr_title_get_nr;

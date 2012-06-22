@@ -19,22 +19,10 @@
 #ifndef __OGMRIP_BLURAY_MAKEMKV_H__
 #define __OGMRIP_BLURAY_MAKEMKV_H__
 
+#include <ogmrip-job.h>
 #include <ogmrip-bluray-disc.h>
 
-#include <gio/gio.h>
-
 G_BEGIN_DECLS
-
-#define OGMBR_MAKEMKV_ERROR ogmbr_makemkv_error_quark ()
-
-typedef enum
-{
-  OGMBR_MAKEMKV_ERROR_COMM,
-  OGMBR_MAKEMKV_ERROR_MEM,
-  OGMBR_MAKEMKV_ERROR_NO_DISC
-} OGMBrMakeMKVError;
-
-GQuark ogmbr_makemkv_error_quark (void);
 
 #define OGMBR_TYPE_MAKEMKV             (ogmbr_makemkv_get_type ())
 #define OGMBR_MAKEMKV(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMBR_TYPE_MAKEMKV, OGMBrMakeMKV))
@@ -49,91 +37,30 @@ typedef struct _OGMBrMakeMKVPriv  OGMBrMakeMKVPriv;
 
 struct _OGMBrMakeMKV
 {
-  GObject parent_instance;
+  OGMJobBin parent_instance;
 
   OGMBrMakeMKVPriv *priv;
 };
 
 struct _OGMBrMakeMKVClass
 {
-  GObjectClass parent_class;
+  OGMJobBinClass parent_class;
 };
 
-typedef void (* OGMBrProgress) (gdouble  fraction,
-                                gpointer user_data);
-
-GType          ogmbr_makemkv_get_type             (void);
-OGMBrMakeMKV * ogmbr_makemkv_get_default          (void);
-gboolean       ogmbr_makemkv_has_drive            (OGMBrMakeMKV        *mmkv,
-                                                   const gchar         *device);
-gboolean       ogmbr_makemkv_update_drives        (OGMBrMakeMKV        *mmkv,
-                                                   GCancellable        *cancellable,
-                                                   GError              **error);
-void           ogmbr_makemkv_update_drives_async  (OGMBrMakeMKV        *mmkv,
-                                                   GCancellable        *cancellable,
-                                                   GAsyncReadyCallback callback,
-                                                   gpointer            user_data);
-gboolean       ogmbr_makemkv_update_drives_finish (OGMBrMakeMKV        *mmkv,
-                                                   GSimpleAsyncResult  *res,
-                                                   GError              **error);
-gboolean       ogmbr_makemkv_open_disc            (OGMBrMakeMKV        *mmkv,
-                                                   OGMBrDisc           *disc,
-                                                   GCancellable        *cancellable,
-                                                   OGMBrProgress       progress_cb,
-                                                   gpointer            progress_data,
-                                                   GError              **error);
-void           ogmbr_makemkv_open_disc_async      (OGMBrMakeMKV        *mmkv,
-                                                   OGMBrDisc           *disc,
-                                                   GCancellable        *cancellable,
-                                                   OGMBrProgress       progress_cb,
-                                                   gpointer            progress_data,
-                                                   GAsyncReadyCallback callback,
-                                                   gpointer            user_data);
-gboolean       ogmbr_makemkv_open_disc_finish     (OGMBrMakeMKV        *mmkv,
-                                                   GSimpleAsyncResult  *res,
-                                                   GError              **error);
-gboolean       ogmbr_makemkv_close_disc           (OGMBrMakeMKV        *mmkv,
-                                                   GCancellable        *cancellable,
-                                                   GError              **error);
-void           ogmbr_makemkv_close_disc_async     (OGMBrMakeMKV        *mmkv,
-                                                   GCancellable        *cancellable,
-                                                   GAsyncReadyCallback callback,
-                                                   gpointer            user_data);
-gboolean       ogmbr_makemkv_close_disc_finish    (OGMBrMakeMKV        *mmkv,
-                                                   GSimpleAsyncResult  *res,
-                                                   GError              **error);
-gboolean       ogmbr_makemkv_eject_disc           (OGMBrMakeMKV        *mmkv,
-                                                   OGMBrDisc           *disc,
-                                                   GCancellable        *cancellable,
-                                                   GError              **error);
-void           ogmbr_makemkv_eject_disc_async     (OGMBrMakeMKV        *mmkv,
-                                                   OGMBrDisc           *disc,
-                                                   GCancellable        *cancellable,
-                                                   GAsyncReadyCallback callback,
-                                                   gpointer            user_data);
-gboolean       ogmbr_makemkv_eject_disc_finish    (OGMBrMakeMKV        *mmkv,
-                                                   GSimpleAsyncResult  *res,
-                                                   GError              **error);
-gboolean       ogmbr_makemkv_backup_disc          (OGMBrMakeMKV        *mmkv,
-                                                   OGMBrDisc           *disc,
-                                                   const gchar         *folder,
-                                                   gboolean            decrypt,
-                                                   GCancellable        *cancellable,
-                                                   OGMBrProgress       progress_cb,
-                                                   gpointer            progress_data,
-                                                   GError              **error);
-void           ogmbr_makemkv_backup_disc_async    (OGMBrMakeMKV        *mmkv,
-                                                   OGMBrDisc           *disc,
-                                                   const gchar         *folder,
-                                                   gboolean            decrypt,
-                                                   GCancellable        *cancellable,
-                                                   OGMBrProgress       progress_cb,
-                                                   gpointer            progress_data,
-                                                   GAsyncReadyCallback callback,
-                                                   gpointer            user_data);
-gboolean       ogmbr_makemkv_backup_disc_finish   (OGMBrMakeMKV        *mmkv,
-                                                   GSimpleAsyncResult  *res,
-                                                   GError              **error);
+GType          ogmbr_makemkv_get_type      (void);
+OGMBrMakeMKV * ogmbr_makemkv_get_default   (void);
+gboolean       ogmbr_makemkv_update_drives (OGMBrMakeMKV *mmkv,
+                                            GCancellable *cancellable,
+                                            GError       **error);
+gboolean       ogmbr_makemkv_open_disc     (OGMBrMakeMKV *mmkv,
+                                            OGMBrDisc    *disc,
+                                            GCancellable *cancellable,
+                                            GError       **error);
+gboolean       ogmbr_makemkv_backup_disc   (OGMBrMakeMKV *mmkv,
+                                            OGMBrDisc    *disc,
+                                            const gchar  *output,
+                                            GCancellable *cancellable,
+                                            GError       **error);
 
 G_END_DECLS
 

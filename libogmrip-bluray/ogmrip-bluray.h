@@ -21,6 +21,7 @@
 
 #include <ogmrip-bluray-audio.h>
 #include <ogmrip-bluray-disc.h>
+#include <ogmrip-bluray-makemkv.h>
 #include <ogmrip-bluray-subp.h>
 #include <ogmrip-bluray-title.h>
 
