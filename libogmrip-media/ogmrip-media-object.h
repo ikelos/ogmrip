@@ -71,7 +71,7 @@ gint64        ogmrip_media_get_size      (OGMRipMedia         *media);
 gint          ogmrip_media_get_n_titles  (OGMRipMedia         *media);
 OGMRipTitle * ogmrip_media_get_nth_title (OGMRipMedia         *media,
                                           guint               nr);
-GSList *      ogmrip_media_get_titles    (OGMRipMedia         *media);
+GList *       ogmrip_media_get_titles    (OGMRipMedia         *media);
 gboolean      ogmrip_media_copy          (OGMRipMedia         *media,
                                           const gchar         *path,
                                           GCancellable        *cancellable,

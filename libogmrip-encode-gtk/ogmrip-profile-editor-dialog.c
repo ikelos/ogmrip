@@ -34,6 +34,7 @@
 
 struct _OGMRipProfileEditorDialogPriv
 {
+  GtkWidget *method_chooser;
   GtkWidget *container_chooser;
   GtkWidget *video_chooser;
   GtkWidget *audio_chooser;
@@ -421,15 +422,17 @@ ogmrip_profile_editor_set_quantizer_sensitivity (GBinding *binding, const GValue
 }
 
 static gboolean
-ogmrip_profile_editor_set_passes_sensitivity (GBinding *binding, const GValue *source_value, GValue *target_value, gpointer spin)
+ogmrip_profile_editor_set_passes_sensitivity (GBinding *binding, const GValue *source_value, GValue *target_value, gpointer data)
 {
+  OGMRipProfileEditorDialog *dialog = data;
+  GType codec;
   gint method;
 
-  method = g_value_get_int (source_value);
-  g_value_set_boolean (target_value, method != OGMRIP_ENCODING_QUANTIZER);
+  method = gtk_combo_box_get_active (GTK_COMBO_BOX (dialog->priv->method_chooser));
+  codec = ogmrip_type_chooser_widget_get_active (GTK_COMBO_BOX (dialog->priv->video_chooser));
 
-  if (method == OGMRIP_ENCODING_QUANTIZER)
-    gtk_spin_button_set_value (GTK_SPIN_BUTTON (spin), 1);
+  g_value_set_boolean (target_value, method != OGMRIP_ENCODING_QUANTIZER &&
+      ogmrip_codec_format (codec) != OGMRIP_FORMAT_COPY);
 
   return TRUE;
 }
@@ -503,7 +506,7 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
   OGMRipProfileEditorDialog *dialog = OGMRIP_PROFILE_EDITOR_DIALOG (gobject);
 
   GSettings *settings;
-  GtkWidget *widget, *combo, *misc;
+  GtkWidget *widget, *misc;
   GtkBuilder *builder;
 
   GtkTreeModel *model, *filter;
@@ -577,8 +580,8 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
   widget = gtk_builder_get_widget (builder, "ensure-sync-check");
   g_settings_bind (settings, OGMRIP_PROFILE_ENSURE_SYNC, widget, "active", G_SETTINGS_BIND_DEFAULT);
 
-  combo = gtk_builder_get_widget (builder, "encoding-combo");
-  g_settings_bind (settings, OGMRIP_PROFILE_ENCODING_METHOD, combo, "active", G_SETTINGS_BIND_DEFAULT);
+  dialog->priv->method_chooser = gtk_builder_get_widget (builder, "encoding-combo");
+  g_settings_bind (settings, OGMRIP_PROFILE_ENCODING_METHOD, dialog->priv->method_chooser, "active", G_SETTINGS_BIND_DEFAULT);
 
   widget = gtk_builder_get_widget (builder, "tnumber-spin");
   g_settings_bind (settings, OGMRIP_PROFILE_TARGET_NUMBER, widget, "value", G_SETTINGS_BIND_DEFAULT);
@@ -587,21 +590,21 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
   g_settings_bind (settings, OGMRIP_PROFILE_TARGET_SIZE, widget, "value", G_SETTINGS_BIND_DEFAULT);
 
   widget = gtk_builder_get_widget (builder, "target-label");
-  g_object_bind_property_full (combo, "active", widget, "sensitive", G_BINDING_SYNC_CREATE,
+  g_object_bind_property_full (dialog->priv->method_chooser, "active", widget, "sensitive", G_BINDING_SYNC_CREATE,
       ogmrip_profile_editor_set_target_sensitivity, NULL, NULL, NULL);
 
   misc = gtk_builder_get_widget (builder, "target-hbox");
   g_object_bind_property (widget, "sensitive", misc, "sensitive", G_BINDING_SYNC_CREATE);
 
   widget = gtk_builder_get_widget (builder, "bitrate-label");
-  g_object_bind_property_full (combo, "active", widget, "sensitive", G_BINDING_SYNC_CREATE,
+  g_object_bind_property_full (dialog->priv->method_chooser, "active", widget, "sensitive", G_BINDING_SYNC_CREATE,
       ogmrip_profile_editor_set_bitrate_sensitivity, NULL, NULL, NULL);
 
   misc = gtk_builder_get_widget (builder, "bitrate-hbox");
   g_object_bind_property (widget, "sensitive", misc, "sensitive", G_BINDING_SYNC_CREATE);
 
   widget = gtk_builder_get_widget (builder, "quantizer-label");
-  g_object_bind_property_full (combo, "active", widget, "sensitive", G_BINDING_SYNC_CREATE,
+  g_object_bind_property_full (dialog->priv->method_chooser, "active", widget, "sensitive", G_BINDING_SYNC_CREATE,
       ogmrip_profile_editor_set_quantizer_sensitivity, NULL, NULL, NULL);
 
   misc = gtk_builder_get_widget (builder, "quantizer-hbox");
@@ -670,8 +673,10 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
       ogmrip_profile_editor_set_passes_spin_adjustment, NULL, NULL, NULL);
 
   widget = gtk_builder_get_widget (builder, "passes-label");
-  g_object_bind_property_full (combo, "active", widget, "sensitive", G_BINDING_SYNC_CREATE,
-      ogmrip_profile_editor_set_passes_sensitivity, NULL, misc, NULL);
+  g_object_bind_property_full (dialog->priv->method_chooser, "active", widget, "sensitive", G_BINDING_SYNC_CREATE,
+      ogmrip_profile_editor_set_passes_sensitivity, NULL, dialog, NULL);
+  g_object_bind_property_full (dialog->priv->video_chooser, "active", widget, "sensitive", G_BINDING_SYNC_CREATE,
+      ogmrip_profile_editor_set_passes_sensitivity, NULL, dialog, NULL);
 
   misc = gtk_builder_get_widget (builder, "passes-hbox");
   g_object_bind_property (widget, "sensitive", misc, "sensitive", G_BINDING_SYNC_CREATE);

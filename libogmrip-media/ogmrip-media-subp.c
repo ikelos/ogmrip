@@ -112,7 +112,7 @@ ogmrip_subp_stream_get_nr (OGMRipSubpStream *subp)
 
   iface = OGMRIP_SUBP_STREAM_GET_IFACE (subp);
 
-  if (!iface->get_newline)
+  if (!iface->get_nr)
     return 0;
 
   return iface->get_nr (subp);
