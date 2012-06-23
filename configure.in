@@ -168,6 +168,18 @@ LIBS="$LIBS $DVDREAD_LIBS"
 
 dnl **************************************************************
 
+PKG_CHECK_MODULES(LIBBLURAY, [libbluray], [have_bluray_support=yes], [have_bluray_support=no])
+CFLAGS="$CFLAGS $LIBBLURAY_CFLAGS"
+LIBS="$LIBS $LIBBLURAY_LIBS"
+
+if test x"$have_bluray_support" = x"yes"; then
+  AC_DEFINE(HAVE_BLURAY_SUPPORT, 1, [Define to 1 if bluray is supported.])
+fi
+
+AM_CONDITIONAL(HAVE_BLURAY_SUPPORT, [test x"$have_bluray_support" = x"yes"])
+
+dnl **************************************************************
+
 AC_PATH_PROG(MPLAYER_PROG, mplayer)
 if test x"$MPLAYER_PROG" = x; then
   AC_MSG_ERROR(Unable to find mplayer in the PATH. You need mplayer to use OGMRip. Find it on http://www.mplayerhq.hu)

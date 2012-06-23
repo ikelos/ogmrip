@@ -4,15 +4,19 @@ SUBDIRS = \
   libogmrip-media   \
   libogmrip-module  \
   libogmrip-dvd     \
-  libogmrip-bluray  \
   libogmrip-file    \
   libogmrip-encode  \
 	libogmrip-mplayer \
   avibox \
   dvdcpy
 
+if HAVE_BLURAY_SUPPORT
+SUBDIRS += \
+  libogmrip-bluray
+endif
+
 if HAVE_GTK_SUPPORT
-SUBDIRS +=      \
+SUBDIRS += \
   libogmrip-media-gtk  \
   libogmrip-file-gtk   \
   libogmrip-encode-gtk \

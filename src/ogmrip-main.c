@@ -22,7 +22,6 @@
 
 #include <ogmrip-job.h>
 #include <ogmrip-dvd.h>
-#include <ogmrip-bluray.h>
 #include <ogmrip-file.h>
 #include <ogmrip-encode-gtk.h>
 #include <ogmrip-media-gtk.h>
@@ -48,6 +47,10 @@
 #ifdef HAVE_LIBNOTIFY_SUPPORT
 #include <libnotify/notify.h>
 #endif /* HAVE_LIBNOTIFY_SUPPORT */
+
+#ifdef HAVE_BLURAY_SUPPORT
+#include <ogmrip-bluray.h>
+#endif /* HAVE_BLURAY_SUPPORT */
 
 #define OGMRIP_UI_FILE    "ogmrip"  G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-ui.xml"
 #define OGMRIP_GLADE_FILE "ogmrip"  G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-main.glade"
@@ -2331,7 +2334,9 @@ ogmrip_startup_thread (GIOSchedulerJob *job, GCancellable *cancellable, GApplica
   gchar *path;
 
   ogmrip_dvd_register_media ();
+#ifdef HAVE_BLURAY_SUPPORT
   ogmrip_bluray_register_media ();
+#endif
   ogmrip_file_register_media ();
 
   ogmrip_hardsub_register_codec ();

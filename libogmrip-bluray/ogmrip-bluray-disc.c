@@ -27,6 +27,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <libbluray/bluray.h>
+
 enum
 {
   PROP_0,
@@ -57,6 +59,9 @@ ogmbr_disc_constructor (GType gtype, guint n_properties, GObjectConstructParam *
   GObject *gobject;
   OGMBrDisc *disc;
 
+  BLURAY *bd;
+  const BLURAY_DISC_INFO *info;
+
   gobject = G_OBJECT_CLASS (ogmbr_disc_parent_class)->constructor (gtype, n_properties, properties);
 
   disc = OGMBR_DISC (gobject);
@@ -72,9 +77,32 @@ ogmbr_disc_constructor (GType gtype, guint n_properties, GObjectConstructParam *
 
   disc->priv->device = g_strdup (disc->priv->uri + 5);
 
-  /*
-   * TODO check for drive
-   */
+  bd = bd_open (disc->priv->device, NULL);
+  if (!bd)
+  {
+    g_warning ("Cannot open bluray disc");
+    g_object_unref (disc);
+    return NULL;
+  }
+
+  info = bd_get_disc_info (bd);
+  if (!info)
+  {
+    g_warning ("Cannot get bluray disc info");
+    g_object_unref (disc);
+    bd_close (bd);
+    return NULL;
+  }
+
+  if (!info->bluray_detected)
+  {
+    g_warning ("No bluray disc detected");
+    g_object_unref (disc);
+    bd_close (bd);
+    return NULL;
+  }
+
+  bd_close (bd);
 
   return gobject;
 }
