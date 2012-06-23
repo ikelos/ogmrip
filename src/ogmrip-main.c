@@ -296,7 +296,7 @@ ogmrip_main_open_media (OGMRipData *data, OGMRipMedia *media)
   gtk_container_set_border_width (GTK_CONTAINER (box), 6);
   gtk_container_add (GTK_CONTAINER (area), box);
 
-  label = gtk_label_new ("Opening media");
+  label = gtk_label_new (_("Opening media"));
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, -1.0);
   gtk_container_add (GTK_CONTAINER (box), label);
 
