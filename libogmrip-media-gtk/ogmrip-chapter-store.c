@@ -27,12 +27,14 @@
 struct _OGMRipChapterStorePriv
 {
   OGMRipTitle *title;
+  gboolean editable;
 };
 
 enum
 {
   PROP_0,
-  PROP_TITLE
+  PROP_TITLE,
+  PROP_EDITABLE
 };
 
 enum
@@ -79,6 +81,10 @@ ogmrip_chapter_store_class_init (OGMRipChapterStoreClass *klass)
       g_param_spec_object ("title", "Title property", "The media title",
         OGMRIP_TYPE_TITLE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
+  g_object_class_install_property (gobject_class, PROP_EDITABLE,
+      g_param_spec_boolean ("editable", "Editable property", "Whether chapters are editable",
+        FALSE, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
   signals[SELECTION_CHANGED] = g_signal_new ("selection-changed", G_TYPE_FROM_CLASS (klass),
       G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
       G_STRUCT_OFFSET (OGMRipChapterStoreClass, selection_changed), NULL, NULL,
@@ -117,6 +123,9 @@ ogmrip_chapter_store_get_property (GObject *gobject, guint property_id, GValue *
   {
     case PROP_TITLE:
       g_value_set_object (value, OGMRIP_CHAPTER_STORE (gobject)->priv->title);
+      break;
+    case PROP_EDITABLE:
+      g_value_set_boolean (value, OGMRIP_CHAPTER_STORE (gobject)->priv->editable);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -187,6 +196,7 @@ ogmrip_chapter_store_set_title (OGMRipChapterStore *store, OGMRipTitle *title)
   store->priv->title = title;
 
   gtk_list_store_clear (GTK_LIST_STORE (store));
+  store->priv->editable = title != NULL;
 
   if (title)
   {
@@ -197,6 +207,7 @@ ogmrip_chapter_store_set_title (OGMRipChapterStore *store, OGMRipTitle *title)
 
       str = g_strdup_printf ("%s %02d", _("Chapter"), chap + 1);
       gtk_list_store_set (GTK_LIST_STORE (store), &iter,
+          OGMRIP_CHAPTER_STORE_SELECTED_COLUMN, TRUE,
           OGMRIP_CHAPTER_STORE_CHAPTER_COLUMN, chap + 1,
           OGMRIP_CHAPTER_STORE_LABEL_COLUMN, str,
           -1);
@@ -210,6 +221,8 @@ ogmrip_chapter_store_set_title (OGMRipChapterStore *store, OGMRipTitle *title)
             -1);
         g_free (str);
       }
+      else
+        store->priv->editable = FALSE;
     }
   }
 
@@ -258,7 +271,8 @@ ogmrip_chapter_store_set_label (OGMRipChapterStore *store, guint chapter, const 
 
   g_return_if_fail (OGMRIP_IS_CHAPTER_STORE (store));
 
-  if (gtk_tree_model_iter_nth_child (GTK_TREE_MODEL (store), &iter, NULL, chapter))
+  if (store->priv->editable &&
+      gtk_tree_model_iter_nth_child (GTK_TREE_MODEL (store), &iter, NULL, chapter))
     gtk_list_store_set (GTK_LIST_STORE (store), &iter,
         OGMRIP_CHAPTER_STORE_LABEL_COLUMN, label,
         -1);
@@ -285,11 +299,14 @@ ogmrip_chapter_store_set_selected (OGMRipChapterStore *store, GtkTreeIter *iter,
   g_return_if_fail (OGMRIP_IS_CHAPTER_STORE (store));
   g_return_if_fail (iter != NULL);
 
-  gtk_list_store_set (GTK_LIST_STORE (store), iter,
-      OGMRIP_CHAPTER_STORE_SELECTED_COLUMN, selected,
-      -1);
+  if (store->priv->editable)
+  {
+    gtk_list_store_set (GTK_LIST_STORE (store), iter,
+        OGMRIP_CHAPTER_STORE_SELECTED_COLUMN, selected,
+        -1);
 
-  g_signal_emit (store, signals[SELECTION_CHANGED], 0);
+    g_signal_emit (store, signals[SELECTION_CHANGED], 0);
+  }
 }
 
 /**
@@ -305,18 +322,21 @@ ogmrip_chapter_store_select_all (OGMRipChapterStore *store)
 
   g_return_if_fail (OGMRIP_IS_CHAPTER_STORE (store));
 
-  if (gtk_tree_model_get_iter_first (GTK_TREE_MODEL (store), &iter))
+  if (store->priv->editable)
   {
-    do
+    if (gtk_tree_model_get_iter_first (GTK_TREE_MODEL (store), &iter))
     {
-      gtk_list_store_set (GTK_LIST_STORE (store), &iter,
-          OGMRIP_CHAPTER_STORE_SELECTED_COLUMN, TRUE,
-          -1);
+      do
+      {
+        gtk_list_store_set (GTK_LIST_STORE (store), &iter,
+            OGMRIP_CHAPTER_STORE_SELECTED_COLUMN, TRUE,
+            -1);
+      }
+      while (gtk_tree_model_iter_next (GTK_TREE_MODEL (store), &iter));
     }
-    while (gtk_tree_model_iter_next (GTK_TREE_MODEL (store), &iter));
-  }
 
-  g_signal_emit (store, signals[SELECTION_CHANGED], 0);
+    g_signal_emit (store, signals[SELECTION_CHANGED], 0);
+  }
 }
 
 /**
@@ -332,18 +352,21 @@ ogmrip_chapter_store_deselect_all (OGMRipChapterStore *store)
 
   g_return_if_fail (OGMRIP_IS_CHAPTER_STORE (store));
 
-  if (gtk_tree_model_get_iter_first (GTK_TREE_MODEL (store), &iter))
+  if (store->priv->editable)
   {
-    do
+    if (gtk_tree_model_get_iter_first (GTK_TREE_MODEL (store), &iter))
     {
-      gtk_list_store_set (GTK_LIST_STORE (store), &iter,
-          OGMRIP_CHAPTER_STORE_SELECTED_COLUMN, FALSE,
-          -1);
+      do
+      {
+        gtk_list_store_set (GTK_LIST_STORE (store), &iter,
+            OGMRIP_CHAPTER_STORE_SELECTED_COLUMN, FALSE,
+            -1);
+      }
+      while (gtk_tree_model_iter_next (GTK_TREE_MODEL (store), &iter));
     }
-    while (gtk_tree_model_iter_next (GTK_TREE_MODEL (store), &iter));
-  }
 
-  g_signal_emit (store, signals[SELECTION_CHANGED], 0);
+    g_signal_emit (store, signals[SELECTION_CHANGED], 0);
+  }
 }
 
 /**
@@ -361,6 +384,14 @@ ogmrip_chapter_store_get_selection (OGMRipChapterStore *store, guint *start_chap
 {
   GtkTreeIter iter;
   gboolean extract, valid;
+
+  if (!store->priv->editable)
+  {
+    *start_chapter = 0;
+    *end_chapter = -1;
+
+    return TRUE;
+  }
 
   valid = gtk_tree_model_get_iter_first (GTK_TREE_MODEL (store), &iter);
 
@@ -393,5 +424,13 @@ ogmrip_chapter_store_get_selection (OGMRipChapterStore *store, guint *start_chap
     *end_chapter = -1;
 
   return TRUE;
+}
+
+gboolean
+ogmrip_chapter_store_get_editable (OGMRipChapterStore *store)
+{
+  g_return_val_if_fail (OGMRIP_IS_CHAPTER_STORE (store), FALSE);
+
+  return store->priv->editable;
 }
 

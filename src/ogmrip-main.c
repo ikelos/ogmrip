@@ -1261,6 +1261,9 @@ ogmrip_main_create_chapters_codec (OGMRipData *data, OGMRipVideoStream *stream, 
   guint last_chap, chap;
   gchar *label;
 
+  if (!ogmrip_chapter_store_get_editable (OGMRIP_CHAPTER_STORE (data->chapter_store)))
+    return NULL;
+
   codec = ogmrip_chapters_new (stream);
   if (!codec)
     return NULL;
