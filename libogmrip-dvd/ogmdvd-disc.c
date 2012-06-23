@@ -91,10 +91,6 @@ static void      ogmdvd_disc_close        (OGMRipMedia           *media);
 static gboolean  ogmdvd_disc_is_open      (OGMRipMedia           *media);
 
 
-#ifndef HAVE_DVD_FILE_SIZE
-uint32_t UDFFindFile( dvd_reader_t *device, char *filename, uint32_t *size );
-#endif
-
 static GHashTable *open_discs;
 
 static gboolean
@@ -187,27 +183,12 @@ dvd_reader_get_id (dvd_reader_t *reader)
 static gint64
 dvd_reader_get_ifo_size (dvd_reader_t *reader, guint vts)
 {
-#ifdef HAVE_DVD_FILE_SIZE
   dvd_file_t *file;
   gint size;
 
   file = DVDOpenFile (reader, vts, DVD_READ_INFO_FILE);
-  size = DVDFileSize (file);
+  size = DVDFileSize (file) * DVD_VIDEO_LB_LEN;
   DVDCloseFile (file);
-
-  size *= DVD_VIDEO_LB_LEN;
-#else /* HAVE_DVD_FILE_SIZE */
-  gchar filename[FILENAME_MAX];
-  guint size;
-
-  if (vts == 0)
-    strncpy (filename, "/VIDEO_TS/VIDEO_TS.IFO", FILENAME_MAX);
-  else
-    snprintf (filename, FILENAME_MAX, "/VIDEO_TS/VTS_%02u_0.IFO", vts);
-
-  if (!UDFFindFile (reader, filename, &size))
-    return -1;
-#endif /* HAVE_DVD_FILE_SIZE */
 
   if (size < 0)
     return 0;
@@ -218,27 +199,12 @@ dvd_reader_get_ifo_size (dvd_reader_t *reader, guint vts)
 static gint64
 dvd_reader_get_bup_size (dvd_reader_t *reader, guint vts)
 {
-#ifdef HAVE_DVD_FILE_SIZE
   dvd_file_t *file;
   gint size;
 
   file = DVDOpenFile (reader, vts, DVD_READ_INFO_BACKUP_FILE);
-  size = DVDFileSize (file);
+  size = DVDFileSize (file) * DVD_VIDEO_LB_LEN;
   DVDCloseFile (file);
-
-  size *= DVD_VIDEO_LB_LEN;
-#else /* HAVE_DVD_FILE_SIZE */
-  gchar filename[FILENAME_MAX];
-  guint size;
-
-  if (vts == 0)
-    strncpy (filename, "/VIDEO_TS/VIDEO_TS.BUP", FILENAME_MAX);
-  else
-    snprintf (filename, FILENAME_MAX, "/VIDEO_TS/VTS_%02u_0.BUP", vts);
-
-  if (!UDFFindFile (reader, filename, &size))
-    return 0;
-#endif /* HAVE_DVD_FILE_SIZE */
 
   if (size < 0)
     return 0;
@@ -249,27 +215,12 @@ dvd_reader_get_bup_size (dvd_reader_t *reader, guint vts)
 static gint64
 dvd_reader_get_menu_size (dvd_reader_t *reader, guint vts)
 {
-#ifdef HAVE_DVD_FILE_SIZE
   dvd_file_t *file;
   gint size;
 
   file = DVDOpenFile (reader, vts, DVD_READ_MENU_VOBS);
-  size = DVDFileSize (file);
+  size = DVDFileSize (file) * DVD_VIDEO_LB_LEN;
   DVDCloseFile (file);
-
-  size *= DVD_VIDEO_LB_LEN;
-#else /* HAVE_DVD_FILE_SIZE */
-  gchar filename[FILENAME_MAX];
-  guint size;
-
-  if (vts == 0)
-    strncpy (filename, "/VIDEO_TS/VIDEO_TS.VOB", FILENAME_MAX);
-  else
-    snprintf (filename, FILENAME_MAX, "/VIDEO_TS/VTS_%02u_0.VOB", vts);
-
-  if (!UDFFindFile (reader, filename, &size))
-    return 0;
-#endif /* HAVE_DVD_FILE_SIZE */
 
   if (size < 0)
     return 0;
@@ -282,33 +233,11 @@ dvd_reader_get_vob_size (dvd_reader_t *reader, guint vts)
 {
   gint64 fullsize;
 
-#ifdef HAVE_DVD_FILE_SIZE
   dvd_file_t *file;
 
   file = DVDOpenFile (reader, vts, DVD_READ_TITLE_VOBS);
-  fullsize = DVDFileSize (file);
+  fullsize = DVDFileSize (file) * DVD_VIDEO_LB_LEN;
   DVDCloseFile (file);
-
-  fullsize *= DVD_VIDEO_LB_LEN;
-#else /* HAVE_DVD_FILE_SIZE */
-  gchar filename[FILENAME_MAX];
-  guint vob, size;
-
-  if (vts == 0)
-    return 0;
-
-  vob = 1; fullsize = 0;
-  while (1)
-  {
-    snprintf (filename, FILENAME_MAX, "/VIDEO_TS/VTS_%02u_%u.VOB", vts, vob++);
-    if (!UDFFindFile (reader, filename, &size))
-      break;
-    fullsize += size;
-  }
-
-  if (vob == 1)
-    return 0;
-#endif /* HAVE_DVD_FILE_SIZE */
 
   if (fullsize < 0)
     return 0;
