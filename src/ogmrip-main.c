@@ -352,8 +352,6 @@ ogmrip_main_load_media (OGMRipData *data, OGMRipMedia *media)
   }
 }
 
-OGMRipMedia * ogmrip_media_new (const gchar *path);
-
 static gboolean
 ogmrip_main_load_path (OGMRipData *data, const gchar *path)
 {
@@ -437,10 +435,10 @@ ogmrip_main_clean (OGMRipData *data, OGMRipEncoding *encoding, gboolean error)
 
       title = ogmrip_encoding_get_title (encoding);
       uri = ogmrip_media_get_uri (ogmrip_title_get_media (title));
-      if (!g_str_has_prefix (uri, "dvd://"))
-        g_warning ("Unknown scheme for '%s'", uri);
-      else
+      if (g_str_has_prefix (uri, "dvd://"))
         ogmrip_fs_rmdir (uri + 6, TRUE, NULL);
+      else
+        g_warning ("Unknown scheme for '%s'", uri);
     }
   }
 

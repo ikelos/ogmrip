@@ -150,7 +150,7 @@ ogmrip_xvid_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   GString *options;
 
   const char *output;
-  gint bitrate, vid, threads, interlaced;
+  gint bitrate, threads, interlaced;
 
   static const gchar *profiles[] =
   {
@@ -332,15 +332,7 @@ ogmrip_xvid_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   g_ptr_array_add (argv, g_strdup ("-xvidencopts"));
   g_ptr_array_add (argv, g_string_free (options, FALSE));
 
-  vid = ogmrip_title_get_nr (title);
-
-  if (MPLAYER_CHECK_VERSION (1,0,0,1))
-    g_ptr_array_add (argv, g_strdup_printf ("dvd://%d", vid + 1));
-  else
-  {
-    g_ptr_array_add (argv, g_strdup ("-dvd"));
-    g_ptr_array_add (argv, g_strdup_printf ("%d", vid + 1));
-  }
+  ogmrip_mplayer_set_input (argv, title);
 
   g_ptr_array_add (argv, NULL);
 

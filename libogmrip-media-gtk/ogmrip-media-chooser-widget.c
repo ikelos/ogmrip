@@ -68,32 +68,6 @@ static void ogmrip_media_chooser_init (OGMRipMediaChooserInterface *iface);
 static void ogmrip_media_chooser_widget_dispose (GObject     *gobject);
 static void ogmrip_media_chooser_widget_changed (GtkComboBox *combo);
 
-OGMRipMedia *
-ogmrip_media_new (const gchar *path)
-{
-  OGMRipMedia *media = NULL;
-  GType *types;
-  guint i;
-
-  if (!path)
-    return NULL;
-
-  types = ogmrip_type_children (OGMRIP_TYPE_MEDIA, NULL);
-  if (!types)
-    return NULL;
-
-  for (i = 0; types[i] != G_TYPE_NONE; i ++)
-  {
-    media = g_object_new (types[i], "uri", path, NULL);
-    if (media)
-      break;
-  }
-
-  g_free (types);
-
-  return media;
-}
-
 static OGMRipMedia *
 ogmrip_media_chooser_widget_get_media (OGMRipMediaChooser *chooser)
 {

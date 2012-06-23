@@ -515,13 +515,7 @@ ogmrip_encoding_new_from_xml (OGMRipXML *xml, GError **error)
   if (!str)
     return NULL;
 
-  if (!g_str_has_prefix (str, "dvd://"))
-  {
-    g_free (str);
-    return NULL;
-  }
-
-  media = ogmdvd_disc_new (str, error);
+  media = ogmrip_media_new (str);
   g_free (str);
 
   if (!media)
@@ -1090,13 +1084,13 @@ ogmrip_encoding_set_copy (OGMRipEncoding *encoding, gboolean copy)
     copy = FALSE;
 
     uri = ogmrip_media_get_uri (ogmrip_title_get_media (encoding->priv->title));
-    if (!g_str_has_prefix (uri, "dvd://"))
-      g_warning ("Unknown scheme for '%s'", uri);
-    else
+    if (g_str_has_prefix (uri, "dvd://"))
     {
       if (g_stat (uri + 6, &buf) == 0)
         copy = S_ISBLK (buf.st_mode);
     }
+    else
+      g_warning ("Unknown scheme for '%s'", uri);
   }
 
   encoding->priv->copy = copy;

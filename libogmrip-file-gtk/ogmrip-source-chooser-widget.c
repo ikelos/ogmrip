@@ -579,7 +579,8 @@ ogmrip_source_chooser_widget_add_audio_stream (OGMRipSourceChooserWidget *choose
 
     ogmrip_source_chooser_widget_get_stream_iter (chooser, &iter);
     gtk_list_store_set (chooser->priv->store, &iter,
-        TEXT_COLUMN, string->str, TYPE_COLUMN, ROW_TYPE_STREAM, LANG_COLUMN, lang, SOURCE_COLUMN, stream, -1);
+        TEXT_COLUMN, string->str, TYPE_COLUMN, ROW_TYPE_STREAM,
+        LANG_COLUMN, ogmrip_audio_stream_get_language (stream), SOURCE_COLUMN, stream, -1);
 
     g_string_free (string, TRUE);
   }
@@ -621,7 +622,8 @@ ogmrip_source_chooser_widget_add_subp_stream (OGMRipSourceChooserWidget *chooser
 
     ogmrip_source_chooser_widget_get_stream_iter (chooser, &iter);
     gtk_list_store_set (chooser->priv->store, &iter,
-        TEXT_COLUMN, string->str, TYPE_COLUMN, ROW_TYPE_STREAM, LANG_COLUMN, lang, SOURCE_COLUMN, stream, -1);
+        TEXT_COLUMN, string->str, TYPE_COLUMN, ROW_TYPE_STREAM,
+        LANG_COLUMN, ogmrip_subp_stream_get_language (stream), SOURCE_COLUMN, stream, -1);
 
     g_string_free (string, TRUE);
   }

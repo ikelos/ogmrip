@@ -142,7 +142,7 @@ ogmrip_lavc_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   GString *options;
 
   const gchar *output, *codec;
-  gint bitrate, vid, threads;
+  gint bitrate, threads;
 
   g_return_val_if_fail (OGMRIP_IS_VIDEO_CODEC (video), NULL);
   g_return_val_if_fail (pass == 1 || log_file != NULL, NULL);
@@ -245,15 +245,7 @@ ogmrip_lavc_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   g_ptr_array_add (argv, g_string_free (options, FALSE));
 
   input = ogmrip_codec_get_input (OGMRIP_CODEC (video));
-  vid = ogmrip_title_get_nr (ogmrip_stream_get_title (input));
-
-  if (MPLAYER_CHECK_VERSION (1,0,0,1))
-    g_ptr_array_add (argv, g_strdup_printf ("dvd://%d", vid + 1));
-  else
-  {
-    g_ptr_array_add (argv, g_strdup ("-dvd"));
-    g_ptr_array_add (argv, g_strdup_printf ("%d", vid + 1));
-  }
+  ogmrip_mplayer_set_input (argv, ogmrip_stream_get_title (input));
 
   g_ptr_array_add (argv, NULL);
 

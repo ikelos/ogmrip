@@ -47,10 +47,9 @@ static gboolean ogmrip_audio_copy_run (OGMJobTask   *task,
 static gchar **
 ogmrip_audio_copy_command (OGMRipAudioCodec *audio)
 {
-  OGMRipTitle *title;
+  OGMRipStream *input;
   OGMRipFile *output;
   GPtrArray *argv;
-  gint vid;
 
   output = ogmrip_codec_get_output (OGMRIP_CODEC (audio));
   argv = ogmrip_mencoder_audio_command (audio, ogmrip_file_get_path (output));
@@ -68,16 +67,8 @@ ogmrip_audio_copy_command (OGMRipAudioCodec *audio)
   g_ptr_array_add (argv, g_strdup ("-oac"));
   g_ptr_array_add (argv, g_strdup ("copy"));
 
-  title = ogmrip_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (audio)));
-  vid = ogmrip_title_get_nr (title);
-
-  if (MPLAYER_CHECK_VERSION (1,0,0,1))
-    g_ptr_array_add (argv, g_strdup_printf ("dvd://%d", vid + 1));
-  else
-  {
-    g_ptr_array_add (argv, g_strdup ("-dvd"));
-    g_ptr_array_add (argv, g_strdup_printf ("%d", vid + 1));
-  }
+  input = ogmrip_codec_get_input (OGMRIP_CODEC (audio));
+  ogmrip_mplayer_set_input (argv, ogmrip_stream_get_title (input));
 
   g_ptr_array_add (argv, NULL);
 
@@ -213,9 +204,8 @@ ogmrip_copy_set_property (GObject *gobject, guint property_id, const GValue *val
 static gchar **
 ogmrip_video_copy_command (OGMRipVideoCodec *video)
 {
-  OGMRipTitle *title;
+  OGMRipStream *input;
   GPtrArray *argv;
-  gint vid;
 
   g_return_val_if_fail (OGMRIP_IS_VIDEO_CODEC (video), NULL);
 
@@ -233,16 +223,8 @@ ogmrip_video_copy_command (OGMRipVideoCodec *video)
   g_ptr_array_add (argv, g_strdup ("-mpegopts"));
   g_ptr_array_add (argv, g_strdup ("format=dvd:tsaf"));
 
-  title = ogmrip_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video)));
-  vid = ogmrip_title_get_nr (title);
-
-  if (MPLAYER_CHECK_VERSION(1,0,0,1))
-    g_ptr_array_add (argv, g_strdup_printf ("dvd://%d", vid + 1));
-  else
-  {
-    g_ptr_array_add (argv, g_strdup ("-dvd"));
-    g_ptr_array_add (argv, g_strdup_printf ("%d", vid + 1));
-  }
+  input = ogmrip_codec_get_input (OGMRIP_CODEC (video));
+  ogmrip_mplayer_set_input (argv, ogmrip_stream_get_title (input));
 
   g_ptr_array_add (argv, NULL);
 

@@ -32,3 +32,9 @@ libogmrip_media_la_LDFLAGS = \
 libogmrip_media_ladir = \
   $(includedir)/ogmrip-media
 
+libogmrip_media_la_LIBADD = \
+  $(top_builddir)/libogmrip-base/libogmrip-base.la
+
+INCLUDES = \
+  -I$(top_srcdir)/libogmrip-base
+
