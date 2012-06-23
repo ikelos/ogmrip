@@ -66,6 +66,12 @@ ogmbr_stream_iface_init (OGMRipStreamInterface *iface)
 }
 
 static gint
+ogmbr_audio_stream_get_bitrate (OGMRipAudioStream *audio)
+{
+  return OGMBR_AUDIO_STREAM (audio)->priv->bitrate;
+}
+
+static gint
 ogmbr_audio_stream_get_channels (OGMRipAudioStream *audio)
 {
   switch (OGMBR_AUDIO_STREAM (audio)->priv->channels)
@@ -116,12 +122,10 @@ ogmbr_audio_sterma_get_sample_rate (OGMRipAudioStream *audio)
 static void
 ogmbr_audio_stream_iface_init (OGMRipAudioStreamInterface *iface)
 {
-/*
-  iface->get_bitrate      = ogmbr_audio_stream_get_bitrate;
-*/
+  iface->get_bitrate     = ogmbr_audio_stream_get_bitrate;
   iface->get_channels    = ogmbr_audio_stream_get_channels;
-  iface->get_content      = ogmbr_audio_stream_get_content;
-  iface->get_language     = ogmbr_audio_stream_get_language;
+  iface->get_content     = ogmbr_audio_stream_get_content;
+  iface->get_language    = ogmbr_audio_stream_get_language;
   iface->get_nr          = ogmbr_audio_stream_get_nr;
   iface->get_sample_rate = ogmbr_audio_sterma_get_sample_rate;
 }

@@ -133,6 +133,12 @@ ogmbr_title_get_resolution (OGMRipVideoStream *video, guint *width, guint *heigh
     *height = title->priv->raw_height;
 }
 
+static gint
+ogmbr_title_get_bitrate (OGMRipVideoStream *video)
+{
+  return OGMBR_TITLE (video)->priv->bitrate;
+}
+
 static void
 ogmbr_video_stream_iface_init (OGMRipVideoStreamInterface *iface)
 {
@@ -143,6 +149,7 @@ ogmbr_video_stream_iface_init (OGMRipVideoStreamInterface *iface)
   iface->get_crop_size    = ogmbr_title_get_crop_size;
 */
   iface->get_aspect_ratio = ogmbr_title_get_aspect_ratio;
+  iface->get_bitrate      = ogmbr_title_get_bitrate;
 }
 
 typedef struct
