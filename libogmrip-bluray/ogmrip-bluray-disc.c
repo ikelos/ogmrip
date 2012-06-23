@@ -29,6 +29,8 @@
 
 #include <libbluray/bluray.h>
 
+#include <glib/gstdio.h>
+
 enum
 {
   PROP_0,
@@ -50,6 +52,36 @@ enum
 
 static void ogmbr_media_iface_init (OGMRipMediaInterface *iface);
 
+static GVolume *
+g_volume_get_from_device (const gchar *device)
+{
+  GVolume *volume = NULL;
+  GVolumeMonitor *monitor;
+  GList *list, *link;
+  gchar *str;
+
+  monitor = g_volume_monitor_get ();
+  list = g_volume_monitor_get_volumes (monitor);
+  g_object_unref (monitor);
+
+  for (link = list; link; link = link->next)
+  {
+    if (!volume)
+    {
+      str = g_volume_get_identifier (link->data, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE);
+      if (g_str_equal (str, device))
+        volume = g_object_ref (link->data);
+      g_free (str);
+    }
+
+    g_object_unref (link->data);
+  }
+
+  g_list_free (list);
+
+  return volume;
+}
+
 G_DEFINE_TYPE_WITH_CODE (OGMBrDisc, ogmbr_disc, G_TYPE_OBJECT,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_MEDIA, ogmbr_media_iface_init));
 
@@ -58,6 +90,7 @@ ogmbr_disc_constructor (GType gtype, guint n_properties, GObjectConstructParam *
 {
   GObject *gobject;
   OGMBrDisc *disc;
+  GVolume *volume;
 
   BLURAY *bd;
   const BLURAY_DISC_INFO *info;
@@ -71,11 +104,21 @@ ogmbr_disc_constructor (GType gtype, guint n_properties, GObjectConstructParam *
 
   if (!g_str_has_prefix (disc->priv->uri, "br://"))
   {
-    g_object_unref (gobject);
+    g_object_unref (disc);
     return NULL;
   }
 
   disc->priv->device = g_strdup (disc->priv->uri + 5);
+
+  volume = g_volume_get_from_device (disc->priv->device);
+  if (!volume)
+  {
+    g_object_unref (disc);
+    return NULL;
+  }
+
+  disc->priv->id = g_volume_get_name (volume);
+  g_object_unref (volume);
 
   bd = bd_open (disc->priv->device, NULL);
   if (!bd)
@@ -311,36 +354,69 @@ ogmbr_disc_device_changed_cb (GFileMonitor *monitor, GFile *file, GFile *other_f
 }
 
 static gboolean
+ogmbr_disc_copy_exists (OGMBrDisc *disc, const gchar *path)
+{
+  OGMRipMedia *media;
+  const gchar *id;
+  gboolean retval;
+
+  if (!g_file_test (path, G_FILE_TEST_IS_DIR))
+    return FALSE;
+
+  media = g_object_new (OGMBR_TYPE_DISC, "uri", path, NULL);
+  if (!media)
+    return FALSE;
+
+  id = ogmrip_media_get_id (media);
+
+  retval = id && disc->priv->id && g_str_equal (id, disc->priv->id);
+
+  g_object_unref (media);
+
+  return retval;
+}
+
+static gboolean
 ogmbr_disc_copy (OGMRipMedia *media, const gchar *path, GCancellable *cancellable,
     OGMRipMediaCallback callback, gpointer user_data, GError **error)
 {
   OGMBrDisc *disc = OGMBR_DISC (media);
-  OGMBrMakeMKV *mmkv;
-  ProgressData data;
+  struct stat buf;
   GFile *file;
-  gboolean retval;
 
-  /*
-   * TODO check if exists
-   */
-
-  mmkv = ogmbr_makemkv_get_default ();
-
-  if (callback)
-  {
-    data.media = g_object_ref (media);
-    data.callback = callback;
-    data.user_data = user_data;
-
-    g_signal_connect (mmkv, "notify::progress",
-        G_CALLBACK (ogmbr_disc_action_progress_cb), &data);
-  }
-
-  retval = ogmbr_makemkv_backup_disc (mmkv, disc, path, cancellable, error);
-  g_object_unref (mmkv);
-
-  if (!retval)
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
+
+  if (g_stat (disc->priv->device, &buf) != 0)
+    return FALSE;
+
+  if (!S_ISBLK (buf.st_mode))
+    return TRUE;
+
+  if (!ogmbr_disc_copy_exists (disc, path))
+  {
+    OGMBrMakeMKV *mmkv;
+    ProgressData data;
+    gboolean retval;
+
+    mmkv = ogmbr_makemkv_get_default ();
+
+    if (callback)
+    {
+      data.media = g_object_ref (media);
+      data.callback = callback;
+      data.user_data = user_data;
+
+      g_signal_connect (mmkv, "notify::progress",
+          G_CALLBACK (ogmbr_disc_action_progress_cb), &data);
+    }
+
+    retval = ogmbr_makemkv_backup_disc (mmkv, disc, path, cancellable, error);
+    g_object_unref (mmkv);
+
+    if (!retval)
+      return FALSE;
+  }
 
   g_free (disc->priv->orig_device);
   disc->priv->orig_device = disc->priv->device;
@@ -360,7 +436,7 @@ ogmbr_disc_copy (OGMRipMedia *media, const gchar *path, GCancellable *cancellabl
   g_signal_connect (disc->priv->monitor, "changed",
       G_CALLBACK (ogmbr_disc_device_changed_cb), disc);
 
-  return retval;
+  return TRUE;
 }
 
 static void

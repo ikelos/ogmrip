@@ -184,7 +184,7 @@ ogmbr_makemkv_parse_media_info (OGMBrDisc *disc, guint attr, guint code, const g
       break;
     case ap_iaVolumeName:
       /* CINFO:32,0,"SERENITY_G51_GLO" */
-      disc->priv->id = g_strdup (value);
+      /* disc->priv->id = g_strdup (value); */
       break;
     default:
       break;
