@@ -23,6 +23,8 @@
 
 G_BEGIN_DECLS
 
+void        ogmrip_mplayer_set_input          (GPtrArray   *argc,
+                                               OGMRipTitle *title);
 /*
  * Audio
  */

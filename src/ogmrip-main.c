@@ -273,32 +273,85 @@ ogmrip_main_dbus_uninhibit (OGMRipData *data, guint cookie)
   }
 }
 
+static void
+ogmrip_main_load_progress_cb (OGMRipMedia *media, gdouble percent, gpointer pbar)
+{
+  gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (pbar), percent);
+}
+
+static gboolean
+ogmrip_main_open_media (OGMRipData *data, OGMRipMedia *media)
+{
+  GtkWidget *dialog, *area, *box, *label, *pbar;
+  GCancellable *cancellable;
+  gboolean res;
+
+  dialog = gtk_dialog_new_with_buttons (_("Opening media"),
+      GTK_WINDOW (data->window), GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
+  gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
+
+  area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+
+  box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
+  gtk_container_set_border_width (GTK_CONTAINER (box), 6);
+  gtk_container_add (GTK_CONTAINER (area), box);
+
+  label = gtk_label_new ("Opening media");
+  gtk_misc_set_alignment (GTK_MISC (label), 0.0, -1.0);
+  gtk_container_add (GTK_CONTAINER (box), label);
+
+  pbar = gtk_progress_bar_new ();
+  gtk_widget_set_size_request (pbar, 300, -1);
+  gtk_container_add (GTK_CONTAINER (box), pbar);
+
+  gtk_widget_show_all (dialog);
+
+  cancellable = g_cancellable_new ();
+  g_signal_connect_swapped (dialog, "response",
+      G_CALLBACK (g_cancellable_cancel), cancellable);
+
+  res = ogmrip_media_open (media, cancellable, ogmrip_main_load_progress_cb, pbar, NULL);
+
+  g_object_unref (cancellable);
+  gtk_widget_destroy (dialog);
+
+  if (!res && !g_cancellable_is_cancelled (cancellable))
+    ogmrip_run_error_dialog (GTK_WINDOW (data->window), NULL, _("Could not open the media"));
+
+  return res;
+}
+
 /*
  * Loads a media
  */
 static void
-ogmrip_main_load (OGMRipData *data, OGMRipMedia *media)
+ogmrip_main_load_media (OGMRipData *data, OGMRipMedia *media)
 {
-  gint nvid;
-  const gchar *label = NULL;
+  if (ogmrip_main_open_media (data, media))
+  {
+    gint nvid;
+    const gchar *label = NULL;
 
-  if (data->media)
-    g_object_unref (data->media);
-  data->media = g_object_ref (media);
+    if (data->media)
+    {
+      ogmrip_media_close (data->media);
+      g_object_unref (data->media);
+    }
+    data->media = g_object_ref (media);
 
-  ogmrip_title_chooser_set_media (OGMRIP_TITLE_CHOOSER (data->title_chooser), media);
+    ogmrip_title_chooser_set_media (OGMRIP_TITLE_CHOOSER (data->title_chooser), media);
 
-  nvid = ogmrip_media_get_n_titles (media);
-  if (nvid > 0)
-    label = ogmrip_media_get_label (media);
+    nvid = ogmrip_media_get_n_titles (media);
+    if (nvid > 0)
+      label = ogmrip_media_get_label (media);
 
-  gtk_entry_set_text (GTK_ENTRY (data->title_entry),
-      label ? label : _("Untitled"));
+    gtk_entry_set_text (GTK_ENTRY (data->title_entry),
+        label ? label : _("Untitled"));
 
-  gtk_action_set_sensitive (data->extract_action, data->prepared);
+    gtk_action_set_sensitive (data->extract_action, data->prepared);
+  }
 }
-
-OGMRipMedia * ogmrip_media_new (const gchar *path);
 
 static gboolean
 ogmrip_main_load_path (OGMRipData *data, const gchar *path)
@@ -312,7 +365,7 @@ ogmrip_main_load_path (OGMRipData *data, const gchar *path)
     return FALSE;
   }
 
-  ogmrip_main_load (data, media);
+  ogmrip_main_load_media (data, media);
   g_object_unref (media);
 
   return TRUE;
@@ -383,10 +436,10 @@ ogmrip_main_clean (OGMRipData *data, OGMRipEncoding *encoding, gboolean error)
 
       title = ogmrip_encoding_get_title (encoding);
       uri = ogmrip_media_get_uri (ogmrip_title_get_media (title));
-      if (!g_str_has_prefix (uri, "dvd://"))
-        g_warning ("Unknown scheme for '%s'", uri);
-      else
+      if (g_str_has_prefix (uri, "dvd://"))
         ogmrip_fs_rmdir (uri + 6, TRUE, NULL);
+      else
+        g_warning ("Unknown scheme for '%s'", uri);
     }
   }
 
@@ -1209,6 +1262,9 @@ ogmrip_main_create_chapters_codec (OGMRipData *data, OGMRipVideoStream *stream, 
   guint last_chap, chap;
   gchar *label;
 
+  if (!ogmrip_chapter_store_get_editable (OGMRIP_CHAPTER_STORE (data->chapter_store)))
+    return NULL;
+
   codec = ogmrip_chapters_new (stream);
   if (!codec)
     return NULL;
@@ -1376,7 +1432,7 @@ ogmrip_main_load_activated (OGMRipData *data)
 
     media = ogmrip_media_chooser_get_media (OGMRIP_MEDIA_CHOOSER (dialog));
     if (media)
-      ogmrip_main_load (data, media);
+      ogmrip_main_load_media (data, media);
   }
   gtk_widget_destroy (dialog);
 }

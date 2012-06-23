@@ -18,6 +18,8 @@
 
 #include "ogmrip-media-object.h"
 
+#include <ogmrip-base.h>
+
 G_DEFINE_INTERFACE (OGMRipMedia, ogmrip_media, G_TYPE_OBJECT)
 
 static void
@@ -212,5 +214,31 @@ ogmrip_media_copy (OGMRipMedia *media, const gchar *path, GCancellable *cancella
     return TRUE;
 
   return iface->copy (media, path, cancellable, callback, user_data, error);
+}
+
+OGMRipMedia *
+ogmrip_media_new (const gchar *path)
+{
+  OGMRipMedia *media = NULL;
+  GType *types;
+  guint i;
+
+  if (!path)
+    return NULL;
+
+  types = ogmrip_type_children (OGMRIP_TYPE_MEDIA, NULL);
+  if (!types)
+    return NULL;
+
+  for (i = 0; types[i] != G_TYPE_NONE; i ++)
+  {
+    media = g_object_new (types[i], "uri", path, NULL);
+    if (media)
+      break;
+  }
+
+  g_free (types);
+
+  return media;
 }
 

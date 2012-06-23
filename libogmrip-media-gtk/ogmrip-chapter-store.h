@@ -78,6 +78,7 @@ void                 ogmrip_chapter_store_deselect_all  (OGMRipChapterStore *sto
 gboolean             ogmrip_chapter_store_get_selection (OGMRipChapterStore *store,
                                                          guint              *start_chapter,
                                                          gint               *end_chapter);
+gboolean             ogmrip_chapter_store_get_editable  (OGMRipChapterStore *store);
 
 G_END_DECLS
 

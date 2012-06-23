@@ -37,6 +37,7 @@ struct _OGMRipMediaFileStream
 
   OGMRipTitle *title;
   gint format;
+  gint id;
 };
 
 struct _OGMRipMediaFileStreamClass
@@ -102,6 +103,12 @@ ogmrip_media_file_stream_class_init (OGMRipMediaFileStreamClass *klass)
 }
 
 static gint
+ogmrip_media_file_get_id (OGMRipStream *stream)
+{
+  return OGMRIP_MEDIA_FILE_STREAM (stream)->id;
+}
+
+static gint
 ogmrip_media_file_get_format (OGMRipStream *stream)
 {
   return OGMRIP_MEDIA_FILE_STREAM (stream)->format;
@@ -116,6 +123,7 @@ ogmrip_media_file_get_title (OGMRipStream *stream)
 static void
 ogmrip_stream_iface_init (OGMRipStreamInterface *iface)
 {
+  iface->get_id     = ogmrip_media_file_get_id;
   iface->get_format = ogmrip_media_file_get_format;
   iface->get_title  = ogmrip_media_file_get_title;
 }
@@ -133,6 +141,12 @@ static void
 ogmrip_media_file_audio_class_init (OGMRipMediaFileAudioClass *klass)
 {
   g_type_class_add_private (klass, sizeof (OGMRipAudioFilePriv));
+}
+
+static gint
+ogmrip_media_file_audio_get_nr (OGMRipAudioStream *audio)
+{
+  return OGMRIP_MEDIA_FILE_STREAM (audio)->id;
 }
 
 static gint
@@ -168,6 +182,7 @@ ogmrip_media_file_audio_get_sample_rate (OGMRipAudioStream *audio)
 static void
 ogmrip_audio_stream_iface_init (OGMRipAudioStreamInterface *iface)
 {
+  iface->get_nr           = ogmrip_media_file_audio_get_nr;
   iface->get_bitrate      = ogmrip_media_file_audio_get_bitrate;
   iface->get_channels     = ogmrip_media_file_audio_get_channels;
   iface->get_label        = ogmrip_media_file_audio_get_label;
@@ -190,6 +205,12 @@ ogmrip_media_file_subp_class_init (OGMRipMediaFileSubpClass *klass)
   g_type_class_add_private (klass, sizeof (OGMRipSubpFilePriv));
 }
 
+static gint
+ogmrip_media_file_subp_get_nr (OGMRipSubpStream *subp)
+{
+  return OGMRIP_MEDIA_FILE_STREAM (subp)->id;
+}
+
 static const gchar *
 ogmrip_media_file_subp_get_label (OGMRipSubpStream *subp)
 {
@@ -205,6 +226,7 @@ ogmrip_media_file_subp_get_language (OGMRipSubpStream *subp)
 static void
 ogmrip_subp_stream_iface_init (OGMRipSubpStreamInterface *iface)
 {
+  iface->get_nr       = ogmrip_media_file_subp_get_nr;
   iface->get_label    = ogmrip_media_file_subp_get_label;
   iface->get_language = ogmrip_media_file_subp_get_language;
 }
@@ -266,6 +288,7 @@ ogmrip_media_file_constructor (GType type, guint n_properties, GObjectConstructP
     stream = g_object_new (OGMRIP_TYPE_MEDIA_FILE_AUDIO, 0);
     stream->title = OGMRIP_TITLE (gobject);
     stream->format = ogmrip_media_info_get_audio_format (info, i);
+    stream->id = i;
 
     ogmrip_media_info_get_audio_info (info, i, OGMRIP_MEDIA_FILE_AUDIO (stream)->priv);
     OGMRIP_FILE (gobject)->priv->title_size += OGMRIP_MEDIA_FILE_AUDIO (stream)->priv->size;
@@ -281,6 +304,7 @@ ogmrip_media_file_constructor (GType type, guint n_properties, GObjectConstructP
     stream = g_object_new (OGMRIP_TYPE_MEDIA_FILE_SUBP, 0);
     stream->title = OGMRIP_TITLE (gobject);
     stream->format = ogmrip_media_info_get_subp_format (info, i);
+    stream->id = i;
 
     ogmrip_media_info_get_subp_info (info, i, OGMRIP_MEDIA_FILE_SUBP (stream)->priv);
     OGMRIP_FILE (gobject)->priv->title_size += OGMRIP_MEDIA_FILE_SUBP (stream)->priv->size;

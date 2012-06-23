@@ -29,6 +29,7 @@
 
 #include "ogmrip-mplayer-player.h"
 #include "ogmrip-mplayer-version.h"
+#include "ogmrip-mplayer-commands.h"
 
 #include <unistd.h>
 
@@ -90,8 +91,6 @@ static gchar **
 ogmrip_mplayer_play_command (OGMRipPlayer *player)
 {
   GPtrArray *argv;
-  const gchar *uri;
-  gint vid;
 
   argv = g_ptr_array_new ();
   g_ptr_array_add (argv, g_strdup ("mplayer"));
@@ -152,23 +151,7 @@ ogmrip_mplayer_play_command (OGMRipPlayer *player)
       g_ptr_array_add (argv, g_strdup_printf ("%d", player->priv->start_chap + 1));
   }
 
-  uri = ogmrip_media_get_uri (ogmrip_title_get_media (player->priv->title));
-
-  g_ptr_array_add (argv, g_strdup ("-dvd-device"));
-  if (g_str_has_prefix (uri, "dvd://"))
-    g_ptr_array_add (argv, g_strdup (uri + 6));
-  else
-    g_ptr_array_add (argv, g_strdup (uri));
-
-  vid = ogmrip_title_get_nr (player->priv->title);
-
-  if (MPLAYER_CHECK_VERSION (1,0,0,1))
-    g_ptr_array_add (argv, g_strdup_printf ("dvd://%d", vid + 1));
-  else
-  {
-    g_ptr_array_add (argv, g_strdup ("-dvd"));
-    g_ptr_array_add (argv, g_strdup_printf ("%d", vid + 1));
-  }
+  ogmrip_mplayer_set_input (argv, player->priv->title);
 
   g_ptr_array_add (argv, NULL);
 

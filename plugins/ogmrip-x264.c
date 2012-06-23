@@ -212,7 +212,7 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   GString *options;
 
   const gchar *output;
-  gint quality, bitrate, vid, threads;
+  gint quality, bitrate, threads;
   gboolean cartoon;
 
   output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (video)));
@@ -364,15 +364,8 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   g_ptr_array_add (argv, g_string_free (options, FALSE));
 
   title = ogmrip_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video)));
-  vid = ogmrip_title_get_nr (title);
-
-  if (MPLAYER_CHECK_VERSION (1,0,0,1))
-    g_ptr_array_add (argv, g_strdup_printf ("dvd://%d", vid + 1));
-  else
-  {
-    g_ptr_array_add (argv, g_strdup ("-dvd"));
-    g_ptr_array_add (argv, g_strdup_printf ("%d", vid + 1));
-  }
+  ogmrip_mplayer_set_input (argv,
+      ogmrip_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video))));
 
   g_ptr_array_add (argv, NULL);
 

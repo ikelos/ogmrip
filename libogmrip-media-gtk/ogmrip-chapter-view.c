@@ -50,41 +50,47 @@ ogmrip_chapter_view_class_init (OGMRipChapterViewClass *klass)
 static void
 ogmrip_chapter_view_selection_toggled (OGMRipChapterView *view, const gchar *path)
 {
-  GtkTreeModel *model = GTK_TREE_MODEL (view->priv->store);
-  GtkTreeIter iter, next_iter, prev_iter;
-  gboolean extract, next_extract, prev_extract;
+  if (ogmrip_chapter_store_get_editable (view->priv->store))
+  {
+    GtkTreeModel *model = GTK_TREE_MODEL (view->priv->store);
+    GtkTreeIter iter, next_iter, prev_iter;
+    gboolean extract, next_extract, prev_extract;
 
-  next_extract = prev_extract = FALSE;
+    next_extract = prev_extract = FALSE;
 
-  gtk_tree_model_get_iter_from_string (model, &iter, path);
+    gtk_tree_model_get_iter_from_string (model, &iter, path);
 
-  next_iter = iter;
-  if (gtk_tree_model_iter_next (model, &next_iter))
-    next_extract = ogmrip_chapter_store_get_selected (view->priv->store, &next_iter);
+    next_iter = iter;
+    if (gtk_tree_model_iter_next (model, &next_iter))
+      next_extract = ogmrip_chapter_store_get_selected (view->priv->store, &next_iter);
 
-  prev_iter = iter;
-  if (gtk_tree_model_iter_previous (model, &prev_iter))
-    prev_extract = ogmrip_chapter_store_get_selected (view->priv->store, &prev_iter);
+    prev_iter = iter;
+    if (gtk_tree_model_iter_previous (model, &prev_iter))
+      prev_extract = ogmrip_chapter_store_get_selected (view->priv->store, &prev_iter);
 
-  extract = ogmrip_chapter_store_get_selected (view->priv->store, &iter);
+    extract = ogmrip_chapter_store_get_selected (view->priv->store, &iter);
 
-  if ((prev_extract && next_extract) ||
-      (!prev_extract && !next_extract && !extract))
-    ogmrip_chapter_store_deselect_all (view->priv->store);
+    if ((prev_extract && next_extract) ||
+        (!prev_extract && !next_extract && !extract))
+      ogmrip_chapter_store_deselect_all (view->priv->store);
 
-  extract = ogmrip_chapter_store_get_selected (view->priv->store, &iter);
-  ogmrip_chapter_store_set_selected (view->priv->store, &iter, !extract);
+    extract = ogmrip_chapter_store_get_selected (view->priv->store, &iter);
+    ogmrip_chapter_store_set_selected (view->priv->store, &iter, !extract);
+  }
 }
 
 static void
 ogmrip_chapter_view_label_edited (OGMRipChapterView *view, const gchar *path, const gchar *text)
 {
-  GtkTreeIter iter;
+  if (ogmrip_chapter_store_get_editable (view->priv->store))
+  {
+    GtkTreeIter iter;
 
-  gtk_tree_model_get_iter_from_string (GTK_TREE_MODEL (view->priv->store), &iter, path);
-  gtk_list_store_set (GTK_LIST_STORE (view->priv->store), &iter,
-      OGMRIP_CHAPTER_STORE_LABEL_COLUMN, text,
-      -1);
+    gtk_tree_model_get_iter_from_string (GTK_TREE_MODEL (view->priv->store), &iter, path);
+    gtk_list_store_set (GTK_LIST_STORE (view->priv->store), &iter,
+        OGMRIP_CHAPTER_STORE_LABEL_COLUMN, text,
+        -1);
+  }
 }
 
 static void

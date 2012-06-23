@@ -70,9 +70,7 @@ static gboolean ogmrip_theora_run          (OGMJobTask   *task,
 static gchar **
 ogmrip_yuv4mpeg_command (OGMRipVideoCodec *video, const gchar *output)
 {
-  OGMRipTitle *title;
   GPtrArray *argv;
-  gint vid;
 
   argv = ogmrip_mplayer_video_command (video, output);
 
@@ -82,16 +80,8 @@ ogmrip_yuv4mpeg_command (OGMRipVideoCodec *video, const gchar *output)
   else
     g_ptr_array_add (argv, g_strdup ("yuv4mpeg"));
 
-  title = ogmrip_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video)));
-  vid = ogmrip_title_get_nr (title);
-
-  if (MPLAYER_CHECK_VERSION (1,0,0,1))
-    g_ptr_array_add (argv, g_strdup_printf ("dvd://%d", vid + 1));
-  else
-  {
-    g_ptr_array_add (argv, g_strdup ("-dvd"));
-    g_ptr_array_add (argv, g_strdup_printf ("%d", vid + 1));
-  }
+  ogmrip_mplayer_set_input (argv,
+      ogmrip_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video))));
 
   g_ptr_array_add (argv, NULL);
 

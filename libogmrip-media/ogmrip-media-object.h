@@ -57,6 +57,7 @@ struct _OGMRipMediaInterface
 };
 
 GType         ogmrip_media_get_type      (void) G_GNUC_CONST;
+OGMRipMedia * ogmrip_media_new           (const gchar         *path);
 gboolean      ogmrip_media_open          (OGMRipMedia         *media,
                                           GCancellable        *cancellable,
                                           OGMRipMediaCallback callback,
