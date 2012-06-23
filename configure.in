@@ -121,7 +121,7 @@ AC_ARG_ENABLE(gtk-support,
   [have_gtk_support="$enableval"], [have_gtk_support="yes"])
 
 if test x"$have_gtk_support" != x"no"; then
-  PKG_CHECK_MODULES(GTK, [gtk+-3.0 >= 3.0], [have_gtk_support=yes], [have_gtk_support=no])
+  PKG_CHECK_MODULES(GTK, [gtk+-3.0 >= $GTK_REQUIRED], [have_gtk_support=yes], [have_gtk_support=no])
 fi
 
 if test x"$have_gtk_support" = x"yes"; then
@@ -160,67 +160,11 @@ LIBS="$LIBS $ENCA_LIBS"
 
 dnl **************************************************************
 
-AC_CHECK_TYPES([sg_io_hdr_t],[has_sg="yes"],[has_sg="no"],
-[#include <sys/types.h>
- #include <scsi/sg.h>])
+DVDREAD_REQUIRED=4.2.0
 
-AC_CHECK_TYPES([scsireq_t],[has_scsiio="yes"],[has_scsiio="no"],
-[#include <sys/types.h>
- #include <sys/scsiio.h>])
-
-AC_CHECK_TYPES([struct uscsi_cmd],[has_uscsi="yes"],[has_uscsi="no"],
-[#include <sys/types.h>
- #include <sys/scsi/impl/uscsi.h>])
-
-AC_CHECK_TYPES([struct cam_device],[has_cam="yes"],[has_cam="no"],
-[#include <stdio.h>
- #include <camlib.h>])
-
-if test x"$has_sg" = x"yes"; then
-  :
-elif test x"$has_scsiio" = x"yes"; then
-  :
-elif test x"$has_uscsi" = x"yes"; then
-  :
-elif test x"$has_cam" = x"yes"; then
-  CAM_LIBS="-lcam"
-else
-  AC_MSG_ERROR([Unable to find a supported SCSI interface. You need either SG on Linux, SCSIPI on NetBSD, USCSI on Solaris, or CAM on FreeBSD.])
-fi
-
-LIBS="$LIBS $CAM_LIBS"
-
-dnl **************************************************************
-
-AC_CHECK_LIB(dvdread, DVDOpen, [DVDREAD_LIBS="-ldvdread"], 
-  AC_MSG_ERROR(Unable to find libdvdread. You need libdvdread to use OGMRip. Find it on http://www.dtek.chalmers.se/groups/dvd))
-AC_SUBST(DVDREAD_LIBS)
-
-AC_LANG(C)
-
-LIBS="$LIBS -ldvdread"
-
-AC_LINK_IFELSE([AC_LANG_SOURCE([[
-#include <stdio.h>
-#include <inttypes.h>
-#include <dvdread/dvd_reader.h>
-int main(void) { DVDFileStat (NULL, 0, 0, NULL); return 0; }
-]])],[have_dvd_file_stat="yes"],[have_dvd_file_stat="no"])
-
-if test x"$have_dvd_file_stat" = x"yes"; then
-  AC_DEFINE(HAVE_DVD_FILE_STAT, 1, [Define to 1 if DVDFileStat is available.])
-fi
-
-AC_LINK_IFELSE([AC_LANG_SOURCE([[
-#include <stdio.h>
-#include <inttypes.h>
-#include <dvdread/dvd_reader.h>
-int main(void) { DVDFileSize (NULL); return 0; }
-]])],[have_dvd_file_size="yes"],[have_dvd_file_size="no"])
-
-if test x"$have_dvd_file_size" = x"yes"; then
-  AC_DEFINE(HAVE_DVD_FILE_SIZE, 1, [Define to 1 if DVDFileSize is available.])
-fi
+PKG_CHECK_MODULES(DVDREAD, [dvdread >= $DVDREAD_REQUIRED])
+CFLAGS="$CFLAGS $DVDREAD_CFLAGS"
+LIBS="$LIBS $DVDREAD_LIBS"
 
 dnl **************************************************************
 
@@ -400,6 +344,8 @@ CFLAGS="$CFLAGS $LIBNOTIFY_CFLAGS"
 LIBS="$LIBS $LIBNOTIFY_LIBS"
 
 dnl **************************************************************
+
+AC_LANG(C)
 
 AC_RUN_IFELSE([AC_LANG_SOURCE([[
 #include <unistd.h>
