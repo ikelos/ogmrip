@@ -30,6 +30,7 @@ struct _OGMBrMakeMKVPriv
 
 struct _OGMBrDiscPriv
 {
+  guint nr;
   gchar *id;
   gchar *uri;
   gchar *orig_uri;

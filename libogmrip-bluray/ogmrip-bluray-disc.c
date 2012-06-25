@@ -224,6 +224,8 @@ static void
 ogmbr_disc_init (OGMBrDisc *disc)
 {
   disc->priv = G_TYPE_INSTANCE_GET_PRIVATE (disc, OGMBR_TYPE_DISC, OGMBrDiscPriv);
+
+  disc->priv->nr = -1;
 }
 
 static void

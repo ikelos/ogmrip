@@ -21,6 +21,7 @@
 
 #include <ogmrip-job.h>
 #include <ogmrip-bluray-disc.h>
+#include <ogmrip-bluray-title.h>
 
 G_BEGIN_DECLS
 
@@ -58,6 +59,16 @@ gboolean       ogmbr_makemkv_open_disc     (OGMBrMakeMKV *mmkv,
                                             GError       **error);
 gboolean       ogmbr_makemkv_backup_disc   (OGMBrMakeMKV *mmkv,
                                             OGMBrDisc    *disc,
+                                            const gchar  *output,
+                                            GCancellable *cancellable,
+                                            GError       **error);
+gboolean       ogmbr_makemkv_copy_disc     (OGMBrMakeMKV *mmkv,
+                                            OGMBrDisc    *disc,
+                                            const gchar  *output,
+                                            GCancellable *cancellable,
+                                            GError       **error);
+gboolean       ogmbr_makemkv_copy_title    (OGMBrMakeMKV *mmkv,
+                                            OGMBrTitle   *title,
                                             const gchar  *output,
                                             GCancellable *cancellable,
                                             GError       **error);
