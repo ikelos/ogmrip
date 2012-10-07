@@ -70,6 +70,12 @@ struct _OGMRipTitleInterface
                                                 OGMRipTitleCallback callback,
                                                 gpointer            user_data,
                                                 GError              **error);
+  OGMRipMedia *       (* copy)                 (OGMRipTitle         *title,
+                                                const gchar         *path,
+                                                GCancellable        *cancellable,
+                                                OGMRipTitleCallback callback,
+                                                gpointer            user_data,
+                                                GError              **error);
 };
 
 GType               ogmrip_title_get_type             (void) G_GNUC_CONST;
@@ -106,6 +112,12 @@ OGMRipSubpStream *  ogmrip_title_get_nth_subp_stream  (OGMRipTitle         *titl
                                                        guint               nr);
 GList *             ogmrip_title_get_subp_streams     (OGMRipTitle         *title);
 gboolean            ogmrip_title_analyze              (OGMRipTitle         *title,
+                                                       GCancellable        *cancellable,
+                                                       OGMRipTitleCallback callback,
+                                                       gpointer            user_data,
+                                                       GError              **error);
+OGMRipMedia *       ogmrip_title_copy                 (OGMRipTitle         *title,
+                                                       const gchar         *path,
                                                        GCancellable        *cancellable,
                                                        OGMRipTitleCallback callback,
                                                        gpointer            user_data,

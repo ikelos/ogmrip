@@ -382,3 +382,22 @@ ogmrip_title_analyze (OGMRipTitle *title, GCancellable *cancellable,
   return iface->analyze (title, cancellable, callback, user_data, error);
 }
 
+OGMRipMedia *
+ogmrip_title_copy (OGMRipTitle *title, const gchar *path, GCancellable *cancellable,
+    OGMRipTitleCallback callback, gpointer user_data, GError **error)
+{
+  OGMRipTitleInterface *iface;
+
+  g_return_val_if_fail (OGMRIP_IS_TITLE (title), NULL);
+  g_return_val_if_fail (path != NULL, NULL);
+  g_return_val_if_fail (cancellable == NULL || G_IS_CANCELLABLE (cancellable), NULL);
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
+
+  iface = OGMRIP_TITLE_GET_IFACE (title);
+
+  if (!iface->copy)
+    return NULL;
+
+  return iface->copy (title, path, cancellable, callback, user_data, error);
+}
+

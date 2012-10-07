@@ -20,6 +20,8 @@
 #define __OGMDVD_PRIV_H__
 
 #include <ogmrip-media.h>
+#include <ogmdvd-disc.h>
+#include <ogmdvd-title.h>
 
 #if defined(HAVE_INTTYPES_H)
 #include <inttypes.h>
@@ -42,9 +44,7 @@ G_BEGIN_DECLS
 struct _OGMDvdDiscPriv
 {
   gchar *uri;
-  gchar *orig_uri;
   gchar *device;
-  gchar *orig_device;
   gchar *label;
   gchar *id;
 
@@ -55,8 +55,6 @@ struct _OGMDvdDiscPriv
 
   dvd_reader_t *reader;
   ifo_handle_t *vmg_file;
-
-  GFileMonitor *monitor;
 };
 
 /**
@@ -212,6 +210,14 @@ struct _OGMDvdParser
   /* const mpeg2_info_t *info; */
   guint width, height;
 };
+
+OGMDvdDisc * ogmdvd_disc_copy (OGMDvdDisc          *disc,
+                               OGMDvdTitle         *title,
+                               const gchar         *path,
+                               GCancellable        *cancellable,
+                               OGMRipMediaCallback callback,
+                               gpointer            user_data,
+                               GError              **error);
 
 gulong ogmdvd_time_to_msec (dvd_time_t *dtime);
 
