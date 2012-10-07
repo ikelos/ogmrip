@@ -38,7 +38,6 @@
 
 #include <sys/ioctl.h>
 #include <sys/types.h>
-#include <sys/stat.h>
 
 #include <fcntl.h>
 
@@ -65,13 +64,6 @@ enum
   PROP_0,
   PROP_URI
 };
-
-typedef struct
-{
-  OGMRipMedia *disc;
-  OGMRipMediaCallback callback;
-  gpointer user_data;
-} OGMDvdProgress;
 
 static void      ogmrip_media_iface_init  (OGMRipMediaInterface  *iface);
 static GObject * ogmdvd_disc_constructor  (GType                 gtype,
@@ -577,12 +569,6 @@ ogmdvd_disc_dispose (GObject *gobject)
 {
   OGMDvdDisc *disc = OGMDVD_DISC (gobject);
 
-  if (disc->priv->monitor)
-  {
-    g_object_unref (disc->priv->monitor);
-    disc->priv->monitor = NULL;
-  }
-
   if (disc->priv->titles)
   {
     g_list_foreach (disc->priv->titles, (GFunc) g_object_unref, NULL);
@@ -601,9 +587,7 @@ ogmdvd_disc_finalize (GObject *gobject)
   ogmdvd_disc_close (OGMRIP_MEDIA (disc));
 
   g_free (disc->priv->uri);
-  g_free (disc->priv->orig_uri);
   g_free (disc->priv->device);
-  g_free (disc->priv->orig_device);
   g_free (disc->priv->label);
   g_free (disc->priv->id);
 
@@ -768,165 +752,11 @@ ogmdvd_disc_get_nth_title (OGMRipMedia *media, guint nr)
   return NULL;
 }
 
-static gchar **
-ogmdvd_disc_copy_command (OGMDvdDisc *disc, const gchar *path)
-{
-  GPtrArray *argv;
-/*
-  gint vid;
-*/
-  argv = g_ptr_array_new ();
-  g_ptr_array_add (argv, g_strdup ("dvdcpy"));
-  g_ptr_array_add (argv, g_strdup ("-s"));
-  g_ptr_array_add (argv, g_strdup ("skip"));
-  g_ptr_array_add (argv, g_strdup ("-o"));
-  g_ptr_array_add (argv, g_strdup (path));
-  g_ptr_array_add (argv, g_strdup ("-m"));
-/*
-  vid = ogmdvd_title_get_nr (title);
-  g_ptr_array_add (argv, g_strdup ("-t"));
-  g_ptr_array_add (argv, g_strdup_printf ("%d", vid + 1));
-*/
-  g_ptr_array_add (argv, g_strdup (disc->priv->device));
-
-  g_ptr_array_add (argv, NULL);
-
-  return (gchar **) g_ptr_array_free (argv, FALSE);
-}
-
-static gboolean
-ogmdvd_disc_copy_watch (OGMJobTask *spawn, const gchar *buffer, gpointer data, GError **error)
-{
-  guint bytes, total, percent;
-
-  if (sscanf (buffer, "%u/%u blocks written (%u%%)", &bytes, &total, &percent) == 3)
-    ogmjob_task_set_progress (spawn, percent / 100.);
-
-  return TRUE;
-}
-
-static void
-ogmdvd_disc_copy_progress_cb (OGMJobTask *spawn, GParamSpec *pspec, OGMDvdProgress *progress)
-{
-  progress->callback (progress->disc, ogmjob_task_get_progress (spawn), progress->user_data);
-}
-
-static void
-ogmdvd_disc_device_changed_cb (GFileMonitor *monitor, GFile *file, GFile *other_file, GFileMonitorEvent event_type, OGMDvdDisc *disc)
-{
-  if (event_type == G_FILE_MONITOR_EVENT_DELETED)
-  {
-    g_free (disc->priv->device);
-    disc->priv->device = disc->priv->orig_device;
-    disc->priv->orig_device = NULL;
-
-    g_free (disc->priv->uri);
-    disc->priv->uri = disc->priv->orig_uri;
-    disc->priv->orig_uri = NULL;
-
-    g_object_unref (monitor);
-  }
-}
-
-static gboolean
-ogmdvd_disc_copy_exists (OGMDvdDisc *disc, const gchar *path)
-{
-  OGMRipMedia *media;
-  const gchar *id1, *id2;
-  gboolean retval;
-
-  if (!g_file_test (path, G_FILE_TEST_IS_DIR))
-    return FALSE;
-
-  media = ogmdvd_disc_new (path, NULL);
-  if (!media)
-    return FALSE;
-
-  id1 = ogmrip_media_get_id (OGMRIP_MEDIA (disc));
-  id2 = ogmrip_media_get_id (media);
-
-  retval = id1 && id2 && g_str_equal (id1, id2);
-
-  g_object_unref (media);
-
-  return retval;
-}
-
-static gboolean
-ogmdvd_disc_copy (OGMRipMedia *media, const gchar *path, GCancellable *cancellable,
+OGMRipMedia *
+ogmdvd_disc_copy_internal (OGMRipMedia *media, const gchar *path, GCancellable *cancellable,
     OGMRipMediaCallback callback, gpointer user_data, GError **error)
 {
-  OGMDvdDisc *disc = OGMDVD_DISC (media);
-  OGMJobTask *spawn;
-  GFile *file;
-
-  struct stat buf;
-  gboolean is_open;
-  gchar **argv;
-  gint result;
-
-  if (g_cancellable_set_error_if_cancelled (cancellable, error))
-    return FALSE;
-
-  if (g_stat (disc->priv->device, &buf) != 0)
-    return FALSE;
-
-  if (!S_ISBLK (buf.st_mode))
-    return TRUE;
-
-  if (!ogmdvd_disc_copy_exists (disc, path))
-  {
-    is_open = ogmdvd_disc_is_open (media);
-    if (!is_open && !ogmdvd_disc_open (media, cancellable, callback, user_data, error))
-      return FALSE;
-
-    argv = ogmdvd_disc_copy_command (disc, path);
-
-    spawn = ogmjob_spawn_newv (argv);
-    ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (spawn),
-        (OGMJobWatch) ogmdvd_disc_copy_watch, NULL);
-
-    if (callback)
-    {
-      OGMDvdProgress progress;
-
-      progress.disc = media;
-      progress.callback = callback;
-      progress.user_data = user_data;
-
-      g_signal_connect (spawn, "notify::progress",
-          G_CALLBACK (ogmdvd_disc_copy_progress_cb), &progress);
-    }
-
-    result = ogmjob_task_run (spawn, cancellable, error);
-    g_object_unref (spawn);
-
-    if (!is_open)
-      ogmdvd_disc_close (media);
-
-    if (!result)
-      return FALSE;
-  }
-
-  g_free (disc->priv->orig_device);
-  disc->priv->orig_device = disc->priv->device;
-  disc->priv->device = g_strdup (path);
-
-  g_free (disc->priv->orig_uri);
-  disc->priv->orig_uri = disc->priv->uri;
-  disc->priv->uri = g_strdup_printf ("dvd://%s", path);
-
-  if (disc->priv->monitor)
-    g_object_unref (disc->priv->monitor);
-
-  file = g_file_new_for_path (path);
-  disc->priv->monitor = g_file_monitor_file (file, G_FILE_MONITOR_NONE, NULL, NULL);
-  g_object_unref (file);
-
-  g_signal_connect (disc->priv->monitor, "changed",
-      G_CALLBACK (ogmdvd_disc_device_changed_cb), disc);
-
-  return TRUE;
+  return (OGMRipMedia *) ogmdvd_disc_copy (OGMDVD_DISC (media), NULL, path, cancellable, callback, user_data, error);
 }
 
 static void
@@ -941,7 +771,7 @@ ogmrip_media_iface_init (OGMRipMediaInterface *iface)
   iface->get_size      = ogmdvd_disc_get_vmg_size;
   iface->get_n_titles  = ogmdvd_disc_get_n_titles;
   iface->get_nth_title = ogmdvd_disc_get_nth_title;
-  iface->copy          = ogmdvd_disc_copy;
+  iface->copy          = ogmdvd_disc_copy_internal;
 }
 
 /**

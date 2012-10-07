@@ -131,8 +131,7 @@ ogmrip_module_load (OGMRipModule *module)
     return;
   }
 
-  if (!g_spawn_command_line_sync (MPLAYER_CHECK_VERSION (1,0,3,0) ?
-        "mplayer -noconfig all -vc help" : "mplayer -vc help", &output, &str, NULL, NULL))
+  if (!g_spawn_command_line_sync ("mplayer -noconfig all -vc help", &output, &str, NULL, NULL))
   {
     g_warning (_("MPlayer is missing"));
     return;

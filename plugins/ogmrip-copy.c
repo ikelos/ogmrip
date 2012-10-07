@@ -55,14 +55,10 @@ ogmrip_audio_copy_command (OGMRipAudioCodec *audio)
   argv = ogmrip_mencoder_audio_command (audio, ogmrip_file_get_path (output));
 
   g_ptr_array_add (argv, g_strdup ("-ovc"));
-  if (MPLAYER_CHECK_VERSION (1,0,0,8))
-  {
-    g_ptr_array_add (argv, g_strdup ("copy"));
-    g_ptr_array_add (argv, g_strdup ("-of"));
-    g_ptr_array_add (argv, g_strdup ("rawaudio"));
-  }
-  else
-    g_ptr_array_add (argv, g_strdup ("frameno"));
+  g_ptr_array_add (argv, g_strdup ("copy"));
+
+  g_ptr_array_add (argv, g_strdup ("-of"));
+  g_ptr_array_add (argv, g_strdup ("rawaudio"));
 
   g_ptr_array_add (argv, g_strdup ("-oac"));
   g_ptr_array_add (argv, g_strdup ("copy"));

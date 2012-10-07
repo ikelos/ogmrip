@@ -86,10 +86,7 @@ ogmrip_yuv4mpeg_command (OGMRipVideoCodec *video, const gchar *fifo)
   argv = ogmrip_mplayer_video_command (video, fifo);
 
   g_ptr_array_add (argv, g_strdup ("-vo"));
-  if (MPLAYER_CHECK_VERSION (1,0,0,6))
-    g_ptr_array_add (argv, g_strdup_printf ("yuv4mpeg:file=%s", fifo));
-  else
-    g_ptr_array_add (argv, g_strdup ("yuv4mpeg"));
+  g_ptr_array_add (argv, g_strdup_printf ("yuv4mpeg:file=%s", fifo));
 
   ogmrip_mplayer_set_input (argv,
       ogmrip_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video))));

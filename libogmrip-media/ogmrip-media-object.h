@@ -48,7 +48,7 @@ struct _OGMRipMediaInterface
   gint          (* get_n_titles)  (OGMRipMedia         *media);
   OGMRipTitle * (* get_nth_title) (OGMRipMedia         *media,
                                    guint               nr);
-  gboolean      (* copy)          (OGMRipMedia         *media,
+  OGMRipMedia * (* copy)          (OGMRipMedia         *media,
                                    const gchar         *path,
                                    GCancellable        *cancellable,
                                    OGMRipMediaCallback callback,
@@ -73,7 +73,7 @@ gint          ogmrip_media_get_n_titles  (OGMRipMedia         *media);
 OGMRipTitle * ogmrip_media_get_nth_title (OGMRipMedia         *media,
                                           guint               nr);
 GList *       ogmrip_media_get_titles    (OGMRipMedia         *media);
-gboolean      ogmrip_media_copy          (OGMRipMedia         *media,
+OGMRipMedia * ogmrip_media_copy          (OGMRipMedia         *media,
                                           const gchar         *path,
                                           GCancellable        *cancellable,
                                           OGMRipMediaCallback callback,

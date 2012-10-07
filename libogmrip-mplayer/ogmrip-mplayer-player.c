@@ -100,25 +100,17 @@ ogmrip_mplayer_play_command (OGMRipPlayer *player)
   g_ptr_array_add (argv, g_strdup ("-nojoystick"));
   g_ptr_array_add (argv, g_strdup ("-nolirc"));
 
-  if (MPLAYER_CHECK_VERSION (1,0,0,1))
-    g_ptr_array_add (argv, g_strdup ("-nomouseinput"));
-
-    g_ptr_array_add (argv, g_strdup ("-noconsolecontrols"));
+  g_ptr_array_add (argv, g_strdup ("-nomouseinput"));
+  g_ptr_array_add (argv, g_strdup ("-noconsolecontrols"));
 
   g_ptr_array_add (argv, g_strdup ("-cache"));
   g_ptr_array_add (argv, g_strdup ("8192"));
 
-  if (MPLAYER_CHECK_VERSION (1,0,0,6))
-  {
-    g_ptr_array_add (argv, g_strdup ("-cache-min"));
-    g_ptr_array_add (argv, g_strdup ("20"));
-  }
+  g_ptr_array_add (argv, g_strdup ("-cache-min"));
+  g_ptr_array_add (argv, g_strdup ("20"));
 
-  if (MPLAYER_CHECK_VERSION (1,0,1,0))
-  {
-    g_ptr_array_add (argv, g_strdup ("-cache-seek-min"));
-    g_ptr_array_add (argv, g_strdup ("50"));
-  }
+  g_ptr_array_add (argv, g_strdup ("-cache-seek-min"));
+  g_ptr_array_add (argv, g_strdup ("50"));
 
   g_ptr_array_add (argv, g_strdup ("-zoom"));
 

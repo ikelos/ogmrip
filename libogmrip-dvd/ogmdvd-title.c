@@ -255,7 +255,7 @@ typedef struct
 } OGMDvdProgress;
 
 static void
-ogmrip_title_open_cb (OGMRipMedia *media, gdouble percent, gpointer user_data)
+ogmdvd_title_open_cb (OGMRipMedia *media, gdouble percent, gpointer user_data)
 {
   OGMDvdProgress *progress = user_data;
 
@@ -270,7 +270,7 @@ ogmdvd_title_open (OGMRipTitle *title, GCancellable *cancellable, OGMRipTitleCal
 
   dtitle->priv->close_disc = !ogmrip_media_is_open (OGMRIP_MEDIA (dtitle->priv->disc));
 
-  if (!ogmrip_media_open (OGMRIP_MEDIA (dtitle->priv->disc), cancellable, callback ? ogmrip_title_open_cb : NULL, &progress, error))
+  if (!ogmrip_media_open (OGMRIP_MEDIA (dtitle->priv->disc), cancellable, callback ? ogmdvd_title_open_cb : NULL, &progress, error))
     return FALSE;
 
   dtitle->priv->vts_file = ifoOpen (OGMDVD_DISC (dtitle->priv->disc)->priv->reader, dtitle->priv->title_set_nr);
@@ -946,6 +946,25 @@ ogmdvd_title_analyze (OGMRipTitle *title, GCancellable *cancellable, OGMRipTitle
 }
 
 static void
+ogmdvd_title_copy_cb (OGMRipMedia *media, gdouble percent, gpointer user_data)
+{
+  OGMDvdProgress *progress = user_data;
+
+  progress->callback (progress->title, percent, progress->user_data);
+}
+
+static OGMRipMedia *
+ogmdvd_title_copy (OGMRipTitle *title, const gchar *path, GCancellable *cancellable,
+    OGMRipTitleCallback callback, gpointer user_data, GError **error)
+{
+  OGMRipMedia *disc = OGMDVD_TITLE (title)->priv->disc;
+  OGMDvdProgress progress = { title, callback, user_data };
+
+  return (OGMRipMedia *) ogmdvd_disc_copy (OGMDVD_DISC (disc), OGMDVD_TITLE (title),
+      path, cancellable, ogmdvd_title_copy_cb, &progress, error);
+}
+
+static void
 ogmdvd_title_iface_init (OGMRipTitleInterface *iface)
 {
   iface->open                 = ogmdvd_title_open;
@@ -969,5 +988,6 @@ ogmdvd_title_iface_init (OGMRipTitleInterface *iface)
   iface->get_telecine         = ogmdvd_title_get_telecine;
   iface->get_interlaced       = ogmdvd_title_get_interlaced;
   iface->analyze              = ogmdvd_title_analyze;
+  iface->copy                 = ogmdvd_title_copy;
 }
 

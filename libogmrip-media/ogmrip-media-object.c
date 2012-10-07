@@ -197,21 +197,21 @@ ogmrip_media_get_titles (OGMRipMedia *media)
   return g_list_reverse (list);
 }
 
-gboolean
+OGMRipMedia *
 ogmrip_media_copy (OGMRipMedia *media, const gchar *path, GCancellable *cancellable,
     OGMRipMediaCallback callback, gpointer user_data, GError **error)
 {
   OGMRipMediaInterface *iface;
 
-  g_return_val_if_fail (OGMRIP_IS_MEDIA (media), FALSE);
-  g_return_val_if_fail (path != NULL, FALSE);
-  g_return_val_if_fail (cancellable == NULL || G_IS_CANCELLABLE (cancellable), FALSE);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (OGMRIP_IS_MEDIA (media), NULL);
+  g_return_val_if_fail (path != NULL, NULL);
+  g_return_val_if_fail (cancellable == NULL || G_IS_CANCELLABLE (cancellable), NULL);
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
   iface = OGMRIP_MEDIA_GET_IFACE (media);
 
   if (!iface->copy)
-    return TRUE;
+    return NULL;
 
   return iface->copy (media, path, cancellable, callback, user_data, error);
 }

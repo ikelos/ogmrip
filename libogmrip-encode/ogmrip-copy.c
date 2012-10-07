@@ -30,7 +30,8 @@
 
 struct _OGMRipCopyPriv
 {
-  OGMRipMedia *media;
+  OGMRipMedia *src;
+  OGMRipMedia *dst;
   gchar *path;
 };
 
@@ -96,7 +97,7 @@ ogmrip_copy_constructed (GObject *gobject)
 {
   OGMRipCopy *copy = OGMRIP_COPY (gobject);
 
-  if (!copy->priv->media)
+  if (!copy->priv->src)
     g_error ("No media specified");
 
   if (!copy->priv->path)
@@ -110,10 +111,16 @@ ogmrip_copy_dispose (GObject *gobject)
 {
   OGMRipCopy *copy = OGMRIP_COPY (gobject);
 
-  if (copy->priv->media)
+  if (copy->priv->src)
   {
-    g_object_unref (copy->priv->media);
-    copy->priv->media = NULL;
+    g_object_unref (copy->priv->src);
+    copy->priv->src = NULL;
+  }
+
+  if (copy->priv->dst)
+  {
+    g_object_unref (copy->priv->dst);
+    copy->priv->dst = NULL;
   }
 
   G_OBJECT_CLASS (ogmrip_copy_parent_class)->dispose (gobject);
@@ -137,7 +144,7 @@ ogmrip_copy_set_property (GObject *gobject, guint property_id, const GValue *val
   switch (property_id) 
   {
     case PROP_MEDIA:
-      copy->priv->media = g_value_dup_object (value);
+      copy->priv->src = g_value_dup_object (value);
       break;
     case PROP_PATH:
       g_free (copy->priv->path);
@@ -157,7 +164,7 @@ ogmrip_copy_get_property (GObject *gobject, guint property_id, GValue *value, GP
   switch (property_id) 
   {
     case PROP_MEDIA:
-      g_value_set_object (value, copy->priv->media);
+      g_value_set_object (value, copy->priv->src);
       break;
     case PROP_PATH:
       g_value_set_string (value, copy->priv->path);
@@ -179,7 +186,12 @@ ogmrip_copy_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
   OGMRipCopy *copy = OGMRIP_COPY (task);
 
-  return ogmrip_media_copy (copy->priv->media, copy->priv->path, cancellable, ogmrip_copy_progress, task, error);
+  if (copy->priv->dst)
+    return TRUE;
+
+  copy->priv->dst = ogmrip_media_copy (copy->priv->src, copy->priv->path, cancellable, ogmrip_copy_progress, task, error);
+
+  return copy->priv->dst != NULL;
 }
 
 /**
@@ -198,5 +210,21 @@ ogmrip_copy_new (OGMRipMedia *media, const gchar *path)
   g_return_val_if_fail (path && *path, NULL);
 
   return g_object_new (OGMRIP_TYPE_COPY, "media", media, "path", path, NULL);
+}
+
+OGMRipMedia *
+ogmrip_copy_get_source (OGMRipCopy *copy)
+{
+  g_return_val_if_fail (OGMRIP_IS_COPY (copy), NULL);
+
+  return copy->priv->src;
+}
+
+OGMRipMedia *
+ogmrip_copy_get_destination (OGMRipCopy *copy)
+{
+  g_return_val_if_fail (OGMRIP_IS_COPY (copy), NULL);
+
+  return copy->priv->dst;
 }
 
