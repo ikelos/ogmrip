@@ -103,21 +103,7 @@ ogmrip_crop_dialog_grab_frame (OGMRipCropDialog *dialog, gulong frame)
   {
     gchar *filename;
 
-    if (MPLAYER_CHECK_VERSION (1,0,0,8))
-      filename = g_build_filename (ogmrip_fs_get_tmp_dir (), "00000001.jpg", NULL);
-    else
-    {
-      filename = g_build_filename (ogmrip_fs_get_tmp_dir (), "00000001.jpg", NULL);
-      g_unlink (filename);
-      g_free (filename);
-
-      filename = g_build_filename (ogmrip_fs_get_tmp_dir (), "00000003.jpg", NULL);
-      g_unlink (filename);
-      g_free (filename);
-
-      filename = g_build_filename (ogmrip_fs_get_tmp_dir (), "00000002.jpg", NULL);
-    }
-
+    filename = g_build_filename (ogmrip_fs_get_tmp_dir (), "00000001.jpg", NULL);
     if (g_file_test (filename, G_FILE_TEST_IS_REGULAR))
     {
       if (dialog->priv->pixbuf)

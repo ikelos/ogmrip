@@ -167,9 +167,8 @@ ogmrip_lavc_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   g_string_append_printf (options, ":autoaspect:mbd=%u:qns=%u:vb_strategy=%u:last_pred=%u:preme=%u",
       lavc->priv->mbd, lavc->priv->qns, lavc->priv->vb_strategy, lavc->priv->last_pred, lavc->priv->preme);
 
-  if (MPLAYER_CHECK_VERSION (1,0,0,6))
-    if (pass != passes && ogmrip_video_codec_get_turbo (video))
-      g_string_append (options, ":turbo");
+  if (pass != passes && ogmrip_video_codec_get_turbo (video))
+    g_string_append (options, ":turbo");
 
   if (lavc->priv->mv0)
     g_string_append (options, ":mv0");

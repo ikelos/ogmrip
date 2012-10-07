@@ -203,20 +203,15 @@ ogmrip_mplayer_set_deint (OGMRipVideoCodec *video, GPtrArray *argv, GString *opt
 
       if (deint == OGMRIP_DEINT_YADIF)
       {
-        if (MPLAYER_CHECK_VERSION (1,0,2,0))
-        {
-          g_string_append (options, "=3");
+        g_string_append (options, "=3");
 
-          if (ogmrip_mplayer_check_mcdeint ())
-            g_string_append (options, ",mcdeint=2:1:10");
+        if (ogmrip_mplayer_check_mcdeint ())
+          g_string_append (options, ",mcdeint=2:1:10");
 
-          g_string_append (options, ",framestep=2");
+        g_string_append (options, ",framestep=2");
 
-          g_ptr_array_add (argv, g_strdup ("-field-dominance"));
-          g_ptr_array_add (argv, g_strdup ("-1")); /* or 1 ? */
-        }
-        else
-          g_string_append (options, "=0");
+        g_ptr_array_add (argv, g_strdup ("-field-dominance"));
+        g_ptr_array_add (argv, g_strdup ("-1")); /* or 1 ? */
       }
     }
     else
@@ -264,6 +259,7 @@ ogmrip_mplayer_wav_command (OGMRipAudioCodec *audio, gboolean header, const gcha
   GPtrArray *argv;
   GString *options;
 
+  gint srate;
   gdouble start, length;
   gchar *chap;
 
@@ -276,11 +272,8 @@ ogmrip_mplayer_wav_command (OGMRipAudioCodec *audio, gboolean header, const gcha
   g_ptr_array_add (argv, g_strdup ("-nocache"));
   g_ptr_array_add (argv, g_strdup ("-noframedrop"));
 
-  if (MPLAYER_CHECK_VERSION (1,0,3,0))
-  {
-    g_ptr_array_add (argv, g_strdup ("-noconfig"));
-    g_ptr_array_add (argv, g_strdup ("all"));
-  }
+  g_ptr_array_add (argv, g_strdup ("-noconfig"));
+  g_ptr_array_add (argv, g_strdup ("all"));
 
   length = ogmrip_codec_get_play_length (OGMRIP_CODEC (audio));
 
@@ -294,39 +287,15 @@ ogmrip_mplayer_wav_command (OGMRipAudioCodec *audio, gboolean header, const gcha
   g_ptr_array_add (argv, g_strdup ("null"));
   g_ptr_array_add (argv, g_strdup ("-ao"));
 
-  if (MPLAYER_CHECK_VERSION (1,0,0,8))
-  {
-    options = g_string_new ("pcm");
+  options = g_string_new ("pcm");
 
-    if (ogmrip_audio_codec_get_fast (audio))
-      g_string_append (options, ":fast");
+  if (ogmrip_audio_codec_get_fast (audio))
+    g_string_append (options, ":fast");
 
-    if (header)
-      g_string_append (options, ":waveheader");
-    else
-      g_string_append (options, ":nowaveheader");
+  g_string_append (options, header ? ":waveheader" : ":nowaveheader");
+  g_string_append_printf (options, ":file=%s", output);
 
-    g_string_append_printf (options, ":file=%s", output);
-
-    g_ptr_array_add (argv, g_string_free (options, FALSE));
-  }
-  else if (MPLAYER_CHECK_VERSION (1,0,0,7))
-  {
-    if (header)
-      g_ptr_array_add (argv, g_strdup_printf ("pcm:waveheader:file=%s", output));
-    else
-      g_ptr_array_add (argv, g_strdup_printf ("pcm:nowaveheader:file=%s", output));
-  }
-  else
-  {
-    g_ptr_array_add (argv, g_strdup ("pcm"));
-    if (header)
-      g_ptr_array_add (argv, g_strdup ("-waveheader"));
-    else
-      g_ptr_array_add (argv, g_strdup ("-nowaveheader"));
-    g_ptr_array_add (argv, g_strdup ("-aofile"));
-    g_ptr_array_add (argv, g_strdup (output));
-  }
+  g_ptr_array_add (argv, g_string_free (options, FALSE));
 
   g_ptr_array_add (argv, g_strdup ("-format"));
   g_ptr_array_add (argv, g_strdup ("s16le"));
@@ -334,38 +303,24 @@ ogmrip_mplayer_wav_command (OGMRipAudioCodec *audio, gboolean header, const gcha
   options = g_string_new (NULL);
 
   if (ogmrip_audio_codec_get_normalize (audio))
-  {
-    if (MPLAYER_CHECK_VERSION (1,0,0,8))
-      g_string_append (options, "volnorm=1");
-    else if (MPLAYER_CHECK_VERSION (1,0,0,6))
-      g_string_append (options, "volnorm");
-    else
-      g_string_append (options, "list=volnorm");
-  }
+    g_string_append (options, "volnorm=1");
 
-  if (MPLAYER_CHECK_VERSION (1,0,0,6))
+  srate = ogmrip_audio_codec_get_sample_rate (audio);
+  if (srate != 48000)
   {
-    gint srate = ogmrip_audio_codec_get_sample_rate (audio);
-    if (srate != 48000)
-    {
-      g_ptr_array_add (argv, g_strdup ("-srate"));
-      g_ptr_array_add (argv, g_strdup_printf ("%d", srate));
+    g_ptr_array_add (argv, g_strdup ("-srate"));
+    g_ptr_array_add (argv, g_strdup_printf ("%d", srate));
 
-      if (options->len > 0)
-        g_string_append_c (options, ',');
-      g_string_append_printf (options, "lavcresample=%d", srate);
-    }
+    if (options->len > 0)
+      g_string_append_c (options, ',');
+    g_string_append_printf (options, "lavcresample=%d", srate);
   }
 
   if (options->len == 0)
     g_string_free (options, TRUE);
   else
   {
-    if (MPLAYER_CHECK_VERSION (1,0,0,6))
-      g_ptr_array_add (argv, g_strdup ("-af"));
-    else
-      g_ptr_array_add (argv, g_strdup ("-aop"));
-
+    g_ptr_array_add (argv, g_strdup ("-af"));
     g_ptr_array_add (argv, g_string_free (options, FALSE));
   }
 
@@ -449,11 +404,8 @@ ogmrip_mencoder_audio_command (OGMRipAudioCodec *audio, const gchar *output)
   g_ptr_array_add (argv, g_strdup ("mencoder"));
   g_ptr_array_add (argv, g_strdup ("-nocache"));
 
-  if (MPLAYER_CHECK_VERSION (1,0,3,0))
-  {
-    g_ptr_array_add (argv, g_strdup ("-noconfig"));
-    g_ptr_array_add (argv, g_strdup ("all"));
-  }
+  g_ptr_array_add (argv, g_strdup ("-noconfig"));
+  g_ptr_array_add (argv, g_strdup ("all"));
 
   ofps = ogmrip_mplayer_get_output_fps (OGMRIP_CODEC (audio), ogmrip_stream_get_title (stream));
   if (ofps)
@@ -518,11 +470,8 @@ ogmrip_mencoder_video_command (OGMRipVideoCodec *video, const gchar *output, gui
   g_ptr_array_add (argv, g_strdup ("-nocache"));
   g_ptr_array_add (argv, g_strdup ("-noslices"));
 
-  if (MPLAYER_CHECK_VERSION (1,0,3,0))
-  {
-    g_ptr_array_add (argv, g_strdup ("-noconfig"));
-    g_ptr_array_add (argv, g_strdup ("all"));
-  }
+  g_ptr_array_add (argv, g_strdup ("-noconfig"));
+  g_ptr_array_add (argv, g_strdup ("all"));
 
   scale = FALSE;
 
@@ -736,11 +685,8 @@ ogmrip_mplayer_video_command (OGMRipVideoCodec *video, const gchar *output)
   g_ptr_array_add (argv, g_strdup ("-nosound"));
   g_ptr_array_add (argv, g_strdup ("-noslices"));
 
-  if (MPLAYER_CHECK_VERSION (1,0,3,0))
-  {
-    g_ptr_array_add (argv, g_strdup ("-noconfig"));
-    g_ptr_array_add (argv, g_strdup ("all"));
-  }
+  g_ptr_array_add (argv, g_strdup ("-noconfig"));
+  g_ptr_array_add (argv, g_strdup ("all"));
 
   sstream = ogmrip_video_codec_get_hard_subp (video, &forced);
   if (sstream)
@@ -921,17 +867,11 @@ ogmrip_mencoder_vobsub_command (OGMRipSubpCodec *subp, const gchar *output)
   g_ptr_array_add (argv, g_strdup ("-nocache"));
   g_ptr_array_add (argv, g_strdup ("-nosound"));
 
-  if (MPLAYER_CHECK_VERSION (1,0,3,0))
-  {
-    g_ptr_array_add (argv, g_strdup ("-noconfig"));
-    g_ptr_array_add (argv, g_strdup ("all"));
-  }
+  g_ptr_array_add (argv, g_strdup ("-noconfig"));
+  g_ptr_array_add (argv, g_strdup ("all"));
 
-  if (MPLAYER_CHECK_VERSION (1,0,0,8))
-  {
-    g_ptr_array_add (argv, g_strdup ("-of"));
-    g_ptr_array_add (argv, g_strdup ("rawaudio"));
-  }
+  g_ptr_array_add (argv, g_strdup ("-of"));
+  g_ptr_array_add (argv, g_strdup ("rawaudio"));
 
   g_ptr_array_add (argv, g_strdup ("-ovc"));
   g_ptr_array_add (argv, g_strdup ("copy"));
@@ -1008,32 +948,21 @@ ogmrip_mencoder_container_append_audio_file (OGMRipContainer *container,
       else if (format != OGMRIP_FORMAT_AC3 && format != OGMRIP_FORMAT_DTS)
       {
         g_ptr_array_add (argv, g_strdup ("-audio-demuxer"));
-        if (MPLAYER_CHECK_VERSION (1,0,1,0))
-          g_ptr_array_add (argv, g_strdup ("audio"));
+        g_ptr_array_add (argv, g_strdup ("audio"));
+      }
+
+      g_ptr_array_add (argv, g_strdup ("-audiofile"));
+      g_ptr_array_add (argv, g_strdup (filename));
+
+      if (format == OGMRIP_FORMAT_AC3 || format == OGMRIP_FORMAT_DTS)
+      {
+        g_ptr_array_add (argv, g_strdup ("-audio-demuxer"));
+        g_ptr_array_add (argv, g_strdup ("rawaudio"));
+        g_ptr_array_add (argv, g_strdup ("-rawaudio"));
+        if (format == OGMRIP_FORMAT_AC3)
+          g_ptr_array_add (argv, g_strdup ("format=0x2000"));
         else
-          g_ptr_array_add (argv, g_strdup ("17"));
-      }
-
-      if (MPLAYER_CHECK_VERSION (1,0,0,8))
-      {
-        g_ptr_array_add (argv, g_strdup ("-audiofile"));
-        g_ptr_array_add (argv, g_strdup (filename));
-
-        if (format == OGMRIP_FORMAT_AC3 || format == OGMRIP_FORMAT_DTS)
-        {
-          g_ptr_array_add (argv, g_strdup ("-audio-demuxer"));
-          g_ptr_array_add (argv, g_strdup ("rawaudio"));
-          g_ptr_array_add (argv, g_strdup ("-rawaudio"));
-          if (format == OGMRIP_FORMAT_AC3)
-            g_ptr_array_add (argv, g_strdup ("format=0x2000"));
-          else
-            g_ptr_array_add (argv, g_strdup ("format=0x2001"));
-        }
-      }
-      else if (format != OGMRIP_FORMAT_AC3 && format != OGMRIP_FORMAT_DTS)
-      {
-        g_ptr_array_add (argv, g_strdup ("-audiofile"));
-        g_ptr_array_add (argv, g_strdup (filename));
+          g_ptr_array_add (argv, g_strdup ("format=0x2001"));
       }
     }
   }
@@ -1079,18 +1008,15 @@ GPtrArray *
 ogmrip_mencoder_container_command (OGMRipContainer *container)
 {
   GPtrArray *argv;
-  const gchar *fourcc;
+  const gchar *str;
 
   argv = g_ptr_array_new ();
   g_ptr_array_add (argv, g_strdup ("mencoder"));
   g_ptr_array_add (argv, g_strdup ("-nocache"));
   g_ptr_array_add (argv, g_strdup ("-noskip"));
 
-  if (MPLAYER_CHECK_VERSION (1,0,3,0))
-  {
-    g_ptr_array_add (argv, g_strdup ("-noconfig"));
-    g_ptr_array_add (argv, g_strdup ("all"));
-  }
+  g_ptr_array_add (argv, g_strdup ("-noconfig"));
+  g_ptr_array_add (argv, g_strdup ("all"));
 
   g_ptr_array_add (argv, g_strdup ("-mc"));
   g_ptr_array_add (argv, g_strdup ("0"));
@@ -1100,23 +1026,18 @@ ogmrip_mencoder_container_command (OGMRipContainer *container)
   g_ptr_array_add (argv, g_strdup ("-oac"));
   g_ptr_array_add (argv, g_strdup ("copy"));
 
-  fourcc = ogmrip_container_get_fourcc (container);
-  if (fourcc)
+  str = ogmrip_container_get_fourcc (container);
+  if (str)
   {
     g_ptr_array_add (argv, g_strdup ("-ffourcc"));
-    g_ptr_array_add (argv, g_strdup (fourcc));
+    g_ptr_array_add (argv, g_strdup (str));
   }
 
-  if (MPLAYER_CHECK_VERSION (1,0,0,8))
+  str = ogmrip_container_get_label (container);
+  if (str)
   {
-    const gchar *label;
-
-    label = ogmrip_container_get_label (container);
-    if (label)
-    {
-      g_ptr_array_add (argv, g_strdup ("-info"));
-      g_ptr_array_add (argv, g_strdup_printf ("name=%s", label));
-    }
+    g_ptr_array_add (argv, g_strdup ("-info"));
+    g_ptr_array_add (argv, g_strdup_printf ("name=%s", str));
   }
 
   ogmrip_container_foreach_file (container, 
@@ -1154,29 +1075,10 @@ ogmrip_mplayer_grab_frame_command (OGMRipTitle *title, guint position, gboolean 
 
   g_ptr_array_add (argv, g_strdup ("-vo"));
 
-  if (MPLAYER_CHECK_VERSION (1,0,0,6))
-    g_ptr_array_add (argv, g_strdup_printf ("jpeg:outdir=%s", ogmrip_fs_get_tmp_dir ()));
-  else
-  {
-    g_ptr_array_add (argv, g_strdup ("jpeg"));
-    g_ptr_array_add (argv, g_strdup ("-jpeg"));
-    g_ptr_array_add (argv, g_strdup_printf ("outdir=%s", ogmrip_fs_get_tmp_dir ()));
-  }
+  g_ptr_array_add (argv, g_strdup_printf ("jpeg:outdir=%s", ogmrip_fs_get_tmp_dir ()));
 
-  if (MPLAYER_CHECK_VERSION (1,0,0,8))
-  {
-    g_ptr_array_add (argv, g_strdup ("-vc"));
-    g_ptr_array_add (argv, g_strdup ("ffmpeg12"));
-    g_ptr_array_add (argv, g_strdup ("-frames"));
-    g_ptr_array_add (argv, g_strdup ("1"));
-  }
-  else
-  {
-    g_ptr_array_add (argv, g_strdup ("-frames"));
-    g_ptr_array_add (argv, g_strdup ("3"));
-    g_ptr_array_add (argv, g_strdup ("-sstep"));
-    g_ptr_array_add (argv, g_strdup ("1"));
-  }
+  g_ptr_array_add (argv, g_strdup ("-frames"));
+  g_ptr_array_add (argv, g_strdup ("1"));
 
   g_ptr_array_add (argv, g_strdup ("-speed"));
   g_ptr_array_add (argv, g_strdup ("100"));
