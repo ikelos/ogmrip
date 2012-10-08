@@ -207,7 +207,6 @@ static gchar **
 ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gchar *log_file)
 {
   OGMRipX264 *x264;
-  OGMRipTitle *title;
   GPtrArray *argv;
   GString *options;
 
@@ -363,7 +362,6 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   g_ptr_array_add (argv, g_strdup ("-x264encopts"));
   g_ptr_array_add (argv, g_string_free (options, FALSE));
 
-  title = ogmrip_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video)));
   ogmrip_mplayer_set_input (argv,
       ogmrip_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video))));
 
