@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="2.22"/>
+  <!-- interface-requires gtk+ 3.0 -->
   <object class="GtkTextBuffer" id="textbuffer1"/>
   <object class="GtkGrid" id="root">
     <property name="visible">True</property>
@@ -126,11 +126,9 @@
         <child>
           <object class="GtkButton" id="replace-button">
             <property name="label" translatable="yes">_Replace</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
-            <property name="use_action_appearance">False</property>
             <property name="use_underline">True</property>
           </object>
           <packing>
@@ -142,11 +140,9 @@
         <child>
           <object class="GtkButton" id="ignore-button">
             <property name="label" translatable="yes">_Ignore</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
-            <property name="use_action_appearance">False</property>
             <property name="use_underline">True</property>
           </object>
           <packing>
@@ -158,11 +154,9 @@
         <child>
           <object class="GtkButton" id="ignore-all-button">
             <property name="label" translatable="yes">Ignore _All</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
-            <property name="use_action_appearance">False</property>
             <property name="use_underline">True</property>
           </object>
           <packing>
@@ -174,11 +168,9 @@
         <child>
           <object class="GtkButton" id="add-word-button">
             <property name="label" translatable="yes">A_dd Word</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
-            <property name="use_action_appearance">False</property>
             <property name="use_underline">True</property>
           </object>
           <packing>

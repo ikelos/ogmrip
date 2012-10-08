@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="2.22"/>
+  <!-- interface-requires gtk+ 3.0 -->
   <object class="GtkAdjustment" id="adjustment1">
     <property name="upper">100</property>
     <property name="step_increment">1</property>
@@ -218,13 +218,11 @@
         <child>
           <object class="GtkCheckButton" id="copy-dvd-check">
             <property name="label" translatable="yes">_Copy DVD on hard drive before encoding</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="margin_left">12</property>
             <property name="hexpand">True</property>
-            <property name="use_action_appearance">False</property>
             <property name="use_underline">True</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
@@ -360,13 +358,11 @@
         <child>
           <object class="GtkCheckButton" id="keep-tmp-check">
             <property name="label" translatable="yes">Do _not remove temporary files</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="margin_left">12</property>
             <property name="hexpand">True</property>
-            <property name="use_action_appearance">False</property>
             <property name="use_underline">True</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
@@ -381,13 +377,11 @@
         <child>
           <object class="GtkCheckButton" id="log-check">
             <property name="label" translatable="yes">_Create a log file</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="margin_left">12</property>
             <property name="hexpand">True</property>
-            <property name="use_action_appearance">False</property>
             <property name="use_underline">True</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>

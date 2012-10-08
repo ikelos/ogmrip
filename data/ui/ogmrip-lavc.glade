@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <!-- interface-requires gtk+ 2.12 -->
+  <!-- interface-requires gtk+ 3.0 -->
   <object class="GtkAdjustment" id="buf_size-adj">
     <property name="upper">100000</property>
     <property name="step_increment">1</property>
@@ -101,12 +101,10 @@
             <child>
               <object class="GtkCheckButton" id="grayscale-check">
                 <property name="label" translatable="yes">_Grayscale only decoding</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="margin_left">12</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="xalign">0</property>
                 <property name="draw_indicator">True</property>
@@ -365,12 +363,10 @@
             <child>
               <object class="GtkCheckButton" id="trellis-check">
                 <property name="label" translatable="yes">_Trellis searched quantization (trellis)</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="margin_left">12</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="xalign">0</property>
                 <property name="draw_indicator">True</property>
@@ -602,12 +598,10 @@
             <child>
               <object class="GtkCheckButton" id="qpel-check">
                 <property name="label" translatable="yes">Use _quarter pel motion compensation</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="margin_left">12</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="xalign">0</property>
                 <property name="draw_indicator">True</property>
@@ -873,14 +867,12 @@
             <child>
               <object class="GtkCheckButton" id="mv0-check">
                 <property name="label" translatable="yes">Try to encode each MB with MV=&lt;0,0&gt; and choose the better one</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                 <property name="margin_left">12</property>
                 <property name="hexpand">True</property>
-                <property name="use_action_appearance">False</property>
                 <property name="xalign">0</property>
                 <property name="draw_indicator">True</property>
               </object>
@@ -894,14 +886,12 @@
             <child>
               <object class="GtkCheckButton" id="v4mv-check">
                 <property name="label" translatable="yes">Allow 4 motion vectors per macroblock (v4mv)</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                 <property name="margin_left">12</property>
                 <property name="hexpand">True</property>
-                <property name="use_action_appearance">False</property>
                 <property name="xalign">0</property>
                 <property name="draw_indicator">True</property>
               </object>

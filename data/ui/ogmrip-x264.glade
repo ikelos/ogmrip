@@ -420,13 +420,11 @@
         <child>
           <object class="GtkCheckButton" id="weight_b-check">
             <property name="label" translatable="yes">Use weighted prediction in B-frames (weightb)</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
             <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
           </object>
@@ -440,13 +438,11 @@
         <child>
           <object class="GtkCheckButton" id="dct8x8-check">
             <property name="label" translatable="yes">Adaptive spatial transform size (8x8dct)</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
             <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
           </object>
@@ -518,12 +514,10 @@
             <child>
               <object class="GtkCheckButton" id="b8x8-check">
                 <property name="label" translatable="yes">Enable types b16x8, b8x16, b8x8 (b8x8)</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="margin_left">12</property>
-                <property name="use_action_appearance">False</property>
                 <property name="xalign">0</property>
                 <property name="draw_indicator">True</property>
               </object>
@@ -537,11 +531,9 @@
             <child>
               <object class="GtkCheckButton" id="i8x8-check">
                 <property name="label" translatable="yes">Enable type i8x8 (i8x8)</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
-                <property name="use_action_appearance">False</property>
                 <property name="xalign">0</property>
                 <property name="draw_indicator">True</property>
               </object>
@@ -555,12 +547,10 @@
             <child>
               <object class="GtkCheckButton" id="p8x8-check">
                 <property name="label" translatable="yes">Enable types p16x8, p8x16, p8x8 (p8x8)</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="margin_left">12</property>
-                <property name="use_action_appearance">False</property>
                 <property name="xalign">0</property>
                 <property name="draw_indicator">True</property>
               </object>
@@ -574,12 +564,10 @@
             <child>
               <object class="GtkCheckButton" id="p4x4-check">
                 <property name="label" translatable="yes">Enable types p8x4, p4x8, p4x4 (p4x4)</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="margin_left">12</property>
-                <property name="use_action_appearance">False</property>
                 <property name="xalign">0</property>
                 <property name="draw_indicator">True</property>
               </object>
@@ -593,11 +581,9 @@
             <child>
               <object class="GtkCheckButton" id="i4x4-check">
                 <property name="label" translatable="yes">Enable type i4x4 (i4x4)</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
-                <property name="use_action_appearance">False</property>
                 <property name="xalign">0</property>
                 <property name="draw_indicator">True</property>
               </object>
@@ -619,12 +605,10 @@
         <child>
           <object class="GtkCheckButton" id="fast_pskip-check">
             <property name="label" translatable="yes">Early skip detection in P-frames (fast_pskip)</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
           </object>
@@ -638,12 +622,10 @@
         <child>
           <object class="GtkCheckButton" id="dct_decimate-check">
             <property name="label" translatable="yes">Eliminate DCT blocks in P-frames containing only a small single coefficient (dct_decimate)</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
           </object>
@@ -771,13 +753,11 @@
         <child>
           <object class="GtkCheckButton" id="cabac-check">
             <property name="label" translatable="yes">Use context-adaptive binary arithmetic coding (cabac)</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
             <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
           </object>
@@ -791,12 +771,10 @@
         <child>
           <object class="GtkCheckButton" id="b_pyramid-check">
             <property name="label" translatable="yes">Allows B-frames to be used as references for predicting other frames (b-pyramid)</property>
-            <property name="use_action_appearance">False</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
             <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
           </object>
@@ -1046,13 +1024,11 @@
         <child>
           <object class="GtkCheckButton" id="mixed_refs-check">
             <property name="label" translatable="yes">Allows each 8x8 or 16x8 motion partition to independently select a reference frame (mixed_refs)</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
             <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
           </object>
@@ -1097,13 +1073,11 @@
         <child>
           <object class="GtkCheckButton" id="brdo-check">
             <property name="label" translatable="yes">Enable rate-distortion optimization of macroblock types in B-frames (brdo)</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
             <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
           </object>
@@ -1117,12 +1091,10 @@
         <child>
           <object class="GtkCheckButton" id="aud-check">
             <property name="label" translatable="yes">Use access unit delimiters (aud)</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
           </object>
@@ -1136,12 +1108,10 @@
         <child>
           <object class="GtkCheckButton" id="force_cfr-check">
             <property name="label" translatable="yes">Force generation of timecodes (force_cfr)</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
           </object>
