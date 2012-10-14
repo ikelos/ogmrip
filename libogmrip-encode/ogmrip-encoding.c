@@ -1644,16 +1644,20 @@ ogmrip_encoding_copy (OGMRipEncoding *encoding, GCancellable *cancellable, GErro
 {
   OGMRipMedia *media;
   OGMJobTask *task;
+
+  gchar *name, *output;
   gboolean result;
-  gchar *output;
   gulong id;
 
   media = ogmrip_title_get_media (encoding->priv->title);
 
   ogmrip_log_printf ("Copying %s\n\n", ogmrip_media_get_label (media));
 
-  output = g_build_filename (ogmrip_fs_get_tmp_dir (), ogmrip_media_get_id (media), NULL);
-  task = ogmrip_copy_new (media, output);
+  name = g_strdup_printf ("%s-%d", ogmrip_media_get_id (media), ogmrip_title_get_nr (encoding->priv->title));
+  output = g_build_filename (ogmrip_fs_get_tmp_dir (), name, NULL);
+  g_free (name);
+
+  task = ogmrip_copy_new_from_title (encoding->priv->title, output);
   g_free (output);
 
   id = g_signal_connect_swapped (task, "notify::progress",
@@ -1662,6 +1666,52 @@ ogmrip_encoding_copy (OGMRipEncoding *encoding, GCancellable *cancellable, GErro
   g_signal_emit (encoding, signals[RUN], 0, task);
   result = ogmjob_task_run (task, cancellable, error);
   g_signal_emit (encoding, signals[COMPLETE], 0, task, OGMRIP_ENCODING_STATUS (result, cancellable));
+
+  if (result)
+  {
+    OGMRipTitle *new_title;
+    gint nr;
+
+    nr = ogmrip_title_get_nr (encoding->priv->title);
+
+    media = ogmrip_copy_get_destination (OGMRIP_COPY (task));
+    new_title = ogmrip_media_get_nth_title (media, nr);
+
+    if (!ogmrip_title_open (new_title, NULL, NULL, NULL, error))
+      result = FALSE;
+    else
+    {
+      OGMRipStream *stream;
+      GList *link;
+
+      ogmrip_title_close (encoding->priv->title);
+      g_object_unref (encoding->priv->title);
+
+      g_object_ref (new_title);
+      encoding->priv->title = new_title;
+
+      g_object_set (encoding->priv->video_codec, "input", ogmrip_title_get_video_stream (encoding->priv->title), NULL);
+
+      for (link = encoding->priv->audio_codecs; link; link = link->next)
+      {
+        stream = ogmrip_codec_get_input (link->data);
+        nr = ogmrip_audio_stream_get_nr (OGMRIP_AUDIO_STREAM (stream));
+        g_object_set (link->data, "input", ogmrip_title_get_nth_audio_stream (encoding->priv->title, nr), NULL);
+      }
+
+      for (link = encoding->priv->subp_codecs; link; link = link->next)
+      {
+        stream = ogmrip_codec_get_input (link->data);
+        nr = ogmrip_subp_stream_get_nr (OGMRIP_SUBP_STREAM (stream));
+        g_object_set (link->data, "input", ogmrip_title_get_nth_subp_stream (encoding->priv->title, nr), NULL);
+      }
+
+      for (link = encoding->priv->chapters; link; link = link->next)
+        g_object_set (link->data, "input", ogmrip_title_get_video_stream (encoding->priv->title), NULL);
+
+      g_object_set_data_full (G_OBJECT (encoding), "media", g_object_ref (media), (GDestroyNotify) g_object_unref);
+    }
+  }
 
   g_signal_handler_disconnect (task, id);
   g_object_unref (task);

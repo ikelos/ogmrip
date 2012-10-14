@@ -47,6 +47,7 @@ struct _OGMDvdDiscPriv
   gchar *device;
   gchar *label;
   gchar *id;
+  gchar *real_id;
 
   guint ntitles;
   GList *titles;

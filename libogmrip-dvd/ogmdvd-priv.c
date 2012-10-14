@@ -274,7 +274,7 @@ ogmdvd_disc_copy (OGMDvdDisc *disc, OGMDvdTitle *title, const gchar *path,
 
   if (!copy->priv->id || !g_str_equal (copy->priv->id, disc->priv->id))
   {
-    g_free (copy->priv->id);
+    copy->priv->real_id = copy->priv->id;
     copy->priv->id = g_strdup (disc->priv->id);
   }
 

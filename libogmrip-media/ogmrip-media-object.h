@@ -79,6 +79,8 @@ OGMRipMedia * ogmrip_media_copy          (OGMRipMedia         *media,
                                           OGMRipMediaCallback callback,
                                           gpointer            user_data,
                                           GError              **error);
+gboolean      ogmrip_media_equal         (OGMRipMedia         *media1,
+                                          OGMRipMedia         *media2);
 
 G_END_DECLS
 

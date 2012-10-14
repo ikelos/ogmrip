@@ -71,6 +71,8 @@ void         ogmrip_video_stream_get_resolution   (OGMRipVideoStream   *video,
                                                    guint               *height);
 gint         ogmrip_video_stream_get_standard     (OGMRipVideoStream   *video);
 gint         ogmrip_video_stream_get_start_delay  (OGMRipVideoStream   *video);
+gboolean     ogmrip_video_stream_equal            (OGMRipVideoStream   *video1,
+                                                   OGMRipVideoStream   *video2);
 
 G_END_DECLS
 

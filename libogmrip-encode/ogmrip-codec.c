@@ -82,19 +82,36 @@ ogmrip_codec_error_quark (void)
   return quark;
 }
 
+static gboolean
+ogmrip_stream_equal (OGMRipStream *stream1, OGMRipStream *stream2)
+{
+  if (OGMRIP_IS_VIDEO_STREAM (stream1) && OGMRIP_IS_VIDEO_STREAM (stream2))
+    return ogmrip_video_stream_equal ((OGMRipVideoStream *) stream1, (OGMRipVideoStream *) stream2);
+
+  if (OGMRIP_IS_AUDIO_STREAM (stream1) && OGMRIP_IS_AUDIO_STREAM (stream2))
+    return ogmrip_audio_stream_equal ((OGMRipAudioStream *) stream1, (OGMRipAudioStream *) stream2);
+
+  if (OGMRIP_IS_SUBP_STREAM (stream1) && OGMRIP_IS_SUBP_STREAM (stream2))
+    return ogmrip_subp_stream_equal ((OGMRipSubpStream *) stream1, (OGMRipSubpStream *) stream2);
+
+  return FALSE;
+}
+
 static void
 ogmrip_codec_set_input (OGMRipCodec *codec, OGMRipStream *input)
 {
-  g_object_ref (input);
+  if (input != codec->priv->input)
+  {
+    if (codec->priv->input)
+    {
+      g_return_if_fail (ogmrip_stream_equal (input, codec->priv->input));
 
-  if (codec->priv->input)
-    g_object_unref (codec->priv->input);
+      g_object_unref (codec->priv->input);
+    }
 
-  codec->priv->input = input;
-  codec->priv->title = ogmrip_stream_get_title (input);
-
-  codec->priv->start_chap = 0;
-  codec->priv->end_chap = -1;
+    codec->priv->input = g_object_ref (input);
+    codec->priv->title = ogmrip_stream_get_title (input);
+  }
 }
 
 G_DEFINE_ABSTRACT_TYPE (OGMRipCodec, ogmrip_codec, OGMJOB_TYPE_BIN)
@@ -116,7 +133,7 @@ ogmrip_codec_class_init (OGMRipCodecClass *klass)
 
   g_object_class_install_property (gobject_class, PROP_INPUT, 
         g_param_spec_object ("input", "Input property", "Set input title", 
-           OGMRIP_TYPE_STREAM, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+           OGMRIP_TYPE_STREAM, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_OUTPUT, 
         g_param_spec_object ("output", "Output property", "Set output file", 

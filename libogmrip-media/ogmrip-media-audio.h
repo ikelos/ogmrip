@@ -54,6 +54,8 @@ gint          ogmrip_audio_stream_get_nr                (OGMRipAudioStream *audi
 gint          ogmrip_audio_stream_get_quantization      (OGMRipAudioStream *audio);
 gint          ogmrip_audio_stream_get_sample_rate       (OGMRipAudioStream *audio);
 gint          ogmrip_audio_stream_get_samples_per_frame (OGMRipAudioStream *audio);
+gboolean      ogmrip_audio_stream_equal                 (OGMRipAudioStream *audio1,
+                                                         OGMRipAudioStream *audio2);
 
 G_END_DECLS
 

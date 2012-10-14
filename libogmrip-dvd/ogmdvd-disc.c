@@ -514,11 +514,15 @@ ogmdvd_disc_constructor (GType gtype, guint n_properties, GObjectConstructParam 
   if (!reader)
     return NULL;
   id = dvd_reader_get_id (reader);
+  if (!id)
+    return NULL;
 
   old = ogmdvd_disc_get_open (disc->priv->device);
   if (old)
   {
-    if (g_str_equal (old->priv->id, id))
+    gchar *old_id = old->priv->real_id ? old->priv->real_id : old->priv->id;
+
+    if (g_str_equal (old_id, id))
     {
       DVDClose (reader);
       g_object_ref (old);
@@ -536,7 +540,7 @@ ogmdvd_disc_constructor (GType gtype, guint n_properties, GObjectConstructParam 
     return NULL;
   }
 
-  disc->priv->id = id ? g_strdup (id) : NULL;
+  disc->priv->id = g_strdup (id);
   disc->priv->label = ogmdvd_disc_get_title_name (disc);
 
   disc->priv->ntitles = vmg_file->tt_srpt->nr_of_srpts;
@@ -587,6 +591,7 @@ ogmdvd_disc_finalize (GObject *gobject)
   g_free (disc->priv->device);
   g_free (disc->priv->label);
   g_free (disc->priv->id);
+  g_free (disc->priv->real_id);
 
   G_OBJECT_CLASS (ogmdvd_disc_parent_class)->finalize (gobject);
 }
@@ -648,6 +653,7 @@ ogmdvd_disc_open (OGMRipMedia *media, GCancellable *cancellable, OGMRipMediaCall
 {
   OGMDvdDisc *disc = OGMDVD_DISC (media);
   dvd_reader_t *reader;
+  const gchar *id, *current_id;
 
   if (ogmdvd_disc_is_open (media))
     return TRUE;
@@ -658,7 +664,10 @@ ogmdvd_disc_open (OGMRipMedia *media, GCancellable *cancellable, OGMRipMediaCall
   if (!reader)
     return FALSE;
 
-  if (disc->priv->id && !g_str_equal (disc->priv->id, dvd_reader_get_id (reader)))
+  id = disc->priv->real_id ? disc->priv->real_id : disc->priv->id;
+  current_id = dvd_reader_get_id (reader);
+
+  if (!current_id || !g_str_equal (id, current_id))
   {
     DVDClose (reader);
     g_set_error (error, OGMDVD_DISC_ERROR, OGMDVD_DISC_ERROR_ID, _("Device does not contain the expected DVD"));

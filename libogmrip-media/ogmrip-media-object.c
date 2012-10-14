@@ -242,3 +242,12 @@ ogmrip_media_new (const gchar *path)
   return media;
 }
 
+gboolean
+ogmrip_media_equal (OGMRipMedia *media1, OGMRipMedia *media2)
+{
+  g_return_val_if_fail (OGMRIP_IS_MEDIA (media1), FALSE);
+  g_return_val_if_fail (OGMRIP_IS_MEDIA (media2), FALSE);
+
+  return g_str_equal (ogmrip_media_get_id (media1), ogmrip_media_get_id (media2));
+}
+

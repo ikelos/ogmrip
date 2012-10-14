@@ -19,6 +19,7 @@
 #include "ogmrip-media-audio.h"
 #include "ogmrip-media-stream.h"
 #include "ogmrip-media-enums.h"
+#include "ogmrip-media-title.h"
 
 G_DEFINE_INTERFACE_WITH_CODE (OGMRipAudioStream, ogmrip_audio_stream, G_TYPE_OBJECT,
     g_type_interface_add_prerequisite (g_define_type_id, OGMRIP_TYPE_STREAM);)
@@ -164,5 +165,15 @@ ogmrip_audio_stream_get_samples_per_frame (OGMRipAudioStream *audio)
     return 1536;
 
   return 1024;
+}
+
+gboolean
+ogmrip_audio_stream_equal (OGMRipAudioStream *audio1, OGMRipAudioStream *audio2)
+{
+  if (ogmrip_audio_stream_get_nr (audio1) != ogmrip_audio_stream_get_nr (audio2))
+    return FALSE;
+
+  return ogmrip_title_equal (ogmrip_stream_get_title (OGMRIP_STREAM (audio1)),
+      ogmrip_stream_get_title (OGMRIP_STREAM (audio2)));
 }
 

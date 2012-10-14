@@ -122,6 +122,8 @@ OGMRipMedia *       ogmrip_title_copy                 (OGMRipTitle         *titl
                                                        OGMRipTitleCallback callback,
                                                        gpointer            user_data,
                                                        GError              **error);
+gboolean            ogmrip_title_equal                (OGMRipTitle         *title1,
+                                                       OGMRipTitle         *title2);
 
 G_END_DECLS
 
