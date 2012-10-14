@@ -20,9 +20,6 @@ ogmrip-profile-editor-dialog.c
 ogmrip-options-dialog.c
 - check options edition
 
-dvdcpy.c
-- check that the id is preserved
-
 profile-ios.xml
 - todo
 
