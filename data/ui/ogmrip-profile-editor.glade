@@ -109,13 +109,11 @@
         <child>
           <object class="GtkCheckButton" id="ensure-sync-check">
             <property name="label" translatable="yes">Ensure A/V _synchronisation</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="margin_left">12</property>
             <property name="hexpand">True</property>
-            <property name="use_action_appearance">False</property>
             <property name="use_underline">True</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
@@ -143,13 +141,11 @@
         <child>
           <object class="GtkButton" id="container-options-button">
             <property name="label" translatable="yes">_Options</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="sensitive">False</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-            <property name="use_action_appearance">False</property>
             <property name="use_underline">True</property>
           </object>
           <packing>
@@ -519,12 +515,10 @@
                 <child>
                   <object class="GtkCheckButton" id="can-crop-check">
                     <property name="label" translatable="yes">_Crop image</property>
-                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="hexpand">True</property>
-                    <property name="use_action_appearance">False</property>
                     <property name="use_underline">True</property>
                     <property name="xalign">0</property>
                     <property name="draw_indicator">True</property>
@@ -587,13 +581,11 @@
                 <child>
                   <object class="GtkCheckButton" id="expand-check">
                     <property name="label" translatable="yes">E_xpand image to maximum size</property>
-                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="sensitive">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="hexpand">True</property>
-                    <property name="use_action_appearance">False</property>
                     <property name="use_underline">True</property>
                     <property name="xalign">0</property>
                     <property name="draw_indicator">True</property>
@@ -753,7 +745,6 @@
             <child>
               <object class="GtkCheckButton" id="denoise-check">
                 <property name="label" translatable="yes">Reduce image _noise</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
@@ -761,7 +752,6 @@
                 <property name="tooltip_markup" translatable="yes">This filter aims to reduce image noise producing smooth images and making still images really still (This should enhance compressibility)</property>
                 <property name="tooltip_text" translatable="yes">This filter aims to reduce image noise producing smooth images and making still images really still (This should enhance compressibility)</property>
                 <property name="margin_left">12</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="xalign">0</property>
                 <property name="draw_indicator">True</property>
@@ -775,12 +765,10 @@
             <child>
               <object class="GtkCheckButton" id="deblock-check">
                 <property name="label" translatable="yes">Use a deblocking filter</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="margin_left">12</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="xalign">0</property>
                 <property name="draw_indicator">True</property>
@@ -794,12 +782,10 @@
             <child>
               <object class="GtkCheckButton" id="dering-check">
                 <property name="label" translatable="yes">Use a deringing filter</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="margin_left">12</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="xalign">0</property>
                 <property name="draw_indicator">True</property>
@@ -813,7 +799,6 @@
             <child>
               <object class="GtkCheckButton" id="turbo-check">
                 <property name="label" translatable="yes">T_urbo</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
@@ -821,7 +806,6 @@
                 <property name="tooltip_markup" translatable="yes">Dramatically speeds up pass one using faster algorithms and disabling CPU-intensive options. This will probably reduce global PSNR a little bit (around 0.01dB) and change individual frame type and PSNR little bit more (up to 0.03dB)</property>
                 <property name="tooltip_text" translatable="yes">Dramatically speeds up pass one using faster algorithms and disabling CPU-intensive options. This will probably reduce global PSNR a little bit (around 0.01dB) and change individual frame type and PSNR little bit more (up to 0.03dB)</property>
                 <property name="margin_left">12</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="xalign">0</property>
                 <property name="draw_indicator">True</property>
@@ -942,13 +926,11 @@
                 <child>
                   <object class="GtkButton" id="video-options-button">
                     <property name="label" translatable="yes">_Edit</property>
-                    <property name="use_action_appearance">False</property>
                     <property name="visible">True</property>
                     <property name="sensitive">False</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="use_action_appearance">False</property>
                     <property name="use_underline">True</property>
                   </object>
                   <packing>
@@ -1143,14 +1125,12 @@
         <child>
           <object class="GtkButton" id="audio-options-button">
             <property name="label" translatable="yes">_Options</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="sensitive">False</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
             <property name="halign">start</property>
-            <property name="use_action_appearance">False</property>
             <property name="use_underline">True</property>
           </object>
           <packing>
@@ -1225,7 +1205,6 @@
             <child>
               <object class="GtkCheckButton" id="normalize-check">
                 <property name="label" translatable="yes">_Normalize</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
@@ -1233,7 +1212,6 @@
                 <property name="tooltip_markup" translatable="yes">Maximizes the volume without distorting the sound</property>
                 <property name="tooltip_text" translatable="yes">Maximizes the volume without distorting the sound</property>
                 <property name="margin_left">12</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="xalign">0</property>
                 <property name="draw_indicator">True</property>
@@ -1360,13 +1338,11 @@
         <child>
           <object class="GtkCheckButton" id="forced-subs-check">
             <property name="label" translatable="yes">_Forced subtitles only</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
             <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
             <property name="use_underline">True</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
@@ -1411,13 +1387,11 @@
         <child>
           <object class="GtkButton" id="subp-options-button">
             <property name="label" translatable="yes">_Options</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="sensitive">False</property>
             <property name="can_focus">True</property>
             <property name="receives_default">True</property>
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-            <property name="use_action_appearance">False</property>
             <property name="use_underline">True</property>
           </object>
           <packing>
@@ -1470,12 +1444,10 @@
             <child>
               <object class="GtkCheckButton" id="spell-check">
                 <property name="label" translatable="yes">Spell _Checking</property>
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
                 <property name="margin_left">12</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="xalign">0</property>
                 <property name="draw_indicator">True</property>

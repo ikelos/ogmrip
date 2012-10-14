@@ -54,7 +54,7 @@ ogmrip_mplayer_set_input (GPtrArray *argv, OGMRipTitle *title)
   {
     g_ptr_array_add (argv, g_strdup ("-dvd-device"));
     g_ptr_array_add (argv, g_strdup (uri + 6));
-    g_ptr_array_add (argv, g_strdup_printf ("dvd://%d", ogmrip_title_get_nr (title)));
+    g_ptr_array_add (argv, g_strdup_printf ("dvd://%d", ogmrip_title_get_nr (title) + 1));
   }
   else if (g_str_has_prefix (uri, "br://"))
   {

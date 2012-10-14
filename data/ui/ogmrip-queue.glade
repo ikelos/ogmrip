@@ -58,14 +58,12 @@
             <property name="icon_size">1</property>
             <child>
               <object class="GtkToolButton" id="remove-button">
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="sensitive">False</property>
                 <property name="can_focus">False</property>
                 <property name="has_tooltip">True</property>
                 <property name="tooltip_markup" translatable="yes">Remove</property>
                 <property name="tooltip_text" translatable="yes">Remove</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="icon_name">list-remove-symbolic</property>
               </object>
@@ -76,14 +74,12 @@
             </child>
             <child>
               <object class="GtkToolButton" id="clear-button">
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="sensitive">False</property>
                 <property name="can_focus">False</property>
                 <property name="has_tooltip">True</property>
                 <property name="tooltip_markup" translatable="yes">Remove all</property>
                 <property name="tooltip_text" translatable="yes">Remove all</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="icon_name">edit-clear-symbolic</property>
               </object>
@@ -94,14 +90,12 @@
             </child>
             <child>
               <object class="GtkToolButton" id="top-button">
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="sensitive">False</property>
                 <property name="can_focus">False</property>
                 <property name="has_tooltip">True</property>
                 <property name="tooltip_markup" translatable="yes">Move to top</property>
                 <property name="tooltip_text" translatable="yes">Move to top</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="icon_name">go-top-symbolic</property>
               </object>
@@ -112,14 +106,12 @@
             </child>
             <child>
               <object class="GtkToolButton" id="up-button">
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="sensitive">False</property>
                 <property name="can_focus">False</property>
                 <property name="has_tooltip">True</property>
                 <property name="tooltip_markup" translatable="yes">Move up</property>
                 <property name="tooltip_text" translatable="yes">Move up</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="icon_name">go-up-symbolic</property>
               </object>
@@ -130,14 +122,12 @@
             </child>
             <child>
               <object class="GtkToolButton" id="down-button">
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="sensitive">False</property>
                 <property name="can_focus">False</property>
                 <property name="has_tooltip">True</property>
                 <property name="tooltip_markup" translatable="yes">Move down</property>
                 <property name="tooltip_text" translatable="yes">Move down</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="icon_name">go-down-symbolic</property>
               </object>
@@ -148,14 +138,12 @@
             </child>
             <child>
               <object class="GtkToolButton" id="bottom-button">
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="sensitive">False</property>
                 <property name="can_focus">False</property>
                 <property name="has_tooltip">True</property>
                 <property name="tooltip_markup" translatable="yes">Move to bottom</property>
                 <property name="tooltip_text" translatable="yes">Move to bottom</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="icon_name">go-bottom-symbolic</property>
               </object>

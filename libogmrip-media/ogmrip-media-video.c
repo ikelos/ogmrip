@@ -19,6 +19,7 @@
 #include "ogmrip-media-video.h"
 #include "ogmrip-media-stream.h"
 #include "ogmrip-media-enums.h"
+#include "ogmrip-media-title.h"
 
 G_DEFINE_INTERFACE_WITH_CODE (OGMRipVideoStream, ogmrip_video_stream, G_TYPE_OBJECT,
     g_type_interface_add_prerequisite (g_define_type_id, OGMRIP_TYPE_STREAM);)
@@ -129,5 +130,12 @@ ogmrip_video_stream_get_start_delay (OGMRipVideoStream *video)
     return 0;
 
   return iface->get_start_delay (video);
+}
+
+gboolean
+ogmrip_video_stream_equal (OGMRipVideoStream *video1, OGMRipVideoStream *video2)
+{
+  return ogmrip_title_equal (ogmrip_stream_get_title (OGMRIP_STREAM (video1)),
+      ogmrip_stream_get_title (OGMRIP_STREAM (video2)));
 }
 

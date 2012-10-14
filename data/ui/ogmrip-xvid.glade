@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
-  <requires lib="gtk+" version="2.22"/>
+  <!-- interface-requires gtk+ 3.0 -->
   <object class="GtkAdjustment" id="bquant_offset-adj">
     <property name="lower">-1000</property>
     <property name="upper">1000</property>
@@ -139,12 +139,10 @@
         <child>
           <object class="GtkCheckButton" id="lumi_mask-check">
             <property name="label" translatable="yes">Adaptive quantization (lumi_mask)</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
           </object>
@@ -158,12 +156,10 @@
         <child>
           <object class="GtkCheckButton" id="interlacing-check">
             <property name="label" translatable="yes">Interlaced encoding (interlacing)</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
           </object>
@@ -177,12 +173,10 @@
         <child>
           <object class="GtkCheckButton" id="qpel-check">
             <property name="label" translatable="yes">Quarter pixel (qpel)</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
           </object>
@@ -196,12 +190,10 @@
         <child>
           <object class="GtkCheckButton" id="gmc-check">
             <property name="label" translatable="yes">Global motion compensation (gmc)</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
           </object>
@@ -215,12 +207,10 @@
         <child>
           <object class="GtkCheckButton" id="trellis-check">
             <property name="label" translatable="yes">Trellis quantization (trellis)</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
           </object>
@@ -532,12 +522,10 @@
         <child>
           <object class="GtkCheckButton" id="chroma_me-check">
             <property name="label" translatable="yes">Use chroma motion (chroma_me)</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
           </object>
@@ -551,12 +539,10 @@
         <child>
           <object class="GtkCheckButton" id="chroma_opt-check">
             <property name="label" translatable="yes">Enable  a  chroma  optimizer  prefilter (chroma_opt)</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
           </object>
@@ -570,12 +556,10 @@
         <child>
           <object class="GtkCheckButton" id="bvhq-check">
             <property name="label" translatable="yes">Allow vector candidates for B-frames (bvhq)</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
           </object>
@@ -635,12 +619,10 @@
         <child>
           <object class="GtkCheckButton" id="grayscale-check">
             <property name="label" translatable="yes">Grayscale mode (grayscale)</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
           </object>
@@ -654,12 +636,10 @@
         <child>
           <object class="GtkCheckButton" id="cartoon-check">
             <property name="label" translatable="yes">Cartoon mode (cartoon)</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
           </object>
@@ -829,12 +809,10 @@
         <child>
           <object class="GtkCheckButton" id="packed-check">
             <property name="label" translatable="yes">Packed bitstream (packed)</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
           </object>
@@ -848,12 +826,10 @@
         <child>
           <object class="GtkCheckButton" id="closed_gop-check">
             <property name="label" translatable="yes">Closed GOP (closed_gop)</property>
-            <property name="use_action_appearance">False</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
             <property name="margin_left">12</property>
-            <property name="use_action_appearance">False</property>
             <property name="xalign">0</property>
             <property name="draw_indicator">True</property>
           </object>

@@ -220,6 +220,7 @@ ogmdvd_disc_copy (OGMDvdDisc *disc, OGMDvdTitle *title, const gchar *path,
 {
   OGMRipMedia *media = OGMRIP_MEDIA (disc);
   OGMJobTask *spawn;
+  OGMDvdDisc *copy;
 
   struct stat buf;
   gboolean is_open;
@@ -269,6 +270,14 @@ ogmdvd_disc_copy (OGMDvdDisc *disc, OGMDvdTitle *title, const gchar *path,
       return NULL;
   }
 
-  return g_object_new (OGMDVD_TYPE_DISC, "uri", path, NULL);
+  copy = g_object_new (OGMDVD_TYPE_DISC, "uri", path, NULL);
+
+  if (!copy->priv->id || !g_str_equal (copy->priv->id, disc->priv->id))
+  {
+    copy->priv->real_id = copy->priv->id;
+    copy->priv->id = g_strdup (disc->priv->id);
+  }
+
+  return copy;
 }
 

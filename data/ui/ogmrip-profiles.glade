@@ -63,13 +63,11 @@
             <property name="icon_size">1</property>
             <child>
               <object class="GtkToolButton" id="new-button">
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="has_tooltip">True</property>
                 <property name="tooltip_markup" translatable="yes">Create</property>
                 <property name="tooltip_text" translatable="yes">Create</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="icon_name">list-add-symbolic</property>
               </object>
@@ -80,14 +78,12 @@
             </child>
             <child>
               <object class="GtkToolButton" id="delete-button">
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="sensitive">False</property>
                 <property name="can_focus">False</property>
                 <property name="has_tooltip">True</property>
                 <property name="tooltip_markup" translatable="yes">Remove</property>
                 <property name="tooltip_text" translatable="yes">Remove</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="icon_name">list-remove-symbolic</property>
               </object>
@@ -98,14 +94,12 @@
             </child>
             <child>
               <object class="GtkToolButton" id="edit-button">
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="sensitive">False</property>
                 <property name="can_focus">False</property>
                 <property name="has_tooltip">True</property>
                 <property name="tooltip_markup" translatable="yes">Edit</property>
                 <property name="tooltip_text" translatable="yes">Edit</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="icon_name">accessories-text-editor-symbolic</property>
               </object>
@@ -116,14 +110,12 @@
             </child>
             <child>
               <object class="GtkToolButton" id="rename-button">
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="sensitive">False</property>
                 <property name="can_focus">False</property>
                 <property name="has_tooltip">True</property>
                 <property name="tooltip_markup" translatable="yes">Rename</property>
                 <property name="tooltip_text" translatable="yes">Rename</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="icon_name">emblem-synchronizing-symbolic</property>
               </object>
@@ -134,14 +126,12 @@
             </child>
             <child>
               <object class="GtkToolButton" id="copy-button">
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="sensitive">False</property>
                 <property name="can_focus">False</property>
                 <property name="has_tooltip">True</property>
                 <property name="tooltip_markup" translatable="yes">Duplicate</property>
                 <property name="tooltip_text" translatable="yes">Duplicate</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="icon_name">edit-copy-symbolic</property>
               </object>
@@ -152,13 +142,11 @@
             </child>
             <child>
               <object class="GtkToolButton" id="import-button">
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="has_tooltip">True</property>
                 <property name="tooltip_markup" translatable="yes">Import</property>
                 <property name="tooltip_text" translatable="yes">Import</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="icon_name">document-open-symbolic</property>
               </object>
@@ -169,14 +157,12 @@
             </child>
             <child>
               <object class="GtkToolButton" id="export-button">
-                <property name="use_action_appearance">False</property>
                 <property name="visible">True</property>
                 <property name="sensitive">False</property>
                 <property name="can_focus">False</property>
                 <property name="has_tooltip">True</property>
                 <property name="tooltip_markup" translatable="yes">Export</property>
                 <property name="tooltip_text" translatable="yes">Export</property>
-                <property name="use_action_appearance">False</property>
                 <property name="use_underline">True</property>
                 <property name="icon_name">document-save-symbolic</property>
               </object>

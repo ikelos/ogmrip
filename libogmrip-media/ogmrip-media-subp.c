@@ -19,6 +19,7 @@
 #include "ogmrip-media-subp.h"
 #include "ogmrip-media-stream.h"
 #include "ogmrip-media-enums.h"
+#include "ogmrip-media-title.h"
 
 G_DEFINE_INTERFACE_WITH_CODE (OGMRipSubpStream, ogmrip_subp_stream, G_TYPE_OBJECT,
     g_type_interface_add_prerequisite (g_define_type_id, OGMRIP_TYPE_STREAM);)
@@ -116,5 +117,15 @@ ogmrip_subp_stream_get_nr (OGMRipSubpStream *subp)
     return 0;
 
   return iface->get_nr (subp);
+}
+
+gboolean
+ogmrip_subp_stream_equal (OGMRipSubpStream *subp1, OGMRipSubpStream *subp2)
+{
+  if (ogmrip_subp_stream_get_nr (subp1) != ogmrip_subp_stream_get_nr (subp2))
+    return FALSE;
+
+  return ogmrip_title_equal (ogmrip_stream_get_title (OGMRIP_STREAM (subp1)),
+      ogmrip_stream_get_title (OGMRIP_STREAM (subp2)));
 }
 
