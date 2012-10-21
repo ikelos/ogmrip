@@ -19,6 +19,8 @@
 #ifndef __OGMRIP_ENCODING_H__
 #define __OGMRIP_ENCODING_H__
 
+#include <ogmrip-base.h>
+
 #include <ogmrip-container.h>
 #include <ogmrip-video-codec.h>
 #include <ogmrip-audio-codec.h>
@@ -114,8 +116,13 @@ GType              ogmrip_encoding_get_type            (void);
 OGMRipEncoding *   ogmrip_encoding_new                 (OGMRipTitle          *title);
 OGMRipEncoding *   ogmrip_encoding_new_from_file       (GFile                *file,
                                                         GError               **error);
-gboolean           ogmrip_encoding_export              (OGMRipEncoding       *encoding,
+OGMRipEncoding *   ogmrip_encoding_new_from_xml        (OGMRipXML            *xml,
+                                                        GError               **error);
+gboolean           ogmrip_encoding_export_to_file      (OGMRipEncoding       *encoding,
                                                         GFile                *file,
+                                                        GError               **error);
+gboolean           ogmrip_encoding_export_to_xml       (OGMRipEncoding       *encoding,
+                                                        OGMRipXML            *xml,
                                                         GError               **error);
 void               ogmrip_encoding_clear               (OGMRipEncoding       *encoding);
 OGMRipCodec *      ogmrip_encoding_get_video_codec     (OGMRipEncoding       *encoding);

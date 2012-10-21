@@ -69,6 +69,36 @@ static void ogmrip_encoding_manager_dialog_set_property (GObject      *gobject,
                                                          GParamSpec   *pspec);
 
 static gboolean
+gtk_widget_button_press_cb (GtkWidget *widget, GdkEventButton *event, GtkWidget *menu)
+{
+  if (event->button != 3 || event->type != GDK_BUTTON_PRESS)
+    return FALSE;
+
+  gtk_menu_popup (GTK_MENU (menu), NULL, NULL, NULL, NULL, event->button, event->time);
+
+  return TRUE;
+}
+
+static gboolean
+gtk_widget_popup_menu_cb (GtkWidget *widget, GtkWidget *menu)
+{
+  gtk_menu_popup (GTK_MENU (menu), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time ());
+
+  return TRUE;
+}
+
+static void
+gtk_widget_set_popup_menu (GtkWidget *widget, GtkMenu *menu)
+{
+  gtk_menu_attach_to_widget (menu, widget, NULL);
+
+  g_signal_connect (widget, "button-press-event",
+      G_CALLBACK (gtk_widget_button_press_cb), menu);
+  g_signal_connect (widget, "popup-menu",
+      G_CALLBACK (gtk_widget_popup_menu_cb), menu);
+}
+
+static gboolean
 ogmrip_encoding_manager_dialog_get_iter (OGMRipEncodingManagerDialog *dialog, OGMRipEncoding *encoding, GtkTreeIter *iter)
 {
   if (gtk_tree_model_get_iter_first (GTK_TREE_MODEL (dialog->priv->store), iter))
@@ -277,40 +307,40 @@ ogmrip_encoding_manager_dialog_set_manager (OGMRipEncodingManagerDialog *dialog,
 }
 
 static void
-ogmrip_encoding_manager_dialog_set_top_button_sensitivity (GtkTreeSelection *selection, GtkWidget *button)
+ogmrip_encoding_manager_dialog_set_move_to_top_sensitivity (GtkTreeSelection *selection, GtkAction *action)
 {
   GtkTreeModel *model;
   GtkTreeIter iter;
 
-  gtk_widget_set_sensitive (button,
+  gtk_action_set_sensitive (action,
       gtk_tree_selection_get_selected (selection, &model, &iter) &&
       gtk_tree_model_iter_previous (model, &iter));
 }
 
 static void
-ogmrip_encoding_manager_dialog_set_down_button_sensitivity (GtkTreeSelection *selection, GtkWidget *button)
+ogmrip_encoding_manager_dialog_set_move_down_sensitivity (GtkTreeSelection *selection, GtkAction *action)
 {
   GtkTreeModel *model;
   GtkTreeIter iter;
 
-  gtk_widget_set_sensitive (button,
+  gtk_action_set_sensitive (action,
       gtk_tree_selection_get_selected (selection, &model, &iter) &&
       gtk_tree_model_iter_next (model, &iter));
 }
 
 static void
-ogmrip_encoding_manager_dialog_set_clear_button_sensitivity (GtkTreeSelection *selection, GtkWidget *button)
+ogmrip_encoding_manager_dialog_set_remove_all_sensitivity (GtkTreeSelection *selection, GtkAction *action)
 {
   GtkTreeModel *model;
 
   gtk_tree_selection_get_selected (selection, &model, NULL);
-  gtk_widget_set_sensitive (button, gtk_tree_model_iter_n_children (model, NULL) > 0);
+  gtk_action_set_sensitive (action, gtk_tree_model_iter_n_children (model, NULL) > 0);
 }
 
 static void
-ogmrip_encoding_manager_dialog_set_button_sensitivity (GtkTreeSelection *selection, GtkWidget *button)
+ogmrip_encoding_manager_dialog_set_action_sensitivity (GtkTreeSelection *selection, GtkAction *action)
 {
-  gtk_widget_set_sensitive (button, gtk_tree_selection_get_selected (selection, NULL, NULL));
+  gtk_action_set_sensitive (action, gtk_tree_selection_get_selected (selection, NULL, NULL));
 }
 
 static OGMRipEncoding *
@@ -330,7 +360,7 @@ ogmrip_encoding_manager_dialog_get_active (OGMRipEncodingManagerDialog *dialog)
 }
 
 static void
-ogmrip_encoding_manager_dialog_clear_clicked (OGMRipEncodingManagerDialog *dialog)
+ogmrip_encoding_manager_dialog_remove_all_activated (OGMRipEncodingManagerDialog *dialog)
 {
   GtkTreeIter iter;
 
@@ -363,7 +393,7 @@ ogmrip_encoding_manager_dialog_clear_clicked (OGMRipEncodingManagerDialog *dialo
 }
 
 static void
-ogmrip_encoding_manager_dialog_remove_clicked (OGMRipEncodingManagerDialog *dialog)
+ogmrip_encoding_manager_dialog_remove_activated (OGMRipEncodingManagerDialog *dialog)
 {
   OGMRipEncoding *encoding;
 
@@ -371,7 +401,7 @@ ogmrip_encoding_manager_dialog_remove_clicked (OGMRipEncodingManagerDialog *dial
   if (encoding)
     ogmrip_encoding_manager_remove (dialog->priv->manager, encoding);
 }
-/*
+
 static void
 ogmrip_encoding_manager_dialog_import_activated (OGMRipEncodingManagerDialog *parent)
 {
@@ -386,35 +416,57 @@ ogmrip_encoding_manager_dialog_import_activated (OGMRipEncodingManagerDialog *pa
   if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
   {
     GError *error = NULL;
+    gboolean status = TRUE;
+
+    OGMRipXML *xml;
     GFile *file;
 
-    OGMRipEncoding *encoding;
-
     file = gtk_file_chooser_get_file (GTK_FILE_CHOOSER (dialog));
+    xml = ogmrip_xml_new_from_file (file, &error);
+    g_object_unref (file);
 
-    encoding = ogmrip_encoding_new_from_file (file, &error);
-    if (encoding)
-    {
-      ogmrip_encoding_manager_add (parent->priv->manager, encoding);
-      g_object_unref (encoding);
-    }
+    if (!xml)
+      status = FALSE;
     else
     {
-      ogmrip_run_error_dialog (GTK_WINDOW (dialog), error, _("Could not export the encoding"));
+      OGMRipEncoding *encoding;
+
+      if (!g_str_equal (ogmrip_xml_get_name (xml), "encodings") || ogmrip_xml_children (xml))
+      {
+        do
+        {
+          encoding = ogmrip_encoding_new_from_xml (xml, &error);
+          if (!encoding)
+            status = FALSE;
+          else
+          {
+            ogmrip_encoding_manager_add (parent->priv->manager, encoding);
+            g_object_unref (encoding);
+          }
+        }
+        while (status && ogmrip_xml_next (xml));
+      }
+
+      ogmrip_xml_free (xml);
+    }
+
+    if (!status)
+    {
+      ogmrip_run_error_dialog (GTK_WINDOW (dialog), error, _("Could not import the encoding"));
       g_clear_error (&error);
     }
-    g_object_unref (file);
   }
+
   gtk_widget_destroy (dialog);
 }
 
 static void
 ogmrip_encoding_manager_dialog_export_activated (OGMRipEncodingManagerDialog *parent)
 {
-  OGMRipEncoding *encoding;
-  
-  encoding = ogmrip_encoding_manager_dialog_get_active (parent);
-  if (encoding)
+  GList *rows, *row;
+
+  rows = gtk_tree_selection_get_selected_rows (parent->priv->selection, NULL);
+  if (rows)
   {
     GtkWidget *dialog;
 
@@ -428,22 +480,54 @@ ogmrip_encoding_manager_dialog_export_activated (OGMRipEncodingManagerDialog *pa
     if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
     {
       GError *error = NULL;
+      gboolean status = TRUE;
+
+      OGMRipXML *xml;
       GFile *file;
 
-      file = gtk_file_chooser_get_file (GTK_FILE_CHOOSER (dialog));
-      if (!ogmrip_encoding_export (encoding, file, &error))
+      xml =  ogmrip_xml_new ();
+
+      if (rows->next)
+        ogmrip_xml_append (xml, "encodings");
+
+      for (row = rows; row; row = row->next)
+      {
+        GtkTreeIter iter;
+
+        if (gtk_tree_model_get_iter (GTK_TREE_MODEL (parent->priv->store), &iter, row->data))
+        {
+          OGMRipEncoding *encoding;
+
+          gtk_tree_model_get (GTK_TREE_MODEL (parent->priv->store), &iter, COL_ENCODING, &encoding, -1);
+          status = ogmrip_encoding_export_to_xml (encoding, xml, &error);
+          if (!status)
+            break;
+        }
+      }
+
+      if (status)
+      {
+        file = gtk_file_chooser_get_file (GTK_FILE_CHOOSER (dialog));
+        status = ogmrip_xml_save (xml, file, &error);
+        g_object_unref (file);
+      }
+
+      ogmrip_xml_free (xml);
+
+      if (!status)
       {
         ogmrip_run_error_dialog (GTK_WINDOW (dialog), error, _("Could not export the encoding"));
         g_clear_error (&error);
       }
-      g_object_unref (file);
     }
     gtk_widget_destroy (dialog);
+
+    g_list_free_full (rows, (GDestroyNotify) gtk_tree_path_free);
   }
 }
-*/
+
 static void
-ogmrip_encoding_manager_dialog_top_button_clicked (OGMRipEncodingManagerDialog *dialog)
+ogmrip_encoding_manager_dialog_move_to_top_activated (OGMRipEncodingManagerDialog *dialog)
 {
   OGMRipEncoding *encoding;
 
@@ -453,7 +537,7 @@ ogmrip_encoding_manager_dialog_top_button_clicked (OGMRipEncodingManagerDialog *
 }
 
 static void
-ogmrip_encoding_manager_dialog_up_button_clicked (OGMRipEncodingManagerDialog *dialog)
+ogmrip_encoding_manager_dialog_move_up_activated (OGMRipEncodingManagerDialog *dialog)
 {
   OGMRipEncoding *encoding;
 
@@ -463,7 +547,7 @@ ogmrip_encoding_manager_dialog_up_button_clicked (OGMRipEncodingManagerDialog *d
 }
 
 static void
-ogmrip_encoding_manager_dialog_down_button_clicked (OGMRipEncodingManagerDialog *dialog)
+ogmrip_encoding_manager_dialog_move_down_activated (OGMRipEncodingManagerDialog *dialog)
 {
   OGMRipEncoding *encoding;
 
@@ -473,7 +557,7 @@ ogmrip_encoding_manager_dialog_down_button_clicked (OGMRipEncodingManagerDialog 
 }
 
 static void
-ogmrip_encoding_manager_dialog_bottom_button_clicked (OGMRipEncodingManagerDialog *dialog)
+ogmrip_encoding_manager_dialog_move_to_bottom_activated (OGMRipEncodingManagerDialog *dialog)
 {
   OGMRipEncoding *encoding;
 
@@ -506,7 +590,8 @@ ogmrip_encoding_manager_dialog_init (OGMRipEncodingManagerDialog *dialog)
 {
   GError *error = NULL;
 
-  GtkWidget *area, *widget;
+  GObject *action;
+  GtkWidget *area, *widget, *menu;
   GtkBuilder *builder;
 
   GtkStyleContext *context;
@@ -550,6 +635,9 @@ ogmrip_encoding_manager_dialog_init (OGMRipEncodingManagerDialog *dialog)
 
   widget = gtk_builder_get_widget (builder, "treeview");
 
+  menu = gtk_builder_get_widget (builder, "popup");
+  gtk_widget_set_popup_menu (widget, GTK_MENU (menu));
+
   dialog->priv->store = gtk_list_store_new (COL_LAST, G_TYPE_STRING, G_TYPE_INT,
       G_TYPE_STRING, OGMRIP_TYPE_ENCODING, G_TYPE_STRING, G_TYPE_INT, G_TYPE_STRING);
   gtk_tree_view_set_model (GTK_TREE_VIEW (widget), GTK_TREE_MODEL (dialog->priv->store));
@@ -572,52 +660,51 @@ ogmrip_encoding_manager_dialog_init (OGMRipEncodingManagerDialog *dialog)
   column = gtk_tree_view_column_new_with_attributes (_("Progress"), renderer, "text", COL_STEP, "value", COL_PROGRESS, NULL);
   gtk_tree_view_append_column (GTK_TREE_VIEW (widget), column);
 
-  widget = gtk_builder_get_widget (builder, "clear-button");
-  g_signal_connect_swapped (widget, "clicked",
-      G_CALLBACK (ogmrip_encoding_manager_dialog_clear_clicked), dialog);
+  action = gtk_builder_get_object (builder, "remove-all-action");
+  g_signal_connect_swapped (action, "activate",
+      G_CALLBACK (ogmrip_encoding_manager_dialog_remove_all_activated), dialog);
   g_signal_connect (dialog->priv->selection, "changed",
-      G_CALLBACK (ogmrip_encoding_manager_dialog_set_clear_button_sensitivity), widget);
+      G_CALLBACK (ogmrip_encoding_manager_dialog_set_remove_all_sensitivity), action);
 
-  widget = gtk_builder_get_widget (builder, "remove-button");
-  g_signal_connect_swapped (widget, "clicked",
-      G_CALLBACK (ogmrip_encoding_manager_dialog_remove_clicked), dialog);
+  action = gtk_builder_get_object (builder, "remove-action");
+  g_signal_connect_swapped (action, "activate",
+      G_CALLBACK (ogmrip_encoding_manager_dialog_remove_activated), dialog);
   g_signal_connect (dialog->priv->selection, "changed",
-      G_CALLBACK (ogmrip_encoding_manager_dialog_set_button_sensitivity), widget);
-/*
-  action = gtk_action_group_get_action (action_group, "Import");
+      G_CALLBACK (ogmrip_encoding_manager_dialog_set_action_sensitivity), action);
+
+  action = gtk_builder_get_object (builder, "import-action");
   g_signal_connect_swapped (action, "activate",
       G_CALLBACK (ogmrip_encoding_manager_dialog_import_activated), dialog);
 
-  action = gtk_action_group_get_action (action_group, "Export");
+  action = gtk_builder_get_object (builder, "export-action");
   g_signal_connect_swapped (action, "activate",
       G_CALLBACK (ogmrip_encoding_manager_dialog_export_activated), dialog);
   g_signal_connect (dialog->priv->selection, "changed",
       G_CALLBACK (ogmrip_encoding_manager_dialog_set_action_sensitivity), action);
-  gtk_action_set_sensitive (action, FALSE);
-*/
-  widget = gtk_builder_get_widget (builder, "top-button");
-  g_signal_connect_swapped (widget, "clicked",
-      G_CALLBACK (ogmrip_encoding_manager_dialog_top_button_clicked), dialog);
-  g_signal_connect (dialog->priv->selection, "changed",
-      G_CALLBACK (ogmrip_encoding_manager_dialog_set_top_button_sensitivity), widget);
 
-  widget = gtk_builder_get_widget (builder, "bottom-button");
-  g_signal_connect_swapped (widget, "clicked",
-      G_CALLBACK (ogmrip_encoding_manager_dialog_bottom_button_clicked), dialog);
+  action = gtk_builder_get_object (builder, "move-to-top-action");
+  g_signal_connect_swapped (action, "activate",
+      G_CALLBACK (ogmrip_encoding_manager_dialog_move_to_top_activated), dialog);
   g_signal_connect (dialog->priv->selection, "changed",
-      G_CALLBACK (ogmrip_encoding_manager_dialog_set_top_button_sensitivity), widget);
+      G_CALLBACK (ogmrip_encoding_manager_dialog_set_move_to_top_sensitivity), action);
 
-  widget = gtk_builder_get_widget (builder, "up-button");
-  g_signal_connect_swapped (widget, "clicked",
-      G_CALLBACK (ogmrip_encoding_manager_dialog_up_button_clicked), dialog);
+  action = gtk_builder_get_object (builder, "move-to-bottom-action");
+  g_signal_connect_swapped (action, "activate",
+      G_CALLBACK (ogmrip_encoding_manager_dialog_move_to_bottom_activated), dialog);
   g_signal_connect (dialog->priv->selection, "changed",
-      G_CALLBACK (ogmrip_encoding_manager_dialog_set_down_button_sensitivity), widget);
+      G_CALLBACK (ogmrip_encoding_manager_dialog_set_move_to_top_sensitivity), action);
 
-  widget = gtk_builder_get_widget (builder, "down-button");
-  g_signal_connect_swapped (widget, "clicked",
-      G_CALLBACK (ogmrip_encoding_manager_dialog_down_button_clicked), dialog);
+  action = gtk_builder_get_object (builder, "move-up-action");
+  g_signal_connect_swapped (action, "activate",
+      G_CALLBACK (ogmrip_encoding_manager_dialog_move_up_activated), dialog);
   g_signal_connect (dialog->priv->selection, "changed",
-      G_CALLBACK (ogmrip_encoding_manager_dialog_set_down_button_sensitivity), widget);
+      G_CALLBACK (ogmrip_encoding_manager_dialog_set_move_down_sensitivity), action);
+
+  action = gtk_builder_get_object (builder, "move-down-action");
+  g_signal_connect_swapped (action, "activate",
+      G_CALLBACK (ogmrip_encoding_manager_dialog_move_down_activated), dialog);
+  g_signal_connect (dialog->priv->selection, "changed",
+      G_CALLBACK (ogmrip_encoding_manager_dialog_set_move_down_sensitivity), action);
 
   g_object_unref (builder);
 }

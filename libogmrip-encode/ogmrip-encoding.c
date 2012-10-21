@@ -495,7 +495,7 @@ weak_notify (gpointer media, GObject *where_the_object_was)
   g_object_unref (media);
 }
 
-static OGMRipEncoding *
+OGMRipEncoding *
 ogmrip_encoding_new_from_xml (OGMRipXML *xml, GError **error)
 {
   OGMRipEncoding *encoding = NULL;
@@ -634,7 +634,7 @@ ogmrip_encoding_clear (OGMRipEncoding *encoding)
 }
 
 gboolean
-ogmrip_encoding_export (OGMRipEncoding *encoding, GFile *file, GError **error)
+ogmrip_encoding_export_to_file (OGMRipEncoding *encoding, GFile *file, GError **error)
 {
   OGMRipXML *xml;
   gboolean retval;
@@ -649,6 +649,20 @@ ogmrip_encoding_export (OGMRipEncoding *encoding, GFile *file, GError **error)
     ogmrip_xml_save (xml, file, error);
 
   ogmrip_xml_free (xml);
+
+  return retval;
+}
+
+gboolean
+ogmrip_encoding_export_to_xml (OGMRipEncoding *encoding, OGMRipXML *xml, GError **error)
+{
+  gboolean retval;
+
+  g_return_val_if_fail (OGMRIP_IS_ENCODING (encoding), FALSE);
+  g_return_val_if_fail (xml != NULL, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  retval = ogmrip_encoding_dump (encoding, xml, error);
 
   return retval;
 }
