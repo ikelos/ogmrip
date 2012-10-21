@@ -71,6 +71,7 @@ typedef struct
   GtkWidget *relative_check;
   GtkWidget *angle_spin;
 
+  GtkAction *load_action;
   GtkAction *extract_action;
 
   GtkTreeModel *chapter_store;
@@ -2087,6 +2088,7 @@ ogmrip_main_connect_proxy (GtkUIManager *uimanager, GtkAction *action, GtkWidget
 static void
 ogmrip_main_app_prepared (OGMRipData *data, GParamSpec *pspec, GApplication *app)
 {
+  gtk_action_set_sensitive (data->load_action, TRUE);
   gtk_action_set_sensitive (data->extract_action, data->media != NULL);
 
   data->prepared = TRUE;
@@ -2208,14 +2210,18 @@ ogmrip_main_new (GApplication *app)
   g_signal_connect_swapped (action, "activate",
       G_CALLBACK (ogmrip_main_export_chapters_activated), data);
 
-  action =  gtk_action_group_get_action (action_group, "Load");
-  g_signal_connect_swapped (action, "activate",
+  data->load_action =  gtk_action_group_get_action (action_group, "Load");
+  gtk_action_set_sensitive (data->load_action, FALSE);
+
+  g_signal_connect_swapped (data->load_action, "activate",
       G_CALLBACK (ogmrip_main_load_activated), data);
 
   widget = gtk_builder_get_widget (builder, "load-button");
-  gtk_activatable_set_related_action (GTK_ACTIVATABLE (widget), action);
+  gtk_activatable_set_related_action (GTK_ACTIVATABLE (widget), data->load_action);
 
   data->extract_action =  gtk_action_group_get_action (action_group, "Extract");
+  gtk_action_set_sensitive (data->extract_action, FALSE);
+
   g_signal_connect_swapped (data->extract_action, "activate",
       G_CALLBACK (ogmrip_main_extract_activated), data);
 
@@ -2323,6 +2329,14 @@ ogmrip_main_profile_manager_update_cb (OGMRipProfileEngine *engine, OGMRipProfil
 }
 
 static gboolean
+ogmrip_startup_finish (GApplication *app)
+{
+  ogmrip_application_prepare (OGMRIP_APPLICATION (app));
+
+  return TRUE;
+}
+
+static gboolean
 ogmrip_startup_thread (GIOSchedulerJob *job, GCancellable *cancellable, GApplication *app)
 {
   OGMRipModuleEngine *module_engine;
@@ -2368,7 +2382,7 @@ ogmrip_startup_thread (GIOSchedulerJob *job, GCancellable *cancellable, GApplica
   ogmrip_profile_engine_add_path (profile_engine, path);
   g_free (path);
 
-  ogmrip_application_prepare (OGMRIP_APPLICATION (app));
+  g_io_scheduler_job_send_to_mainloop (job, (GSourceFunc) ogmrip_startup_finish, app, NULL);
 
   return FALSE;
 }
