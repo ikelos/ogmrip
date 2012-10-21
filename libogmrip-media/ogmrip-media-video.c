@@ -132,10 +132,3 @@ ogmrip_video_stream_get_start_delay (OGMRipVideoStream *video)
   return iface->get_start_delay (video);
 }
 
-gboolean
-ogmrip_video_stream_equal (OGMRipVideoStream *video1, OGMRipVideoStream *video2)
-{
-  return ogmrip_title_equal (ogmrip_stream_get_title (OGMRIP_STREAM (video1)),
-      ogmrip_stream_get_title (OGMRIP_STREAM (video2)));
-}
-

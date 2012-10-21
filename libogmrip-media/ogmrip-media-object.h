@@ -54,6 +54,8 @@ struct _OGMRipMediaInterface
                                    OGMRipMediaCallback callback,
                                    gpointer            user_data,
                                    GError              **error);
+  gboolean      (* is_copy)       (OGMRipMedia         *media,
+                                   OGMRipMedia         *copy);
 };
 
 GType         ogmrip_media_get_type      (void) G_GNUC_CONST;
@@ -79,8 +81,8 @@ OGMRipMedia * ogmrip_media_copy          (OGMRipMedia         *media,
                                           OGMRipMediaCallback callback,
                                           gpointer            user_data,
                                           GError              **error);
-gboolean      ogmrip_media_equal         (OGMRipMedia         *media1,
-                                          OGMRipMedia         *media2);
+gboolean      ogmrip_media_is_copy       (OGMRipMedia         *media,
+                                          OGMRipMedia         *copy);
 
 G_END_DECLS
 

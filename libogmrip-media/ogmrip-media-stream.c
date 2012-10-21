@@ -80,3 +80,25 @@ ogmrip_stream_get_format (OGMRipStream *stream)
   return iface->get_format (stream);
 }
 
+gboolean
+ogmrip_stream_is_copy (OGMRipStream *stream, OGMRipStream *copy)
+{
+  OGMRipStreamInterface *iface;
+
+  g_return_val_if_fail (OGMRIP_IS_STREAM (stream), -1);
+  g_return_val_if_fail (OGMRIP_IS_STREAM (copy), -1);
+
+  iface = OGMRIP_STREAM_GET_IFACE (stream);
+
+  if (iface->is_copy)
+    return iface->is_copy (stream, copy);
+
+  if (G_OBJECT_TYPE (stream) != G_OBJECT_TYPE (copy))
+    return FALSE;
+
+  if (ogmrip_stream_get_id (stream) != ogmrip_stream_get_id (copy))
+    return FALSE;
+
+  return ogmrip_title_is_copy (ogmrip_stream_get_title (stream), ogmrip_stream_get_title (copy));
+}
+

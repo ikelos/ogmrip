@@ -522,33 +522,37 @@ ogmrip_encoding_new_from_xml (OGMRipXML *xml, GError **error)
     return NULL;
 
   str = ogmrip_xml_get_string (xml, "id");
-  if (str)
+  if (!str)
   {
-    if (!g_str_equal (str, ogmrip_media_get_id (media)))
-    {
-      g_set_error (error, OGMDVD_DISC_ERROR, OGMDVD_DISC_ERROR_ID,
-          _("Device does not contain the expected DVD"));
-      g_object_unref (media);
-    }
-    else
-    {
-      OGMRipTitle *title;
-      guint nr;
+    g_object_unref (media);
+    return NULL;
+  }
 
-      nr = ogmrip_xml_get_uint (xml, "title");
+  if (!g_str_equal (str, ogmrip_media_get_id (media)))
+  {
+    g_set_error (error, OGMDVD_DISC_ERROR, OGMDVD_DISC_ERROR_ID,
+        _("Device does not contain the expected DVD"));
+    g_object_unref (media);
+  }
+  else
+  {
+    OGMRipTitle *title;
+    guint nr;
 
-      title = ogmrip_media_get_nth_title (media, nr);
-      if (title)
+    nr = ogmrip_xml_get_uint (xml, "title");
+
+    title = ogmrip_media_get_nth_title (media, nr);
+    if (title)
+    {
+      encoding = ogmrip_encoding_new (title);
+      if (encoding)
       {
-        encoding = ogmrip_encoding_new (title);
-        if (encoding)
-        {
-          g_object_weak_ref (G_OBJECT (encoding), weak_notify, g_object_ref (media));
-          ogmrip_encoding_parse (encoding, xml, NULL);
-        }
+        g_object_weak_ref (G_OBJECT (encoding), weak_notify, g_object_ref (media));
+        ogmrip_encoding_parse (encoding, xml, NULL);
       }
     }
   }
+  g_free (str);
 
   g_object_unref (media);
 

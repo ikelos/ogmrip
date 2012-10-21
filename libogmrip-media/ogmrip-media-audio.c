@@ -167,13 +167,3 @@ ogmrip_audio_stream_get_samples_per_frame (OGMRipAudioStream *audio)
   return 1024;
 }
 
-gboolean
-ogmrip_audio_stream_equal (OGMRipAudioStream *audio1, OGMRipAudioStream *audio2)
-{
-  if (ogmrip_audio_stream_get_nr (audio1) != ogmrip_audio_stream_get_nr (audio2))
-    return FALSE;
-
-  return ogmrip_title_equal (ogmrip_stream_get_title (OGMRIP_STREAM (audio1)),
-      ogmrip_stream_get_title (OGMRIP_STREAM (audio2)));
-}
-

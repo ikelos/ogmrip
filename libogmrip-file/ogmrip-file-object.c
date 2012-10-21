@@ -72,6 +72,7 @@ ogmrip_file_finalize (GObject *gobject)
 {
   OGMRipFile *file = OGMRIP_FILE (gobject);
 
+  g_free (file->priv->id);
   g_free (file->priv->uri);
   g_free (file->priv->path);
   g_free (file->priv->label);
@@ -123,6 +124,13 @@ ogmrip_file_set_property (GObject *gobject, guint property_id, const GValue *val
 }
 
 static const gchar *
+ogmrip_file_get_media_id (OGMRipMedia *media)
+{
+  return OGMRIP_FILE (media)->priv->id;
+}
+
+
+static const gchar *
 ogmrip_file_get_media_label (OGMRipMedia *media)
 {
   return OGMRIP_FILE (media)->priv->label;
@@ -155,6 +163,7 @@ ogmrip_file_get_nth_title (OGMRipMedia *media, guint nr)
 static void
 ogmrip_media_iface_init (OGMRipMediaInterface *iface)
 {
+  iface->get_id = ogmrip_file_get_media_id;
   iface->get_label = ogmrip_file_get_media_label;
   iface->get_uri = ogmrip_file_get_uri;
   iface->get_size = ogmrip_file_get_media_size;

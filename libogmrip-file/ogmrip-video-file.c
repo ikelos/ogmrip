@@ -54,6 +54,7 @@ ogmrip_video_file_class_init (OGMRipVideoFileClass *klass)
 static GObject *
 ogmrip_video_file_constructor (GType type, guint n_properties, GObjectConstructParam *properties)
 {
+  GFile *file;
   GObject *gobject;
   OGMRipMediaInfo *info;
   const gchar *str;
@@ -62,6 +63,16 @@ ogmrip_video_file_constructor (GType type, guint n_properties, GObjectConstructP
 
   info = ogmrip_media_info_get_default ();
   if (!info || !OGMRIP_FILE (gobject)->priv->path)
+  {
+    g_object_unref (gobject);
+    return NULL;
+  }
+
+  file = g_file_new_for_path (OGMRIP_FILE (gobject)->priv->path);
+  OGMRIP_FILE (gobject)->priv->id = g_file_get_id (file);
+  g_object_unref (file);
+
+  if (!OGMRIP_FILE (gobject)->priv->id)
   {
     g_object_unref (gobject);
     return NULL;

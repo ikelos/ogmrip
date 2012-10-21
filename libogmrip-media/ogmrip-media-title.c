@@ -402,14 +402,21 @@ ogmrip_title_copy (OGMRipTitle *title, const gchar *path, GCancellable *cancella
 }
 
 gboolean
-ogmrip_title_equal (OGMRipTitle *title1, OGMRipTitle *title2)
+ogmrip_title_is_copy (OGMRipTitle *title, OGMRipTitle *copy)
 {
-  g_return_val_if_fail (OGMRIP_IS_TITLE (title1), FALSE);
-  g_return_val_if_fail (OGMRIP_IS_TITLE (title2), FALSE);
+  OGMRipTitleInterface *iface;
 
-  if (ogmrip_title_get_nr (title1) != ogmrip_title_get_nr (title2))
+  g_return_val_if_fail (OGMRIP_IS_TITLE (title), FALSE);
+  g_return_val_if_fail (OGMRIP_IS_TITLE (copy), FALSE);
+
+  iface = OGMRIP_TITLE_GET_IFACE (title);
+
+  if (iface->is_copy)
+    return iface->is_copy (title, copy);
+
+  if (ogmrip_title_get_nr (title) != ogmrip_title_get_nr (copy))
     return FALSE;
 
-  return ogmrip_media_equal (ogmrip_title_get_media (title1), ogmrip_title_get_media (title2));
+  return ogmrip_media_is_copy (ogmrip_title_get_media (title), ogmrip_title_get_media (copy));
 }
 
