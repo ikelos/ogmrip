@@ -1,6 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
+  <object class="GtkAction" id="add-action">
+    <property name="label" translatable="yes">_New</property>
+    <property name="tooltip" translatable="yes">Create a new profile</property>
+    <property name="icon_name">bookmark-new-symbolic</property>
+  </object>
+  <object class="GtkAction" id="copy-action">
+    <property name="label" translatable="yes">_Duplicate</property>
+    <property name="tooltip" translatable="yes">Duplicate the current profile</property>
+    <property name="icon_name">edit-copy-symbolic</property>
+    <property name="sensitive">False</property>
+  </object>
+  <object class="GtkAction" id="edit-action">
+    <property name="label" translatable="yes">_Edit</property>
+    <property name="tooltip" translatable="yes">Edit the current profile</property>
+    <property name="icon_name">accessories-text-editor-symbolic</property>
+    <property name="sensitive">False</property>
+  </object>
+  <object class="GtkAction" id="export-action">
+    <property name="label" translatable="yes">E_xport</property>
+    <property name="tooltip" translatable="yes">Export the current profile</property>
+    <property name="icon_name">document-save-symbolic</property>
+    <property name="sensitive">False</property>
+  </object>
+  <object class="GtkAction" id="import-action">
+    <property name="label" translatable="yes">_Import</property>
+    <property name="tooltip" translatable="yes">Import an existing profile</property>
+    <property name="icon_name">list-add-symbolic</property>
+  </object>
+  <object class="GtkAction" id="remove-action">
+    <property name="label" translatable="yes">_Remove</property>
+    <property name="tooltip" translatable="yes">Remove the current profile</property>
+    <property name="icon_name">list-remove-symbolic</property>
+    <property name="sensitive">False</property>
+  </object>
+  <object class="GtkAction" id="rename-action">
+    <property name="label" translatable="yes">_Rename</property>
+    <property name="tooltip" translatable="yes">Rename the current profile</property>
+    <property name="icon_name">emblem-synchronizing-symbolic</property>
+    <property name="sensitive">False</property>
+  </object>
+  <object class="GtkMenu" id="popup">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <child>
+      <object class="GtkMenuItem" id="edit-menu">
+        <property name="related_action">edit-action</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="rename-menu">
+        <property name="related_action">rename-action</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="copy-menu">
+        <property name="related_action">copy-action</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="export-menu">
+        <property name="related_action">export-action</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="remove-menu">
+        <property name="related_action">remove-action</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+      </object>
+    </child>
+  </object>
   <object class="GtkBox" id="root">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -62,14 +141,14 @@
             <property name="can_focus">False</property>
             <property name="icon_size">1</property>
             <child>
-              <object class="GtkToolButton" id="new-button">
+              <object class="GtkToolButton" id="import-button">
+                <property name="related_action">import-action</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="has_tooltip">True</property>
-                <property name="tooltip_markup" translatable="yes">Create</property>
-                <property name="tooltip_text" translatable="yes">Create</property>
+                <property name="tooltip_markup" translatable="yes">Import</property>
+                <property name="related_action">import-action</property>
                 <property name="use_underline">True</property>
-                <property name="icon_name">list-add-symbolic</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -78,14 +157,13 @@
             </child>
             <child>
               <object class="GtkToolButton" id="delete-button">
+                <property name="related_action">remove-action</property>
                 <property name="visible">True</property>
-                <property name="sensitive">False</property>
                 <property name="can_focus">False</property>
                 <property name="has_tooltip">True</property>
                 <property name="tooltip_markup" translatable="yes">Remove</property>
-                <property name="tooltip_text" translatable="yes">Remove</property>
+                <property name="related_action">remove-action</property>
                 <property name="use_underline">True</property>
-                <property name="icon_name">list-remove-symbolic</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -93,78 +171,14 @@
               </packing>
             </child>
             <child>
-              <object class="GtkToolButton" id="edit-button">
-                <property name="visible">True</property>
-                <property name="sensitive">False</property>
-                <property name="can_focus">False</property>
-                <property name="has_tooltip">True</property>
-                <property name="tooltip_markup" translatable="yes">Edit</property>
-                <property name="tooltip_text" translatable="yes">Edit</property>
-                <property name="use_underline">True</property>
-                <property name="icon_name">accessories-text-editor-symbolic</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkToolButton" id="rename-button">
-                <property name="visible">True</property>
-                <property name="sensitive">False</property>
-                <property name="can_focus">False</property>
-                <property name="has_tooltip">True</property>
-                <property name="tooltip_markup" translatable="yes">Rename</property>
-                <property name="tooltip_text" translatable="yes">Rename</property>
-                <property name="use_underline">True</property>
-                <property name="icon_name">emblem-synchronizing-symbolic</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkToolButton" id="copy-button">
-                <property name="visible">True</property>
-                <property name="sensitive">False</property>
-                <property name="can_focus">False</property>
-                <property name="has_tooltip">True</property>
-                <property name="tooltip_markup" translatable="yes">Duplicate</property>
-                <property name="tooltip_text" translatable="yes">Duplicate</property>
-                <property name="use_underline">True</property>
-                <property name="icon_name">edit-copy-symbolic</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkToolButton" id="import-button">
+              <object class="GtkToolButton" id="new-button">
+                <property name="related_action">add-action</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="has_tooltip">True</property>
-                <property name="tooltip_markup" translatable="yes">Import</property>
-                <property name="tooltip_text" translatable="yes">Import</property>
+                <property name="tooltip_markup" translatable="yes">Create</property>
+                <property name="related_action">add-action</property>
                 <property name="use_underline">True</property>
-                <property name="icon_name">document-open-symbolic</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkToolButton" id="export-button">
-                <property name="visible">True</property>
-                <property name="sensitive">False</property>
-                <property name="can_focus">False</property>
-                <property name="has_tooltip">True</property>
-                <property name="tooltip_markup" translatable="yes">Export</property>
-                <property name="tooltip_text" translatable="yes">Export</property>
-                <property name="use_underline">True</property>
-                <property name="icon_name">document-save-symbolic</property>
               </object>
               <packing>
                 <property name="expand">False</property>
