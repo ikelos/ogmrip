@@ -157,7 +157,7 @@ ogmrip_profile_manager_dialog_run_profile_dialog (GtkWindow *parent, const gchar
 }
 
 static void
-ogmrip_profile_manager_dialog_add_action_activated (OGMRipProfileManagerDialog *dialog)
+ogmrip_profile_manager_dialog_add_activated (OGMRipProfileManagerDialog *dialog)
 {
   gchar *name;
 
@@ -177,7 +177,7 @@ ogmrip_profile_manager_dialog_add_action_activated (OGMRipProfileManagerDialog *
 }
 
 static void
-ogmrip_profile_manager_dialog_copy_action_activated (OGMRipProfileManagerDialog *dialog)
+ogmrip_profile_manager_dialog_copy_activated (OGMRipProfileManagerDialog *dialog)
 {
   GtkTreeModel *model;
   GtkTreeIter iter;
@@ -203,7 +203,7 @@ ogmrip_profile_manager_dialog_copy_action_activated (OGMRipProfileManagerDialog 
 }
 
 static void
-ogmrip_profile_manager_dialog_edit_button_activated (OGMRipProfileManagerDialog *parent)
+ogmrip_profile_manager_dialog_edit_activated (OGMRipProfileManagerDialog *parent)
 {
   GtkTreeModel *model;
   GtkTreeIter iter;
@@ -226,7 +226,7 @@ ogmrip_profile_manager_dialog_edit_button_activated (OGMRipProfileManagerDialog 
 }
 
 static void
-ogmrip_profile_manager_dialog_remove_action_activated (OGMRipProfileManagerDialog *parent)
+ogmrip_profile_manager_dialog_remove_activated (OGMRipProfileManagerDialog *parent)
 {
   GtkTreeIter iter;
   GtkTreeModel *model;
@@ -258,7 +258,7 @@ ogmrip_profile_manager_dialog_remove_action_activated (OGMRipProfileManagerDialo
 }
 
 static void
-ogmrip_profile_manager_dialog_rename_action_activated (OGMRipProfileManagerDialog *parent)
+ogmrip_profile_manager_dialog_rename_activated (OGMRipProfileManagerDialog *parent)
 {
   GtkTreeModel *model;
   GtkTreeIter iter;
@@ -282,7 +282,7 @@ ogmrip_profile_manager_dialog_rename_action_activated (OGMRipProfileManagerDialo
 }
 
 static void
-ogmrip_profile_manager_dialog_export_action_activated (OGMRipProfileManagerDialog *parent)
+ogmrip_profile_manager_dialog_export_activated (OGMRipProfileManagerDialog *parent)
 {
   GtkTreeModel *model;
   GtkTreeIter iter;
@@ -322,7 +322,7 @@ ogmrip_profile_manager_dialog_export_action_activated (OGMRipProfileManagerDialo
 }
 
 static void
-ogmrip_profile_manager_dialog_import_action_activated (OGMRipProfileManagerDialog *parent)
+ogmrip_profile_manager_dialog_import_activated (OGMRipProfileManagerDialog *parent)
 {
   GtkWidget *dialog;
 
@@ -427,6 +427,8 @@ ogmrip_profile_manager_dialog_init (OGMRipProfileManagerDialog *dialog)
   gtk_style_context_add_class (context, GTK_STYLE_CLASS_INLINE_TOOLBAR);
 
   widget = gtk_builder_get_widget (builder, "treeview");
+  g_signal_connect_swapped (widget, "row-activated",
+      G_CALLBACK (ogmrip_profile_manager_dialog_edit_activated), dialog);
 
   menu = gtk_builder_get_widget (builder, "popup");
   gtk_widget_set_popup_menu (widget, GTK_MENU (menu));
@@ -449,37 +451,37 @@ ogmrip_profile_manager_dialog_init (OGMRipProfileManagerDialog *dialog)
 
   edit_action = gtk_builder_get_object (builder, "edit-action");
   g_signal_connect_swapped (edit_action, "activate",
-      G_CALLBACK (ogmrip_profile_manager_dialog_edit_button_activated), dialog);
+      G_CALLBACK (ogmrip_profile_manager_dialog_edit_activated), dialog);
   g_signal_connect (dialog->priv->selection, "changed",
       G_CALLBACK (ogmrip_profile_manager_dialog_set_action_sensitivity), edit_action);
 
   action = gtk_builder_get_object (builder, "add-action");
   g_signal_connect_swapped (action, "activate",
-      G_CALLBACK (ogmrip_profile_manager_dialog_add_action_activated), dialog);
+      G_CALLBACK (ogmrip_profile_manager_dialog_add_activated), dialog);
 
   action = gtk_builder_get_object (builder, "remove-action");
   g_object_bind_property (edit_action, "sensitive", action, "sensitive", 0);
   g_signal_connect_swapped (action, "activate",
-      G_CALLBACK (ogmrip_profile_manager_dialog_remove_action_activated), dialog);
+      G_CALLBACK (ogmrip_profile_manager_dialog_remove_activated), dialog);
 
   action = gtk_builder_get_object (builder, "copy-action");
   g_object_bind_property (edit_action, "sensitive", action, "sensitive", 0);
   g_signal_connect_swapped (action, "activate",
-      G_CALLBACK (ogmrip_profile_manager_dialog_copy_action_activated), dialog);
+      G_CALLBACK (ogmrip_profile_manager_dialog_copy_activated), dialog);
 
   action = gtk_builder_get_object (builder, "rename-action");
   g_object_bind_property (edit_action, "sensitive", action, "sensitive", 0);
   g_signal_connect_swapped (action, "activate",
-      G_CALLBACK (ogmrip_profile_manager_dialog_rename_action_activated), dialog);
+      G_CALLBACK (ogmrip_profile_manager_dialog_rename_activated), dialog);
 
   action = gtk_builder_get_object (builder, "export-action");
   g_object_bind_property (edit_action, "sensitive", action, "sensitive", 0);
   g_signal_connect_swapped (action, "activate",
-      G_CALLBACK (ogmrip_profile_manager_dialog_export_action_activated), dialog);
+      G_CALLBACK (ogmrip_profile_manager_dialog_export_activated), dialog);
 
   action = gtk_builder_get_object (builder, "import-action");
   g_signal_connect_swapped (action, "activate",
-      G_CALLBACK (ogmrip_profile_manager_dialog_import_action_activated), dialog);
+      G_CALLBACK (ogmrip_profile_manager_dialog_import_activated), dialog);
 
   g_object_unref (builder);
 }
