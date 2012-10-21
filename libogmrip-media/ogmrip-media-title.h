@@ -76,6 +76,8 @@ struct _OGMRipTitleInterface
                                                 OGMRipTitleCallback callback,
                                                 gpointer            user_data,
                                                 GError              **error);
+  gboolean            (* is_copy)              (OGMRipTitle         *title,
+                                                OGMRipTitle         *copy);
 };
 
 GType               ogmrip_title_get_type             (void) G_GNUC_CONST;
@@ -122,8 +124,8 @@ OGMRipMedia *       ogmrip_title_copy                 (OGMRipTitle         *titl
                                                        OGMRipTitleCallback callback,
                                                        gpointer            user_data,
                                                        GError              **error);
-gboolean            ogmrip_title_equal                (OGMRipTitle         *title1,
-                                                       OGMRipTitle         *title2);
+gboolean            ogmrip_title_is_copy              (OGMRipTitle         *title,
+                                                       OGMRipTitle         *copy);
 
 G_END_DECLS
 

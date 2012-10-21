@@ -82,21 +82,6 @@ ogmrip_codec_error_quark (void)
   return quark;
 }
 
-static gboolean
-ogmrip_stream_equal (OGMRipStream *stream1, OGMRipStream *stream2)
-{
-  if (OGMRIP_IS_VIDEO_STREAM (stream1) && OGMRIP_IS_VIDEO_STREAM (stream2))
-    return ogmrip_video_stream_equal ((OGMRipVideoStream *) stream1, (OGMRipVideoStream *) stream2);
-
-  if (OGMRIP_IS_AUDIO_STREAM (stream1) && OGMRIP_IS_AUDIO_STREAM (stream2))
-    return ogmrip_audio_stream_equal ((OGMRipAudioStream *) stream1, (OGMRipAudioStream *) stream2);
-
-  if (OGMRIP_IS_SUBP_STREAM (stream1) && OGMRIP_IS_SUBP_STREAM (stream2))
-    return ogmrip_subp_stream_equal ((OGMRipSubpStream *) stream1, (OGMRipSubpStream *) stream2);
-
-  return FALSE;
-}
-
 static void
 ogmrip_codec_set_input (OGMRipCodec *codec, OGMRipStream *input)
 {
@@ -104,7 +89,7 @@ ogmrip_codec_set_input (OGMRipCodec *codec, OGMRipStream *input)
   {
     if (codec->priv->input)
     {
-      g_return_if_fail (ogmrip_stream_equal (input, codec->priv->input));
+      g_return_if_fail (ogmrip_stream_is_copy (codec->priv->input, input));
 
       g_object_unref (codec->priv->input);
     }

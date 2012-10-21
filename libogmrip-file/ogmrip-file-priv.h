@@ -28,6 +28,7 @@ G_BEGIN_DECLS
 
 struct _OGMRipFilePriv
 {
+  gchar *id;
   gchar *uri;
   gchar *path;
   gchar *label;
@@ -73,23 +74,25 @@ struct _OGMRipMediaFilePriv
   GList *subp_streams;
 };
 
-void ogmrip_media_info_get_file_info    (OGMRipMediaInfo     *info,
-                                         OGMRipFilePriv      *file);
-gint ogmrip_media_info_get_video_format (OGMRipMediaInfo     *info,
-                                         guint               track);
-void ogmrip_media_info_get_video_info   (OGMRipMediaInfo     *info,
-                                         guint               track,
-                                         OGMRipVideoFilePriv *video);
-gint ogmrip_media_info_get_audio_format (OGMRipMediaInfo     *info,
-                                         guint               track);
-void ogmrip_media_info_get_audio_info   (OGMRipMediaInfo     *info,
-                                         guint               track,
-                                         OGMRipAudioFilePriv *audio);
-gint ogmrip_media_info_get_subp_format  (OGMRipMediaInfo     *info,
-                                         guint               track);
-void ogmrip_media_info_get_subp_info    (OGMRipMediaInfo     *info,
-                                         guint               track,
-                                         OGMRipSubpFilePriv  *subp);
+gchar * g_file_get_id (GFile *file);
+
+void    ogmrip_media_info_get_file_info    (OGMRipMediaInfo     *info,
+                                            OGMRipFilePriv      *file);
+gint    ogmrip_media_info_get_video_format (OGMRipMediaInfo     *info,
+                                            guint               track);
+void    ogmrip_media_info_get_video_info   (OGMRipMediaInfo     *info,
+                                            guint               track,
+                                            OGMRipVideoFilePriv *video);
+gint    ogmrip_media_info_get_audio_format (OGMRipMediaInfo     *info,
+                                            guint               track);
+void    ogmrip_media_info_get_audio_info   (OGMRipMediaInfo     *info,
+                                            guint               track,
+                                            OGMRipAudioFilePriv *audio);
+gint    ogmrip_media_info_get_subp_format  (OGMRipMediaInfo     *info,
+                                            guint               track);
+void    ogmrip_media_info_get_subp_info    (OGMRipMediaInfo     *info,
+                                            guint               track,
+                                            OGMRipSubpFilePriv  *subp);
 
 G_END_DECLS
 

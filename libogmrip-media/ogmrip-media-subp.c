@@ -119,13 +119,3 @@ ogmrip_subp_stream_get_nr (OGMRipSubpStream *subp)
   return iface->get_nr (subp);
 }
 
-gboolean
-ogmrip_subp_stream_equal (OGMRipSubpStream *subp1, OGMRipSubpStream *subp2)
-{
-  if (ogmrip_subp_stream_get_nr (subp1) != ogmrip_subp_stream_get_nr (subp2))
-    return FALSE;
-
-  return ogmrip_title_equal (ogmrip_stream_get_title (OGMRIP_STREAM (subp1)),
-      ogmrip_stream_get_title (OGMRIP_STREAM (subp2)));
-}
-

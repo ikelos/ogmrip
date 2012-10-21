@@ -37,6 +37,8 @@ struct _OGMRipStreamInterface
   gint          (* get_format) (OGMRipStream *stream);
   gint          (* get_id)     (OGMRipStream *stream);
   OGMRipTitle * (* get_title)  (OGMRipStream *stream);
+  gboolean      (* is_copy)    (OGMRipStream *stream,
+                                OGMRipStream *copy);
 };
 
 GType          ogmrip_stream_get_type   (void) G_GNUC_CONST;
@@ -44,6 +46,8 @@ gint           ogmrip_stream_get_format (OGMRipStream *stream);
 gint           ogmrip_stream_get_id     (OGMRipStream *stream);
 OGMRipTitle *  ogmrip_stream_get_title  (OGMRipStream *stream);
 const gchar *  ogmrip_stream_get_uri    (OGMRipStream *stream);
+gboolean       ogmrip_stream_is_copy    (OGMRipStream *stream,
+                                         OGMRipStream *copy);
 
 G_END_DECLS
 

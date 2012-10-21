@@ -168,7 +168,6 @@ static gboolean
 ogmdvd_disc_copy_exists (OGMDvdDisc *disc, const gchar *path)
 {
   OGMRipMedia *media;
-  const gchar *id1, *id2;
   gboolean retval;
 
   if (!g_file_test (path, G_FILE_TEST_IS_DIR))
@@ -178,10 +177,7 @@ ogmdvd_disc_copy_exists (OGMDvdDisc *disc, const gchar *path)
   if (!media)
     return FALSE;
 
-  id1 = ogmrip_media_get_id (OGMRIP_MEDIA (disc));
-  id2 = ogmrip_media_get_id (media);
-
-  retval = id1 && id2 && g_str_equal (id1, id2);
+  retval = g_str_equal (ogmrip_media_get_id (OGMRIP_MEDIA (disc)), ogmrip_media_get_id (media));
 
   g_object_unref (media);
 

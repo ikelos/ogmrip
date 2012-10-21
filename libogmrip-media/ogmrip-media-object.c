@@ -109,15 +109,18 @@ const gchar *
 ogmrip_media_get_id (OGMRipMedia *media)
 {
   OGMRipMediaInterface *iface;
+  const gchar *id = NULL;
 
   g_return_val_if_fail (OGMRIP_IS_MEDIA (media), NULL);
 
   iface = OGMRIP_MEDIA_GET_IFACE (media);
 
-  if (!iface->get_id)
-    return NULL;
+  if (iface->get_id)
+    id = iface->get_id (media);
 
-  return iface->get_id (media);
+  g_assert (id != NULL);
+
+  return id;
 }
 
 gint64
@@ -202,6 +205,7 @@ ogmrip_media_copy (OGMRipMedia *media, const gchar *path, GCancellable *cancella
     OGMRipMediaCallback callback, gpointer user_data, GError **error)
 {
   OGMRipMediaInterface *iface;
+  OGMRipMedia *copy;
 
   g_return_val_if_fail (OGMRIP_IS_MEDIA (media), NULL);
   g_return_val_if_fail (path != NULL, NULL);
@@ -213,7 +217,27 @@ ogmrip_media_copy (OGMRipMedia *media, const gchar *path, GCancellable *cancella
   if (!iface->copy)
     return NULL;
 
-  return iface->copy (media, path, cancellable, callback, user_data, error);
+  copy = iface->copy (media, path, cancellable, callback, user_data, error);
+  if (copy)
+    g_object_set_data_full (G_OBJECT (copy), "__copy_from__", g_object_ref (media), g_object_unref);
+
+  return copy;
+}
+
+gboolean
+ogmrip_media_is_copy (OGMRipMedia *media, OGMRipMedia *copy)
+{
+  OGMRipMediaInterface *iface;
+
+  g_return_val_if_fail (OGMRIP_IS_MEDIA (media), FALSE);
+  g_return_val_if_fail (OGMRIP_IS_MEDIA (copy), FALSE);
+
+  iface = OGMRIP_MEDIA_GET_IFACE (media);
+
+  if (iface->is_copy)
+    return iface->is_copy (media, copy);
+
+  return media == g_object_get_data (G_OBJECT (copy), "__copy_from__");
 }
 
 OGMRipMedia *
@@ -240,14 +264,5 @@ ogmrip_media_new (const gchar *path)
   g_free (types);
 
   return media;
-}
-
-gboolean
-ogmrip_media_equal (OGMRipMedia *media1, OGMRipMedia *media2)
-{
-  g_return_val_if_fail (OGMRIP_IS_MEDIA (media1), FALSE);
-  g_return_val_if_fail (OGMRIP_IS_MEDIA (media2), FALSE);
-
-  return g_str_equal (ogmrip_media_get_id (media1), ogmrip_media_get_id (media2));
 }
 

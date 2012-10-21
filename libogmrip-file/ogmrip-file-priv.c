@@ -281,3 +281,22 @@ ogmrip_media_info_get_subp_info (OGMRipMediaInfo *info, guint track, OGMRipSubpF
   subp->label = str ? g_strdup (str) : NULL;
 }
 
+gchar *
+g_file_get_id (GFile *file)
+{
+  GFileInfo *info;
+  const gchar *str;
+  gchar *id = NULL;
+
+  info = g_file_query_info (file, G_FILE_ATTRIBUTE_ID_FILE, G_FILE_QUERY_INFO_NONE, NULL, NULL);
+  if (!info)
+    return NULL;
+
+  str = g_file_info_get_attribute_string (info, G_FILE_ATTRIBUTE_ID_FILE);
+  if (str)
+    id = g_strdup (str);
+  g_object_unref (info);
+
+  return id;
+}
+

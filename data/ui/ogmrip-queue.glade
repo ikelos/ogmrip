@@ -1,6 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface>
   <!-- interface-requires gtk+ 3.0 -->
+  <object class="GtkAction" id="export-action">
+    <property name="label" translatable="yes">_Export</property>
+    <property name="tooltip" translatable="yes">Export selected encodings</property>
+    <property name="icon_name">document-save-symbolic</property>
+    <property name="sensitive">False</property>
+  </object>
+  <object class="GtkAction" id="import-action">
+    <property name="label" translatable="yes">_Import</property>
+    <property name="tooltip" translatable="yes">Import existing encodings</property>
+    <property name="icon_name">list-add-symbolic</property>
+  </object>
+  <object class="GtkAction" id="move-down-action">
+    <property name="label" translatable="yes">Move _down</property>
+    <property name="tooltip" translatable="yes">Move the current encoding down</property>
+    <property name="icon_name">go-down-symbolic</property>
+    <property name="sensitive">False</property>
+  </object>
+  <object class="GtkAction" id="move-to-bottom-action">
+    <property name="label" translatable="yes">Move to _bottom</property>
+    <property name="tooltip" translatable="yes">Move the current encoding to the bottom</property>
+    <property name="icon_name">go-bottom-symbolic</property>
+    <property name="sensitive">False</property>
+  </object>
+  <object class="GtkAction" id="move-to-top-action">
+    <property name="label" translatable="yes">Move to _top</property>
+    <property name="tooltip" translatable="yes">Move the current encoding to the top</property>
+    <property name="icon_name">go-top-symbolic</property>
+    <property name="sensitive">False</property>
+  </object>
+  <object class="GtkAction" id="move-up-action">
+    <property name="label" translatable="yes">Move _up</property>
+    <property name="tooltip" translatable="yes">Move the current encoding up</property>
+    <property name="icon_name">go-up-symbolic</property>
+    <property name="sensitive">False</property>
+  </object>
+  <object class="GtkAction" id="remove-action">
+    <property name="label" translatable="yes">_Remove</property>
+    <property name="tooltip" translatable="yes">Remove the current encoding</property>
+    <property name="icon_name">list-remove-symbolic</property>
+    <property name="sensitive">False</property>
+  </object>
+  <object class="GtkAction" id="remove-all-action">
+    <property name="label" translatable="yes">Remove _all</property>
+    <property name="tooltip" translatable="yes">Remove all the encodings</property>
+    <property name="icon_name">edit-clear-symbolic</property>
+    <property name="sensitive">False</property>
+  </object>
+  <object class="GtkMenu" id="popup">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <child>
+      <object class="GtkMenuItem" id="export-menu">
+        <property name="related_action">export-action</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="remove-menu">
+        <property name="related_action">remove-action</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="remove-all-menu">
+        <property name="related_action">remove-all-action</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+      </object>
+    </child>
+  </object>
   <object class="GtkBox" id="root">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
@@ -28,6 +100,7 @@
         <property name="orientation">vertical</property>
         <child>
           <object class="GtkScrolledWindow" id="swin">
+            <property name="height_request">250</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="hexpand">True</property>
@@ -57,15 +130,12 @@
             <property name="can_focus">False</property>
             <property name="icon_size">1</property>
             <child>
-              <object class="GtkToolButton" id="remove-button">
+              <object class="GtkToolButton" id="import-button">
+                <property name="related_action">import-action</property>
                 <property name="visible">True</property>
-                <property name="sensitive">False</property>
                 <property name="can_focus">False</property>
-                <property name="has_tooltip">True</property>
-                <property name="tooltip_markup" translatable="yes">Remove</property>
-                <property name="tooltip_text" translatable="yes">Remove</property>
+                <property name="related_action">import-action</property>
                 <property name="use_underline">True</property>
-                <property name="icon_name">list-remove-symbolic</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -73,15 +143,14 @@
               </packing>
             </child>
             <child>
-              <object class="GtkToolButton" id="clear-button">
+              <object class="GtkToolButton" id="remove-button">
+                <property name="related_action">remove-action</property>
                 <property name="visible">True</property>
-                <property name="sensitive">False</property>
                 <property name="can_focus">False</property>
                 <property name="has_tooltip">True</property>
-                <property name="tooltip_markup" translatable="yes">Remove all</property>
-                <property name="tooltip_text" translatable="yes">Remove all</property>
+                <property name="tooltip_markup" translatable="yes">Remove</property>
+                <property name="related_action">remove-action</property>
                 <property name="use_underline">True</property>
-                <property name="icon_name">edit-clear-symbolic</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -90,14 +159,13 @@
             </child>
             <child>
               <object class="GtkToolButton" id="top-button">
+                <property name="related_action">move-to-top-action</property>
                 <property name="visible">True</property>
-                <property name="sensitive">False</property>
                 <property name="can_focus">False</property>
                 <property name="has_tooltip">True</property>
                 <property name="tooltip_markup" translatable="yes">Move to top</property>
-                <property name="tooltip_text" translatable="yes">Move to top</property>
+                <property name="related_action">move-to-top-action</property>
                 <property name="use_underline">True</property>
-                <property name="icon_name">go-top-symbolic</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -106,14 +174,13 @@
             </child>
             <child>
               <object class="GtkToolButton" id="up-button">
+                <property name="related_action">move-up-action</property>
                 <property name="visible">True</property>
-                <property name="sensitive">False</property>
                 <property name="can_focus">False</property>
                 <property name="has_tooltip">True</property>
                 <property name="tooltip_markup" translatable="yes">Move up</property>
-                <property name="tooltip_text" translatable="yes">Move up</property>
+                <property name="related_action">move-up-action</property>
                 <property name="use_underline">True</property>
-                <property name="icon_name">go-up-symbolic</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -122,14 +189,13 @@
             </child>
             <child>
               <object class="GtkToolButton" id="down-button">
+                <property name="related_action">move-down-action</property>
                 <property name="visible">True</property>
-                <property name="sensitive">False</property>
                 <property name="can_focus">False</property>
                 <property name="has_tooltip">True</property>
                 <property name="tooltip_markup" translatable="yes">Move down</property>
-                <property name="tooltip_text" translatable="yes">Move down</property>
+                <property name="related_action">move-down-action</property>
                 <property name="use_underline">True</property>
-                <property name="icon_name">go-down-symbolic</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -138,14 +204,13 @@
             </child>
             <child>
               <object class="GtkToolButton" id="bottom-button">
+                <property name="related_action">move-to-bottom-action</property>
                 <property name="visible">True</property>
-                <property name="sensitive">False</property>
                 <property name="can_focus">False</property>
                 <property name="has_tooltip">True</property>
                 <property name="tooltip_markup" translatable="yes">Move to bottom</property>
-                <property name="tooltip_text" translatable="yes">Move to bottom</property>
+                <property name="related_action">move-to-bottom-action</property>
                 <property name="use_underline">True</property>
-                <property name="icon_name">go-bottom-symbolic</property>
               </object>
               <packing>
                 <property name="expand">False</property>
