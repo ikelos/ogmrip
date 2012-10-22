@@ -387,6 +387,7 @@ ogmrip_title_copy (OGMRipTitle *title, const gchar *path, GCancellable *cancella
     OGMRipTitleCallback callback, gpointer user_data, GError **error)
 {
   OGMRipTitleInterface *iface;
+  OGMRipMedia *copy;
 
   g_return_val_if_fail (OGMRIP_IS_TITLE (title), NULL);
   g_return_val_if_fail (path != NULL, NULL);
@@ -398,7 +399,11 @@ ogmrip_title_copy (OGMRipTitle *title, const gchar *path, GCancellable *cancella
   if (!iface->copy)
     return NULL;
 
-  return iface->copy (title, path, cancellable, callback, user_data, error);
+  copy = iface->copy (title, path, cancellable, callback, user_data, error);
+  if (copy)
+    g_object_set_data_full (G_OBJECT (copy), "__copy_from__", g_object_ref (title), g_object_unref);
+
+  return copy;
 }
 
 gboolean
@@ -417,6 +422,7 @@ ogmrip_title_is_copy (OGMRipTitle *title, OGMRipTitle *copy)
   if (ogmrip_title_get_nr (title) != ogmrip_title_get_nr (copy))
     return FALSE;
 
-  return ogmrip_media_is_copy (ogmrip_title_get_media (title), ogmrip_title_get_media (copy));
+  return title == g_object_get_data (G_OBJECT (copy), "__copy_from__") ||
+    ogmrip_media_is_copy (ogmrip_title_get_media (title), ogmrip_title_get_media (copy));
 }
 
