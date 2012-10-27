@@ -196,7 +196,7 @@ ogmrip_profile_editor_subp_options_button_clicked (OGMRipProfileEditorDialog *ed
 }
 
 static void
-ogmrip_profile_editor_dialog_container_setting_changed (GtkWidget *chooser, GSettings *settings);
+ogmrip_profile_editor_dialog_container_setting_changed (GtkWidget *chooser, const gchar *key, GSettings *settings);
 
 static void
 ogmrip_profile_editor_dialog_container_chooser_changed (GtkWidget *chooser, GSettings *settings)
@@ -216,7 +216,7 @@ ogmrip_profile_editor_dialog_container_chooser_changed (GtkWidget *chooser, GSet
 }
 
 static void
-ogmrip_profile_editor_dialog_container_setting_changed (GtkWidget *chooser, GSettings *settings)
+ogmrip_profile_editor_dialog_container_setting_changed (GtkWidget *chooser, const gchar *key, GSettings *settings)
 {
   gchar *name;
 
@@ -232,7 +232,7 @@ ogmrip_profile_editor_dialog_container_setting_changed (GtkWidget *chooser, GSet
 }
 
 static void
-ogmrip_profile_editor_dialog_codec_setting_changed (GtkWidget *chooser, GSettings *settings);
+ogmrip_profile_editor_dialog_codec_setting_changed (GtkWidget *chooser, const gchar *key, GSettings *settings);
 
 static void
 ogmrip_profile_editor_dialog_codec_chooser_changed (GtkWidget *chooser, GSettings *settings)
@@ -250,7 +250,7 @@ ogmrip_profile_editor_dialog_codec_chooser_changed (GtkWidget *chooser, GSetting
 }
 
 static void
-ogmrip_profile_editor_dialog_codec_setting_changed (GtkWidget *chooser, GSettings *settings)
+ogmrip_profile_editor_dialog_codec_setting_changed (GtkWidget *chooser, const gchar *key, GSettings *settings)
 {
   gchar *name;
 
@@ -553,7 +553,7 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
   dialog->priv->container_chooser = gtk_builder_get_widget (builder, "container-combo");
   ogmrip_type_chooser_widget_construct (GTK_COMBO_BOX (dialog->priv->container_chooser), OGMRIP_TYPE_CONTAINER);
 
-  ogmrip_profile_editor_dialog_container_setting_changed (dialog->priv->container_chooser, settings);
+  ogmrip_profile_editor_dialog_container_setting_changed (dialog->priv->container_chooser, OGMRIP_PROFILE_CONTAINER, settings);
 
   g_signal_connect (dialog->priv->container_chooser, "changed",
       G_CALLBACK (ogmrip_profile_editor_dialog_container_chooser_changed), settings);
@@ -621,7 +621,7 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
   dialog->priv->video_chooser = gtk_builder_get_widget (builder, "video-codec-combo");
   ogmrip_type_chooser_widget_construct (GTK_COMBO_BOX (dialog->priv->video_chooser), OGMRIP_TYPE_VIDEO_CODEC);
 
-  ogmrip_profile_editor_dialog_codec_setting_changed (dialog->priv->video_chooser, settings);
+  ogmrip_profile_editor_dialog_codec_setting_changed (dialog->priv->video_chooser, OGMRIP_PROFILE_CODEC, settings);
 
   g_signal_connect (dialog->priv->video_chooser, "changed",
       G_CALLBACK (ogmrip_profile_editor_dialog_codec_chooser_changed), settings);
@@ -749,7 +749,7 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
   dialog->priv->audio_chooser = gtk_builder_get_widget (builder, "audio-codec-combo");
   ogmrip_type_chooser_widget_construct (GTK_COMBO_BOX (dialog->priv->audio_chooser), OGMRIP_TYPE_AUDIO_CODEC);
 
-  ogmrip_profile_editor_dialog_codec_setting_changed (dialog->priv->audio_chooser, settings);
+  ogmrip_profile_editor_dialog_codec_setting_changed (dialog->priv->audio_chooser, OGMRIP_PROFILE_CODEC, settings);
 
   g_signal_connect (dialog->priv->audio_chooser, "changed",
       G_CALLBACK (ogmrip_profile_editor_dialog_codec_chooser_changed), settings);
@@ -803,7 +803,7 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
   dialog->priv->subp_chooser = gtk_builder_get_widget (builder, "subp-codec-combo");
   ogmrip_type_chooser_widget_construct (GTK_COMBO_BOX (dialog->priv->subp_chooser), OGMRIP_TYPE_SUBP_CODEC);
 
-  ogmrip_profile_editor_dialog_codec_setting_changed (dialog->priv->subp_chooser, settings);
+  ogmrip_profile_editor_dialog_codec_setting_changed (dialog->priv->subp_chooser, OGMRIP_PROFILE_CODEC, settings);
 
   g_signal_connect (dialog->priv->subp_chooser, "changed",
       G_CALLBACK (ogmrip_profile_editor_dialog_codec_chooser_changed), settings);
