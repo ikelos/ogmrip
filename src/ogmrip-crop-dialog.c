@@ -91,33 +91,27 @@ ogmrip_crop_dialog_crop_frame (OGMRipCropDialog *dialog)
 static void
 ogmrip_crop_dialog_grab_frame (OGMRipCropDialog *dialog, gulong frame)
 {
-  OGMJobTask *task;
-  GPtrArray *argv;
-  guint position;
+  GFile *file;
 
-  position = (guint) (frame * dialog->priv->rate_denominator / (gdouble) dialog->priv->rate_numerator);
-  argv = ogmrip_mplayer_grab_frame_command (dialog->priv->title, position, dialog->priv->deint);
-
-  task = ogmjob_spawn_newv ((gchar **) g_ptr_array_free (argv, FALSE));
-  if (ogmjob_task_run (task, NULL, NULL))
+  file = ogmrip_title_grab_frame (dialog->priv->title, frame, NULL, NULL);
+  if (file)
   {
     gchar *filename;
 
-    filename = g_build_filename (ogmrip_fs_get_tmp_dir (), "00000001.jpg", NULL);
-    if (g_file_test (filename, G_FILE_TEST_IS_REGULAR))
-    {
-      if (dialog->priv->pixbuf)
-        g_object_unref (dialog->priv->pixbuf);
-      dialog->priv->pixbuf = gdk_pixbuf_new_from_file_at_size (filename, 
-          dialog->priv->raw_width * SCALE_FACTOR, dialog->priv->raw_height * SCALE_FACTOR, NULL);
-      g_unlink (filename);
-    }
+    if (dialog->priv->pixbuf)
+      g_object_unref (dialog->priv->pixbuf);
+
+    filename = g_file_get_path (file);
+    dialog->priv->pixbuf = gdk_pixbuf_new_from_file_at_size (filename,
+        dialog->priv->raw_width * SCALE_FACTOR, dialog->priv->raw_height * SCALE_FACTOR, NULL);
     g_free (filename);
+
+    g_file_delete (file, NULL, NULL);
+    g_object_unref (file);
 
     if (dialog->priv->pixbuf)
       ogmrip_crop_dialog_crop_frame (dialog);
   }
-  g_object_unref (task);
 }
 
 static void

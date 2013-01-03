@@ -222,13 +222,6 @@ OGMDvdDisc * ogmdvd_disc_copy (OGMDvdDisc          *disc,
 
 gulong ogmdvd_time_to_msec (dvd_time_t *dtime);
 
-GSList * g_ulist_add_min           (GSList *ulist,
-                                    gint   val);
-GSList * g_ulist_add_max           (GSList *ulist,
-                                    gint   val);
-gint     g_ulist_get_most_frequent (GSList *ulist);
-void     g_ulist_free              (GSList *ulist);
-
 G_END_DECLS
 
 #endif /* __OGMDVD_PRIV_H__ */
