@@ -477,6 +477,12 @@ ogmrip_options_dialog_crop_button_clicked (OGMRipOptionsDialog *parent)
 }
 
 static void
+ogmrip_progress_dialog_progress_cb (OGMJobTask *spawn, GParamSpec *pspec, OGMRipProgressDialog *dialog)
+{
+  ogmrip_progress_dialog_set_fraction (dialog, ogmjob_task_get_progress (spawn));
+}
+
+static void
 ogmrip_progress_dialog_response_cb (OGMRipProgressDialog *dialog, gint response_id, GCancellable *cancellable)
 {
   g_cancellable_cancel (cancellable);
@@ -501,8 +507,11 @@ ogmrip_options_dialog_autocrop_button_clicked (OGMRipOptionsDialog *parent)
     gtk_window_present (GTK_WINDOW (dialog));
 
     ogmrip_progress_dialog_set_message (OGMRIP_PROGRESS_DIALOG (dialog), _("Analyzing video stream"));
+    ogmrip_progress_dialog_set_fraction (OGMRIP_PROGRESS_DIALOG (dialog), 0.0);
 
     task = ogmrip_analyze_new (parent->priv->title);
+    g_signal_connect (task, "notify::progress",
+        G_CALLBACK (ogmrip_progress_dialog_progress_cb), dialog);
 
     cancellable = g_cancellable_new ();
     g_signal_connect (dialog, "response", G_CALLBACK (ogmrip_progress_dialog_response_cb), cancellable);
@@ -515,12 +524,14 @@ ogmrip_options_dialog_autocrop_button_clicked (OGMRipOptionsDialog *parent)
     if (result)
     {
       OGMRipVideoStream *stream;
-      guint x, y, w, h;
+      guint x, y, w, h, rw, rh;
 
       stream = ogmrip_title_get_video_stream (parent->priv->title);
       ogmrip_video_stream_get_crop_size (stream, &x, &y, &w, &h);
 
-      ogmrip_options_dialog_set_crop (parent, x, y, w, h);
+      ogmrip_video_stream_get_resolution (ogmrip_title_get_video_stream (parent->priv->title), &rw, &rh);
+
+      ogmrip_options_dialog_set_crop (parent, x, y, rw > x + w ? rw - w - x : 0, rh > h + y ? rh - h - y : 0);
       ogmrip_options_dialog_update_scale_combo (parent);
 
       gtk_widget_set_sensitive (parent->priv->autocrop_button, FALSE);
