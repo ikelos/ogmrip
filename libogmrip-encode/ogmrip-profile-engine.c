@@ -274,6 +274,21 @@ ogmrip_profile_engine_get_default (void)
   return default_engine;
 }
 
+static gboolean
+ogmrip_profile_is_new_version (OGMRipProfile *profile, OGMRipXML *xml, guint *new_minor, guint *new_major)
+{
+  GVariant *variant;
+  guint current_major, current_minor;
+
+  g_settings_get (G_SETTINGS (profile), OGMRIP_PROFILE_VERSION, "(uu)", &current_major, &current_minor);
+
+  variant = ogmrip_xml_get_variant (xml, OGMRIP_PROFILE_VERSION, "(uu)");
+  g_variant_get (variant, "(uu)", new_major, new_minor);
+  g_variant_unref (variant);
+
+  return *new_major > current_major || (*new_major == current_major && *new_minor > current_minor);
+}
+
 static void
 ogmrip_profile_engine_load_file (OGMRipProfileEngine *engine, const gchar *filename)
 {
@@ -291,32 +306,25 @@ ogmrip_profile_engine_load_file (OGMRipProfileEngine *engine, const gchar *filen
     if (name)
     {
       OGMRipProfile *profile;
-      gboolean load = TRUE;
 
       profile = ogmrip_profile_engine_get (engine, name);
       if (profile)
       {
-        GVariant *variant;
-        guint major1, minor1, major2, minor2;
+        guint major, minor;
 
-        g_settings_get (G_SETTINGS (profile), OGMRIP_PROFILE_VERSION, "(uu)", &major1, &minor1);
+        g_object_set (profile, "file", file, NULL);
 
-        variant = ogmrip_xml_get_variant (xml, OGMRIP_PROFILE_VERSION, "(uu)");
-        g_variant_get (variant, "(uu)", &major2, &minor2);
-        g_variant_unref (variant);
-
-        load = FALSE;
-        if (major2 > major1 || (major2 == major1 && minor2 > minor1))
+        if (ogmrip_profile_is_new_version (profile, xml, &major, &minor))
         {
+          gboolean load = FALSE;
+
           g_signal_emit (engine, signals[UPDATE], 0, profile, &load);
           if (load)
-            ogmrip_profile_engine_remove (engine, profile);
-          else
-            g_settings_set (G_SETTINGS (profile), OGMRIP_PROFILE_VERSION, "(uu)", major2, minor2);
+            ogmrip_profile_reset (profile);
+          g_settings_set (G_SETTINGS (profile), OGMRIP_PROFILE_VERSION, "(uu)", major, minor);
         }
       }
-
-      if (load)
+      else
       {
         profile = ogmrip_profile_new_from_file (file, NULL);
         ogmrip_profile_engine_add (engine, profile);
