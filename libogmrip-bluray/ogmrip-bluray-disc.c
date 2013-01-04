@@ -192,25 +192,11 @@ ogmbr_disc_set_property (GObject *gobject, guint prop_id, const GValue *value, G
 }
 
 static void
-ogmbr_disc_dispose (GObject *gobject)
+ogmbr_disc_finalize (GObject *gobject)
 {
   OGMBrDisc *disc = OGMBR_DISC (gobject);
 
   ogmrip_media_close (OGMRIP_MEDIA (gobject));
-
-  if (disc->priv->monitor)
-  {
-    g_object_unref (disc->priv->monitor);
-    disc->priv->monitor = NULL;
-  }
-
-  G_OBJECT_CLASS (ogmbr_disc_parent_class)->dispose (gobject);
-}
-
-static void
-ogmbr_disc_finalize (GObject *gobject)
-{
-  OGMBrDisc *disc = OGMBR_DISC (gobject);
 
   g_free (disc->priv->label);
   g_free (disc->priv->device);
@@ -237,7 +223,6 @@ ogmbr_disc_class_init (OGMBrDiscClass *klass)
   gobject_class->constructor = ogmbr_disc_constructor;
   gobject_class->get_property = ogmbr_disc_get_property;
   gobject_class->set_property = ogmbr_disc_set_property;
-  gobject_class->dispose = ogmbr_disc_dispose;
   gobject_class->finalize = ogmbr_disc_finalize;
 
   g_object_class_override_property (gobject_class, PROP_URI, "uri");
@@ -338,23 +323,6 @@ ogmbr_disc_get_nth_title (OGMRipMedia *media, guint nr)
   return g_list_nth_data (OGMBR_DISC (media)->priv->titles, nr);
 }
 
-static void
-ogmbr_disc_device_changed_cb (GFileMonitor *monitor, GFile *file, GFile *other_file, GFileMonitorEvent event_type, OGMBrDisc *disc)
-{
-  if (event_type == G_FILE_MONITOR_EVENT_DELETED)
-  {
-    g_free (disc->priv->device);
-    disc->priv->device = disc->priv->orig_device;
-    disc->priv->orig_device = NULL;
-
-    g_free (disc->priv->uri);
-    disc->priv->uri = disc->priv->orig_uri;
-    disc->priv->orig_uri = NULL;
-
-    g_object_unref (monitor);
-  }
-}
-
 static gboolean
 ogmbr_disc_copy_exists (OGMBrDisc *disc, const gchar *path)
 {
@@ -378,22 +346,21 @@ ogmbr_disc_copy_exists (OGMBrDisc *disc, const gchar *path)
   return retval;
 }
 
-static gboolean
+static OGMRipMedia *
 ogmbr_disc_copy (OGMRipMedia *media, const gchar *path, GCancellable *cancellable,
     OGMRipMediaCallback callback, gpointer user_data, GError **error)
 {
-  OGMBrDisc *disc = OGMBR_DISC (media);
+  OGMBrDisc *disc = OGMBR_DISC (media), *copy;
   struct stat buf;
-  GFile *file;
 
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
-    return FALSE;
+    return NULL;
 
   if (g_stat (disc->priv->device, &buf) != 0)
-    return FALSE;
+    return NULL;
 
   if (!S_ISBLK (buf.st_mode))
-    return TRUE;
+    return NULL;
 
   if (!ogmbr_disc_copy_exists (disc, path))
   {
@@ -417,28 +384,18 @@ ogmbr_disc_copy (OGMRipMedia *media, const gchar *path, GCancellable *cancellabl
     g_object_unref (mmkv);
 
     if (!retval)
-      return FALSE;
+      return NULL;
   }
 
-  g_free (disc->priv->orig_device);
-  disc->priv->orig_device = disc->priv->device;
-  disc->priv->device = g_strdup (path);
+  copy = g_object_new (OGMBR_TYPE_DISC, "uri", path, NULL);
 
-  g_free (disc->priv->orig_uri);
-  disc->priv->orig_uri = disc->priv->uri;
-  disc->priv->uri = g_strdup_printf ("br://%s", path);
+  if (!copy->priv->id || !g_str_equal (copy->priv->id, disc->priv->id))
+  {
+    copy->priv->real_id = copy->priv->id;
+    copy->priv->id = g_strdup (disc->priv->id);
+  }
 
-  if (disc->priv->monitor)
-    g_object_unref (disc->priv->monitor);
-
-  file = g_file_new_for_path (path);
-  disc->priv->monitor = g_file_monitor_file (file, G_FILE_MONITOR_NONE, NULL, NULL);
-  g_object_unref (file);
-
-  g_signal_connect (disc->priv->monitor, "changed",
-      G_CALLBACK (ogmbr_disc_device_changed_cb), disc);
-
-  return TRUE;
+  return OGMRIP_MEDIA (copy);
 }
 
 static void

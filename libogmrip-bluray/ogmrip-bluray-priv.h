@@ -32,18 +32,15 @@ struct _OGMBrDiscPriv
 {
   guint nr;
   gchar *id;
+  gchar *real_id;
   gchar *uri;
-  gchar *orig_uri;
   gchar *device;
-  gchar *orig_device;
   guint ntitles;
   GList *titles;
 
   guint type;
   gchar *label;
   gboolean is_open;
-
-  GFileMonitor *monitor;
 };
 
 struct _OGMBrTitlePriv
@@ -68,7 +65,16 @@ struct _OGMBrTitlePriv
   guint raw_height;
   guint rate_num;
   guint rate_denom;
+  guint crop_x;
+  guint crop_y;
+  guint crop_width;
+  guint crop_height;
   gint bitrate;
+
+  gboolean analyzed;
+  gboolean interlaced;
+  gboolean progressive;
+  gboolean telecine;
 };
 
 struct _OGMBrAudioStreamPriv

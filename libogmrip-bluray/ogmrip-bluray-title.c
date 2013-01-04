@@ -133,6 +133,24 @@ ogmbr_title_get_resolution (OGMRipVideoStream *video, guint *width, guint *heigh
     *height = title->priv->raw_height;
 }
 
+static void
+ogmbr_title_get_crop_size (OGMRipVideoStream *video, guint *x, guint *y, guint *width, guint *height)
+{
+  OGMBrTitle *title = OGMBR_TITLE (video);
+
+  if (x)
+    *x = title->priv->crop_x;
+
+  if (y)
+    *y = title->priv->crop_y;
+
+  if (width)
+    *width = title->priv->crop_width;
+
+  if (height)
+    *height = title->priv->crop_height;
+}
+
 static gint
 ogmbr_title_get_bitrate (OGMRipVideoStream *video)
 {
@@ -145,9 +163,7 @@ ogmbr_video_stream_iface_init (OGMRipVideoStreamInterface *iface)
   iface->get_aspect_ratio = ogmbr_title_get_aspect_ratio;
   iface->get_framerate    = ogmbr_title_get_framerate;
   iface->get_resolution   = ogmbr_title_get_resolution;
-/*
   iface->get_crop_size    = ogmbr_title_get_crop_size;
-*/
   iface->get_aspect_ratio = ogmbr_title_get_aspect_ratio;
   iface->get_bitrate      = ogmbr_title_get_bitrate;
 }
@@ -253,6 +269,68 @@ ogmbr_title_get_nth_subp_stream (OGMRipTitle *title, guint nr)
   return g_list_nth_data (OGMBR_TITLE (title)->priv->subp_streams, nr);
 }
 
+static gboolean
+ogmbr_title_get_progressive (OGMRipTitle *title)
+{
+  return OGMBR_TITLE (title)->priv->progressive;
+}
+
+static gboolean
+ogmbr_title_get_telecine (OGMRipTitle *title)
+{
+  return OGMBR_TITLE (title)->priv->telecine;
+}
+
+static gboolean
+ogmbr_title_get_interlaced (OGMRipTitle *title)
+{
+  return OGMBR_TITLE (title)->priv->interlaced;
+}
+
+typedef struct
+{
+  OGMRipTitleCallback callback;
+  gpointer user_data;
+} OGMBrAnalyze;
+
+static void
+ogmbr_title_benchmark_cb (OGMRipTitle *title, gdouble percent, OGMBrAnalyze *analyze)
+{
+  analyze->callback (title, percent / 2.0, analyze->user_data);
+}
+
+static void
+ogmbr_title_crop_detect_cb (OGMRipTitle *title, gdouble percent, OGMBrAnalyze *analyze)
+{
+  analyze->callback (title, 0.5 + percent / 2.0, analyze->user_data);
+}
+
+static gboolean
+ogmbr_title_analyze (OGMRipTitle *title, GCancellable *cancellable, OGMRipTitleCallback callback, gpointer user_data, GError **error)
+{
+  OGMBrTitle *dtitle = OGMBR_TITLE (title);
+  OGMBrAnalyze analyze = { callback, user_data };
+
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return FALSE;
+
+  if (dtitle->priv->analyzed)
+    return TRUE;
+
+  if (!ogmrip_title_benchmark (title, &dtitle->priv->progressive, &dtitle->priv->telecine,
+        &dtitle->priv->interlaced, cancellable, (OGMRipTitleCallback) ogmbr_title_benchmark_cb, &analyze, error))
+    return FALSE;
+
+  if (!ogmrip_title_crop_detect (title, &dtitle->priv->crop_x, &dtitle->priv->crop_y,
+        &dtitle->priv->crop_width, &dtitle->priv->crop_height, cancellable,
+        (OGMRipTitleCallback) ogmbr_title_crop_detect_cb, &analyze, error))
+    return FALSE;
+
+  dtitle->priv->analyzed = TRUE;
+
+  return TRUE;
+}
+
 static void
 ogmbr_title_iface_init (OGMRipTitleInterface *iface)
 {
@@ -273,11 +351,9 @@ ogmbr_title_iface_init (OGMRipTitleInterface *iface)
   iface->get_nth_audio_stream = ogmbr_title_get_nth_audio_stream;
   iface->get_n_subp_streams   = ogmbr_title_get_n_subp_streams;
   iface->get_nth_subp_stream  = ogmbr_title_get_nth_subp_stream;
-/*
   iface->get_progressive      = ogmbr_title_get_progressive;
   iface->get_telecine         = ogmbr_title_get_telecine;
   iface->get_interlaced       = ogmbr_title_get_interlaced;
   iface->analyze              = ogmbr_title_analyze;
-*/
 }
 
