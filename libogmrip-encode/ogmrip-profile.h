@@ -66,6 +66,7 @@ OGMRipProfile * ogmrip_profile_copy          (OGMRipProfile *profile,
 gboolean        ogmrip_profile_export        (OGMRipProfile *profile,
                                               GFile         *file,
                                               GError        **error);
+void            ogmrip_profile_reset         (OGMRipProfile *profile);
 void            ogmrip_profile_get           (OGMRipProfile *profile,
                                               const gchar   *section,
                                               const gchar   *key,

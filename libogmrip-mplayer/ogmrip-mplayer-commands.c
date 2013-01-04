@@ -64,7 +64,6 @@ ogmrip_mplayer_set_input (GPtrArray *argv, OGMRipTitle *title)
   }
   else
     g_warning ("Unknown scheme for '%s'", uri);
-
 }
 
 static gint
@@ -1056,48 +1055,5 @@ ogmrip_mplayer_watch_stderr (OGMJobTask *task, const gchar *buffer, OGMRipVideoC
   }
 
   return TRUE;
-}
-
-GPtrArray *
-ogmrip_mplayer_grab_frame_command (OGMRipTitle *title, guint position, gboolean deint)
-{
-  GPtrArray *argv;
-
-  argv = g_ptr_array_new ();
-  g_ptr_array_add (argv, g_strdup ("mplayer"));
-  g_ptr_array_add (argv, g_strdup ("-nolirc"));
-  g_ptr_array_add (argv, g_strdup ("-nocache"));
-  g_ptr_array_add (argv, g_strdup ("-nosound"));
-  g_ptr_array_add (argv, g_strdup ("-nozoom"));
-
-  if (ogmrip_check_mplayer_nosub ())
-    g_ptr_array_add (argv, g_strdup ("-nosub"));
-
-  g_ptr_array_add (argv, g_strdup ("-vo"));
-
-  g_ptr_array_add (argv, g_strdup_printf ("jpeg:outdir=%s", ogmrip_fs_get_tmp_dir ()));
-
-  g_ptr_array_add (argv, g_strdup ("-frames"));
-  g_ptr_array_add (argv, g_strdup ("1"));
-
-  g_ptr_array_add (argv, g_strdup ("-speed"));
-  g_ptr_array_add (argv, g_strdup ("100"));
-
-  if (deint)
-  {
-    g_ptr_array_add (argv, g_strdup ("-vf"));
-    g_ptr_array_add (argv, g_strdup ("pp=lb"));
-  }
-/*
-  time_ = (gint) (frame * dialog->priv->rate_denominator / (gdouble) dialog->priv->rate_numerator);
-*/
-  g_ptr_array_add (argv, g_strdup ("-ss"));
-  g_ptr_array_add (argv, g_strdup_printf ("%u", position));
-
-  ogmrip_mplayer_set_input (argv, title);
-
-  g_ptr_array_add (argv, NULL);
-
-  return argv;
 }
 
