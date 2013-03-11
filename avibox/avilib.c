@@ -3196,7 +3196,7 @@ static const char *avi_errors[] =
   /* 12 */ "avilib - AVI file has no video data",
   /* 13 */ "avilib - operation needs an index",
   /* 14 */ "avilib - destination buffer is too small",
-  /* 15 */ "avilib - Unkown Error"
+  /* 15 */ "avilib - Unknown Error"
 };
 static int num_avi_errors = sizeof(avi_errors)/sizeof(char*);
 
