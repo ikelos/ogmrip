@@ -35,14 +35,14 @@ typedef struct _OGMRipApplicationPriv  OGMRipApplicationPriv;
 
 struct _OGMRipApplication
 {
-  GtkDialog parent_instance;
+  GApplication parent_instance;
 
   OGMRipApplicationPriv *priv;
 };
 
 struct _OGMRipApplicationClass
 {
-  GtkDialogClass parent_class;
+  GApplicationClass parent_class;
 };
 
 GType          ogmrip_application_get_type     (void);
