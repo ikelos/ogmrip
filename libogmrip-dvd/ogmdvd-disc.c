@@ -305,8 +305,8 @@ static OGMDvdAudioStream *
 ogmdvd_audio_stream_new (OGMDvdTitle *title, ifo_handle_t *vts_file, guint nr, guint real_nr)
 {
   OGMDvdAudioStream *stream;
-
   audio_attr_t *attr;
+  guint16 pgcn;
 
   stream = g_object_new (OGMDVD_TYPE_AUDIO_STREAM, NULL);
   stream->priv->title = OGMRIP_TITLE (title);
@@ -321,7 +321,8 @@ ogmdvd_audio_stream_new (OGMDvdTitle *title, ifo_handle_t *vts_file, guint nr, g
   stream->priv->code_extension = attr->code_extension;
   stream->priv->lang_code = attr->lang_code;
 
-  stream->priv->id = vts_file->vts_pgcit->pgci_srp[title->priv->ttn - 1].pgc->audio_control[real_nr] >> 8 & 7;
+  pgcn = vts_file->vts_ptt_srpt->title[title->priv->ttn - 1].ptt[0].pgcn;
+  stream->priv->id = vts_file->vts_pgcit->pgci_srp[pgcn - 1].pgc->audio_control[real_nr] >> 8 & 7;
 
   return stream;
 }
@@ -331,6 +332,7 @@ ogmdvd_subp_stream_new (OGMDvdTitle *title, ifo_handle_t *vts_file, guint nr, gu
 {
   OGMDvdSubpStream *stream;
   subp_attr_t *attr;
+  guint16 pgcn;
 
   stream = g_object_new (OGMDVD_TYPE_SUBP_STREAM, NULL);
   stream->priv->title = OGMRIP_TITLE (title);
@@ -342,11 +344,13 @@ ogmdvd_subp_stream_new (OGMDvdTitle *title, ifo_handle_t *vts_file, guint nr, gu
   stream->priv->lang_extension = attr->lang_extension;
   stream->priv->lang_code = attr->lang_code;
 
+  pgcn = vts_file->vts_ptt_srpt->title[title->priv->ttn - 1].ptt[0].pgcn;
+
   stream->priv->id = nr;
   if (title->priv->display_aspect_ratio == 0) /* 4:3 */
-    stream->priv->id = vts_file->vts_pgcit->pgci_srp[title->priv->ttn - 1].pgc->subp_control[real_nr] >> 24 & 31;
+    stream->priv->id = vts_file->vts_pgcit->pgci_srp[pgcn - 1].pgc->subp_control[real_nr] >> 24 & 31;
   else if (title->priv->display_aspect_ratio == 3) /* 16:9 */
-    stream->priv->id = vts_file->vts_pgcit->pgci_srp[title->priv->ttn - 1].pgc->subp_control[real_nr] >> 8 & 31;
+    stream->priv->id = vts_file->vts_pgcit->pgci_srp[pgcn - 1].pgc->subp_control[real_nr] >> 8 & 31;
 
   return stream;
 }
@@ -424,7 +428,7 @@ ogmdvd_title_new (OGMDvdDisc *disc, dvd_reader_t *reader, ifo_handle_t *vmg_file
 
   for (i = 0; i < vts_file->vtsi_mat->nr_of_vts_audio_streams; i++)
   {
-    if (vts_file->vts_pgcit->pgci_srp[title->priv->ttn - 1].pgc->audio_control[i] & 0x8000)
+    if (vts_file->vts_pgcit->pgci_srp[pgcn - 1].pgc->audio_control[i] & 0x8000)
     {
       OGMDvdAudioStream *stream;
 
@@ -437,7 +441,7 @@ ogmdvd_title_new (OGMDvdDisc *disc, dvd_reader_t *reader, ifo_handle_t *vmg_file
 
   for (i = 0; i < vts_file->vtsi_mat->nr_of_vts_subp_streams; i++)
   {
-    if (vts_file->vts_pgcit->pgci_srp[title->priv->ttn - 1].pgc->subp_control[i] & 0x80000000)
+    if (vts_file->vts_pgcit->pgci_srp[pgcn - 1].pgc->subp_control[i] & 0x80000000)
     {
       OGMDvdSubpStream *stream;
 
