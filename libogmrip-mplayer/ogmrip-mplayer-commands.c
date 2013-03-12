@@ -265,6 +265,8 @@ ogmrip_mplayer_wav_command (OGMRipAudioCodec *audio, gboolean header, const gcha
   g_return_val_if_fail (OGMRIP_IS_AUDIO_CODEC (audio), NULL);
   g_return_val_if_fail (output != NULL, NULL);
 
+  stream = ogmrip_codec_get_input (OGMRIP_CODEC (audio));
+
   argv = g_ptr_array_new ();
   g_ptr_array_add (argv, g_strdup ("mplayer"));
   g_ptr_array_add (argv, g_strdup ("-nolirc"));
@@ -305,7 +307,7 @@ ogmrip_mplayer_wav_command (OGMRipAudioCodec *audio, gboolean header, const gcha
     g_string_append (options, "volnorm=1");
 
   srate = ogmrip_audio_codec_get_sample_rate (audio);
-  if (srate != 48000)
+  if (srate != ogmrip_audio_stream_get_sample_rate (OGMRIP_AUDIO_STREAM (stream)))
   {
     g_ptr_array_add (argv, g_strdup ("-srate"));
     g_ptr_array_add (argv, g_strdup_printf ("%d", srate));
@@ -325,8 +327,6 @@ ogmrip_mplayer_wav_command (OGMRipAudioCodec *audio, gboolean header, const gcha
 
   g_ptr_array_add (argv, g_strdup ("-channels"));
   g_ptr_array_add (argv, g_strdup_printf ("%d", ogmrip_audio_codec_get_channels (audio) + 1));
-
-  stream = ogmrip_codec_get_input (OGMRIP_CODEC (audio));
 
   chap = ogmrip_mplayer_get_chapters (OGMRIP_CODEC (audio), ogmrip_stream_get_title (stream));
   if (chap)
