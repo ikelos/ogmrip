@@ -51,22 +51,37 @@ ogmrip_audio_copy_command (OGMRipAudioCodec *audio)
   OGMRipFile *output;
   GPtrArray *argv;
 
+  input  = ogmrip_codec_get_input (OGMRIP_CODEC (audio));
   output = ogmrip_codec_get_output (OGMRIP_CODEC (audio));
-  argv = ogmrip_mencoder_audio_command (audio, ogmrip_file_get_path (output));
 
-  g_ptr_array_add (argv, g_strdup ("-ovc"));
-  g_ptr_array_add (argv, g_strdup ("copy"));
+  if (ogmrip_stream_get_format (input) == OGMRIP_FORMAT_PCM)
+  {
+    ogmrip_audio_codec_set_fast (audio, FALSE);
+    ogmrip_audio_codec_set_normalize (audio, FALSE);
+    ogmrip_audio_codec_set_sample_rate (audio,
+        ogmrip_audio_stream_get_sample_rate (OGMRIP_AUDIO_STREAM (input)));
+    ogmrip_audio_codec_set_channels (audio,
+        ogmrip_audio_stream_get_channels (OGMRIP_AUDIO_STREAM (input)));
 
-  g_ptr_array_add (argv, g_strdup ("-of"));
-  g_ptr_array_add (argv, g_strdup ("rawaudio"));
+    argv = ogmrip_mplayer_wav_command (audio, FALSE, ogmrip_file_get_path (output));
+  }
+  else
+  {
+    argv = ogmrip_mencoder_audio_command (audio, ogmrip_file_get_path (output));
 
-  g_ptr_array_add (argv, g_strdup ("-oac"));
-  g_ptr_array_add (argv, g_strdup ("copy"));
+    g_ptr_array_add (argv, g_strdup ("-ovc"));
+    g_ptr_array_add (argv, g_strdup ("copy"));
 
-  input = ogmrip_codec_get_input (OGMRIP_CODEC (audio));
-  ogmrip_mplayer_set_input (argv, ogmrip_stream_get_title (input));
+    g_ptr_array_add (argv, g_strdup ("-of"));
+    g_ptr_array_add (argv, g_strdup ("rawaudio"));
 
-  g_ptr_array_add (argv, NULL);
+    g_ptr_array_add (argv, g_strdup ("-oac"));
+    g_ptr_array_add (argv, g_strdup ("copy"));
+
+    ogmrip_mplayer_set_input (argv, ogmrip_stream_get_title (input));
+
+    g_ptr_array_add (argv, NULL);
+  }
 
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
