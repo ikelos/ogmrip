@@ -972,8 +972,7 @@ ogmrip_x264_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   ogmjob_container_remove (OGMJOB_CONTAINER (task), queue);
 
   mbtree_file = g_strconcat (log_file, ".mbtree", NULL);
-  if (g_file_test (mbtree_file, G_FILE_TEST_EXISTS))
-    g_unlink (mbtree_file);
+  g_unlink (mbtree_file);
   g_free (mbtree_file);
 
   g_unlink (log_file);

@@ -1316,8 +1316,7 @@ ogmrip_encoding_get_file_size (OGMRipCodec *codec)
   guint64 size = 0;
 
   filename = ogmrip_file_get_path (ogmrip_codec_get_output (codec));
-  if (filename && g_file_test (filename, G_FILE_TEST_IS_REGULAR))
-    if (g_stat (filename, &buf) == 0)
+  if (filename && g_stat (filename, &buf) == 0)
       size = (guint64) buf.st_size;
 
   return size;

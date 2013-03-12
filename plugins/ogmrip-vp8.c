@@ -364,12 +364,10 @@ ogmrip_vp8_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 
   ogmjob_container_remove (OGMJOB_CONTAINER (task), queue);
 
-  if (g_file_test (fifo, G_FILE_TEST_EXISTS))
-    g_unlink (fifo);
+  g_unlink (fifo);
   g_free (fifo);
 
-  if (g_file_test (log_file, G_FILE_TEST_EXISTS))
-    g_unlink (log_file);
+  g_unlink (log_file);
   g_free (log_file);
 
   return result;

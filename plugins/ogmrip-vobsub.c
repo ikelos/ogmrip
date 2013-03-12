@@ -99,13 +99,11 @@ ogmrip_vobsub_finalize (GObject *gobject)
       gchar *filename;
 
       filename = g_strconcat (output, ".idx", NULL);
-      if (g_file_test (filename, G_FILE_TEST_IS_REGULAR))
-        g_unlink (filename);
+      g_unlink (filename);
       g_free (filename);
 
       filename = g_strconcat (output, ".sub", NULL);
-      if (g_file_test (filename, G_FILE_TEST_IS_REGULAR))
-        g_unlink (filename);
+      g_unlink (filename);
       g_free (filename);
     }
 */
@@ -228,10 +226,8 @@ ogmrip_vobsub_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
     idxname = g_strconcat (basename, ".idx", NULL);
     subname = g_strconcat (basename, ".sub", NULL);
 
-    if ((g_file_test (idxname, G_FILE_TEST_IS_REGULAR) &&
-         g_stat (idxname, &buf) == 0 && buf.st_size > 0) &&
-        (g_file_test (subname, G_FILE_TEST_IS_REGULAR) &&
-         g_stat (subname, &buf) == 0 && buf.st_size > 0))
+    if ((g_stat (idxname, &buf) == 0 && buf.st_size > 0) &&
+        (g_stat (subname, &buf) == 0 && buf.st_size > 0))
     {
       if (!ogmrip_vobsub_set_foo (task, basename, error))
         return FALSE;

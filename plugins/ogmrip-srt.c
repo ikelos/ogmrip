@@ -470,18 +470,15 @@ ogmrip_srt_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
     }
   }
 
-  if (g_file_test (xml_file, G_FILE_TEST_EXISTS))
-    g_unlink (xml_file);
+  g_unlink (xml_file);
   g_free (xml_file);
 
   xml_file = g_strconcat (tmp_file, ".idx", NULL);
-  if (g_file_test (xml_file, G_FILE_TEST_EXISTS))
-    g_unlink (xml_file);
+  g_unlink (xml_file);
   g_free (xml_file);
 
   xml_file = g_strconcat (tmp_file, ".sub", NULL);
-  if (g_file_test (xml_file, G_FILE_TEST_EXISTS))
-    g_unlink (xml_file);
+  g_unlink (xml_file);
   g_free (xml_file);
 
   dir = g_dir_open (ogmrip_fs_get_tmp_dir (), 0, NULL);

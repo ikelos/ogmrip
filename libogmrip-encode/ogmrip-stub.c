@@ -50,16 +50,12 @@ static gint64
 ogmrip_codec_get_size (OGMRipCodec *codec)
 {
   const gchar *output;
+  struct stat buf;
   gint64 size = 0;
 
   output = ogmrip_file_get_path (ogmrip_codec_get_output (codec));
-  if (g_file_test (output, G_FILE_TEST_IS_REGULAR))
-  {
-    struct stat buf;
-
-    if (g_stat (output, &buf) == 0)
-      size = buf.st_size;
-  }
+  if (g_stat (output, &buf) == 0)
+    size = buf.st_size;
 
   return size;
 }

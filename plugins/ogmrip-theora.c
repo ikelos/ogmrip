@@ -219,8 +219,7 @@ ogmrip_theora_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 
   ogmjob_container_remove (OGMJOB_CONTAINER (task), pipeline);
 
-  if (g_file_test (fifo, G_FILE_TEST_EXISTS))
-    g_unlink (fifo);
+  g_unlink (fifo);
   g_free (fifo);
 
   return result;
