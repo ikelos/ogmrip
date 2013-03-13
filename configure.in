@@ -2,8 +2,8 @@ dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.53)
 
-m4_define([ogmrip_major_version], [0])
-m4_define([ogmrip_minor_version], [14])
+m4_define([ogmrip_major_version], [1])
+m4_define([ogmrip_minor_version], [9])
 m4_define([ogmrip_micro_version], [0])
 m4_define([ogmrip_version], [ogmrip_major_version.ogmrip_minor_version.ogmrip_micro_version])
 
