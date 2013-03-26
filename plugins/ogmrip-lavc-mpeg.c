@@ -1,5 +1,5 @@
 /* OGMRipLavcMpeg - Mpeg 1, 2 and 4 plugins for OGMRip
- * Copyright (C) 2004-2012 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public

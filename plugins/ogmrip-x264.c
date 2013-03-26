@@ -1,5 +1,5 @@
-/* OGMRipX264 - A X264 plugin for OGMRip
- * Copyright (C) 2004-2012 Olivier Rolland <billl@users.sourceforge.net>
+/* OGMRipX264 - An X264 plugin for OGMRip
+ * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public

@@ -1,5 +1,5 @@
-/* OGMRipXvidOptions - A XviD options plugin for OGMRip
- * Copyright (C) 2004-2012 Olivier Rolland <billl@users.sourceforge.net>
+/* OGMRipXvidOptions - An XviD options plugin for OGMRip
+ * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redisectionibute it and/or
  * modify it under the terms of the GNU Lesser General Public

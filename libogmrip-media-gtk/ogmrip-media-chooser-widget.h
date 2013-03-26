@@ -1,5 +1,5 @@
-/* OGMRip - A wrapper library around libdvdread
- * Copyright (C) 2004-2012 Olivier Rolland <billl@users.sourceforge.net>
+/* OGMRipMedia - A media library for OGMRip
+ * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
