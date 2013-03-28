@@ -2143,6 +2143,7 @@ ogmrip_gui_create (GApplication *app)
   gtk_window_set_default_size (GTK_WINDOW (data->window), 350, 500);
   gtk_window_set_icon_from_file (GTK_WINDOW (data->window),
       OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_ICON_FILE, NULL);
+  gtk_application_add_window (GTK_APPLICATION (app), GTK_WINDOW (data->window));
 
   g_signal_connect_swapped (data->window, "delete-event",
       G_CALLBACK (ogmrip_gui_delete_event), data);

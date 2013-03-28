@@ -1,6 +1,6 @@
 [Desktop Entry]
-_Name=DVD Encoder OGMRip
-_Comment=A DVD encoder
+_Name=OGMRip
+_Comment=A media encoder
 Exec=ogmrip
 Icon=ogmrip
 StartupNotify=true
