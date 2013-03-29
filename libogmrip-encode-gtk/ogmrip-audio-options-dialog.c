@@ -28,8 +28,8 @@
 
 #include <glib/gi18n-lib.h>
 
-#define OGMRIP_GLADE_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-profile-editor.glade"
-#define OGMRIP_GLADE_ROOT "audio-page"
+#define OGMRIP_UI_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-profile-editor.ui"
+#define OGMRIP_UI_ROOT "audio-page"
 
 #define gtk_builder_get_widget(builder, name) \
     (GtkWidget *) gtk_builder_get_object ((builder), (name))
@@ -187,7 +187,7 @@ ogmrip_audio_options_dialog_init (OGMRipAudioOptionsDialog *dialog)
       OGMRIP_TYPE_AUDIO_OPTIONS_DIALOG, OGMRipAudioOptionsDialogPriv);
 
   builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))
+  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_UI_FILE, &error))
     g_error ("Couldn't load builder file: %s", error->message);
 
   gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE);
@@ -246,7 +246,7 @@ ogmrip_audio_options_dialog_init (OGMRipAudioOptionsDialog *dialog)
   gtk_widget_set_margin_left (dialog->priv->default_check, 12);
   gtk_widget_show (dialog->priv->default_check);
 
-  grid2 = gtk_builder_get_widget (builder, OGMRIP_GLADE_ROOT);
+  grid2 = gtk_builder_get_widget (builder, OGMRIP_UI_ROOT);
   gtk_container_set_border_width (GTK_CONTAINER (grid2), 0);
   gtk_widget_reparent (grid2, grid1);
   gtk_widget_show (grid2);

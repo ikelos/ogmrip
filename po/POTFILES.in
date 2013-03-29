@@ -1,18 +1,18 @@
 [encoding: UTF-8]
 
-data/ui/ogmrip-crop.glade
-data/ui/ogmrip-lavc.glade
-data/ui/ogmrip-main.glade
-data/ui/ogmrip-mp4.glade
-data/ui/ogmrip-options.glade
-data/ui/ogmrip-pref.glade
-data/ui/ogmrip-profile-editor.glade
-data/ui/ogmrip-profiles.glade
-data/ui/ogmrip-progress.glade
-data/ui/ogmrip-queue.glade
-data/ui/ogmrip-spell.glade
-data/ui/ogmrip-x264.glade
-data/ui/ogmrip-xvid.glade
+[type: gettext/glade]data/ui/ogmrip-crop-dialog.ui
+[type: gettext/glade]data/ui/ogmrip-encoding-manager-dialog.ui
+[type: gettext/glade]data/ui/ogmrip-lavc-options-dialog.ui
+[type: gettext/glade]data/ui/ogmrip-main-window.ui
+[type: gettext/glade]data/ui/ogmrip-mp4-options-dialog.ui
+[type: gettext/glade]data/ui/ogmrip-options-dialog.ui
+[type: gettext/glade]data/ui/ogmrip-pref-dialog.ui
+[type: gettext/glade]data/ui/ogmrip-profile-editor.ui
+[type: gettext/glade]data/ui/ogmrip-profile-manager-dialog.ui
+[type: gettext/glade]data/ui/ogmrip-progress-dialog.ui
+[type: gettext/glade]data/ui/ogmrip-spell-dialog.ui
+[type: gettext/glade]data/ui/ogmrip-x264-options-dialog.ui
+[type: gettext/glade]data/ui/ogmrip-xvid-options-dialog.ui
 data/ui/ogmrip.desktop.in
 
 libogmrip-base/ogmrip-fs.c

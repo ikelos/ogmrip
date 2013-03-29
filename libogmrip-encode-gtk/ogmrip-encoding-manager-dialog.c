@@ -26,8 +26,8 @@
 
 #include <glib/gi18n-lib.h>
 
-#define OGMRIP_GLADE_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-queue.glade"
-#define OGMRIP_GLADE_ROOT "root"
+#define OGMRIP_UI_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-encoding-manager-dialog.ui"
+#define OGMRIP_UI_ROOT "root"
 
 #define gtk_builder_get_widget(builder, name) \
     (GtkWidget *) gtk_builder_get_object ((builder), (name))
@@ -602,7 +602,7 @@ ogmrip_encoding_manager_dialog_init (OGMRipEncodingManagerDialog *dialog)
       OGMRIP_TYPE_ENCODING_MANAGER_DIALOG, OGMRipEncodingManagerDialogPriv);
 
   builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))
+  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_UI_FILE, &error))
   {
     g_warning ("Couldn't load builder file: %s", error->message);
     g_object_unref (builder);
@@ -620,7 +620,7 @@ ogmrip_encoding_manager_dialog_init (OGMRipEncodingManagerDialog *dialog)
 
   area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
 
-  widget = gtk_builder_get_widget (builder, OGMRIP_GLADE_ROOT);
+  widget = gtk_builder_get_widget (builder, OGMRIP_UI_ROOT);
   gtk_container_add (GTK_CONTAINER (area), widget);
   gtk_widget_show (widget);
 

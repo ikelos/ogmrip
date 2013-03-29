@@ -27,8 +27,8 @@
 
 #include <glib/gi18n.h>
 
-#define OGMRIP_GLADE_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-mp4.glade"
-#define OGMRIP_GLADE_ROOT "root"
+#define OGMRIP_UI_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-mp4-options-dialog.ui"
+#define OGMRIP_UI_ROOT "root"
 
 #define gtk_builder_get_widget(builder, name) \
     (GtkWidget *) gtk_builder_get_object ((builder), (name))
@@ -166,12 +166,12 @@ ogmrip_mp4_dialog_init (OGMRipMp4Dialog *dialog)
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
 
   builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))
+  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_UI_FILE, &error))
     g_error ("Couldn't load builder file: %s", error->message);
 
   misc = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
 
-  widget = gtk_builder_get_widget (builder, OGMRIP_GLADE_ROOT);
+  widget = gtk_builder_get_widget (builder, OGMRIP_UI_ROOT);
   gtk_container_add (GTK_CONTAINER (misc), widget);
   gtk_widget_show (widget);
 

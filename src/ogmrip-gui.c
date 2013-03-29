@@ -51,9 +51,9 @@ static gboolean debug = TRUE;
 static gboolean debug = FALSE;
 #endif
 
-#define OGMRIP_UI_FILE    "ogmrip"  G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-ui.xml"
-#define OGMRIP_GLADE_FILE "ogmrip"  G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-main.glade"
-#define OGMRIP_ICON_FILE  "pixmaps" G_DIR_SEPARATOR_S "ogmrip.png"
+#define OGMRIP_MENU_FILE "ogmrip"  G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-ui.xml"
+#define OGMRIP_UI_FILE   "ogmrip"  G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-main-window.ui"
+#define OGMRIP_ICON_FILE "pixmaps" G_DIR_SEPARATOR_S "ogmrip.png"
 
 #define OGMRIP_DEFAULT_FILE_NAME "movie"
 
@@ -2132,7 +2132,7 @@ ogmrip_gui_create (GApplication *app)
   GtkUIManager *ui_manager;
 
   builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))
+  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_UI_FILE, &error))
     g_error ("Couldn't load builder file: %s", error->message);
 
   data = g_new0 (OGMRipData, 1);
@@ -2162,7 +2162,7 @@ ogmrip_gui_create (GApplication *app)
 
   gtk_ui_manager_insert_action_group (ui_manager, action_group, 0);
   gtk_ui_manager_add_ui_from_file (ui_manager,
-      OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_UI_FILE, NULL);
+      OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_MENU_FILE, NULL);
 
   accel_group = gtk_ui_manager_get_accel_group (ui_manager);
   gtk_window_add_accel_group (GTK_WINDOW (data->window), accel_group);

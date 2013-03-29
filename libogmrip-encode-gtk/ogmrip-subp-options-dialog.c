@@ -26,8 +26,8 @@
 
 #include <glib/gi18n-lib.h>
 
-#define OGMRIP_GLADE_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-profile-editor.glade"
-#define OGMRIP_GLADE_ROOT "subp-page"
+#define OGMRIP_UI_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-profile-editor.ui"
+#define OGMRIP_UI_ROOT "subp-page"
 
 #define gtk_builder_get_widget(builder, name) \
     (GtkWidget *) gtk_builder_get_object ((builder), (name))
@@ -185,7 +185,7 @@ ogmrip_subp_options_dialog_init (OGMRipSubpOptionsDialog *dialog)
       OGMRIP_TYPE_SUBP_OPTIONS_DIALOG, OGMRipSubpOptionsDialogPriv);
 
   builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))
+  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_UI_FILE, &error))
   {
     g_warning ("Couldn't load builder file: %s", error->message);
     g_object_unref (builder);
@@ -248,7 +248,7 @@ ogmrip_subp_options_dialog_init (OGMRipSubpOptionsDialog *dialog)
   gtk_widget_set_margin_left (dialog->priv->default_check, 12);
   gtk_widget_show (dialog->priv->default_check);
 
-  grid2 = gtk_builder_get_widget (builder, OGMRIP_GLADE_ROOT);
+  grid2 = gtk_builder_get_widget (builder, OGMRIP_UI_ROOT);
   gtk_container_set_border_width (GTK_CONTAINER (grid2), 0);
   gtk_widget_reparent (grid2, grid1);
   gtk_widget_show (grid2);

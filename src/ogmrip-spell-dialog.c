@@ -29,8 +29,8 @@
 #include <enchant.h>
 #include <glib/gi18n.h>
 
-#define OGMRIP_GLADE_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-spell.glade"
-#define OGMRIP_GLADE_ROOT "root"
+#define OGMRIP_UI_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-spell-dialog.ui"
+#define OGMRIP_UI_ROOT "root"
 
 #define OGMRIP_SPELL_DIALOG_GET_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_SPELL_DIALOG, OGMRipSpellDialogPriv))
@@ -190,7 +190,7 @@ ogmrip_spell_dialog_init (OGMRipSpellDialog *dialog)
   dialog->priv = OGMRIP_SPELL_DIALOG_GET_PRIVATE (dialog);
 
   builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))
+  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_UI_FILE, &error))
   {
     g_warning ("Couldn't load builder file: %s", error->message);
     g_object_unref (builder);
@@ -205,7 +205,7 @@ ogmrip_spell_dialog_init (OGMRipSpellDialog *dialog)
 
   area = gtk_dialog_get_action_area (GTK_DIALOG (dialog));
 
-  widget = gtk_builder_get_widget (builder, OGMRIP_GLADE_ROOT);
+  widget = gtk_builder_get_widget (builder, OGMRIP_UI_ROOT);
   gtk_container_add (GTK_CONTAINER (area), widget);
   gtk_widget_show (widget);
 

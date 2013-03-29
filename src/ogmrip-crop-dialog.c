@@ -29,8 +29,8 @@
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 
-#define OGMRIP_GLADE_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-crop.glade"
-#define OGMRIP_GLADE_ROOT "root"
+#define OGMRIP_UI_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-crop-dialog.ui"
+#define OGMRIP_UI_ROOT "root"
 
 #define SCALE_FACTOR 2 / 3
 
@@ -169,7 +169,7 @@ ogmrip_crop_dialog_init (OGMRipCropDialog *dialog)
   dialog->priv = OGMRIP_CROP_DIALOG_GET_PRIVATE (dialog);
 
   builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))
+  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_UI_FILE, &error))
     g_error ("Couldn't load builder file: %s", error->message);
 
   gtk_dialog_add_buttons (GTK_DIALOG (dialog),
@@ -180,7 +180,7 @@ ogmrip_crop_dialog_init (OGMRipCropDialog *dialog)
 
   area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
 
-  root = gtk_builder_get_widget (builder, OGMRIP_GLADE_ROOT);
+  root = gtk_builder_get_widget (builder, OGMRIP_UI_ROOT);
   gtk_container_add (GTK_CONTAINER (area), root);
   gtk_widget_show (root);
 

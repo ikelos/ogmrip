@@ -29,8 +29,8 @@
 #endif /* HAVE_LIBNOTIFY_SUPPORT */
 
 #define OGMRIP_ICON_FILE  "pixmaps" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip.png"
-#define OGMRIP_GLADE_FILE "ogmrip"  G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-progress.glade"
-#define OGMRIP_GLADE_ROOT "root"
+#define OGMRIP_UI_FILE "ogmrip"  G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-progress-dialog.ui"
+#define OGMRIP_UI_ROOT "root"
 
 #define gtk_builder_get_widget(builder, name) \
     (GtkWidget *) gtk_builder_get_object ((builder), (name))
@@ -172,7 +172,7 @@ ogmrip_progress_dialog_init (OGMRipProgressDialog *dialog)
       OGMRIP_TYPE_PROGRESS_DIALOG, OGMRipProgressDialogPriv);
 
   builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_GLADE_FILE, &error))
+  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_UI_FILE, &error))
   {
     g_warning ("Couldn't load builder file: %s", error->message);
     g_object_unref (builder);
@@ -192,7 +192,7 @@ ogmrip_progress_dialog_init (OGMRipProgressDialog *dialog)
 
   area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
 
-  root = gtk_builder_get_widget (builder, OGMRIP_GLADE_ROOT);
+  root = gtk_builder_get_widget (builder, OGMRIP_UI_ROOT);
   gtk_container_add (GTK_CONTAINER (area), root);
   gtk_widget_show (root);
 
