@@ -2,7 +2,7 @@ uidir = \
   $(datadir)/ogmrip/ui
 
 ui_DATA = \
-  ogmrip-ui.xml                     \
+  ogmrip-menu.ui                    \
   ogmrip-crop-dialog.ui             \
   ogmrip-main-window.ui             \
   ogmrip-options-dialog.ui          \

@@ -51,7 +51,7 @@ static gboolean debug = TRUE;
 static gboolean debug = FALSE;
 #endif
 
-#define OGMRIP_MENU_FILE "ogmrip"  G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-ui.xml"
+#define OGMRIP_MENU_FILE "ogmrip"  G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-menu.ui"
 #define OGMRIP_UI_FILE   "ogmrip"  G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-main-window.ui"
 #define OGMRIP_ICON_FILE "pixmaps" G_DIR_SEPARATOR_S "ogmrip.png"
 
@@ -74,8 +74,8 @@ typedef struct
   GtkWidget *relative_check;
   GtkWidget *angle_spin;
 
-  GtkAction *load_action;
-  GtkAction *extract_action;
+  GAction *load_action;
+  GAction *extract_action;
 
   GtkTreeModel *chapter_store;
 
@@ -354,7 +354,7 @@ ogmrip_gui_load_media (OGMRipData *data, OGMRipMedia *media)
     gtk_entry_set_text (GTK_ENTRY (data->title_entry),
         label ? label : _("Untitled"));
 
-    gtk_action_set_sensitive (data->extract_action, data->prepared);
+    g_simple_action_set_enabled (G_SIMPLE_ACTION (data->extract_action), data->prepared);
   }
 }
 
@@ -1966,7 +1966,7 @@ ogmrip_gui_chapter_selection_changed (OGMRipData *data)
     }
   }
 
-  gtk_action_set_sensitive (data->extract_action, sensitive);
+  g_simple_action_set_enabled (G_SIMPLE_ACTION (data->extract_action), sensitive);
   gtk_widget_set_sensitive (data->relative_check, sensitive && (start_chap > 0 || end_chap != -1));
 }
 
@@ -2007,24 +2007,6 @@ ogmrip_gui_destroyed (OGMRipData *data)
 }
 
 /*
- * When a menu item is selected
- */
-static void
-ogmrip_gui_item_selected (GtkWidget *item, GtkWidget *statusbar)
-{
-  gchar *hint;
-
-  hint = g_object_get_data (G_OBJECT (item), "__menu_hint__");
-  if (hint)
-  {
-    guint context_id;
-
-    context_id = gtk_statusbar_get_context_id (GTK_STATUSBAR (statusbar), "__menu_hint__");
-    gtk_statusbar_push (GTK_STATUSBAR (statusbar), context_id, hint);
-  }
-}
-
-/*
  * When the play signal is emitted
  */
 static void
@@ -2060,76 +2042,39 @@ ogmrip_gui_player_stop (OGMRipPlayer *player, GtkWidget *button)
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (button), FALSE);
 }
 
-/*
- * When a menu item is deselected
- */
-static void
-ogmrip_gui_item_deselected (GtkWidget *item, GtkWidget *statusbar)
-{
-  guint context_id;
-
-  context_id = gtk_statusbar_get_context_id (GTK_STATUSBAR (statusbar), "__menu_hint__");
-  gtk_statusbar_pop (GTK_STATUSBAR (statusbar), context_id);
-}
-
-static void
-ogmrip_gui_connect_proxy (GtkUIManager *uimanager, GtkAction *action, GtkWidget *proxy, GtkWidget *statusbar)
-{
-  if (GTK_IS_MENU_ITEM (proxy))
-  {
-    gchar *hint;
-
-    g_object_get (action, "tooltip", &hint, NULL);
-    if (hint)
-    {
-      g_object_set_data_full (G_OBJECT (proxy), "__menu_hint__", hint, (GDestroyNotify) g_free);
-
-      g_signal_connect (proxy, "select", G_CALLBACK (ogmrip_gui_item_selected), statusbar);
-      g_signal_connect (proxy, "deselect", G_CALLBACK (ogmrip_gui_item_deselected), statusbar);
-    }
-  }
-}
-
 static void
 ogmrip_gui_app_prepared (OGMRipData *data, GParamSpec *pspec, GApplication *app)
 {
-  gtk_action_set_sensitive (data->load_action, TRUE);
-  gtk_action_set_sensitive (data->extract_action, data->media != NULL);
+  g_simple_action_set_enabled (G_SIMPLE_ACTION (data->load_action), TRUE);
+  g_simple_action_set_enabled (G_SIMPLE_ACTION (data->extract_action), data->media != NULL);
 
   data->prepared = TRUE;
 }
 
+static GActionEntry win_entries[] =
+{
+  { "load",          NULL, NULL, NULL, NULL },
+  { "extract",       NULL, NULL, NULL, NULL },
+  { "open_chapters", NULL, NULL, NULL, NULL },
+  { "save_chapters", NULL, NULL, NULL, NULL },
+  { "select_all",    NULL, NULL, NULL, NULL },
+  { "deselect_all",  NULL, NULL, NULL, NULL },
+  { "encodings",     NULL, NULL, NULL, NULL },
+  { "profiles",      NULL, NULL, NULL, NULL },
+  { "preferences",   NULL, NULL, NULL, NULL },
+  { "about",         NULL, NULL, NULL, NULL },
+  { "quit",          NULL, NULL, NULL, NULL }
+};
+
 static OGMRipData *
 ogmrip_gui_create (GApplication *app)
 {
-  GtkActionEntry action_entries[] =
-  {
-    { "FileMenu",     NULL,                  N_("_File"),               NULL,          NULL,                             NULL },
-    { "Load",         GTK_STOCK_CDROM,       N_("_Load"),               "<ctl>L",      N_("Load a media"),               NULL },
-    { "Extract",      GTK_STOCK_CONVERT,     N_("E_xtract"),            "<ctl>Return", N_("Extract selected title"),     NULL },
-    { "OpenChapters", NULL,                  N_("_Import Chapters..."), NULL,          N_("Import chapter information"), NULL },
-    { "SaveChapters", NULL,                  N_("_Export Chapters..."), NULL,          N_("Export chapter information"), NULL },
-    { "Quit",         GTK_STOCK_QUIT,        NULL,                      NULL,          N_("Exit OGMRip"),                NULL },
-    { "EditMenu",     NULL,                  N_("_Edit"),               NULL,          NULL,                             NULL },
-    { "SelectAll",    NULL,                  N_("Select _All"),         "<ctl>A",      N_("Select all chapters"),        NULL },
-    { "DeselectAll",  NULL,                  N_("_Deselect All"),       "<ctl>D",      N_("Deselect all chapters"),      NULL },
-    { "Profiles",     NULL,                  N_("Pro_files"),           "<ctl>F",      N_("Edit the profiles"),          NULL },
-    { "Preferences",  GTK_STOCK_PREFERENCES, NULL,                      NULL,          N_("Edit the preferences"),       NULL },
-    { "Encodings",    NULL,                  N_("_Encodings"),          "<ctl>E",      N_("Edit the encodings"),         NULL },
-    { "HelpMenu",     NULL,                  N_("_Help"),               NULL,          NULL,                             NULL },
-    { "About",        GTK_STOCK_ABOUT,       N_("_About"),              NULL,          N_("About OGMRip"),               NULL },
-  };
-
   GError *error = NULL;
 
   OGMRipData *data;
   GtkWidget *widget, *child;
   GtkBuilder *builder;
-
-  GtkAction *action;
-  GtkActionGroup *action_group;
-  GtkAccelGroup *accel_group;
-  GtkUIManager *ui_manager;
+  GAction *action;
 
   builder = gtk_builder_new ();
   if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_UI_FILE, &error))
@@ -2150,45 +2095,26 @@ ogmrip_gui_create (GApplication *app)
   g_signal_connect_swapped (data->window, "destroy",
       G_CALLBACK (ogmrip_gui_destroyed), data);
 
-  action_group = gtk_action_group_new ("MenuActions");
-  gtk_action_group_set_translation_domain (action_group, GETTEXT_PACKAGE);
-  gtk_action_group_add_actions (action_group,
-      action_entries, G_N_ELEMENTS (action_entries), NULL);
+  g_action_map_add_action_entries (G_ACTION_MAP (data->window),
+      win_entries, G_N_ELEMENTS (win_entries), NULL);
 
-  ui_manager = gtk_ui_manager_new ();
-
-  widget = gtk_builder_get_widget (builder, "statusbar");
-  g_signal_connect (ui_manager, "connect-proxy", G_CALLBACK (ogmrip_gui_connect_proxy), widget);
-
-  gtk_ui_manager_insert_action_group (ui_manager, action_group, 0);
-  gtk_ui_manager_add_ui_from_file (ui_manager,
-      OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_MENU_FILE, NULL);
-
-  accel_group = gtk_ui_manager_get_accel_group (ui_manager);
-  gtk_window_add_accel_group (GTK_WINDOW (data->window), accel_group);
-
-  child = gtk_bin_get_child (GTK_BIN (data->window));
-
-  widget = gtk_ui_manager_get_widget (ui_manager, "/Menubar");
-  gtk_grid_attach (GTK_GRID (child), widget, 0, -1, 1, 1);
-
-  action = gtk_action_group_get_action (action_group, "Quit");
+  action = g_action_map_lookup_action (G_ACTION_MAP (data->window), "quit");
   g_signal_connect_swapped (action, "activate",
       G_CALLBACK (gtk_widget_destroy), data->window);
 
-  action = gtk_action_group_get_action (action_group, "Preferences");
+  action = g_action_map_lookup_action (G_ACTION_MAP (data->window), "preferences");
   g_signal_connect_swapped (action, "activate",
       G_CALLBACK (ogmrip_gui_pref_activated), data);
 
-  action = gtk_action_group_get_action (action_group, "Profiles");
+  action = g_action_map_lookup_action (G_ACTION_MAP (data->window), "profiles");
   g_signal_connect_swapped (action, "activate",
       G_CALLBACK (ogmrip_gui_profiles_activated), data);
 
-  action = gtk_action_group_get_action (action_group, "Encodings");
+  action = g_action_map_lookup_action (G_ACTION_MAP (data->window), "encodings");
   g_signal_connect_swapped (action, "activate",
       G_CALLBACK (ogmrip_gui_encodings_activated), data);
 
-  action = gtk_action_group_get_action (action_group, "About");
+  action = g_action_map_lookup_action (G_ACTION_MAP (data->window), "about");
   g_signal_connect_swapped (action, "activate",
       G_CALLBACK (ogmrip_gui_about_activated), data);
 
@@ -2202,40 +2128,40 @@ ogmrip_gui_create (GApplication *app)
   g_signal_connect_swapped (data->title_chooser, "changed",
       G_CALLBACK (ogmrip_gui_title_chooser_changed), data);
 
-  action = gtk_action_group_get_action (action_group, "OpenChapters");
+  action = g_action_map_lookup_action (G_ACTION_MAP (data->window), "open_chapters");
   g_object_bind_property (data->title_chooser, "sensitive",
-      action, "sensitive", G_BINDING_SYNC_CREATE);
+      action, "enabled", G_BINDING_SYNC_CREATE);
 
   g_signal_connect_swapped (action, "activate",
       G_CALLBACK (ogmrip_gui_import_chapters_activated), data);
 
-  action = gtk_action_group_get_action (action_group, "SaveChapters");
+  action = g_action_map_lookup_action (G_ACTION_MAP (data->window), "save_chapters");
   g_object_bind_property (data->title_chooser, "sensitive",
-      action, "sensitive", G_BINDING_SYNC_CREATE);
+      action, "enabled", G_BINDING_SYNC_CREATE);
 
   g_signal_connect_swapped (action, "activate",
       G_CALLBACK (ogmrip_gui_export_chapters_activated), data);
 
-  data->load_action =  gtk_action_group_get_action (action_group, "Load");
-  gtk_action_set_sensitive (data->load_action, FALSE);
+  data->load_action = g_action_map_lookup_action (G_ACTION_MAP (data->window), "load");
+  g_simple_action_set_enabled (G_SIMPLE_ACTION (data->load_action), FALSE);
 
   g_signal_connect_swapped (data->load_action, "activate",
       G_CALLBACK (ogmrip_gui_load_activated), data);
 
   widget = gtk_builder_get_widget (builder, "load-button");
-  gtk_activatable_set_related_action (GTK_ACTIVATABLE (widget), data->load_action);
+  gtk_actionable_set_detailed_action_name (GTK_ACTIONABLE (widget), "win.load");
 
-  data->extract_action =  gtk_action_group_get_action (action_group, "Extract");
-  gtk_action_set_sensitive (data->extract_action, FALSE);
+  data->extract_action = g_action_map_lookup_action (G_ACTION_MAP (data->window), "extract");
+  g_simple_action_set_enabled (G_SIMPLE_ACTION (data->extract_action), FALSE);
 
   g_signal_connect_swapped (data->extract_action, "activate",
       G_CALLBACK (ogmrip_gui_extract_activated), data);
 
   widget = gtk_builder_get_widget (builder, "extract-button");
-  gtk_activatable_set_related_action (GTK_ACTIVATABLE (widget), data->extract_action);
+  gtk_actionable_set_detailed_action_name (GTK_ACTIONABLE (widget), "win.extract");
 
   widget = gtk_builder_get_widget (builder, "play-button");
-  g_object_bind_property (data->extract_action, "sensitive",
+  g_object_bind_property (data->extract_action, "enabled",
       widget, "sensitive", G_BINDING_SYNC_CREATE);
 
   g_signal_connect_swapped (widget, "toggled",
@@ -2275,16 +2201,16 @@ ogmrip_gui_create (GApplication *app)
   g_signal_connect_swapped (data->chapter_store, "selection-changed",
       G_CALLBACK (ogmrip_gui_chapter_selection_changed), data);
 
-  action = gtk_action_group_get_action (action_group, "SelectAll");
+  action = g_action_map_lookup_action (G_ACTION_MAP (data->window), "select_all");
   g_object_bind_property (data->title_chooser, "sensitive",
-      action, "sensitive", G_BINDING_SYNC_CREATE);
+      action, "enabled", G_BINDING_SYNC_CREATE);
 
   g_signal_connect_swapped (action, "activate",
       G_CALLBACK (ogmrip_chapter_store_select_all), data->chapter_store);
 
-  action = gtk_action_group_get_action (action_group, "DeselectAll");
+  action = g_action_map_lookup_action (G_ACTION_MAP (data->window), "deselect_all");
   g_object_bind_property (data->title_chooser, "sensitive",
-      action, "sensitive", G_BINDING_SYNC_CREATE);
+      action, "enabled", G_BINDING_SYNC_CREATE);
 
   g_signal_connect_swapped (action, "activate",
       G_CALLBACK (ogmrip_chapter_store_deselect_all), data->chapter_store);
@@ -2301,9 +2227,23 @@ ogmrip_gui_create (GApplication *app)
   return data;
 }
 
-/*
- * When the application is activated
- */
+static void
+ogmrip_gui_startup_cb (GApplication *app)
+{
+  GError *error = NULL;
+  GtkBuilder *builder;
+  GObject *menu;
+
+  builder = gtk_builder_new ();
+  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_MENU_FILE, &error))
+    g_error ("Couldn't load builder file: %s", error->message);
+
+  menu = gtk_builder_get_object (builder, "win-menu");
+  gtk_application_set_menubar (GTK_APPLICATION (app), G_MENU_MODEL (menu));
+
+  g_object_unref (builder);
+}
+
 static void
 ogmrip_gui_activate_cb (GApplication *app)
 {
@@ -2446,6 +2386,8 @@ ogmrip_gui_new (const gchar *app_id)
       "flags", G_APPLICATION_HANDLES_OPEN,
       NULL);
 
+  g_signal_connect (app, "startup",
+      G_CALLBACK (ogmrip_gui_startup_cb), NULL);
   g_signal_connect (app, "activate",
       G_CALLBACK (ogmrip_gui_activate_cb), NULL);
   g_signal_connect (app, "open",

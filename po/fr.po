@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OGMRip\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-29 10:13+0100\n"
+"POT-Creation-Date: 2013-03-29 21:23+0100\n"
 "PO-Revision-Date: 2008-01-11 21:30+0100\n"
 "Last-Translator: Olivier Rolland <billl@users.sourceforge.net>\n"
 "Language-Team: French <fr@li.org>\n"
@@ -17,6 +17,65 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Launchpad-Export-Date: 2007-09-23 15:48+0000\n"
 "X-Generator: Launchpad (build Unknown)\n"
+
+#: ../data/ui/ogmrip-menu.ui.h:1
+msgid "_File"
+msgstr "_Fichier"
+
+#: ../data/ui/ogmrip-menu.ui.h:2 ../data/ui/ogmrip-main-window.ui.h:8
+#: ../libogmrip-media-gtk/ogmrip-media-chooser-dialog.c:150
+msgid "_Load"
+msgstr "_Charger"
+
+#: ../data/ui/ogmrip-menu.ui.h:3 ../data/ui/ogmrip-main-window.ui.h:9
+#: ../src/ogmrip-options-dialog.c:684
+msgid "E_xtract"
+msgstr "E_xtraire"
+
+#: ../data/ui/ogmrip-menu.ui.h:4
+msgid "_Import chapters..."
+msgstr "_Importer le chapitrage..."
+
+#: ../data/ui/ogmrip-menu.ui.h:5
+msgid "_Export chapters..."
+msgstr "_Exporter le chapitrage..."
+
+#: ../data/ui/ogmrip-menu.ui.h:6
+msgid "_Quit"
+msgstr "_Quitter"
+
+#: ../data/ui/ogmrip-menu.ui.h:7 ../data/ui/ogmrip-profile-editor.ui.h:51
+#: ../data/ui/ogmrip-profile-manager-dialog.ui.h:5
+msgid "_Edit"
+msgstr "_Éditer"
+
+#: ../data/ui/ogmrip-menu.ui.h:8
+msgid "Select _all"
+msgstr "Séléctionner _tout"
+
+#: ../data/ui/ogmrip-menu.ui.h:9
+msgid "_Deselect all"
+msgstr "_Déselectionner tout"
+
+#: ../data/ui/ogmrip-menu.ui.h:10
+msgid "Pro_files"
+msgstr "Pro_fils"
+
+#: ../data/ui/ogmrip-menu.ui.h:11
+msgid "_Encodings"
+msgstr "_Encodages"
+
+#: ../data/ui/ogmrip-menu.ui.h:12
+msgid "_Preferences"
+msgstr "_Préférences"
+
+#: ../data/ui/ogmrip-menu.ui.h:13
+msgid "_Help"
+msgstr "_Aide"
+
+#: ../data/ui/ogmrip-menu.ui.h:14
+msgid "_About"
+msgstr "À _propos"
 
 #: ../data/ui/ogmrip-crop-dialog.ui.h:1
 msgid "_Top"
@@ -355,17 +414,6 @@ msgstr "<b>Durée :</b>"
 #: ../data/ui/ogmrip-main-window.ui.h:7
 msgid "_Relative mode"
 msgstr "Mode _relatif"
-
-#: ../data/ui/ogmrip-main-window.ui.h:8
-#: ../libogmrip-media-gtk/ogmrip-media-chooser-dialog.c:150
-#: ../src/ogmrip-gui.c:2108
-msgid "_Load"
-msgstr "_Charger"
-
-#: ../data/ui/ogmrip-main-window.ui.h:9 ../src/ogmrip-gui.c:2109
-#: ../src/ogmrip-options-dialog.c:684
-msgid "E_xtract"
-msgstr "E_xtraire"
 
 #: ../data/ui/ogmrip-main-window.ui.h:10
 msgid "Angle:"
@@ -752,11 +800,6 @@ msgstr "_Qualité :"
 #: ../data/ui/ogmrip-profile-editor.ui.h:50
 msgid "_Passes:"
 msgstr "_Passes :"
-
-#: ../data/ui/ogmrip-profile-editor.ui.h:51
-#: ../data/ui/ogmrip-profile-manager-dialog.ui.h:5 ../src/ogmrip-gui.c:2113
-msgid "_Edit"
-msgstr "_Éditer"
 
 #: ../data/ui/ogmrip-profile-editor.ui.h:52
 msgid "1 audio +"
@@ -2105,86 +2148,6 @@ msgstr "Olivier Rolland <billl@users.sourceforge.net>"
 msgid "A DVD Encoder for GNOME"
 msgstr "Un encodeur de DVD pour GNOME"
 
-#: ../src/ogmrip-gui.c:2107
-msgid "_File"
-msgstr "_Fichier"
-
-#: ../src/ogmrip-gui.c:2108
-msgid "Load a media"
-msgstr "Charger un fichier multimedia"
-
-#: ../src/ogmrip-gui.c:2109
-msgid "Extract selected title"
-msgstr "Extrait le titre sélectionné"
-
-#: ../src/ogmrip-gui.c:2110
-msgid "_Import Chapters..."
-msgstr "_Importer le chapitrage..."
-
-#: ../src/ogmrip-gui.c:2110
-msgid "Import chapter information"
-msgstr "Importe un fichier de chapitrage"
-
-#: ../src/ogmrip-gui.c:2111
-msgid "_Export Chapters..."
-msgstr "_Exporter le chapitrage..."
-
-#: ../src/ogmrip-gui.c:2111
-msgid "Export chapter information"
-msgstr "Exporte le chapitrage"
-
-#: ../src/ogmrip-gui.c:2112
-msgid "Exit OGMRip"
-msgstr "Quitte OGMRip"
-
-#: ../src/ogmrip-gui.c:2114
-msgid "Select _All"
-msgstr "Séléctionner _tout"
-
-#: ../src/ogmrip-gui.c:2114
-msgid "Select all chapters"
-msgstr "Sélectionne tous les chapitres"
-
-#: ../src/ogmrip-gui.c:2115
-msgid "_Deselect All"
-msgstr "_Déselectionner tout"
-
-#: ../src/ogmrip-gui.c:2115
-msgid "Deselect all chapters"
-msgstr "Désélectionne tous les chapitres"
-
-#: ../src/ogmrip-gui.c:2116
-msgid "Pro_files"
-msgstr "Pro_fils"
-
-#: ../src/ogmrip-gui.c:2116
-msgid "Edit the profiles"
-msgstr "Éditer les profils"
-
-#: ../src/ogmrip-gui.c:2117
-msgid "Edit the preferences"
-msgstr "Edite les préférences"
-
-#: ../src/ogmrip-gui.c:2118
-msgid "_Encodings"
-msgstr "_Encodages"
-
-#: ../src/ogmrip-gui.c:2118
-msgid "Edit the encodings"
-msgstr "Édite les encodages"
-
-#: ../src/ogmrip-gui.c:2119
-msgid "_Help"
-msgstr "_Aide"
-
-#: ../src/ogmrip-gui.c:2120
-msgid "_About"
-msgstr "À _propos"
-
-#: ../src/ogmrip-gui.c:2120
-msgid "About OGMRip"
-msgstr "À propos de OGMRip"
-
 #: ../src/ogmrip-helper.c:87
 msgid "Please insert the DVD required to encode this title."
 msgstr "Veuillez insérer le DVD requis pour encoder ce titre."
@@ -2450,9 +2413,6 @@ msgstr "MEncoder est compilé sans support XviD"
 #: ../plugins/ogmrip-xvid-options.c:284
 msgid "XviD Options"
 msgstr "XviD Options"
-
-#~ msgid "DVD Encoder OGMRip"
-#~ msgstr "Encodeur de DVD OGMRip"
 
 #~ msgid "Edit"
 #~ msgstr "Éditer"

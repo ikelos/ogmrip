@@ -1,5 +1,6 @@
 [encoding: UTF-8]
 
+[type: gettext/glade]data/ui/ogmrip-menu.ui
 [type: gettext/glade]data/ui/ogmrip-crop-dialog.ui
 [type: gettext/glade]data/ui/ogmrip-encoding-manager-dialog.ui
 [type: gettext/glade]data/ui/ogmrip-lavc-options-dialog.ui
@@ -13,6 +14,7 @@
 [type: gettext/glade]data/ui/ogmrip-spell-dialog.ui
 [type: gettext/glade]data/ui/ogmrip-x264-options-dialog.ui
 [type: gettext/glade]data/ui/ogmrip-xvid-options-dialog.ui
+
 data/ui/ogmrip.desktop.in
 
 libogmrip-base/ogmrip-fs.c

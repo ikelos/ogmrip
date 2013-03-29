@@ -1,0 +1,79 @@
+<interface>
+  <menu id="win-menu">
+    <submenu>
+      <attribute name="label" translatable="yes">_File</attribute>
+      <section>
+        <item>
+          <attribute name="label" translatable="yes">_Load</attribute>
+          <attribute name="action">win.load</attribute>
+          <attribute name="accel">&lt;Primary&gt;l</attribute>
+        </item>
+        <item>
+          <attribute name="label" translatable="yes">E_xtract</attribute>
+          <attribute name="action">win.extract</attribute>
+          <attribute name="accel">&lt;Primary&gt;Return</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name="label" translatable="yes">_Import chapters...</attribute>
+          <attribute name="action">win.open_chapters</attribute>
+        </item>
+        <item>
+          <attribute name="label" translatable="yes">_Export chapters...</attribute>
+          <attribute name="action">win.save_chapters</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name="label" translatable="yes">_Quit</attribute>
+          <attribute name="action">win.quit</attribute>
+          <attribute name="accel">&lt;Primary&gt;q</attribute>
+        </item>
+      </section>
+    </submenu>
+    <submenu>
+      <attribute name="label" translatable="yes">_Edit</attribute>
+      <section>
+        <item>
+          <attribute name="label" translatable="yes">Select _all</attribute>
+          <attribute name="action">win.select_all</attribute>
+          <attribute name="accel">&lt;Primary&gt;a</attribute>
+        </item>
+        <item>
+          <attribute name="label" translatable="yes">_Deselect all</attribute>
+          <attribute name="action">win.deselect_all</attribute>
+          <attribute name="accel">&lt;Primary&gt;d</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name="label" translatable="yes">Pro_files</attribute>
+          <attribute name="action">win.profiles</attribute>
+          <attribute name="accel">&lt;Primary&gt;f</attribute>
+        </item>
+        <item>
+          <attribute name="label" translatable="yes">_Encodings</attribute>
+          <attribute name="action">win.encodings</attribute>
+          <attribute name="accel">&lt;Primary&gt;e</attribute>
+        </item>
+      </section>
+      <section>
+        <item>
+          <attribute name="label" translatable="yes">_Preferences</attribute>
+          <attribute name="action">win.preferences</attribute>
+        </item>
+      </section>
+    </submenu>
+    <submenu>
+      <attribute name="label" translatable="yes">_Help</attribute>
+      <section>
+        <item>
+          <attribute name="label" translatable="yes">_About</attribute>
+          <attribute name="action">win.about</attribute>
+        </item>
+      </section>
+    </submenu>
+  </menu>
+</interface>
+
