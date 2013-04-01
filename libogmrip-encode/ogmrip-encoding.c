@@ -124,7 +124,7 @@ static void   ogmrip_encoding_complete      (OGMRipEncoding       *encoding,
                                              OGMJobTask           *task,
                                              OGMRipEncodingStatus result);
 
-guint signals[LAST_SIGNAL] = { 0 };
+static guint signals[LAST_SIGNAL] = { 0 };
 
 static OGMRipCodec **
 ogmrip_codec_array_copy (OGMRipCodec **array)

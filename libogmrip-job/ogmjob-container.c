@@ -43,7 +43,7 @@ static void ogmjob_container_real_add    (OGMJobContainer *container,
 static void ogmjob_container_real_remove (OGMJobContainer *container,
                                           OGMJobTask      *task);
 
-static gint signals[LAST_SIGNAL] = { 0 };
+static guint signals[LAST_SIGNAL] = { 0 };
 
 G_DEFINE_ABSTRACT_TYPE (OGMJobContainer, ogmjob_container, OGMJOB_TYPE_TASK)
 

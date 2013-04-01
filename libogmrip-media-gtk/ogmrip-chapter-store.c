@@ -63,7 +63,7 @@ static void ogmrip_chapter_store_set_property (GObject      *gobject,
                                                const GValue *value,
                                                GParamSpec   *pspec);
 
-static int signals[LAST_SIGNAL] = { 0 };
+static guint signals[LAST_SIGNAL] = { 0 };
 
 G_DEFINE_TYPE (OGMRipChapterStore, ogmrip_chapter_store, GTK_TYPE_LIST_STORE);
 

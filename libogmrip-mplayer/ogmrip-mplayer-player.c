@@ -60,7 +60,7 @@ enum
 
 static void ogmrip_player_dispose (GObject *gobject);
 
-static int signals[LAST_SIGNAL] = { 0 };
+static guint signals[LAST_SIGNAL] = { 0 };
 
 static gint
 ogmrip_mplayer_map_audio_id (OGMRipStream *astream)

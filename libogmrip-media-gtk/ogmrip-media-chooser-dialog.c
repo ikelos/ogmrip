@@ -53,7 +53,7 @@ struct _OGMRipMediaChooserDialogPriv
 
 static void ogmrip_media_chooser_init (OGMRipMediaChooserInterface *iface);
 
-static int signals[LAST_SIGNAL] = { 0 };
+static guint signals[LAST_SIGNAL] = { 0 };
 
 static OGMRipMedia *
 ogmrip_media_chooser_dialog_get_media (OGMRipMediaChooser *chooser)

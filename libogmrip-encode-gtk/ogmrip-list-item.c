@@ -68,7 +68,7 @@ static void ogmrip_list_item_set_property (GObject      *gobject,
                                            const GValue *value,
                                            GParamSpec   *pspec);
 
-static int signals[N_SIGNALS] = { 0 };
+static guint signals[N_SIGNALS] = { 0 };
 
 static void
 ogmrip_list_item_add_button_clicked_cb (OGMRipListItem *item)
