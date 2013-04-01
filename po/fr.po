@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OGMRip\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-29 21:23+0100\n"
+"POT-Creation-Date: 2013-03-31 19:13+0200\n"
 "PO-Revision-Date: 2008-01-11 21:30+0100\n"
 "Last-Translator: Olivier Rolland <billl@users.sourceforge.net>\n"
 "Language-Team: French <fr@li.org>\n"
@@ -19,63 +19,63 @@ msgstr ""
 "X-Generator: Launchpad (build Unknown)\n"
 
 #: ../data/ui/ogmrip-menu.ui.h:1
-msgid "_File"
-msgstr "_Fichier"
+msgid "Pro_files"
+msgstr "Pro_fils"
 
-#: ../data/ui/ogmrip-menu.ui.h:2 ../data/ui/ogmrip-main-window.ui.h:8
+#: ../data/ui/ogmrip-menu.ui.h:2
+msgid "_Preferences"
+msgstr "_Préférences"
+
+#: ../data/ui/ogmrip-menu.ui.h:3
+msgid "_About"
+msgstr "À _propos"
+
+#: ../data/ui/ogmrip-menu.ui.h:4
+msgid "_Quit"
+msgstr "_Quitter"
+
+#: ../data/ui/ogmrip-menu.ui.h:5
+msgid "_Media"
+msgstr "_Média"
+
+#: ../data/ui/ogmrip-menu.ui.h:6 ../data/ui/ogmrip-main-window.ui.h:8
 #: ../libogmrip-media-gtk/ogmrip-media-chooser-dialog.c:150
 msgid "_Load"
 msgstr "_Charger"
 
-#: ../data/ui/ogmrip-menu.ui.h:3 ../data/ui/ogmrip-main-window.ui.h:9
+#: ../data/ui/ogmrip-menu.ui.h:7 ../data/ui/ogmrip-main-window.ui.h:9
 #: ../src/ogmrip-options-dialog.c:684
 msgid "E_xtract"
 msgstr "E_xtraire"
 
-#: ../data/ui/ogmrip-menu.ui.h:4
+#: ../data/ui/ogmrip-menu.ui.h:8
 msgid "_Import chapters..."
 msgstr "_Importer le chapitrage..."
 
-#: ../data/ui/ogmrip-menu.ui.h:5
+#: ../data/ui/ogmrip-menu.ui.h:9
 msgid "_Export chapters..."
 msgstr "_Exporter le chapitrage..."
 
-#: ../data/ui/ogmrip-menu.ui.h:6
-msgid "_Quit"
-msgstr "_Quitter"
+#: ../data/ui/ogmrip-menu.ui.h:10
+msgid "_Close"
+msgstr "_Fermer"
 
-#: ../data/ui/ogmrip-menu.ui.h:7 ../data/ui/ogmrip-profile-editor.ui.h:51
+#: ../data/ui/ogmrip-menu.ui.h:11 ../data/ui/ogmrip-profile-editor.ui.h:51
 #: ../data/ui/ogmrip-profile-manager-dialog.ui.h:5
 msgid "_Edit"
 msgstr "_Éditer"
 
-#: ../data/ui/ogmrip-menu.ui.h:8
+#: ../data/ui/ogmrip-menu.ui.h:12
 msgid "Select _all"
 msgstr "Séléctionner _tout"
 
-#: ../data/ui/ogmrip-menu.ui.h:9
+#: ../data/ui/ogmrip-menu.ui.h:13
 msgid "_Deselect all"
 msgstr "_Déselectionner tout"
 
-#: ../data/ui/ogmrip-menu.ui.h:10
-msgid "Pro_files"
-msgstr "Pro_fils"
-
-#: ../data/ui/ogmrip-menu.ui.h:11
+#: ../data/ui/ogmrip-menu.ui.h:14
 msgid "_Encodings"
 msgstr "_Encodages"
-
-#: ../data/ui/ogmrip-menu.ui.h:12
-msgid "_Preferences"
-msgstr "_Préférences"
-
-#: ../data/ui/ogmrip-menu.ui.h:13
-msgid "_Help"
-msgstr "_Aide"
-
-#: ../data/ui/ogmrip-menu.ui.h:14
-msgid "_About"
-msgstr "À _propos"
 
 #: ../data/ui/ogmrip-crop-dialog.ui.h:1
 msgid "_Top"
@@ -2413,6 +2413,12 @@ msgstr "MEncoder est compilé sans support XviD"
 #: ../plugins/ogmrip-xvid-options.c:284
 msgid "XviD Options"
 msgstr "XviD Options"
+
+#~ msgid "_File"
+#~ msgstr "_Fichier"
+
+#~ msgid "_Help"
+#~ msgstr "_Aide"
 
 #~ msgid "Edit"
 #~ msgstr "Éditer"

@@ -1801,38 +1801,6 @@ ogmrip_gui_export_chapters_activated (OGMRipData *data)
 }
 
 /*
- * When the preferences menu item is activated
- */
-static void
-ogmrip_gui_pref_activated (OGMRipData *data)
-{
-  GtkWidget *dialog;
-
-  dialog = ogmrip_pref_dialog_new ();
-  gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (data->window));
-  gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
-
-  gtk_dialog_run (GTK_DIALOG (dialog));
-  gtk_widget_destroy (dialog);
-}
-
-/*
- * When the profiles menu item is activated
- */
-static void
-ogmrip_gui_profiles_activated (OGMRipData *data)
-{
-  GtkWidget *dialog;
-
-  dialog = ogmrip_profile_manager_dialog_new ();
-  gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (data->window));
-  gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
-
-  gtk_dialog_run (GTK_DIALOG (dialog));
-  gtk_widget_destroy (dialog);
-}
-
-/*
  * When the encoding manager dialog sends the response signal
  */
 static void
@@ -1868,46 +1836,6 @@ ogmrip_gui_encodings_activated (OGMRipData *data)
       G_CALLBACK (ogmrip_gui_encodings_responsed), data);
 
   gtk_window_present (GTK_WINDOW (dialog));
-}
-
-/*
- * When the about menu item is activated
- */
-static void
-ogmrip_gui_about_activated (OGMRipData *data)
-{
-  static GdkPixbuf *icon = NULL;
-
-  const gchar *authors[] =
-  {
-    "Olivier Rolland <billl@users.sourceforge.net>",
-    NULL
-  };
-  gchar *translator_credits = _("translator-credits");
-
-  const gchar *documenters[] =
-  {
-    "Olivier Rolland <billl@users.sourceforge.net>",
-    NULL
-  };
-
-  if (!icon)
-    icon = gdk_pixbuf_new_from_file (OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_ICON_FILE, NULL);
-
-  if (g_str_equal (translator_credits, "translator-credits"))
-    translator_credits = NULL;
-
-  gtk_show_about_dialog (GTK_WINDOW (data->window),
-      "name", PACKAGE_NAME,
-      "version", PACKAGE_VERSION,
-      "comments", _("A DVD Encoder for GNOME"),
-      "copyright", "(c) 2004-2012 Olivier Rolland",
-      "website", "http://ogmrip.sourceforge.net",
-      "translator-credits", translator_credits,
-      "documenters", documenters,
-      "authors", authors,
-      "logo", icon,
-      NULL);
 }
 
 /*
@@ -2063,7 +1991,7 @@ static GActionEntry win_entries[] =
   { "profiles",      NULL, NULL, NULL, NULL },
   { "preferences",   NULL, NULL, NULL, NULL },
   { "about",         NULL, NULL, NULL, NULL },
-  { "quit",          NULL, NULL, NULL, NULL }
+  { "close",         NULL, NULL, NULL, NULL }
 };
 
 static OGMRipData *
@@ -2098,25 +2026,13 @@ ogmrip_gui_create (GApplication *app)
   g_action_map_add_action_entries (G_ACTION_MAP (data->window),
       win_entries, G_N_ELEMENTS (win_entries), NULL);
 
-  action = g_action_map_lookup_action (G_ACTION_MAP (data->window), "quit");
+  action = g_action_map_lookup_action (G_ACTION_MAP (data->window), "close");
   g_signal_connect_swapped (action, "activate",
       G_CALLBACK (gtk_widget_destroy), data->window);
-
-  action = g_action_map_lookup_action (G_ACTION_MAP (data->window), "preferences");
-  g_signal_connect_swapped (action, "activate",
-      G_CALLBACK (ogmrip_gui_pref_activated), data);
-
-  action = g_action_map_lookup_action (G_ACTION_MAP (data->window), "profiles");
-  g_signal_connect_swapped (action, "activate",
-      G_CALLBACK (ogmrip_gui_profiles_activated), data);
 
   action = g_action_map_lookup_action (G_ACTION_MAP (data->window), "encodings");
   g_signal_connect_swapped (action, "activate",
       G_CALLBACK (ogmrip_gui_encodings_activated), data);
-
-  action = g_action_map_lookup_action (G_ACTION_MAP (data->window), "about");
-  g_signal_connect_swapped (action, "activate",
-      G_CALLBACK (ogmrip_gui_about_activated), data);
 
   widget = gtk_builder_get_widget (builder, "hbox");
 
@@ -2227,6 +2143,133 @@ ogmrip_gui_create (GApplication *app)
   return data;
 }
 
+/*
+ * When the profiles menu item is activated
+ */
+static void
+ogmrip_gui_profiles_activated (GSimpleAction *action, GVariant *parameter, gpointer app)
+{
+  GtkWindow *parent;
+  GtkWidget *dialog;
+  
+#if GTK_CHECK_VERSION(3,6,0)
+  parent = gtk_application_get_active_window (app);
+#else
+  GList *list;
+
+  list = gtk_application_get_windows (app);
+  parent = list ? list->data : NULL;
+#endif
+
+  dialog = ogmrip_profile_manager_dialog_new ();
+  gtk_window_set_transient_for (GTK_WINDOW (dialog), parent);
+  gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
+
+  gtk_dialog_run (GTK_DIALOG (dialog));
+  gtk_widget_destroy (dialog);
+}
+
+/*
+ * When the preferences menu item is activated
+ */
+static void
+ogmrip_gui_pref_activated (GSimpleAction *action, GVariant *parameter, gpointer app)
+{
+  GtkWindow *parent;
+  GtkWidget *dialog;
+
+#if GTK_CHECK_VERSION(3,6,0)
+  parent = gtk_application_get_active_window (app);
+#else
+  GList *list;
+
+  list = gtk_application_get_windows (app);
+  parent = list ? list->data : NULL;
+#endif
+
+  dialog = ogmrip_pref_dialog_new ();
+  gtk_window_set_transient_for (GTK_WINDOW (dialog), parent);
+  gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
+
+  gtk_dialog_run (GTK_DIALOG (dialog));
+  gtk_widget_destroy (dialog);
+}
+
+/*
+ * When the about menu item is activated
+ */
+static void
+ogmrip_gui_about_activated (GSimpleAction *action, GVariant *parameter, gpointer app)
+{
+  static GdkPixbuf *icon = NULL;
+  GtkWindow *parent;
+
+  const gchar *authors[] =
+  {
+    "Olivier Rolland <billl@users.sourceforge.net>",
+    NULL
+  };
+  gchar *translator_credits = _("translator-credits");
+
+  const gchar *documenters[] =
+  {
+    "Olivier Rolland <billl@users.sourceforge.net>",
+    NULL
+  };
+
+#if GTK_CHECK_VERSION(3,6,0)
+  parent = gtk_application_get_active_window (app);
+#else
+  GList *list;
+
+  list = gtk_application_get_windows (app);
+  parent = list ? list->data : NULL;
+#endif
+
+  if (!icon)
+    icon = gdk_pixbuf_new_from_file (OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_ICON_FILE, NULL);
+
+  if (g_str_equal (translator_credits, "translator-credits"))
+    translator_credits = NULL;
+
+  gtk_show_about_dialog (parent,
+      "name", PACKAGE_NAME,
+      "version", PACKAGE_VERSION,
+      "comments", _("A DVD Encoder for GNOME"),
+      "copyright", "(c) 2004-2012 Olivier Rolland",
+      "website", "http://ogmrip.sourceforge.net",
+      "translator-credits", translator_credits,
+      "documenters", documenters,
+      "authors", authors,
+      "logo", icon,
+      NULL);
+}
+
+/*
+ * When the quit menu item is activated
+ */
+static void
+ogmrip_gui_quit_activated (GSimpleAction *action, GVariant *parameter, gpointer app)
+{
+  GList *list;
+
+  while (1)
+  {
+    list = gtk_application_get_windows (app);
+    if (!list)
+      break;
+    gtk_widget_destroy (list->data);
+  }
+}
+
+static GActionEntry app_entries[] =
+{
+  { "profiles",    ogmrip_gui_profiles_activated, NULL, NULL, NULL },
+  { "preferences", ogmrip_gui_pref_activated,     NULL, NULL, NULL },
+  { "about",       ogmrip_gui_about_activated,    NULL, NULL, NULL },
+  { "quit",        ogmrip_gui_quit_activated,     NULL, NULL, NULL }
+};
+
 static void
 ogmrip_gui_startup_cb (GApplication *app)
 {
@@ -2237,6 +2280,12 @@ ogmrip_gui_startup_cb (GApplication *app)
   builder = gtk_builder_new ();
   if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_MENU_FILE, &error))
     g_error ("Couldn't load builder file: %s", error->message);
+
+  g_action_map_add_action_entries (G_ACTION_MAP (app),
+      app_entries, G_N_ELEMENTS (app_entries), app);
+
+  menu = gtk_builder_get_object (builder, "app-menu");
+  gtk_application_set_app_menu (GTK_APPLICATION (app), G_MENU_MODEL (menu));
 
   menu = gtk_builder_get_object (builder, "win-menu");
   gtk_application_set_menubar (GTK_APPLICATION (app), G_MENU_MODEL (menu));
