@@ -21,7 +21,6 @@
 
 #include <ogmrip-job.h>
 #include <ogmrip-file.h>
-#include <ogmrip-profile.h>
 
 G_BEGIN_DECLS
 
