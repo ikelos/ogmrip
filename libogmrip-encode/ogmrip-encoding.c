@@ -1821,7 +1821,7 @@ ogmrip_encoding_run_codec (OGMRipEncoding *encoding, OGMRipCodec *codec, GCancel
   }
 
   if (encoding->priv->profile && OGMRIP_IS_CONFIGURABLE (codec) &&
-      ogmrip_video_codec_get_quality (OGMRIP_VIDEO_CODEC (codec)) == OGMRIP_QUALITY_USER)
+      (!OGMRIP_IS_VIDEO_CODEC (codec) || ogmrip_video_codec_get_quality (OGMRIP_VIDEO_CODEC (codec)) == OGMRIP_QUALITY_USER))
     ogmrip_configurable_configure (OGMRIP_CONFIGURABLE (codec), encoding->priv->profile);
 
   id = g_signal_connect_swapped (codec, "notify::progress",
