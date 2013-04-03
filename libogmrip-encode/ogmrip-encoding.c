@@ -178,7 +178,7 @@ ogmrip_encoding_error_quark (void)
 static void
 ogmrip_encoding_open_log (OGMRipEncoding *encoding)
 {
-  if (!encoding->priv->log_open)
+  if (encoding->priv->log_file && !encoding->priv->log_open)
   {
     ogmrip_log_open (encoding->priv->log_file, NULL);
     encoding->priv->log_open = TRUE;
@@ -2080,5 +2080,58 @@ ogmrip_encoding_resume (OGMRipEncoding *encoding)
 
   if (encoding->priv->task)
     ogmjob_task_resume (encoding->priv->task);
+}
+
+void
+ogmrip_encoding_clean (OGMRipEncoding *encoding, gboolean temporary, gboolean copy, gboolean log)
+{
+  g_return_if_fail (OGMRIP_IS_ENCODING (encoding));
+
+  if (temporary)
+  {
+    OGMRipCodec *codec;
+    GList *list, *link;
+
+    codec = ogmrip_encoding_get_video_codec (encoding);
+    if (codec)
+      g_unlink (ogmrip_file_get_path (ogmrip_codec_get_output (codec)));
+
+    list = ogmrip_encoding_get_audio_codecs (encoding);
+    for (link = list; link; link = link->next)
+      g_unlink (ogmrip_file_get_path (ogmrip_codec_get_output (link->data)));
+    g_list_free (list);
+
+    list = ogmrip_encoding_get_subp_codecs (encoding);
+    for (link = list; link; link = link->next)
+      g_unlink (ogmrip_file_get_path (ogmrip_codec_get_output (link->data)));
+    g_list_free (list);
+
+    list = ogmrip_encoding_get_chapters (encoding);
+    for (link = list; link; link = link->next)
+      g_unlink (ogmrip_file_get_path (ogmrip_codec_get_output (link->data)));
+    g_list_free (list);
+  }
+
+  if (copy && encoding->priv->copy)
+  {
+    OGMRipTitle *title;
+    const gchar *uri;
+
+    title = ogmrip_encoding_get_title (encoding);
+    uri = ogmrip_media_get_uri (ogmrip_title_get_media (title));
+    if (g_str_has_prefix (uri, "dvd://"))
+      ogmrip_fs_rmdir (uri + 6, TRUE, NULL);
+    else
+      g_warning ("Unknown scheme for '%s'", uri);
+  }
+
+  if (log)
+  {
+    const gchar *filename;
+
+    filename = ogmrip_encoding_get_log_file (encoding);
+    if (filename)
+      g_unlink (filename);
+  }
 }
 

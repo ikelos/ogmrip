@@ -207,6 +207,10 @@ gboolean           ogmrip_encoding_encode              (OGMRipEncoding       *en
                                                         GError               **error);
 void               ogmrip_encoding_suspend             (OGMRipEncoding       *encoding);
 void               ogmrip_encoding_resume              (OGMRipEncoding       *encoding);
+void               ogmrip_encoding_clean               (OGMRipEncoding       *encoding,
+                                                        gboolean             temporary,
+                                                        gboolean             copy,
+                                                        gboolean             log);
 
 G_END_DECLS
 
