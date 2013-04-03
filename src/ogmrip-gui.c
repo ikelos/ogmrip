@@ -20,6 +20,7 @@
 #include "config.h"
 #endif
 
+#include "ogmrip-application.h"
 #include "ogmrip-gui.h"
 #include "ogmrip-helper.h"
 #include "ogmrip-options-dialog.h"
@@ -38,12 +39,6 @@
 #endif /* HAVE_ENCHANT_SUPPORT */
 
 #include <stdlib.h>
-
-enum
-{
-  PREPARE,
-  LAST_SIGNAL
-};
 
 #ifdef G_ENABLE_DEBUG
 static gboolean debug = TRUE;
@@ -84,8 +79,6 @@ typedef struct
 } OGMRipData;
 
 GSettings *settings;
-
-guint signals[LAST_SIGNAL] = { 0 };
 
 static void
 gtk_container_clear (GtkContainer *container)
@@ -382,39 +375,10 @@ ogmrip_gui_load_path (OGMRipData *data, const gchar *path)
 static void
 ogmrip_gui_clean (OGMRipData *data, OGMRipEncoding *encoding, gboolean error)
 {
-  if (!g_settings_get_boolean (settings, OGMRIP_SETTINGS_KEEP_TMP))
-  {
-    OGMRipCodec *codec;
-    GList *list, *link;
+  gboolean temporary, log, copy = FALSE;
 
-    codec = ogmrip_encoding_get_video_codec (encoding);
-    if (codec)
-      g_unlink (ogmrip_file_get_path (ogmrip_codec_get_output (codec)));
-
-    list = ogmrip_encoding_get_audio_codecs (encoding);
-    for (link = list; link; link = link->next)
-      g_unlink (ogmrip_file_get_path (ogmrip_codec_get_output (link->data)));
-    g_list_free (list);
-
-    list = ogmrip_encoding_get_subp_codecs (encoding);
-    for (link = list; link; link = link->next)
-      g_unlink (ogmrip_file_get_path (ogmrip_codec_get_output (link->data)));
-    g_list_free (list);
-
-    list = ogmrip_encoding_get_chapters (encoding);
-    for (link = list; link; link = link->next)
-      g_unlink (ogmrip_file_get_path (ogmrip_codec_get_output (link->data)));
-    g_list_free (list);
-  }
-
-  if (!error && !g_settings_get_boolean (settings, OGMRIP_SETTINGS_LOG_OUTPUT))
-  {
-    const gchar *filename;
-
-    filename = ogmrip_encoding_get_log_file (encoding);
-    if (filename)
-      g_unlink (filename);
-  }
+  temporary = !g_settings_get_boolean (settings, OGMRIP_SETTINGS_KEEP_TMP);
+  log = !error && !g_settings_get_boolean (settings, OGMRIP_SETTINGS_LOG_OUTPUT);
 
   if (ogmrip_encoding_get_copy (encoding))
   {
@@ -434,19 +398,10 @@ ogmrip_gui_clean (OGMRipData *data, OGMRipEncoding *encoding, gboolean error)
       gtk_widget_destroy (dialog);
     }
 
-    if (after == OGMRIP_AFTER_ENC_REMOVE)
-    {
-      OGMRipTitle *title;
-      const gchar *uri;
-
-      title = ogmrip_encoding_get_title (encoding);
-      uri = ogmrip_media_get_uri (ogmrip_title_get_media (title));
-      if (g_str_has_prefix (uri, "dvd://"))
-        ogmrip_fs_rmdir (uri + 6, TRUE, NULL);
-      else
-        g_warning ("Unknown scheme for '%s'", uri);
-    }
+    copy = after == OGMRIP_AFTER_ENC_REMOVE;
   }
+
+  ogmrip_encoding_clean (encoding, temporary, copy, log);
 
   g_object_unref (encoding);
 }
@@ -2212,7 +2167,13 @@ ogmrip_gui_open_cb (GApplication *app, GFile **files, gint n_files, const gchar 
   }
 }
 
-G_DEFINE_TYPE (OGMRipGui, ogmrip_gui, GTK_TYPE_APPLICATION);
+static void
+ogmrip_application_iface_init (OGMRipApplicationInterface *iface)
+{
+}
+
+G_DEFINE_TYPE_WITH_CODE (OGMRipGui, ogmrip_gui, GTK_TYPE_APPLICATION,
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_APPLICATION, ogmrip_application_iface_init));
 
 static GOptionEntry opts[] =
 {
@@ -2288,11 +2249,6 @@ ogmrip_gui_class_init (OGMRipGuiClass *klass)
 
   application_class = G_APPLICATION_CLASS (klass);
   application_class->local_command_line = ogmrip_gui_local_cmdline;
-
-  signals[PREPARE] = g_signal_new ("prepare", G_TYPE_FROM_CLASS (klass),
-      G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
-      G_STRUCT_OFFSET (OGMRipGuiClass, prepare), NULL, NULL,
-      g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 }
 
 static void
@@ -2322,13 +2278,5 @@ ogmrip_gui_new (const gchar *app_id)
       G_CALLBACK (ogmrip_gui_open_cb), NULL);
 
   return app;
-}
-
-void
-ogmrip_gui_prepare (OGMRipGui *gui)
-{
-  g_return_if_fail (OGMRIP_IS_GUI (gui));
-
-  g_signal_emit (gui, signals[PREPARE], 0);
 }
 

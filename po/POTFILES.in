@@ -51,6 +51,7 @@ libogmrip-encode-gtk/ogmrip-subp-options-dialog.c
 
 libogmrip-mplayer/ogmrip-mplayer-commands.c
 
+src/ogmrip-cli.c
 src/ogmrip-crop-dialog.c
 src/ogmrip-gui.c
 src/ogmrip-helper.c

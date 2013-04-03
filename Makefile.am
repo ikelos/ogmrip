@@ -14,8 +14,7 @@ if HAVE_GTK_SUPPORT
 SUBDIRS +=      \
   libogmrip-media-gtk  \
   libogmrip-file-gtk   \
-  libogmrip-encode-gtk \
-  src
+  libogmrip-encode-gtk
 endif
 
 if HAVE_THEORA_SUPPORT
@@ -31,6 +30,7 @@ endif
 SUBDIRS += \
   plugins \
   data \
+  src \
   po
 
 EXTRA_DIST= \

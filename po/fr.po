@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OGMRip\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-31 19:13+0200\n"
+"POT-Creation-Date: 2013-04-03 18:40+0200\n"
 "PO-Revision-Date: 2008-01-11 21:30+0100\n"
 "Last-Translator: Olivier Rolland <billl@users.sourceforge.net>\n"
 "Language-Team: French <fr@li.org>\n"
@@ -387,7 +387,7 @@ msgid "Motion _Estimation"
 msgstr "_Estimation de mouvement"
 
 #: ../data/ui/ogmrip-main-window.ui.h:1 ../data/ui/ogmrip.desktop.in.h:1
-#: ../src/ogmrip-main.c:213
+#: ../src/ogmrip-main.c:224
 msgid "OGMRip"
 msgstr "OGMRip"
 
@@ -419,7 +419,8 @@ msgstr "Mode _relatif"
 msgid "Angle:"
 msgstr "Angle :"
 
-#: ../data/ui/ogmrip-mp4-options-dialog.ui.h:1
+#: ../data/ui/ogmrip-mp4-options-dialog.ui.h:1 ../src/ogmrip-cli.c:309
+#: ../src/ogmrip-cli.c:353
 msgid "Format"
 msgstr "Format"
 
@@ -514,6 +515,7 @@ msgstr "Nom du _fichier"
 #: ../data/ui/ogmrip-pref-dialog.ui.h:6
 #: ../libogmrip-media-gtk/ogmrip-title-chooser-widget.c:105
 #: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:652
+#: ../src/ogmrip-cli.c:418
 msgid "Title"
 msgstr "Titre"
 
@@ -1453,7 +1455,7 @@ msgstr "Min"
 msgid "Max"
 msgstr "Max"
 
-#: ../data/ui/ogmrip-xvid-options-dialog.ui.h:34
+#: ../data/ui/ogmrip-xvid-options-dialog.ui.h:34 ../src/ogmrip-cli.c:358
 msgid "Quantization"
 msgstr "Quantum"
 
@@ -1754,7 +1756,7 @@ msgstr ""
 "constant."
 
 #: ../libogmrip-media-gtk/ogmrip-chapter-store.c:208
-#: ../libogmrip-media-gtk/ogmrip-chapter-view.c:117
+#: ../libogmrip-media-gtk/ogmrip-chapter-view.c:117 ../src/ogmrip-cli.c:403
 msgid "Chapter"
 msgstr "Chapitre"
 
@@ -1796,7 +1798,7 @@ msgid "Unknown media"
 msgstr "Média inconnu"
 
 #: ../libogmrip-media-gtk/ogmrip-media-chooser-widget.c:183
-#: ../src/ogmrip-gui.c:355
+#: ../src/ogmrip-gui.c:348
 msgid "Untitled"
 msgstr "Sans titre"
 
@@ -1873,6 +1875,7 @@ msgid "No subp"
 msgstr "Aucun sous-titres"
 
 #: ../libogmrip-file-gtk/ogmrip-source-chooser-widget.c:613
+#: ../src/ogmrip-cli.c:381
 msgid "Subtitle"
 msgstr "Sous-titres"
 
@@ -1900,43 +1903,44 @@ msgid "Use _profile settings"
 msgstr "Utiliser les _paramètres du profil"
 
 #: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:137
-#: ../src/ogmrip-gui.c:535
+#: ../src/ogmrip-cli.c:697 ../src/ogmrip-gui.c:490
 msgid "Encoding video title"
 msgstr "Encodage du titre vidéo"
 
 #: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:139
-#: ../src/ogmrip-gui.c:537
+#: ../src/ogmrip-cli.c:699 ../src/ogmrip-gui.c:492
 msgid "Extracting chapters information"
 msgstr "Extraction du chapitrage"
 
 #: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:141
-#: ../src/ogmrip-gui.c:539
+#: ../src/ogmrip-cli.c:701 ../src/ogmrip-gui.c:494
 msgid "Merging audio and video streams"
 msgstr "Fusion des pistes audio et vidéo"
 
 #: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:143
-#: ../src/ogmrip-gui.c:541
+#: ../src/ogmrip-cli.c:703 ../src/ogmrip-gui.c:496
 msgid "Copying media"
 msgstr "Copie du média"
 
 #: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:145
-#: ../src/ogmrip-gui.c:543 ../src/ogmrip-options-dialog.c:509
+#: ../src/ogmrip-cli.c:705 ../src/ogmrip-gui.c:498
+#: ../src/ogmrip-options-dialog.c:509
 msgid "Analyzing video stream"
 msgstr "Analyse du flux vidéo"
 
 #: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:147
-#: ../src/ogmrip-gui.c:545
+#: ../src/ogmrip-cli.c:707 ../src/ogmrip-gui.c:500
 msgid "Running the compressibility test"
 msgstr "Test de la compressibilité"
 
 #: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:151
-#: ../src/ogmrip-gui.c:549
+#: ../src/ogmrip-cli.c:711 ../src/ogmrip-gui.c:504
 #, c-format
 msgid "Extracting audio stream %d"
 msgstr "Extraction de la piste audio %d"
 
 #: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:159
-#: ../src/ogmrip-gui.c:557
+#: ../src/ogmrip-cli.c:719 ../src/ogmrip-gui.c:512
 #, c-format
 msgid "Extracting subtitle stream %d"
 msgstr "Extraction du sous-titre %d"
@@ -1950,7 +1954,7 @@ msgid "Encoding cancelled by user"
 msgstr "Encodage annulé par l'utilisateur"
 
 #: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:201
-#: ../src/ogmrip-gui.c:465
+#: ../src/ogmrip-gui.c:420
 msgid "Encoding failed"
 msgstr "L'encodage a échoué"
 
@@ -2046,7 +2050,7 @@ msgid "Cannot load profile"
 msgstr "Impossible de charger le profil"
 
 #: ../libogmrip-encode-gtk/ogmrip-profile-manager-dialog.c:358
-#: ../src/ogmrip-gui.c:470
+#: ../src/ogmrip-gui.c:425
 msgid "Unknown error"
 msgstr "Erreur indéterminée"
 
@@ -2073,6 +2077,216 @@ msgstr "Options des sous-titres"
 msgid "Error while decoding frame"
 msgstr "Erreur de décodage d'une trame"
 
+#: ../src/ogmrip-cli.c:98
+#, c-format
+msgid "Failed to stat '%s': %s"
+msgstr "Impossible d'évaluer '%s': %s"
+
+#: ../src/ogmrip-cli.c:182 ../src/ogmrip-cli.c:252 ../src/ogmrip-cli.c:283
+#, c-format
+msgid "Cannot parse value '%s' for %s"
+msgstr "Ne peut analyser la valeur '%s' pour '%s'"
+
+#: ../src/ogmrip-cli.c:312
+msgid "Aspect ratio"
+msgstr "Rapport largeur/hauteur"
+
+#: ../src/ogmrip-cli.c:315
+msgid "Resolution"
+msgstr "Résolution"
+
+#: ../src/ogmrip-cli.c:347 ../src/ogmrip-cli.c:421
+msgid "Audio"
+msgstr "Audio"
+
+#: ../src/ogmrip-cli.c:350 ../src/ogmrip-cli.c:384
+msgid "Language"
+msgstr "Langue"
+
+#: ../src/ogmrip-cli.c:355
+msgid "Frequency"
+msgstr "Fréquence"
+
+#: ../src/ogmrip-cli.c:361
+msgid "Channels"
+msgstr "Canaux"
+
+#: ../src/ogmrip-cli.c:364 ../src/ogmrip-cli.c:387
+msgid "Content"
+msgstr "Contenu"
+
+#: ../src/ogmrip-cli.c:403 ../src/ogmrip-cli.c:419
+msgid "Length"
+msgstr "Durée"
+
+#: ../src/ogmrip-cli.c:420
+msgid "Chapters"
+msgstr "Chapitres"
+
+#: ../src/ogmrip-cli.c:422
+msgid "Subpictures"
+msgstr "Sous-titres"
+
+#: ../src/ogmrip-cli.c:437
+msgid "Number of angles"
+msgstr "Nombre d'angles"
+
+#: ../src/ogmrip-cli.c:459 ../src/ogmrip-cli.c:508 ../src/ogmrip-cli.c:806
+#, c-format
+msgid "Cannot open title %d."
+msgstr "Impossible d'ouvrir le titre %d"
+
+#: ../src/ogmrip-cli.c:473
+msgid "Longest title"
+msgstr "Titre le plus long"
+
+#: ../src/ogmrip-cli.c:487 ../src/ogmrip-cli.c:791
+#, c-format
+msgid "Couldn't open media: '%s'"
+msgstr "Impossible d'ouvrir le media '%s'"
+
+#: ../src/ogmrip-cli.c:500 ../src/ogmrip-cli.c:798
+#, c-format
+msgid "Title %d does not exist."
+msgstr "Le titre %d n'existe pas."
+
+#: ../src/ogmrip-cli.c:590
+#, c-format
+msgid "Video stream does not exist."
+msgstr "Le flux vidéo n'existe pas."
+
+#: ../src/ogmrip-cli.c:629
+#, c-format
+msgid "Audio stream %d does not exist."
+msgstr "Le flux audio %d n'existe pas."
+
+#: ../src/ogmrip-cli.c:775
+#, c-format
+msgid "Profile '%s' does not exist."
+msgstr "Le profil '%s' n'existe pas."
+
+#: ../src/ogmrip-cli.c:834
+msgid "Cannot open title"
+msgstr "Impossible d'ouvrir le titre"
+
+#: ../src/ogmrip-cli.c:839
+msgid "Cannot encode title"
+msgstr "Impossible d'encoder le titre"
+
+#: ../src/ogmrip-cli.c:895
+msgid "Show help options"
+msgstr "Affiche l'aide"
+
+#: ../src/ogmrip-cli.c:896
+msgid "Enable debug messages"
+msgstr "Affiche les messages de débogag"
+
+#: ../src/ogmrip-cli.c:902 ../src/ogmrip-cli.c:916
+msgid "Specify the media path"
+msgstr "Spécifie le chemin du média"
+
+#: ../src/ogmrip-cli.c:903 ../src/ogmrip-cli.c:918
+msgid "Specify the title (default: none)"
+msgstr "Spécifie le titre (défaut : aucun)"
+
+#: ../src/ogmrip-cli.c:904
+msgid "Show video info"
+msgstr "Affiche les informations video"
+
+#: ../src/ogmrip-cli.c:905
+msgid "Show audio info"
+msgstr "Affiche les informations audio"
+
+#: ../src/ogmrip-cli.c:906
+msgid "Show chapters info"
+msgstr "Affiche les informations de chapitrage"
+
+#: ../src/ogmrip-cli.c:907
+msgid "Show angles info"
+msgstr "Affiche le nombre d'angles"
+
+#: ../src/ogmrip-cli.c:908
+msgid "Show palette info"
+msgstr "Affiche la palette"
+
+#: ../src/ogmrip-cli.c:909
+msgid "Show subtitles info"
+msgstr "Affiche les informations de sous-titres"
+
+#: ../src/ogmrip-cli.c:910
+msgid "Show all info"
+msgstr "Affiche toutes les informations"
+
+#: ../src/ogmrip-cli.c:917
+msgid "Specify the output file"
+msgstr "Spéficie le fichier de sortie"
+
+#: ../src/ogmrip-cli.c:919
+msgid "Select the audio id to encode (default: none)"
+msgstr "Sélectionne l'identificateur du flux audio à encoder (défaut : aucun)"
+
+#: ../src/ogmrip-cli.c:920
+msgid "Select the subtitle id to extract (default: none)"
+msgstr ""
+"Sélectionne l'identificateur des sous-titres à extraire (défaut : aucun)"
+
+#: ../src/ogmrip-cli.c:921
+msgid "Specify which chapters to extract. (default: all)"
+msgstr "Spécifie les chapitres à extraire (défaut : tous)"
+
+#: ../src/ogmrip-cli.c:922
+msgid "Extract selected chapters in relative mode"
+msgstr "Extrait les chapitres sélectionnés en mode relatif"
+
+#: ../src/ogmrip-cli.c:923
+msgid "Specify the encoding profile"
+msgstr "Spéficie le profile d'encodage"
+
+#: ../src/ogmrip-cli.c:940
+msgid "Usage:"
+msgstr "Usage : "
+
+#: ../src/ogmrip-cli.c:941 ../src/ogmrip-cli.c:946
+msgid "COMMAND"
+msgstr "COMMANDE"
+
+#: ../src/ogmrip-cli.c:941
+msgid "OPTION"
+msgstr "OPTION"
+
+#: ../src/ogmrip-cli.c:942
+msgid "Commands"
+msgstr "Commandes"
+
+#: ../src/ogmrip-cli.c:943
+msgid "lists the content of a media"
+msgstr "liste le contenu d'un média"
+
+#: ../src/ogmrip-cli.c:944
+msgid "encodes selected title, audio streams and subtitles"
+msgstr "encode le titre et les flux audio et de sous-titres sélectionnés"
+
+#: ../src/ogmrip-cli.c:946
+msgid "Try"
+msgstr "Essayez"
+
+#: ../src/ogmrip-cli.c:946
+msgid "to get a list of available options"
+msgstr "pour une liste des options disponibles"
+
+#: ../src/ogmrip-cli.c:998
+#, c-format
+msgid "Option parsing failed: %s"
+msgstr "Erreur d'analyse des options: %s"
+
+#: ../src/ogmrip-cli.c:1026
+msgid "No media specified"
+msgstr "Aucun média spécifié"
+
+#: ../src/ogmrip-cli.c:1035
+msgid "No output file speficied"
+msgstr "Aucun fichier de sortie spécifiée"
+
 #: ../src/ogmrip-crop-dialog.c:130
 #, c-format
 msgid "Frame %lu of %lu"
@@ -2082,69 +2296,69 @@ msgstr "Image %lu sur %lu"
 msgid "Cropping"
 msgstr "Découpage"
 
-#: ../src/ogmrip-gui.c:135
+#: ../src/ogmrip-gui.c:128
 msgid "Could not create dictionary"
 msgstr "Impossible de créer le dictionnaire"
 
-#: ../src/ogmrip-gui.c:135
+#: ../src/ogmrip-gui.c:128
 msgid "Spell will not be checked."
 msgstr "La vérification orthographique ne sera pas effectuée."
 
-#: ../src/ogmrip-gui.c:294 ../src/ogmrip-gui.c:305
+#: ../src/ogmrip-gui.c:287 ../src/ogmrip-gui.c:298
 msgid "Opening media"
 msgstr "Ouverture du média"
 
-#: ../src/ogmrip-gui.c:325 ../src/ogmrip-gui.c:369
+#: ../src/ogmrip-gui.c:318 ../src/ogmrip-gui.c:362
 msgid "Could not open the media"
 msgstr "Impossible d'ouvrir le média"
 
-#: ../src/ogmrip-gui.c:431
+#: ../src/ogmrip-gui.c:395
 msgid "Do you want to remove the copy of the DVD ?"
 msgstr "Voulez-vous supprimer la copie du DVD ?"
 
-#: ../src/ogmrip-gui.c:590
+#: ../src/ogmrip-gui.c:545
 msgid "Are you sure you want to cancel the encoding process?"
 msgstr "Etes-vous sûr de vouloir interrompre l'encodage ?"
 
-#: ../src/ogmrip-gui.c:618
+#: ../src/ogmrip-gui.c:573
 #, c-format
 msgid "A file named '%s' already exists."
 msgstr "Un fichier nommé '%s' existe déjà."
 
-#: ../src/ogmrip-gui.c:621
+#: ../src/ogmrip-gui.c:576
 msgid "Do you want to replace it?"
 msgstr "Voulez-vous le remplacer ?"
 
-#: ../src/ogmrip-gui.c:931
+#: ../src/ogmrip-gui.c:886
 msgid "Could not export the chapters"
 msgstr "Impossible d'exporter le chapitrage"
 
-#: ../src/ogmrip-gui.c:1673
+#: ../src/ogmrip-gui.c:1507
 msgid "Cannot encode media"
 msgstr "Impossible d'encoder le média"
 
-#: ../src/ogmrip-gui.c:1731
+#: ../src/ogmrip-gui.c:1565
 msgid "Can't play DVD title"
 msgstr "Impossible de jouer le DVD"
 
-#: ../src/ogmrip-gui.c:1745
+#: ../src/ogmrip-gui.c:1579
 msgid "Select a chapters file"
 msgstr "Sélectionner un fichier de chapitrage"
 
-#: ../src/ogmrip-gui.c:1767
+#: ../src/ogmrip-gui.c:1601
 #, c-format
 msgid "Could not open the chapters file '%s'"
 msgstr "Impossible d'ouvrir le fichier de chapitrage '%s'"
 
-#: ../src/ogmrip-gui.c:1784
+#: ../src/ogmrip-gui.c:1618
 msgid "Select a file"
 msgstr "Sélectionner un fichier"
 
-#: ../src/ogmrip-gui.c:1886
+#: ../src/ogmrip-gui.c:2046
 msgid "translator-credits"
 msgstr "Olivier Rolland <billl@users.sourceforge.net>"
 
-#: ../src/ogmrip-gui.c:1903
+#: ../src/ogmrip-gui.c:2072
 msgid "A DVD Encoder for GNOME"
 msgstr "Un encodeur de DVD pour GNOME"
 
@@ -2414,430 +2628,11 @@ msgstr "MEncoder est compilé sans support XviD"
 msgid "XviD Options"
 msgstr "XviD Options"
 
-#~ msgid "_File"
-#~ msgstr "_Fichier"
+#~ msgid "Video codec '%s' does not exist."
+#~ msgstr "Le codec vidéo '%s' n'existe pas."
 
-#~ msgid "_Help"
-#~ msgstr "_Aide"
+#~ msgid "Audio codec '%s' does not exist."
+#~ msgstr "Le codec audio '%s' n'existe pas."
 
-#~ msgid "Edit"
-#~ msgstr "Éditer"
-
-#~ msgid "Use global header (global_header)"
-#~ msgstr "Utilise une entête globale (global_header)"
-
-#~ msgid "Use small macroblocks (partitions)"
-#~ msgstr "Partitionne les macroblocks (partitions)"
-
-#~ msgid "DVD backup"
-#~ msgstr "Copie du DVD"
-
-#~ msgid "Failed to stat the file system containing '%s': %s"
-#~ msgstr "Impossible d'évaluer le système de fichiers contenant '%s': %s"
-
-#~ msgid "Failed to stat '%s': %s"
-#~ msgstr "Impossible d'évaluer '%s': %s"
-
-#~ msgid "Failed to change to directory '%s': %s"
-#~ msgstr "Impossible de changer vers le répertoire '%s': %s"
-
-#~ msgid "Failed to stat '..': %s"
-#~ msgstr "Impossible d'évaluer '..': %s"
-
-#~ msgid "Failed to change to directory '..': %s"
-#~ msgstr "Impossible de changer vers le répertoire '..': %s"
-
-#~ msgid "Load a DVD disk, an ISO file, or a DVD structure"
-#~ msgstr "Charger un DVD, une image ISO ou une structure DVD"
-
-#~ msgid "Clear"
-#~ msgstr "Supprimer tout"
-
-#~ msgid "Open a DVD structure"
-#~ msgstr "Sélectionner une structure de DVD"
-
-#~ msgid "_Open"
-#~ msgstr "_Ouvrir"
-
-#~ msgid "_Profiles:"
-#~ msgstr "_Profils :"
-
-#~ msgid "ISO images"
-#~ msgstr "Images ISO"
-
-#~ msgid "Failed to create directory '%s': %s"
-#~ msgstr "Impossible de créer le répertoire '%s': %s"
-
-#~ msgid "Failed to link '%s': %s"
-#~ msgstr "Impossible de créer un lien sur '%s': %s"
-
-#~ msgid "Select a media structure"
-#~ msgstr "Sélectionner une structure de DVD"
-
-#~ msgid ""
-#~ "<b>No DVD</b>\n"
-#~ "No device"
-#~ msgstr ""
-#~ "<b>Aucun DVD</b>\n"
-#~ "Aucun périphérique"
-
-#~ msgid "Select a DVD structure..."
-#~ msgstr "Sélectionner une structure de DVD..."
-
-#~ msgid "Select an ISO file..."
-#~ msgstr "Sélectionner une image ISO..."
-
-#~ msgid "Open DVD Disk"
-#~ msgstr "Ouvre un DVD"
-
-#~ msgid "Select an ISO file"
-#~ msgstr "Sélectionner une image ISO"
-
-#~ msgid "Unknown Drive"
-#~ msgstr "Lecteur inconnu"
-
-#~ msgid "_Trellis searched quantization"
-#~ msgstr "Recherche de quantification par treillis (trellis)"
-
-#~ msgid "_Rate Control"
-#~ msgstr "_Contrôle du débit"
-
-#~ msgid ""
-#~ "<b><big>Profile updates are available</big></b>\n"
-#~ "Select the profiles you want to update"
-#~ msgstr ""
-#~ "<b><big>Des mises à jour des profils sont disponibles</big></b>\n"
-#~ "Sélectionner les profils que vous souhaiter mettre à jour"
-
-#~ msgid "Update profiles"
-#~ msgstr "Mise à jour des profiles"
-
-#~ msgid "Plugin %s disabled"
-#~ msgstr "Greffon %s désactivé"
-
-#~ msgid "some requirements are not available"
-#~ msgstr "des prérequis sont manquants"
-
-#~ msgid "The container '%s' is not available"
-#~ msgstr "Le conteneur '%s' n'est pas disponible"
-
-#~ msgid "The video codec '%s' is not available"
-#~ msgstr "Le codec vidéo '%s' n'est pas disponible"
-
-#~ msgid "The audio codec '%s' is not available"
-#~ msgstr "Le codec audio '%s' n'est pas disponible"
-
-#~ msgid "The subtitles codec '%s' is not available"
-#~ msgstr "Le codec de sous-titres '%s' n'est pas disponible"
-
-#~ msgid "Cannot open video manager"
-#~ msgstr "Impossible d'ouvrir gestionnaire vidéo"
-
-#~ msgid "Unknown error while identifying '%s'"
-#~ msgstr "Erreur indéterminée lors de l'identification de '%s'"
-
-#~ msgid "Cannot identify file '%s': %s"
-#~ msgstr "Impossible d'identifier le fichier '%s': %s"
-
-#~ msgid "Cannot get bitrate of file '%s'"
-#~ msgstr "Impossible de déterminer le taux d'échantillonage du fichier '%s'"
-
-#~ msgid "Cannot get rate of file '%s'"
-#~ msgstr "Impossible de déterminer le taux d'échantillongage du fichier '%s'"
-
-#~ msgid "Cannot get length of file '%s'"
-#~ msgstr "Impossible de déterminer la longueur du fichier '%s'"
-
-#~ msgid "Cannot get format of file '%s'"
-#~ msgstr "Impossible de déterminer le format du fichier '%s'"
-
-#~ msgid "Cannot get number of channels of file '%s'"
-#~ msgstr "Impossible de déterminer le nombre de canaux du fichier '%s'"
-
-#~ msgid "File '%s' contains video tracks"
-#~ msgstr "Le fichier '%s' contient des pistes vidéo"
-
-#~ msgid "Format of file '%s' is not supported"
-#~ msgstr "Le format du fichier '%s' n'est pas supporté"
-
-#~ msgid "Unknown error while opening '%s': %s"
-#~ msgstr "Erreur indéterminée lors de l'ouverture de '%s': %s"
-
-#~ msgid "Cannot get width of video file '%s'"
-#~ msgstr "Impossible de déterminer la largeur de '%s'"
-
-#~ msgid "Cannot get height of video file '%s'"
-#~ msgstr "Impossible de déterminer la hauteur de '%s'"
-
-#~ msgid "Cannot get aspect ratio of video file '%s'"
-#~ msgstr "Impossible de déterminer le rapport hauteur/largeur de '%s'"
-
-#~ msgid "Cannot get frame rate of video file '%s'"
-#~ msgstr "Impossible de déterminer le nombre de trames/sec de '%s'"
-
-#~ msgid "..."
-#~ msgstr "..."
-
-#~ msgid ""
-#~ "Disabled\n"
-#~ "Mpeg-4 reference decoder\n"
-#~ "Libavcodec specific extensions\n"
-#~ "Experimental  codecs and features"
-#~ msgstr ""
-#~ "Désactivé\n"
-#~ "Décodeur MPEG-4 de référence\n"
-#~ "Extensions spécifiques à libavcodec\n"
-#~ "Codecs et fonctionnalités expérimentales"
-
-#~ msgid ""
-#~ "Use comparison function given by mbcmp\n"
-#~ "Select the MB mode which needs the fewest bits\n"
-#~ "Select the MB mode which has the best rate distortion"
-#~ msgstr ""
-#~ "Utilise la fonction de comparaison donnée par mbcmp\n"
-#~ "Sélectionne le mode MB qui requiert le moins de bits\n"
-#~ "Sélectionne le mode MB qui est le plus fidèle à l'original"
-
-#~ msgid ""
-#~ "MPEG-4 uses a half pixel precision for its motion search by default. The "
-#~ "standard proposes a mode where encoders are allowed to use quarter pixel "
-#~ "precision. This option usually results in a sharper image. Unfortunately "
-#~ "it has a great impact on bitrate and sometimes the higher bitrate use "
-#~ "will prevent it from giving a better image quality at a fixed bitrate. "
-#~ "It's better to test with and without this option and see whether it is "
-#~ "worth activating"
-#~ msgstr ""
-#~ "MPEG-4 recherche par défaut les mouvements avec une précision d'un demi-"
-#~ "pixel. Il est néanmoins possible de faire une recherche avec une "
-#~ "précision d'un quart de pixel, ce qui permet généralement d'obtenir une "
-#~ "image plus détaillée et d'économiser des bits en description de "
-#~ "mouvement. Malheureusement, cette plus grande précision consomme une "
-#~ "partie de la bande passante vidéo, ainsi cette option peut aussi bien "
-#~ "dégrader la qualité de l'image que l'améliorer. Le mieux est donc de "
-#~ "comparer la vidéo obtenue avec et sans cette option et de ne garder que "
-#~ "celle qui vous paraît la plus fidèle (qui n'est pas forcément celle dont "
-#~ "le PSNR est le plus élevé)"
-
-#~ msgid ""
-#~ "Trellis quantization is a kind of adaptive quantization method that saves "
-#~ "bits by modifying quantized coefficients to make them more compressible "
-#~ "by the entropy encoder. Its impact on quality is good"
-#~ msgstr ""
-#~ "La quantification trellis est un type d'encodage adaptatif qui permet "
-#~ "d'économiser des bits en modifiant les coefficients de quantification "
-#~ "pour augmenter la compressibilité de la vidéo. Aussi, dans un contexte "
-#~ "d'encodage temps réel, pensez à cette option"
-
-#~ msgid "Baseline (no 8x8dct, no cabac, no weight_p, no cqm, no bframes)"
-#~ msgstr "Baseline (no 8x8dct, no cabac, no weight_p, no cqm, no bframes)"
-
-#~ msgid "High (no restriction)"
-#~ msgstr "Haut (pas de restriction)"
-
-#~ msgid "Main (no 8x8dct and no cqm)"
-#~ msgstr "Main (no 8x8dct and no cqm)"
-
-#~ msgid ""
-#~ "&lt;b&gt;DivX for Standalone Player&lt;/b&gt;&#xA;2-pass, 1x700MB (AVI + "
-#~ "XviD + MP3)"
-#~ msgstr ""
-#~ "&lt;b&gt;Compatible Platine DivX&lt;/b&gt;&#xA;2 passes, 1x700Mo (AVI + "
-#~ "XviD + MP3)"
-
-#~ msgid ""
-#~ "&lt;b&gt;PC, High Quality&lt;/b&gt;&#xA;Quantizer 2 (MKV + X264 + AAC)"
-#~ msgstr ""
-#~ "&lt;b&gt;PC, Haute Qualité&lt;/b&gt;&#xA;Quantizer 2 (MKV + X264 + AAC)"
-
-#~ msgid ""
-#~ "&lt;b&gt;PC, Low Quality&lt;/b&gt;&#xA;1-pass, 1x700MB (OGM + Lavc + "
-#~ "Vorbis)"
-#~ msgstr ""
-#~ "&lt;b&gt;PC, Basse Qualité&lt;/b&gt;&#xA;1 passe, 1x700Mo (OGM + Lavc + "
-#~ "Vorbis)"
-
-#~ msgid "Unknown error while extracting chapters"
-#~ msgstr "Erreur indéterminée lors de l'extraction du chapitrage."
-
-#~ msgid "Unknown error while extracting subtitle stream"
-#~ msgstr "Erreur indéterminée lors de l'extraction des sous-titres."
-
-#~ msgid "Unknown error while extracting audio stream"
-#~ msgstr "Erreur indéterminée lors de l'extraction de la piste audio."
-
-#~ msgid "Unknown error while extracting video stream"
-#~ msgstr "Erreur indéterminée lors de l'extraction de la piste vidéo"
-
-#~ msgid "Unknown error while merging"
-#~ msgstr "Erreur indéterminée lors de la fusion."
-
-#~ msgid "Your version of MPlayer does not support DTS streams"
-#~ msgstr "Votre version de MPlayer ne supporte pas les pistes DTS."
-
-#~ msgid "It is not possible to hardcode multiple subtitle streams"
-#~ msgstr "Il n'est pas possible d'incruster plusieurs sous-titres."
-
-#~ msgid "The container and the subtitles codec are incompatible."
-#~ msgstr "Le conteneur et le codec de sous-titres sont incompatibles."
-
-#~ msgid "The container and the audio file are incompatible."
-#~ msgstr "Le conteneur et le fichier audio sont incompatibles"
-
-#~ msgid "The container and the subtitles file are incompatible."
-#~ msgstr "Le conteneur et le fichier de sous-titres sont incompatibles"
-
-#~ msgid "The selected container does not support multiple audio streams"
-#~ msgstr "Le conteneur sélectionné ne supporte pas de multiples pistes audio."
-
-#~ msgid "The selected container does not support multiple subtitles streams"
-#~ msgstr "Le conteneur sélectionné ne supporte pas de multiples sous-titres."
-
-#~ msgid "No container has been selected."
-#~ msgstr "Aucun conteneur n'a été sélectionné."
-
-#~ msgid "Failed to get mount point of '%s'"
-#~ msgstr "Impossible de déterminer le point de montage de '%s'"
-
-#~ msgid "The file %s does not seem to contain a valid encoding"
-#~ msgstr "Le fichier '%s' ne semble pas contenir un profil valide"
-
-#~ msgid "Unknown error while copying the DVD on the hard drive"
-#~ msgstr "Erreur indéterminée lors de la copie du DVD sur le disque dur."
-
-#~ msgid ""
-#~ "Cannot perform a compressibility test when the video codec is not defined."
-#~ msgstr ""
-#~ "Impossible d'effectuer un test de compressibilité si aucun codec vidéo "
-#~ "n'est défini."
-
-#~ msgid ""
-#~ "Cannot perform a compressibility test when cropping parameters are not "
-#~ "defined."
-#~ msgstr ""
-#~ "Impossible d'effectuer un test de compressibilité tant que les "
-#~ "informations de découpage ne sont pas définies."
-
-#~ msgid ""
-#~ "Cannot perform a compressibility test when scaling parameters are not "
-#~ "defined."
-#~ msgstr ""
-#~ "Impossible d'effectuer un test de compressibilité tant que les "
-#~ "informations de redimensionnement ne sont pas définies."
-
-#~ msgid "More options"
-#~ msgstr "Plus d'options"
-
-#~ msgid ""
-#~ "Please, check http://ogmrip.sourceforge.net to see if this is a known "
-#~ "issue."
-#~ msgstr ""
-#~ "Veuillez consulter http://ogmrip.sourceforge.net pour voir s'il s'agit "
-#~ "d'une erreur connue."
-
-#~ msgid ""
-#~ "You really should join the log file if you open a bug report or ask "
-#~ "questions on the forum."
-#~ msgstr ""
-#~ "Vous devriez joindre le fichier de log si vous ouvrez un rapport "
-#~ "d'anomalie ou posez des questions sur le forum."
-
-#~ msgid "Please, choose some others."
-#~ msgstr "Choisissez-en d'autres."
-
-#~ msgid "Please, choose one audio stream only."
-#~ msgstr "Ne choisissez qu'une seule piste audio."
-
-#~ msgid "Please, choose one subtitles stream only."
-#~ msgstr "Ne choissisez qu'un seul sous-titre."
-
-#~ msgid "This is an unexpected error and should not happen."
-#~ msgstr "Il s'agit d'une erreur inatendue qui n'aurait pas dû se produire."
-
-#~ msgid "Please, fill a bug report at http://ogmrip.sourceforge.net."
-#~ msgstr ""
-#~ "Merci de remplir un rapport d'anomalie sur http://ogmrip.sourceforge.net"
-
-#~ msgid ""
-#~ "Do you want to remove the copy of the DVD,\n"
-#~ "keep it on the hard drive, or\n"
-#~ "keep it and update the GUI ?"
-#~ msgstr ""
-#~ "Voulez-vous supprimer la copie du DVD,\n"
-#~ "la conserver sur le disque dur ou\n"
-#~ "la conserver et mettre à jour l'interface graphique ?"
-
-#~ msgid "_Keep"
-#~ msgstr "_Conserver"
-
-#~ msgid "_Update"
-#~ msgstr "_Mettre à jour"
-
-#~ msgid "Audio stream %d seems to be empty. It has not been merged."
-#~ msgstr "La piste audio %d semble vide. Elle n'a pas été fusionnée."
-
-#~ msgid "Subtitle stream %d seems to be empty. It has not been merged."
-#~ msgstr "Les sous-titres %d semblent vides. Ils n'ont pas été fusionnés"
-
-#~ msgid "No available profile"
-#~ msgstr "Aucun profil disponible"
-
-#~ msgid "You must create at least one profile before you can encode."
-#~ msgstr "Vous devez créer au moins un profil avant de pouvoir encoder."
-
-#~ msgid ""
-#~ "A file named '%s' already exists.\n"
-#~ "Do you want to replace it?"
-#~ msgstr ""
-#~ "Un fichier nommé '%s' existe déjà.\n"
-#~ "Voulez-vous le remplacer ?"
-
-#~ msgid "The scaling parameters have been adjusted to optimize the quality."
-#~ msgstr ""
-#~ "Les paramètres de redimensionnement ont été modifiés pour optimiser la "
-#~ "qualité."
-
-#~ msgid "Could not read the DVD"
-#~ msgstr "Impossible de lire le DVD."
-
-#~ msgid "Unknown error while exporting the chapters"
-#~ msgstr "Erreur indéterminée lors de l'export du chapitrage."
-
-#~ msgid "The DVD has been successfully encoded, but..."
-#~ msgstr "Le DVD a été encodé avec succès, mais ..."
-
-#~ msgid "Detecting cropping parameters"
-#~ msgstr "Détection des paramètres de découpage"
-
-#~ msgid "Please wait"
-#~ msgstr "Veuillez patienter..."
-
-#~ msgid "%s: %02.0lf%% done"
-#~ msgstr "%s: %02.0lf%% effectué"
-
-#~ msgid "Cannot load encoding from '%s'"
-#~ msgstr "Impossible de charger un encodage depuis '%s'"
-
-#~ msgid "Save encoding"
-#~ msgstr "Sauvegarder un encodage"
-
-#~ msgid "This encoding will have the same output file name as another one."
-#~ msgstr "Cet encodage a le même nom de fichier que encodage existant."
-
-#~ msgid ""
-#~ "A file with the same name as the output file of the encoding already "
-#~ "exists."
-#~ msgstr ""
-#~ "Un fichier ayant le même nom que le fichier de sortie de l'encodage "
-#~ "existe déjà."
-
-#~ msgid "An MOV file must contain a video stream."
-#~ msgstr "Un fichier MOV doit contenir une piste vidéo"
-
-#~ msgid "QuickTime Media (MOV)"
-#~ msgstr "QuickTime Media (MOV)"
-
-#~ msgid "MEncoder is build without lavf support"
-#~ msgstr "MEncoder est compilé sans support lavf"
-
-#~ msgid "Keep the copy and update the GUI"
-#~ msgstr "Conserver la copie et mettre à jour l'interface graphique"
+#~ msgid "Subp codec '%s' does not exist."
+#~ msgstr "Le codec de sous-titres '%s' n'existe pas."

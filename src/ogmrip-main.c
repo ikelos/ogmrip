@@ -20,8 +20,13 @@
 #include "config.h"
 #endif
 
-#include "ogmrip-gui.h"
+#include "ogmrip-application.h"
+#include "ogmrip-cli.h"
 #include "ogmrip-settings.h"
+
+#ifdef HAVE_GTK_SUPPORT
+#include "ogmrip-gui.h"
+#endif
 
 #include <ogmrip-encode.h>
 #include <ogmrip-dvd.h>
@@ -48,6 +53,7 @@ ogmrip_tmp_dir_changed_cb (GSettings *settings, const gchar *key)
   g_free (path);
 }
 
+#ifdef HAVE_GTK_SUPPORT
 static gboolean
 ogmrip_profile_engine_update_cb (OGMRipProfileEngine *engine, OGMRipProfile *profile)
 {
@@ -70,11 +76,12 @@ ogmrip_profile_engine_update_cb (OGMRipProfileEngine *engine, OGMRipProfile *pro
 
   return response == GTK_RESPONSE_YES;
 }
+#endif
 
 static gboolean
-ogmrip_startup_finish (GApplication *app)
+ogmrip_startup_finish (OGMRipApplication *app)
 {
-  ogmrip_gui_prepare (OGMRIP_GUI (app));
+  ogmrip_application_prepare (app);
 
   return TRUE;
 }
@@ -114,8 +121,10 @@ ogmrip_startup_thread (GIOSchedulerJob *job, GCancellable *cancellable, GApplica
   profile_engine = ogmrip_profile_engine_get_default ();
   g_object_set_data_full (G_OBJECT (app), "profile-engine", profile_engine, g_object_unref);
 
+#ifdef HAVE_GTK_SUPPORT
   g_signal_connect (profile_engine, "update",
       G_CALLBACK (ogmrip_profile_engine_update_cb), NULL);
+#endif
 
   path = g_build_filename (OGMRIP_DATA_DIR, "ogmrip", "profiles", NULL);
   ogmrip_profile_engine_add_path (profile_engine, path);
@@ -208,11 +217,18 @@ main (int argc, char *argv[])
   textdomain (GETTEXT_PACKAGE);
 #endif /* ENABLE_NLS */
 
+#ifdef HAVE_GTK_SUPPORT
   gtk_init (&argc, &argv);
+#endif
 
   g_set_application_name (_("OGMRip"));
 
+#ifdef HAVE_GTK_SUPPORT
   app = ogmrip_gui_new ("org.gnome.ogmrip");
+#else
+  app = ogmrip_cli_new ("org.gnome.ogmrip");
+#endif
+
   g_signal_connect (G_OBJECT (app), "startup",
       G_CALLBACK (ogmrip_gui_startup_cb), NULL);
 
