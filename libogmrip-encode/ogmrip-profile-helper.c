@@ -186,12 +186,12 @@ ogmrip_create_subp_codec (OGMRipSubpStream *stream, OGMRipProfile *profile)
 
   settings = ogmrip_profile_get_child (profile, OGMRIP_PROFILE_SUBP);
 
-    ogmrip_subp_codec_set_charset (OGMRIP_SUBP_CODEC (codec),
-        g_settings_get_uint (settings, OGMRIP_PROFILE_CHARACTER_SET));
-    ogmrip_subp_codec_set_newline (OGMRIP_SUBP_CODEC (codec),
-        g_settings_get_uint (settings, OGMRIP_PROFILE_NEWLINE_STYLE));
-    ogmrip_subp_codec_set_forced_only (OGMRIP_SUBP_CODEC (codec),
-        g_settings_get_boolean (settings, OGMRIP_PROFILE_FORCED_ONLY));
+  ogmrip_subp_codec_set_charset (OGMRIP_SUBP_CODEC (codec),
+      g_settings_get_uint (settings, OGMRIP_PROFILE_CHARACTER_SET));
+  ogmrip_subp_codec_set_newline (OGMRIP_SUBP_CODEC (codec),
+      g_settings_get_uint (settings, OGMRIP_PROFILE_NEWLINE_STYLE));
+  ogmrip_subp_codec_set_forced_only (OGMRIP_SUBP_CODEC (codec),
+      g_settings_get_boolean (settings, OGMRIP_PROFILE_FORCED_ONLY));
 
   g_object_unref (settings);
 
