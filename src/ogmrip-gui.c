@@ -1010,15 +1010,6 @@ ogmrip_gui_add_subp_chooser (OGMRipData *data)
       G_CALLBACK (gtk_container_remove), data->subp_list);
 }
 
-static const gchar *fourcc[] =
-{
-  NULL,
-  "XVID",
-  "DIVX",
-  "DX50",
-  "FMP4"
-};
-
 /*
  * Creates a container
  */
@@ -1026,29 +1017,10 @@ static OGMRipContainer *
 ogmrip_gui_create_container (OGMRipData *data, OGMRipProfile *profile)
 {
   OGMRipContainer *container;
-  GSettings *settings;
-  GType type;
-  gchar *name;
 
-  ogmrip_profile_get (profile, OGMRIP_PROFILE_GENERAL, OGMRIP_PROFILE_CONTAINER, "s", &name);
-  type = ogmrip_type_from_name (name);
-  g_free (name);
-
-  g_assert (type != G_TYPE_NONE);
-
-  container = g_object_new (type, NULL);
+  container = ogmrip_create_container (profile);
   ogmrip_container_set_label (container,
       gtk_entry_get_text (GTK_ENTRY (data->title_entry)));
-
-  settings = ogmrip_profile_get_child (profile, OGMRIP_PROFILE_GENERAL);
-
-  ogmrip_container_set_fourcc (container,
-      fourcc[g_settings_get_uint (settings, OGMRIP_PROFILE_FOURCC)]);
-  ogmrip_container_set_split (container,
-      g_settings_get_uint (settings, OGMRIP_PROFILE_TARGET_NUMBER),
-      g_settings_get_uint (settings, OGMRIP_PROFILE_TARGET_SIZE));
-
-  g_object_unref (settings);
 
   return container;
 }
@@ -1061,63 +1033,12 @@ ogmrip_gui_create_video_codec (OGMRipData *data, OGMRipProfile *profile,
     OGMRipVideoStream *stream, guint start_chap, gint end_chap)
 {
   OGMRipCodec *codec;
-  GSettings *settings;
-  GType type;
-  guint w, h, m;
-  gchar *name;
 
-  ogmrip_profile_get (profile, OGMRIP_PROFILE_VIDEO, OGMRIP_PROFILE_CODEC, "s", &name);
-  type = ogmrip_type_from_name (name);
-  g_free (name);
-
-  if (type == G_TYPE_NONE)
+  codec = ogmrip_create_video_codec (stream, profile);
+  if (!codec)
     return NULL;
 
-  codec = g_object_new (type, "input", stream, NULL);
-
   ogmrip_codec_set_chapters (codec, start_chap, end_chap);
-
-  settings = ogmrip_profile_get_child (profile, OGMRIP_PROFILE_VIDEO);
-
-  ogmrip_video_codec_set_angle (OGMRIP_VIDEO_CODEC (codec),
-      gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (data->angle_spin)));
-  ogmrip_video_codec_set_passes (OGMRIP_VIDEO_CODEC (codec),
-      g_settings_get_uint (settings, OGMRIP_PROFILE_PASSES));
-  ogmrip_video_codec_set_scaler (OGMRIP_VIDEO_CODEC (codec),
-      g_settings_get_uint (settings, OGMRIP_PROFILE_SCALER));
-  ogmrip_video_codec_set_turbo (OGMRIP_VIDEO_CODEC (codec),
-      g_settings_get_boolean (settings, OGMRIP_PROFILE_TURBO));
-  ogmrip_video_codec_set_denoise (OGMRIP_VIDEO_CODEC (codec),
-      g_settings_get_boolean (settings, OGMRIP_PROFILE_DENOISE));
-  ogmrip_video_codec_set_deblock (OGMRIP_VIDEO_CODEC (codec),
-      g_settings_get_boolean (settings, OGMRIP_PROFILE_DEBLOCK));
-  ogmrip_video_codec_set_dering (OGMRIP_VIDEO_CODEC (codec),
-      g_settings_get_boolean (settings, OGMRIP_PROFILE_DERING));
-  ogmrip_video_codec_set_quality (OGMRIP_VIDEO_CODEC (codec),
-      g_settings_get_uint (settings, OGMRIP_PROFILE_QUALITY));
-
-  w = g_settings_get_uint (settings, OGMRIP_PROFILE_MIN_WIDTH);
-  h = g_settings_get_uint (settings, OGMRIP_PROFILE_MIN_HEIGHT);
-
-  if (w > 0 && h > 0)
-    ogmrip_video_codec_set_min_size (OGMRIP_VIDEO_CODEC (codec), w, h);
-
-  w = g_settings_get_uint (settings, OGMRIP_PROFILE_MAX_WIDTH);
-  h = g_settings_get_uint (settings, OGMRIP_PROFILE_MAX_HEIGHT);
-
-  if (w > 0 && h > 0)
-    ogmrip_video_codec_set_max_size (OGMRIP_VIDEO_CODEC (codec), w, h,
-        g_settings_get_boolean (settings, OGMRIP_PROFILE_EXPAND));
-
-  ogmrip_profile_get (profile, OGMRIP_PROFILE_GENERAL, OGMRIP_PROFILE_ENCODING_METHOD, "u", &m);
-  if (m == OGMRIP_ENCODING_BITRATE)
-    ogmrip_video_codec_set_bitrate (OGMRIP_VIDEO_CODEC (codec),
-        g_settings_get_uint (settings, OGMRIP_PROFILE_BITRATE));
-  else if (m == OGMRIP_ENCODING_QUANTIZER)
-    ogmrip_video_codec_set_quantizer (OGMRIP_VIDEO_CODEC (codec),
-        g_settings_get_double (settings, OGMRIP_PROFILE_QUANTIZER));
-
-  g_object_unref (settings);
 
   return codec;
 }
@@ -1137,21 +1058,16 @@ ogmrip_gui_create_audio_codec (OGMRipData *data, OGMRipProfile *profile,
   GType type;
 
   options = ogmrip_audio_chooser_widget_get_options (OGMRIP_AUDIO_CHOOSER_WIDGET (chooser));
-  if (options)
-    type = ogmrip_audio_options_get_codec (options);
+  if (!options)
+    codec = ogmrip_create_audio_codec (stream, profile);
   else
   {
-    gchar *name;
-
-    ogmrip_profile_get (profile, OGMRIP_PROFILE_AUDIO, OGMRIP_PROFILE_CODEC, "s", &name);
-    type = ogmrip_type_from_name (name);
-    g_free (name);
+    type = ogmrip_audio_options_get_codec (options);
+    if (type == G_TYPE_NONE)
+      return NULL;
+    codec = g_object_new (type, "input", stream, NULL);
   }
 
-  if (type == G_TYPE_NONE)
-    return NULL;
-
-  codec = g_object_new (type, "input", stream, NULL);
   if (!codec)
     return NULL;
 
@@ -1172,23 +1088,6 @@ ogmrip_gui_create_audio_codec (OGMRipData *data, OGMRipProfile *profile,
     ogmrip_audio_codec_set_sample_rate (OGMRIP_AUDIO_CODEC (codec),
         sample_rate[ogmrip_audio_options_get_sample_rate (options)]);
   }
-  else
-  {
-    GSettings *settings;
-
-    settings = ogmrip_profile_get_child (profile, OGMRIP_PROFILE_AUDIO);
-
-    ogmrip_audio_codec_set_channels (OGMRIP_AUDIO_CODEC (codec),
-        g_settings_get_uint (settings, OGMRIP_PROFILE_CHANNELS));
-    ogmrip_audio_codec_set_normalize (OGMRIP_AUDIO_CODEC (codec),
-        g_settings_get_boolean (settings, OGMRIP_PROFILE_NORMALIZE));
-    ogmrip_audio_codec_set_quality (OGMRIP_AUDIO_CODEC (codec),
-        g_settings_get_uint (settings, OGMRIP_PROFILE_QUALITY));
-    ogmrip_audio_codec_set_sample_rate (OGMRIP_AUDIO_CODEC (codec),
-        sample_rate[g_settings_get_uint (settings, OGMRIP_PROFILE_SAMPLERATE)]);
-
-    g_object_unref (settings);
-  }
 
   return codec;
 }
@@ -1205,21 +1104,16 @@ ogmrip_gui_create_subp_codec (OGMRipData *data, OGMRipProfile *profile,
   GType type;
 
   options = ogmrip_subp_chooser_widget_get_options (OGMRIP_SUBP_CHOOSER_WIDGET (chooser));
-  if (options)
-    type = ogmrip_subp_options_get_codec (options);
+  if (!options)
+    codec = ogmrip_create_subp_codec (stream, profile);
   else
   {
-    gchar *name;
-
-    ogmrip_profile_get (profile, OGMRIP_PROFILE_SUBP, OGMRIP_PROFILE_CODEC, "s", &name);
-    type = ogmrip_type_from_name (name);
-    g_free (name);
+    type = ogmrip_subp_options_get_codec (options);
+    if (type == G_TYPE_NONE)
+      return NULL;
+    codec = g_object_new (type, "input", stream, NULL);
   }
 
-  if (type == G_TYPE_NONE)
-    return NULL;
-
-  codec = g_object_new (type, "input", stream, NULL);
   if (!codec)
     return NULL;
 
@@ -1237,21 +1131,6 @@ ogmrip_gui_create_subp_codec (OGMRipData *data, OGMRipProfile *profile,
         ogmrip_subp_options_get_newline (options));
     ogmrip_subp_codec_set_forced_only (OGMRIP_SUBP_CODEC (codec),
         ogmrip_subp_options_get_forced_only (options));
-  }
-  else
-  {
-    GSettings *settings;
-
-    settings = ogmrip_profile_get_child (profile, OGMRIP_PROFILE_SUBP);
-
-    ogmrip_subp_codec_set_charset (OGMRIP_SUBP_CODEC (codec),
-        g_settings_get_uint (settings, OGMRIP_PROFILE_CHARACTER_SET));
-    ogmrip_subp_codec_set_newline (OGMRIP_SUBP_CODEC (codec),
-        g_settings_get_uint (settings, OGMRIP_PROFILE_NEWLINE_STYLE));
-    ogmrip_subp_codec_set_forced_only (OGMRIP_SUBP_CODEC (codec),
-        g_settings_get_boolean (settings, OGMRIP_PROFILE_FORCED_ONLY));
-
-    g_object_unref (settings);
   }
 
   return codec;
@@ -1971,7 +1850,7 @@ ogmrip_gui_player_stop (OGMRipPlayer *player, GtkWidget *button)
 }
 
 static void
-ogmrip_gui_app_prepared (OGMRipData *data, GParamSpec *pspec, GApplication *app)
+ogmrip_gui_app_prepared (OGMRipData *data, GApplication *app)
 {
   g_simple_action_set_enabled (G_SIMPLE_ACTION (data->load_action), TRUE);
   g_simple_action_set_enabled (G_SIMPLE_ACTION (data->extract_action), data->media != NULL);

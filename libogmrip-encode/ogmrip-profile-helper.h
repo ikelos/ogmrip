@@ -16,27 +16,25 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef __OGMRIP_ENCODE_H__
-#define __OGMRIP_ENCODE_H__
+#ifndef __OGMRIP_PROFILE_HELPER_H__
+#define __OGMRIP_PROFILE_HELPER_H__
 
-#include <ogmrip-analyze.h>
-#include <ogmrip-audio-codec.h>
-#include <ogmrip-chapters.h>
-#include <ogmrip-configurable.h>
-#include <ogmrip-container.h>
-#include <ogmrip-copy.h>
+#include <ogmrip-profile.h>
 #include <ogmrip-encoding.h>
-#include <ogmrip-encoding-manager.h>
-#include <ogmrip-enums.h>
-#include <ogmrip-hardsub.h>
-#include <ogmrip-marshal.h>
-#include <ogmrip-novideo.h>
-#include <ogmrip-profile-engine.h>
-#include <ogmrip-profile-helper.h>
-#include <ogmrip-profile-keys.h>
-#include <ogmrip-subp-codec.h>
-#include <ogmrip-test.h>
-#include <ogmrip-version.h>
-#include <ogmrip-video-codec.h>
+#include <ogmrip-container.h>
+#include <ogmrip-codec.h>
 
-#endif /* __OGMRIP_ENCODE_H__ */
+G_BEGIN_DECLS
+
+OGMRipContainer * ogmrip_create_container   (OGMRipProfile     *profile);
+OGMRipCodec *     ogmrip_create_video_codec (OGMRipVideoStream *stream,
+                                             OGMRipProfile     *profile);
+OGMRipCodec *     ogmrip_create_audio_codec (OGMRipAudioStream *stream,
+                                             OGMRipProfile     *profile);
+OGMRipCodec *     ogmrip_create_subp_codec  (OGMRipSubpStream  *stream,
+                                             OGMRipProfile     *profile);
+
+G_END_DECLS
+
+#endif /* __OGMRIP_PROFILE_HELPER_H__ */
+

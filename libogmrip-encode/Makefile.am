@@ -22,6 +22,7 @@ libogmrip_encode_la_SOURCES = \
   ogmrip-plugin.c           \
   ogmrip-profile.c          \
   ogmrip-profile-engine.c   \
+  ogmrip-profile-helper.c   \
   ogmrip-profile-parser.c   \
   ogmrip-stub.c             \
   ogmrip-subp-codec.c       \
@@ -48,6 +49,7 @@ libogmrip_encode_la_HEADERS = \
   ogmrip-novideo.h          \
   ogmrip-profile.h          \
   ogmrip-profile-engine.h   \
+  ogmrip-profile-helper.h   \
   ogmrip-profile-keys.h     \
   ogmrip-profile-parser.h   \
   ogmrip-subp-codec.h       \
