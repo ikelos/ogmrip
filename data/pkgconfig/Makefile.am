@@ -4,6 +4,7 @@ pkgconfigdir = \
 pkgconfig_DATA = \
   ogmrip-base.pc   \
   ogmrip-dvd.pc    \
+  ogmrip-bluray.pc \
   ogmrip-encode.pc \
   ogmrip-file.pc   \
   ogmrip-job.pc    \

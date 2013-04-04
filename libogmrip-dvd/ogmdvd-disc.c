@@ -516,7 +516,10 @@ ogmdvd_disc_constructor (GType gtype, guint n_properties, GObjectConstructParam 
 
   reader = dvd_open_reader (disc->priv->device, NULL);
   if (!reader)
+  {
+    g_object_unref (disc);
     return NULL;
+  }
   id = dvd_reader_get_id (reader);
   if (!id)
     return NULL;

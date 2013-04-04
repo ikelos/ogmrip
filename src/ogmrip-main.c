@@ -32,6 +32,10 @@
 #include <ogmrip-dvd.h>
 #include <ogmrip-module.h>
 
+#ifdef HAVE_BLURAY_SUPPORT
+#include <ogmrip-bluray.h>
+#endif
+
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 
@@ -94,6 +98,9 @@ ogmrip_startup_thread (GIOSchedulerJob *job, GCancellable *cancellable, GApplica
   gchar *path;
 
   ogmrip_dvd_register_media ();
+#ifdef HAVE_BLURAY_SUPPORT
+  ogmrip_bluray_register_media ();
+#endif
   ogmrip_file_register_media ();
 
   ogmrip_hardsub_register_codec ();
