@@ -24,6 +24,9 @@
  */
 
 #include "ogmrip-subp-codec.h"
+#include "ogmrip-profile-keys.h"
+
+#include <ogmrip-base.h>
 
 #define OGMRIP_SUBP_GET_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_SUBP_CODEC, OGMRipSubpCodecPriv))
@@ -186,6 +189,49 @@ ogmrip_subp_codec_get_property (GObject *gobject, guint property_id, GValue *val
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
   }
+}
+
+OGMRipCodec *
+ogmrip_subp_codec_new (GType type, OGMRipSubpStream *stream)
+{
+  g_return_val_if_fail (g_type_is_a (type, OGMRIP_TYPE_SUBP_CODEC), NULL);
+  g_return_val_if_fail (OGMRIP_IS_SUBP_STREAM (stream), NULL);
+
+  return g_object_new (type, "input", stream, NULL);
+}
+
+OGMRipCodec *
+ogmrip_subp_codec_new_from_profile (OGMRipSubpStream *stream, OGMRipProfile *profile)
+{
+  OGMRipCodec *codec;
+  GSettings *settings;
+  GType type;
+  gchar *name;
+
+  g_return_val_if_fail (OGMRIP_IS_PROFILE (profile), NULL);
+  g_return_val_if_fail (OGMRIP_IS_SUBP_STREAM (stream), NULL);
+
+  ogmrip_profile_get (profile, OGMRIP_PROFILE_SUBP, OGMRIP_PROFILE_CODEC, "s", &name);
+  type = ogmrip_type_from_name (name);
+  g_free (name);
+  
+  if (type == G_TYPE_NONE)
+    return NULL;
+
+  codec = ogmrip_subp_codec_new (type, stream);
+
+  settings = ogmrip_profile_get_child (profile, OGMRIP_PROFILE_SUBP);
+
+  ogmrip_subp_codec_set_charset (OGMRIP_SUBP_CODEC (codec),
+      g_settings_get_uint (settings, OGMRIP_PROFILE_CHARACTER_SET));
+  ogmrip_subp_codec_set_newline (OGMRIP_SUBP_CODEC (codec),
+      g_settings_get_uint (settings, OGMRIP_PROFILE_NEWLINE_STYLE));
+  ogmrip_subp_codec_set_forced_only (OGMRIP_SUBP_CODEC (codec),
+      g_settings_get_boolean (settings, OGMRIP_PROFILE_FORCED_ONLY));
+
+  g_object_unref (settings);
+
+  return codec;
 }
 
 /**

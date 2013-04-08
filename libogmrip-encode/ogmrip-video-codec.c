@@ -24,7 +24,11 @@
  */
 
 #include "ogmrip-video-codec.h"
+#include "ogmrip-profile-keys.h"
+#include "ogmrip-encoding.h"
 #include "ogmrip-version.h"
+
+#include <ogmrip-base.h>
 
 #include <string.h>
 #include <stdio.h>
@@ -510,6 +514,79 @@ ogmrip_video_codec_autosize (OGMRipVideoCodec *video)
       video->priv->scale_height = scale_height;
     }
   }
+}
+
+OGMRipCodec *
+ogmrip_video_codec_new (GType type, OGMRipVideoStream *stream)
+{
+  g_return_val_if_fail (g_type_is_a (type, OGMRIP_TYPE_VIDEO_CODEC), NULL);
+  g_return_val_if_fail (OGMRIP_IS_VIDEO_STREAM (stream), NULL);
+
+  return g_object_new (type, "input", stream, NULL);
+}
+
+OGMRipCodec *
+ogmrip_video_codec_new_from_profile (OGMRipVideoStream *stream, OGMRipProfile *profile)
+{
+  OGMRipCodec *codec;
+  GSettings *settings;
+  GType type;
+  guint w, h, m;
+  gchar *name;
+
+  g_return_val_if_fail (OGMRIP_IS_PROFILE (profile), NULL);
+  g_return_val_if_fail (OGMRIP_IS_VIDEO_STREAM (stream), NULL);
+
+  ogmrip_profile_get (profile, OGMRIP_PROFILE_VIDEO, OGMRIP_PROFILE_CODEC, "s", &name);
+  type = ogmrip_type_from_name (name);
+  g_free (name);
+  
+  if (type == G_TYPE_NONE)
+    return NULL;
+
+  codec = ogmrip_video_codec_new (type, stream);
+
+  settings = ogmrip_profile_get_child (profile, OGMRIP_PROFILE_VIDEO);
+
+  ogmrip_video_codec_set_passes (OGMRIP_VIDEO_CODEC (codec),
+      g_settings_get_uint (settings, OGMRIP_PROFILE_PASSES));
+  ogmrip_video_codec_set_scaler (OGMRIP_VIDEO_CODEC (codec),
+      g_settings_get_uint (settings, OGMRIP_PROFILE_SCALER));
+  ogmrip_video_codec_set_turbo (OGMRIP_VIDEO_CODEC (codec),
+      g_settings_get_boolean (settings, OGMRIP_PROFILE_TURBO));
+  ogmrip_video_codec_set_denoise (OGMRIP_VIDEO_CODEC (codec),
+      g_settings_get_boolean (settings, OGMRIP_PROFILE_DENOISE));
+  ogmrip_video_codec_set_deblock (OGMRIP_VIDEO_CODEC (codec),
+      g_settings_get_boolean (settings, OGMRIP_PROFILE_DEBLOCK));
+  ogmrip_video_codec_set_dering (OGMRIP_VIDEO_CODEC (codec),
+      g_settings_get_boolean (settings, OGMRIP_PROFILE_DERING));
+  ogmrip_video_codec_set_quality (OGMRIP_VIDEO_CODEC (codec),
+      g_settings_get_uint (settings, OGMRIP_PROFILE_QUALITY));
+
+  w = g_settings_get_uint (settings, OGMRIP_PROFILE_MIN_WIDTH);
+  h = g_settings_get_uint (settings, OGMRIP_PROFILE_MIN_HEIGHT);
+
+  if (w > 0 && h > 0)
+    ogmrip_video_codec_set_min_size (OGMRIP_VIDEO_CODEC (codec), w, h);
+
+  w = g_settings_get_uint (settings, OGMRIP_PROFILE_MAX_WIDTH);
+  h = g_settings_get_uint (settings, OGMRIP_PROFILE_MAX_HEIGHT);
+
+  if (w > 0 && h > 0)
+    ogmrip_video_codec_set_max_size (OGMRIP_VIDEO_CODEC (codec), w, h,
+        g_settings_get_boolean (settings, OGMRIP_PROFILE_EXPAND));
+
+  ogmrip_profile_get (profile, OGMRIP_PROFILE_GENERAL, OGMRIP_PROFILE_ENCODING_METHOD, "u", &m);
+  if (m == OGMRIP_ENCODING_BITRATE)
+    ogmrip_video_codec_set_bitrate (OGMRIP_VIDEO_CODEC (codec),
+        g_settings_get_uint (settings, OGMRIP_PROFILE_BITRATE));
+  else if (m == OGMRIP_ENCODING_QUANTIZER)
+    ogmrip_video_codec_set_quantizer (OGMRIP_VIDEO_CODEC (codec),
+        g_settings_get_double (settings, OGMRIP_PROFILE_QUANTIZER));
+
+  g_object_unref (settings);
+
+  return codec;
 }
 
 /**

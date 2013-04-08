@@ -20,6 +20,7 @@
 #define __OGMRIP_AUDIO_CODEC_H__
 
 #include <ogmrip-codec.h>
+#include <ogmrip-profile.h>
 
 G_BEGIN_DECLS
 
@@ -46,28 +47,32 @@ struct _OGMRipAudioCodecClass
   OGMRipCodecClass parent_class;
 };
 
-GType         ogmrip_audio_codec_get_type        (void);
-void          ogmrip_audio_codec_set_channels    (OGMRipAudioCodec *audio,
-                                                  OGMRipChannels   channels);
-gint          ogmrip_audio_codec_get_channels    (OGMRipAudioCodec *audio);
-void          ogmrip_audio_codec_set_fast        (OGMRipAudioCodec *audio,
-                                                  gboolean         fast);
-gboolean      ogmrip_audio_codec_get_fast        (OGMRipAudioCodec *audio);
-void          ogmrip_audio_codec_set_label       (OGMRipAudioCodec *audio,
-                                                  const gchar      *label);
-const gchar * ogmrip_audio_codec_get_label       (OGMRipAudioCodec *audio);
-void          ogmrip_audio_codec_set_language    (OGMRipAudioCodec *audio,
-                                                  guint            language);
-gint          ogmrip_audio_codec_get_language    (OGMRipAudioCodec *audio);
-void          ogmrip_audio_codec_set_normalize   (OGMRipAudioCodec *audio,
-                                                  gboolean         normalize);
-gboolean      ogmrip_audio_codec_get_normalize   (OGMRipAudioCodec *audio);
-void          ogmrip_audio_codec_set_quality     (OGMRipAudioCodec *audio,
-                                                  guint            quality);
-gint          ogmrip_audio_codec_get_quality     (OGMRipAudioCodec *audio);
-void          ogmrip_audio_codec_set_sample_rate (OGMRipAudioCodec *audio,
-                                                  guint            srate);
-gint          ogmrip_audio_codec_get_sample_rate (OGMRipAudioCodec *audio);
+GType         ogmrip_audio_codec_get_type         (void);
+OGMRipCodec * ogmrip_audio_codec_new              (GType             type,
+                                                   OGMRipAudioStream *stream);
+OGMRipCodec * ogmrip_audio_codec_new_from_profile (OGMRipAudioStream *stream,
+                                                   OGMRipProfile     *profile);
+void          ogmrip_audio_codec_set_channels     (OGMRipAudioCodec  *audio,
+                                                   OGMRipChannels    channels);
+gint          ogmrip_audio_codec_get_channels     (OGMRipAudioCodec  *audio);
+void          ogmrip_audio_codec_set_fast         (OGMRipAudioCodec  *audio,
+                                                   gboolean          fast);
+gboolean      ogmrip_audio_codec_get_fast         (OGMRipAudioCodec  *audio);
+void          ogmrip_audio_codec_set_label        (OGMRipAudioCodec  *audio,
+                                                   const gchar       *label);
+const gchar * ogmrip_audio_codec_get_label        (OGMRipAudioCodec  *audio);
+void          ogmrip_audio_codec_set_language     (OGMRipAudioCodec  *audio,
+                                                   guint             language);
+gint          ogmrip_audio_codec_get_language     (OGMRipAudioCodec  *audio);
+void          ogmrip_audio_codec_set_normalize    (OGMRipAudioCodec  *audio,
+                                                   gboolean          normalize);
+gboolean      ogmrip_audio_codec_get_normalize    (OGMRipAudioCodec  *audio);
+void          ogmrip_audio_codec_set_quality      (OGMRipAudioCodec  *audio,
+                                                   guint             quality);
+gint          ogmrip_audio_codec_get_quality      (OGMRipAudioCodec  *audio);
+void          ogmrip_audio_codec_set_sample_rate  (OGMRipAudioCodec  *audio,
+                                                   guint             srate);
+gint          ogmrip_audio_codec_get_sample_rate  (OGMRipAudioCodec  *audio);
 
 G_END_DECLS
 

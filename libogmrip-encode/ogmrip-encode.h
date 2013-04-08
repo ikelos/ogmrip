@@ -32,7 +32,6 @@
 #include <ogmrip-marshal.h>
 #include <ogmrip-novideo.h>
 #include <ogmrip-profile-engine.h>
-#include <ogmrip-profile-helper.h>
 #include <ogmrip-profile-keys.h>
 #include <ogmrip-subp-codec.h>
 #include <ogmrip-test.h>

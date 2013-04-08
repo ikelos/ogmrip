@@ -21,6 +21,7 @@
 
 #include <ogmrip-codec.h>
 #include <ogmrip-enums.h>
+#include <ogmrip-profile.h>
 
 G_BEGIN_DECLS
 
@@ -47,22 +48,26 @@ struct _OGMRipSubpCodecClass
   OGMRipCodecClass parent_class;
 };
 
-GType         ogmrip_subp_codec_get_type        (void);
-gint          ogmrip_subp_codec_get_charset     (OGMRipSubpCodec  *subp);
-void          ogmrip_subp_codec_set_charset     (OGMRipSubpCodec  *subp,
-                                                 OGMRipCharset    charset);
-gboolean      ogmrip_subp_codec_get_forced_only (OGMRipSubpCodec  *subp);
-void          ogmrip_subp_codec_set_forced_only (OGMRipSubpCodec  *subp,
-                                                 gboolean         forced_only);
-const gchar * ogmrip_subp_codec_get_label       (OGMRipSubpCodec  *codec);
-void          ogmrip_subp_codec_set_label       (OGMRipSubpCodec  *codec,
-                                                 const gchar      *label);
-gint          ogmrip_subp_codec_get_language    (OGMRipSubpCodec  *subp);
-void          ogmrip_subp_codec_set_language    (OGMRipSubpCodec  *subp,
-                                                 guint            language);
-gint          ogmrip_subp_codec_get_newline     (OGMRipSubpCodec  *subp);
-void          ogmrip_subp_codec_set_newline     (OGMRipSubpCodec  *subp,
-                                                 OGMRipNewline    newline);
+GType         ogmrip_subp_codec_get_type         (void);
+OGMRipCodec * ogmrip_subp_codec_new              (GType            type,
+                                                  OGMRipSubpStream *stream);
+OGMRipCodec * ogmrip_subp_codec_new_from_profile (OGMRipSubpStream *stream,
+                                                  OGMRipProfile    *profile);
+gint          ogmrip_subp_codec_get_charset      (OGMRipSubpCodec  *subp);
+void          ogmrip_subp_codec_set_charset      (OGMRipSubpCodec  *subp,
+                                                  OGMRipCharset    charset);
+gboolean      ogmrip_subp_codec_get_forced_only  (OGMRipSubpCodec  *subp);
+void          ogmrip_subp_codec_set_forced_only  (OGMRipSubpCodec  *subp,
+                                                  gboolean         forced_only);
+const gchar * ogmrip_subp_codec_get_label        (OGMRipSubpCodec  *codec);
+void          ogmrip_subp_codec_set_label        (OGMRipSubpCodec  *codec,
+                                                  const gchar      *label);
+gint          ogmrip_subp_codec_get_language     (OGMRipSubpCodec  *subp);
+void          ogmrip_subp_codec_set_language     (OGMRipSubpCodec  *subp,
+                                                  guint            language);
+gint          ogmrip_subp_codec_get_newline      (OGMRipSubpCodec  *subp);
+void          ogmrip_subp_codec_set_newline      (OGMRipSubpCodec  *subp,
+                                                  OGMRipNewline    newline);
 
 G_END_DECLS
 

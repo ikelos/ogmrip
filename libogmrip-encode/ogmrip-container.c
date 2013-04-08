@@ -29,6 +29,7 @@
 
 #include "ogmrip-container.h"
 #include "ogmrip-encoding.h"
+#include "ogmrip-profile-keys.h"
 
 #include <unistd.h>
 #include <glib/gstdio.h>
@@ -239,6 +240,54 @@ ogmrip_container_get_property (GObject *gobject, guint property_id, GValue *valu
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
   }
+}
+
+OGMRipContainer *
+ogmrip_container_new (GType type)
+{
+  g_return_val_if_fail (g_type_is_a (type, OGMRIP_TYPE_CONTAINER), NULL);
+
+  return g_object_new (type, NULL);
+}
+
+static const gchar *fourcc[] =
+{
+  NULL,
+  "XVID",
+  "DIVX",
+  "DX50",
+  "FMP4"
+};
+
+OGMRipContainer *
+ogmrip_container_new_from_profile (OGMRipProfile *profile)
+{
+  OGMRipContainer *container;
+  GSettings *settings;
+  GType type;
+  gchar *name;
+
+  g_return_val_if_fail (OGMRIP_IS_PROFILE (profile), NULL);
+
+  ogmrip_profile_get (profile, OGMRIP_PROFILE_GENERAL, OGMRIP_PROFILE_CONTAINER, "s", &name);
+  type = ogmrip_type_from_name (name);
+  g_free (name);
+
+  if (type == G_TYPE_NONE)
+    return NULL;
+
+  container = ogmrip_container_new (type);
+
+  settings = ogmrip_profile_get_child (profile, OGMRIP_PROFILE_GENERAL);
+  ogmrip_container_set_fourcc (container,
+      fourcc[g_settings_get_uint (settings, OGMRIP_PROFILE_FOURCC)]);
+  ogmrip_container_set_split (container,
+      g_settings_get_uint (settings, OGMRIP_PROFILE_TARGET_NUMBER),
+      g_settings_get_uint (settings, OGMRIP_PROFILE_TARGET_SIZE));
+
+  g_object_unref (settings);
+
+  return container;
 }
 
 /**

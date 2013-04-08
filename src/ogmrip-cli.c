@@ -558,7 +558,7 @@ ogmrip_cli_set_container (OGMRipEncoding *encoding, OGMRipProfile *profile)
   gboolean status;
   GFile *file;
 
-  container = ogmrip_create_container (profile);
+  container = ogmrip_container_new_from_profile (profile);
   status = ogmrip_encoding_set_container (encoding, container, &error);
   g_object_unref (container);
 
@@ -592,7 +592,7 @@ ogmrip_cli_set_video_codec (OGMRipEncoding *encoding, OGMRipProfile *profile, OG
     return FALSE;
   }
 
-  codec = ogmrip_create_video_codec (stream, profile);
+  codec = ogmrip_video_codec_new_from_profile (stream, profile);
   ogmrip_codec_set_chapters (OGMRIP_CODEC (codec), start_chap, end_chap);
   /*
    * crop size, scale size, deinterlacer, angle
@@ -631,7 +631,7 @@ ogmrip_cli_add_audio_codec (OGMRipEncoding *encoding, OGMRipProfile *profile, OG
         return FALSE;
       }
 
-      codec = ogmrip_create_audio_codec (stream, profile);
+      codec = ogmrip_audio_codec_new_from_profile (stream, profile);
       ogmrip_codec_set_chapters (OGMRIP_CODEC (codec), start_chap, end_chap);
       /*
        * label, language
@@ -668,7 +668,7 @@ ogmrip_cli_add_subp_codec (OGMRipEncoding *encoding, OGMRipProfile *profile, OGM
       if (!stream)
         return FALSE;
 
-      codec = ogmrip_create_subp_codec (stream, profile);
+      codec = ogmrip_subp_codec_new_from_profile (stream, profile);
       ogmrip_codec_set_chapters (OGMRIP_CODEC (codec), start_chap, end_chap);
       /*
        * label, language

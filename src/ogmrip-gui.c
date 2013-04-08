@@ -973,7 +973,7 @@ ogmrip_gui_create_container (OGMRipData *data, OGMRipProfile *profile)
 {
   OGMRipContainer *container;
 
-  container = ogmrip_create_container (profile);
+  container = ogmrip_container_new_from_profile (profile);
   ogmrip_container_set_label (container,
       gtk_entry_get_text (GTK_ENTRY (data->title_entry)));
 
@@ -989,7 +989,7 @@ ogmrip_gui_create_video_codec (OGMRipData *data, OGMRipProfile *profile,
 {
   OGMRipCodec *codec;
 
-  codec = ogmrip_create_video_codec (stream, profile);
+  codec = ogmrip_video_codec_new_from_profile (stream, profile);
   if (!codec)
     return NULL;
 
@@ -1014,13 +1014,13 @@ ogmrip_gui_create_audio_codec (OGMRipData *data, OGMRipProfile *profile,
 
   options = ogmrip_audio_chooser_widget_get_options (OGMRIP_AUDIO_CHOOSER_WIDGET (chooser));
   if (!options)
-    codec = ogmrip_create_audio_codec (stream, profile);
+    codec = ogmrip_audio_codec_new_from_profile (stream, profile);
   else
   {
     type = ogmrip_audio_options_get_codec (options);
     if (type == G_TYPE_NONE)
       return NULL;
-    codec = g_object_new (type, "input", stream, NULL);
+    codec = ogmrip_audio_codec_new (type, stream);
   }
 
   if (!codec)
@@ -1060,13 +1060,13 @@ ogmrip_gui_create_subp_codec (OGMRipData *data, OGMRipProfile *profile,
 
   options = ogmrip_subp_chooser_widget_get_options (OGMRIP_SUBP_CHOOSER_WIDGET (chooser));
   if (!options)
-    codec = ogmrip_create_subp_codec (stream, profile);
+    codec = ogmrip_subp_codec_new_from_profile (stream, profile);
   else
   {
     type = ogmrip_subp_options_get_codec (options);
     if (type == G_TYPE_NONE)
       return NULL;
-    codec = g_object_new (type, "input", stream, NULL);
+    codec = ogmrip_subp_codec_new (type, stream);
   }
 
   if (!codec)

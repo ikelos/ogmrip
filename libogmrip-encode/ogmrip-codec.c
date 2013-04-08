@@ -117,7 +117,7 @@ ogmrip_codec_class_init (OGMRipCodecClass *klass)
   task_class->run = ogmrip_codec_run;
 
   g_object_class_install_property (gobject_class, PROP_INPUT, 
-        g_param_spec_object ("input", "Input property", "Set input title", 
+        g_param_spec_object ("input", "Input property", "Set input stream", 
            OGMRIP_TYPE_STREAM, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_OUTPUT, 

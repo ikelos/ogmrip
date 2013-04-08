@@ -21,6 +21,7 @@
 
 #include <ogmrip-codec.h>
 #include <ogmrip-enums.h>
+#include <ogmrip-profile.h>
 
 G_BEGIN_DECLS
 
@@ -52,7 +53,10 @@ struct _OGMRipVideoCodecClass
 };
 
 GType               ogmrip_video_codec_get_type           (void);
-
+OGMRipCodec *       ogmrip_video_codec_new                (GType             type,
+                                                           OGMRipVideoStream *stream);
+OGMRipCodec *       ogmrip_video_codec_new_from_profile   (OGMRipVideoStream *stream,
+                                                           OGMRipProfile     *profile);
 gint                ogmrip_video_codec_get_angle          (OGMRipVideoCodec  *video);
 void                ogmrip_video_codec_set_angle          (OGMRipVideoCodec  *video,
                                                            guint             angle);

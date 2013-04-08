@@ -24,6 +24,9 @@
  */
 
 #include "ogmrip-audio-codec.h"
+#include "ogmrip-profile-keys.h"
+
+#include <ogmrip-base.h>
 
 #define DEFAULT_SPF 1024
 
@@ -216,6 +219,54 @@ ogmrip_audio_codec_get_property (GObject *gobject, guint property_id, GValue *va
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
   }
+}
+
+OGMRipCodec *
+ogmrip_audio_codec_new (GType type, OGMRipAudioStream *stream)
+{
+  g_return_val_if_fail (g_type_is_a (type, OGMRIP_TYPE_AUDIO_CODEC), NULL);
+  g_return_val_if_fail (OGMRIP_IS_AUDIO_STREAM (stream), NULL);
+
+  return g_object_new (type, "input", stream, NULL);
+}
+
+static const gint sample_rate[] =
+{ 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000 };
+
+OGMRipCodec *
+ogmrip_audio_codec_new_from_profile (OGMRipAudioStream *stream, OGMRipProfile *profile)
+{
+  OGMRipCodec *codec;
+  GSettings *settings;
+  GType type;
+  gchar *name;
+
+  g_return_val_if_fail (OGMRIP_IS_PROFILE (profile), NULL);
+  g_return_val_if_fail (OGMRIP_IS_AUDIO_STREAM (stream), NULL);
+
+  ogmrip_profile_get (profile, OGMRIP_PROFILE_AUDIO, OGMRIP_PROFILE_CODEC, "s", &name);
+  type = ogmrip_type_from_name (name);
+  g_free (name);
+  
+  if (type == G_TYPE_NONE)
+    return NULL;
+
+  codec = ogmrip_audio_codec_new (type, stream);
+
+  settings = ogmrip_profile_get_child (profile, OGMRIP_PROFILE_AUDIO);
+
+  ogmrip_audio_codec_set_channels (OGMRIP_AUDIO_CODEC (codec),
+      g_settings_get_uint (settings, OGMRIP_PROFILE_CHANNELS));
+  ogmrip_audio_codec_set_normalize (OGMRIP_AUDIO_CODEC (codec),
+      g_settings_get_boolean (settings, OGMRIP_PROFILE_NORMALIZE));
+  ogmrip_audio_codec_set_quality (OGMRIP_AUDIO_CODEC (codec),
+      g_settings_get_uint (settings, OGMRIP_PROFILE_QUALITY));
+  ogmrip_audio_codec_set_sample_rate (OGMRIP_AUDIO_CODEC (codec),
+      sample_rate[g_settings_get_uint (settings, OGMRIP_PROFILE_SAMPLERATE)]);
+
+  g_object_unref (settings);
+
+  return codec;
 }
 
 /**
