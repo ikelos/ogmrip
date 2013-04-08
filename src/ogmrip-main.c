@@ -180,18 +180,15 @@ ogmrip_gui_startup_cb (GApplication *app)
     g_settings_set_uint (settings, OGMRIP_SETTINGS_CHAPTER_LANG, ogmrip_get_locale ());
 
   path = g_settings_get_string (settings, OGMRIP_SETTINGS_OUTPUT_DIR);
-  if (!strlen (path))
+  if (!strlen (path) || !g_file_test (path, G_FILE_TEST_IS_DIR))
     g_settings_set_string (settings, OGMRIP_SETTINGS_OUTPUT_DIR, g_get_user_special_dir (G_USER_DIRECTORY_VIDEOS));
   g_free (path);
 
   path = g_settings_get_string (settings, OGMRIP_SETTINGS_TMP_DIR);
-  if (strlen (path) > 0)
+  if (strlen (path) > 0 && g_file_test (path, G_FILE_TEST_IS_DIR))
     ogmrip_fs_set_tmp_dir (path);
   else
-  {
-    g_settings_set_string (settings, OGMRIP_SETTINGS_TMP_DIR, g_get_tmp_dir ());
-    ogmrip_fs_set_tmp_dir (g_get_tmp_dir ());
-  }
+    g_settings_set_string (settings, OGMRIP_SETTINGS_TMP_DIR, ogmrip_fs_get_tmp_dir ());
   g_free (path);
 
   g_signal_connect (settings, "changed::" OGMRIP_SETTINGS_TMP_DIR,
