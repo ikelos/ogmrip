@@ -235,6 +235,11 @@ typedef enum
   OGMRIP_FORMAT_VP8,
   OGMRIP_FORMAT_CHAPTERS,
   OGMRIP_FORMAT_PGS,
+  OGMRIP_FORMAT_VC1,
+  OGMRIP_FORMAT_TRUEHD,
+  OGMRIP_FORMAT_EAC3,
+  OGMRIP_FORMAT_DTS_HD,
+  OGMRIP_FORMAT_DTS_HD_MA,
   OGMRIP_FORMAT_LAST
 } OGMRipFormat;
 
@@ -245,7 +250,8 @@ typedef enum
                                            (format) == OGMRIP_FORMAT_THEORA || \
                                            (format) == OGMRIP_FORMAT_DIRAC  || \
                                            (format) == OGMRIP_FORMAT_MJPEG  || \
-                                           (format) == OGMRIP_FORMAT_VP8)
+                                           (format) == OGMRIP_FORMAT_VP8    || \
+                                           (format) == OGMRIP_FORMAT_VC1)
 
 #define OGMRIP_IS_AUDIO_FORMAT(format)    ((format) == OGMRIP_FORMAT_PCM    || \
                                            (format) == OGMRIP_FORMAT_MP2    || \
@@ -254,7 +260,11 @@ typedef enum
                                            (format) == OGMRIP_FORMAT_DTS    || \
                                            (format) == OGMRIP_FORMAT_AAC    || \
                                            (format) == OGMRIP_FORMAT_VORBIS || \
-                                           (format) == OGMRIP_FORMAT_FLAC)
+                                           (format) == OGMRIP_FORMAT_FLAC   || \
+                                           (format) == OGMRIP_FORMAT_TRUEHD || \
+                                           (format) == OGMRIP_FORMAT_EAC3   || \
+                                           (format) == OGMRIP_FORMAT_DTS_HD || \
+                                           (format) == OGMRIP_FORMAT_DTS_HD_MA)
 
 #define OGMRIP_IS_SUBP_FORMAT(format)     ((format) == OGMRIP_FORMAT_SRT || \
                                            (format) == OGMRIP_FORMAT_SSA || \

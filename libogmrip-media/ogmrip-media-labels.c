@@ -59,6 +59,11 @@ ogmrip_format_get_label (OGMRipFormat format)
     "VP8",
     "Chapters",
     "PGS",
+    "VC1",
+    "TrueHD",
+    "AC3+",
+    "DTS-HD",
+    "DTS-HD Master Audio"
   };
 
   return format_type[format + 1];
