@@ -194,14 +194,26 @@ gdouble
 ogmrip_title_get_chapters_length (OGMRipTitle *title, guint start, gint end, OGMRipTime *length)
 {
   OGMRipTitleInterface *iface;
+  gint nchapters;
 
   g_return_val_if_fail (OGMRIP_IS_TITLE (title), -1.0);
   g_return_val_if_fail ((start <= end && end < ogmrip_title_get_n_chapters (title)) || end < 0, -1.0);
 
   iface = OGMRIP_TITLE_GET_IFACE (title);
 
+  if (length)
+    length->hour = length->min = length->sec = length->msec = 0;
+
   if (!iface->get_chapters_length)
     return 0.0;
+
+  nchapters = ogmrip_title_get_n_chapters (title);
+
+  if (end < 0)
+    end = nchapters - 1;
+
+  if (start == 0 && end + 1 == nchapters)
+    return ogmrip_title_get_length (title, length);
 
   return iface->get_chapters_length (title, start, end, length);
 }

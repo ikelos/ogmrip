@@ -75,7 +75,7 @@ ogmrip_media_iface_init (OGMRipMediaInterface *iface)
 }
 
 static gdouble
-ogmrip_stub_get_chapters_length (OGMRipTitle *title, guint start, gint end, OGMRipTime *time_)
+ogmrip_stub_get_chapters_length (OGMRipTitle *title, guint start, guint end, OGMRipTime *time_)
 {
   OGMRipStub *stub = OGMRIP_STUB (title);
   OGMRipStream *input;

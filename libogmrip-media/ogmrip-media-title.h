@@ -53,7 +53,7 @@ struct _OGMRipTitleInterface
                                                 OGMRipTime          *length);
   gdouble             (* get_chapters_length)  (OGMRipTitle         *title, 
                                                 guint               start,
-                                                gint                end,
+                                                guint               end,
                                                 OGMRipTime          *length);
   const guint *       (* get_palette)          (OGMRipTitle         *title);
   gint                (* get_n_angles)         (OGMRipTitle         *title);

@@ -383,16 +383,10 @@ ogmdvd_title_get_length (OGMRipTitle *title, OGMRipTime  *length)
 }
 
 static gdouble
-ogmdvd_title_get_chapters_length (OGMRipTitle *title, guint start, gint end, OGMRipTime *length)
+ogmdvd_title_get_chapters_length (OGMRipTitle *title, guint start, guint end, OGMRipTime *length)
 {
   OGMDvdTitle *dtitle = OGMDVD_TITLE (title);
   gulong total;
-
-  if (end < 0)
-    end = dtitle->priv->nr_of_chapters - 1;
-
-  if (start == 0 && end + 1 == dtitle->priv->nr_of_chapters)
-    return ogmdvd_title_get_length (title, length);
 
   for (total = 0; start <= end; start ++)
     total += dtitle->priv->length_of_chapters[start];
