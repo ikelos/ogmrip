@@ -34,7 +34,7 @@
 const gchar *
 ogmrip_format_get_label (OGMRipFormat format)
 {
-  static const gchar *format_type[] = 
+  static const gchar *format_type[OGMRIP_FORMAT_LAST + 1] = 
   {
     "Undefined",
     "MPEG1",
@@ -49,29 +49,16 @@ ogmrip_format_get_label (OGMRipFormat format)
     "DTS",
     "AAC",
     "Vorbis",
-    "MicroDVD",
-    "SubRip",
     "SRT",
-    "SAMI",
-    "VPLAYER",
-    "RT",
     "SSA",
-    "PJS",
-    "MPSub",
-    "AQT",
-    "SRT_2_0",
-    "SubRip_0_9",
-    "JacoSub",
-    "MPL_2",
     "VOBSUB",
     "COPY",
-    "LPCM",
-    "BPCM",
     "MP12",
     "MJPEG",
     "Flac",
     "VP8",
-    "Chapters"
+    "Chapters",
+    "PGS",
   };
 
   return format_type[format + 1];
