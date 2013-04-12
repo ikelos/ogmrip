@@ -309,7 +309,7 @@ ogmrip_cli_video_info (OGMRipTitle *title)
   g_print ("\t%s: %s, ", _("Format"), ogmrip_format_get_label (val));
 
   ogmrip_video_stream_get_aspect_ratio (stream, &num, &denom);
-  g_print ("%s: %ux%u, ", _("Aspect ratio"), num, denom);
+  g_print ("%s: %u:%u, ", _("Aspect ratio"), num, denom);
 
   ogmrip_video_stream_get_resolution (stream, &width, &height);
   g_print ("%s: %dx%d\n", _("Resolution"), width, height);
@@ -355,13 +355,17 @@ ogmrip_cli_audio_info (OGMRipTitle *title)
       g_print ("%s: 48 kHz, ", _("Frequency"));
 
       val = ogmrip_audio_stream_get_quantization (stream);
-      g_print ("%s: %s, ", _("Quantization"), ogmrip_quantization_get_label (val));
+      if (val != OGMRIP_QUANTIZATION_UNDEFINED)
+        g_print ("%s: %s, ", _("Quantization"), ogmrip_quantization_get_label (val));
 
       val = ogmrip_audio_stream_get_channels (stream);
-      g_print ("%s: %s, ", _("Channels"), ogmrip_channels_get_label (val));
+      g_print ("%s: %s", _("Channels"), ogmrip_channels_get_label (val));
 
       val = ogmrip_audio_stream_get_content (stream);
-      g_print ("%s: %s\n", _("Content"), ogmrip_audio_content_get_label (val));
+      if (val != OGMRIP_AUDIO_CONTENT_UNDEFINED)
+        g_print (", %s: %s", _("Content"), ogmrip_audio_content_get_label (val));
+
+      g_print ("\n");
     }
   }
 }
@@ -383,8 +387,14 @@ ogmrip_cli_subp_info (OGMRipTitle *title)
       val = ogmrip_subp_stream_get_language (stream);
       g_print ("%s: %s, ", _("Language"), ogmrip_language_to_iso639_1 (val));
 
+      val = ogmrip_stream_get_format (OGMRIP_STREAM (stream));
+      g_print ("%s: %s", _("Format"), ogmrip_format_get_label (val));
+
       val = ogmrip_subp_stream_get_content (stream);
-      g_print ("%s: %s\n", _("Content"), ogmrip_subp_content_get_label (val));
+      if (val != OGMRIP_SUBP_CONTENT_UNDEFINED)
+        g_print (", %s: %s", _("Content"), ogmrip_subp_content_get_label (val));
+
+      g_print ("\n");
     }
   }
 }
@@ -398,9 +408,9 @@ ogmrip_cli_chapters_info (OGMRipTitle *title)
   nchap = ogmrip_title_get_n_chapters (title);
   for (chap = 0; chap < nchap; chap ++)
   {
-    ogmrip_title_get_chapters_length (title, chap, chap, &length);
-    g_print ("\t\t%s: %02d, %s: %02lu:%02lu:%02lu\n",
-        _("Chapter"), chap + 1, _("Length"), length.hour, length.min, length.sec);
+    if (ogmrip_title_get_chapters_length (title, chap, chap, &length) > 0.0)
+      g_print ("\t\t%s: %02d, %s: %02lu:%02lu:%02lu\n",
+          _("Chapter"), chap + 1, _("Length"), length.hour, length.min, length.sec);
   }
 }
 
@@ -476,18 +486,25 @@ ogmrip_cli_media_info (OGMRipMedia *media)
 }
 
 static void
+ogmrip_cli_media_open_cb (OGMRipMedia *media, gdouble percent, gpointer user_data)
+{
+  g_print ("\rOpening media: %d%%  ", (gint) (percent * 100));
+}
+
+static void
 ogmrip_cli_list (OGMRipCli *cli)
 {
   OGMRipMedia *media = NULL;
   gboolean retval;
 
   media = ogmrip_media_new (input);
-  if (!media || !ogmrip_media_open (media, NULL, NULL, NULL, NULL))
+  if (!media || !ogmrip_media_open (media, NULL, ogmrip_cli_media_open_cb, NULL, NULL))
   {
     g_printerr (_("Couldn't open media: '%s'"), input);
     g_printerr ("\n");
     goto cleanup;
   }
+  g_print ("\rOpening media: 100%%\n");
 
   if (ntitle == -1)
     retval = ogmrip_cli_media_info (media);
@@ -777,16 +794,8 @@ ogmrip_cli_encode (OGMRipCli *cli)
     goto cleanup;
   }
 
-  {
-    gchar *str;
-
-    str = g_settings_get_string (G_SETTINGS (profile), "name");
-    g_message ("%s", str);
-    g_free (str);
-  }
-
   media = ogmrip_media_new (input);
-  if (!media || !ogmrip_media_open (media, NULL, NULL, NULL, NULL))
+  if (!media || !ogmrip_media_open (media, NULL, ogmrip_cli_media_open_cb, NULL, NULL))
   {
     g_printerr (_("Couldn't open media: '%s'"), input);
     g_printerr ("\n");
@@ -969,7 +978,7 @@ ogmrip_cli_local_cmdline (GApplication *cli, gchar ***argv, gint *status)
   gboolean retval;
   gint argc;
 
-  context = g_option_context_new ("[<PATH>]");
+  context = g_option_context_new (NULL);
   g_option_context_set_help_enabled (context, FALSE);
   g_option_context_add_main_entries (context, main_opts, GETTEXT_PACKAGE);
 
@@ -1030,7 +1039,7 @@ ogmrip_cli_local_cmdline (GApplication *cli, gchar ***argv, gint *status)
     goto cleanup;
   }
 
-  if (!output)
+  if (action == ENCODE && !output)
   {
     g_printerr ("%s\n", _("No output file speficied"));
 
