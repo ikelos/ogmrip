@@ -44,8 +44,7 @@ struct _OGMRipTitleInterface
   gboolean            (* is_open)              (OGMRipTitle         *title);
   OGMRipMedia *       (* get_media)            (OGMRipTitle         *title);
   gint64              (* get_size)             (OGMRipTitle         *title);
-  gint                (* get_nr)               (OGMRipTitle         *title);
-  gint                (* get_ts_nr)            (OGMRipTitle         *title);
+  gint                (* get_id)               (OGMRipTitle         *title);
   gboolean            (* get_progressive)      (OGMRipTitle         *title);
   gboolean            (* get_telecine)         (OGMRipTitle         *title);
   gboolean            (* get_interlaced)       (OGMRipTitle         *title);
@@ -60,11 +59,13 @@ struct _OGMRipTitleInterface
   gint                (* get_n_chapters)       (OGMRipTitle         *title);
   OGMRipVideoStream * (* get_video_stream)     (OGMRipTitle         *title);
   gint                (* get_n_audio_streams)  (OGMRipTitle         *title);
-  OGMRipAudioStream * (* get_nth_audio_stream) (OGMRipTitle         *title,
-                                                guint               nr);
+  OGMRipAudioStream * (* get_audio_stream)     (OGMRipTitle         *title,
+                                                guint               id);
+  GList *             (* get_audio_streams)    (OGMRipTitle         *title);
   gint                (* get_n_subp_streams)   (OGMRipTitle         *title);
-  OGMRipSubpStream *  (* get_nth_subp_stream)  (OGMRipTitle         *title,
-                                                guint               nr);
+  OGMRipSubpStream *  (* get_subp_stream)      (OGMRipTitle         *title,
+                                                guint               id);
+  GList *             (* get_subp_streams)     (OGMRipTitle         *title);
   gboolean            (* analyze)              (OGMRipTitle         *title,
                                                 GCancellable        *cancellable,
                                                 OGMRipTitleCallback callback,
@@ -90,8 +91,7 @@ void                ogmrip_title_close                (OGMRipTitle         *titl
 gboolean            ogmrip_title_is_open              (OGMRipTitle         *title);
 OGMRipMedia *       ogmrip_title_get_media            (OGMRipTitle         *title);
 gint64              ogmrip_title_get_size             (OGMRipTitle         *title);
-gint                ogmrip_title_get_nr               (OGMRipTitle         *title);
-gint                ogmrip_title_get_ts_nr            (OGMRipTitle         *title);
+gint                ogmrip_title_get_id               (OGMRipTitle         *title);
 gboolean            ogmrip_title_get_progressive      (OGMRipTitle         *title);
 gboolean            ogmrip_title_get_telecine         (OGMRipTitle         *title);
 gboolean            ogmrip_title_get_interlaced       (OGMRipTitle         *title);
@@ -106,12 +106,12 @@ gint                ogmrip_title_get_n_angles         (OGMRipTitle         *titl
 gint                ogmrip_title_get_n_chapters       (OGMRipTitle         *title);
 OGMRipVideoStream * ogmrip_title_get_video_stream     (OGMRipTitle         *title);
 gint                ogmrip_title_get_n_audio_streams  (OGMRipTitle         *title);
-OGMRipAudioStream * ogmrip_title_get_nth_audio_stream (OGMRipTitle         *title,
-                                                       guint               nr);
+OGMRipAudioStream * ogmrip_title_get_audio_stream     (OGMRipTitle         *title,
+                                                       guint               id);
 GList *             ogmrip_title_get_audio_streams    (OGMRipTitle         *title);
 gint                ogmrip_title_get_n_subp_streams   (OGMRipTitle         *title);
-OGMRipSubpStream *  ogmrip_title_get_nth_subp_stream  (OGMRipTitle         *title,
-                                                       guint               nr);
+OGMRipSubpStream *  ogmrip_title_get_subp_stream      (OGMRipTitle         *title,
+                                                       guint               id);
 GList *             ogmrip_title_get_subp_streams     (OGMRipTitle         *title);
 gboolean            ogmrip_title_analyze              (OGMRipTitle         *title,
                                                        GCancellable        *cancellable,

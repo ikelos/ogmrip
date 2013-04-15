@@ -87,17 +87,10 @@ ogmdvd_subp_stream_get_language (OGMRipSubpStream *subp)
   return OGMDVD_SUBP_STREAM (subp)->priv->lang_code;
 }
 
-static gint
-ogmdvd_subp_stream_get_nr (OGMRipSubpStream *stream)
-{
-  return OGMDVD_SUBP_STREAM (stream)->priv->nr;
-}
-
 static void
 ogmrip_subp_stream_iface_init (OGMRipSubpStreamInterface *iface)
 {
   iface->get_content  = ogmdvd_subp_stream_get_content;
   iface->get_language = ogmdvd_subp_stream_get_language;
-  iface->get_nr       = ogmdvd_subp_stream_get_nr;
 }
 

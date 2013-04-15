@@ -502,7 +502,7 @@ ogmrip_gui_encoding_spawn_run (OGMRipEncoding *encoding, OGMJobSpawn *spawn, OGM
     {
       stream = ogmrip_codec_get_input (OGMRIP_CODEC (spawn));
       message = g_strdup_printf (_("Extracting audio stream %d"),
-          ogmrip_audio_stream_get_nr (OGMRIP_AUDIO_STREAM (stream)) + 1);
+          ogmrip_stream_get_id (stream) + 1);
       ogmrip_progress_dialog_set_message (dialog, message);
       g_free (message);
     }
@@ -510,7 +510,7 @@ ogmrip_gui_encoding_spawn_run (OGMRipEncoding *encoding, OGMJobSpawn *spawn, OGM
     {
       stream = ogmrip_codec_get_input (OGMRIP_CODEC (spawn));
       message = g_strdup_printf (_("Extracting subtitle stream %d"),
-          ogmrip_subp_stream_get_nr (OGMRIP_SUBP_STREAM (stream)) + 1);
+          ogmrip_stream_get_id (stream) + 1);
       ogmrip_progress_dialog_set_message (dialog, message);
       g_free (message);
     }
@@ -919,12 +919,11 @@ ogmrip_gui_add_audio_chooser (OGMRipData *data)
 
     if (!ogmrip_source_chooser_get_active (OGMRIP_SOURCE_CHOOSER (chooser)))
     {
-      OGMRipAudioStream *stream = NULL;
+      GList *list;
 
-      if (ogmrip_title_get_n_audio_streams (title) > 0)
-        stream = ogmrip_title_get_nth_audio_stream (title, 0);
-
-      ogmrip_source_chooser_set_active (OGMRIP_SOURCE_CHOOSER (chooser), stream ? OGMRIP_STREAM (stream) : NULL);
+      list = ogmrip_title_get_audio_streams (title);
+      ogmrip_source_chooser_set_active (OGMRIP_SOURCE_CHOOSER (chooser), list ? list->data : NULL);
+      g_list_free (list);
     }
   }
 

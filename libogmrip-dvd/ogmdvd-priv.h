@@ -127,7 +127,6 @@ struct _OGMDvdAudioStreamPriv
 {
   OGMRipTitle *title;
   guint id;
-  guint nr;
   guint format;
   guint channels;
   guint quantization;
@@ -144,7 +143,6 @@ struct _OGMDvdSubpStreamPriv
 {
   OGMRipTitle *title;
   guint id;
-  guint nr;
   guint lang_extension;
   guint lang_code;
 };

@@ -315,15 +315,9 @@ ogmdvd_title_get_media (OGMRipTitle *title)
 }
 
 static gint
-ogmdvd_title_get_nr (OGMRipTitle *title)
+ogmdvd_title_get_id (OGMRipTitle *title)
 {
   return OGMDVD_TITLE (title)->priv->nr;
-}
-
-static gint
-ogmdvd_title_get_ts_nr (OGMRipTitle *title)
-{
-  return OGMDVD_TITLE (title)->priv->title_set_nr;
 }
 
 static gboolean
@@ -428,7 +422,7 @@ ogmdvd_title_get_n_audio_streams (OGMRipTitle *title)
 }
 
 static OGMRipAudioStream *
-ogmdvd_title_get_nth_audio_stream (OGMRipTitle *title, guint nr)
+ogmdvd_title_get_audio_stream (OGMRipTitle *title, guint id)
 {
   GList *link;
 
@@ -436,11 +430,17 @@ ogmdvd_title_get_nth_audio_stream (OGMRipTitle *title, guint nr)
   {
     OGMDvdAudioStream *stream = link->data;
 
-    if (stream->priv->nr == nr)
+    if (stream->priv->id == id)
       return link->data;
   }
 
   return NULL;
+}
+
+static GList *
+ogmdvd_title_get_audio_streams (OGMRipTitle *title)
+{
+  return g_list_copy (OGMDVD_TITLE (title)->priv->audio_streams);
 }
 
 static gint
@@ -450,7 +450,7 @@ ogmdvd_title_get_n_subp_streams (OGMRipTitle *title)
 }
 
 static OGMRipSubpStream *
-ogmdvd_title_get_nth_subp_stream (OGMRipTitle *title, guint nr)
+ogmdvd_title_get_subp_stream (OGMRipTitle *title, guint id)
 {
   GList *link;
 
@@ -458,11 +458,17 @@ ogmdvd_title_get_nth_subp_stream (OGMRipTitle *title, guint nr)
   {
     OGMDvdSubpStream *stream = link->data;
 
-    if (stream->priv->nr == nr)
+    if (stream->priv->id == id)
       return link->data;
   }
 
   return NULL;
+}
+
+static GList *
+ogmdvd_title_get_subp_streams (OGMRipTitle *title)
+{
+  return g_list_copy (OGMDVD_TITLE (title)->priv->subp_streams);
 }
 
 typedef struct
@@ -534,8 +540,7 @@ ogmdvd_title_iface_init (OGMRipTitleInterface *iface)
   iface->close                = ogmdvd_title_close;
   iface->is_open              = ogmdvd_title_is_open;
   iface->get_media            = ogmdvd_title_get_media;
-  iface->get_nr               = ogmdvd_title_get_nr;
-  iface->get_ts_nr            = ogmdvd_title_get_ts_nr;
+  iface->get_id               = ogmdvd_title_get_id;
   iface->get_size             = ogmdvd_title_get_vts_size;
   iface->get_length           = ogmdvd_title_get_length;
   iface->get_chapters_length  = ogmdvd_title_get_chapters_length;
@@ -544,9 +549,11 @@ ogmdvd_title_iface_init (OGMRipTitleInterface *iface)
   iface->get_n_chapters       = ogmdvd_title_get_n_chapters;
   iface->get_video_stream     = ogmdvd_title_get_video_stream;
   iface->get_n_audio_streams  = ogmdvd_title_get_n_audio_streams;
-  iface->get_nth_audio_stream = ogmdvd_title_get_nth_audio_stream;
+  iface->get_audio_stream     = ogmdvd_title_get_audio_stream;
+  iface->get_audio_streams    = ogmdvd_title_get_audio_streams;
   iface->get_n_subp_streams   = ogmdvd_title_get_n_subp_streams;
-  iface->get_nth_subp_stream  = ogmdvd_title_get_nth_subp_stream;
+  iface->get_subp_stream      = ogmdvd_title_get_subp_stream;
+  iface->get_subp_streams     = ogmdvd_title_get_subp_streams;
   iface->get_progressive      = ogmdvd_title_get_progressive;
   iface->get_telecine         = ogmdvd_title_get_telecine;
   iface->get_interlaced       = ogmdvd_title_get_interlaced;

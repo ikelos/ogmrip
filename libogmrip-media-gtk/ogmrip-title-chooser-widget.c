@@ -43,7 +43,7 @@ enum
 enum
 {
   TEXT_COLUMN,
-  NR_COLUMN,
+  ID_COLUMN,
   NUM_COLUMNS
 };
 
@@ -68,15 +68,6 @@ static void
 ogmrip_title_chooser_widget_set_disc (OGMRipTitleChooserWidget *chooser, OGMRipMedia *media)
 {
   GtkTreeModel *model;
-  GtkTreeIter iter;
-
-  OGMRipTitle *title;
-  OGMRipTime time_;
-  GString *string;
-
-  gint vid, nvid, standard;
-  glong length, longest;
-  guint num, denom;
 
   if (media)
     g_object_ref (media);
@@ -91,48 +82,55 @@ ogmrip_title_chooser_widget_set_disc (OGMRipTitleChooserWidget *chooser, OGMRipM
     gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), -1);
   else
   {
+    GtkTreeIter iter;
+    GList *list, *link;
+
     OGMRipVideoStream *stream;
+    OGMRipTime time_;
+    GString *string;
 
-    nvid = ogmrip_media_get_n_titles (media);
-    for (vid = 0, longest = 0; vid < nvid; vid++)
+    gint standard;
+    glong length, longest = 0;
+    guint num, denom;
+
+    list = ogmrip_media_get_titles (media);
+    for (link = list; link; link = link->next)
     {
-      title = ogmrip_media_get_nth_title (media, vid);
-      if (title)
+      stream = ogmrip_title_get_video_stream (link->data);
+
+      string = g_string_new (NULL);
+      g_string_printf (string, "%s %02d", _("Title"), ogmrip_title_get_id (link->data) + 1);
+
+      length = ogmrip_title_get_length (link->data, &time_);
+      if (time_.hour > 0)
+        g_string_append_printf (string, " (%02lu:%02lu %s", time_.hour, time_.min, _("hours"));
+      else if (time_.min > 0)
+        g_string_append_printf (string, " (%02lu:%02lu %s", time_.min, time_.sec, _("minutes"));
+      else
+        g_string_append_printf (string, " (%02lu %s", time_.sec, _("seconds"));
+
+      standard = ogmrip_video_stream_get_standard (stream);
+      if (standard != OGMRIP_STANDARD_UNDEFINED)
+        g_string_append_printf (string, ", %s", ogmrip_standard_get_label (standard));
+
+      ogmrip_video_stream_get_aspect_ratio (stream, &num, &denom);
+      if (num > 0 && denom > 0)
+        g_string_append_printf (string, ", %u/%u", num, denom);
+
+      g_string_append_c (string, ')');
+
+      gtk_list_store_append (GTK_LIST_STORE (model), &iter);
+      gtk_list_store_set (GTK_LIST_STORE (model), &iter, TEXT_COLUMN, string->str,
+          ID_COLUMN, ogmrip_title_get_id (link->data), -1);
+      g_string_free (string, TRUE);
+
+      if (length > longest)
       {
-        stream = ogmrip_title_get_video_stream (title);
-
-        string = g_string_new (NULL);
-        g_string_printf (string, "%s %02d", _("Title"), vid + 1);
-
-        length = ogmrip_title_get_length (title, &time_);
-        if (time_.hour > 0)
-          g_string_append_printf (string, " (%02lu:%02lu %s", time_.hour, time_.min, _("hours"));
-        else if (time_.min > 0)
-          g_string_append_printf (string, " (%02lu:%02lu %s", time_.min, time_.sec, _("minutes"));
-        else
-          g_string_append_printf (string, " (%02lu %s", time_.sec, _("seconds"));
-
-        standard = ogmrip_video_stream_get_standard (stream);
-        if (standard != OGMRIP_STANDARD_UNDEFINED)
-          g_string_append_printf (string, ", %s", ogmrip_standard_get_label (standard));
-
-        ogmrip_video_stream_get_aspect_ratio (stream, &num, &denom);
-        if (num > 0 && denom > 0)
-          g_string_append_printf (string, ", %u/%u", num, denom);
-
-        g_string_append_c (string, ')');
-
-        gtk_list_store_append (GTK_LIST_STORE (model), &iter);
-        gtk_list_store_set (GTK_LIST_STORE (model), &iter, TEXT_COLUMN, string->str, NR_COLUMN, vid, -1);
-        g_string_free (string, TRUE);
-
-        if (length > longest)
-        {
-          longest = length;
-          gtk_combo_box_set_active_iter (GTK_COMBO_BOX (chooser), &iter);
-        }
+        longest = length;
+        gtk_combo_box_set_active_iter (GTK_COMBO_BOX (chooser), &iter);
       }
     }
+    g_list_free (list);
   }
 }
 
@@ -142,7 +140,7 @@ ogmrip_title_chooser_widget_get_active (OGMRipTitleChooser *chooser)
   OGMRipTitleChooserWidget *widget = OGMRIP_TITLE_CHOOSER_WIDGET (chooser);
   GtkTreeModel *model;
   GtkTreeIter iter;
-  gint nr;
+  gint id;
 
   if (!widget->priv->media)
     return NULL;
@@ -151,9 +149,9 @@ ogmrip_title_chooser_widget_get_active (OGMRipTitleChooser *chooser)
     return NULL;
 
   model = gtk_combo_box_get_model (GTK_COMBO_BOX (widget));
-  gtk_tree_model_get (model, &iter, NR_COLUMN, &nr, -1);
+  gtk_tree_model_get (model, &iter, ID_COLUMN, &id, -1);
 
-  return ogmrip_media_get_nth_title (widget->priv->media, nr);
+  return ogmrip_media_get_title (widget->priv->media, id);
 }
 
 static void
@@ -162,20 +160,20 @@ ogmrip_title_chooser_widget_set_active (OGMRipTitleChooser *chooser, OGMRipTitle
   OGMRipTitleChooserWidget *widget = OGMRIP_TITLE_CHOOSER_WIDGET (chooser);
   GtkTreeModel *model;
   GtkTreeIter iter;
-  gint nr1, nr2;
+  gint id1, id2;
 
-  nr1 = ogmrip_title_get_nr (title);
+  id1 = ogmrip_title_get_id (title);
 
   model = gtk_combo_box_get_model (GTK_COMBO_BOX (widget));
   if (gtk_tree_model_get_iter_first (model, &iter))
   {
     do
     {
-      gtk_tree_model_get (model, &iter, NR_COLUMN, &nr2, -1);
+      gtk_tree_model_get (model, &iter, ID_COLUMN, &id2, -1);
     }
-    while (nr1 != nr2 && gtk_tree_model_iter_next (model, &iter));
+    while (id1 != id2 && gtk_tree_model_iter_next (model, &iter));
 
-    if (nr2 == nr1)
+    if (id2 == id1)
       gtk_combo_box_set_active_iter (GTK_COMBO_BOX (widget), &iter);
   }
 }

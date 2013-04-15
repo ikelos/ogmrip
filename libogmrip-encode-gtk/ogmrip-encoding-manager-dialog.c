@@ -148,16 +148,14 @@ ogmrip_encoding_manager_dialog_encoding_run_cb (OGMRipEncodingManagerDialog *dia
       else if (OGMRIP_IS_AUDIO_CODEC (spawn))
       {
         stream = ogmrip_codec_get_input (OGMRIP_CODEC (spawn));
-        message = g_strdup_printf (_("Extracting audio stream %d"),
-            ogmrip_audio_stream_get_nr (OGMRIP_AUDIO_STREAM (stream)) + 1);
+        message = g_strdup_printf (_("Extracting audio stream %d"), ogmrip_stream_get_id (stream) + 1);
         gtk_list_store_set (dialog->priv->store, &iter, COL_STEP, message, -1);
         g_free (message);
       }
       else if (OGMRIP_IS_SUBP_CODEC (spawn))
       {
         stream = ogmrip_codec_get_input (OGMRIP_CODEC (spawn));
-        message = g_strdup_printf (_("Extracting subtitle stream %d"),
-            ogmrip_subp_stream_get_nr (OGMRIP_SUBP_STREAM (stream)) + 1);
+        message = g_strdup_printf (_("Extracting subtitle stream %d"), ogmrip_stream_get_id (stream) + 1);
         gtk_list_store_set (dialog->priv->store, &iter, COL_STEP, message, -1);
         g_free (message);
       }
@@ -221,7 +219,7 @@ ogmrip_encoding_manager_dialog_add_encoding (OGMRipEncodingManagerDialog *dialog
   gtk_list_store_append (dialog->priv->store, &iter);
   gtk_list_store_set (dialog->priv->store, &iter,
       COL_NAME, ogmrip_container_get_label (ogmrip_encoding_get_container (encoding)),
-      COL_TITLE, ogmrip_title_get_nr (ogmrip_encoding_get_title (encoding)) + 1,
+      COL_TITLE, ogmrip_title_get_id (ogmrip_encoding_get_title (encoding)) + 1,
       COL_PROFILE, str, COL_ENCODING, encoding, -1);
 
   g_signal_connect_swapped (encoding, "run",

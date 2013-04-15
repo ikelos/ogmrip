@@ -155,9 +155,15 @@ ogmrip_file_get_n_titles (OGMRipMedia *media)
 }
 
 static OGMRipTitle *
-ogmrip_file_get_nth_title (OGMRipMedia *media, guint nr)
+ogmrip_file_get_title (OGMRipMedia *media, guint nr)
 {
   return OGMRIP_TITLE (media);
+}
+
+static GList *
+ogmrip_file_get_titles (OGMRipMedia *media)
+{
+  return g_list_append (NULL, media);
 }
 
 static void
@@ -168,7 +174,8 @@ ogmrip_media_iface_init (OGMRipMediaInterface *iface)
   iface->get_uri = ogmrip_file_get_uri;
   iface->get_size = ogmrip_file_get_media_size;
   iface->get_n_titles = ogmrip_file_get_n_titles;
-  iface->get_nth_title = ogmrip_file_get_nth_title;
+  iface->get_title = ogmrip_file_get_title;
+  iface->get_titles = ogmrip_file_get_titles;
 }
 
 static OGMRipMedia *
@@ -218,7 +225,7 @@ ogmrip_file_get_n_audio_streams (OGMRipTitle *title)
 }
 
 static OGMRipAudioStream *
-ogmrip_file_get_nth_audio_stream (OGMRipTitle *title, guint nr)
+ogmrip_file_get_audio_stream (OGMRipTitle *title, guint nr)
 {
   OGMRipFile *file = OGMRIP_FILE (title);
 
@@ -226,6 +233,17 @@ ogmrip_file_get_nth_audio_stream (OGMRipTitle *title, guint nr)
     return NULL;
 
   return OGMRIP_AUDIO_STREAM (file);
+}
+
+static GList *
+ogmrip_file_get_audio_streams (OGMRipTitle *title)
+{
+  OGMRipFile *file = OGMRIP_FILE (title);
+
+  if (!OGMRIP_IS_AUDIO_STREAM (file))
+    return NULL;
+
+  return g_list_append (NULL, file);
 }
 
 static gint
@@ -240,7 +258,7 @@ ogmrip_file_get_n_subp_streams (OGMRipTitle *title)
 }
 
 static OGMRipSubpStream *
-ogmrip_file_get_nth_subp_stream (OGMRipTitle *title, guint nr)
+ogmrip_file_get_subp_stream (OGMRipTitle *title, guint nr)
 {
   OGMRipFile *file = OGMRIP_FILE (title);
 
@@ -248,6 +266,17 @@ ogmrip_file_get_nth_subp_stream (OGMRipTitle *title, guint nr)
     return NULL;
 
   return OGMRIP_SUBP_STREAM (file);
+}
+
+static GList *
+ogmrip_file_get_subp_streams (OGMRipTitle *title)
+{
+  OGMRipFile *file = OGMRIP_FILE (title);
+
+  if (!OGMRIP_IS_SUBP_STREAM (file))
+    return NULL;
+
+  return g_list_append (NULL, file);
 }
 
 static void
@@ -258,9 +287,11 @@ ogmrip_title_iface_init (OGMRipTitleInterface *iface)
   iface->get_length = ogmrip_file_get_length;
   iface->get_video_stream = ogmrip_file_get_video_stream;
   iface->get_n_audio_streams = ogmrip_file_get_n_audio_streams;
-  iface->get_nth_audio_stream = ogmrip_file_get_nth_audio_stream;
+  iface->get_audio_stream = ogmrip_file_get_audio_stream;
+  iface->get_audio_streams = ogmrip_file_get_audio_streams;
   iface->get_n_subp_streams = ogmrip_file_get_n_subp_streams;
-  iface->get_nth_subp_stream = ogmrip_file_get_nth_subp_stream;
+  iface->get_subp_stream = ogmrip_file_get_subp_stream;
+  iface->get_subp_streams = ogmrip_file_get_subp_streams;
 }
 
 static gint
@@ -270,7 +301,7 @@ ogmrip_file_get_format (OGMRipStream *stream)
 }
 
 OGMRipTitle *
-ogmrip_file_get_title (OGMRipStream *stream)
+ogmrip_stream_get_title (OGMRipStream *stream)
 {
   return OGMRIP_TITLE (stream);
 }
@@ -279,7 +310,7 @@ static void
 ogmrip_stream_iface_init (OGMRipStreamInterface *iface)
 {
   iface->get_format = ogmrip_file_get_format;
-  iface->get_title  = ogmrip_file_get_title;
+  iface->get_title  = ogmrip_stream_get_title;
 }
 
 const gchar *

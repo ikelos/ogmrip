@@ -39,7 +39,6 @@ struct _OGMRipSubpStreamInterface
   const gchar * (* get_label)    (OGMRipSubpStream *subp);
   gint          (* get_language) (OGMRipSubpStream *subp);
   gint          (* get_newline)  (OGMRipSubpStream *subp);
-  gint          (* get_nr)       (OGMRipSubpStream *subp);
 };
 
 GType         ogmrip_subp_stream_get_type     (void) G_GNUC_CONST;
@@ -48,7 +47,6 @@ gint          ogmrip_subp_stream_get_content  (OGMRipSubpStream *subp);
 const gchar * ogmrip_subp_stream_get_label    (OGMRipSubpStream *subp);
 gint          ogmrip_subp_stream_get_language (OGMRipSubpStream *subp);
 gint          ogmrip_subp_stream_get_newline  (OGMRipSubpStream *subp);
-gint          ogmrip_subp_stream_get_nr       (OGMRipSubpStream *subp);
 gboolean      ogmrip_subp_stream_equal        (OGMRipSubpStream *subp1,
                                                OGMRipSubpStream *subp2);
 

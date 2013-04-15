@@ -537,11 +537,11 @@ ogmrip_encoding_new_from_xml (OGMRipXML *xml, GError **error)
   else
   {
     OGMRipTitle *title;
-    guint nr;
+    guint id;
 
-    nr = ogmrip_xml_get_uint (xml, "title");
+    id = ogmrip_xml_get_uint (xml, "title");
 
-    title = ogmrip_media_get_nth_title (media, nr);
+    title = ogmrip_media_get_title (media, id);
     if (title)
     {
       encoding = ogmrip_encoding_new (title);
@@ -1670,7 +1670,7 @@ ogmrip_encoding_copy (OGMRipEncoding *encoding, GCancellable *cancellable, GErro
 
   ogmrip_log_printf ("Copying %s\n\n", ogmrip_media_get_label (media));
 
-  name = g_strdup_printf ("%s-%d", ogmrip_media_get_id (media), ogmrip_title_get_nr (encoding->priv->title));
+  name = g_strdup_printf ("%s-%d", ogmrip_media_get_id (media), ogmrip_title_get_id (encoding->priv->title));
   output = g_build_filename (ogmrip_fs_get_tmp_dir (), name, NULL);
   g_free (name);
 
@@ -1687,12 +1687,12 @@ ogmrip_encoding_copy (OGMRipEncoding *encoding, GCancellable *cancellable, GErro
   if (result)
   {
     OGMRipTitle *new_title;
-    gint nr;
+    gint id;
 
-    nr = ogmrip_title_get_nr (encoding->priv->title);
+    id = ogmrip_title_get_id (encoding->priv->title);
 
     media = ogmrip_copy_get_destination (OGMRIP_COPY (task));
-    new_title = ogmrip_media_get_nth_title (media, nr);
+    new_title = ogmrip_media_get_title (media, id);
 
     if (!ogmrip_title_open (new_title, NULL, NULL, NULL, error))
       result = FALSE;
@@ -1712,15 +1712,15 @@ ogmrip_encoding_copy (OGMRipEncoding *encoding, GCancellable *cancellable, GErro
       for (link = encoding->priv->audio_codecs; link; link = link->next)
       {
         stream = ogmrip_codec_get_input (link->data);
-        nr = ogmrip_audio_stream_get_nr (OGMRIP_AUDIO_STREAM (stream));
-        g_object_set (link->data, "input", ogmrip_title_get_nth_audio_stream (encoding->priv->title, nr), NULL);
+        id = ogmrip_stream_get_id (stream);
+        g_object_set (link->data, "input", ogmrip_title_get_audio_stream (encoding->priv->title, id), NULL);
       }
 
       for (link = encoding->priv->subp_codecs; link; link = link->next)
       {
         stream = ogmrip_codec_get_input (link->data);
-        nr = ogmrip_subp_stream_get_nr (OGMRIP_SUBP_STREAM (stream));
-        g_object_set (link->data, "input", ogmrip_title_get_nth_subp_stream (encoding->priv->title, nr), NULL);
+        id = ogmrip_stream_get_id (stream);
+        g_object_set (link->data, "input", ogmrip_title_get_subp_stream (encoding->priv->title, id), NULL);
       }
 
       for (link = encoding->priv->chapters; link; link = link->next)
@@ -1743,7 +1743,7 @@ ogmrip_encoding_analyze (OGMRipEncoding *encoding, GCancellable *cancellable, GE
   gboolean result;
   gulong id;
 
-  ogmrip_log_printf ("\nAnalyzing video title %d\n", ogmrip_title_get_nr (encoding->priv->title) + 1);
+  ogmrip_log_printf ("\nAnalyzing video title %d\n", ogmrip_title_get_id (encoding->priv->title) + 1);
   ogmrip_log_printf ("-----------------------\n\n");
 
   task = ogmrip_analyze_new (encoding->priv->title);
@@ -1777,7 +1777,7 @@ ogmrip_encoding_test_internal (OGMRipEncoding *encoding, GCancellable *cancellab
   gboolean result;
   gulong id;
 
-  ogmrip_log_printf ("\nTesting video title %d\n", ogmrip_title_get_nr (encoding->priv->title) + 1);
+  ogmrip_log_printf ("\nTesting video title %d\n", ogmrip_title_get_id (encoding->priv->title) + 1);
   ogmrip_log_printf ("----------------------\n\n");
 
   task = ogmrip_test_new (encoding);
@@ -1805,13 +1805,13 @@ ogmrip_encoding_run_codec (OGMRipEncoding *encoding, OGMRipCodec *codec, GCancel
   if (OGMRIP_IS_SUBP_CODEC (codec))
   {
     ogmrip_log_printf ("\nEncoding subp stream %02d\n",
-        ogmrip_subp_stream_get_nr (OGMRIP_SUBP_STREAM (stream)) + 1);
+        ogmrip_stream_get_id (stream) + 1);
     ogmrip_log_printf ("-----------------------\n\n");
   }
   else if (OGMRIP_IS_AUDIO_CODEC (codec))
   {
     ogmrip_log_printf ("\nEncoding audio stream %02d\n",
-        ogmrip_audio_stream_get_nr (OGMRIP_AUDIO_STREAM (stream)) + 1);
+        ogmrip_stream_get_id (stream) + 1);
     ogmrip_log_printf ("------------------------\n\n");
   }
   else if (OGMRIP_IS_VIDEO_CODEC (codec))

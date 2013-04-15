@@ -86,7 +86,7 @@ ogmrip_title_get_media (OGMRipTitle *title)
 }
 
 gint 
-ogmrip_title_get_nr (OGMRipTitle *title)
+ogmrip_title_get_id (OGMRipTitle *title)
 {
   OGMRipTitleInterface *iface;
 
@@ -94,25 +94,10 @@ ogmrip_title_get_nr (OGMRipTitle *title)
 
   iface = OGMRIP_TITLE_GET_IFACE (title);
 
-  if (!iface->get_nr)
+  if (!iface->get_id)
     return 0;
 
-  return iface->get_nr (title);
-}
-
-gint 
-ogmrip_title_get_ts_nr (OGMRipTitle *title)
-{
-  OGMRipTitleInterface *iface;
-
-  g_return_val_if_fail (OGMRIP_IS_TITLE (title), -1);
-
-  iface = OGMRIP_TITLE_GET_IFACE (title);
-
-  if (!iface->get_ts_nr)
-    return ogmrip_title_get_nr (title);
-
-  return iface->get_ts_nr (title);
+  return iface->get_id (title);
 }
 
 gboolean
@@ -294,7 +279,7 @@ ogmrip_title_get_n_audio_streams (OGMRipTitle *title)
 }
 
 OGMRipAudioStream * 
-ogmrip_title_get_nth_audio_stream (OGMRipTitle *title, guint nr)
+ogmrip_title_get_audio_stream (OGMRipTitle *title, guint id)
 {
   OGMRipTitleInterface *iface;
 
@@ -302,29 +287,25 @@ ogmrip_title_get_nth_audio_stream (OGMRipTitle *title, guint nr)
 
   iface = OGMRIP_TITLE_GET_IFACE (title);
 
-  if (!iface->get_nth_audio_stream)
+  if (!iface->get_audio_stream)
     return NULL;
 
-  return iface->get_nth_audio_stream (title, nr);
+  return iface->get_audio_stream (title, id);
 }
 
 GList * 
 ogmrip_title_get_audio_streams (OGMRipTitle *title)
 {
-  GList *list = NULL;
-  OGMRipAudioStream *stream;
-  gint i, n;
+  OGMRipTitleInterface *iface;
 
   g_return_val_if_fail (OGMRIP_IS_TITLE (title), NULL);
 
-  n = ogmrip_title_get_n_audio_streams (title);
-  for (i = 0; i < n; i ++)
-  {
-    stream = ogmrip_title_get_nth_audio_stream (title, i);
-    list = g_list_prepend (list, stream);
-  }
+  iface = OGMRIP_TITLE_GET_IFACE (title);
 
-  return g_list_reverse (list);
+  if (!iface->get_audio_streams)
+    return NULL;
+
+  return iface->get_audio_streams (title);
 }
 
 gint 
@@ -343,7 +324,7 @@ ogmrip_title_get_n_subp_streams (OGMRipTitle *title)
 }
 
 OGMRipSubpStream * 
-ogmrip_title_get_nth_subp_stream (OGMRipTitle *title, guint nr)
+ogmrip_title_get_subp_stream (OGMRipTitle *title, guint id)
 {
   OGMRipTitleInterface *iface;
 
@@ -351,29 +332,25 @@ ogmrip_title_get_nth_subp_stream (OGMRipTitle *title, guint nr)
 
   iface = OGMRIP_TITLE_GET_IFACE (title);
 
-  if (!iface->get_nth_subp_stream)
+  if (!iface->get_subp_stream)
     return NULL;
 
-  return iface->get_nth_subp_stream (title, nr);
+  return iface->get_subp_stream (title, id);
 }
 
 GList * 
 ogmrip_title_get_subp_streams (OGMRipTitle *title)
 {
-  GList *list = NULL;
-  OGMRipSubpStream *stream;
-  gint i, n;
+  OGMRipTitleInterface *iface;
 
   g_return_val_if_fail (OGMRIP_IS_TITLE (title), NULL);
 
-  n = ogmrip_title_get_n_subp_streams (title);
-  for (i = 0; i < n; i ++)
-  {
-    stream = ogmrip_title_get_nth_subp_stream (title, i);
-    list = g_list_prepend (list, stream);
-  }
+  iface = OGMRIP_TITLE_GET_IFACE (title);
 
-  return g_list_reverse (list);
+  if (!iface->get_subp_streams)
+    return NULL;
+
+  return iface->get_subp_streams (title);
 }
 
 gboolean
@@ -431,7 +408,7 @@ ogmrip_title_is_copy (OGMRipTitle *title, OGMRipTitle *copy)
   if (iface->is_copy)
     return iface->is_copy (title, copy);
 
-  if (ogmrip_title_get_nr (title) != ogmrip_title_get_nr (copy))
+  if (ogmrip_title_get_id (title) != ogmrip_title_get_id (copy))
     return FALSE;
 
   return title == g_object_get_data (G_OBJECT (copy), "__copy_from__") ||

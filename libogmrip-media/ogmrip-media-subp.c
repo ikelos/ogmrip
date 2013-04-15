@@ -104,18 +104,3 @@ ogmrip_subp_stream_get_newline (OGMRipSubpStream *subp)
   return iface->get_newline (subp);
 }
 
-gint
-ogmrip_subp_stream_get_nr (OGMRipSubpStream *subp)
-{
-  OGMRipSubpStreamInterface *iface;
-
-  g_return_val_if_fail (OGMRIP_IS_SUBP_STREAM (subp), -1);
-
-  iface = OGMRIP_SUBP_STREAM_GET_IFACE (subp);
-
-  if (!iface->get_nr)
-    return 0;
-
-  return iface->get_nr (subp);
-}
-

@@ -335,68 +335,62 @@ ogmrip_cli_palette_info (OGMRipTitle *title)
 static void
 ogmrip_cli_audio_info (OGMRipTitle *title)
 {
-  OGMRipAudioStream *stream;
-  gint aid, naid, val;
+  GList *list, *link;
+  gint val;
 
-  naid = ogmrip_title_get_n_audio_streams (title);
-  for (aid = 0; aid < naid; aid ++)
+  list = ogmrip_title_get_audio_streams (title);
+  for (link = list; link; link = link->next)
   {
-    stream = ogmrip_title_get_nth_audio_stream (title, aid);
-    if (stream)
-    {
-      g_print ("\t%s: %02d, ", _("Audio"),aid + 1);
+    g_print ("\t%s: %02d, ", _("Audio"), ogmrip_stream_get_id (link->data) + 1);
 
-      val = ogmrip_audio_stream_get_language (stream);
-      g_print ("%s: %s, ", _("Language"), ogmrip_language_to_iso639_1 (val));
+    val = ogmrip_audio_stream_get_language (link->data);
+    g_print ("%s: %s, ", _("Language"), ogmrip_language_to_iso639_1 (val));
 
-      val = ogmrip_stream_get_format (OGMRIP_STREAM (stream));
-      g_print ("%s: %s, ", _("Format"), ogmrip_format_get_label (val));
+    val = ogmrip_stream_get_format (link->data);
+    g_print ("%s: %s, ", _("Format"), ogmrip_format_get_label (val));
 
-      g_print ("%s: 48 kHz, ", _("Frequency"));
+    g_print ("%s: 48 kHz, ", _("Frequency"));
 
-      val = ogmrip_audio_stream_get_quantization (stream);
-      if (val != OGMRIP_QUANTIZATION_UNDEFINED)
-        g_print ("%s: %s, ", _("Quantization"), ogmrip_quantization_get_label (val));
+    val = ogmrip_audio_stream_get_quantization (link->data);
+    if (val != OGMRIP_QUANTIZATION_UNDEFINED)
+      g_print ("%s: %s, ", _("Quantization"), ogmrip_quantization_get_label (val));
 
-      val = ogmrip_audio_stream_get_channels (stream);
-      g_print ("%s: %s", _("Channels"), ogmrip_channels_get_label (val));
+    val = ogmrip_audio_stream_get_channels (link->data);
+    g_print ("%s: %s", _("Channels"), ogmrip_channels_get_label (val));
 
-      val = ogmrip_audio_stream_get_content (stream);
-      if (val != OGMRIP_AUDIO_CONTENT_UNDEFINED)
-        g_print (", %s: %s", _("Content"), ogmrip_audio_content_get_label (val));
+    val = ogmrip_audio_stream_get_content (link->data);
+    if (val != OGMRIP_AUDIO_CONTENT_UNDEFINED)
+      g_print (", %s: %s", _("Content"), ogmrip_audio_content_get_label (val));
 
-      g_print ("\n");
-    }
+    g_print ("\n");
   }
+  g_list_free (list);
 }
 
 static void
 ogmrip_cli_subp_info (OGMRipTitle *title)
 {
-  OGMRipSubpStream *stream;
-  gint sid, nsid, val;
+  GList *list, *link;
+  gint val;
 
-  nsid = ogmrip_title_get_n_subp_streams (title);
-  for (sid = 0; sid < nsid; sid ++)
+  list = ogmrip_title_get_subp_streams (title);
+  for (link = list; link; link = link->next)
   {
-    stream = ogmrip_title_get_nth_subp_stream (title, sid);
-    if (stream)
-    {
-      g_print ("\t%s: %02d, ", _("Subtitle"), sid + 1);
+    g_print ("\t%s: %02d, ", _("Subtitle"), ogmrip_stream_get_id (link->data) + 1);
 
-      val = ogmrip_subp_stream_get_language (stream);
-      g_print ("%s: %s, ", _("Language"), ogmrip_language_to_iso639_1 (val));
+    val = ogmrip_subp_stream_get_language (link->data);
+    g_print ("%s: %s, ", _("Language"), ogmrip_language_to_iso639_1 (val));
 
-      val = ogmrip_stream_get_format (OGMRIP_STREAM (stream));
-      g_print ("%s: %s", _("Format"), ogmrip_format_get_label (val));
+    val = ogmrip_stream_get_format (link->data);
+    g_print ("%s: %s", _("Format"), ogmrip_format_get_label (val));
 
-      val = ogmrip_subp_stream_get_content (stream);
-      if (val != OGMRIP_SUBP_CONTENT_UNDEFINED)
-        g_print (", %s: %s", _("Content"), ogmrip_subp_content_get_label (val));
+    val = ogmrip_subp_stream_get_content (link->data);
+    if (val != OGMRIP_SUBP_CONTENT_UNDEFINED)
+      g_print (", %s: %s", _("Content"), ogmrip_subp_content_get_label (val));
 
-      g_print ("\n");
-    }
+    g_print ("\n");
   }
+  g_list_free (list);
 }
 
 static void
@@ -425,7 +419,7 @@ ogmrip_cli_title_info (OGMRipTitle *title)
   num_audio = ogmrip_title_get_n_audio_streams (title);
   num_subp = ogmrip_title_get_n_subp_streams (title);
 
-  g_print ("%s: %02d, ", _("Title"), ntitle);
+  g_print ("%s: %02d, ", _("Title"), ogmrip_title_get_id (title) + 1);
   g_print ("%s: %02lu:%02lu:%02lu, ", _("Length"), length.hour, length.min, length.sec);
   g_print ("%s: %02d, ", _("Chapters"), num_chapters);
   g_print ("%s: %02d, ", _("Audio"), num_audio);
@@ -455,31 +449,24 @@ ogmrip_cli_title_info (OGMRipTitle *title)
 static gboolean
 ogmrip_cli_media_info (OGMRipMedia *media)
 {
-  OGMRipTitle *title;
-  gdouble length, longest_length;
-  gint longest_title, ntitles;
+  GList *list, *link;
+  gdouble length, longest_length = 0;
+  gint longest_title = 1;
 
-  ntitles = ogmrip_media_get_n_titles (media);
-
-  for (longest_title = ntitle = 1, longest_length = 0; ntitle <= ntitles; ntitle++)
+  list = ogmrip_media_get_titles (media);
+  for (link = list; link; link = link->next)
   {
-    title = ogmrip_media_get_nth_title (media, ntitle - 1);
-    if (!title)
-    {
-      g_printerr (_("Cannot open title %d."), ntitle);
-      g_printerr ("\n");
-      return FALSE;
-    }
+    ogmrip_cli_title_info (link->data);
 
-    ogmrip_cli_title_info (title);
-
-    length = ogmrip_title_get_length (title, NULL);
+    length = ogmrip_title_get_length (link->data, NULL);
     if (length > longest_length)
     {
       longest_length = length;
-      longest_title = ntitle;
+      longest_title = ogmrip_title_get_id (link->data);
     }
   }
+  g_list_free (list);
+
   g_print ("%s: %d\n", _("Longest title"), longest_title);
 
   return TRUE;
@@ -512,17 +499,9 @@ ogmrip_cli_list (OGMRipCli *cli)
   {
     OGMRipTitle *title;
 
-    if (ntitle < 1 || ntitle > ogmrip_media_get_n_titles (media))
+    if (ntitle < 1 || !(title = ogmrip_media_get_title (media, ntitle - 1)))
     {
       g_printerr (_("Title %d does not exist."), ntitle);
-      g_printerr ("\n");
-      goto cleanup;
-    }
-
-    title = ogmrip_media_get_nth_title (media, ntitle - 1);
-    if (!title)
-    {
-      g_printerr (_("Cannot open title %d."), ntitle);
       g_printerr ("\n");
       goto cleanup;
     }
@@ -640,7 +619,7 @@ ogmrip_cli_add_audio_codec (OGMRipEncoding *encoding, OGMRipProfile *profile, OG
   {
     if (aid[i])
     {
-      stream = ogmrip_title_get_nth_audio_stream (title, i);
+      stream = ogmrip_title_get_audio_stream (title, i);
       if (!stream)
       {
         g_printerr (_("Audio stream %d does not exist."), i);
@@ -681,7 +660,7 @@ ogmrip_cli_add_subp_codec (OGMRipEncoding *encoding, OGMRipProfile *profile, OGM
   {
     if (sid[i])
     {
-      stream = ogmrip_title_get_nth_subp_stream (title, i);
+      stream = ogmrip_title_get_subp_stream (title, i);
       if (!stream)
         return FALSE;
 
@@ -726,7 +705,7 @@ ogmrip_cli_encoding_progress (OGMJobSpawn *spawn, gdouble fraction)
   {
     stream = ogmrip_codec_get_input (OGMRIP_CODEC (spawn));
     message = g_strdup_printf (_("Extracting audio stream %d"),
-        ogmrip_audio_stream_get_nr (OGMRIP_AUDIO_STREAM (stream)) + 1);
+        ogmrip_stream_get_id (stream) + 1);
     g_print ("%s", message);
     g_free (message);
   }
@@ -734,7 +713,7 @@ ogmrip_cli_encoding_progress (OGMJobSpawn *spawn, gdouble fraction)
   {
     stream = ogmrip_codec_get_input (OGMRIP_CODEC (spawn));
     message = g_strdup_printf (_("Extracting subtitle stream %d"),
-        ogmrip_subp_stream_get_nr (OGMRIP_SUBP_STREAM (stream)) + 1);
+        ogmrip_stream_get_id (stream) + 1);
     g_print ("%s", message);
     g_free (message);
   }
@@ -802,17 +781,9 @@ ogmrip_cli_encode (OGMRipCli *cli)
     goto cleanup;
   }
 
-  if (ntitle < 1 || ntitle > ogmrip_media_get_n_titles (media))
+  if (ntitle < 1 || !(title = ogmrip_media_get_title (media, ntitle - 1)))
   {
     g_printerr (_("Title %d does not exist."), ntitle);
-    g_printerr ("\n");
-    goto cleanup;
-  }
-
-  title = ogmrip_media_get_nth_title (media, ntitle - 1);
-  if (!title)
-  {
-    g_printerr (_("Cannot open title %d."), ntitle);
     g_printerr ("\n");
     goto cleanup;
   }

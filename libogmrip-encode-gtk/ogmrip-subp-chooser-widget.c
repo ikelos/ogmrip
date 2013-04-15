@@ -105,16 +105,12 @@ ogmrip_subp_chooser_widget_combo_title_notified (OGMRipSubpChooserWidget *widget
   title = ogmrip_source_chooser_get_title (OGMRIP_SOURCE_CHOOSER (widget->priv->chooser));
   if (title)
   {
-    OGMRipSubpStream *stream;
-    gint i, n;
+    GList *list, *link;
 
-    n = ogmrip_title_get_n_subp_streams (title);
-    for (i = 0; i < n; i ++)
-    {
-      stream = ogmrip_title_get_nth_subp_stream (title, i);
-      if (stream)
-        ogmrip_source_chooser_widget_add_subp_stream (OGMRIP_SOURCE_CHOOSER_WIDGET (widget->priv->chooser), stream);
-    }
+    list = ogmrip_title_get_subp_streams (title);
+    for (link = list; link; link = link->next)
+      ogmrip_source_chooser_widget_add_subp_stream (OGMRIP_SOURCE_CHOOSER_WIDGET (widget->priv->chooser), link->data);
+    g_list_free (list);
   }
 }
 

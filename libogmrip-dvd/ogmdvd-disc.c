@@ -310,7 +310,6 @@ ogmdvd_audio_stream_new (OGMDvdTitle *title, ifo_handle_t *vts_file, guint nr, g
 
   stream = g_object_new (OGMDVD_TYPE_AUDIO_STREAM, NULL);
   stream->priv->title = OGMRIP_TITLE (title);
-  stream->priv->nr = nr;
 
   g_object_add_weak_pointer (G_OBJECT (title), (gpointer *) &stream->priv->title);
 
@@ -336,7 +335,6 @@ ogmdvd_subp_stream_new (OGMDvdTitle *title, ifo_handle_t *vts_file, guint nr, gu
 
   stream = g_object_new (OGMDVD_TYPE_SUBP_STREAM, NULL);
   stream->priv->title = OGMRIP_TITLE (title);
-  stream->priv->nr = nr;
 
   g_object_add_weak_pointer (G_OBJECT (title), (gpointer *) &stream->priv->title);
 
@@ -747,7 +745,7 @@ ogmdvd_disc_get_n_titles (OGMRipMedia *media)
 }
 
 static OGMRipTitle *
-ogmdvd_disc_get_nth_title (OGMRipMedia *media, guint nr)
+ogmdvd_disc_get_title (OGMRipMedia *media, guint id)
 {
   GList *link;
 
@@ -755,11 +753,17 @@ ogmdvd_disc_get_nth_title (OGMRipMedia *media, guint nr)
   {
     OGMDvdTitle *title = link->data;
 
-    if (title->priv->nr == nr)
+    if (title->priv->nr == id)
       return link->data;
   }
 
   return NULL;
+}
+
+static GList *
+ogmdvd_disc_get_titles (OGMRipMedia *media)
+{
+  return g_list_copy (OGMDVD_DISC (media)->priv->titles);
 }
 
 OGMRipMedia *
@@ -780,7 +784,8 @@ ogmrip_media_iface_init (OGMRipMediaInterface *iface)
   iface->get_uri       = ogmdvd_disc_get_uri;
   iface->get_size      = ogmdvd_disc_get_vmg_size;
   iface->get_n_titles  = ogmdvd_disc_get_n_titles;
-  iface->get_nth_title = ogmdvd_disc_get_nth_title;
+  iface->get_title     = ogmdvd_disc_get_title;
+  iface->get_titles    = ogmdvd_disc_get_titles;
   iface->copy          = ogmdvd_disc_copy_internal;
 }
 

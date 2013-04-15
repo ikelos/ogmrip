@@ -105,16 +105,12 @@ ogmrip_audio_chooser_widget_combo_title_notified (OGMRipAudioChooserWidget *widg
   title = ogmrip_source_chooser_get_title (OGMRIP_SOURCE_CHOOSER (widget->priv->chooser));
   if (title)
   {
-    OGMRipAudioStream *stream;
-    gint i, n;
+    GList *list, *link;
 
-    n = ogmrip_title_get_n_audio_streams (title);
-    for (i = 0; i < n; i ++)
-    {
-      stream = ogmrip_title_get_nth_audio_stream (title, i);
-      if (stream)
-        ogmrip_source_chooser_widget_add_audio_stream (OGMRIP_SOURCE_CHOOSER_WIDGET (widget->priv->chooser), stream);
-    }
+    list = ogmrip_title_get_audio_streams (title);
+    for (link = list; link; link = link->next)
+      ogmrip_source_chooser_widget_add_audio_stream (OGMRIP_SOURCE_CHOOSER_WIDGET (widget->priv->chooser), link->data);
+    g_list_free (list);
   }
 }
 

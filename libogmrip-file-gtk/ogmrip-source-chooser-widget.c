@@ -551,7 +551,7 @@ ogmrip_source_chooser_widget_add_audio_stream (OGMRipSourceChooserWidget *choose
 
     string = g_string_new (NULL);
 
-    aid = ogmrip_audio_stream_get_nr (stream);
+    aid = ogmrip_stream_get_id (OGMRIP_STREAM (stream));
     g_string_printf (string, "%s %02d", _("Track"), aid + 1);
 
     content = ogmrip_audio_stream_get_content (stream);
@@ -609,7 +609,7 @@ ogmrip_source_chooser_widget_add_subp_stream (OGMRipSourceChooserWidget *chooser
 
     string = g_string_new (NULL);
 
-    sid = ogmrip_subp_stream_get_nr (stream);
+    sid = ogmrip_stream_get_id (OGMRIP_STREAM (stream));
     g_string_append_printf (string, "%s %02d", _("Subtitle"), sid + 1);
 
     content = ogmrip_subp_stream_get_content (stream);

@@ -104,21 +104,6 @@ ogmrip_audio_stream_get_language (OGMRipAudioStream *audio)
   return iface->get_language (audio);
 }
 
-gint
-ogmrip_audio_stream_get_nr (OGMRipAudioStream *audio)
-{
-  OGMRipAudioStreamInterface *iface;
-
-  g_return_val_if_fail (OGMRIP_IS_AUDIO_STREAM (audio), -1);
-
-  iface = OGMRIP_AUDIO_STREAM_GET_IFACE (audio);
-
-  if (!iface->get_nr)
-    return 0;
-
-  return iface->get_nr (audio);
-}
-
 gint 
 ogmrip_audio_stream_get_quantization (OGMRipAudioStream *audio)
 {

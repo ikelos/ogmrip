@@ -182,11 +182,11 @@ ogmrip_encoding_parse_audio_codec (OGMRipEncoding *encoding, OGMRipXML *xml, GEr
     if (type != G_TYPE_NONE && g_type_is_a (type, OGMRIP_TYPE_AUDIO_CODEC))
     {
       OGMRipAudioStream *stream;
-      guint nr;
+      guint id;
 
-      nr = ogmrip_xml_get_uint (xml, "stream");
+      id = ogmrip_xml_get_uint (xml, "stream");
 
-      stream = ogmrip_title_get_nth_audio_stream (ogmrip_encoding_get_title (encoding), nr);
+      stream = ogmrip_title_get_audio_stream (ogmrip_encoding_get_title (encoding), id);
       if (stream)
       {
         OGMRipAudioCodec *codec;
@@ -245,11 +245,11 @@ ogmrip_encoding_parse_subp_codec (OGMRipEncoding *encoding, OGMRipXML *xml, GErr
     if (type != G_TYPE_NONE && g_type_is_a (type, OGMRIP_TYPE_SUBP_CODEC))
     {
       OGMRipSubpStream *stream;
-      guint nr;
+      guint id;
 
-      nr = ogmrip_xml_get_uint (xml, "stream");
+      id = ogmrip_xml_get_uint (xml, "stream");
 
-      stream = ogmrip_title_get_nth_subp_stream (ogmrip_encoding_get_title (encoding), nr);
+      stream = ogmrip_title_get_subp_stream (ogmrip_encoding_get_title (encoding), id);
       if (stream)
       {
         OGMRipSubpCodec *codec;
@@ -553,7 +553,7 @@ ogmrip_encoding_dump_audio_codec (OGMRipXML *xml, OGMRipCodec *codec)
 
   stream = ogmrip_codec_get_input (codec);
   ogmrip_xml_set_uint (xml, "stream",
-      ogmrip_audio_stream_get_nr (OGMRIP_AUDIO_STREAM (stream)));
+      ogmrip_stream_get_id (stream));
 
   klass = OGMRIP_AUDIO_CODEC_GET_CLASS (codec);
 
@@ -586,7 +586,7 @@ ogmrip_encoding_dump_subp_codec (OGMRipXML *xml, OGMRipCodec *codec)
 
   stream = ogmrip_codec_get_input (codec);
   ogmrip_xml_set_uint (xml, "stream",
-      ogmrip_subp_stream_get_nr (OGMRIP_SUBP_STREAM (stream)));
+      ogmrip_stream_get_id (stream));
 
   klass = OGMRIP_SUBP_CODEC_GET_CLASS (codec);
 
@@ -686,7 +686,7 @@ ogmrip_encoding_dump (OGMRipEncoding *encoding, OGMRipXML *xml, GError **error)
   ogmrip_xml_set_string (xml, "id",
       ogmrip_media_get_id (ogmrip_title_get_media (title)));
   ogmrip_xml_set_int (xml, "title",
-      ogmrip_title_get_nr (title));
+      ogmrip_title_get_id (title));
 
   profile = ogmrip_encoding_get_profile (encoding);
   if (profile)

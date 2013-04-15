@@ -99,6 +99,7 @@ ogmrip_stream_iface_init (OGMRipStreamInterface *iface)
 static gint
 ogmdvd_audio_stream_get_bitrate (OGMRipAudioStream *audio)
 {
+/*
   OGMDvdAudioStream *stream = OGMDVD_AUDIO_STREAM (audio);
 
   if (stream->priv->title)
@@ -108,7 +109,7 @@ ogmdvd_audio_stream_get_bitrate (OGMRipAudioStream *audio)
     if (title->priv->bitrates)
       return title->priv->bitrates[stream->priv->nr];
   }
-
+*/
   return 0;
 }
 
@@ -143,12 +144,6 @@ ogmdvd_audio_stream_get_language (OGMRipAudioStream *audio)
 }
 
 static gint
-ogmdvd_audio_stream_get_nr (OGMRipAudioStream *stream)
-{
-  return OGMDVD_AUDIO_STREAM (stream)->priv->nr;
-}
-
-static gint
 ogmdvd_audio_stream_get_quantization (OGMRipAudioStream *audio)
 {
   return OGMDVD_AUDIO_STREAM (audio)->priv->quantization;
@@ -167,7 +162,6 @@ ogmrip_audio_stream_iface_init (OGMRipAudioStreamInterface *iface)
   iface->get_channels     = ogmdvd_audio_stream_get_channels;
   iface->get_content      = ogmdvd_audio_stream_get_content;
   iface->get_language     = ogmdvd_audio_stream_get_language;
-  iface->get_nr           = ogmdvd_audio_stream_get_nr;
   iface->get_quantization = ogmdvd_audio_stream_get_quantization;
   iface->get_sample_rate  = ogmdvd_audio_stream_get_sample_rate;
 }

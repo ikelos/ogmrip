@@ -39,7 +39,6 @@ struct _OGMRipAudioStreamInterface
   gint          (* get_content)      (OGMRipAudioStream *audio);
   const gchar * (* get_label)        (OGMRipAudioStream *audio);
   gint          (* get_language)     (OGMRipAudioStream *audio);
-  gint          (* get_nr)           (OGMRipAudioStream *audio);
   gint          (* get_quantization) (OGMRipAudioStream *audio);
   gint          (* get_sample_rate)  (OGMRipAudioStream *audio);
 };
@@ -50,7 +49,6 @@ gint          ogmrip_audio_stream_get_channels          (OGMRipAudioStream *audi
 gint          ogmrip_audio_stream_get_content           (OGMRipAudioStream *audio);
 const gchar * ogmrip_audio_stream_get_label             (OGMRipAudioStream *audio);
 gint          ogmrip_audio_stream_get_language          (OGMRipAudioStream *audio);
-gint          ogmrip_audio_stream_get_nr                (OGMRipAudioStream *audio);
 gint          ogmrip_audio_stream_get_quantization      (OGMRipAudioStream *audio);
 gint          ogmrip_audio_stream_get_sample_rate       (OGMRipAudioStream *audio);
 gint          ogmrip_audio_stream_get_samples_per_frame (OGMRipAudioStream *audio);

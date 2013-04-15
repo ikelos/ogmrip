@@ -167,7 +167,7 @@ ogmrip_media_get_n_titles (OGMRipMedia *media)
 }
 
 OGMRipTitle *
-ogmrip_media_get_nth_title (OGMRipMedia *media, guint nr)
+ogmrip_media_get_title (OGMRipMedia *media, guint id)
 {
   OGMRipMediaInterface *iface;
 
@@ -175,29 +175,25 @@ ogmrip_media_get_nth_title (OGMRipMedia *media, guint nr)
 
   iface = OGMRIP_MEDIA_GET_IFACE (media);
 
-  if (!iface->get_nth_title)
+  if (!iface->get_title)
     return NULL;
 
-  return iface->get_nth_title (media, nr);
+  return iface->get_title (media, id);
 }
 
 GList *
 ogmrip_media_get_titles (OGMRipMedia *media)
 {
-  GList *list = NULL;
-  OGMRipTitle *title;
-  gint i, n;
+  OGMRipMediaInterface *iface;
 
   g_return_val_if_fail (OGMRIP_IS_MEDIA (media), NULL);
 
-  n = ogmrip_media_get_n_titles (media);
-  for (i = 0; i < n; i ++)
-  {
-    title = ogmrip_media_get_nth_title (media, i);
-    list = g_list_prepend (list, title);
-  }
+  iface = OGMRIP_MEDIA_GET_IFACE (media);
 
-  return g_list_reverse (list);
+  if (!iface->get_titles)
+    return NULL;
+
+  return iface->get_titles (media);
 }
 
 OGMRipMedia *

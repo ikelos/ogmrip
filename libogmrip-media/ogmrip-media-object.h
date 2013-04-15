@@ -46,8 +46,9 @@ struct _OGMRipMediaInterface
   const gchar * (* get_uri)       (OGMRipMedia         *media);
   gint64        (* get_size)      (OGMRipMedia         *media);
   gint          (* get_n_titles)  (OGMRipMedia         *media);
-  OGMRipTitle * (* get_nth_title) (OGMRipMedia         *media,
-                                   guint               nr);
+  OGMRipTitle * (* get_title)     (OGMRipMedia         *media,
+                                   guint               id);
+  GList *       (* get_titles)    (OGMRipMedia         *media);
   OGMRipMedia * (* copy)          (OGMRipMedia         *media,
                                    const gchar         *path,
                                    GCancellable        *cancellable,
@@ -72,8 +73,8 @@ const gchar * ogmrip_media_get_id        (OGMRipMedia         *media);
 const gchar * ogmrip_media_get_uri       (OGMRipMedia         *media);
 gint64        ogmrip_media_get_size      (OGMRipMedia         *media);
 gint          ogmrip_media_get_n_titles  (OGMRipMedia         *media);
-OGMRipTitle * ogmrip_media_get_nth_title (OGMRipMedia         *media,
-                                          guint               nr);
+OGMRipTitle * ogmrip_media_get_title     (OGMRipMedia         *media,
+                                          guint               id);
 GList *       ogmrip_media_get_titles    (OGMRipMedia         *media);
 OGMRipMedia * ogmrip_media_copy          (OGMRipMedia         *media,
                                           const gchar         *path,
