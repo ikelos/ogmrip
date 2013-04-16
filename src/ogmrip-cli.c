@@ -467,7 +467,7 @@ ogmrip_cli_media_info (OGMRipMedia *media)
   }
   g_list_free (list);
 
-  g_print ("%s: %d\n", _("Longest title"), longest_title);
+  g_print ("%s: %d\n", _("Longest title"), longest_title + 1);
 
   return TRUE;
 }
