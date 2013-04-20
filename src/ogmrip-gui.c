@@ -392,7 +392,7 @@ ogmrip_gui_clean (OGMRipData *data, OGMRipEncoding *encoding, gboolean error)
       dialog = gtk_message_dialog_new (GTK_WINDOW (data->window),
           GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
           GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
-          _("Do you want to remove the copy of the DVD ?"));
+          _("Do you want to remove the copy of the media?"));
       after = gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES ?
         OGMRIP_AFTER_ENC_REMOVE : OGMRIP_AFTER_ENC_KEEP;
       gtk_widget_destroy (dialog);
@@ -1234,7 +1234,7 @@ ogmrip_gui_eject_activated (OGMRipData *data, GtkWidget *dialog)
       const gchar *uri;
 
       uri = ogmrip_media_get_uri (data->media);
-      if (!g_str_has_prefix (uri, "dvd://"))
+      if (!g_str_has_prefix (uri, "dvd://") || !g_str_has_prefix (uri, "br://"))
         g_warning ("Unknown scheme for '%s'", uri);
       else if (g_str_equal (ogmrip_media_get_uri (media), uri))
       {
@@ -1561,7 +1561,7 @@ ogmrip_gui_play_activated (OGMRipData *data, GtkWidget *button)
 
   if (!ogmrip_player_play (data->player, &error))
   {
-    ogmrip_run_error_dialog (GTK_WINDOW (data->window), error, _("Can't play DVD title"));
+    ogmrip_run_error_dialog (GTK_WINDOW (data->window), error, _("Can't play title"));
     g_clear_error (&error);
   }
 }
@@ -2068,7 +2068,7 @@ ogmrip_gui_about_activated (GSimpleAction *action, GVariant *parameter, gpointer
   gtk_show_about_dialog (parent,
       "name", PACKAGE_NAME,
       "version", PACKAGE_VERSION,
-      "comments", _("A DVD Encoder for GNOME"),
+      "comments", _("A Media Encoder for GNOME"),
       "copyright", "(c) 2004-2012 Olivier Rolland",
       "website", "http://ogmrip.sourceforge.net",
       "translator-credits", translator_credits,

@@ -84,7 +84,7 @@ ogmrip_open_title (GtkWindow *parent, OGMRipTitle *title, GError **error)
       GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
       GTK_MESSAGE_INFO, GTK_BUTTONS_CANCEL, "<b>%s</b>\n\n%s",
       ogmrip_media_get_label (ogmrip_title_get_media (title)),
-      _("Please insert the DVD required to encode this title."));
+      _("Please insert the media required to encode this title."));
   g_signal_connect (dialog, "delete-event",
       G_CALLBACK (gtk_widget_hide_on_delete), NULL);
 

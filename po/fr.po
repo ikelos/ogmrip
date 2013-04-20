@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OGMRip\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-03 18:40+0200\n"
+"POT-Creation-Date: 2013-04-20 15:41+0200\n"
 "PO-Revision-Date: 2008-01-11 21:30+0100\n"
 "Last-Translator: Olivier Rolland <billl@users.sourceforge.net>\n"
 "Language-Team: French <fr@li.org>\n"
@@ -387,7 +387,7 @@ msgid "Motion _Estimation"
 msgstr "_Estimation de mouvement"
 
 #: ../data/ui/ogmrip-main-window.ui.h:1 ../data/ui/ogmrip.desktop.in.h:1
-#: ../src/ogmrip-main.c:224
+#: ../src/ogmrip-main.c:221
 msgid "OGMRip"
 msgstr "OGMRip"
 
@@ -420,7 +420,7 @@ msgid "Angle:"
 msgstr "Angle :"
 
 #: ../data/ui/ogmrip-mp4-options-dialog.ui.h:1 ../src/ogmrip-cli.c:309
-#: ../src/ogmrip-cli.c:353
+#: ../src/ogmrip-cli.c:350 ../src/ogmrip-cli.c:385
 msgid "Format"
 msgstr "Format"
 
@@ -513,9 +513,9 @@ msgid "_File Name:"
 msgstr "Nom du _fichier"
 
 #: ../data/ui/ogmrip-pref-dialog.ui.h:6
-#: ../libogmrip-media-gtk/ogmrip-title-chooser-widget.c:105
-#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:652
-#: ../src/ogmrip-cli.c:418
+#: ../libogmrip-media-gtk/ogmrip-title-chooser-widget.c:102
+#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:650
+#: ../src/ogmrip-cli.c:422
 msgid "Title"
 msgstr "Titre"
 
@@ -544,12 +544,12 @@ msgid "_Chapters:"
 msgstr "_Chapitres :"
 
 #: ../data/ui/ogmrip-pref-dialog.ui.h:14
-msgid "<b>DVD Copy</b>"
-msgstr "<b>Copie de DVD</b>"
+msgid "<b>Media Copy</b>"
+msgstr "<b>Copie de média</b>"
 
 #: ../data/ui/ogmrip-pref-dialog.ui.h:15
-msgid "_Copy DVD on hard drive before encoding"
-msgstr "_Copier le DVD sur le disque dur avant l'encodage"
+msgid "_Copy media on hard drive before encoding"
+msgstr "_Copier le média sur le disque dur avant l'encodage"
 
 #: ../data/ui/ogmrip-pref-dialog.ui.h:16
 msgid "_After the encoding:"
@@ -1455,7 +1455,7 @@ msgstr "Min"
 msgid "Max"
 msgstr "Max"
 
-#: ../data/ui/ogmrip-xvid-options-dialog.ui.h:34 ../src/ogmrip-cli.c:358
+#: ../data/ui/ogmrip-xvid-options-dialog.ui.h:34 ../src/ogmrip-cli.c:356
 msgid "Quantization"
 msgstr "Quantum"
 
@@ -1680,7 +1680,7 @@ msgstr "Le dossier ne contient pas une structure de DVD valide"
 msgid "No such directory, block device or iso file"
 msgstr "Répertoire, périphérique ou fichier iso inéxistant"
 
-#: ../libogmrip-dvd/ogmdvd-disc.c:677
+#: ../libogmrip-dvd/ogmdvd-disc.c:679
 #: ../libogmrip-encode/ogmrip-encoding.c:534
 #, c-format
 msgid "Device does not contain the expected DVD"
@@ -1691,19 +1691,19 @@ msgstr "Le périphérique ne contient pas le DVD attendu"
 msgid "Cannot open video titleset"
 msgstr "Impossible d'ouvrir le titleset vidéo"
 
-#: ../libogmrip-encode/ogmrip-container.c:403
+#: ../libogmrip-encode/ogmrip-container.c:452
 #: ../libogmrip-encode/ogmrip-encoding.c:689
 #, c-format
 msgid "The container cannot contain more than %d video codecs and files"
 msgstr "Le conteneur ne peut pas contenir plus de %d codecs et fichiers vidéo"
 
-#: ../libogmrip-encode/ogmrip-container.c:418
+#: ../libogmrip-encode/ogmrip-container.c:467
 #: ../libogmrip-encode/ogmrip-encoding.c:716
 #, c-format
 msgid "The container cannot contain more than %d audio codecs and files"
 msgstr "Le conteneur ne peut pas contenir plus de %d codecs et fichiers audio"
 
-#: ../libogmrip-encode/ogmrip-container.c:433
+#: ../libogmrip-encode/ogmrip-container.c:482
 #: ../libogmrip-encode/ogmrip-encoding.c:743
 #, c-format
 msgid "The container cannot contain more than %d subp codecs and files"
@@ -1756,7 +1756,7 @@ msgstr ""
 "constant."
 
 #: ../libogmrip-media-gtk/ogmrip-chapter-store.c:208
-#: ../libogmrip-media-gtk/ogmrip-chapter-view.c:117 ../src/ogmrip-cli.c:403
+#: ../libogmrip-media-gtk/ogmrip-chapter-view.c:117 ../src/ogmrip-cli.c:407
 msgid "Chapter"
 msgstr "Chapitre"
 
@@ -1822,15 +1822,15 @@ msgstr "Sélectionner un répertoire média"
 msgid "Supported files"
 msgstr "Fichiers pris en charge"
 
-#: ../libogmrip-media-gtk/ogmrip-title-chooser-widget.c:109
+#: ../libogmrip-media-gtk/ogmrip-title-chooser-widget.c:106
 msgid "hours"
 msgstr "heures"
 
-#: ../libogmrip-media-gtk/ogmrip-title-chooser-widget.c:111
+#: ../libogmrip-media-gtk/ogmrip-title-chooser-widget.c:108
 msgid "minutes"
 msgstr "minutes"
 
-#: ../libogmrip-media-gtk/ogmrip-title-chooser-widget.c:113
+#: ../libogmrip-media-gtk/ogmrip-title-chooser-widget.c:110
 msgid "seconds"
 msgstr "secondes"
 
@@ -1875,7 +1875,7 @@ msgid "No subp"
 msgstr "Aucun sous-titres"
 
 #: ../libogmrip-file-gtk/ogmrip-source-chooser-widget.c:613
-#: ../src/ogmrip-cli.c:381
+#: ../src/ogmrip-cli.c:379
 msgid "Subtitle"
 msgstr "Sous-titres"
 
@@ -1903,90 +1903,90 @@ msgid "Use _profile settings"
 msgstr "Utiliser les _paramètres du profil"
 
 #: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:137
-#: ../src/ogmrip-cli.c:697 ../src/ogmrip-gui.c:490
+#: ../src/ogmrip-cli.c:693 ../src/ogmrip-gui.c:490
 msgid "Encoding video title"
 msgstr "Encodage du titre vidéo"
 
 #: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:139
-#: ../src/ogmrip-cli.c:699 ../src/ogmrip-gui.c:492
+#: ../src/ogmrip-cli.c:695 ../src/ogmrip-gui.c:492
 msgid "Extracting chapters information"
 msgstr "Extraction du chapitrage"
 
 #: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:141
-#: ../src/ogmrip-cli.c:701 ../src/ogmrip-gui.c:494
+#: ../src/ogmrip-cli.c:697 ../src/ogmrip-gui.c:494
 msgid "Merging audio and video streams"
 msgstr "Fusion des pistes audio et vidéo"
 
 #: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:143
-#: ../src/ogmrip-cli.c:703 ../src/ogmrip-gui.c:496
+#: ../src/ogmrip-cli.c:699 ../src/ogmrip-gui.c:496
 msgid "Copying media"
 msgstr "Copie du média"
 
 #: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:145
-#: ../src/ogmrip-cli.c:705 ../src/ogmrip-gui.c:498
+#: ../src/ogmrip-cli.c:701 ../src/ogmrip-gui.c:498
 #: ../src/ogmrip-options-dialog.c:509
 msgid "Analyzing video stream"
 msgstr "Analyse du flux vidéo"
 
 #: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:147
-#: ../src/ogmrip-cli.c:707 ../src/ogmrip-gui.c:500
+#: ../src/ogmrip-cli.c:703 ../src/ogmrip-gui.c:500
 msgid "Running the compressibility test"
 msgstr "Test de la compressibilité"
 
 #: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:151
-#: ../src/ogmrip-cli.c:711 ../src/ogmrip-gui.c:504
+#: ../src/ogmrip-cli.c:707 ../src/ogmrip-gui.c:504
 #, c-format
 msgid "Extracting audio stream %d"
 msgstr "Extraction de la piste audio %d"
 
-#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:159
-#: ../src/ogmrip-cli.c:719 ../src/ogmrip-gui.c:512
+#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:158
+#: ../src/ogmrip-cli.c:715 ../src/ogmrip-gui.c:512
 #, c-format
 msgid "Extracting subtitle stream %d"
 msgstr "Extraction du sous-titre %d"
 
-#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:195
+#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:193
 msgid "Encoding completed successfully"
 msgstr "Test de compressibilité effectué avec succès."
 
-#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:198
+#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:196
 msgid "Encoding cancelled by user"
 msgstr "Encodage annulé par l'utilisateur"
 
-#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:201
+#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:199
 #: ../src/ogmrip-gui.c:420
 msgid "Encoding failed"
 msgstr "L'encodage a échoué"
 
-#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:410
+#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:408
 msgid "Import Encoding"
 msgstr "Importer un encodage"
 
-#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:455
+#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:453
 msgid "Could not import the encoding"
 msgstr "Impossible d'importer l'encodage"
 
-#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:473
+#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:471
 msgid "Export Encoding"
 msgstr "Exporter l'encodage"
 
-#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:519
+#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:517
 msgid "Could not export the encoding"
 msgstr "Impossible d'exporter l'encodage"
 
-#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:616
+#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:614
 msgid "Encoding Manager"
 msgstr "Gestionnaire d'encodages"
 
-#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:648
+#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:646
 msgid "Name"
 msgstr "Nom"
 
-#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:656
+#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:654
 msgid "Profile"
 msgstr "Profil"
 
-#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:660
+#: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:658
 #: ../libogmrip-encode-gtk/ogmrip-progress-dialog.c:189
 msgid "Progress"
 msgstr "Progression"
@@ -2072,7 +2072,7 @@ msgstr "Continuer"
 msgid "Subtitles Options"
 msgstr "Options des sous-titres"
 
-#: ../libogmrip-mplayer/ogmrip-mplayer-commands.c:1053
+#: ../libogmrip-mplayer/ogmrip-mplayer-commands.c:1062
 #, c-format
 msgid "Error while decoding frame"
 msgstr "Erreur de décodage d'une trame"
@@ -2095,195 +2095,190 @@ msgstr "Rapport largeur/hauteur"
 msgid "Resolution"
 msgstr "Résolution"
 
-#: ../src/ogmrip-cli.c:347 ../src/ogmrip-cli.c:421
+#: ../src/ogmrip-cli.c:344 ../src/ogmrip-cli.c:425
 msgid "Audio"
 msgstr "Audio"
 
-#: ../src/ogmrip-cli.c:350 ../src/ogmrip-cli.c:384
+#: ../src/ogmrip-cli.c:347 ../src/ogmrip-cli.c:382
 msgid "Language"
 msgstr "Langue"
 
-#: ../src/ogmrip-cli.c:355
+#: ../src/ogmrip-cli.c:352
 msgid "Frequency"
 msgstr "Fréquence"
 
-#: ../src/ogmrip-cli.c:361
+#: ../src/ogmrip-cli.c:359
 msgid "Channels"
 msgstr "Canaux"
 
-#: ../src/ogmrip-cli.c:364 ../src/ogmrip-cli.c:387
+#: ../src/ogmrip-cli.c:363 ../src/ogmrip-cli.c:389
 msgid "Content"
 msgstr "Contenu"
 
-#: ../src/ogmrip-cli.c:403 ../src/ogmrip-cli.c:419
+#: ../src/ogmrip-cli.c:407 ../src/ogmrip-cli.c:423
 msgid "Length"
 msgstr "Durée"
 
-#: ../src/ogmrip-cli.c:420
+#: ../src/ogmrip-cli.c:424
 msgid "Chapters"
 msgstr "Chapitres"
 
-#: ../src/ogmrip-cli.c:422
+#: ../src/ogmrip-cli.c:426
 msgid "Subpictures"
 msgstr "Sous-titres"
 
-#: ../src/ogmrip-cli.c:437
+#: ../src/ogmrip-cli.c:441
 msgid "Number of angles"
 msgstr "Nombre d'angles"
 
-#: ../src/ogmrip-cli.c:459 ../src/ogmrip-cli.c:508 ../src/ogmrip-cli.c:806
-#, c-format
-msgid "Cannot open title %d."
-msgstr "Impossible d'ouvrir le titre %d"
-
-#: ../src/ogmrip-cli.c:473
+#: ../src/ogmrip-cli.c:470
 msgid "Longest title"
 msgstr "Titre le plus long"
 
-#: ../src/ogmrip-cli.c:487 ../src/ogmrip-cli.c:791
+#: ../src/ogmrip-cli.c:490 ../src/ogmrip-cli.c:779
 #, c-format
 msgid "Couldn't open media: '%s'"
 msgstr "Impossible d'ouvrir le media '%s'"
 
-#: ../src/ogmrip-cli.c:500 ../src/ogmrip-cli.c:798
+#: ../src/ogmrip-cli.c:504 ../src/ogmrip-cli.c:786
 #, c-format
 msgid "Title %d does not exist."
 msgstr "Le titre %d n'existe pas."
 
-#: ../src/ogmrip-cli.c:590
+#: ../src/ogmrip-cli.c:586
 #, c-format
 msgid "Video stream does not exist."
 msgstr "Le flux vidéo n'existe pas."
 
-#: ../src/ogmrip-cli.c:629
+#: ../src/ogmrip-cli.c:625
 #, c-format
 msgid "Audio stream %d does not exist."
 msgstr "Le flux audio %d n'existe pas."
 
-#: ../src/ogmrip-cli.c:775
+#: ../src/ogmrip-cli.c:771
 #, c-format
 msgid "Profile '%s' does not exist."
 msgstr "Le profil '%s' n'existe pas."
 
-#: ../src/ogmrip-cli.c:834
+#: ../src/ogmrip-cli.c:814
 msgid "Cannot open title"
 msgstr "Impossible d'ouvrir le titre"
 
-#: ../src/ogmrip-cli.c:839
+#: ../src/ogmrip-cli.c:819
 msgid "Cannot encode title"
 msgstr "Impossible d'encoder le titre"
 
-#: ../src/ogmrip-cli.c:895
+#: ../src/ogmrip-cli.c:875
 msgid "Show help options"
 msgstr "Affiche l'aide"
 
-#: ../src/ogmrip-cli.c:896
+#: ../src/ogmrip-cli.c:876
 msgid "Enable debug messages"
 msgstr "Affiche les messages de débogag"
 
-#: ../src/ogmrip-cli.c:902 ../src/ogmrip-cli.c:916
+#: ../src/ogmrip-cli.c:882 ../src/ogmrip-cli.c:896
 msgid "Specify the media path"
 msgstr "Spécifie le chemin du média"
 
-#: ../src/ogmrip-cli.c:903 ../src/ogmrip-cli.c:918
+#: ../src/ogmrip-cli.c:883 ../src/ogmrip-cli.c:898
 msgid "Specify the title (default: none)"
 msgstr "Spécifie le titre (défaut : aucun)"
 
-#: ../src/ogmrip-cli.c:904
+#: ../src/ogmrip-cli.c:884
 msgid "Show video info"
 msgstr "Affiche les informations video"
 
-#: ../src/ogmrip-cli.c:905
+#: ../src/ogmrip-cli.c:885
 msgid "Show audio info"
 msgstr "Affiche les informations audio"
 
-#: ../src/ogmrip-cli.c:906
+#: ../src/ogmrip-cli.c:886
 msgid "Show chapters info"
 msgstr "Affiche les informations de chapitrage"
 
-#: ../src/ogmrip-cli.c:907
+#: ../src/ogmrip-cli.c:887
 msgid "Show angles info"
 msgstr "Affiche le nombre d'angles"
 
-#: ../src/ogmrip-cli.c:908
+#: ../src/ogmrip-cli.c:888
 msgid "Show palette info"
 msgstr "Affiche la palette"
 
-#: ../src/ogmrip-cli.c:909
+#: ../src/ogmrip-cli.c:889
 msgid "Show subtitles info"
 msgstr "Affiche les informations de sous-titres"
 
-#: ../src/ogmrip-cli.c:910
+#: ../src/ogmrip-cli.c:890
 msgid "Show all info"
 msgstr "Affiche toutes les informations"
 
-#: ../src/ogmrip-cli.c:917
+#: ../src/ogmrip-cli.c:897
 msgid "Specify the output file"
 msgstr "Spéficie le fichier de sortie"
 
-#: ../src/ogmrip-cli.c:919
+#: ../src/ogmrip-cli.c:899
 msgid "Select the audio id to encode (default: none)"
 msgstr "Sélectionne l'identificateur du flux audio à encoder (défaut : aucun)"
 
-#: ../src/ogmrip-cli.c:920
+#: ../src/ogmrip-cli.c:900
 msgid "Select the subtitle id to extract (default: none)"
 msgstr ""
 "Sélectionne l'identificateur des sous-titres à extraire (défaut : aucun)"
 
-#: ../src/ogmrip-cli.c:921
+#: ../src/ogmrip-cli.c:901
 msgid "Specify which chapters to extract. (default: all)"
 msgstr "Spécifie les chapitres à extraire (défaut : tous)"
 
-#: ../src/ogmrip-cli.c:922
+#: ../src/ogmrip-cli.c:902
 msgid "Extract selected chapters in relative mode"
 msgstr "Extrait les chapitres sélectionnés en mode relatif"
 
-#: ../src/ogmrip-cli.c:923
+#: ../src/ogmrip-cli.c:903
 msgid "Specify the encoding profile"
 msgstr "Spéficie le profile d'encodage"
 
-#: ../src/ogmrip-cli.c:940
+#: ../src/ogmrip-cli.c:920
 msgid "Usage:"
 msgstr "Usage : "
 
-#: ../src/ogmrip-cli.c:941 ../src/ogmrip-cli.c:946
+#: ../src/ogmrip-cli.c:921 ../src/ogmrip-cli.c:926
 msgid "COMMAND"
 msgstr "COMMANDE"
 
-#: ../src/ogmrip-cli.c:941
+#: ../src/ogmrip-cli.c:921
 msgid "OPTION"
 msgstr "OPTION"
 
-#: ../src/ogmrip-cli.c:942
+#: ../src/ogmrip-cli.c:922
 msgid "Commands"
 msgstr "Commandes"
 
-#: ../src/ogmrip-cli.c:943
+#: ../src/ogmrip-cli.c:923
 msgid "lists the content of a media"
 msgstr "liste le contenu d'un média"
 
-#: ../src/ogmrip-cli.c:944
+#: ../src/ogmrip-cli.c:924
 msgid "encodes selected title, audio streams and subtitles"
 msgstr "encode le titre et les flux audio et de sous-titres sélectionnés"
 
-#: ../src/ogmrip-cli.c:946
+#: ../src/ogmrip-cli.c:926
 msgid "Try"
 msgstr "Essayez"
 
-#: ../src/ogmrip-cli.c:946
+#: ../src/ogmrip-cli.c:926
 msgid "to get a list of available options"
 msgstr "pour une liste des options disponibles"
 
-#: ../src/ogmrip-cli.c:998
+#: ../src/ogmrip-cli.c:978
 #, c-format
 msgid "Option parsing failed: %s"
 msgstr "Erreur d'analyse des options: %s"
 
-#: ../src/ogmrip-cli.c:1026
+#: ../src/ogmrip-cli.c:1006
 msgid "No media specified"
 msgstr "Aucun média spécifié"
 
-#: ../src/ogmrip-cli.c:1035
+#: ../src/ogmrip-cli.c:1015
 msgid "No output file speficied"
 msgstr "Aucun fichier de sortie spécifiée"
 
@@ -2313,8 +2308,8 @@ msgid "Could not open the media"
 msgstr "Impossible d'ouvrir le média"
 
 #: ../src/ogmrip-gui.c:395
-msgid "Do you want to remove the copy of the DVD ?"
-msgstr "Voulez-vous supprimer la copie du DVD ?"
+msgid "Do you want to remove the copy of the media?"
+msgstr "Voulez-vous supprimer la copie du média ?"
 
 #: ../src/ogmrip-gui.c:545
 msgid "Are you sure you want to cancel the encoding process?"
@@ -2333,38 +2328,38 @@ msgstr "Voulez-vous le remplacer ?"
 msgid "Could not export the chapters"
 msgstr "Impossible d'exporter le chapitrage"
 
-#: ../src/ogmrip-gui.c:1507
+#: ../src/ogmrip-gui.c:1506
 msgid "Cannot encode media"
 msgstr "Impossible d'encoder le média"
 
-#: ../src/ogmrip-gui.c:1565
-msgid "Can't play DVD title"
-msgstr "Impossible de jouer le DVD"
+#: ../src/ogmrip-gui.c:1564
+msgid "Can't play title"
+msgstr "Impossible de jouer le titre"
 
-#: ../src/ogmrip-gui.c:1579
+#: ../src/ogmrip-gui.c:1578
 msgid "Select a chapters file"
 msgstr "Sélectionner un fichier de chapitrage"
 
-#: ../src/ogmrip-gui.c:1601
+#: ../src/ogmrip-gui.c:1600
 #, c-format
 msgid "Could not open the chapters file '%s'"
 msgstr "Impossible d'ouvrir le fichier de chapitrage '%s'"
 
-#: ../src/ogmrip-gui.c:1618
+#: ../src/ogmrip-gui.c:1617
 msgid "Select a file"
 msgstr "Sélectionner un fichier"
 
-#: ../src/ogmrip-gui.c:2046
+#: ../src/ogmrip-gui.c:2045
 msgid "translator-credits"
 msgstr "Olivier Rolland <billl@users.sourceforge.net>"
 
-#: ../src/ogmrip-gui.c:2072
-msgid "A DVD Encoder for GNOME"
-msgstr "Un encodeur de DVD pour GNOME"
+#: ../src/ogmrip-gui.c:2071
+msgid "A Media Encoder for GNOME"
+msgstr "Un encodeur de Média pour GNOME"
 
 #: ../src/ogmrip-helper.c:87
-msgid "Please insert the DVD required to encode this title."
-msgstr "Veuillez insérer le DVD requis pour encoder ce titre."
+msgid "Please insert the media required to encode this title."
+msgstr "Veuillez insérer le média requis pour encoder ce titre."
 
 #: ../src/ogmrip-options-dialog.c:654
 msgid "Extra Small"
@@ -2627,6 +2622,9 @@ msgstr "MEncoder est compilé sans support XviD"
 #: ../plugins/ogmrip-xvid-options.c:284
 msgid "XviD Options"
 msgstr "XviD Options"
+
+#~ msgid "Cannot open title %d."
+#~ msgstr "Impossible d'ouvrir le titre %d"
 
 #~ msgid "Video codec '%s' does not exist."
 #~ msgstr "Le codec vidéo '%s' n'existe pas."

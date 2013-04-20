@@ -205,7 +205,7 @@
             <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
             <property name="hexpand">True</property>
             <property name="xalign">0</property>
-            <property name="label" translatable="yes">&lt;b&gt;DVD Copy&lt;/b&gt;</property>
+            <property name="label" translatable="yes">&lt;b&gt;Media Copy&lt;/b&gt;</property>
             <property name="use_markup">True</property>
           </object>
           <packing>
@@ -217,7 +217,7 @@
         </child>
         <child>
           <object class="GtkCheckButton" id="copy-dvd-check">
-            <property name="label" translatable="yes">_Copy DVD on hard drive before encoding</property>
+            <property name="label" translatable="yes">_Copy media on hard drive before encoding</property>
             <property name="visible">True</property>
             <property name="can_focus">True</property>
             <property name="receives_default">False</property>
