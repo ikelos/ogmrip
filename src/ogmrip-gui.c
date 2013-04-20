@@ -1234,9 +1234,8 @@ ogmrip_gui_eject_activated (OGMRipData *data, GtkWidget *dialog)
       const gchar *uri;
 
       uri = ogmrip_media_get_uri (data->media);
-      if (!g_str_has_prefix (uri, "dvd://") || !g_str_has_prefix (uri, "br://"))
-        g_warning ("Unknown scheme for '%s'", uri);
-      else if (g_str_equal (ogmrip_media_get_uri (media), uri))
+      if ((g_str_has_prefix (uri, "dvd://") || g_str_has_prefix (uri, "br://")) &&
+          g_str_equal (ogmrip_media_get_uri (media), uri))
       {
         g_object_unref (data->media);
         data->media = NULL;

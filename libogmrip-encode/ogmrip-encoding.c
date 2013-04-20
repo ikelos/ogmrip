@@ -1107,8 +1107,6 @@ ogmrip_encoding_set_copy (OGMRipEncoding *encoding, gboolean copy)
       if (g_stat (uri + 6, &buf) == 0)
         copy = S_ISBLK (buf.st_mode);
     }
-    else
-      g_warning ("Unknown scheme for '%s'", uri);
   }
 
   encoding->priv->copy = copy;
@@ -2121,8 +2119,6 @@ ogmrip_encoding_clean (OGMRipEncoding *encoding, gboolean temporary, gboolean co
     uri = ogmrip_media_get_uri (ogmrip_title_get_media (title));
     if (g_str_has_prefix (uri, "dvd://"))
       ogmrip_fs_rmdir (uri + 6, TRUE, NULL);
-    else
-      g_warning ("Unknown scheme for '%s'", uri);
   }
 
   if (log)
