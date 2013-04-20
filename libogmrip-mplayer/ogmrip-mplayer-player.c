@@ -61,7 +61,7 @@ enum
 static void ogmrip_player_dispose (GObject *gobject);
 
 static guint signals[LAST_SIGNAL] = { 0 };
-
+/*
 static gint
 ogmrip_mplayer_map_audio_id (OGMRipStream *astream)
 {
@@ -86,7 +86,7 @@ ogmrip_mplayer_map_audio_id (OGMRipStream *astream)
 
   return aid;
 }
-
+*/
 static gchar **
 ogmrip_mplayer_play_command (OGMRipPlayer *player)
 {
@@ -112,13 +112,19 @@ ogmrip_mplayer_play_command (OGMRipPlayer *player)
   g_ptr_array_add (argv, g_strdup ("-cache-seek-min"));
   g_ptr_array_add (argv, g_strdup ("50"));
 
+  g_ptr_array_add (argv, g_strdup ("-noconfig"));
+  g_ptr_array_add (argv, g_strdup ("all"));
+
+  g_ptr_array_add (argv, g_strdup ("-demuxer"));
+  g_ptr_array_add (argv, g_strdup ("lavf"));
+
   g_ptr_array_add (argv, g_strdup ("-zoom"));
 
   if (player->priv->astream)
   {
     g_ptr_array_add (argv, g_strdup ("-aid"));
     g_ptr_array_add (argv, g_strdup_printf ("%d",
-          ogmrip_mplayer_map_audio_id (OGMRIP_STREAM (player->priv->astream))));
+          ogmrip_stream_get_id (OGMRIP_STREAM (player->priv->astream))));
   }
   else
     g_ptr_array_add (argv, g_strdup ("-nosound"));

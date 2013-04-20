@@ -60,12 +60,12 @@ ogmrip_mplayer_set_input (GPtrArray *argv, OGMRipTitle *title)
   {
     g_ptr_array_add (argv, g_strdup ("-bluray-device"));
     g_ptr_array_add (argv, g_strdup (uri + 5));
-    g_ptr_array_add (argv, g_strdup_printf ("br://%d", ogmrip_title_get_id (title)));
+    g_ptr_array_add (argv, g_strdup_printf ("br://%d", ogmrip_title_get_id (title) + 1));
   }
   else
     g_warning ("Unknown scheme for '%s'", uri);
 }
-
+/*
 static gint
 ogmrip_mplayer_map_audio_id (OGMRipStream *astream)
 {
@@ -95,7 +95,7 @@ ogmrip_mplayer_map_audio_id (OGMRipStream *astream)
 
   return aid;
 }
-
+*/
 static glong
 ogmrip_mplayer_get_frames (OGMRipCodec *codec)
 {
@@ -276,6 +276,9 @@ ogmrip_mplayer_wav_command (OGMRipAudioCodec *audio, gboolean header, const gcha
   g_ptr_array_add (argv, g_strdup ("-noconfig"));
   g_ptr_array_add (argv, g_strdup ("all"));
 
+  g_ptr_array_add (argv, g_strdup ("-demuxer"));
+  g_ptr_array_add (argv, g_strdup ("lavf"));
+
   length = ogmrip_codec_get_play_length (OGMRIP_CODEC (audio));
 
   if (length <= 0.0)
@@ -355,7 +358,7 @@ ogmrip_mplayer_wav_command (OGMRipAudioCodec *audio, gboolean header, const gcha
   }
 
   g_ptr_array_add (argv, g_strdup ("-aid"));
-  g_ptr_array_add (argv, g_strdup_printf ("%d", ogmrip_mplayer_map_audio_id (stream)));
+  g_ptr_array_add (argv, g_strdup_printf ("%d", ogmrip_stream_get_id (stream)));
 
   ogmrip_mplayer_set_input (argv, ogmrip_stream_get_title (stream));
 
@@ -406,6 +409,9 @@ ogmrip_mencoder_audio_command (OGMRipAudioCodec *audio, const gchar *output)
   g_ptr_array_add (argv, g_strdup ("-noconfig"));
   g_ptr_array_add (argv, g_strdup ("all"));
 
+  g_ptr_array_add (argv, g_strdup ("-demuxer"));
+  g_ptr_array_add (argv, g_strdup ("lavf"));
+
   ofps = ogmrip_mplayer_get_output_fps (OGMRIP_CODEC (audio), ogmrip_stream_get_title (stream));
   if (ofps)
   {
@@ -441,7 +447,7 @@ ogmrip_mencoder_audio_command (OGMRipAudioCodec *audio, const gchar *output)
   }
 
   g_ptr_array_add (argv, g_strdup ("-aid"));
-  g_ptr_array_add (argv, g_strdup_printf ("%d", ogmrip_mplayer_map_audio_id (stream)));
+  g_ptr_array_add (argv, g_strdup_printf ("%d", ogmrip_stream_get_id (stream)));
 
   g_ptr_array_add (argv, g_strdup ("-o"));
   g_ptr_array_add (argv, g_strdup (output));
@@ -472,6 +478,9 @@ ogmrip_mencoder_video_command (OGMRipVideoCodec *video, const gchar *output, gui
   g_ptr_array_add (argv, g_strdup ("-noconfig"));
   g_ptr_array_add (argv, g_strdup ("all"));
 
+  g_ptr_array_add (argv, g_strdup ("-demuxer"));
+  g_ptr_array_add (argv, g_strdup ("lavf"));
+
   scale = FALSE;
 
   if (ogmrip_codec_format (G_OBJECT_TYPE (video)) == OGMRIP_FORMAT_COPY)
@@ -498,7 +507,7 @@ ogmrip_mencoder_video_command (OGMRipVideoCodec *video, const gchar *output, gui
       g_ptr_array_add (argv, g_strdup ("-af"));
       g_ptr_array_add (argv, g_strdup ("channels=1,lavcresample=8000"));
       g_ptr_array_add (argv, g_strdup ("-aid"));
-      g_ptr_array_add (argv, g_strdup_printf ("%d", ogmrip_mplayer_map_audio_id (OGMRIP_STREAM (astream))));
+      g_ptr_array_add (argv, g_strdup_printf ("%d", ogmrip_stream_get_id (OGMRIP_STREAM (astream))));
     }
     else
       g_ptr_array_add (argv, g_strdup ("-nosound"));
