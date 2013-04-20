@@ -514,7 +514,10 @@ ogmdvd_disc_constructor (GType gtype, guint n_properties, GObjectConstructParam 
 
   reader = dvd_open_reader (disc->priv->device, NULL);
   if (!reader)
+  {
+    g_object_unref (disc);
     return NULL;
+  }
   id = dvd_reader_get_id (reader);
   if (!id)
     return NULL;
@@ -672,7 +675,8 @@ ogmdvd_disc_open (OGMRipMedia *media, GCancellable *cancellable, OGMRipMediaCall
   if (!current_id || !g_str_equal (id, current_id))
   {
     DVDClose (reader);
-    g_set_error (error, OGMDVD_DISC_ERROR, OGMDVD_DISC_ERROR_ID, _("Device does not contain the expected DVD"));
+    g_set_error (error, OGMDVD_DISC_ERROR, OGMDVD_DISC_ERROR_ID,
+        _("Device does not contain the expected DVD"));
     return FALSE;
   }
 
