@@ -1861,6 +1861,37 @@ ogmrip_encoding_merge (OGMRipEncoding *encoding, GCancellable *cancellable, GErr
   return result;
 }
 
+static gboolean
+ogmrip_encoding_set_video_method (OGMRipEncoding *encoding, GError **error)
+{
+  gint bitrate;
+
+  switch (encoding->priv->method)
+  {
+    case OGMRIP_ENCODING_SIZE:
+      bitrate = ogmrip_encoding_autobitrate (encoding);
+      if (bitrate <= 0)
+      {
+        g_set_error (error, OGMRIP_ENCODING_ERROR, OGMRIP_ENCODING_ERROR_VIDEO,
+            _("Cannot compute bitrate for video stream"));
+        return FALSE;
+      }
+      ogmrip_video_codec_set_bitrate (encoding->priv->video_codec, bitrate);
+      ogmrip_log_printf ("Automatic bitrate: %d bps\n\n", bitrate);
+      break;
+    case OGMRIP_ENCODING_BITRATE:
+      ogmrip_log_printf ("Constant bitrate: %d bps\n\n",
+          ogmrip_video_codec_get_bitrate (encoding->priv->video_codec));
+      break;
+    case OGMRIP_ENCODING_QUANTIZER:
+      ogmrip_log_printf ("Constant quantizer: %lf\n\n",
+          ogmrip_video_codec_get_quantizer (encoding->priv->video_codec));
+      break;
+  }
+
+  return TRUE;
+}
+
 gboolean
 ogmrip_encoding_encode (OGMRipEncoding *encoding, GCancellable *cancellable, GError **error)
 {
@@ -1949,23 +1980,9 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GCancellable *cancellable, GEr
     /*
      * Compute bitrate if encoding by size
      */
-    switch (encoding->priv->method)
-    {
-      case OGMRIP_ENCODING_SIZE:
-        ogmrip_video_codec_set_bitrate (encoding->priv->video_codec,
-            ogmrip_encoding_autobitrate (encoding));
-        ogmrip_log_printf ("Automatic bitrate: %d bps\n\n",
-            ogmrip_video_codec_get_bitrate (encoding->priv->video_codec));
-        break;
-      case OGMRIP_ENCODING_BITRATE:
-        ogmrip_log_printf ("Constant bitrate: %d bps\n\n",
-            ogmrip_video_codec_get_bitrate (encoding->priv->video_codec));
-        break;
-      case OGMRIP_ENCODING_QUANTIZER:
-        ogmrip_log_printf ("Constant quantizer: %lf\n\n",
-            ogmrip_video_codec_get_quantizer (encoding->priv->video_codec));
-        break;
-    }
+    result = ogmrip_encoding_set_video_method (encoding, error);
+    if (!result)
+      goto encode_cleanup;
 
     /*
      * Get cropping parameters

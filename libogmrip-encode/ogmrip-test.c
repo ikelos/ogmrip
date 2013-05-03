@@ -473,7 +473,17 @@ ogmrip_test_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
       optimal_bitrate += bitrate;
 
       if (info.method == OGMRIP_ENCODING_SIZE)
-        user_bitrate += ogmrip_encoding_autobitrate (test->priv->encoding);
+      {
+        bitrate = ogmrip_encoding_autobitrate (test->priv->encoding);
+        if (bitrate < 0)
+        {
+          g_set_error (error, OGMRIP_ENCODING_ERROR, OGMRIP_ENCODING_ERROR_VIDEO,
+              _("Cannot compute bitrate for video stream"));
+          result = FALSE;
+          break;
+        }
+        user_bitrate += bitrate;
+      }
 
       files ++;
     }
