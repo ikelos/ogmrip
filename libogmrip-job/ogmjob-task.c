@@ -83,47 +83,35 @@ ogmjob_task_set_property (GObject *gobject, guint prop_id, const GValue *value, 
   }
 }
 
-static gboolean
-ogmjob_task_run_thread (GIOSchedulerJob *job, GCancellable *cancellable, GSimpleAsyncResult *simple)
+static void
+ogmjob_task_run_thread (GTask *gtask, OGMJobTask *task, gpointer data, GCancellable *cancellable)
 {
   GError *error = NULL;
-  OGMJobTask *task;
   gboolean retval;
 
-  task = g_object_get_data (G_OBJECT (simple), "task");
-
   retval = ogmjob_task_run (task, cancellable, &error);
-  g_simple_async_result_set_op_res_gboolean (simple, TRUE);
 
   if (!retval)
-    g_simple_async_result_take_error (simple, error);
+    g_task_return_error (gtask, error);
+  else
+    g_task_return_boolean (gtask, TRUE);
 
-  g_simple_async_result_complete_in_idle (simple);
-
-  return FALSE;
+  g_object_unref (gtask);
 }
 
-void
+static void
 ogmjob_task_real_run_async (OGMJobTask *task, GCancellable *cancellable, GAsyncReadyCallback callback, gpointer user_data)
 {
-  GSimpleAsyncResult *simple;
+  GTask *gtask;
 
-  simple = g_simple_async_result_new (G_OBJECT (task), callback, user_data, ogmjob_task_run_async);
-  g_object_set_data_full (G_OBJECT (simple), "task", g_object_ref (task), g_object_unref);
-
-  g_io_scheduler_push_job ((GIOSchedulerJobFunc) ogmjob_task_run_thread,
-      simple, g_object_unref, G_PRIORITY_DEFAULT, cancellable);
+  gtask = g_task_new (task, cancellable, callback, user_data);
+  g_task_run_in_thread (gtask, (GTaskThreadFunc) ogmjob_task_run_thread);
 }
 
-gboolean
+static gboolean
 ogmjob_task_real_run_finish (OGMJobTask *task, GAsyncResult *res, GError **error)
 {
-  GSimpleAsyncResult *simple = G_SIMPLE_ASYNC_RESULT (res);
-
-  if (g_simple_async_result_propagate_error (simple, error))
-    return FALSE;
-
-  return g_simple_async_result_get_op_res_gboolean (simple);
+  return g_task_propagate_boolean (G_TASK (res), error);
 }
 
 static void

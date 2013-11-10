@@ -62,7 +62,7 @@ enum
 typedef struct
 {
   OGMJobSpawn *spawn;
-  GSimpleAsyncResult *simple;
+  GTask *task;
   GError *error;
 
   GCancellable *cancellable;
@@ -100,12 +100,14 @@ task_cancel_cb (GCancellable *cancellable, TaskAsyncData *data)
 }
 
 static TaskAsyncData *
-new_task (OGMJobTask *spawn, GCancellable *cancellable)
+new_task (OGMJobTask *spawn, GCancellable *cancellable, GAsyncReadyCallback callback, gpointer user_data)
 {
   TaskAsyncData *data;
 
   data = g_new0 (TaskAsyncData, 1);
+
   data->spawn = g_object_ref (spawn);
+  data->task = g_task_new (spawn, cancellable, callback, user_data);
 
   if (cancellable)
   {
@@ -122,8 +124,6 @@ complete_task (TaskAsyncData *data)
 {
   if (!data->spawn->priv->pid && !data->src_out && !data->src_err)
   {
-    g_simple_async_result_complete_in_idle (data->simple);
-
     if (data->cancellable)
     {
       g_cancellable_disconnect (data->cancellable, data->handler);
@@ -137,7 +137,7 @@ complete_task (TaskAsyncData *data)
     g_free (data->partial_err);
 
     g_object_unref (data->spawn);
-    g_object_unref (data->simple);
+    g_object_unref (data->task);
 
     g_free (data);
   }
@@ -202,11 +202,11 @@ task_pid_watch (GPid pid, gint status, TaskAsyncData *data)
 
   if (data->error)
   {
-    g_simple_async_result_take_error (data->simple, data->error);
+    g_task_return_error (data->task, data->error);
     data->error = NULL;
   }
-
-  g_simple_async_result_set_op_res_gboolean (data->simple, WIFEXITED (status) && WEXITSTATUS (status) == 0);
+  else
+    g_task_return_boolean (data->task, WIFEXITED (status) && WEXITSTATUS (status) == 0);
 }
 
 static void
@@ -318,9 +318,7 @@ ogmjob_spawn_run_async (OGMJobTask *task, GCancellable *cancellable, GAsyncReady
   gint fdout, fderr;
   guint i;
 
-  data = new_task (task, cancellable);
-  data->simple = g_simple_async_result_new (G_OBJECT (task),
-      callback, user_data, ogmjob_spawn_run_async);
+  data = new_task (task, cancellable, callback, user_data);
 
   for (i = 0; data->spawn->priv->argv[i]; i++)
     ogmrip_log_printf ("%s ", data->spawn->priv->argv[i]);
@@ -330,7 +328,7 @@ ogmjob_spawn_run_async (OGMJobTask *task, GCancellable *cancellable, GAsyncReady
         G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD, NULL, NULL, 
         &data->spawn->priv->pid, NULL, &fdout, &fderr, &data->error))
   {
-    g_simple_async_result_take_error (data->simple, data->error);
+    g_task_return_error (data->task, data->error);
     complete_task (data);
   }
   else
