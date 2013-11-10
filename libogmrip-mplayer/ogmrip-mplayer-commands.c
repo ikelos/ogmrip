@@ -111,8 +111,8 @@ ogmrip_mplayer_get_frames (OGMRipCodec *codec)
   return length / (gdouble) denom * num;
 }
 
-static gchar *
-ogmrip_mplayer_get_output_fps (OGMRipCodec *codec, OGMRipTitle *title)
+static void
+ogmrip_mplayer_set_fps (OGMRipCodec *codec, OGMRipTitle *title, GPtrArray *argv)
 {
   OGMRipVideoStream *stream;
   guint num1, denom1, num2, denom2;
@@ -132,13 +132,17 @@ ogmrip_mplayer_get_output_fps (OGMRipCodec *codec, OGMRipTitle *title)
   }
 
   if (num1 != num2 || denom2 != denom2)
-    return g_strdup_printf ("%d/%d", num2, denom2);
+  {
+    g_ptr_array_add (argv, g_strdup ("-fps"));
+    g_ptr_array_add (argv, g_strdup_printf ("%d/%d", num1, denom1));
 
-  return NULL;
+    g_ptr_array_add (argv, g_strdup ("-ofps"));
+    g_ptr_array_add (argv, g_strdup_printf ("%d/%d", num2, denom2));
+  }
 }
 
-static gchar *
-ogmrip_mplayer_get_chapters (OGMRipCodec *codec, OGMRipTitle *title)
+static void
+ogmrip_mplayer_set_chapters (OGMRipCodec *codec, OGMRipTitle *title, GPtrArray *argv)
 {
   guint start, end;
   gint n_chap;
@@ -159,10 +163,9 @@ ogmrip_mplayer_get_chapters (OGMRipCodec *codec, OGMRipTitle *title)
     else
       str = g_strdup_printf ("%d", start + 1);
 
-    return str;
+    g_ptr_array_add (argv, g_strdup ("-chapter"));
+    g_ptr_array_add (argv, str);
   }
-
-  return NULL;
 }
 
 static gboolean
@@ -260,7 +263,6 @@ ogmrip_mplayer_wav_command (OGMRipAudioCodec *audio, gboolean header, const gcha
 
   gint srate;
   gdouble start, length;
-  gchar *chap;
 
   g_return_val_if_fail (OGMRIP_IS_AUDIO_CODEC (audio), NULL);
   g_return_val_if_fail (output != NULL, NULL);
@@ -331,12 +333,7 @@ ogmrip_mplayer_wav_command (OGMRipAudioCodec *audio, gboolean header, const gcha
   g_ptr_array_add (argv, g_strdup ("-channels"));
   g_ptr_array_add (argv, g_strdup_printf ("%d", ogmrip_audio_codec_get_channels (audio) + 1));
 
-  chap = ogmrip_mplayer_get_chapters (OGMRIP_CODEC (audio), ogmrip_stream_get_title (stream));
-  if (chap)
-  {
-    g_ptr_array_add (argv, g_strdup ("-chapter"));
-    g_ptr_array_add (argv, chap);
-  }
+  ogmrip_mplayer_set_chapters (OGMRIP_CODEC (audio), ogmrip_stream_get_title (stream), argv);
 
   start = ogmrip_codec_get_start_position (OGMRIP_CODEC (audio));
   if (start > 0.0)
@@ -395,8 +392,9 @@ ogmrip_mencoder_audio_command (OGMRipAudioCodec *audio, const gchar *output)
   OGMRipStream *stream;
 
   gdouble start, length;
+/*
   gchar *ofps, *chap;
-
+*/
   g_return_val_if_fail (OGMRIP_IS_AUDIO_CODEC (audio), NULL);
 
   stream = ogmrip_codec_get_input (OGMRIP_CODEC (audio));
@@ -412,19 +410,16 @@ ogmrip_mencoder_audio_command (OGMRipAudioCodec *audio, const gchar *output)
   g_ptr_array_add (argv, g_strdup ("-demuxer"));
   g_ptr_array_add (argv, g_strdup ("lavf"));
 
+  ogmrip_mplayer_set_fps (OGMRIP_CODEC (audio), ogmrip_stream_get_title (stream), argv);
+/*
   ofps = ogmrip_mplayer_get_output_fps (OGMRIP_CODEC (audio), ogmrip_stream_get_title (stream));
   if (ofps)
   {
     g_ptr_array_add (argv, g_strdup ("-ofps"));
     g_ptr_array_add (argv, ofps);
   }
-
-  chap = ogmrip_mplayer_get_chapters (OGMRIP_CODEC (audio), ogmrip_stream_get_title (stream));
-  if (chap)
-  {
-    g_ptr_array_add (argv, g_strdup ("-chapter"));
-    g_ptr_array_add (argv, chap);
-  }
+*/
+  ogmrip_mplayer_set_chapters (OGMRIP_CODEC (audio), ogmrip_stream_get_title (stream), argv);
 
   start = ogmrip_codec_get_start_position (OGMRIP_CODEC (audio));
   if (start > 0.0)
@@ -464,7 +459,6 @@ ogmrip_mencoder_video_command (OGMRipVideoCodec *video, const gchar *output, gui
   OGMRipStream *stream;
 
   gdouble start, length;
-  gchar *ofps, *chap;
   gboolean scale;
 
   stream = ogmrip_codec_get_input (OGMRIP_CODEC (video));
@@ -550,7 +544,8 @@ ogmrip_mencoder_video_command (OGMRipVideoCodec *video, const gchar *output, gui
       g_string_append (pp, "dr");
     }
 
-    if (ogmrip_title_get_telecine (ogmrip_stream_get_title (stream)))
+    if (ogmrip_title_get_progressive (ogmrip_stream_get_title (stream)) ||
+        ogmrip_title_get_telecine (ogmrip_stream_get_title (stream)))
     {
       if (options->len > 0)
         g_string_append_c (options, ',');
@@ -612,22 +607,20 @@ ogmrip_mencoder_video_command (OGMRipVideoCodec *video, const gchar *output, gui
       g_ptr_array_add (argv, g_string_free (options, FALSE));
     }
 
+    ogmrip_mplayer_set_fps (OGMRIP_CODEC (video), ogmrip_stream_get_title (stream), argv);
+/*
     ofps = ogmrip_mplayer_get_output_fps (OGMRIP_CODEC (video), ogmrip_stream_get_title (stream));
     if (ofps)
     {
       g_ptr_array_add (argv, g_strdup ("-ofps"));
       g_ptr_array_add (argv, ofps);
     }
+*/
   }
 
   g_ptr_array_add (argv, g_strdup (scale ? "-zoom": "-nozoom"));
 
-  chap = ogmrip_mplayer_get_chapters (OGMRIP_CODEC (video), ogmrip_stream_get_title (stream));
-  if (chap)
-  {
-    g_ptr_array_add (argv, g_strdup ("-chapter"));
-    g_ptr_array_add (argv, chap);
-  }
+  ogmrip_mplayer_set_chapters (OGMRIP_CODEC (video), ogmrip_stream_get_title (stream), argv);
 
   start = ogmrip_codec_get_start_position (OGMRIP_CODEC (video));
   if (start > 0.0)
@@ -677,7 +670,6 @@ ogmrip_mplayer_video_command (OGMRipVideoCodec *video, const gchar *output)
 
   gdouble start, length;
   gboolean forced, scale;
-  gchar *chap;
 
   g_return_val_if_fail (OGMRIP_IS_VIDEO_CODEC (video), NULL);
   g_return_val_if_fail (output != NULL, NULL);
@@ -746,7 +738,8 @@ ogmrip_mplayer_video_command (OGMRipVideoCodec *video, const gchar *output)
       g_string_append (pp, "dr");
     }
 
-    if (ogmrip_title_get_telecine (ogmrip_stream_get_title (stream)))
+    if (ogmrip_title_get_progressive (ogmrip_stream_get_title (stream)) ||
+        ogmrip_title_get_telecine (ogmrip_stream_get_title (stream)))
     {
       if (options->len > 0)
         g_string_append_c (options, ',');
@@ -814,12 +807,7 @@ ogmrip_mplayer_video_command (OGMRipVideoCodec *video, const gchar *output)
   g_ptr_array_add (argv, g_strdup ("-dvdangle"));
   g_ptr_array_add (argv, g_strdup_printf ("%d", ogmrip_video_codec_get_angle (video)));
 
-  chap = ogmrip_mplayer_get_chapters (OGMRIP_CODEC (video), ogmrip_stream_get_title (stream));
-  if (chap)
-  {
-    g_ptr_array_add (argv, g_strdup ("-chapter"));
-    g_ptr_array_add (argv, chap);
-  }
+  ogmrip_mplayer_set_chapters (OGMRIP_CODEC (video), ogmrip_stream_get_title (stream), argv);
 
   start = ogmrip_codec_get_start_position (OGMRIP_CODEC (video));
   if (start > 0.0)
@@ -864,7 +852,6 @@ ogmrip_mencoder_vobsub_command (OGMRipSubpCodec *subp, const gchar *output)
 
   GPtrArray *argv;
   gdouble start, length;
-  gchar *ofps, *chap;
   gint sid;
 
   g_return_val_if_fail (OGMRIP_IS_SUBP_CODEC (subp), NULL);
@@ -886,13 +873,15 @@ ogmrip_mencoder_vobsub_command (OGMRipSubpCodec *subp, const gchar *output)
 
   stream = ogmrip_codec_get_input (OGMRIP_CODEC (subp));
 
+  ogmrip_mplayer_set_fps (OGMRIP_CODEC (subp), ogmrip_stream_get_title (stream), argv);
+/*
   ofps = ogmrip_mplayer_get_output_fps (OGMRIP_CODEC (subp), ogmrip_stream_get_title (stream));
   if (ofps)
   {
     g_ptr_array_add (argv, g_strdup ("-ofps"));
     g_ptr_array_add (argv, ofps);
   }
-
+*/
   g_ptr_array_add (argv, g_strdup ("-o"));
   g_ptr_array_add (argv, g_strdup ("/dev/null"));
 
@@ -904,12 +893,7 @@ ogmrip_mencoder_vobsub_command (OGMRipSubpCodec *subp, const gchar *output)
   g_ptr_array_add (argv, g_strdup ("-sid"));
   g_ptr_array_add (argv, g_strdup_printf ("%d", sid));
 
-  chap = ogmrip_mplayer_get_chapters (OGMRIP_CODEC (subp), ogmrip_stream_get_title (stream));
-  if (chap)
-  {
-    g_ptr_array_add (argv, g_strdup ("-chapter"));
-    g_ptr_array_add (argv, chap);
-  }
+  ogmrip_mplayer_set_chapters (OGMRIP_CODEC (subp), ogmrip_stream_get_title (stream), argv);
 
   start = ogmrip_codec_get_start_position (OGMRIP_CODEC (subp));
   if (start > 0.0)
