@@ -4,7 +4,7 @@
   <object class="GtkAction" id="add-action">
     <property name="label" translatable="yes">_New</property>
     <property name="tooltip" translatable="yes">Create a new profile</property>
-    <property name="icon_name">bookmark-new-symbolic</property>
+    <property name="icon_name">list-add-symbolic</property>
   </object>
   <object class="GtkAction" id="copy-action">
     <property name="label" translatable="yes">_Duplicate</property>
@@ -15,19 +15,19 @@
   <object class="GtkAction" id="edit-action">
     <property name="label" translatable="yes">_Edit</property>
     <property name="tooltip" translatable="yes">Edit the current profile</property>
-    <property name="icon_name">accessories-text-editor-symbolic</property>
+    <property name="icon_name">emblem-system-symbolic</property>
     <property name="sensitive">False</property>
   </object>
   <object class="GtkAction" id="export-action">
-    <property name="label" translatable="yes">E_xport</property>
-    <property name="tooltip" translatable="yes">Export the current profile</property>
+    <property name="label" translatable="yes">_Save</property>
+    <property name="tooltip" translatable="yes">Save the current profile</property>
     <property name="icon_name">document-save-symbolic</property>
     <property name="sensitive">False</property>
   </object>
   <object class="GtkAction" id="import-action">
-    <property name="label" translatable="yes">_Import</property>
-    <property name="tooltip" translatable="yes">Import an existing profile</property>
-    <property name="icon_name">list-add-symbolic</property>
+    <property name="label" translatable="yes">_Load</property>
+    <property name="tooltip" translatable="yes">Load an existing profile</property>
+    <property name="icon_name">document-open-symbolic</property>
   </object>
   <object class="GtkAction" id="remove-action">
     <property name="label" translatable="yes">_Remove</property>
@@ -141,13 +141,12 @@
             <property name="can_focus">False</property>
             <property name="icon_size">1</property>
             <child>
-              <object class="GtkToolButton" id="import-button">
-                <property name="related_action">import-action</property>
+              <object class="GtkToolButton" id="new-button">
+                <property name="related_action">add-action</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="has_tooltip">True</property>
-                <property name="tooltip_markup" translatable="yes">Import</property>
-                <property name="related_action">import-action</property>
+                <property name="tooltip_markup" translatable="yes">Create</property>
                 <property name="use_underline">True</property>
               </object>
               <packing>
@@ -160,10 +159,6 @@
                 <property name="related_action">remove-action</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="has_tooltip">True</property>
-                <property name="tooltip_markup" translatable="yes">Remove</property>
-                <property name="related_action">remove-action</property>
-                <property name="use_underline">True</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -171,14 +166,32 @@
               </packing>
             </child>
             <child>
-              <object class="GtkToolButton" id="new-button">
-                <property name="related_action">add-action</property>
+              <object class="GtkToolButton" id="import-button">
+                <property name="related_action">import-action</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="has_tooltip">True</property>
-                <property name="tooltip_markup" translatable="yes">Create</property>
-                <property name="related_action">add-action</property>
-                <property name="use_underline">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkToolButton" id="export-button">
+                <property name="related_action">export-action</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="homogeneous">True</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkToolButton" id="edit-button">
+                <property name="related_action">edit-action</property>
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
               </object>
               <packing>
                 <property name="expand">False</property>
