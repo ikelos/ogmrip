@@ -1981,20 +1981,11 @@ ogmrip_gui_create (GApplication *app)
 static void
 ogmrip_gui_profiles_activated (GSimpleAction *action, GVariant *parameter, gpointer app)
 {
-  GtkWindow *parent;
   GtkWidget *dialog;
   
-#if GTK_CHECK_VERSION(3,6,0)
-  parent = gtk_application_get_active_window (app);
-#else
-  GList *list;
-
-  list = gtk_application_get_windows (app);
-  parent = list ? list->data : NULL;
-#endif
-
   dialog = ogmrip_profile_manager_dialog_new ();
-  gtk_window_set_transient_for (GTK_WINDOW (dialog), parent);
+  gtk_window_set_transient_for (GTK_WINDOW (dialog),
+      gtk_application_get_active_window (app));
   gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
 
   gtk_dialog_run (GTK_DIALOG (dialog));
@@ -2007,20 +1998,11 @@ ogmrip_gui_profiles_activated (GSimpleAction *action, GVariant *parameter, gpoin
 static void
 ogmrip_gui_pref_activated (GSimpleAction *action, GVariant *parameter, gpointer app)
 {
-  GtkWindow *parent;
   GtkWidget *dialog;
 
-#if GTK_CHECK_VERSION(3,6,0)
-  parent = gtk_application_get_active_window (app);
-#else
-  GList *list;
-
-  list = gtk_application_get_windows (app);
-  parent = list ? list->data : NULL;
-#endif
-
   dialog = ogmrip_pref_dialog_new ();
-  gtk_window_set_transient_for (GTK_WINDOW (dialog), parent);
+  gtk_window_set_transient_for (GTK_WINDOW (dialog),
+      gtk_application_get_active_window (app));
   gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
 
   gtk_dialog_run (GTK_DIALOG (dialog));
@@ -2034,7 +2016,6 @@ static void
 ogmrip_gui_about_activated (GSimpleAction *action, GVariant *parameter, gpointer app)
 {
   static GdkPixbuf *icon = NULL;
-  GtkWindow *parent;
 
   const gchar *authors[] =
   {
@@ -2049,22 +2030,14 @@ ogmrip_gui_about_activated (GSimpleAction *action, GVariant *parameter, gpointer
     NULL
   };
 
-#if GTK_CHECK_VERSION(3,6,0)
-  parent = gtk_application_get_active_window (app);
-#else
-  GList *list;
-
-  list = gtk_application_get_windows (app);
-  parent = list ? list->data : NULL;
-#endif
-
   if (!icon)
     icon = gdk_pixbuf_new_from_file (OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_ICON_FILE, NULL);
 
   if (g_str_equal (translator_credits, "translator-credits"))
     translator_credits = NULL;
 
-  gtk_show_about_dialog (parent,
+  gtk_show_about_dialog (
+      gtk_application_get_active_window (app),
       "name", PACKAGE_NAME,
       "version", PACKAGE_VERSION,
       "comments", _("A Media Encoder for GNOME"),
