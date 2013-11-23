@@ -181,96 +181,6 @@ spell_check_cleanup:
 }
 #endif /* HAVE_ENCHANT_SUPPORT */
 
-#define PM_DBUS_SERVICE           "org.gnome.SessionManager"
-#define PM_DBUS_INHIBIT_PATH      "/org/gnome/SessionManager"
-#define PM_DBUS_INHIBIT_INTERFACE "org.gnome.SessionManager"
-
-static gint
-ogmrip_gui_dbus_inhibit (OGMRipData *data)
-{
-  GError *error = NULL;
-
-  GDBusConnection *conn;
-  GVariant *res;
-  guint cookie;
-
-  conn = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
-  if (!conn)
-  {
-    g_warning ("Couldn't get a DBUS connection: %s", error->message);
-    g_error_free (error);
-    return -1;
-  }
-
-  res = g_dbus_connection_call_sync (conn,
-      PM_DBUS_SERVICE,
-      PM_DBUS_INHIBIT_PATH,
-      PM_DBUS_INHIBIT_INTERFACE,
-      "Inhibit",
-      g_variant_new("(susu)",
-        g_get_application_name (),
-        0,
-        "Encoding",
-        1 | 4),
-      G_VARIANT_TYPE ("(u)"),
-      G_DBUS_CALL_FLAGS_NONE,
-      -1,
-      NULL,
-      &error);
-
-  if (res)
-  {
-    g_variant_get (res, "(u)", &cookie);
-    g_variant_unref (res);
-  }
-  else
-  {
-    g_warning ("Failed to inhibit the system from suspending: %s", error->message);
-    g_error_free (error);
-    cookie = -1;
-  }
-
-  return cookie;
-}
-
-static void
-ogmrip_gui_dbus_uninhibit (OGMRipData *data, guint cookie)
-{
-  GError *error = NULL;
-
-  GDBusConnection *conn;
-  GVariant *res;
-
-  conn = g_bus_get_sync (G_BUS_TYPE_SESSION, NULL, &error);
-  if (!conn)
-  {
-    g_warning ("Couldn't get a DBUS connection: %s", error->message);
-    g_error_free (error);
-    return;
-  }
-
-  res = g_dbus_connection_call_sync (conn,
-      PM_DBUS_SERVICE,
-      PM_DBUS_INHIBIT_PATH,
-      PM_DBUS_INHIBIT_INTERFACE,
-      "Uninhibit",
-      g_variant_new("(u)",
-        cookie),
-      NULL,
-      G_DBUS_CALL_FLAGS_NONE,
-      -1,
-      NULL,
-      &error);
-
-  if (res)
-    g_variant_unref (res);
-  else
-  {
-    g_warning ("Failed to restore the system power manager: %s", error->message);
-    g_error_free (error);
-  }
-}
-
 static void
 ogmrip_gui_load_progress_cb (OGMRipMedia *media, gdouble percent, gpointer pbar)
 {
@@ -600,9 +510,10 @@ ogmrip_gui_encode (OGMRipData *data, OGMRipEncoding *encoding)
   {
     GCancellable *cancellable;
     GtkWidget *dialog;
-    gint cookie;
+    guint cookie;
 
-    cookie = ogmrip_gui_dbus_inhibit (data);
+    cookie = gtk_application_inhibit (gtk_window_get_application (GTK_WINDOW (data->window)),
+        GTK_WINDOW (data->window), GTK_APPLICATION_INHIBIT_SUSPEND, NULL);
 
     dialog = ogmrip_progress_dialog_new (GTK_WINDOW (data->window),
         GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT, TRUE);
@@ -646,8 +557,8 @@ ogmrip_gui_encode (OGMRipData *data, OGMRipEncoding *encoding)
 
     gtk_widget_destroy (dialog);
 
-    if (cookie >= 0)
-      ogmrip_gui_dbus_uninhibit (data, cookie);
+    if (cookie > 0)
+      gtk_application_uninhibit (gtk_window_get_application (GTK_WINDOW (data->window)), cookie);
 
     ogmrip_title_close (ogmrip_encoding_get_title (encoding));
   }
@@ -674,9 +585,10 @@ ogmrip_gui_test (OGMRipData *data, OGMRipEncoding *encoding, guint *width, guint
   {
     GCancellable *cancellable;
     GtkWidget *dialog;
-    gint cookie;
+    guint cookie;
 
-    cookie = ogmrip_gui_dbus_inhibit (data);
+    cookie = gtk_application_inhibit (gtk_window_get_application (GTK_WINDOW (data->window)),
+        GTK_WINDOW (data->window), GTK_APPLICATION_INHIBIT_SUSPEND, NULL);
 
     dialog = ogmrip_progress_dialog_new (GTK_WINDOW (data->window),
         GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT, TRUE);
@@ -707,8 +619,8 @@ ogmrip_gui_test (OGMRipData *data, OGMRipEncoding *encoding, guint *width, guint
 
     gtk_widget_destroy (dialog);
 
-    if (cookie >= 0)
-      ogmrip_gui_dbus_uninhibit (data, cookie);
+    if (cookie > 0)
+      gtk_application_uninhibit (gtk_window_get_application (GTK_WINDOW (data->window)), cookie);
 
     ogmrip_title_close (ogmrip_encoding_get_title (encoding));
 
