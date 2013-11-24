@@ -426,7 +426,7 @@ ogmrip_gui_encoding_spawn_run (OGMRipEncoding *encoding, OGMJobSpawn *spawn, OGM
     }
   }
 
-  ogmrip_progress_dialog_set_fraction (dialog, 0.0);
+  ogmrip_progress_dialog_set_fraction (dialog, -1.0);
 }
 
 static void
