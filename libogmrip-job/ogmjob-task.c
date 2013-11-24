@@ -95,8 +95,6 @@ ogmjob_task_run_thread (GTask *gtask, OGMJobTask *task, gpointer data, GCancella
     g_task_return_error (gtask, error);
   else
     g_task_return_boolean (gtask, TRUE);
-
-  g_object_unref (gtask);
 }
 
 static void
@@ -106,11 +104,14 @@ ogmjob_task_real_run_async (OGMJobTask *task, GCancellable *cancellable, GAsyncR
 
   gtask = g_task_new (task, cancellable, callback, user_data);
   g_task_run_in_thread (gtask, (GTaskThreadFunc) ogmjob_task_run_thread);
+  g_object_unref (gtask);
 }
 
 static gboolean
 ogmjob_task_real_run_finish (OGMJobTask *task, GAsyncResult *res, GError **error)
 {
+  g_return_val_if_fail (g_task_is_valid (res, task), FALSE);
+
   return g_task_propagate_boolean (G_TASK (res), error);
 }
 
