@@ -513,7 +513,7 @@ ogmrip_gui_encode (OGMRipData *data, OGMRipEncoding *encoding)
     guint cookie;
 
     cookie = gtk_application_inhibit (gtk_window_get_application (GTK_WINDOW (data->window)),
-        GTK_WINDOW (data->window), GTK_APPLICATION_INHIBIT_SUSPEND, NULL);
+        GTK_WINDOW (data->window), GTK_APPLICATION_INHIBIT_SUSPEND, _("Encoding a movie"));
 
     dialog = ogmrip_progress_dialog_new (GTK_WINDOW (data->window),
         GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT, TRUE);
