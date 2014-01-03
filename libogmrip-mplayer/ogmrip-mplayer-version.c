@@ -229,28 +229,3 @@ ogmrip_check_mplayer_dts (void)
   return have_dts;
 }
 
-/**
- * ogmrip_check_mplayer_nosub:
- *
- * Checks if mplayer supports the -nosub option.
- *
- * Returns: TRUE if -nosub is supported
- */
-gboolean
-ogmrip_check_mplayer_nosub (void)
-{
-  static gint have_nosub = -1; 
-
-  if (have_nosub < 0)
-  {
-    gint status;
-
-    have_nosub = 0;
-    if (g_spawn_command_line_sync ("mplayer -nocache -nosound -really-quiet -frames 0 "
-          "-rawvideo pal:fps=25 -demuxer rawvideo -vc null -vo null -nosub /dev/zero", NULL, NULL, &status, NULL))
-      have_nosub = status == 0 ? 1 : 0;
-  }
-
-  return have_nosub == 1;
-}
-

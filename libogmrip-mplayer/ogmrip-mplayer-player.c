@@ -129,7 +129,9 @@ ogmrip_mplayer_play_command (OGMRipPlayer *player)
   else
     g_ptr_array_add (argv, g_strdup ("-nosound"));
 
-  if (player->priv->sstream)
+  if (!player->priv->sstream)
+    g_ptr_array_add (argv, g_strdup ("-nosub"));
+  else
   {
     g_ptr_array_add (argv, g_strdup ("-spuaa"));
     g_ptr_array_add (argv, g_strdup ("20"));
@@ -137,8 +139,6 @@ ogmrip_mplayer_play_command (OGMRipPlayer *player)
     g_ptr_array_add (argv, g_strdup_printf ("%d",
           ogmrip_stream_get_id (OGMRIP_STREAM (player->priv->sstream))));
   }
-  else if (ogmrip_check_mplayer_nosub ())
-    g_ptr_array_add (argv, g_strdup ("-nosub"));
 
   if (player->priv->start_chap > 0 || player->priv->end_chap >= 0)
   {
