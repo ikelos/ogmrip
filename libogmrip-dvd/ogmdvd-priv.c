@@ -149,8 +149,9 @@ ogmdvd_disc_copy (OGMDvdDisc *disc, OGMDvdTitle *title, const gchar *path,
       return NULL;
 
     argv = ogmdvd_disc_copy_command (disc, title, path);
-
     spawn = ogmjob_spawn_newv (argv);
+    g_strfreev (argv);
+
     ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (spawn),
         (OGMJobWatch) ogmdvd_disc_copy_watch, NULL);
 

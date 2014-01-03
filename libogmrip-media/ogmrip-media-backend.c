@@ -290,8 +290,9 @@ ogmrip_title_benchmark (OGMRipTitle *title, gboolean *progressive, gboolean *tel
   benchmark.nframes = 500;
 
   argv = ogmrip_title_benchmark_command (title, benchmark.nframes);
-
   spawn = ogmjob_spawn_newv (argv);
+  g_strfreev (argv);
+
   ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (spawn),
       (OGMJobWatch) ogmrip_title_benchmark_watch, &benchmark);
 
@@ -507,8 +508,9 @@ ogmrip_title_crop_detect (OGMRipTitle *title, guint *crop_x, guint *crop_y, guin
   for (start = step; start < length; start += step)
   {
     argv = ogmrip_title_crop_command (title, start, crop.nframes);
-
     spawn = ogmjob_spawn_newv (argv);
+    g_strfreev (argv);
+
     ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (spawn),
         (OGMJobWatch) ogmrip_title_crop_watch, &crop);
 
@@ -560,7 +562,7 @@ ogmrip_title_crop_detect (OGMRipTitle *title, guint *crop_x, guint *crop_y, guin
   return TRUE;
 }
 
-static GPtrArray *
+static gchar **
 ogmrip_title_grab_frame_command (OGMRipTitle *title, guint pos, gboolean deint)
 {
   GPtrArray *argv;
@@ -595,7 +597,7 @@ ogmrip_title_grab_frame_command (OGMRipTitle *title, guint pos, gboolean deint)
 
   g_ptr_array_add (argv, NULL);
 
-  return argv;
+  return (gchar **) g_ptr_array_free (argv, FALSE);;
 }
 
 GFile *
@@ -603,7 +605,7 @@ ogmrip_title_grab_frame (OGMRipTitle *title, gulong frame, GCancellable *cancell
 {
   GFile *file = NULL;
   OGMJobTask *spawn;
-  GPtrArray *argv;
+  gchar **argv;
 
   guint num, denom;
 
@@ -611,9 +613,11 @@ ogmrip_title_grab_frame (OGMRipTitle *title, gulong frame, GCancellable *cancell
     return FALSE;
 
   ogmrip_video_stream_get_framerate (ogmrip_title_get_video_stream (title), &num, &denom);
-  argv = ogmrip_title_grab_frame_command (title, (guint) (frame / (gdouble) num * denom), FALSE);
 
-  spawn = ogmjob_spawn_newv ((gchar **) g_ptr_array_free (argv, FALSE));
+  argv = ogmrip_title_grab_frame_command (title, (guint) (frame / (gdouble) num * denom), FALSE);
+  spawn = ogmjob_spawn_newv (argv);
+  g_strfreev (argv);
+
   if (ogmjob_task_run (spawn, cancellable, error))
   {
     gchar *filename;
