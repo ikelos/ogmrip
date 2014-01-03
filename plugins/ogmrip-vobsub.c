@@ -54,17 +54,6 @@ static gboolean ogmrip_vobsub_run      (OGMJobTask   *task,
                                         GCancellable *cancellable,
                                         GError       **error);
 
-static gchar **
-ogmrip_vobsub_command (OGMRipSubpCodec *subp)
-{
-  GPtrArray *argv;
-
-  argv = ogmrip_mencoder_vobsub_command (subp,
-      ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (subp))));
-
-  return (gchar **) g_ptr_array_free (argv, FALSE);
-}
-
 G_DEFINE_TYPE (OGMRipVobSub, ogmrip_vobsub, OGMRIP_TYPE_SUBP_CODEC)
 
 static void
@@ -200,18 +189,10 @@ static gboolean
 ogmrip_vobsub_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
   OGMJobTask *child;
-  gchar **argv;
   gboolean result;
 
-  argv = ogmrip_vobsub_command (OGMRIP_SUBP_CODEC (task));
-  if (!argv)
-    return FALSE;
-
-  child = ogmjob_spawn_newv (argv);
-  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child),
-      (OGMJobWatch) ogmrip_mencoder_vobsub_watch, task);
-  ogmjob_spawn_set_watch_stderr (OGMJOB_SPAWN (child),
-      (OGMJobWatch) ogmrip_mplayer_watch_stderr, task);
+  child = ogmrip_mencoder_vobsub_command (OGMRIP_SUBP_CODEC (task),
+      ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (task))));
   ogmjob_container_add (OGMJOB_CONTAINER (task), child);
   g_object_unref (child);
 

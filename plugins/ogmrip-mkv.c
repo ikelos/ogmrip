@@ -286,9 +286,11 @@ ogmrip_matroska_foreach_file (OGMRipContainer *matroska, OGMRipFile *file, GPtrA
     ogmrip_matroska_append_chapters_file (matroska, file, argv);
 }
 
-gchar **
+static OGMJobTask *
 ogmrip_matroska_command (OGMRipContainer *matroska)
 {
+  OGMJobTask *task;
+
   GPtrArray *argv;
   const gchar *label, *fourcc;
   guint tsize, tnumber;
@@ -325,7 +327,13 @@ ogmrip_matroska_command (OGMRipContainer *matroska)
 
   g_ptr_array_add (argv, NULL);
 
-  return (gchar **) g_ptr_array_free (argv, FALSE);
+  task = ogmjob_spawn_newv ((gchar **) argv->pdata);
+  g_ptr_array_free (argv, TRUE);
+
+  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (task),
+      (OGMJobWatch) ogmrip_matroska_watch, matroska);
+
+  return task;
 }
 
 static gint
@@ -358,15 +366,9 @@ static gboolean
 ogmrip_matroska_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
   OGMJobTask *child;
-  gchar **argv;
   gboolean result;
 
-  argv = ogmrip_matroska_command (OGMRIP_CONTAINER (task));
-  if (!argv)
-    return FALSE;
-
-  child = ogmjob_spawn_newv (argv);
-  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child), (OGMJobWatch) ogmrip_matroska_watch, task);
+  child = ogmrip_matroska_command (OGMRIP_CONTAINER (task));
   ogmjob_container_add (OGMJOB_CONTAINER (task), child);
   g_object_unref (child);
 

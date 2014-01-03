@@ -52,17 +52,6 @@ static gboolean ogmrip_wav_run (OGMJobTask   *task,
                                 GCancellable *cancellable,
                                 GError       **error);
 
-static gchar **
-ogmrip_wav_command (OGMRipAudioCodec *audio, gboolean header)
-{
-  GPtrArray *argv;
-
-  argv = ogmrip_mplayer_wav_command (audio, TRUE,
-      ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (audio))));
-
-  return (gchar **) g_ptr_array_free (argv, FALSE);
-}
-
 G_DEFINE_TYPE (OGMRipWav, ogmrip_wav, OGMRIP_TYPE_AUDIO_CODEC)
 
 static void
@@ -85,18 +74,10 @@ static gboolean
 ogmrip_wav_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
   OGMJobTask *child;
-  gchar **argv;
   gboolean result;
 
-  argv = ogmrip_wav_command (OGMRIP_AUDIO_CODEC (task), OGMRIP_WAV (task)->header);
-  if (!argv)
-    return FALSE;
-
-  child = ogmjob_spawn_newv (argv);
-  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child),
-      (OGMJobWatch) ogmrip_mplayer_wav_watch, task);
-  ogmjob_spawn_set_watch_stderr (OGMJOB_SPAWN (child),
-      (OGMJobWatch) ogmrip_mplayer_watch_stderr, task);
+  child = ogmrip_mplayer_wav_command (OGMRIP_AUDIO_CODEC (task), TRUE,
+      ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (task))));
   ogmjob_container_add (OGMJOB_CONTAINER (task), child);
   g_object_unref (child);
 

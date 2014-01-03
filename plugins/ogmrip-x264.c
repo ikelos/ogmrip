@@ -203,11 +203,13 @@ ogmrip_x264_get_crf (OGMRipVideoCodec *video, gdouble quantizer)
   return CLAMP (crf, 0, 50);
 }
 
-static gchar **
+static OGMJobTask *
 ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gchar *log_file)
 {
-  OGMRipX264 *x264;
-  GPtrArray *argv;
+  OGMRipX264 *x264 = OGMRIP_X264 (video);
+  gchar *opts[] = { "-ovc", "x264", "-x264encopts", NULL, NULL, NULL, NULL };
+
+  OGMJobTask *task;
   GString *options;
 
   const gchar *output;
@@ -218,13 +220,7 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
 
   cartoon = FALSE;
 
-  x264 = OGMRIP_X264 (video);
   quality = ogmrip_video_codec_get_quality (video);
-
-  argv = ogmrip_mencoder_video_command (video, pass == passes ? output : "/dev/null", pass);
-
-  g_ptr_array_add (argv, g_strdup ("-ovc"));
-  g_ptr_array_add (argv, g_strdup ("x264"));
 
   options = g_string_new (cartoon ? "deblock=1,1:aq_strength=0.6" : "deblock");
   g_string_append_printf (options, ":subq=%u:direct_pred=%s",
@@ -349,8 +345,8 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   {
     g_string_append_printf (options, ":pass=%u", pass == 1 ? 1 : pass == passes ? 2 : 3);
 
-    g_ptr_array_add (argv, g_strdup ("-passlogfile"));
-    g_ptr_array_add (argv, g_strdup (log_file));
+    opts[4] = "-passlogfile";
+    opts[5] = (gchar *) log_file;
   }
   
   threads = ogmrip_video_codec_get_threads (video);
@@ -359,15 +355,13 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   else
     g_string_append (options, ":threads=auto");
 
-  g_ptr_array_add (argv, g_strdup ("-x264encopts"));
-  g_ptr_array_add (argv, g_string_free (options, FALSE));
+  opts[3] = options->str;
 
-  ogmrip_mplayer_set_input (argv,
-      ogmrip_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video))));
+  task = ogmrip_mencoder_video_command (video, (const gchar * const *) opts, pass == passes ? output : "/dev/null");
 
-  g_ptr_array_add (argv, NULL);
+  g_string_free (options, TRUE);
 
-  return (gchar **) g_ptr_array_free (argv, FALSE);
+  return task;
 }
 
 static gboolean
@@ -934,7 +928,7 @@ static gboolean
 ogmrip_x264_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
   OGMJobTask *queue, *child;
-  gchar **argv, *log_file, *mbtree_file;
+  gchar *log_file, *mbtree_file;
   gint pass, passes;
   gboolean result;
 
@@ -954,15 +948,7 @@ ogmrip_x264_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 
   for (pass = 0; pass < passes; pass ++)
   {
-    argv = ogmrip_x264_command (OGMRIP_VIDEO_CODEC (task), pass + 1, passes, log_file);
-    if (!argv)
-      return FALSE;
-
-    child = ogmjob_spawn_newv (argv);
-    ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child),
-        (OGMJobWatch) ogmrip_mencoder_codec_watch, task);
-    ogmjob_spawn_set_watch_stderr (OGMJOB_SPAWN (child),
-        (OGMJobWatch) ogmrip_mplayer_watch_stderr, task);
+    child = ogmrip_x264_command (OGMRIP_VIDEO_CODEC (task), pass + 1, passes, log_file);
     ogmjob_container_add (OGMJOB_CONTAINER (queue), child);
     g_object_unref (child);
   }
