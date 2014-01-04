@@ -354,15 +354,15 @@ ogmrip_mplayer_watch_stderr (OGMJobTask *task, const gchar *buffer, OGMRipVideoC
 static gboolean
 ogmrip_mplayer_wav_watch (OGMJobTask *task, const gchar *buffer, OGMRipAudioCodec *audio, GError **error)
 {
-  gchar pos[12], pos_time[12], total[12];
+  gchar a[12], v[12];
   static gdouble start;
   gdouble secs;
 
   if (g_str_equal (buffer, "Starting playback..."))
     start = 0;
-  else if (sscanf (buffer, "A: %s %s of %s", pos, pos_time, total) == 3)
+  else if (sscanf (buffer, "A: %s V: %s", a, v) == 2)
   {
-    secs = strtod (pos, NULL);
+    secs = strtod (a, NULL);
     if (!start)
       start = secs;
 
@@ -390,7 +390,7 @@ ogmrip_mplayer_wav_command (OGMRipAudioCodec *audio, gboolean header, const gcha
 
   g_ptr_array_add (argv, g_strdup ("-benchmark"));
   g_ptr_array_add (argv, g_strdup ("-vc"));
-  g_ptr_array_add (argv, g_strdup ("-null"));
+  g_ptr_array_add (argv, g_strdup ("null"));
   g_ptr_array_add (argv, g_strdup ("-vo"));
   g_ptr_array_add (argv, g_strdup ("null"));
 
