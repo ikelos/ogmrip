@@ -67,7 +67,7 @@ ogmrip_audio_copy_command (OGMRipAudioCodec *audio)
   }
   else
   {
-    const gchar * const options[] = { "-ovc", "copy", "-oac", "copy", NULL };
+    const gchar * const options[] = { "-mc", "0", "-noskip", "-ovc", "copy", "-oac", "copy", NULL };
 
     task = ogmrip_mencoder_audio_command (audio, options, ogmrip_file_get_path (output));
   }
@@ -195,7 +195,8 @@ ogmrip_copy_set_property (GObject *gobject, guint property_id, const GValue *val
 static OGMJobTask *
 ogmrip_video_copy_command (OGMRipVideoCodec *video)
 {
-  const gchar * const options[] = { "-ovc", "copy", "-of", "mpeg", "-mpegopts", "format=dvd:tsaf", NULL };
+  const gchar * const options[] =
+  { "-mc", "0", "-noskip", "-ovc", "copy", "-oac", "copy", "-of", "mpeg", "-mpegopts", "format=dvd:tsaf", NULL };
 
   g_return_val_if_fail (OGMRIP_IS_VIDEO_CODEC (video), NULL);
 

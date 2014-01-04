@@ -56,7 +56,7 @@ ogmrip_mplayer_get_frames (OGMRipCodec *codec)
 }
 
 static GPtrArray *
-ogmrip_command_new (const gchar *command)
+ogmrip_command_new (const gchar *command, gboolean lavf)
 {
   GPtrArray *argv;
 
@@ -67,18 +67,22 @@ ogmrip_command_new (const gchar *command)
   g_ptr_array_add (argv, g_strdup ("-noslices"));
   g_ptr_array_add (argv, g_strdup ("-noconfig"));
   g_ptr_array_add (argv, g_strdup ("all"));
-  g_ptr_array_add (argv, g_strdup ("-demuxer"));
-  g_ptr_array_add (argv, g_strdup ("+lavf"));
+
+  if (lavf)
+  {
+    g_ptr_array_add (argv, g_strdup ("-demuxer"));
+    g_ptr_array_add (argv, g_strdup ("+lavf"));
+  }
 
   return argv;
 }
 
 static GPtrArray *
-ogmrip_mplayer_command_new (void)
+ogmrip_mplayer_command_new (gboolean lavf)
 {
   GPtrArray *argv;
 
-  argv = ogmrip_command_new ("mplayer");
+  argv = ogmrip_command_new ("mplayer", lavf);
   g_ptr_array_add (argv, g_strdup ("-nolirc"));
   g_ptr_array_add (argv, g_strdup ("-noframedrop"));
   g_ptr_array_add (argv, g_strdup ("-nocorrect-pts"));
@@ -87,11 +91,11 @@ ogmrip_mplayer_command_new (void)
 }
 
 static GPtrArray *
-ogmrip_mencoder_command_new (const gchar *output)
+ogmrip_mencoder_command_new (const gchar *output, gboolean lavf)
 {
   GPtrArray *argv;
 
-  argv = ogmrip_command_new ("mencoder");
+  argv = ogmrip_command_new ("mencoder", lavf);
 
   if (output)
   {
@@ -398,7 +402,7 @@ ogmrip_mplayer_wav_command (OGMRipAudioCodec *audio, gboolean header, const gcha
 
   stream = ogmrip_codec_get_input (OGMRIP_CODEC (audio));
 
-  argv = ogmrip_mplayer_command_new ();
+  argv = ogmrip_mplayer_command_new (TRUE);
 
   g_ptr_array_add (argv, g_strdup ("-benchmark"));
   g_ptr_array_add (argv, g_strdup ("-vc"));
@@ -478,7 +482,7 @@ ogmrip_mencoder_audio_command (OGMRipAudioCodec *audio, const gchar * const *opt
 
   stream = ogmrip_codec_get_input (OGMRIP_CODEC (audio));
 
-  argv = ogmrip_mencoder_command_new (output);
+  argv = ogmrip_mencoder_command_new (output, TRUE);
 
   g_ptr_array_add (argv, g_strdup ("-of"));
   g_ptr_array_add (argv, g_strdup ("rawaudio"));
@@ -514,26 +518,30 @@ ogmrip_mencoder_video_command (OGMRipVideoCodec *video, const gchar * const *opt
 {
   OGMJobTask *task;
   OGMRipStream *stream;
+  OGMRipAudioStream *astream;
 
   GPtrArray *argv;
   gboolean scale = FALSE;
 
   stream = ogmrip_codec_get_input (OGMRIP_CODEC (video));
-
-  argv = ogmrip_mencoder_command_new (output);
+  astream = ogmrip_video_codec_get_ensure_sync (video);
 
   if (ogmrip_codec_format (G_OBJECT_TYPE (video)) == OGMRIP_FORMAT_COPY)
-    ogmrip_command_set_audio (argv, NULL);
+  {
+    argv = ogmrip_mencoder_command_new (output, FALSE);
+
+    if (astream)
+      ogmrip_command_set_audio (argv, OGMRIP_STREAM (astream));
+  }
   else
   {
-    OGMRipAudioStream *astream;
     OGMRipSubpStream *sstream;
     OGMRipScalerType scaler;
     gboolean forced;
 
-    astream = ogmrip_video_codec_get_ensure_sync (video);
-    ogmrip_command_set_audio (argv, OGMRIP_STREAM (astream));
+    argv = ogmrip_mencoder_command_new (output, TRUE);
 
+    ogmrip_command_set_audio (argv, OGMRIP_STREAM (astream));
     if (astream)
     {
       g_ptr_array_add (argv, g_strdup ("-oac"));
@@ -610,7 +618,7 @@ ogmrip_mplayer_video_command (OGMRipVideoCodec *video, const gchar * const *opti
   g_return_val_if_fail (OGMRIP_IS_VIDEO_CODEC (video), NULL);
   g_return_val_if_fail (output != NULL, NULL);
 
-  argv = ogmrip_mplayer_command_new ();
+  argv = ogmrip_mplayer_command_new (TRUE);
 
   ogmrip_command_set_audio (argv, NULL);
 
@@ -683,7 +691,7 @@ ogmrip_mencoder_vobsub_command (OGMRipSubpCodec *subp, const gchar *output)
   g_return_val_if_fail (OGMRIP_IS_SUBP_CODEC (subp), NULL);
   g_return_val_if_fail (output != NULL, NULL);
 
-  argv = ogmrip_mencoder_command_new ("/dev/null");
+  argv = ogmrip_mencoder_command_new ("/dev/null", TRUE);
 
   g_ptr_array_add (argv, g_strdup ("-of"));
   g_ptr_array_add (argv, g_strdup ("rawaudio"));
@@ -739,7 +747,7 @@ ogmrip_mencoder_extract_command (OGMRipContainer *container, const gchar *input,
   g_return_val_if_fail (OGMRIP_IS_CONTAINER (container), NULL);
   g_return_val_if_fail (output != NULL, NULL);
 
-  argv = ogmrip_mencoder_command_new (output);
+  argv = ogmrip_mencoder_command_new (output, TRUE);
   g_ptr_array_add (argv, g_strdup ("-noskip"));
   g_ptr_array_add (argv, g_strdup ("-mc"));
   g_ptr_array_add (argv, g_strdup ("0"));
