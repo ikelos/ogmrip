@@ -68,6 +68,8 @@ static gboolean ogmrip_matroska_run (OGMJobTask   *task,
                                      GCancellable *cancellable,
                                      GError       **error);
 
+G_DEFINE_TYPE (OGMRipMatroska, ogmrip_matroska, OGMRIP_TYPE_CONTAINER)
+
 static gboolean
 ogmrip_matroska_watch (OGMJobTask *task, const gchar *buffer, OGMRipContainer *matroska, GError **error)
 {
@@ -89,7 +91,12 @@ ogmrip_matroska_append_video_file (OGMRipContainer *matroska, OGMRipFile *file, 
   g_ptr_array_add (argv, g_strdup ("UTF-8"));
 
   g_ptr_array_add (argv, g_strdup ("-d"));
-  g_ptr_array_add (argv, g_strdup ("0"));
+
+  if (ogmrip_stream_get_format (OGMRIP_STREAM (file)) == OGMRIP_FORMAT_VP8)
+    g_ptr_array_add (argv, g_strdup ("1"));
+  else
+    g_ptr_array_add (argv, g_strdup ("0"));
+
   g_ptr_array_add (argv, g_strdup ("-A"));
   g_ptr_array_add (argv, g_strdup ("-S"));
   g_ptr_array_add (argv, g_strdup (ogmrip_file_get_path (file)));
@@ -145,16 +152,14 @@ ogmrip_matroska_append_audio_file (OGMRipContainer *matroska, OGMRipFile *file, 
 static void
 ogmrip_matroska_append_subp_file (OGMRipContainer *matroska, OGMRipFile *file, GPtrArray *argv)
 {
-  gint format;
   const gchar *filename;
   gchar *real_filename;
   gboolean do_merge;
   struct stat buf;
 
   filename = ogmrip_file_get_path (file);
-  format = ogmrip_stream_get_format (OGMRIP_STREAM (file));
 
-  if (format == OGMRIP_FORMAT_VOBSUB)
+  if (ogmrip_stream_get_format (OGMRIP_STREAM (file)) == OGMRIP_FORMAT_VOBSUB)
   {
     if (!g_str_has_suffix (filename, ".idx"))
     {
@@ -282,7 +287,7 @@ ogmrip_matroska_foreach_file (OGMRipContainer *matroska, OGMRipFile *file, GPtrA
     ogmrip_matroska_append_audio_file (matroska, file, argv);
   else if (OGMRIP_IS_SUBP_STREAM (file))
     ogmrip_matroska_append_subp_file (matroska, file, argv);
-  else if (OGMRIP_IS_CHAPTERS_STREAM (file))
+  else if (OGMRIP_IS_CHAPTERS_STREAM (file) && OGMRIP_MATROSKA (matroska)->webm == FALSE)
     ogmrip_matroska_append_chapters_file (matroska, file, argv);
 }
 
@@ -297,6 +302,9 @@ ogmrip_matroska_command (OGMRipContainer *matroska)
 
   argv = g_ptr_array_new ();
   g_ptr_array_add (argv, g_strdup (MKVMERGE));
+
+  if (OGMRIP_MATROSKA (matroska)->webm)
+    g_ptr_array_add (argv, g_strdup ("--webm"));
 
   g_ptr_array_add (argv, g_strdup ("-o"));
   g_ptr_array_add (argv, g_file_get_path (ogmrip_container_get_output (matroska)));
@@ -341,8 +349,6 @@ ogmrip_matroska_get_overhead (OGMRipContainer *container)
 {
   return MKV_OVERHEAD;
 }
-
-G_DEFINE_TYPE (OGMRipMatroska, ogmrip_matroska, OGMRIP_TYPE_CONTAINER)
 
 static void
 ogmrip_matroska_class_init (OGMRipMatroskaClass *klass)
