@@ -149,7 +149,7 @@ ogmrip_mplayer_play_command (OGMRipPlayer *player)
       g_ptr_array_add (argv, g_strdup_printf ("%d", player->priv->start_chap + 1));
   }
 
-  ogmrip_mplayer_set_input (argv, player->priv->title);
+  ogmrip_mplayer_set_input (argv, player->priv->title, 0);
 
   g_ptr_array_add (argv, NULL);
 
