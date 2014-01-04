@@ -507,7 +507,7 @@ ogmrip_options_dialog_autocrop_button_clicked (OGMRipOptionsDialog *parent)
     gtk_window_present (GTK_WINDOW (dialog));
 
     ogmrip_progress_dialog_set_message (OGMRIP_PROGRESS_DIALOG (dialog), _("Analyzing video stream"));
-    ogmrip_progress_dialog_set_fraction (OGMRIP_PROGRESS_DIALOG (dialog), 0.0);
+    ogmrip_progress_dialog_set_fraction (OGMRIP_PROGRESS_DIALOG (dialog), -1.0);
 
     task = ogmrip_analyze_new (parent->priv->title);
     g_signal_connect (task, "notify::progress",
