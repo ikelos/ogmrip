@@ -355,38 +355,40 @@ ogmrip_progress_dialog_set_fraction (OGMRipProgressDialog *dialog, gdouble fract
 {
   GTimeVal tv;
   gulong eta;
-  gchar *str;
+  gchar *str = NULL;
 
   g_return_if_fail (OGMRIP_IS_PROGRESS_DIALOG (dialog));
 
-  gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (dialog->priv->progress), fraction);
-
-  if (fraction <= 0.0)
-  {
-    g_get_current_time (&tv);
+  g_get_current_time (&tv);
+  if (fraction < 0.0)
     dialog->priv->start_time = tv.tv_sec;
+  else
+  {
+    gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (dialog->priv->progress), fraction);
+
+    if (fraction > 0.0)
+    {
+      eta = (1.0 - fraction) * (tv.tv_sec - dialog->priv->start_time) / fraction;
+
+      if (eta >= 3600)
+        str = g_strdup_printf ("%ld hour(s) %ld minute(s)", eta / 3600, (eta % 3600) / 60);
+      else if (eta >= 60)
+        str = g_strdup_printf ("%ld minute(s)", eta / 60);
+      else
+        str = g_strdup_printf ("%ld second(s)", eta);
+    }
   }
 
-  g_get_current_time (&tv);
-  eta = (1.0 - fraction) * (tv.tv_sec - dialog->priv->start_time) / fraction;
-
-  if (eta >= 3600)
-    str = g_strdup_printf ("%ld hour(s) %ld minute(s)", eta / 3600, (eta % 3600) / 60);
-  else
-    str = g_strdup_printf ("%ld minute(s)", eta / 60);
-
-  gtk_label_set_text (GTK_LABEL (dialog->priv->eta_label), str);
+  gtk_label_set_text (GTK_LABEL (dialog->priv->eta_label), str ? str : "");
   g_free (str);
-
+/*
   if (dialog->priv->status_icon)
   {
-/*
     str = g_strdup_printf (_("%s: %02.0lf%% done"), dialog->priv->label, fraction * 100);
     gtk_status_icon_set_tooltip_text (dialog->priv->status_icon, str);
     g_free (str);
-*/
   }
-/*
+
   parent = gtk_window_get_transient_for (GTK_WINDOW (dialog));
   if (parent)
   {

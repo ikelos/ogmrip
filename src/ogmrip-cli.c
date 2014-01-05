@@ -1074,8 +1074,6 @@ ogmrip_cli_new (const gchar *app_id)
 
   g_return_val_if_fail (g_application_id_is_valid (app_id), NULL);
 
-  g_type_init ();
-
   app = g_object_new (OGMRIP_TYPE_CLI,
       "application-id", app_id,
       NULL);

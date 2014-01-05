@@ -62,7 +62,7 @@ enum
 typedef struct
 {
   OGMJobSpawn *spawn;
-  GSimpleAsyncResult *simple;
+  GTask *task;
   GError *error;
 
   GCancellable *cancellable;
@@ -78,7 +78,7 @@ typedef struct
 
 typedef struct
 {
-  GMainLoop *loop;
+  gboolean complete;
   GError *error;
   gboolean retval;
 } TaskSyncData;
@@ -100,12 +100,14 @@ task_cancel_cb (GCancellable *cancellable, TaskAsyncData *data)
 }
 
 static TaskAsyncData *
-new_task (OGMJobTask *spawn, GCancellable *cancellable)
+new_task (OGMJobTask *spawn, GCancellable *cancellable, GAsyncReadyCallback callback, gpointer user_data)
 {
   TaskAsyncData *data;
 
   data = g_new0 (TaskAsyncData, 1);
+
   data->spawn = g_object_ref (spawn);
+  data->task = g_task_new (spawn, cancellable, callback, user_data);
 
   if (cancellable)
   {
@@ -122,8 +124,6 @@ complete_task (TaskAsyncData *data)
 {
   if (!data->spawn->priv->pid && !data->src_out && !data->src_err)
   {
-    g_simple_async_result_complete_in_idle (data->simple);
-
     if (data->cancellable)
     {
       g_cancellable_disconnect (data->cancellable, data->handler);
@@ -137,50 +137,10 @@ complete_task (TaskAsyncData *data)
     g_free (data->partial_err);
 
     g_object_unref (data->spawn);
-    g_object_unref (data->simple);
+    g_object_unref (data->task);
 
     g_free (data);
   }
-}
-
-static gboolean
-watch_task (TaskAsyncData *data, OGMJobWatch watch_func, gpointer watch_data, gchar *buffer, gchar **partial)
-{
-  gboolean retval;
-  gchar *line;
-  gsize len;
-
-  if (*partial)
-    line = g_strconcat (*partial, buffer, NULL);
-  else
-    line = g_strdup (buffer);
-
-  g_free (*partial);
-  *partial = NULL;
-
-  len = strlen (line);
-  if (len > 0 && line[len - 1] != '\n' && line[len - 1] != '\r')
-  {
-    *partial = line;
-
-    return TRUE;
-  }
-
-  while (len --)
-  {
-    if (line[len] == '\n' || line[len] == '\r')
-      line[len] = '\0';
-    else
-      break;
-  }
-
-  retval = watch_func (data->spawn, line, watch_data, &data->error);
-  g_free (line);
-
-  if (!retval)
-    task_kill (data);
-
-  return retval;
 }
 
 static void
@@ -202,11 +162,11 @@ task_pid_watch (GPid pid, gint status, TaskAsyncData *data)
 
   if (data->error)
   {
-    g_simple_async_result_take_error (data->simple, data->error);
+    g_task_return_error (data->task, data->error);
     data->error = NULL;
   }
-
-  g_simple_async_result_set_op_res_gboolean (data->simple, WIFEXITED (status) && WEXITSTATUS (status) == 0);
+  else
+    g_task_return_boolean (data->task, WIFEXITED (status) && WEXITSTATUS (status) == 0);
 }
 
 static void
@@ -226,11 +186,12 @@ task_stderr_notify (TaskAsyncData *data)
 static gboolean
 task_watch (GIOChannel *channel, TaskAsyncData *data, gchar **partial, OGMJobWatch watch_func, gpointer watch_data)
 {
-  gboolean retval = TRUE;
   GIOStatus status;
-  gsize size, bytes_read;
-  gchar *buffer, *line;
-  guint i, j;
+
+  gboolean is_partial, retval = TRUE;
+  gchar *buffer, **strv, *str;
+  gsize size, len;
+  guint i;
 
   if (data->error)
     return FALSE;
@@ -238,7 +199,7 @@ task_watch (GIOChannel *channel, TaskAsyncData *data, gchar **partial, OGMJobWat
   size = g_io_channel_get_buffer_size (channel);
   buffer = g_new0 (char, size + 1);
 
-  status = g_io_channel_read_chars (channel, buffer, size, &bytes_read, &data->error);
+  status = g_io_channel_read_chars (channel, buffer, size, &len, &data->error);
   if (status != G_IO_STATUS_NORMAL)
   {
     g_free (buffer);
@@ -257,34 +218,34 @@ task_watch (GIOChannel *channel, TaskAsyncData *data, gchar **partial, OGMJobWat
     return TRUE;
   }
 
-  for (i = 0, j = 0; retval && buffer[i + j] != '\0'; j++)
+  is_partial = buffer[len - 1] != '\n' && buffer[len - 1] != '\r';
+
+  strv = g_strsplit_set (buffer, "\n\r", -1);
+  g_free (buffer);
+
+  for (i = 0; retval && strv && strv[i]; i ++)
   {
-    gint k = 0;
-
-    if (buffer[i + j] == '\n')
-      k = 1;
-    else if (buffer[i + j] == '\r')
-      k = buffer[i + j + 1] == '\n' ? 2 : 1;
-
-    if (k > 0)
+    if (is_partial && !strv[i + 1] && strv[i][0] != '\0')
+      *partial = g_strdup (strv[i]);
+    else
     {
-      line = g_strndup (buffer + i, j + k);
-      retval = watch_task (data, watch_func, watch_data, line, partial);
-      g_free (line);
+      if (!(*partial) && strv[i][0] != '\0')
+        retval = watch_func (data->spawn, strv[i], watch_data, &data->error);
+      else if (*partial)
+      {
+        str = g_strconcat (*partial, strv[i], NULL);
+        retval = watch_func (data->spawn, str, watch_data, &data->error);
+        g_free (str);
 
-      i += j + k;
-      j = -1;
+        g_free (*partial);
+        *partial = NULL;
+      }
+
+      if (!retval)
+        task_kill (data);
     }
   }
-
-  if (retval && j > 0 && buffer[i + j] == '\0')
-  {
-    line = g_strndup (buffer + i, j);
-    retval = watch_task (data, watch_func, watch_data, line, partial);
-    g_free (line);
-  }
-
-  g_free (buffer);
+  g_strfreev (strv);
 
   return retval;
 }
@@ -306,7 +267,7 @@ task_ready_cb (OGMJobTask *task, GAsyncResult *res, TaskSyncData *data)
 {
   data->retval = ogmjob_task_run_finish (task, res, &data->error);
 
-  g_main_loop_quit (data->loop);
+  data->complete = TRUE;
 }
 
 G_DEFINE_TYPE (OGMJobSpawn, ogmjob_spawn, OGMJOB_TYPE_TASK);
@@ -318,9 +279,7 @@ ogmjob_spawn_run_async (OGMJobTask *task, GCancellable *cancellable, GAsyncReady
   gint fdout, fderr;
   guint i;
 
-  data = new_task (task, cancellable);
-  data->simple = g_simple_async_result_new (G_OBJECT (task),
-      callback, user_data, ogmjob_spawn_run_async);
+  data = new_task (task, cancellable, callback, user_data);
 
   for (i = 0; data->spawn->priv->argv[i]; i++)
     ogmrip_log_printf ("%s ", data->spawn->priv->argv[i]);
@@ -330,7 +289,7 @@ ogmjob_spawn_run_async (OGMJobTask *task, GCancellable *cancellable, GAsyncReady
         G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD, NULL, NULL, 
         &data->spawn->priv->pid, NULL, &fdout, &fderr, &data->error))
   {
-    g_simple_async_result_take_error (data->simple, data->error);
+    g_task_return_error (data->task, data->error);
     complete_task (data);
   }
   else
@@ -363,16 +322,14 @@ ogmjob_spawn_run_async (OGMJobTask *task, GCancellable *cancellable, GAsyncReady
 static gboolean
 ogmjob_spawn_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
-  TaskSyncData data = { NULL, NULL, FALSE };
+  TaskSyncData data = { FALSE, NULL, FALSE };
 
   g_object_ref (task);
 
-  data.loop = g_main_loop_new (NULL, FALSE);
-
   ogmjob_spawn_run_async (task, cancellable, (GAsyncReadyCallback) task_ready_cb, &data);
 
-  g_main_loop_run (data.loop);
-  g_main_loop_unref (data.loop);
+  while (!data.complete)
+    g_main_context_iteration (NULL, TRUE);
 
   if (data.error)
     g_propagate_error (error, data.error);

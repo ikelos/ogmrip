@@ -44,12 +44,12 @@ static gboolean ogmrip_audio_copy_run (OGMJobTask   *task,
                                        GCancellable *cancellable,
                                        GError       **error);
 
-static gchar **
+static OGMJobTask *
 ogmrip_audio_copy_command (OGMRipAudioCodec *audio)
 {
+  OGMJobTask *task;
   OGMRipStream *input;
   OGMRipFile *output;
-  GPtrArray *argv;
 
   input  = ogmrip_codec_get_input (OGMRIP_CODEC (audio));
   output = ogmrip_codec_get_output (OGMRIP_CODEC (audio));
@@ -63,27 +63,16 @@ ogmrip_audio_copy_command (OGMRipAudioCodec *audio)
     ogmrip_audio_codec_set_channels (audio,
         ogmrip_audio_stream_get_channels (OGMRIP_AUDIO_STREAM (input)));
 
-    argv = ogmrip_mplayer_wav_command (audio, FALSE, ogmrip_file_get_path (output));
+    task = ogmrip_mplayer_wav_command (audio, FALSE, ogmrip_file_get_path (output));
   }
   else
   {
-    argv = ogmrip_mencoder_audio_command (audio, ogmrip_file_get_path (output));
+    const gchar * const options[] = { "-mc", "0", "-noskip", "-ovc", "copy", "-oac", "copy", NULL };
 
-    g_ptr_array_add (argv, g_strdup ("-ovc"));
-    g_ptr_array_add (argv, g_strdup ("copy"));
-
-    g_ptr_array_add (argv, g_strdup ("-of"));
-    g_ptr_array_add (argv, g_strdup ("rawaudio"));
-
-    g_ptr_array_add (argv, g_strdup ("-oac"));
-    g_ptr_array_add (argv, g_strdup ("copy"));
-
-    ogmrip_mplayer_set_input (argv, ogmrip_stream_get_title (input));
-
-    g_ptr_array_add (argv, NULL);
+    task = ogmrip_mencoder_audio_command (audio, options, ogmrip_file_get_path (output));
   }
 
-  return (gchar **) g_ptr_array_free (argv, FALSE);
+  return task;
 }
 
 G_DEFINE_TYPE (OGMRipAudioCopy, ogmrip_audio_copy, OGMRIP_TYPE_AUDIO_CODEC)
@@ -106,18 +95,9 @@ static gboolean
 ogmrip_audio_copy_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
   OGMJobTask *child;
-  gchar **argv;
   gboolean result;
 
-  argv = ogmrip_audio_copy_command (OGMRIP_AUDIO_CODEC (task));
-  if (!argv)
-    return FALSE;
-
-  child = ogmjob_spawn_newv (argv);
-  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child),
-      (OGMJobWatch) ogmrip_mencoder_codec_watch, task);
-  ogmjob_spawn_set_watch_stderr (OGMJOB_SPAWN (child),
-      (OGMJobWatch) ogmrip_mplayer_watch_stderr, task);
+  child = ogmrip_audio_copy_command (OGMRIP_AUDIO_CODEC (task));
   ogmjob_container_add (OGMJOB_CONTAINER (task), child);
   g_object_unref (child);
 
@@ -212,49 +192,27 @@ ogmrip_copy_set_property (GObject *gobject, guint property_id, const GValue *val
   }
 }
 
-static gchar **
+static OGMJobTask *
 ogmrip_video_copy_command (OGMRipVideoCodec *video)
 {
-  OGMRipStream *input;
-  GPtrArray *argv;
+  const gchar * const options[] =
+  { "-mc", "0", "-noskip", "-ovc", "copy", "-oac", "copy", "-of", "mpeg", "-mpegopts", "format=dvd:tsaf", NULL };
 
   g_return_val_if_fail (OGMRIP_IS_VIDEO_CODEC (video), NULL);
 
   ogmrip_video_codec_set_ensure_sync (video, NULL);
 
-  argv = ogmrip_mencoder_video_command (video,
-      ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (video))), 0);
-
-  g_ptr_array_add (argv, g_strdup ("-ovc"));
-  g_ptr_array_add (argv, g_strdup ("copy"));
-
-  g_ptr_array_add (argv, g_strdup ("-of"));
-  g_ptr_array_add (argv, g_strdup ("mpeg"));
-
-  g_ptr_array_add (argv, g_strdup ("-mpegopts"));
-  g_ptr_array_add (argv, g_strdup ("format=dvd:tsaf"));
-
-  input = ogmrip_codec_get_input (OGMRIP_CODEC (video));
-  ogmrip_mplayer_set_input (argv, ogmrip_stream_get_title (input));
-
-  g_ptr_array_add (argv, NULL);
-
-  return (gchar **) g_ptr_array_free (argv, FALSE);
+  return ogmrip_mencoder_video_command (video, options,
+      ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (video))));
 }
 
 static gboolean
 ogmrip_video_copy_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
   OGMJobTask *child;
-  gchar **argv;
   gboolean result;
 
-  argv = ogmrip_video_copy_command (OGMRIP_VIDEO_CODEC (task));
-  if (!argv)
-    return FALSE;
-
-  child = ogmjob_spawn_newv (argv);
-  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child), (OGMJobWatch) ogmrip_mencoder_codec_watch, task);
+  child = ogmrip_video_copy_command (OGMRIP_VIDEO_CODEC (task));
   ogmjob_container_add (OGMJOB_CONTAINER (task), child);
   g_object_unref (child);
 

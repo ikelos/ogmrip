@@ -87,11 +87,11 @@ ogmrip_startup_finish (OGMRipApplication *app)
 {
   ogmrip_application_prepare (app);
 
-  return TRUE;
+  return FALSE;
 }
 
-static gboolean
-ogmrip_startup_thread (GIOSchedulerJob *job, GCancellable *cancellable, GApplication *app)
+static void
+ogmrip_startup_thread (GTask *task, GApplication *app, gpointer data, GCancellable *cancellable)
 {
   OGMRipModuleEngine *module_engine;
   OGMRipProfileEngine *profile_engine;
@@ -141,9 +141,11 @@ ogmrip_startup_thread (GIOSchedulerJob *job, GCancellable *cancellable, GApplica
   ogmrip_profile_engine_add_path (profile_engine, path);
   g_free (path);
 
-  g_io_scheduler_job_send_to_mainloop (job, (GSourceFunc) ogmrip_startup_finish, app, NULL);
+  g_main_context_invoke (NULL, (GSourceFunc) ogmrip_startup_finish, app);
 
-  return FALSE;
+  g_task_return_pointer (task, NULL, NULL);
+
+  g_object_unref (task);
 }
 
 static guint
@@ -175,6 +177,7 @@ ogmrip_get_locale (void)
 static void
 ogmrip_gui_startup_cb (GApplication *app)
 {
+  GTask *task;
   gchar *path;
 
   settings = g_settings_new ("org.ogmrip.preferences");
@@ -205,8 +208,8 @@ ogmrip_gui_startup_cb (GApplication *app)
   notify_init (PACKAGE_NAME);
 #endif /* HAVE_LIBNOTIFY_SUPPORT */
 
-  g_io_scheduler_push_job ((GIOSchedulerJobFunc) ogmrip_startup_thread,
-      app, NULL, G_PRIORITY_HIGH, NULL);
+  task = g_task_new (app, NULL, NULL, NULL);
+  g_task_run_in_thread (task, (GTaskThreadFunc) ogmrip_startup_thread);
 }
 
 int

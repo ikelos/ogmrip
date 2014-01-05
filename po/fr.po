@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OGMRip\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-04-20 15:41+0200\n"
+"POT-Creation-Date: 2013-11-11 10:59+0100\n"
 "PO-Revision-Date: 2008-01-11 21:30+0100\n"
 "Last-Translator: Olivier Rolland <billl@users.sourceforge.net>\n"
 "Language-Team: French <fr@li.org>\n"
@@ -38,7 +38,10 @@ msgstr "_Quitter"
 msgid "_Media"
 msgstr "_Média"
 
-#: ../data/ui/ogmrip-menu.ui.h:6 ../data/ui/ogmrip-main-window.ui.h:8
+#: ../data/ui/ogmrip-menu.ui.h:6
+#: ../data/ui/ogmrip-encoding-manager-dialog.ui.h:3
+#: ../data/ui/ogmrip-main-window.ui.h:8
+#: ../data/ui/ogmrip-profile-manager-dialog.ui.h:9
 #: ../libogmrip-media-gtk/ogmrip-media-chooser-dialog.c:150
 msgid "_Load"
 msgstr "_Charger"
@@ -94,21 +97,17 @@ msgid "_Right"
 msgstr "_Droite"
 
 #: ../data/ui/ogmrip-encoding-manager-dialog.ui.h:1
-msgid "_Export"
-msgstr "_Exporter"
+#: ../data/ui/ogmrip-profile-manager-dialog.ui.h:7
+msgid "_Save"
+msgstr "_Enregistrer"
 
 #: ../data/ui/ogmrip-encoding-manager-dialog.ui.h:2
-msgid "Export selected encodings"
-msgstr "Exporter les encodages sélectionnés"
-
-#: ../data/ui/ogmrip-encoding-manager-dialog.ui.h:3
-#: ../data/ui/ogmrip-profile-manager-dialog.ui.h:9
-msgid "_Import"
-msgstr "_Importer"
+msgid "Save selected encodings"
+msgstr "Enregistrer les encodages sélectionnés"
 
 #: ../data/ui/ogmrip-encoding-manager-dialog.ui.h:4
-msgid "Import existing encodings"
-msgstr "Importe un encodage existant"
+msgid "Load existing encodings"
+msgstr "Charger un encodage existant"
 
 #: ../data/ui/ogmrip-encoding-manager-dialog.ui.h:5
 msgid "Move _down"
@@ -162,27 +161,6 @@ msgstr "Supprime tous les encodages"
 #: ../data/ui/ogmrip-encoding-manager-dialog.ui.h:17
 msgid "<b>Encodings</b>"
 msgstr "<b>Encodages</b>"
-
-#: ../data/ui/ogmrip-encoding-manager-dialog.ui.h:18
-#: ../data/ui/ogmrip-profile-manager-dialog.ui.h:17
-msgid "Remove"
-msgstr "Supprimer"
-
-#: ../data/ui/ogmrip-encoding-manager-dialog.ui.h:19
-msgid "Move to top"
-msgstr "Mettre en premier"
-
-#: ../data/ui/ogmrip-encoding-manager-dialog.ui.h:20
-msgid "Move up"
-msgstr "Déplacer vers le haut"
-
-#: ../data/ui/ogmrip-encoding-manager-dialog.ui.h:21
-msgid "Move down"
-msgstr "Déplacer vers le bas"
-
-#: ../data/ui/ogmrip-encoding-manager-dialog.ui.h:22
-msgid "Move to bottom"
-msgstr "Mettre en dernier"
 
 #: ../data/ui/ogmrip-lavc-options-dialog.ui.h:1
 msgid "<b>Standard</b>"
@@ -387,7 +365,7 @@ msgid "Motion _Estimation"
 msgstr "_Estimation de mouvement"
 
 #: ../data/ui/ogmrip-main-window.ui.h:1 ../data/ui/ogmrip.desktop.in.h:1
-#: ../src/ogmrip-main.c:221
+#: ../src/ogmrip-main.c:224
 msgid "OGMRip"
 msgstr "OGMRip"
 
@@ -977,17 +955,13 @@ msgstr "Duplique le profil courant"
 msgid "Edit the current profile"
 msgstr "Édite le profil courant"
 
-#: ../data/ui/ogmrip-profile-manager-dialog.ui.h:7
-msgid "E_xport"
-msgstr "E_xporter"
-
 #: ../data/ui/ogmrip-profile-manager-dialog.ui.h:8
-msgid "Export the current profile"
-msgstr "Exporte le profil courant"
+msgid "Save the current profile"
+msgstr "Enregistre le profil courant"
 
 #: ../data/ui/ogmrip-profile-manager-dialog.ui.h:10
-msgid "Import an existing profile"
-msgstr "Importe un profil existant"
+msgid "Load an existing profile"
+msgstr "Charge un profil existant"
 
 #: ../data/ui/ogmrip-profile-manager-dialog.ui.h:12
 msgid "Remove the current profile"
@@ -1006,10 +980,6 @@ msgid "<b>_Profiles:</b>"
 msgstr "<b>_Profils :</b>"
 
 #: ../data/ui/ogmrip-profile-manager-dialog.ui.h:16
-msgid "Import"
-msgstr "Importer"
-
-#: ../data/ui/ogmrip-profile-manager-dialog.ui.h:18
 msgid "Create"
 msgstr "Créer"
 
@@ -1716,24 +1686,30 @@ msgstr ""
 msgid "'%s' does not contain a valid encoding"
 msgstr "'%s' ne contient pas un encodage valide"
 
-#: ../libogmrip-encode/ogmrip-encoding.c:1620
+#: ../libogmrip-encode/ogmrip-encoding.c:1618
 #, c-format
 msgid "Not enough space to store output and temporary files (%s needed)."
 msgstr ""
 "Pas assez d'espace pour stocker le fichier de sortie et les fichiers "
 "temporaires (%sMo nécessaires)."
 
-#: ../libogmrip-encode/ogmrip-encoding.c:1631
+#: ../libogmrip-encode/ogmrip-encoding.c:1629
 #, c-format
 msgid "Not enough space to store the output file (%s needed)."
 msgstr ""
 "Pas assez d'espace pour stocker le fichier de sortie (%sMo nécessaires)."
 
-#: ../libogmrip-encode/ogmrip-encoding.c:1641
+#: ../libogmrip-encode/ogmrip-encoding.c:1639
 #, c-format
 msgid "Not enough space to store the temporary files (%s needed)."
 msgstr ""
 "Pas assez d'espace pour stocker les fichiers temporaires (%sMo nécessaires)."
+
+#: ../libogmrip-encode/ogmrip-encoding.c:1876
+#: ../libogmrip-encode/ogmrip-test.c:481
+#, c-format
+msgid "Cannot compute bitrate for video stream"
+msgstr ""
 
 #: ../libogmrip-encode/ogmrip-hardsub.c:43
 msgid "Hardcoded subtitle"
@@ -2072,7 +2048,7 @@ msgstr "Continuer"
 msgid "Subtitles Options"
 msgstr "Options des sous-titres"
 
-#: ../libogmrip-mplayer/ogmrip-mplayer-commands.c:1062
+#: ../libogmrip-mplayer/ogmrip-mplayer-commands.c:1046
 #, c-format
 msgid "Error while decoding frame"
 msgstr "Erreur de décodage d'une trame"
@@ -2328,32 +2304,32 @@ msgstr "Voulez-vous le remplacer ?"
 msgid "Could not export the chapters"
 msgstr "Impossible d'exporter le chapitrage"
 
-#: ../src/ogmrip-gui.c:1506
+#: ../src/ogmrip-gui.c:1505
 msgid "Cannot encode media"
 msgstr "Impossible d'encoder le média"
 
-#: ../src/ogmrip-gui.c:1564
+#: ../src/ogmrip-gui.c:1563
 msgid "Can't play title"
 msgstr "Impossible de jouer le titre"
 
-#: ../src/ogmrip-gui.c:1578
+#: ../src/ogmrip-gui.c:1577
 msgid "Select a chapters file"
 msgstr "Sélectionner un fichier de chapitrage"
 
-#: ../src/ogmrip-gui.c:1600
+#: ../src/ogmrip-gui.c:1599
 #, c-format
 msgid "Could not open the chapters file '%s'"
 msgstr "Impossible d'ouvrir le fichier de chapitrage '%s'"
 
-#: ../src/ogmrip-gui.c:1617
+#: ../src/ogmrip-gui.c:1616
 msgid "Select a file"
 msgstr "Sélectionner un fichier"
 
-#: ../src/ogmrip-gui.c:2045
+#: ../src/ogmrip-gui.c:2044
 msgid "translator-credits"
 msgstr "Olivier Rolland <billl@users.sourceforge.net>"
 
-#: ../src/ogmrip-gui.c:2071
+#: ../src/ogmrip-gui.c:2070
 msgid "A Media Encoder for GNOME"
 msgstr "Un encodeur de Média pour GNOME"
 
@@ -2622,6 +2598,36 @@ msgstr "MEncoder est compilé sans support XviD"
 #: ../plugins/ogmrip-xvid-options.c:284
 msgid "XviD Options"
 msgstr "XviD Options"
+
+#~ msgid "_Export"
+#~ msgstr "_Exporter"
+
+#~ msgid "_Import"
+#~ msgstr "_Importer"
+
+#~ msgid "Remove"
+#~ msgstr "Supprimer"
+
+#~ msgid "Move to top"
+#~ msgstr "Mettre en premier"
+
+#~ msgid "Move up"
+#~ msgstr "Déplacer vers le haut"
+
+#~ msgid "Move down"
+#~ msgstr "Déplacer vers le bas"
+
+#~ msgid "Move to bottom"
+#~ msgstr "Mettre en dernier"
+
+#~ msgid "E_xport"
+#~ msgstr "E_xporter"
+
+#~ msgid "Export the current profile"
+#~ msgstr "Exporte le profil courant"
+
+#~ msgid "Import"
+#~ msgstr "Importer"
 
 #~ msgid "Cannot open title %d."
 #~ msgstr "Impossible d'ouvrir le titre %d"

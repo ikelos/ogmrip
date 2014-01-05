@@ -78,27 +78,26 @@ static gboolean ogmrip_vp8_run          (OGMJobTask   *task,
                                          GCancellable *cancellable,
                                          GError       **error);
 
-static gchar **
+static OGMJobTask *
 ogmrip_yuv4mpeg_command (OGMRipVideoCodec *video, const gchar *fifo)
 {
-  GPtrArray *argv;
+  OGMJobTask *task;
+  gchar *options[] = { "-vo", NULL, NULL };
 
-  argv = ogmrip_mplayer_video_command (video, fifo);
+  options[1] = g_strdup_printf ("yuv4mpeg:file=%s", fifo);
 
-  g_ptr_array_add (argv, g_strdup ("-vo"));
-  g_ptr_array_add (argv, g_strdup_printf ("yuv4mpeg:file=%s", fifo));
+  task = ogmrip_mplayer_video_command (video, (const gchar * const *) options, fifo);
 
-  ogmrip_mplayer_set_input (argv,
-      ogmrip_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video))));
+  g_free (options[1]);
 
-  g_ptr_array_add (argv, NULL);
-
-  return (gchar **) g_ptr_array_free (argv, FALSE);
+  return task;
 }
 
-static gchar **
+static OGMJobTask *
 ogmrip_vp8_command (OGMRipVideoCodec *video, const gchar *fifo, guint pass, guint passes, const gchar *log_file)
 {
+  OGMJobTask *task;
+
   GPtrArray *argv;
   const gchar *output;
   guint width, height, num, denom;
@@ -184,36 +183,26 @@ ogmrip_vp8_command (OGMRipVideoCodec *video, const gchar *fifo, guint pass, guin
 
   g_ptr_array_add (argv, NULL);
 
-  return (gchar **) g_ptr_array_free (argv, FALSE);
+  task = ogmjob_spawn_newv ((gchar **) argv->pdata);
+  g_ptr_array_free (argv, TRUE);
+
+  return task;
 }
 
 static OGMJobTask *
 ogmrip_vp8_pipeline (OGMJobTask *task, const gchar *fifo, guint pass, guint passes, const gchar *log_file)
 {
   OGMJobTask *pipeline, *child;
-  gchar **argv;
 
   pipeline = ogmjob_pipeline_new ();
 
-  argv = ogmrip_yuv4mpeg_command (OGMRIP_VIDEO_CODEC (task), fifo);
-  if (argv)
-  {
-    child = ogmjob_spawn_newv (argv);
-    ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child),
-        (OGMJobWatch) ogmrip_mplayer_video_watch, task);
-    ogmjob_spawn_set_watch_stderr (OGMJOB_SPAWN (child),
-        (OGMJobWatch) ogmrip_mplayer_watch_stderr, task);
-    ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
-    g_object_unref (child);
+  child = ogmrip_yuv4mpeg_command (OGMRIP_VIDEO_CODEC (task), fifo);
+  ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
+  g_object_unref (child);
 
-    argv = ogmrip_vp8_command (OGMRIP_VIDEO_CODEC (task), fifo, pass + 1, passes, log_file);
-    if (argv)
-    {
-      child = ogmjob_spawn_newv (argv);
-      ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
-      g_object_unref (child);
-    }
-  }
+  child = ogmrip_vp8_command (OGMRIP_VIDEO_CODEC (task), fifo, pass + 1, passes, log_file);
+  ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
+  g_object_unref (child);
 
   return pipeline;
 }

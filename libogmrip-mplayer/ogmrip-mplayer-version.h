@@ -44,7 +44,6 @@ gboolean ogmrip_check_mplayer_version (gint major,
                                        gint rc,
                                        gint pre);
 gboolean ogmrip_check_mplayer_dts     (void);
-gboolean ogmrip_check_mplayer_nosub   (void);
 
 G_END_DECLS
 

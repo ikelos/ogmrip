@@ -98,6 +98,25 @@ static gboolean ogmrip_mp4_run          (OGMJobTask   *task,
                                          GCancellable *cancellable,
                                          GError       **error);
 
+static gboolean
+ogmrip_mp4_create_watch (OGMJobTask *task, const gchar *buffer, OGMRipMp4 *mp4, GError **error)
+{
+  guint percent;
+  gchar *sep;
+
+  if ((sep = strrchr (buffer, '(')) && sscanf (sep, "(%u/100)", &percent) == 1)
+  {
+    if (percent < mp4->old_percent)
+      mp4->streams ++;
+
+    mp4->old_percent = percent;
+
+    ogmjob_task_set_progress (task, mp4->streams / (gdouble) mp4->nstreams + percent / (mp4->nstreams * 100.0));
+  }
+
+  return TRUE;
+}
+
 static void
 ogmrip_mp4_append_audio_file (OGMRipContainer *mp4, OGMRipFile *file, GPtrArray *argv)
 {
@@ -214,47 +233,12 @@ ogmrip_mp4_append_file (OGMRipContainer *mp4, OGMRipFile *file, GPtrArray *argv)
     ogmrip_mp4_append_chapters_file (mp4, file, argv);
 }
 
-static gchar **
-ogmrip_mencoder_extract_command (const gchar *input, const gchar *output)
-{
-  GPtrArray *argv;
-
-  argv = g_ptr_array_new ();
-  g_ptr_array_add (argv, g_strdup ("mencoder"));
-  g_ptr_array_add (argv, g_strdup ("-nocache"));
-  g_ptr_array_add (argv, g_strdup ("-noskip"));
-
-  g_ptr_array_add (argv, g_strdup ("-noconfig"));
-  g_ptr_array_add (argv, g_strdup ("all"));
-
-  g_ptr_array_add (argv, g_strdup ("-mc"));
-  g_ptr_array_add (argv, g_strdup ("0"));
-
-  g_ptr_array_add (argv, g_strdup ("-nosound"));
-
-  if (ogmrip_check_mplayer_nosub ())
-    g_ptr_array_add (argv, g_strdup ("-nosub"));
-
-  g_ptr_array_add (argv, g_strdup ("-ovc"));
-  g_ptr_array_add (argv, g_strdup ("copy"));
-
-  g_ptr_array_add (argv, g_strdup ("-of"));
-  g_ptr_array_add (argv, g_strdup ("rawvideo"));
-
-  g_ptr_array_add (argv, g_strdup ("-o"));
-  g_ptr_array_add (argv, g_strdup (output));
-
-  g_ptr_array_add (argv, g_strdup (input));
-
-  g_ptr_array_add (argv, NULL);
-
-  return (gchar **) g_ptr_array_free (argv, FALSE);
-}
-
-static gchar **
+static OGMJobTask *
 ogmrip_mp4_create_command (OGMRipContainer *container, const gchar *input)
 {
   OGMRipMp4 *mp4 = OGMRIP_MP4 (container);
+
+  OGMJobTask *task;
   GPtrArray *argv;
   const gchar *label, *fmt = NULL;
   gchar fps[8];
@@ -337,49 +321,13 @@ ogmrip_mp4_create_command (OGMRipContainer *container, const gchar *input)
 
   g_ptr_array_add (argv, NULL);
 
-  return (gchar **) g_ptr_array_free (argv, FALSE);
-}
+  task = ogmjob_spawn_newv ((gchar **) argv->pdata);
+  g_ptr_array_free (argv, TRUE);
 
-static gboolean
-ogmrip_mp4_create_watch (OGMJobTask *task, const gchar *buffer, OGMRipMp4 *mp4, GError **error)
-{
-  guint percent;
-  gchar *sep;
+  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (task),
+      (OGMJobWatch) ogmrip_mp4_create_watch, mp4);
 
-  if ((sep = strrchr (buffer, '(')) && sscanf (sep, "(%u/100)", &percent) == 1)
-  {
-    if (percent < mp4->old_percent)
-      mp4->streams ++;
-
-    mp4->old_percent = percent;
-
-    ogmjob_task_set_progress (task, mp4->streams / (gdouble) mp4->nstreams + percent / (mp4->nstreams * 100.0));
-  }
-
-  return TRUE;
-}
-
-static gchar **
-ogmrip_mp4_split_command (OGMRipContainer *mp4)
-{
-  GPtrArray *argv;
-  guint tsize;
-
-  argv = g_ptr_array_new ();
-  g_ptr_array_add (argv, g_strdup (MP4BOX));
-
-  g_ptr_array_add (argv, g_strdup ("-tmp"));
-  g_ptr_array_add (argv, g_strdup (ogmrip_fs_get_tmp_dir ()));
-
-  ogmrip_container_get_split (OGMRIP_CONTAINER (mp4), NULL, &tsize);
-  g_ptr_array_add (argv, g_strdup ("-splits"));
-  g_ptr_array_add (argv, g_strdup_printf ("%d", tsize));
-
-  g_ptr_array_add (argv, g_file_get_path (ogmrip_container_get_output (mp4)));
-
-  g_ptr_array_add (argv, NULL);
-
-  return (gchar **) g_ptr_array_free (argv, FALSE);
+  return task;
 }
 
 static gboolean
@@ -406,6 +354,36 @@ ogmrip_mp4_split_watch (OGMJobTask *task, const gchar *buffer, OGMRipMp4 *mp4, G
   }
 
   return TRUE;
+}
+
+static OGMJobTask *
+ogmrip_mp4_split_command (OGMRipContainer *mp4)
+{
+  OGMJobTask *task;
+  GPtrArray *argv;
+  guint tsize;
+
+  argv = g_ptr_array_new ();
+  g_ptr_array_add (argv, g_strdup (MP4BOX));
+
+  g_ptr_array_add (argv, g_strdup ("-tmp"));
+  g_ptr_array_add (argv, g_strdup (ogmrip_fs_get_tmp_dir ()));
+
+  ogmrip_container_get_split (OGMRIP_CONTAINER (mp4), NULL, &tsize);
+  g_ptr_array_add (argv, g_strdup ("-splits"));
+  g_ptr_array_add (argv, g_strdup_printf ("%d", tsize));
+
+  g_ptr_array_add (argv, g_file_get_path (ogmrip_container_get_output (mp4)));
+
+  g_ptr_array_add (argv, NULL);
+
+  task = ogmjob_spawn_newv ((gchar **) argv->pdata);
+  g_ptr_array_free (argv, TRUE);
+
+  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (task),
+      (OGMJobWatch) ogmrip_mp4_split_watch, mp4);
+
+  return task;
 }
 
 static void
@@ -521,8 +499,7 @@ ogmrip_mp4_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   OGMRipMp4 *mp4 = OGMRIP_MP4 (task);
   OGMJobTask *queue, *child;
 
-  gchar **argv, *filename = NULL;
-
+  gchar *filename = NULL;
   gboolean result = FALSE;
 
   ogmrip_container_get_split (OGMRIP_CONTAINER (task), &mp4->nsplits, NULL);
@@ -539,49 +516,30 @@ ogmrip_mp4_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   {
     filename = ogmrip_fs_mktemp ("video.XXXXXX", NULL);
 
-    argv = ogmrip_mencoder_extract_command (ogmrip_file_get_path (mp4->video), filename);
-    if (!argv)
-    {
-      g_free (filename);
-      return FALSE;
-    }
-
-    child = ogmjob_spawn_newv (argv);
-    ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child), (OGMJobWatch) ogmrip_mencoder_container_watch, task);
-
+    child = ogmrip_mencoder_extract_command (OGMRIP_CONTAINER (task), ogmrip_file_get_path (mp4->video), filename);
     ogmjob_container_add (OGMJOB_CONTAINER (queue), child);
     g_object_unref (child);
   }
 
-  argv = ogmrip_mp4_create_command (OGMRIP_CONTAINER (task), filename);
-  if (argv)
+  mp4->old_percent = 0;
+  mp4->nstreams = 2 + mp4->naudio + mp4->nvobsub;
+  mp4->streams = 0;
+
+  child = ogmrip_mp4_create_command (OGMRIP_CONTAINER (task), filename);
+  ogmjob_container_add (OGMJOB_CONTAINER (queue), child);
+  g_object_unref (child);
+
+  if (mp4->nsplits > 1 && result)
   {
-    mp4->old_percent = 0;
-    mp4->nstreams = 2 + mp4->naudio + mp4->nvobsub;
-    mp4->streams = 0;
+    mp4->split_percent = 0;
+    mp4->splits = 0;
 
-    child = ogmjob_spawn_newv (argv);
-    ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child), (OGMJobWatch) ogmrip_mp4_create_watch, task);
+    child = ogmrip_mp4_split_command (OGMRIP_CONTAINER (task));
     ogmjob_container_add (OGMJOB_CONTAINER (queue), child);
     g_object_unref (child);
-
-    if (mp4->nsplits > 1 && result)
-    {
-      argv = ogmrip_mp4_split_command (OGMRIP_CONTAINER (task));
-      if (argv)
-      {
-        mp4->split_percent = 0;
-        mp4->splits = 0;
-
-        child = ogmjob_spawn_newv (argv);
-        ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child), (OGMJobWatch) ogmrip_mp4_split_watch, task);
-        ogmjob_container_add (OGMJOB_CONTAINER (queue), child);
-        g_object_unref (child);
-      }
-    }
-
-    result = OGMJOB_TASK_CLASS (ogmrip_mp4_parent_class)->run (task, cancellable, error);
   }
+
+  result = OGMJOB_TASK_CLASS (ogmrip_mp4_parent_class)->run (task, cancellable, error);
 
   ogmjob_container_remove (OGMJOB_CONTAINER (task), queue);
 

@@ -52,9 +52,11 @@ static gboolean ogmrip_flac_run      (OGMJobTask   *task,
                                       GCancellable *cancellable,
                                       GError       **error);
 
-static gchar **
+static OGMJobTask *
 ogmrip_flac_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input)
 {
+  OGMJobTask *task;
+
   GPtrArray *argv;
   const gchar *output;
   gint quality;
@@ -86,17 +88,10 @@ ogmrip_flac_command (OGMRipAudioCodec *audio, gboolean header, const gchar *inpu
   g_ptr_array_add (argv, g_strdup (input));
   g_ptr_array_add (argv, NULL);
 
-  return (gchar **) g_ptr_array_free (argv, FALSE);
-}
+  task = ogmjob_spawn_newv ((gchar **) argv->pdata);
+  g_ptr_array_free (argv, TRUE);
 
-static gchar **
-ogmrip_wav_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input, const gchar *output)
-{
-  GPtrArray *argv;
-
-  argv = ogmrip_mplayer_wav_command (audio, header, output);
-
-  return (gchar **) g_ptr_array_free (argv, FALSE);
+  return task;
 }
 
 G_DEFINE_TYPE (OGMRipFlac, ogmrip_flac, OGMRIP_TYPE_AUDIO_CODEC)
@@ -120,7 +115,8 @@ ogmrip_flac_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
   OGMJobTask *pipeline;
   OGMJobTask *child;
-  gchar **argv, *fifo;
+
+  gchar *fifo;
   gboolean result;
 
   result = FALSE;
@@ -133,27 +129,15 @@ ogmrip_flac_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   ogmjob_container_add (OGMJOB_CONTAINER (task), pipeline);
   g_object_unref (pipeline);
 
-  argv = ogmrip_wav_command (OGMRIP_AUDIO_CODEC (task), TRUE, NULL, fifo);
-  if (argv)
-  {
-    child = ogmjob_spawn_newv (argv);
-    ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child),
-        (OGMJobWatch) ogmrip_mplayer_wav_watch, task);
-    ogmjob_spawn_set_watch_stderr (OGMJOB_SPAWN (child),
-        (OGMJobWatch) ogmrip_mplayer_watch_stderr, task);
-    ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
-    g_object_unref (child);
+  child = ogmrip_mplayer_wav_command (OGMRIP_AUDIO_CODEC (task), TRUE, fifo);
+  ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
+  g_object_unref (child);
 
-    argv = ogmrip_flac_command (OGMRIP_AUDIO_CODEC (task), TRUE, fifo);
-    if (argv)
-    {
-      child = ogmjob_spawn_newv (argv);
-      ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
-      g_object_unref (child);
+  child = ogmrip_flac_command (OGMRIP_AUDIO_CODEC (task), TRUE, fifo);
+  ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
+  g_object_unref (child);
 
-      result = OGMJOB_TASK_CLASS (ogmrip_flac_parent_class)->run (task, cancellable, error);
-    }
-  }
+  result = OGMJOB_TASK_CLASS (ogmrip_flac_parent_class)->run (task, cancellable, error);
 
   ogmjob_container_remove (OGMJOB_CONTAINER (task), pipeline);
 

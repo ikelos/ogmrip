@@ -131,14 +131,15 @@ ogmrip_lavc_get_codec (OGMRipLavc *lavc)
   return NULL;
 }
 
-static gchar **
+static OGMJobTask *
 ogmrip_lavc_command (OGMRipVideoCodec *video, guint pass, guint passes, const gchar *log_file)
 {
   static const gint strict[] = { 0, 1, -1, -2 };
 
-  OGMRipLavc *lavc;
-  OGMRipStream *input;
-  GPtrArray *argv;
+  OGMRipLavc *lavc = OGMRIP_LAVC (video);
+  gchar *opts[] = { "-ovc", "lavc", "-lavcopts", NULL, NULL, NULL, NULL };
+
+  OGMJobTask *task;
   GString *options;
 
   const gchar *output, *codec;
@@ -148,13 +149,6 @@ ogmrip_lavc_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   g_return_val_if_fail (pass == 1 || log_file != NULL, NULL);
 
   output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (video)));
-
-  lavc = OGMRIP_LAVC (video);
-
-  argv = ogmrip_mencoder_video_command (video, pass == passes ? output : "/dev/null", pass);
-
-  g_ptr_array_add (argv, g_strdup ("-ovc"));
-  g_ptr_array_add (argv, g_strdup ("lavc"));
 
   options = g_string_new (NULL);
 
@@ -230,8 +224,8 @@ ogmrip_lavc_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
         g_string_append (options, ":vpass=3");
     }
 
-    g_ptr_array_add (argv, g_strdup ("-passlogfile"));
-    g_ptr_array_add (argv, g_strdup (log_file));
+    opts[4] = "-passlogfile";
+    opts[5] = (gchar *) log_file;
   }
 
   threads = ogmrip_video_codec_get_threads (video);
@@ -240,15 +234,13 @@ ogmrip_lavc_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   if (threads > 0)
     g_string_append_printf (options, ":threads=%u", CLAMP (threads, 1, 8));
 
-  g_ptr_array_add (argv, g_strdup ("-lavcopts"));
-  g_ptr_array_add (argv, g_string_free (options, FALSE));
+  opts[3] = options->str;
 
-  input = ogmrip_codec_get_input (OGMRIP_CODEC (video));
-  ogmrip_mplayer_set_input (argv, ogmrip_stream_get_title (input));
+  task = ogmrip_mencoder_video_command (video, (const gchar * const *) opts, pass == passes ? output : "/dev/null");
 
-  g_ptr_array_add (argv, NULL);
+  g_string_free (options, TRUE);
 
-  return (gchar **) g_ptr_array_free (argv, FALSE);
+  return task;
 }
 
 static gboolean
@@ -687,7 +679,8 @@ static gboolean
 ogmrip_lavc_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
   OGMJobTask *queue, *child;
-  gchar **argv, *log_file;
+
+  gchar *log_file;
   gint pass, passes;
   gboolean result;
 
@@ -703,15 +696,7 @@ ogmrip_lavc_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 
   for (pass = 0; pass < passes; pass ++)
   {
-    argv = ogmrip_lavc_command (OGMRIP_VIDEO_CODEC (task), pass + 1, passes, log_file);
-    if (!argv)
-      return FALSE;
-
-    child = ogmjob_spawn_newv (argv);
-    ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child),
-        (OGMJobWatch) ogmrip_mencoder_codec_watch, task);
-    ogmjob_spawn_set_watch_stderr (OGMJOB_SPAWN (child),
-        (OGMJobWatch) ogmrip_mplayer_watch_stderr, task);
+    child = ogmrip_lavc_command (OGMRIP_VIDEO_CODEC (task), pass + 1, passes, log_file);
     ogmjob_container_add (OGMJOB_CONTAINER (queue), child);
     g_object_unref (child);
   }

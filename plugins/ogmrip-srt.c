@@ -119,9 +119,10 @@ ogmrip_tesseract_watch (OGMJobTask *task, const gchar *buffer, OGMRipSrt *srt, G
   return TRUE;
 }
 
-static gchar **
+static OGMJobTask *
 ogmrip_subp2pgm_command (OGMRipSubpCodec *subp, const gchar *input)
 {
+  OGMJobTask *task;
   GPtrArray *argv;
 
   argv = g_ptr_array_new ();
@@ -139,12 +140,19 @@ ogmrip_subp2pgm_command (OGMRipSubpCodec *subp, const gchar *input)
   g_ptr_array_add (argv, g_strdup (input));
   g_ptr_array_add (argv, NULL);
 
-  return (gchar **) g_ptr_array_free (argv, FALSE);
+  task = ogmjob_spawn_newv ((gchar **) argv->pdata);
+  g_ptr_array_free (argv, TRUE);
+
+  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (task),
+      (OGMJobWatch) ogmrip_subp2pgm_watch, subp);
+
+  return task;
 }
 
-static gchar **
+static OGMJobTask *
 ogmrip_gocr_command (OGMRipSubpCodec *subp, const gchar *input)
 {
+  OGMJobTask *task;
   GPtrArray *argv;
 
   argv = g_ptr_array_new ();
@@ -175,12 +183,19 @@ ogmrip_gocr_command (OGMRipSubpCodec *subp, const gchar *input)
   g_ptr_array_add (argv, g_strdup (input));
   g_ptr_array_add (argv, NULL);
 
-  return (gchar **) g_ptr_array_free (argv, FALSE);
+  task = ogmjob_spawn_newv ((gchar **) argv->pdata);
+  g_ptr_array_free (argv, TRUE);
+
+  ogmjob_spawn_set_watch_stderr (OGMJOB_SPAWN (task),
+      (OGMJobWatch) ogmrip_gocr_watch, subp);
+
+  return task;
 }
 
-static gchar **
+static OGMJobTask *
 ogmrip_ocrad_command (OGMRipSubpCodec *subp, const gchar *input)
 {
+  OGMJobTask *task;
   GPtrArray *argv;
 
   argv = g_ptr_array_new ();
@@ -207,12 +222,19 @@ ogmrip_ocrad_command (OGMRipSubpCodec *subp, const gchar *input)
   g_ptr_array_add (argv, g_strdup (input));
   g_ptr_array_add (argv, NULL);
 
-  return (gchar **) g_ptr_array_free (argv, FALSE);
+  task = ogmjob_spawn_newv ((gchar **) argv->pdata);
+  g_ptr_array_free (argv, TRUE);
+
+  ogmjob_spawn_set_watch_stderr (OGMJOB_SPAWN (task),
+      (OGMJobWatch) ogmrip_ocrad_watch, subp);
+
+  return task;
 }
 
-static gchar **
+static OGMJobTask *
 ogmrip_tesseract_command (OGMRipSubpCodec *subp, const gchar *input, gboolean lang)
 {
+  OGMJobTask *task;
   GPtrArray *argv;
 
   argv = g_ptr_array_new ();
@@ -244,12 +266,20 @@ ogmrip_tesseract_command (OGMRipSubpCodec *subp, const gchar *input, gboolean la
 
   g_ptr_array_add (argv, NULL);
 
-  return (gchar **) g_ptr_array_free (argv, FALSE);
+  task = ogmjob_spawn_newv ((gchar **) argv->pdata);
+  g_ptr_array_free (argv, TRUE);
+
+  ogmjob_spawn_set_watch_stderr (OGMJOB_SPAWN (task),
+      (OGMJobWatch) ogmrip_tesseract_watch, subp);
+
+  return task;
 }
 
-static gchar **
+static OGMJobTask *
 ogmrip_srt_command (OGMRipSubpCodec *subp, const gchar *input)
 {
+  OGMJobTask *task;
+
   GPtrArray *argv;
   const gchar *output;
 
@@ -286,46 +316,23 @@ ogmrip_srt_command (OGMRipSubpCodec *subp, const gchar *input)
   g_ptr_array_add (argv, g_strdup (output));
   g_ptr_array_add (argv, NULL);
 
-  return (gchar **) g_ptr_array_free (argv, FALSE);
-}
+  task = ogmjob_spawn_newv ((gchar **) argv->pdata);
+  g_ptr_array_free (argv, TRUE);
 
-static gchar **
-ogmrip_vobsub_command (OGMRipSubpCodec *subp, const gchar *output)
-{
-  GPtrArray *argv;
-
-  argv = ogmrip_mencoder_vobsub_command (subp, output);
-
-  return (gchar **) g_ptr_array_free (argv, FALSE);
+  return task;
 }
 
 static OGMJobTask *
 ogmrip_srt_ocr (OGMJobTask *task, const gchar *filename, gboolean lang)
 {
   OGMJobTask *child;
-  gchar **argv;
 
   if (use_tesseract)
-    argv = ogmrip_tesseract_command (OGMRIP_SUBP_CODEC (task), filename, lang);
+    child = ogmrip_tesseract_command (OGMRIP_SUBP_CODEC (task), filename, lang);
   else if (use_ocrad)
-    argv = ogmrip_ocrad_command (OGMRIP_SUBP_CODEC (task), filename);
+    child = ogmrip_ocrad_command (OGMRIP_SUBP_CODEC (task), filename);
   else
-    argv = ogmrip_gocr_command (OGMRIP_SUBP_CODEC (task), filename);
-
-  if (!argv)
-    return NULL;
-
-  child = ogmjob_spawn_newv (argv);
-
-  if (use_tesseract)
-    ogmjob_spawn_set_watch_stderr (OGMJOB_SPAWN (child),
-        (OGMJobWatch) ogmrip_tesseract_watch, task);
-  else if (use_ocrad)
-    ogmjob_spawn_set_watch_stderr (OGMJOB_SPAWN (child),
-        (OGMJobWatch) ogmrip_ocrad_watch, task);
-  else
-    ogmjob_spawn_set_watch_stderr (OGMJOB_SPAWN (child),
-        (OGMJobWatch) ogmrip_gocr_watch, task);
+    child = ogmrip_gocr_command (OGMRIP_SUBP_CODEC (task), filename);
 
   return child;
 }
@@ -357,7 +364,7 @@ ogmrip_srt_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   GDir *dir;
 
   gboolean result = FALSE, have_sub_files = FALSE;
-  gchar **argv, *pattern, *str, *tmp_file, *xml_file;
+  gchar *pattern, *str, *tmp_file, *xml_file;
   const gchar *name;
   gint fd;
 
@@ -369,34 +376,21 @@ ogmrip_srt_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 
   xml_file = g_strconcat (tmp_file, ".xml", NULL);
 
-  argv = ogmrip_vobsub_command (OGMRIP_SUBP_CODEC (task), tmp_file);
-  if (argv)
-  {
-    child = ogmjob_spawn_newv (argv);
-    ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child),
-        (OGMJobWatch) ogmrip_mencoder_vobsub_watch, task);
-    ogmjob_spawn_set_watch_stderr (OGMJOB_SPAWN (child),
-        (OGMJobWatch) ogmrip_mplayer_watch_stderr, task);
-    ogmjob_container_add (OGMJOB_CONTAINER (task), child);
-    g_object_unref (child);
+  child = ogmrip_mencoder_vobsub_command (OGMRIP_SUBP_CODEC (task), tmp_file);
+  ogmjob_container_add (OGMJOB_CONTAINER (task), child);
+  g_object_unref (child);
 
-    result = OGMJOB_TASK_CLASS (ogmrip_srt_parent_class)->run (task, cancellable, error);
+  result = OGMJOB_TASK_CLASS (ogmrip_srt_parent_class)->run (task, cancellable, error);
 
-    ogmjob_container_remove (OGMJOB_CONTAINER (task), child);
-  }
+  ogmjob_container_remove (OGMJOB_CONTAINER (task), child);
 
   if (result)
   {
     result = FALSE;
 
-    argv = ogmrip_subp2pgm_command (OGMRIP_SUBP_CODEC (task), tmp_file);
-    if (argv)
-    {
-      child = ogmjob_spawn_newv (argv);
-      ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child), (OGMJobWatch) ogmrip_subp2pgm_watch, task);
-      result = ogmjob_task_run (child, cancellable, error);
-      g_object_unref (child);
-    }
+    child = ogmrip_subp2pgm_command (OGMRIP_SUBP_CODEC (task), tmp_file);
+    result = ogmjob_task_run (child, cancellable, error);
+    g_object_unref (child);
   }
 
   if (result)
@@ -460,13 +454,9 @@ ogmrip_srt_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
     {
       result = FALSE;
 
-      argv = ogmrip_srt_command (OGMRIP_SUBP_CODEC (task), xml_file);
-      if (argv)
-      {
-        child = ogmjob_spawn_newv (argv);
-        result = ogmjob_task_run (child, cancellable, error);
-        g_object_unref (child);
-      }
+      child = ogmrip_srt_command (OGMRIP_SUBP_CODEC (task), xml_file);
+      result = ogmjob_task_run (child, cancellable, error);
+      g_object_unref (child);
     }
   }
 

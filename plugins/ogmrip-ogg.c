@@ -193,9 +193,11 @@ ogmrip_ogg_merge_foreach_file (OGMRipContainer *ogg, OGMRipFile *file, GPtrArray
 
 }
 
-static gchar **
+static OGMJobTask *
 ogmrip_ogg_merge_command (OGMRipContainer *ogg, const gchar *output)
 {
+  OGMJobTask *task;
+
   GPtrArray *argv;
   const gchar *label, *fourcc;
 
@@ -224,12 +226,20 @@ ogmrip_ogg_merge_command (OGMRipContainer *ogg, const gchar *output)
 
   g_ptr_array_add (argv, NULL);
 
-  return (gchar **) g_ptr_array_free (argv, FALSE);
+  task = ogmjob_spawn_newv ((gchar **) argv->pdata);
+  g_ptr_array_free (argv, TRUE);
+
+  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (task),
+      (OGMJobWatch) ogmrip_ogg_merge_watch, ogg);
+
+  return task;
 }
 
-static gchar **
+static OGMJobTask *
 ogmrip_ogg_split_command (OGMRipContainer *ogg, const gchar *input)
 {
+  OGMJobTask *task;
+
   GPtrArray *argv;
   guint tsize;
 
@@ -245,7 +255,13 @@ ogmrip_ogg_split_command (OGMRipContainer *ogg, const gchar *input)
   g_ptr_array_add (argv, g_strdup (input));
   g_ptr_array_add (argv, NULL);
 
-  return (gchar **) g_ptr_array_free (argv, FALSE);
+  task = ogmjob_spawn_newv ((gchar **) argv->pdata);
+  g_ptr_array_free (argv, TRUE);
+
+  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (task),
+      (OGMJobWatch) ogmrip_ogg_split_watch, ogg);
+
+  return task;
 }
 
 G_DEFINE_TYPE (OGMRipOgg, ogmrip_ogg, OGMRIP_TYPE_CONTAINER)
@@ -268,7 +284,8 @@ static gboolean
 ogmrip_ogg_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
   OGMJobTask *child;
-  gchar **argv, *file;
+
+  gchar *file;
   gboolean result;
   guint tnumber;
   gint fd;
@@ -290,33 +307,23 @@ ogmrip_ogg_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
     }
   }
 
-  argv = ogmrip_ogg_merge_command (OGMRIP_CONTAINER (task), file);
-  if (argv)
+  child = ogmrip_ogg_merge_command (OGMRIP_CONTAINER (task), file);
+  ogmjob_container_add (OGMJOB_CONTAINER (task), child);
+  g_object_unref (child);
+
+  result = OGMJOB_TASK_CLASS (ogmrip_ogg_parent_class)->run (task, cancellable, error);
+
+  ogmjob_container_remove (OGMJOB_CONTAINER (task), child);
+
+  if (tnumber > 1 && result)
   {
-    child = ogmjob_spawn_newv (argv);
-    ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child), (OGMJobWatch) ogmrip_ogg_merge_watch, task);
+    child = ogmrip_ogg_split_command (OGMRIP_CONTAINER (task), file);
     ogmjob_container_add (OGMJOB_CONTAINER (task), child);
     g_object_unref (child);
 
     result = OGMJOB_TASK_CLASS (ogmrip_ogg_parent_class)->run (task, cancellable, error);
 
     ogmjob_container_remove (OGMJOB_CONTAINER (task), child);
-  }
-
-  if (tnumber > 1 && result)
-  {
-    argv = ogmrip_ogg_split_command (OGMRIP_CONTAINER (task), file);
-    if (argv)
-    {
-      child = ogmjob_spawn_newv (argv);
-      ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (child), (OGMJobWatch) ogmrip_ogg_split_watch, task);
-      ogmjob_container_add (OGMJOB_CONTAINER (task), child);
-      g_object_unref (child);
-
-      result = OGMJOB_TASK_CLASS (ogmrip_ogg_parent_class)->run (task, cancellable, error);
-
-      ogmjob_container_remove (OGMJOB_CONTAINER (task), child);
-    }
   }
 
   if (file)
