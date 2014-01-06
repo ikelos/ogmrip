@@ -94,10 +94,16 @@ ogmjob_container_init (OGMJobContainer *container)
 }
 
 static void
+ogmjob_container_remove_from_container (OGMJobTask *child, OGMJobContainer *container)
+{
+  ogmjob_container_remove (container, child);
+}
+
+static void
 ogmjob_container_dispose (GObject *gobject)
 {
   ogmjob_container_foreach (OGMJOB_CONTAINER (gobject), 
-      (OGMJobCallback) g_object_unref, NULL);
+      (OGMJobCallback) ogmjob_container_remove_from_container, gobject);
 
   G_OBJECT_CLASS (ogmjob_container_parent_class)->dispose (gobject);
 }
@@ -174,6 +180,7 @@ ogmjob_container_foreach (OGMJobContainer *container, OGMJobCallback callback, g
   OGMJobContainerClass *klass;
 
   g_return_if_fail (OGMJOB_IS_CONTAINER (container));
+  g_return_if_fail (callback != NULL);
 
   klass = OGMJOB_CONTAINER_GET_CLASS (container);
 

@@ -45,7 +45,7 @@ typedef struct _OGMJobSpawnClass OGMJobSpawnClass;
  * Specifies the type of functions passed to ogmjob_spawn_add_watch(), and
  * ogmjob_spawn_add_watch_full().
  *
- * Returns: The progress made, or -1
+ * Returns: %TRUE to stop watching
  */
 typedef gboolean (* OGMJobWatch) (OGMJobSpawn *spawn,
                                   const gchar *buffer,

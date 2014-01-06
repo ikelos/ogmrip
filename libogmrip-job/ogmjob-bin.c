@@ -105,7 +105,7 @@ ogmjob_bin_forall (OGMJobContainer *container, OGMJobCallback callback, gpointer
   OGMJobBin *bin;
 
   bin = OGMJOB_BIN (container);
-  if (callback && bin->priv->child)
+  if (bin->priv->child)
     (* callback) (bin->priv->child, data);
 }
 

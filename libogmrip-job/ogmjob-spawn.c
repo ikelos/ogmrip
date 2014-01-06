@@ -106,7 +106,9 @@ new_task (OGMJobTask *spawn, GCancellable *cancellable, GAsyncReadyCallback call
 
   data = g_new0 (TaskAsyncData, 1);
 
-  data->spawn = g_object_ref (spawn);
+  /* No need to take a reference because g_task_new does */
+  data->spawn = OGMJOB_SPAWN (spawn);
+
   data->task = g_task_new (spawn, cancellable, callback, user_data);
 
   if (cancellable)
@@ -124,6 +126,17 @@ complete_task (TaskAsyncData *data)
 {
   if (!data->spawn->priv->pid && !data->src_out && !data->src_err)
   {
+    if (!data->error)
+      g_cancellable_set_error_if_cancelled (data->cancellable, &data->error);
+
+    if (data->error)
+    {
+      g_task_return_error (data->task, data->error);
+      data->error = NULL;
+    }
+    else
+      g_task_return_boolean (data->task, WIFEXITED (data->spawn->priv->status) && WEXITSTATUS (data->spawn->priv->status) == 0);
+
     if (data->cancellable)
     {
       g_cancellable_disconnect (data->cancellable, data->handler);
@@ -136,7 +149,6 @@ complete_task (TaskAsyncData *data)
     g_free (data->partial_out);
     g_free (data->partial_err);
 
-    g_object_unref (data->spawn);
     g_object_unref (data->task);
 
     g_free (data);
@@ -156,17 +168,6 @@ task_pid_watch (GPid pid, gint status, TaskAsyncData *data)
     data->spawn->priv->status = WEXITSTATUS (status);
 */
   data->spawn->priv->status = status;
-
-  if (!data->error)
-    g_cancellable_set_error_if_cancelled (data->cancellable, &data->error);
-
-  if (data->error)
-  {
-    g_task_return_error (data->task, data->error);
-    data->error = NULL;
-  }
-  else
-    g_task_return_boolean (data->task, WIFEXITED (status) && WEXITSTATUS (status) == 0);
 }
 
 static void
