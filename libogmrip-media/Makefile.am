@@ -3,7 +3,7 @@ lib_LTLIBRARIES = \
 
 libogmrip_media_la_SOURCES = \
   ogmrip-media-audio.c    \
-	ogmrip-media-backend.c  \
+  ogmrip-media-backend.c  \
   ogmrip-media-chapters.c \
   ogmrip-media-labels.c   \
   ogmrip-media-object.c   \
@@ -15,7 +15,7 @@ libogmrip_media_la_SOURCES = \
 
 libogmrip_media_la_HEADERS = \
   ogmrip-media-audio.h    \
-	ogmrip-media-backend.h  \
+  ogmrip-media-backend.h  \
   ogmrip-media-chapters.h \
   ogmrip-media-enums.h    \
   ogmrip-media-labels.h   \

@@ -3,7 +3,7 @@ bin_PROGRAMS = \
 
 ogmrip_SOURCES = \
   ogmrip-application.c \
-	ogmrip-cli.c   \
+  ogmrip-cli.c   \
   ogmrip-main.c
 
 if HAVE_GTK_SUPPORT
