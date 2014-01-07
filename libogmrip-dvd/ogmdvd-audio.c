@@ -49,6 +49,16 @@ G_DEFINE_TYPE_WITH_CODE (OGMDvdAudioStream, ogmdvd_audio_stream, G_TYPE_OBJECT,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_AUDIO_STREAM, ogmrip_audio_stream_iface_init));
 
 static void
+ogmdvd_audio_stream_finalize (GObject *gobject)
+{
+#ifdef G_ENABLE_DEBUG
+  g_message ("Finalizing %s (%d)", G_OBJECT_TYPE_NAME (gobject), OGMDVD_AUDIO_STREAM (gobject)->priv->id);
+#endif
+
+  G_OBJECT_CLASS (ogmdvd_audio_stream_parent_class)->finalize (gobject);
+}  
+
+static void
 ogmdvd_audio_stream_init (OGMDvdAudioStream *stream)
 {
   stream->priv = G_TYPE_INSTANCE_GET_PRIVATE (stream, OGMDVD_TYPE_AUDIO_STREAM, OGMDvdAudioStreamPriv);
@@ -57,6 +67,11 @@ ogmdvd_audio_stream_init (OGMDvdAudioStream *stream)
 static void
 ogmdvd_audio_stream_class_init (OGMDvdAudioStreamClass *klass)
 {
+  GObjectClass *gobject_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->finalize = ogmdvd_audio_stream_finalize;
+
   g_type_class_add_private (klass, sizeof (OGMDvdAudioStreamPriv));
 }
 

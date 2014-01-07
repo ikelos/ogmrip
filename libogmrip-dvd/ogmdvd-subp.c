@@ -38,6 +38,16 @@ G_DEFINE_TYPE_WITH_CODE (OGMDvdSubpStream, ogmdvd_subp_stream, G_TYPE_OBJECT,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_SUBP_STREAM, ogmrip_subp_stream_iface_init));
 
 static void
+ogmdvd_subp_stream_finalize (GObject *gobject)
+{
+#ifdef G_ENABLE_DEBUG
+  // g_message ("Finalizing %s (%d)", G_OBJECT_TYPE_NAME (gobject), OGMDVD_SUBP_STREAM (gobject)->priv->id);
+#endif
+
+  G_OBJECT_CLASS (ogmdvd_subp_stream_parent_class)->finalize (gobject);
+}  
+
+static void
 ogmdvd_subp_stream_init (OGMDvdSubpStream *stream)
 {
   stream->priv = G_TYPE_INSTANCE_GET_PRIVATE (stream, OGMDVD_TYPE_SUBP_STREAM, OGMDvdSubpStreamPriv);
@@ -46,6 +56,11 @@ ogmdvd_subp_stream_init (OGMDvdSubpStream *stream)
 static void
 ogmdvd_subp_stream_class_init (OGMDvdSubpStreamClass *klass)
 {
+  GObjectClass *gobject_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->finalize = ogmdvd_subp_stream_finalize;
+
   g_type_class_add_private (klass, sizeof (OGMDvdSubpStreamPriv));
 }
 
