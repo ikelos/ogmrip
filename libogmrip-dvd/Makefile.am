@@ -40,3 +40,8 @@ INCLUDES = \
   -I$(top_srcdir)/libogmrip-media \
   -I$(top_srcdir)/libogmrip-job
 
+if MAINTAINER_MODE
+INCLUDES += \
+  -DG_ENABLE_DEBUG
+endif
+
