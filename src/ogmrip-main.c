@@ -221,6 +221,8 @@ main (int argc, char *argv[])
   gtk_init (&argc, &argv);
 #endif
 
+  setlocale (LC_ALL, "");
+
   g_set_application_name (_("OGMRip"));
 
 #ifdef HAVE_GTK_SUPPORT
