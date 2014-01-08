@@ -66,6 +66,7 @@ struct _OGMRipX264
   gboolean dct_decimate;
   gboolean fast_pskip;
   gboolean force_cfr;
+  gboolean global_header;
   gboolean mixed_refs;
   gboolean weight_b;
   gboolean x88dct;
@@ -96,6 +97,7 @@ enum
   PROP_FAST_PSKIP,
   PROP_FORCE_CFR,
   PROP_FRAMEREF,
+  PROP_GLOBAL_HEADER,
   PROP_KEYINT,
   PROP_LEVEL_IDC,
   PROP_ME,
@@ -282,6 +284,7 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
     g_string_append (options, x264->dct_decimate ? ":dct_decimate" : ":nodct_decimate");
     g_string_append (options, x264->fast_pskip ? ":fast_pskip" : ":nofast_pskip");
     g_string_append (options, x264->force_cfr ? ":force_cfr" : ":noforce_cfr");
+    g_string_append (options, x264->global_header ? ":global_header" : ":noglobal_header");
 
     if (x264_have_weight_p)
       g_string_append_printf (options, ":weightp=%d", CLAMP (x264->weight_p, 0, 2));
@@ -453,6 +456,8 @@ ogmrip_x264_configure (OGMRipConfigurable *configurable, OGMRipProfile *profile)
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
     g_settings_bind (settings, "frameref", configurable, OGMRIP_X264_PROP_FRAMEREF,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "global-header", configurable, OGMRIP_X264_PROP_GLOBAL_HEADER,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
     g_settings_bind (settings, "keyint", configurable, OGMRIP_X264_PROP_KEYINT,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
     g_settings_bind (settings, "level-idc", configurable, OGMRIP_X264_PROP_LEVEL_IDC,
@@ -572,6 +577,10 @@ ogmrip_x264_class_init (OGMRipX264Class *klass)
       g_param_spec_uint (OGMRIP_X264_PROP_FRAMEREF, "Frameref property", "Set frameref",
         1, 16, OGMRIP_X264_DEFAULT_FRAMEREF, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
+  g_object_class_install_property (gobject_class, PROP_GLOBAL_HEADER,
+      g_param_spec_boolean (OGMRIP_X264_PROP_GLOBAL_HEADER, "Global header property", "Set global header",
+        OGMRIP_X264_DEFAULT_GLOBAL_HEADER, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_property (gobject_class, PROP_KEYINT,
       g_param_spec_uint (OGMRIP_X264_PROP_KEYINT, "Keyint property", "Set keyint",
         0, G_MAXUINT, OGMRIP_X264_DEFAULT_KEYINT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
@@ -657,6 +666,7 @@ ogmrip_x264_init (OGMRipX264 *x264)
   x264->fast_pskip = OGMRIP_X264_DEFAULT_FAST_PSKIP;
   x264->force_cfr = OGMRIP_X264_DEFAULT_FORCE_CFR;
   x264->frameref = OGMRIP_X264_DEFAULT_FRAMEREF;
+  x264->global_header = OGMRIP_X264_DEFAULT_GLOBAL_HEADER;
   x264->keyint = OGMRIP_X264_DEFAULT_KEYINT;
   x264->level_idc = OGMRIP_X264_DEFAULT_LEVEL_IDC;
   x264->me = OGMRIP_X264_DEFAULT_ME;
@@ -769,6 +779,9 @@ ogmrip_x264_get_property (GObject *gobject, guint property_id, GValue *value, GP
     case PROP_FRAMEREF:
       g_value_set_uint (value, x264->frameref);
       break;
+    case PROP_GLOBAL_HEADER:
+      g_value_set_boolean (value, x264->global_header);
+      break;
     case PROP_KEYINT:
       g_value_set_uint (value, x264->keyint);
       break;
@@ -871,6 +884,9 @@ ogmrip_x264_set_property (GObject *gobject, guint property_id, const GValue *val
       break;
     case PROP_FRAMEREF:
       x264->frameref = g_value_get_uint (value);
+      break;
+    case PROP_GLOBAL_HEADER:
+      x264->global_header = g_value_get_boolean (value);
       break;
     case PROP_KEYINT:
       x264->keyint = g_value_get_uint (value);

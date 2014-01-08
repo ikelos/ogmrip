@@ -37,6 +37,7 @@ G_BEGIN_DECLS
 #define OGMRIP_X264_PROP_FORCE_CFR        "force-cfr"
 #define OGMRIP_X264_PROP_FAST_PSKIP       "fast-pskip"
 #define OGMRIP_X264_PROP_FRAMEREF         "frameref"
+#define OGMRIP_X264_PROP_GLOBAL_HEADER    "global-header"
 #define OGMRIP_X264_PROP_KEYINT           "keyint"
 #define OGMRIP_X264_PROP_LEVEL_IDC        "level-idc"
 #define OGMRIP_X264_PROP_ME               "me"
@@ -67,6 +68,7 @@ G_BEGIN_DECLS
 #define OGMRIP_X264_DEFAULT_FAST_PSKIP    TRUE
 #define OGMRIP_X264_DEFAULT_FORCE_CFR     FALSE
 #define OGMRIP_X264_DEFAULT_FRAMEREF      3
+#define OGMRIP_X264_DEFAULT_GLOBAL_HEADER FALSE
 #define OGMRIP_X264_DEFAULT_KEYINT        250
 #define OGMRIP_X264_DEFAULT_LEVEL_IDC     51
 #define OGMRIP_X264_DEFAULT_ME            2

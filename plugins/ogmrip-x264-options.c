@@ -67,6 +67,7 @@ struct _OGMRipX264Dialog
   GtkWidget *fast_pskip_check;
   GtkWidget *force_cfr_check;
   GtkWidget *frameref_spin;
+  GtkWidget *global_header_check;
   GtkWidget *keyint_spin;
   GtkWidget *level_idc_spin;
   GtkWidget *me_combo;
@@ -370,6 +371,8 @@ ogmrip_x264_dialog_set_profile (OGMRipX264Dialog *dialog, OGMRipProfile *profile
         dialog->fast_pskip_check, "active", G_SETTINGS_BIND_DEFAULT);
     g_settings_bind (settings, OGMRIP_X264_PROP_FORCE_CFR,
         dialog->force_cfr_check, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_GLOBAL_HEADER,
+        dialog->global_header_check, "active", G_SETTINGS_BIND_DEFAULT);
 
     g_settings_bind_with_mapping (settings, OGMRIP_X264_PROP_PARTITIONS,
         dialog->partitions_check[B8X8], "active", G_SETTINGS_BIND_DEFAULT,
@@ -591,6 +594,7 @@ ogmrip_x264_dialog_init (OGMRipX264Dialog *dialog)
   dialog->dct_decimate_check = gtk_builder_get_widget (builder, "dct_decimate-check");
   dialog->fast_pskip_check = gtk_builder_get_widget (builder, "fast_pskip-check");
   dialog->force_cfr_check = gtk_builder_get_widget (builder, "force_cfr-check");
+  dialog->global_header_check = gtk_builder_get_widget (builder, "global_header-check");
 
   dialog->psy_rd_spin = gtk_builder_get_widget (builder, "psy_rd-spin");
   gtk_widget_set_sensitive (dialog->psy_rd_spin, x264_have_psy);
