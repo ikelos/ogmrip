@@ -36,6 +36,8 @@
 #define OGMRIP_VIDEO_GET_PRIVATE(o) \
   (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_VIDEO_CODEC, OGMRipVideoCodecPriv))
 
+#define DEFAULT_BPP 0.15
+
 #define ROUND(x) ((gint) ((x) + 0.5) != (gint) (x) ? ((gint) ((x) + 0.5)) : ((gint) (x)))
 #define FLOOR(x) ((gint) (x))
 
@@ -148,7 +150,7 @@ ogmrip_video_codec_class_init (OGMRipVideoCodecClass *klass)
 
   g_object_class_install_property (gobject_class, PROP_BPP, 
         g_param_spec_double ("bpp", "Bits per pixel property", "Set bits per pixel", 
-           0.0, 1.0, 0.25, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+           0.0, 1.0, DEFAULT_BPP, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_PASSES, 
         g_param_spec_uint ("passes", "Passes property", "Set the number of passes", 
@@ -251,7 +253,7 @@ ogmrip_video_codec_init (OGMRipVideoCodec *video)
   video->priv->turbo = TRUE;
   video->priv->can_crop = TRUE;
   video->priv->angle = 1;
-  video->priv->bpp = 0.25;
+  video->priv->bpp = DEFAULT_BPP;
   video->priv->passes = 1;
   video->priv->can_crop = TRUE;
 }
