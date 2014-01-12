@@ -202,7 +202,7 @@ ogmrip_profile_engine_remove_internal (OGMRipProfileEngine *engine, OGMRipProfil
 {
   gchar *name;
 
-  name = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_NAME);
+  g_object_get (profile, "name", &name, NULL);
   if (g_hash_table_remove (engine->priv->profiles, name))
     g_object_notify (G_OBJECT (engine), "profiles");
   g_free (name);
@@ -224,7 +224,6 @@ ogmrip_profile_engine_init (OGMRipProfileEngine *engine)
 
   g_settings_bind (engine->priv->settings, "profiles",
       engine, "profiles", G_SETTINGS_BIND_GET | G_SETTINGS_BIND_SET | G_SETTINGS_BIND_GET_NO_CHANGES);
-
 }
 
 static void
