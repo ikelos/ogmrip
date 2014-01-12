@@ -139,11 +139,29 @@ ogmrip_media_info_get_video_info (OGMRipMediaInfo *info, guint track, OGMRipVide
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, track, "DisplayAspectRatio/String");
   if (str)
   {
-    if (sscanf (str, "%u:%u", &video->aspect_num, &video->aspect_denom) != 2)
-    {
-      gdouble aspect;
+    gdouble aspect;
+    gchar *endptr;
 
-      aspect = strtod (str, NULL);
+    aspect = g_ascii_strtod (str, &endptr);
+    g_assert (endptr != str);
+
+    video->aspect_denom = 1;
+
+    if (*endptr == ':')
+    {
+      str = endptr + 1;
+
+      video->aspect_denom = strtoul (str, &endptr, 10);
+      g_assert (endptr != str);
+
+      if (video->aspect_denom > 1)
+        video->aspect_num = aspect;
+    }
+
+    if (video->aspect_denom > 1)
+      video->aspect_num = aspect;
+    else
+    {
       video->aspect_num = aspect * 1000;
       video->aspect_denom = 1000;
     }

@@ -115,7 +115,16 @@ ogmrip_title_chooser_widget_set_disc (OGMRipTitleChooserWidget *chooser, OGMRipM
 
       ogmrip_video_stream_get_aspect_ratio (stream, &num, &denom);
       if (num > 0 && denom > 0)
-        g_string_append_printf (string, ", %u/%u", num, denom);
+      {
+        if (denom == 1000)
+        {
+          gchar aspect[G_ASCII_DTOSTR_BUF_SIZE];
+
+          g_string_append_printf (string, ", %s:1", g_ascii_formatd (aspect, G_ASCII_DTOSTR_BUF_SIZE, "%.02lf", num / 1000.));
+        }
+        else
+          g_string_append_printf (string, ", %u/%u", num, denom);
+      }
 
       g_string_append_c (string, ')');
 
