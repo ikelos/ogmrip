@@ -274,19 +274,19 @@ ogmdvd_disc_get_title_name (OGMDvdDisc *disc)
 
   f = fopen (disc->priv->device, "r");
   if (!f)
-    return g_strdup ("Unknown");
+    return NULL;
 
 
   if (fseek (f, 32808, SEEK_SET) < 0)
   {
     fclose (f);
-    return g_strdup ("Unknown");
+    return NULL;
   }
 
   if (32 != (i = fread (label, 1, 32, f)))
   {
     fclose (f);
-    return g_strdup ("Unknown");
+    return NULL;
   }
 
   fclose (f);

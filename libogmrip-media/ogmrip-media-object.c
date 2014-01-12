@@ -20,6 +20,10 @@
 
 #include <ogmrip-base.h>
 
+#include <glib/gi18n.h>
+
+static const gchar *untitled = N_("Untitled");
+
 G_DEFINE_INTERFACE (OGMRipMedia, ogmrip_media, G_TYPE_OBJECT)
 
 static void
@@ -94,15 +98,18 @@ const gchar *
 ogmrip_media_get_label (OGMRipMedia *media)
 {
   OGMRipMediaInterface *iface;
+  const gchar *label;
 
   g_return_val_if_fail (OGMRIP_IS_MEDIA (media), NULL);
 
   iface = OGMRIP_MEDIA_GET_IFACE (media);
 
   if (!iface->get_label)
-    return NULL;
+    return untitled;
 
-  return iface->get_label (media);
+  label = iface->get_label (media);
+
+  return label ? label : untitled;
 }
 
 const gchar *

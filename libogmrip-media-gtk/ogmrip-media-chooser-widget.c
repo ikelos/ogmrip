@@ -170,17 +170,12 @@ ogmrip_media_chooser_widget_volume_added (OGMRipMediaChooserWidget *chooser, GVo
       GtkTreeModel *model;
       GtkTreeIter sibling, iter;
       gchar *text, *name, *title;
-      const gchar *label;
 
       name = g_volume_get_name (volume);
       if (!name)
         name = g_strdup (_("Unknown media"));
 
-      label = ogmrip_media_get_label (media);
-      if (label)
-        title = g_markup_escape_text (label, -1);
-      else
-        title = g_strdup (_("Untitled"));
+      title = g_markup_escape_text (ogmrip_media_get_label (media), -1);
       text = g_strdup_printf ("<b>%s</b>\n%s", title, name);
       g_free (title);
 
@@ -346,6 +341,7 @@ ogmrip_media_chooser_widget_add_media (GtkComboBox *combo, OGMRipMedia *media, g
 {
   GtkTreeModel *model;
   GtkTreeIter sibling, iter;
+
   gchar *title, *text;
   gint type;
 
