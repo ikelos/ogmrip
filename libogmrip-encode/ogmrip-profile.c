@@ -105,13 +105,6 @@ ogmrip_profile_has_schema (const gchar *schema)
   return FALSE;
 }
 
-static void
-ogmrip_profile_codec_changed (GSettings *settings, const gchar *key, gchar **name)
-{
-  g_free (*name);
-  *name = g_settings_get_string (settings, key);
-}
-
 static gboolean
 ogmrip_profile_check (OGMRipProfile *profile)
 {
@@ -134,6 +127,42 @@ ogmrip_profile_check (OGMRipProfile *profile)
     return FALSE;
 
   return TRUE;
+}
+
+static void
+ogmrip_profile_update_container (OGMRipProfile *profile)
+{
+  g_free (profile->priv->container);
+  profile->priv->container = g_settings_get_string (profile->priv->general_settings, OGMRIP_PROFILE_CONTAINER);
+
+  profile->priv->available = ogmrip_profile_check (profile);
+}
+
+static void
+ogmrip_profile_update_video_codec (OGMRipProfile *profile)
+{
+  g_free (profile->priv->video_codec);
+  profile->priv->video_codec = g_settings_get_string (profile->priv->video_settings, OGMRIP_PROFILE_CODEC);
+
+  profile->priv->available = ogmrip_profile_check (profile);
+}
+
+static void
+ogmrip_profile_update_audio_codec (OGMRipProfile *profile)
+{
+  g_free (profile->priv->audio_codec);
+  profile->priv->audio_codec = g_settings_get_string (profile->priv->audio_settings, OGMRIP_PROFILE_CODEC);
+
+  profile->priv->available = ogmrip_profile_check (profile);
+}
+
+static void
+ogmrip_profile_update_subp_codec (OGMRipProfile *profile)
+{
+  g_free (profile->priv->subp_codec);
+  profile->priv->subp_codec = g_settings_get_string (profile->priv->subp_settings, OGMRIP_PROFILE_CODEC);
+
+  profile->priv->available = ogmrip_profile_check (profile);
 }
 
 G_DEFINE_TYPE (OGMRipProfile, ogmrip_profile, G_TYPE_SETTINGS)
@@ -178,26 +207,26 @@ ogmrip_profile_constructed (GObject *gobject)
   profile->priv->general_settings = g_settings_get_child (G_SETTINGS (profile), OGMRIP_PROFILE_GENERAL);
   profile->priv->container = g_settings_get_string (profile->priv->general_settings, OGMRIP_PROFILE_CONTAINER);
 
-  g_signal_connect (profile->priv->general_settings, "changed::" OGMRIP_PROFILE_CONTAINER,
-      G_CALLBACK (ogmrip_profile_codec_changed), &profile->priv->container);
+  g_signal_connect_swapped (profile->priv->general_settings, "changed::" OGMRIP_PROFILE_CONTAINER,
+      G_CALLBACK (ogmrip_profile_update_container), profile);
 
   profile->priv->video_settings = g_settings_get_child (G_SETTINGS (profile), OGMRIP_PROFILE_VIDEO);
   profile->priv->video_codec = g_settings_get_string (profile->priv->video_settings, OGMRIP_PROFILE_CODEC);
 
-  g_signal_connect (profile->priv->video_settings, "changed::" OGMRIP_PROFILE_CODEC,
-      G_CALLBACK (ogmrip_profile_codec_changed), &profile->priv->video_codec);
+  g_signal_connect_swapped (profile->priv->video_settings, "changed::" OGMRIP_PROFILE_CODEC,
+      G_CALLBACK (ogmrip_profile_update_video_codec), profile);
 
   profile->priv->audio_settings = g_settings_get_child (G_SETTINGS (profile), OGMRIP_PROFILE_AUDIO);
   profile->priv->audio_codec = g_settings_get_string (profile->priv->audio_settings, OGMRIP_PROFILE_CODEC);
 
-  g_signal_connect (profile->priv->audio_settings, "changed::" OGMRIP_PROFILE_CODEC,
-      G_CALLBACK (ogmrip_profile_codec_changed), &profile->priv->audio_codec);
+  g_signal_connect_swapped (profile->priv->audio_settings, "changed::" OGMRIP_PROFILE_CODEC,
+      G_CALLBACK (ogmrip_profile_update_audio_codec), profile);
 
   profile->priv->subp_settings = g_settings_get_child (G_SETTINGS (profile), OGMRIP_PROFILE_SUBP);
   profile->priv->subp_codec = g_settings_get_string (profile->priv->subp_settings, OGMRIP_PROFILE_CODEC);
 
-  g_signal_connect (profile->priv->subp_settings, "changed::" OGMRIP_PROFILE_CODEC,
-      G_CALLBACK (ogmrip_profile_codec_changed), &profile->priv->subp_codec);
+  g_signal_connect_swapped (profile->priv->subp_settings, "changed::" OGMRIP_PROFILE_CODEC,
+      G_CALLBACK (ogmrip_profile_update_subp_codec), profile);
 
   g_object_get (profile, "path", &profile->priv->path, NULL);
 
@@ -579,6 +608,8 @@ ogmrip_profile_get_child_for_container (OGMRipProfile *profile, const gchar *con
   return ogmrip_profile_get_child_internal (profile, id, name);
 }
 
+#define STRING_IS_DEFINED(str) ((str) != NULL && (*str) != '\0')
+
 GSettings *
 ogmrip_profile_get_child (OGMRipProfile *profile, const gchar *name)
 {
@@ -594,14 +625,26 @@ ogmrip_profile_get_child (OGMRipProfile *profile, const gchar *name)
   if (g_str_equal (name, OGMRIP_PROFILE_SUBP))
     return g_object_ref (profile->priv->subp_settings);
 
+  if (!STRING_IS_DEFINED (profile->priv->container))
+    ogmrip_profile_update_container (profile);
+
   if (g_str_equal (name, profile->priv->container))
     return ogmrip_profile_get_child_for_container (profile, name);
+
+  if (!STRING_IS_DEFINED (profile->priv->video_codec))
+    ogmrip_profile_update_video_codec (profile);
 
   if (g_str_equal (name, profile->priv->video_codec))
     return ogmrip_profile_get_child_for_codec (profile, name);
 
+  if (!STRING_IS_DEFINED (profile->priv->audio_codec))
+    ogmrip_profile_update_audio_codec (profile);
+
   if (g_str_equal (name, profile->priv->audio_codec))
     return ogmrip_profile_get_child_for_codec (profile, name);
+
+  if (!STRING_IS_DEFINED (profile->priv->subp_codec))
+    ogmrip_profile_update_subp_codec (profile);
 
   if (g_str_equal (name, profile->priv->subp_codec))
     return ogmrip_profile_get_child_for_codec (profile, name);

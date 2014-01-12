@@ -50,21 +50,27 @@ ogmrip_profile_parse_section (OGMRipProfile *profile, OGMRipXML *xml)
   gchar *name;
 
   name = ogmrip_xml_get_string (xml, "name");
+
   settings = ogmrip_profile_get_child (profile, name);
-  g_free (name);
-
-  if (ogmrip_xml_children (xml))
+  if (!settings)
+    g_warning ("No child for %s", name);
+  else
   {
-    do
+    if (ogmrip_xml_children (xml))
     {
-      ogmrip_profile_parse_key (settings, xml);
-    }
-    while (ogmrip_xml_next (xml));
+      do
+      {
+        ogmrip_profile_parse_key (settings, xml);
+      }
+      while (ogmrip_xml_next (xml));
 
-    ogmrip_xml_parent (xml);
+      ogmrip_xml_parent (xml);
+    }
+
+    g_object_unref (settings);
   }
 
-  g_object_unref (settings);
+  g_free (name);
 }
 
 gboolean
