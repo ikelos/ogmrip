@@ -242,7 +242,7 @@ ogmrip_encoding_finalize (GObject *gobject)
   OGMRipEncoding *encoding = OGMRIP_ENCODING (gobject);
 
 #ifdef G_ENABLE_DEBUG
-  g_message ("Finalizing %s", G_OBJECT_TYPE_NAME (gobject));
+  g_debug ("Finalizing %s", G_OBJECT_TYPE_NAME (gobject));
 #endif
 
   ogmrip_encoding_close_log (encoding);

@@ -41,7 +41,7 @@ static void
 ogmdvd_subp_stream_finalize (GObject *gobject)
 {
 #ifdef G_ENABLE_DEBUG
-  // g_message ("Finalizing %s (%d)", G_OBJECT_TYPE_NAME (gobject), OGMDVD_SUBP_STREAM (gobject)->priv->id);
+  // g_debug ("Finalizing %s (%d)", G_OBJECT_TYPE_NAME (gobject), OGMDVD_SUBP_STREAM (gobject)->priv->id);
 #endif
 
   G_OBJECT_CLASS (ogmdvd_subp_stream_parent_class)->finalize (gobject);

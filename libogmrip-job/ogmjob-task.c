@@ -56,7 +56,7 @@ static void
 ogmjob_task_finalize (GObject *gobject)
 {
 #ifdef G_ENABLE_DEBUG
-  g_message ("Finalizing %s", G_OBJECT_TYPE_NAME (gobject));
+  g_debug ("Finalizing %s", G_OBJECT_TYPE_NAME (gobject));
 #endif
 
   G_OBJECT_CLASS (ogmjob_task_parent_class)->finalize (gobject);

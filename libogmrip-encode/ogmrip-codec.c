@@ -130,7 +130,7 @@ ogmrip_codec_dispose (GObject *gobject)
 static void
 ogmrip_codec_finalize (GObject *gobject)
 {
-  g_message ("Finalizing %s", G_OBJECT_TYPE_NAME (gobject));
+  g_debug ("Finalizing %s", G_OBJECT_TYPE_NAME (gobject));
 
   G_OBJECT_CLASS (ogmrip_codec_parent_class)->dispose (gobject);
 }

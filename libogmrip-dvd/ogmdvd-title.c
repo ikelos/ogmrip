@@ -96,7 +96,7 @@ ogmdvd_title_finalize (GObject *gobject)
   OGMDvdTitle *title = OGMDVD_TITLE (gobject);
 
 #ifdef G_ENABLE_DEBUG
-  g_message ("Finalizing %s (%d)", G_OBJECT_TYPE_NAME (gobject), OGMDVD_TITLE (gobject)->priv->nr);
+  g_debug ("Finalizing %s (%d)", G_OBJECT_TYPE_NAME (gobject), OGMDVD_TITLE (gobject)->priv->nr);
 #endif
 
   ogmdvd_title_close (OGMRIP_TITLE (title));

@@ -591,7 +591,7 @@ ogmdvd_disc_finalize (GObject *gobject)
   OGMDvdDisc *disc = OGMDVD_DISC (gobject);
 
 #ifdef G_ENABLE_DEBUG
-  g_message ("Finalizing %s", G_OBJECT_TYPE_NAME (gobject));
+  g_debug ("Finalizing %s", G_OBJECT_TYPE_NAME (gobject));
 #endif
 
   ogmdvd_disc_close (OGMRIP_MEDIA (disc));
