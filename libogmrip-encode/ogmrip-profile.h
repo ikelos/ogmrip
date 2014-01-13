@@ -60,7 +60,7 @@ GType           ogmrip_profile_get_type      (void);
 OGMRipProfile * ogmrip_profile_new           (const gchar   *name);
 OGMRipProfile * ogmrip_profile_new_from_file (GFile         *file,
                                               GError        **error);
-gboolean        ogmrip_profile_is_available  (OGMRipProfile *profile);
+gboolean        ogmrip_profile_is_valid      (OGMRipProfile *profile);
 OGMRipProfile * ogmrip_profile_copy          (OGMRipProfile *profile,
                                               gchar         *name);
 gboolean        ogmrip_profile_export        (OGMRipProfile *profile,

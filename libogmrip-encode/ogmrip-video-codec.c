@@ -518,6 +518,22 @@ ogmrip_video_codec_autosize (OGMRipVideoCodec *video)
   }
 }
 
+GType
+ogmrip_video_codec_get_default (GType container)
+{
+  GType *types;
+  guint i;
+
+  g_return_val_if_fail (g_type_is_a (container, OGMRIP_TYPE_CONTAINER), G_TYPE_NONE);
+
+  types = ogmrip_type_children (OGMRIP_TYPE_VIDEO_CODEC, NULL);
+  for (i = 0; types[i] != G_TYPE_NONE; i ++)
+    if (ogmrip_container_contains (container, types[i]))
+      return types[i];
+
+  return G_TYPE_NONE;
+}
+
 OGMRipCodec *
 ogmrip_video_codec_new (GType type, OGMRipVideoStream *stream)
 {

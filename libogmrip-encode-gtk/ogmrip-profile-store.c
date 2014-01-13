@@ -25,14 +25,14 @@
 struct _OGMRipProfileStorePriv
 {
   OGMRipProfileEngine *engine;
-  gboolean available_only;
+  gboolean valid_only;
 };
 
 enum
 {
   PROP_0,
   PROP_ENGINE,
-  PROP_AVAILABLE
+  PROP_VALID_ONLY
 };
 
 static const GType column_types[] =
@@ -155,8 +155,8 @@ ogmrip_profile_store_class_init (OGMRipProfileStoreClass *klass)
       g_param_spec_object ("engine", "engine", "engine", OGMRIP_TYPE_PROFILE_ENGINE,
         G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
 
-  g_object_class_install_property (gobject_class, PROP_AVAILABLE,
-      g_param_spec_boolean ("available-only", "available-only", "available-only", FALSE,
+  g_object_class_install_property (gobject_class, PROP_VALID_ONLY,
+      g_param_spec_boolean ("valid-only", "valid-only", "valid-only", FALSE,
         G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
 
   g_type_class_add_private (klass, sizeof (OGMRipProfileStorePriv));
@@ -228,8 +228,8 @@ ogmrip_profile_store_get_property (GObject *gobject, guint property_id, GValue *
     case PROP_ENGINE:
       g_value_set_object (value, store->priv->engine);
       break;
-    case PROP_AVAILABLE:
-      g_value_set_boolean (value, store->priv->available_only);
+    case PROP_VALID_ONLY:
+      g_value_set_boolean (value, store->priv->valid_only);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -247,8 +247,8 @@ ogmrip_profile_store_set_property (GObject *gobject, guint property_id, const GV
     case PROP_ENGINE:
       store->priv->engine = g_value_dup_object (value);
       break;
-    case PROP_AVAILABLE:
-      store->priv->available_only = g_value_get_boolean (value);
+    case PROP_VALID_ONLY:
+      store->priv->valid_only = g_value_get_boolean (value);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -257,11 +257,11 @@ ogmrip_profile_store_set_property (GObject *gobject, guint property_id, const GV
 }
 
 OGMRipProfileStore *
-ogmrip_profile_store_new (OGMRipProfileEngine *engine, gboolean available_only)
+ogmrip_profile_store_new (OGMRipProfileEngine *engine, gboolean valid_only)
 {
   g_return_val_if_fail (engine == NULL || OGMRIP_IS_PROFILE_ENGINE (engine), NULL);
 
-  return g_object_new (OGMRIP_TYPE_PROFILE_STORE, "engine", engine, "available-only", available_only, NULL);
+  return g_object_new (OGMRIP_TYPE_PROFILE_STORE, "engine", engine, "valid-only", valid_only, NULL);
 }
 
 void
@@ -275,7 +275,7 @@ ogmrip_profile_store_reload (OGMRipProfileStore *store)
 
   list = ogmrip_profile_engine_get_list (store->priv->engine);
   for (link = list; link; link = link->next)
-    if (!store->priv->available_only || ogmrip_profile_is_available (link->data))
+    if (!store->priv->valid_only || ogmrip_profile_is_valid (link->data))
       ogmrip_profile_store_add (store, link->data);
   g_slist_free (list);
 }

@@ -25,6 +25,7 @@
 
 #include "ogmrip-audio-codec.h"
 #include "ogmrip-profile-keys.h"
+#include "ogmrip-container.h"
 
 #include <ogmrip-base.h>
 
@@ -219,6 +220,22 @@ ogmrip_audio_codec_get_property (GObject *gobject, guint property_id, GValue *va
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
   }
+}
+
+GType
+ogmrip_audio_codec_get_default (GType container)
+{
+  GType *types;
+  guint i;
+
+  g_return_val_if_fail (g_type_is_a (container, OGMRIP_TYPE_CONTAINER), G_TYPE_NONE);
+
+  types = ogmrip_type_children (OGMRIP_TYPE_AUDIO_CODEC, NULL);
+  for (i = 0; types[i] != G_TYPE_NONE; i ++)
+    if (ogmrip_container_contains (container, types[i]))
+      return types[i];
+
+  return G_TYPE_NONE;
 }
 
 OGMRipCodec *

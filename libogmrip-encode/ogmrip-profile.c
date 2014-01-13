@@ -25,7 +25,9 @@
 #include "ogmrip-profile-keys.h"
 #include "ogmrip-profile-parser.h"
 #include "ogmrip-marshal.h"
-#include "ogmrip-codec.h"
+#include "ogmrip-video-codec.h"
+#include "ogmrip-audio-codec.h"
+#include "ogmrip-subp-codec.h"
 #include "ogmrip-container.h"
 #include "ogmrip-hardsub.h"
 
@@ -38,19 +40,12 @@
 
 struct _OGMRipProfilePriv
 {
-  gboolean available;
+  gboolean is_valid;
 
   GSettings *general_settings;
-  gchar *container;
-
   GSettings *video_settings;
-  gchar *video_codec;
-
   GSettings *audio_settings;
-  gchar *audio_codec;
-
   GSettings *subp_settings;
-  gchar *subp_codec;
 
   gchar *name, *path;
   GFile *file;
@@ -60,7 +55,8 @@ enum
 {
   PROP_0,
   PROP_NAME,
-  PROP_FILE
+  PROP_FILE,
+  PROP_VALID
 };
 
 static void ogmrip_profile_constructed  (GObject      *gobject);
@@ -105,64 +101,94 @@ ogmrip_profile_has_schema (const gchar *schema)
   return FALSE;
 }
 
-static gboolean
+static GType
+ogmrip_profile_get_container (OGMRipProfile *profile)
+{
+  GType gtype = G_TYPE_NONE;
+  gchar *name;
+
+  name = g_settings_get_string (profile->priv->general_settings, OGMRIP_PROFILE_CONTAINER);
+  if (name && *name)
+    gtype = ogmrip_type_from_name (name);
+  g_free (name);
+
+  return gtype;
+}
+
+static GType
+ogmrip_profile_get_video_codec (OGMRipProfile *profile)
+{
+  GType gtype = G_TYPE_NONE;
+  gchar *name;
+
+  name = g_settings_get_string (profile->priv->video_settings, OGMRIP_PROFILE_CODEC);
+  if (name && *name)
+    gtype = ogmrip_type_from_name (name);
+  g_free (name);
+
+  return gtype;
+}
+
+static GType
+ogmrip_profile_get_audio_codec (OGMRipProfile *profile)
+{
+  GType gtype = G_TYPE_NONE;
+  gchar *name;
+
+  name = g_settings_get_string (profile->priv->audio_settings, OGMRIP_PROFILE_CODEC);
+  if (name && *name)
+    gtype = ogmrip_type_from_name (name);
+  g_free (name);
+
+  return gtype;
+}
+
+static GType
+ogmrip_profile_get_subp_codec (OGMRipProfile *profile)
+{
+  GType gtype = G_TYPE_NONE;
+  gchar *name;
+
+  name = g_settings_get_string (profile->priv->subp_settings, OGMRIP_PROFILE_CODEC);
+  if (name && *name)
+    gtype = ogmrip_type_from_name (name);
+  g_free (name);
+
+  return gtype;
+}
+
+static void
 ogmrip_profile_check (OGMRipProfile *profile)
 {
   GType container, codec;
+  gboolean is_valid;
 
-  container = ogmrip_type_from_name (profile->priv->container);
-  if (container == G_TYPE_NONE)
-    return FALSE;
+  container = ogmrip_profile_get_container (profile);
+  is_valid = container != G_TYPE_NONE;
 
-  codec = ogmrip_type_from_name (profile->priv->video_codec);
-  if (codec == G_TYPE_NONE || !ogmrip_container_contains (container, ogmrip_codec_format (codec)))
-    return FALSE;
+  if (is_valid)
+  {
+    codec = ogmrip_profile_get_video_codec (profile);
+    is_valid = codec != G_TYPE_NONE && ogmrip_container_contains (container, ogmrip_codec_format (codec));
+  }
 
-  codec = ogmrip_type_from_name (profile->priv->audio_codec);
-  if (codec == G_TYPE_NONE || !ogmrip_container_contains (container, ogmrip_codec_format (codec)))
-    return FALSE;
+  if (is_valid)
+  {
+    codec = ogmrip_profile_get_audio_codec (profile);
+    is_valid = codec != G_TYPE_NONE && ogmrip_container_contains (container, ogmrip_codec_format (codec));
+  }
 
-  codec = ogmrip_type_from_name (profile->priv->subp_codec);
-  if (codec == G_TYPE_NONE || (codec != OGMRIP_TYPE_HARDSUB && !ogmrip_container_contains(container, ogmrip_codec_format (codec))))
-    return FALSE;
+  if (is_valid)
+  {
+    codec = ogmrip_profile_get_subp_codec (profile);
+    is_valid = codec != G_TYPE_NONE && (codec == OGMRIP_TYPE_HARDSUB || ogmrip_container_contains(container, ogmrip_codec_format (codec)));
+  }
 
-  return TRUE;
-}
-
-static void
-ogmrip_profile_update_container (OGMRipProfile *profile)
-{
-  g_free (profile->priv->container);
-  profile->priv->container = g_settings_get_string (profile->priv->general_settings, OGMRIP_PROFILE_CONTAINER);
-
-  profile->priv->available = ogmrip_profile_check (profile);
-}
-
-static void
-ogmrip_profile_update_video_codec (OGMRipProfile *profile)
-{
-  g_free (profile->priv->video_codec);
-  profile->priv->video_codec = g_settings_get_string (profile->priv->video_settings, OGMRIP_PROFILE_CODEC);
-
-  profile->priv->available = ogmrip_profile_check (profile);
-}
-
-static void
-ogmrip_profile_update_audio_codec (OGMRipProfile *profile)
-{
-  g_free (profile->priv->audio_codec);
-  profile->priv->audio_codec = g_settings_get_string (profile->priv->audio_settings, OGMRIP_PROFILE_CODEC);
-
-  profile->priv->available = ogmrip_profile_check (profile);
-}
-
-static void
-ogmrip_profile_update_subp_codec (OGMRipProfile *profile)
-{
-  g_free (profile->priv->subp_codec);
-  profile->priv->subp_codec = g_settings_get_string (profile->priv->subp_settings, OGMRIP_PROFILE_CODEC);
-
-  profile->priv->available = ogmrip_profile_check (profile);
+  if (profile->priv->is_valid != is_valid)
+  {
+    profile->priv->is_valid = is_valid;
+    g_object_notify (G_OBJECT (profile), "validity");
+  }
 }
 
 G_DEFINE_TYPE (OGMRipProfile, ogmrip_profile, G_TYPE_SETTINGS)
@@ -187,6 +213,10 @@ ogmrip_profile_class_init (OGMRipProfileClass *klass)
       g_param_spec_object ("file", "File property", "Get file",
         G_TYPE_FILE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
+  g_object_class_install_property (gobject_class, PROP_VALID,
+      g_param_spec_boolean ("validity", "Validity property", "Get validity",
+        FALSE, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
   g_type_class_add_private (klass, sizeof (OGMRipProfilePriv));
 }
 
@@ -200,33 +230,62 @@ static void
 ogmrip_profile_constructed (GObject *gobject)
 {
   OGMRipProfile *profile = OGMRIP_PROFILE (gobject);
+  GType container, codec;
   gchar *str;
 
   G_OBJECT_CLASS (ogmrip_profile_parent_class)->constructed (gobject);
 
   profile->priv->general_settings = g_settings_get_child (G_SETTINGS (profile), OGMRIP_PROFILE_GENERAL);
-  profile->priv->container = g_settings_get_string (profile->priv->general_settings, OGMRIP_PROFILE_CONTAINER);
+
+  container = ogmrip_profile_get_container (profile);
+  if (container == G_TYPE_NONE)
+  {
+    container = ogmrip_container_get_default ();
+    if (container != G_TYPE_NONE)
+      g_settings_set_string (profile->priv->general_settings, OGMRIP_PROFILE_CONTAINER, ogmrip_type_name (container));
+  }
 
   g_signal_connect_swapped (profile->priv->general_settings, "changed::" OGMRIP_PROFILE_CONTAINER,
-      G_CALLBACK (ogmrip_profile_update_container), profile);
+      G_CALLBACK (ogmrip_profile_check), profile);
 
   profile->priv->video_settings = g_settings_get_child (G_SETTINGS (profile), OGMRIP_PROFILE_VIDEO);
-  profile->priv->video_codec = g_settings_get_string (profile->priv->video_settings, OGMRIP_PROFILE_CODEC);
+
+  codec = ogmrip_profile_get_video_codec (profile);
+  if (codec == G_TYPE_NONE && container != G_TYPE_NONE)
+  {
+    codec = ogmrip_video_codec_get_default (container);
+    if (codec != G_TYPE_NONE)
+      g_settings_set_string (profile->priv->video_settings, OGMRIP_PROFILE_CODEC, ogmrip_type_name (codec));
+  }
 
   g_signal_connect_swapped (profile->priv->video_settings, "changed::" OGMRIP_PROFILE_CODEC,
-      G_CALLBACK (ogmrip_profile_update_video_codec), profile);
+      G_CALLBACK (ogmrip_profile_check), profile);
 
   profile->priv->audio_settings = g_settings_get_child (G_SETTINGS (profile), OGMRIP_PROFILE_AUDIO);
-  profile->priv->audio_codec = g_settings_get_string (profile->priv->audio_settings, OGMRIP_PROFILE_CODEC);
+
+  codec = ogmrip_profile_get_audio_codec (profile);
+  if (codec == G_TYPE_NONE && container != G_TYPE_NONE)
+  {
+    codec = ogmrip_audio_codec_get_default (container);
+    if (codec != G_TYPE_NONE)
+      g_settings_set_string (profile->priv->audio_settings, OGMRIP_PROFILE_CODEC, ogmrip_type_name (codec));
+  }
 
   g_signal_connect_swapped (profile->priv->audio_settings, "changed::" OGMRIP_PROFILE_CODEC,
-      G_CALLBACK (ogmrip_profile_update_audio_codec), profile);
+      G_CALLBACK (ogmrip_profile_check), profile);
 
   profile->priv->subp_settings = g_settings_get_child (G_SETTINGS (profile), OGMRIP_PROFILE_SUBP);
-  profile->priv->subp_codec = g_settings_get_string (profile->priv->subp_settings, OGMRIP_PROFILE_CODEC);
+
+  codec = ogmrip_profile_get_subp_codec (profile);
+  if (codec == G_TYPE_NONE && container != G_TYPE_NONE)
+  {
+    codec = ogmrip_subp_codec_get_default (container);
+    if (codec != G_TYPE_NONE)
+      g_settings_set_string (profile->priv->subp_settings, OGMRIP_PROFILE_CODEC, ogmrip_type_name (codec));
+  }
 
   g_signal_connect_swapped (profile->priv->subp_settings, "changed::" OGMRIP_PROFILE_CODEC,
-      G_CALLBACK (ogmrip_profile_update_subp_codec), profile);
+      G_CALLBACK (ogmrip_profile_check), profile);
 
   g_object_get (profile, "path", &profile->priv->path, NULL);
 
@@ -234,7 +293,7 @@ ogmrip_profile_constructed (GObject *gobject)
   profile->priv->name = g_path_get_basename (str);
   g_free (str);
 
-  profile->priv->available = ogmrip_profile_check (profile);
+  ogmrip_profile_check (profile);
 }
 
 static void
@@ -296,6 +355,9 @@ ogmrip_profile_get_property (GObject *gobject, guint property_id, GValue *value,
       break;
     case PROP_FILE:
       g_value_set_object (value, profile->priv->file);
+      break;
+    case PROP_VALID:
+      g_value_set_boolean (value, profile->priv->is_valid);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -613,6 +675,8 @@ ogmrip_profile_get_child_for_container (OGMRipProfile *profile, const gchar *con
 GSettings *
 ogmrip_profile_get_child (OGMRipProfile *profile, const gchar *name)
 {
+  GType gtype;
+
   if (g_str_equal (name, OGMRIP_PROFILE_GENERAL))
     return g_object_ref (profile->priv->general_settings);
 
@@ -625,38 +689,30 @@ ogmrip_profile_get_child (OGMRipProfile *profile, const gchar *name)
   if (g_str_equal (name, OGMRIP_PROFILE_SUBP))
     return g_object_ref (profile->priv->subp_settings);
 
-  if (!STRING_IS_DEFINED (profile->priv->container))
-    ogmrip_profile_update_container (profile);
+  gtype = ogmrip_type_from_name (name);
+  if (gtype == G_TYPE_NONE)
+    return NULL;
 
-  if (g_str_equal (name, profile->priv->container))
+  if (ogmrip_profile_get_container (profile) == gtype)
     return ogmrip_profile_get_child_for_container (profile, name);
 
-  if (!STRING_IS_DEFINED (profile->priv->video_codec))
-    ogmrip_profile_update_video_codec (profile);
-
-  if (g_str_equal (name, profile->priv->video_codec))
+  if (ogmrip_profile_get_video_codec (profile) == gtype)
     return ogmrip_profile_get_child_for_codec (profile, name);
 
-  if (!STRING_IS_DEFINED (profile->priv->audio_codec))
-    ogmrip_profile_update_audio_codec (profile);
-
-  if (g_str_equal (name, profile->priv->audio_codec))
+  if (ogmrip_profile_get_audio_codec (profile) == gtype)
     return ogmrip_profile_get_child_for_codec (profile, name);
 
-  if (!STRING_IS_DEFINED (profile->priv->subp_codec))
-    ogmrip_profile_update_subp_codec (profile);
-
-  if (g_str_equal (name, profile->priv->subp_codec))
+  if (ogmrip_profile_get_subp_codec (profile) == gtype)
     return ogmrip_profile_get_child_for_codec (profile, name);
 
   return NULL;
 }
 
 gboolean
-ogmrip_profile_is_available (OGMRipProfile *profile)
+ogmrip_profile_is_valid (OGMRipProfile *profile)
 {
   g_return_val_if_fail (OGMRIP_IS_PROFILE (profile), FALSE);
 
-  return profile->priv->available;
+  return profile->priv->is_valid;
 }
 

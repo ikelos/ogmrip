@@ -53,6 +53,7 @@ struct _OGMRipVideoCodecClass
 };
 
 GType               ogmrip_video_codec_get_type           (void);
+GType               ogmrip_video_codec_get_default        (GType             container);
 OGMRipCodec *       ogmrip_video_codec_new                (GType             type,
                                                            OGMRipVideoStream *stream);
 OGMRipCodec *       ogmrip_video_codec_new_from_profile   (OGMRipVideoStream *stream,

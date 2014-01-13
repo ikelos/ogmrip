@@ -48,6 +48,7 @@ struct _OGMRipAudioCodecClass
 };
 
 GType         ogmrip_audio_codec_get_type         (void);
+GType         ogmrip_audio_codec_get_default      (GType             container);
 OGMRipCodec * ogmrip_audio_codec_new              (GType             type,
                                                    OGMRipAudioStream *stream);
 OGMRipCodec * ogmrip_audio_codec_new_from_profile (OGMRipAudioStream *stream,

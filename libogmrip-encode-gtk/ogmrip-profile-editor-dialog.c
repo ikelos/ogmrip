@@ -438,7 +438,7 @@ ogmrip_profile_editor_set_passes_sensitivity (GBinding *binding, const GValue *s
   codec = ogmrip_type_chooser_widget_get_active (GTK_COMBO_BOX (dialog->priv->video_chooser));
 
   g_value_set_boolean (target_value, method != OGMRIP_ENCODING_QUANTIZER &&
-      ogmrip_codec_format (codec) != OGMRIP_FORMAT_COPY);
+      codec != G_TYPE_NONE && ogmrip_codec_format (codec) != OGMRIP_FORMAT_COPY);
 
   return TRUE;
 }

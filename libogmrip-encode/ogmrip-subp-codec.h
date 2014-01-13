@@ -49,6 +49,7 @@ struct _OGMRipSubpCodecClass
 };
 
 GType         ogmrip_subp_codec_get_type         (void);
+GType         ogmrip_subp_codec_get_default      (GType            container);
 OGMRipCodec * ogmrip_subp_codec_new              (GType            type,
                                                   OGMRipSubpStream *stream);
 OGMRipCodec * ogmrip_subp_codec_new_from_profile (OGMRipSubpStream *stream,

@@ -56,6 +56,7 @@ typedef void (* OGMRipContainerFunc) (OGMRipContainer  *container,
                                       gpointer         data);
 
 GType             ogmrip_container_get_type         (void);
+GType             ogmrip_container_get_default      (void);
 OGMRipContainer * ogmrip_container_new              (GType               type);
 OGMRipContainer * ogmrip_container_new_from_profile (OGMRipProfile       *profile);
 GFile *           ogmrip_container_get_output       (OGMRipContainer     *container);

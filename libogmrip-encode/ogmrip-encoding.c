@@ -210,11 +210,11 @@ ogmrip_encoding_constructed (GObject *gobject)
 
   if (!encoding->priv->container)
   {
-    GType *types;
+    GType type;
 
-    types = ogmrip_type_children (OGMRIP_TYPE_CONTAINER, NULL);
-    if (types[0] != G_TYPE_NONE)
-      encoding->priv->container = g_object_new (types[0], NULL);
+    type = ogmrip_container_get_default ();
+    if (type != G_TYPE_NONE)
+      encoding->priv->container = g_object_new (type, NULL);
   }
 
   (*G_OBJECT_CLASS (ogmrip_encoding_parent_class)->constructed) (gobject);
