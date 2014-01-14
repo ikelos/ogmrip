@@ -53,6 +53,7 @@ struct _OGMRipX264
   guint level_idc;
   guint me;
   guint merange;
+  guint profile;
   guint rc_lookahead;
   guint subq;
   guint trellis;
@@ -104,6 +105,7 @@ enum
   PROP_MERANGE,
   PROP_MIXED_REFS,
   PROP_PARTITIONS,
+  PROP_PROFILE,
   PROP_PSY_RD,
   PROP_PSY_TRELLIS,
   PROP_RC_LOOKAHEAD,
@@ -141,6 +143,13 @@ enum
   B_PYRAMID_NORMAL
 };
 
+enum
+{
+  PROFILE_BASELINE,
+  PROFILE_MAIN,
+  PROFILE_HIGH
+};
+
 static void     ogmrip_x264_finalize     (GObject      *gobject);
 static void     ogmrip_x264_notify       (GObject      *gobject,
                                           GParamSpec   *pspec);
@@ -174,6 +183,11 @@ static const gchar *b_pyramid_name[] =
 static const gchar *cqm_name[] =
 {
   "flat", "jvm"
+};
+
+static const gchar *profile_name[] =
+{
+  "baseline", "main", "high"
 };
 
 gboolean x264_have_8x8dct         = FALSE;
@@ -275,6 +289,9 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   quality = ogmrip_video_codec_get_quality (video);
   if (quality == OGMRIP_QUALITY_USER)
   {
+    g_string_append_printf (options, ":profile=%s",
+        profile_name[CLAMP (x264->profile, PROFILE_BASELINE, PROFILE_HIGH)]);
+
     g_string_append_printf (options, ":keyint=%u", x264->keyint);
     g_string_append_printf (options, ":cqm=%s", cqm_name[CLAMP (x264->cqm, 0, 1)]);
     g_string_append_printf (options, ":aq_mode=%u", x264->aq_mode);
@@ -285,6 +302,16 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
     g_string_append (options, x264->fast_pskip ? ":fast_pskip" : ":nofast_pskip");
     g_string_append (options, x264->force_cfr ? ":force_cfr" : ":noforce_cfr");
     g_string_append (options, x264->global_header ? ":global_header" : ":noglobal_header");
+
+    switch (x264->profile)
+    {
+      case 0:
+        break;
+      case 1:
+        break;
+      case 2:
+        break;
+    }
 
     if (x264_have_weight_p)
       g_string_append_printf (options, ":weightp=%d", CLAMP (x264->weight_p, 0, 2));
@@ -470,6 +497,8 @@ ogmrip_x264_configure (OGMRipConfigurable *configurable, OGMRipProfile *profile)
         ogmrip_x264_get_merange, NULL, NULL, NULL);
     g_settings_bind (settings, "mixed-refs", configurable, OGMRIP_X264_PROP_MIXED_REFS,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "profile", configurable, OGMRIP_X264_PROP_PROFILE,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
     g_settings_bind (settings, "psy-rd", configurable, OGMRIP_X264_PROP_PSY_RD,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
     g_settings_bind (settings, "psy-trellis", configurable, OGMRIP_X264_PROP_PSY_TRELLIS,
@@ -609,6 +638,10 @@ ogmrip_x264_class_init (OGMRipX264Class *klass)
       g_param_spec_string (OGMRIP_X264_PROP_PARTITIONS, "Partitions property", "Set partitions",
         OGMRIP_X264_DEFAULT_PARTITIONS, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
+  g_object_class_install_property (gobject_class, PROP_PROFILE,
+      g_param_spec_uint (OGMRIP_X264_PROP_PROFILE, "Profile property", "Set profile",
+        0, 2, OGMRIP_X264_DEFAULT_PROFILE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_property (gobject_class, PROP_PSY_RD,
       g_param_spec_double (OGMRIP_X264_PROP_PSY_RD, "Psy RD property", "Set psy-rd",
         0.0, 10.0, OGMRIP_X264_DEFAULT_PSY_RD, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
@@ -672,6 +705,7 @@ ogmrip_x264_init (OGMRipX264 *x264)
   x264->me = OGMRIP_X264_DEFAULT_ME;
   x264->merange = OGMRIP_X264_DEFAULT_MERANGE;
   x264->mixed_refs = OGMRIP_X264_DEFAULT_MIXED_REFS;
+  x264->profile = OGMRIP_X264_DEFAULT_PROFILE;
   x264->psy_rd = OGMRIP_X264_DEFAULT_PSY_RD;
   x264->psy_trellis = OGMRIP_X264_DEFAULT_PSY_TRELLIS;
   x264->rc_lookahead = OGMRIP_X264_DEFAULT_RC_LOOKAHEAD;
@@ -800,6 +834,9 @@ ogmrip_x264_get_property (GObject *gobject, guint property_id, GValue *value, GP
     case PROP_PARTITIONS:
       g_value_set_string (value, x264->partitions);
       break;
+    case PROP_PROFILE:
+      g_value_set_uint (value, x264->profile);
+      break;
     case PROP_PSY_RD:
       g_value_set_double (value, x264->psy_rd);
       break;
@@ -906,6 +943,9 @@ ogmrip_x264_set_property (GObject *gobject, guint property_id, const GValue *val
     case PROP_PARTITIONS:
       g_free (x264->partitions);
       x264->partitions = g_value_dup_string (value);
+      break;
+    case PROP_PROFILE:
+      x264->profile = g_value_get_uint (value);
       break;
     case PROP_PSY_RD:
       x264->psy_rd = g_value_get_double (value);

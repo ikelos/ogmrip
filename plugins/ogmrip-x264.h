@@ -44,6 +44,7 @@ G_BEGIN_DECLS
 #define OGMRIP_X264_PROP_MERANGE          "merange"
 #define OGMRIP_X264_PROP_MIXED_REFS       "mixed-refs"
 #define OGMRIP_X264_PROP_PARTITIONS       "partitions"
+#define OGMRIP_X264_PROP_PROFILE          "profile"
 #define OGMRIP_X264_PROP_PSY_RD           "psy-rd"
 #define OGMRIP_X264_PROP_PSY_TRELLIS      "psy-trellis"
 #define OGMRIP_X264_PROP_RC_LOOKAHEAD     "rc-lookahead"
@@ -75,6 +76,7 @@ G_BEGIN_DECLS
 #define OGMRIP_X264_DEFAULT_MERANGE       16
 #define OGMRIP_X264_DEFAULT_MIXED_REFS    TRUE
 #define OGMRIP_X264_DEFAULT_PARTITIONS    "p8x8,b8x8,i8x8,i4x4"
+#define OGMRIP_X264_DEFAULT_PROFILE       2
 #define OGMRIP_X264_DEFAULT_PSY_RD        1
 #define OGMRIP_X264_DEFAULT_PSY_TRELLIS   0.15
 #define OGMRIP_X264_DEFAULT_RC_LOOKAHEAD  40

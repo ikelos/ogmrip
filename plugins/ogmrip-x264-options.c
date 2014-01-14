@@ -39,9 +39,6 @@
 #define OGMRIP_IS_X264_DIALOG(obj)       (G_TYPE_CHECK_INSTANCE_TYPE ((obj), OGMRIP_TYPE_X264_DIALOG))
 #define OGMRIP_IS_X264_DIALOG_CLASS(obj) (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_X264_DIALOG))
 
-#define OGMRIP_X264_PROP_PROFILE      "profile"
-#define OGMRIP_X264_DEFAULT_PROFILE   HIGH
-
 typedef struct _OGMRipX264Dialog      OGMRipX264Dialog;
 typedef struct _OGMRipX264DialogClass OGMRipX264DialogClass;
 
