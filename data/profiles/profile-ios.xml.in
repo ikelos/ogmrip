@@ -6,9 +6,8 @@
   </section>
   <section name="video">
     <key name="codec">'x264'</key>
-    <key name="expand">true</key>
-    <key name="max-width">640</key>
-    <key name="max-height">480</key>
+    <key name="max-width">960</key>
+    <key name="max-height">640</key>
     <key name="quality">3</key>
   </section>
   <section name="audio">
@@ -18,24 +17,13 @@
   <section name="subp">
     <key name="codec">'srt'</key>
   </section>
+  <section name="mp4">
+    <key name="format">2</key>
+  </section>
   <section name="x264">
-    <key name="b-adapt">2</key>
-    <key name="b-frames">0</key>
-    <key name="b-pyramid">2</key>
-    <key name="cabac">false</key>
     <key name="dct8x8">false</key>
-    <key name="frameref">5</key>
     <key name="global-header">true</key>
-    <key name="level-idc">30</key>
-    <key name="me">3</key>
-    <key name="mixed-refs">true</key>
-    <key name="profile">0</key>
-    <key name="rc-lookahead">50</key>
-    <key name="subq">8</key>
-    <key name="trellis">1</key>
-    <key name="vbv-bufsize">10000</key>
-    <key name="vbv-maxrate">10000</key>
-    <key name="weight-b">true</key>
-    <key name="weight-p">0</key>
+    <key name="level-idc">31</key>
+    <key name="profile">1</key>
   </section>
 </profile>

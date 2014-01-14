@@ -18,6 +18,9 @@
   <section name="subp">
     <key name="codec">'srt'</key>
   </section>
+  <section name="mp4">
+    <key name="format">3</key>
+  </section>
   <section name="x264">
     <key name="b-adapt">2</key>
     <key name="b-frames">3</key>
