@@ -90,6 +90,12 @@ ogmrip_mp3_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input
     g_ptr_array_add (argv, g_strdup ("-s"));
     g_ptr_array_add (argv, g_strdup_printf ("%.1f",
           ogmrip_audio_codec_get_sample_rate (audio) / 1000.0));
+
+    if (ogmrip_audio_codec_get_channels (audio) == OGMRIP_CHANNELS_MONO)
+    {
+      g_ptr_array_add (argv, g_strdup ("-m"));
+      g_ptr_array_add (argv, g_strdup ("m"));
+    }
   }
 
   g_ptr_array_add (argv, g_strdup ("--preset"));
