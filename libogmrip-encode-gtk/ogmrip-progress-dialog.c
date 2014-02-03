@@ -217,7 +217,7 @@ ogmrip_progress_dialog_init (OGMRipProgressDialog *dialog)
   button = gtk_button_new_with_mnemonic (_("Resume"));
   gtk_dialog_add_action_widget (GTK_DIALOG (dialog), button, OGMRIP_RESPONSE_RESUME);
 
-  image = gtk_image_new_from_stock (GTK_STOCK_MEDIA_PLAY, GTK_ICON_SIZE_BUTTON);
+  image = gtk_image_new_from_icon_name ("media-playback-start", GTK_ICON_SIZE_BUTTON);
   gtk_button_set_image (GTK_BUTTON (button), image);
 
   action = gtk_action_group_get_action (action_group, "Resume");
@@ -230,7 +230,7 @@ ogmrip_progress_dialog_init (OGMRipProgressDialog *dialog)
 
   g_signal_connect_swapped (action, "activate", G_CALLBACK (ogmrip_progress_dialog_suspend), dialog);
 
-  image = gtk_image_new_from_stock (GTK_STOCK_MEDIA_PAUSE, GTK_ICON_SIZE_BUTTON);
+  image = gtk_image_new_from_icon_name ("media-playback-pause", GTK_ICON_SIZE_BUTTON);
   gtk_button_set_image (GTK_BUTTON (button), image);
 
   action = gtk_action_group_get_action (action_group, "Suspend");

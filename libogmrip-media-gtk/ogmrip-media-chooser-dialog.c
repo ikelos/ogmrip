@@ -144,14 +144,14 @@ ogmrip_media_chooser_dialog_init (OGMRipMediaChooserDialog *dialog)
   g_signal_connect_swapped (dialog->priv->eject_button, "clicked",
       G_CALLBACK (ogmrip_media_chooser_dialog_eject_clicked), dialog);
 
-  image = gtk_image_new_from_stock (GTK_STOCK_REFRESH, GTK_ICON_SIZE_BUTTON);
+  image = gtk_image_new_from_icon_name ("view-refresh", GTK_ICON_SIZE_BUTTON);
   gtk_button_set_image (GTK_BUTTON (dialog->priv->eject_button), image);
 
   dialog->priv->load_button = gtk_button_new_with_mnemonic (_("_Load"));
   gtk_dialog_add_action_widget (GTK_DIALOG (dialog), dialog->priv->load_button, GTK_RESPONSE_OK);
   gtk_widget_show (dialog->priv->load_button);
 
-  image = gtk_image_new_from_stock (GTK_STOCK_CDROM, GTK_ICON_SIZE_BUTTON);
+  image = gtk_image_new_from_icon_name ("media-optical", GTK_ICON_SIZE_BUTTON);
   gtk_button_set_image (GTK_BUTTON (dialog->priv->load_button), image);
 
   area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));

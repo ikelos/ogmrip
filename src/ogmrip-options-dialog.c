@@ -678,7 +678,7 @@ ogmrip_options_dialog_constructed (GObject *gobject)
     gtk_widget_set_sensitive (widget, FALSE);
     gtk_widget_show (widget);
 
-    image = gtk_image_new_from_stock (GTK_STOCK_ADD, GTK_ICON_SIZE_BUTTON);
+    image = gtk_image_new_from_icon_name ("list-add", GTK_ICON_SIZE_BUTTON);
     gtk_button_set_image (GTK_BUTTON (widget), image);
 
     widget = gtk_button_new_with_mnemonic (_("E_xtract"));
@@ -687,7 +687,7 @@ ogmrip_options_dialog_constructed (GObject *gobject)
     gtk_widget_set_sensitive (widget, FALSE);
     gtk_widget_show (widget);
 
-    image = gtk_image_new_from_stock (GTK_STOCK_CONVERT, GTK_ICON_SIZE_BUTTON);
+    image = gtk_image_new_from_icon_name ("system-run", GTK_ICON_SIZE_BUTTON);
     gtk_button_set_image (GTK_BUTTON (widget), image);
 
     gtk_dialog_set_default_response (GTK_DIALOG (dialog), OGMRIP_RESPONSE_EXTRACT);

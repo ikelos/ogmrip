@@ -1689,7 +1689,7 @@ ogmrip_gui_player_play (OGMRipPlayer *player, GtkWidget *button)
   image = gtk_bin_get_child (GTK_BIN (button));
   gtk_container_remove (GTK_CONTAINER (button), image);
 
-  image = gtk_image_new_from_stock (GTK_STOCK_MEDIA_STOP, GTK_ICON_SIZE_MENU);
+  image = gtk_image_new_from_icon_name ("media-playback-stop", GTK_ICON_SIZE_MENU);
 
   gtk_container_add (GTK_CONTAINER (button), image);
   gtk_widget_show (image);
@@ -1706,7 +1706,7 @@ ogmrip_gui_player_stop (OGMRipPlayer *player, GtkWidget *button)
   image = gtk_bin_get_child (GTK_BIN (button));
   gtk_container_remove (GTK_CONTAINER (button), image);
 
-  image = gtk_image_new_from_stock (GTK_STOCK_MEDIA_PLAY, GTK_ICON_SIZE_MENU);
+  image = gtk_image_new_from_icon_name ("media-playback-start", GTK_ICON_SIZE_MENU);
 
   gtk_container_add (GTK_CONTAINER (button), image);
   gtk_widget_show (image);
