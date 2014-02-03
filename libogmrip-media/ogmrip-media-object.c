@@ -259,7 +259,10 @@ ogmrip_media_new (const gchar *path)
 
   for (i = 0; types[i] != G_TYPE_NONE; i ++)
   {
-    media = g_object_new (types[i], "uri", path, NULL);
+    if (g_type_is_a (types[i], G_TYPE_INITABLE))
+      media = g_initable_new (types[i], NULL, NULL, "uri", path, NULL);
+    else
+      media = g_object_new (types[i], "uri", path, NULL);
     if (media)
       break;
   }

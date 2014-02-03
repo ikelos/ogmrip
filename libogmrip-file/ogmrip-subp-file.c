@@ -22,13 +22,12 @@
 
 #include <stdlib.h>
 
-static void ogmrip_subp_iface_init (OGMRipSubpStreamInterface *iface);
-static GObject * ogmrip_subp_file_constructor  (GType type,
-                                                guint n_properties,
-                                                GObjectConstructParam *properties);
+static void g_initable_iface_init         (GInitableIface            *iface);
+static void ogmrip_subp_stream_iface_init (OGMRipSubpStreamInterface *iface);
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipSubpFile, ogmrip_subp_file, OGMRIP_TYPE_FILE,
-    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_SUBP_STREAM, ogmrip_subp_iface_init));
+    G_IMPLEMENT_INTERFACE (G_TYPE_INITABLE, g_initable_iface_init)
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_SUBP_STREAM, ogmrip_subp_stream_iface_init));
 
 static void
 ogmrip_subp_file_init (OGMRipSubpFile *stream)
@@ -39,70 +38,57 @@ ogmrip_subp_file_init (OGMRipSubpFile *stream)
 static void
 ogmrip_subp_file_class_init (OGMRipSubpFileClass *klass)
 {
-  GObjectClass *gobject_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->constructor = ogmrip_subp_file_constructor;
-
   g_type_class_add_private (klass, sizeof (OGMRipSubpFilePriv));
 }
 
-static GObject *
-ogmrip_subp_file_constructor (GType type, guint n_properties, GObjectConstructParam *properties)
+static gboolean
+ogmrip_subp_file_initable_init (GInitable *initable, GCancellable *cancellable, GError **error)
 {
   GFile *file;
-  GObject *gobject;
   OGMRipMediaInfo *info;
   const gchar *str;
 
-  gobject = G_OBJECT_CLASS (ogmrip_subp_file_parent_class)->constructor (type, n_properties, properties);
-
   info = ogmrip_media_info_get_default ();
-  if (!info || !OGMRIP_FILE (gobject)->priv->path)
-  {
-    g_object_unref (gobject);
-    return NULL;
-  }
+  if (!info || !OGMRIP_FILE (initable)->priv->path)
+    return FALSE;
 
-  file = g_file_new_for_path (OGMRIP_FILE (gobject)->priv->path);
-  OGMRIP_FILE (gobject)->priv->id = g_file_get_id (file);
+  file = g_file_new_for_path (OGMRIP_FILE (initable)->priv->path);
+  OGMRIP_FILE (initable)->priv->id = g_file_get_id (file);
   g_object_unref (file);
 
-  if (!OGMRIP_FILE (gobject)->priv->id)
-  {
-    g_object_unref (gobject);
-    return NULL;
-  }
+  if (!OGMRIP_FILE (initable)->priv->id)
+    return FALSE;
 
-  if (!ogmrip_media_info_open (info, OGMRIP_FILE (gobject)->priv->path))
-  {
-    g_object_unref (gobject);
-    return NULL;
-  }
+  if (!ogmrip_media_info_open (info, OGMRIP_FILE (initable)->priv->path))
+    return FALSE;
 
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "TextCount");
   if (!str || !g_str_equal (str, "1"))
   {
     g_object_unref (info);
-    g_object_unref (gobject);
-    return NULL;
+    return FALSE;
   }
 
-  OGMRIP_FILE (gobject)->priv->format = ogmrip_media_info_get_subp_format (info, 0);
-  if (OGMRIP_FILE (gobject)->priv->format < 0)
+  OGMRIP_FILE (initable)->priv->format = ogmrip_media_info_get_subp_format (info, 0);
+  if (OGMRIP_FILE (initable)->priv->format < 0)
   {
     g_object_unref (info);
-    g_object_unref (gobject);
-    return NULL;
+    return FALSE;
   }
-  ogmrip_media_info_get_file_info (info, OGMRIP_FILE (gobject)->priv);
-  ogmrip_media_info_get_subp_info (info, 0, OGMRIP_SUBP_FILE (gobject)->priv);
+  ogmrip_media_info_get_file_info (info, OGMRIP_FILE (initable)->priv);
+  ogmrip_media_info_get_subp_info (info, 0, OGMRIP_SUBP_FILE (initable)->priv);
 
-  OGMRIP_FILE (gobject)->priv->title_size = OGMRIP_SUBP_FILE (gobject)->priv->size;
+  OGMRIP_FILE (initable)->priv->title_size = OGMRIP_SUBP_FILE (initable)->priv->size;
 
   ogmrip_media_info_close (info);
 
-  return gobject;
+  return TRUE;
+}
+
+static void
+g_initable_iface_init (GInitableIface *iface)
+{
+  iface->init = ogmrip_subp_file_initable_init;
 }
 
 static const gchar *
@@ -118,7 +104,7 @@ ogmrip_subp_file_get_language (OGMRipSubpStream *subp)
 }
 
 static void
-ogmrip_subp_iface_init (OGMRipSubpStreamInterface *iface)
+ogmrip_subp_stream_iface_init (OGMRipSubpStreamInterface *iface)
 {
   iface->get_label    = ogmrip_subp_file_get_label;
   iface->get_language = ogmrip_subp_file_get_language;
@@ -129,7 +115,7 @@ ogmrip_subp_file_new (const gchar *uri)
 {
   g_return_val_if_fail (uri != NULL, NULL);
 
-  return g_object_new (OGMRIP_TYPE_SUBP_FILE, "uri", uri, NULL);
+  return g_initable_new (OGMRIP_TYPE_SUBP_FILE, NULL, NULL, "uri", uri, NULL);
 }
 
 void
