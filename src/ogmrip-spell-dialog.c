@@ -199,7 +199,7 @@ ogmrip_spell_dialog_init (OGMRipSpellDialog *dialog)
   }
 
   gtk_dialog_add_buttons (GTK_DIALOG (dialog),
-      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+      _("_Cancel"), GTK_RESPONSE_CANCEL,
       NULL);
   gtk_window_set_title (GTK_WINDOW (dialog), _("Spell Checking"));
 

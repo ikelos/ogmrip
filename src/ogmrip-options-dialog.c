@@ -665,12 +665,12 @@ ogmrip_options_dialog_constructed (GObject *gobject)
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
 
   if (ogmrip_encoding_get_profile (dialog->priv->encoding))
-    gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE);
+    gtk_dialog_add_button (GTK_DIALOG (dialog), _("_Close"), GTK_RESPONSE_CLOSE);
   else
   {
     GtkWidget *image;
 
-    gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT);
+    gtk_dialog_add_button (GTK_DIALOG (dialog), _("_Cancel"), GTK_RESPONSE_REJECT);
 
     widget = gtk_button_new_with_mnemonic (_("En_queue"));
     gtk_dialog_add_action_widget (GTK_DIALOG (dialog), widget, OGMRIP_RESPONSE_ENQUEUE);

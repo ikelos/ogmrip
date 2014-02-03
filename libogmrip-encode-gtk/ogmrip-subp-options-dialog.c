@@ -193,7 +193,7 @@ ogmrip_subp_options_dialog_init (OGMRipSubpOptionsDialog *dialog)
     return;
   }
 
-  gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE);
+  gtk_dialog_add_button (GTK_DIALOG (dialog), _("_Close"), GTK_RESPONSE_CLOSE);
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
 
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);

@@ -203,7 +203,7 @@ ogmrip_lavc_dialog_init (OGMRipLavcDialog *dialog)
   GtkWidget *misc, *widget;
 
   gtk_dialog_add_buttons (GTK_DIALOG (dialog),
-      GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
+      _("_Close"), GTK_RESPONSE_CLOSE,
       NULL);
   gtk_window_set_title (GTK_WINDOW (dialog), _("Lavc Options"));
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);

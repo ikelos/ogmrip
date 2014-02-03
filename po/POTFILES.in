@@ -20,6 +20,8 @@ data/ui/ogmrip.desktop.in
 libogmrip-base/ogmrip-fs.c
 libogmrip-base/ogmrip-xml.c
 
+libogmrip-media/ogmrip-media-object.c
+
 libogmrip-dvd/ogmdvd-disc.c
 libogmrip-dvd/ogmdvd-title.c
 

@@ -173,8 +173,8 @@ ogmrip_crop_dialog_init (OGMRipCropDialog *dialog)
     g_error ("Couldn't load builder file: %s", error->message);
 
   gtk_dialog_add_buttons (GTK_DIALOG (dialog),
-      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-      GTK_STOCK_OK, GTK_RESPONSE_OK,
+      _("_Cancel"), GTK_RESPONSE_CANCEL,
+      _("_OK"), GTK_RESPONSE_OK,
       NULL);
   gtk_window_set_title (GTK_WINDOW (dialog), _("Cropping"));
 

@@ -133,7 +133,7 @@ ogmrip_media_chooser_dialog_init (OGMRipMediaChooserDialog *dialog)
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
   gtk_window_set_modal (GTK_WINDOW (dialog), TRUE);
 
-  gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
+  gtk_dialog_add_button (GTK_DIALOG (dialog), _("_Cancel"), GTK_RESPONSE_CANCEL);
 
   area = gtk_dialog_get_action_area (GTK_DIALOG (dialog));
 

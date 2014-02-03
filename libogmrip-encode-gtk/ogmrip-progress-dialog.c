@@ -58,9 +58,9 @@ static void ogmrip_progress_dialog_dispose (GObject *gobject);
 
 static const GtkActionEntry action_entries[] =
 {
-  { "Suspend", GTK_STOCK_MEDIA_PAUSE, N_("Suspend"), NULL, NULL, NULL },
-  { "Resume",  GTK_STOCK_MEDIA_PLAY,  N_("Resume"),  NULL, NULL, NULL },
-  { "Cancel",  GTK_STOCK_CANCEL,      NULL,          NULL, NULL, NULL },
+  { "Suspend", NULL, N_("Suspend"), NULL, NULL, NULL },
+  { "Resume",  NULL, N_("Resume"),  NULL, NULL, NULL },
+  { "Cancel",  NULL, N_("_Cancel"), NULL, NULL, NULL },
 };
 
 static const char *ui_description =
@@ -236,7 +236,7 @@ ogmrip_progress_dialog_init (OGMRipProgressDialog *dialog)
   action = gtk_action_group_get_action (action_group, "Suspend");
   g_object_bind_property (button, "visible", action, "visible", G_BINDING_SYNC_CREATE);
 
-  gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
+  gtk_dialog_add_button (GTK_DIALOG (dialog), _("_Cancel"), GTK_RESPONSE_CANCEL);
 
   action = gtk_action_group_get_action (action_group, "Cancel");
 

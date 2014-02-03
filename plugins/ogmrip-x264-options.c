@@ -502,7 +502,7 @@ ogmrip_x264_dialog_init (OGMRipX264Dialog *dialog)
   GtkWidget *misc, *widget;
 
   gtk_dialog_add_buttons (GTK_DIALOG (dialog),
-      GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
+      _("_Close"), GTK_RESPONSE_CLOSE,
       NULL);
   gtk_window_set_title (GTK_WINDOW (dialog), _("X264 Options"));
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);

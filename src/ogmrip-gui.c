@@ -196,7 +196,7 @@ ogmrip_gui_open_media (OGMRipData *data, OGMRipMedia *media)
 
   dialog = gtk_dialog_new_with_buttons (_("Opening media"),
       GTK_WINDOW (data->window), GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, NULL);
+      _("_Cancel"), GTK_RESPONSE_CANCEL, NULL);
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
 
   area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
@@ -1488,7 +1488,7 @@ ogmrip_gui_import_chapters_activated (OGMRipData *data)
 
   dialog = gtk_file_chooser_dialog_new (_("Select a chapters file"),
       GTK_WINDOW (data->window), GTK_FILE_CHOOSER_ACTION_OPEN,
-      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_OK, NULL);
+      _("_Cancel"), GTK_RESPONSE_CANCEL, _("_Open"), GTK_RESPONSE_OK, NULL);
 
   filter = gtk_file_filter_new ();
   gtk_file_filter_add_mime_type (filter, "text/*");
@@ -1527,7 +1527,7 @@ ogmrip_gui_export_chapters_activated (OGMRipData *data)
 
   dialog = gtk_file_chooser_dialog_new (_("Select a file"),
       GTK_WINDOW (data->window), GTK_FILE_CHOOSER_ACTION_SAVE,
-      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_SAVE, GTK_RESPONSE_OK, NULL);
+      _("_Cancel"), GTK_RESPONSE_CANCEL, _("_Save"), GTK_RESPONSE_OK, NULL);
   gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog), TRUE);
 
   if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_OK)

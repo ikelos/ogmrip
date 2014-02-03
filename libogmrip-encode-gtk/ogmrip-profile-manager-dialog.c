@@ -98,8 +98,8 @@ ogmrip_profile_manager_dialog_run_profile_dialog (GtkWindow *parent, const gchar
   gchar *new_name = NULL;
 
   dialog = gtk_dialog_new_with_buttons (old_name ? _("Rename profile") : _("New profile"), NULL,
-      GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT, GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
-      GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, NULL);
+      GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT, _("_Cancel"), GTK_RESPONSE_REJECT,
+      _("_OK"), GTK_RESPONSE_ACCEPT, NULL);
 
   gtk_dialog_set_response_sensitive (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT, FALSE);
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
@@ -298,8 +298,8 @@ ogmrip_profile_manager_dialog_export_activated (OGMRipProfileManagerDialog *pare
 
       dialog = gtk_file_chooser_dialog_new (_("Export Profile"),
           GTK_WINDOW (parent), GTK_FILE_CHOOSER_ACTION_SAVE,
-          GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
-          GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
+          _("_Cancel"), GTK_RESPONSE_REJECT,
+          _("_Save"), GTK_RESPONSE_ACCEPT,
           NULL);
       gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog), TRUE);
 
@@ -328,8 +328,8 @@ ogmrip_profile_manager_dialog_import_activated (OGMRipProfileManagerDialog *pare
 
   dialog = gtk_file_chooser_dialog_new (_("Select profile to import"),
       GTK_WINDOW (parent), GTK_FILE_CHOOSER_ACTION_OPEN,
-      GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
-      GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT,
+      _("_Cancel"), GTK_RESPONSE_REJECT,
+      _("_Open"), GTK_RESPONSE_ACCEPT,
       NULL);
 
   if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
@@ -406,7 +406,7 @@ ogmrip_profile_manager_dialog_init (OGMRipProfileManagerDialog *dialog)
   if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_UI_FILE, &error))
     g_error ("Couldn't load builder file: %s", error->message);
 
-  gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE);
+  gtk_dialog_add_button (GTK_DIALOG (dialog), _("_Close"), GTK_RESPONSE_CLOSE);
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
   gtk_window_set_default_size (GTK_WINDOW (dialog), 450, -1);
   gtk_window_set_title (GTK_WINDOW (dialog), _("Edit Profiles"));

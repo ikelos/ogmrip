@@ -407,8 +407,8 @@ ogmrip_encoding_manager_dialog_import_activated (OGMRipEncodingManagerDialog *pa
 
   dialog = gtk_file_chooser_dialog_new (_("Import Encoding"),
       GTK_WINDOW (parent), GTK_FILE_CHOOSER_ACTION_OPEN,
-      GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
-      GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
+      _("_Cancel"), GTK_RESPONSE_REJECT,
+      _("_Save"), GTK_RESPONSE_ACCEPT,
       NULL);
 
   if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_ACCEPT)
@@ -470,8 +470,8 @@ ogmrip_encoding_manager_dialog_export_activated (OGMRipEncodingManagerDialog *pa
 
     dialog = gtk_file_chooser_dialog_new (_("Export Encoding"),
         GTK_WINDOW (parent), GTK_FILE_CHOOSER_ACTION_SAVE,
-        GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
-        GTK_STOCK_SAVE, GTK_RESPONSE_ACCEPT,
+        _("_Cancel"), GTK_RESPONSE_REJECT,
+        _("_Save"), GTK_RESPONSE_ACCEPT,
         NULL);
     gtk_file_chooser_set_do_overwrite_confirmation (GTK_FILE_CHOOSER (dialog), TRUE);
 
@@ -608,8 +608,8 @@ ogmrip_encoding_manager_dialog_init (OGMRipEncodingManagerDialog *dialog)
     return;
   }
 
-  gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE);
-  gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_EXECUTE, GTK_RESPONSE_ACCEPT);
+  gtk_dialog_add_button (GTK_DIALOG (dialog), _("_Close"), GTK_RESPONSE_CLOSE);
+  gtk_dialog_add_button (GTK_DIALOG (dialog), _("_Execute"), GTK_RESPONSE_ACCEPT);
 
   gtk_window_set_title (GTK_WINDOW (dialog), _("Encoding Manager"));
   gtk_window_set_default_size (GTK_WINDOW (dialog), 500, 300);

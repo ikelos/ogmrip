@@ -399,7 +399,7 @@ ogmrip_media_chooser_widget_select_file (GtkComboBox *combo, gboolean file)
 
   dialog = gtk_file_chooser_dialog_new (file ? _("Select an media file") : _("Select a media directory"),
       NULL, file ? GTK_FILE_CHOOSER_ACTION_OPEN : GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
-      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_OK, NULL);
+      _("_Cancel"), GTK_RESPONSE_CANCEL, _("_Open"), GTK_RESPONSE_OK, NULL);
 
   toplevel = gtk_widget_get_toplevel (GTK_WIDGET (combo));
   if (gtk_widget_is_toplevel (toplevel) && GTK_IS_WINDOW (toplevel))

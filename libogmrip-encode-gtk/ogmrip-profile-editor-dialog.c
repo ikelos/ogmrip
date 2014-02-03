@@ -534,7 +534,7 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
       G_CALLBACK (ogmrip_profile_editor_reset_button_clicked), dialog);
 
   gtk_dialog_add_buttons (GTK_DIALOG (dialog),
-      GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
+      _("_Close"), GTK_RESPONSE_CLOSE,
       NULL);
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
   gtk_container_set_border_width (GTK_CONTAINER (dialog), 6);
