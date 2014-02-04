@@ -29,7 +29,7 @@
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 
-#define OGMRIP_UI_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-crop-dialog.ui"
+#define OGMRIP_UI_RES  "/org/ogmrip/ogmrip-crop-dialog.ui"
 #define OGMRIP_UI_ROOT "root"
 
 #define SCALE_FACTOR 2 / 3
@@ -169,7 +169,7 @@ ogmrip_crop_dialog_init (OGMRipCropDialog *dialog)
   dialog->priv = OGMRIP_CROP_DIALOG_GET_PRIVATE (dialog);
 
   builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_UI_FILE, &error))
+  if (!gtk_builder_add_from_resource (builder, OGMRIP_UI_RES, &error))
     g_error ("Couldn't load builder file: %s", error->message);
 
   gtk_dialog_add_buttons (GTK_DIALOG (dialog),

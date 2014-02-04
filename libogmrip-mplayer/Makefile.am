@@ -27,11 +27,12 @@ libogmrip_mplayer_la_HEADERS = \
   ogmrip-mplayer.h
 
 INCLUDES = \
-  -I$(top_srcdir)/libogmrip-base  \
-  -I$(top_srcdir)/libogmrip-job   \
-  -I$(top_srcdir)/libogmrip-media \
-  -I$(top_srcdir)/libogmrip-file  \
-  -I$(top_srcdir)/libogmrip-encode
+  -I$(top_srcdir)/libogmrip-base   \
+  -I$(top_srcdir)/libogmrip-job    \
+  -I$(top_srcdir)/libogmrip-media  \
+  -I$(top_srcdir)/libogmrip-file   \
+  -I$(top_srcdir)/libogmrip-encode \
+  -I$(top_builddir)/libogmrip-encode
 
 if MAINTAINER_MODE
 INCLUDES += \

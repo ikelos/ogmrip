@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/org/ogmrip">
+    <file preprocess="xml-stripblanks">ogmrip-lavc-options-dialog.ui</file>
+  </gresource>
+</gresources>

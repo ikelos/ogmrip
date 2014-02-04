@@ -30,7 +30,7 @@
 
 #include <stdlib.h>
 
-#define OGMRIP_UI_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-options-dialog.ui"
+#define OGMRIP_UI_RES  "/org/ogmrip/ogmrip-options-dialog.ui"
 #define OGMRIP_UI_ROOT "root"
 
 #define ROUND(x) ((gint) ((x) + 0.5) != (gint) (x) ? ((gint) ((x) + 0.5)) : ((gint) (x)))
@@ -658,7 +658,7 @@ ogmrip_options_dialog_constructed (GObject *gobject)
     g_error ("No encoding has been specified");
 
   builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_UI_FILE, &error))
+  if (!gtk_builder_add_from_resource (builder, OGMRIP_UI_RES, &error))
     g_error ("Couldn't load builder file: %s", error->message);
 
   gtk_window_set_title (GTK_WINDOW (dialog), _("Options"));

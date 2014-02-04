@@ -6,6 +6,8 @@ ogmrip_SOURCES = \
   ogmrip-cli.c   \
   ogmrip-main.c
 
+resourcefiles =
+
 if HAVE_GTK_SUPPORT
 ogmrip_SOURCES += \
   ogmrip-crop-dialog.c    \
@@ -14,9 +16,34 @@ ogmrip_SOURCES += \
   ogmrip-options-dialog.c \
   ogmrip-pref-dialog.c    \
   ogmrip-spell-dialog.c
+
+resourcefiles += \
+  ogmrip.gresource.xml
 endif
 
+ogmrip_RESOURCES = \
+  $(resourcefiles:.gresource.xml=-gresource.c)
+
+ogmrip_SOURCES += \
+  $(ogmrip_RESOURCES)
+
+BUILT_SOURCES = \
+  $(ogmrip_RESOURCES)
+
+ui_FILES = \
+  ogmrip-crop-dialog.ui    \
+  ogmrip-main-window.ui    \
+  ogmrip-menu.ui           \
+  ogmrip-options-dialog.ui \
+  ogmrip-pref-dialog.ui    \
+  ogmrip-spell-dialog.ui
+
+ogmrip-gresource.c: ogmrip.gresource.xml $(ui_FILES) $(GLIB_COMPILE_RESOURCES)
+	$(GLIB_COMPILE_RESOURCES) --sourcedir=$(top_srcdir)/src --generate-source --target=$@ $<
+
 EXTRA_DIST = \
+  $(ui_FILES)             \
+  $(resourcefiles)        \
   ogmrip-application.h    \
   ogmrip-cli.h            \
   ogmrip-crop-dialog.h    \
@@ -52,8 +79,8 @@ INCLUDES = \
   -I$(top_srcdir)/libogmrip-dvd        \
   -I$(top_srcdir)/libogmrip-encode     \
   -I$(top_srcdir)/libogmrip-module     \
+  -I$(top_srcdir)/libogmrip-mplayer    \
   -I$(top_builddir)/libogmrip-encode   \
-  -I$(top_builddir)/libogmrip-mplayer  \
   -DOGMRIP_DATA_DIR=\""$(datadir)"\"   \
   -DOGMRIP_LIB_DIR=\""$(libdir)"\"
 
@@ -70,5 +97,6 @@ INCLUDES += \
 endif
 
 CLEANFILES = \
-  $(BUILT_SOURCES) *~ *.bak
+  $(ogmrip_RESOURCES) \
+  *~ *.bak
 

@@ -26,7 +26,7 @@
 
 #include <glib/gi18n-lib.h>
 
-#define OGMRIP_UI_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-encoding-manager-dialog.ui"
+#define OGMRIP_UI_RES  "/org/ogmrip/ogmrip-encoding-manager-dialog.ui"
 #define OGMRIP_UI_ROOT "root"
 
 #define gtk_builder_get_widget(builder, name) \
@@ -600,7 +600,7 @@ ogmrip_encoding_manager_dialog_init (OGMRipEncodingManagerDialog *dialog)
       OGMRIP_TYPE_ENCODING_MANAGER_DIALOG, OGMRipEncodingManagerDialogPriv);
 
   builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_UI_FILE, &error))
+  if (!gtk_builder_add_from_resource (builder, OGMRIP_UI_RES, &error))
   {
     g_warning ("Couldn't load builder file: %s", error->message);
     g_object_unref (builder);

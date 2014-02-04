@@ -26,7 +26,7 @@
 
 #include <glib/gi18n-lib.h>
 
-#define OGMRIP_UI_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-profile-editor.ui"
+#define OGMRIP_UI_RES  "/org/ogmrip/ogmrip-profile-editor-dialog.ui"
 #define OGMRIP_UI_ROOT "root"
 
 #define gtk_builder_get_widget(builder, name) \
@@ -541,7 +541,7 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
 
   builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_UI_FILE, &error))
+  if (!gtk_builder_add_from_resource (builder, OGMRIP_UI_RES, &error))
     g_error ("Couldn't load builder file: %s", error->message);
 
   misc = gtk_dialog_get_content_area (GTK_DIALOG (dialog));

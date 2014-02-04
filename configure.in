@@ -374,6 +374,7 @@ fi
 dnl **************************************************************
 
 AC_PATH_PROG(GLIB_GENMARSHAL, glib-genmarshal)
+AC_PATH_PROG(GLIB_COMPILE_RESOURCES, glib-compile-resources)
 
 dnl **************************************************************
 

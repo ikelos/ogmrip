@@ -51,6 +51,27 @@ libogmrip_encode_gtk_la_LIBADD = \
   $(top_builddir)/libogmrip-job/libogmrip-job.la             \
   $(top_builddir)/libogmrip-encode/libogmrip-encode.la
 
+resourcefiles = \
+  ogmrip-encode.gresource.xml
+
+ogmrip_RESOURCES = \
+  $(resourcefiles:.gresource.xml=-gresource.c)
+
+libogmrip_encode_gtk_la_SOURCES += \
+  $(ogmrip_RESOURCES)
+
+BUILT_SOURCES = \
+  $(ogmrip_RESOURCES)
+
+ui_FILES = \
+  ogmrip-profile-editor-dialog.ui   \
+  ogmrip-profile-manager-dialog.ui  \
+  ogmrip-progress-dialog.ui         \
+  ogmrip-encoding-manager-dialog.ui
+
+ogmrip-encode-gresource.c: ogmrip-encode.gresource.xml $(ui_FILES) $(GLIB_COMPILE_RESOURCES)
+	$(GLIB_COMPILE_RESOURCES) --sourcedir=$(top_srcdir)/libogmrip-encode-gtk --generate-source --target=$@ $<
+
 INCLUDES = \
   -I$(top_srcdir)/libogmrip-base      \
   -I$(top_srcdir)/libogmrip-job       \
@@ -60,9 +81,15 @@ INCLUDES = \
   -I$(top_srcdir)/libogmrip-file-gtk  \
   -I$(top_srcdir)/libogmrip-dvd       \
   -I$(top_srcdir)/libogmrip-encode    \
+  -I$(top_builddir)/libogmrip-encode  \
   -DOGMRIP_LIB_DIR=\""$(libdir)"\"    \
   -DOGMRIP_DATA_DIR=\""$(datadir)"\"
 
-EXTRA_DIST = \
+CLEANFILES = \
+  $(BUILT_SOURCES)
+
+EXTRA_DIST =  \
+  $(ui_FILES) \
+  $(resourcefiles) \
   ogmrip-type-chooser-widget.h
 

@@ -1,22 +1,3 @@
-uidir = \
-  $(datadir)/ogmrip/ui
-
-ui_DATA = \
-  ogmrip-menu.ui                    \
-  ogmrip-crop-dialog.ui             \
-  ogmrip-main-window.ui             \
-  ogmrip-options-dialog.ui          \
-  ogmrip-pref-dialog.ui             \
-  ogmrip-profile-editor.ui          \
-  ogmrip-profile-manager-dialog.ui  \
-  ogmrip-progress-dialog.ui         \
-  ogmrip-encoding-manager-dialog.ui \
-  ogmrip-spell-dialog.ui            \
-  ogmrip-lavc-options-dialog.ui     \
-  ogmrip-x264-options-dialog.ui     \
-  ogmrip-xvid-options-dialog.ui     \
-	ogmrip-mp4-options-dialog.ui
-
 pixmapdir = \
   $(datadir)/pixmaps
 
@@ -35,7 +16,6 @@ desktop_DATA = \
 @INTLTOOL_DESKTOP_RULE@
 
 EXTRA_DIST =     \
-  $(ui_DATA)     \
   $(pixmap_DATA) \
   $(desktopfile)
 

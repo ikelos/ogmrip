@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/org/ogmrip">
+    <file preprocess="xml-stripblanks">ogmrip-encoding-manager-dialog.ui</file>
+  </gresource>
+  <gresource prefix="/org/ogmrip">
+    <file preprocess="xml-stripblanks">ogmrip-profile-editor-dialog.ui</file>
+  </gresource>
+  <gresource prefix="/org/ogmrip">
+    <file preprocess="xml-stripblanks">ogmrip-profile-manager-dialog.ui</file>
+  </gresource>
+  <gresource prefix="/org/ogmrip">
+    <file preprocess="xml-stripblanks">ogmrip-progress-dialog.ui</file>
+  </gresource>
+</gresources>

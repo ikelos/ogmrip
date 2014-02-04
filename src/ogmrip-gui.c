@@ -46,8 +46,8 @@ static gboolean debug = TRUE;
 static gboolean debug = FALSE;
 #endif
 
-#define OGMRIP_MENU_FILE "ogmrip"  G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-menu.ui"
-#define OGMRIP_UI_FILE   "ogmrip"  G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-main-window.ui"
+#define OGMRIP_UI_RES    "/org/ogmrip/ogmrip-main-window.ui"
+#define OGMRIP_MENU_RES  "/org/ogmrip/ogmrip-menu.ui"
 #define OGMRIP_ICON_FILE "pixmaps" G_DIR_SEPARATOR_S "ogmrip.png"
 
 #define OGMRIP_DEFAULT_FILE_NAME "movie"
@@ -1749,7 +1749,7 @@ ogmrip_gui_create (GApplication *app)
   GAction *action;
 
   builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_UI_FILE, &error))
+  if (!gtk_builder_add_from_resource (builder, OGMRIP_UI_RES, &error))
     g_error ("Couldn't load builder file: %s", error->message);
 
   data = g_new0 (OGMRipData, 1);
@@ -1995,7 +1995,7 @@ ogmrip_gui_startup_cb (GApplication *app)
   GObject *menu;
 
   builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_MENU_FILE, &error))
+  if (!gtk_builder_add_from_resource (builder, OGMRIP_MENU_RES, &error))
     g_error ("Couldn't load builder file: %s", error->message);
 
   g_action_map_add_action_entries (G_ACTION_MAP (app),

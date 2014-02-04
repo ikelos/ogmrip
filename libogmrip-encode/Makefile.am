@@ -79,11 +79,12 @@ EXTRA_DIST = \
   ogmrip-version.h.in
 
 INCLUDES = \
-  -I$(top_srcdir)/libogmrip-base   \
-  -I$(top_srcdir)/libogmrip-job    \
-  -I$(top_srcdir)/libogmrip-media  \
-  -I$(top_srcdir)/libogmrip-file   \
-  -I$(top_srcdir)/libogmrip-dvd    \
+  -I$(top_srcdir)/libogmrip-base     \
+  -I$(top_srcdir)/libogmrip-job      \
+  -I$(top_srcdir)/libogmrip-media    \
+  -I$(top_srcdir)/libogmrip-file     \
+  -I$(top_srcdir)/libogmrip-dvd      \
+  -I$(top_builddir)/libogmrip-encode \
   -DOGMRIP_LIB_DIR=\""$(libdir)"\" \
   -DOGMRIP_DATA_DIR=\""$(datadir)"\"
 
