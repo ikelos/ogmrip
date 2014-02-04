@@ -34,6 +34,3 @@ INCLUDES = \
   -DOGMRIP_LIB_DIR=\""$(libdir)"\"    \
   -DOGMRIP_DATA_DIR=\""$(datadir)"\"
 
-CLEANFILES = \
-  $(BUILT_SOURCES)
-

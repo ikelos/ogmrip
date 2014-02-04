@@ -66,6 +66,3 @@ INCLUDES = \
 EXTRA_DIST = \
   ogmrip-type-chooser-widget.h
 
-CLEANFILES = \
-  $(BUILT_SOURCES)
-
