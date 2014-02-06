@@ -31,13 +31,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipLanguageChooserWidget      OGMRipLanguageChooserWidget;
 typedef struct _OGMRipLanguageChooserWidgetClass OGMRipLanguageChooserWidgetClass;
-typedef struct _OGMRipLanguageChooserWidgetPriv  OGMRipLanguageChooserWidgetPriv;
+typedef struct _OGMRipLanguageChooserWidgetPriv  OGMRipLanguageChooserWidgetPrivate;
 
 struct _OGMRipLanguageChooserWidget
 {
   GtkComboBox parent_instance;
 
-  OGMRipLanguageChooserWidgetPriv *priv;
+  OGMRipLanguageChooserWidgetPrivate *priv;
 };
 
 struct _OGMRipLanguageChooserWidgetClass
