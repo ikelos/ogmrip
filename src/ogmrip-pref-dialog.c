@@ -30,6 +30,22 @@
 #define OGMRIP_UI_RES  "/org/ogmrip/ogmrip-pref-dialog.ui"
 #define OGMRIP_UI_ROOT "root"
 
+struct _OGMRipPrefDialogPriv
+{
+  GtkWidget *general_page;
+  GtkWidget *audio_lang_chooser;
+  GtkWidget *subp_lang_chooser;
+  GtkWidget *chapters_lang_chooser;
+  GtkWidget *output_dir_chooser;
+  GtkWidget *tmp_dir_chooser;
+  GtkWidget *filename_combo;
+  GtkWidget *after_enc_combo;
+  GtkWidget *threads_spin;
+  GtkWidget *copy_dvd_check;
+  GtkWidget *keep_tmp_check;
+  GtkWidget *log_check;
+};
+
 extern GSettings *settings;
 
 static void
@@ -104,157 +120,102 @@ ogmrip_pref_dialog_disconnect (GtkWidget *widget, GCallback callback)
   g_signal_handlers_disconnect_by_func (settings, callback, widget);
 }
 
-G_DEFINE_TYPE (OGMRipPrefDialog, ogmrip_pref_dialog, GTK_TYPE_DIALOG)
+G_DEFINE_TYPE_WITH_PRIVATE (OGMRipPrefDialog, ogmrip_pref_dialog, GTK_TYPE_DIALOG)
 
 static void
 ogmrip_pref_dialog_class_init (OGMRipPrefDialogClass *klass)
 {
+  gtk_widget_class_set_template_from_resource (GTK_WIDGET_CLASS (klass), OGMRIP_UI_RES);
+
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipPrefDialog, general_page);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipPrefDialog, audio_lang_chooser);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipPrefDialog, subp_lang_chooser);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipPrefDialog, chapters_lang_chooser);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipPrefDialog, output_dir_chooser);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipPrefDialog, tmp_dir_chooser);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipPrefDialog, filename_combo);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipPrefDialog, after_enc_combo);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipPrefDialog, threads_spin);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipPrefDialog, copy_dvd_check);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipPrefDialog, keep_tmp_check);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipPrefDialog, log_check);
 }
 
 static void
 ogmrip_pref_dialog_init (OGMRipPrefDialog *dialog)
 {
-  GError *error = NULL;
-
-  GtkBuilder *builder;
-  GtkWidget *area, *widget, *chooser;
-
   GtkTreeModel *model;
   GtkTreeIter iter;
 
-  builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_resource (builder, OGMRIP_UI_RES, &error))
-    g_error ("Couldn't load builder file: %s", error->message);
+  gtk_widget_init_template (GTK_WIDGET (dialog));
 
-  gtk_dialog_add_buttons (GTK_DIALOG (dialog), _("_Close"), GTK_RESPONSE_CLOSE, NULL);
-  gtk_container_set_border_width (GTK_CONTAINER (dialog), 6);
+  dialog->priv = ogmrip_pref_dialog_get_instance_private (dialog);
+
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
-  gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
-  gtk_window_set_title (GTK_WINDOW (dialog), _("Preferences"));
 
-  area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
-
-  widget = gtk_builder_get_widget (builder, OGMRIP_UI_ROOT);
-  gtk_container_add (GTK_CONTAINER (area), widget);
-  gtk_widget_show (widget);
-
-  /*
-   * General
-   */
-
-  widget = gtk_builder_get_widget (builder, "output-dir-chooser");
-
-  ogmrip_pref_dialog_folder_setting_changed (widget, OGMRIP_SETTINGS_OUTPUT_DIR);
-
-  g_signal_connect (widget, "current-folder-changed",
-      G_CALLBACK (ogmrip_pref_dialog_folder_chooser_changed), OGMRIP_SETTINGS_OUTPUT_DIR);
-  g_signal_connect_swapped (settings, "changed::" OGMRIP_SETTINGS_OUTPUT_DIR,
-      G_CALLBACK (ogmrip_pref_dialog_folder_setting_changed), widget);
-  g_signal_connect (widget, "destroy",
-      G_CALLBACK (ogmrip_pref_dialog_disconnect), ogmrip_pref_dialog_folder_setting_changed);
-
-  gtk_file_chooser_set_action (GTK_FILE_CHOOSER (widget), 
-      GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
-
-  widget = gtk_builder_get_widget (builder, "filename-combo");
-  g_settings_bind (settings, OGMRIP_SETTINGS_FILENAME, widget, "active", G_SETTINGS_BIND_DEFAULT);
-
-  area = gtk_builder_get_widget (builder, "general-page");
-
-  chooser = ogmrip_language_chooser_widget_new ();
-  gtk_grid_attach (GTK_GRID (area), chooser, 1, 4, 1, 1);
-  gtk_widget_set_hexpand (chooser, TRUE);
-  gtk_widget_show (chooser);
-
-  model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
+  model = gtk_combo_box_get_model (GTK_COMBO_BOX (dialog->priv->audio_lang_chooser));
   gtk_list_store_append (GTK_LIST_STORE (model), &iter);
   gtk_list_store_set (GTK_LIST_STORE (model), &iter,
       OGMRIP_LANGUAGE_STORE_NAME_COLUMN, _("No favorite audio language"),
       OGMRIP_LANGUAGE_STORE_CODE_COLUMN, 0, -1);
 
-  ogmrip_pref_dialog_lang_setting_changed (chooser, OGMRIP_SETTINGS_PREF_AUDIO);
-
-  g_signal_connect (chooser, "changed",
-      G_CALLBACK (ogmrip_pref_dialog_lang_chooser_changed), OGMRIP_SETTINGS_PREF_AUDIO);
-  g_signal_connect_swapped (settings, "changed::" OGMRIP_SETTINGS_PREF_AUDIO,
-      G_CALLBACK (ogmrip_pref_dialog_lang_setting_changed), chooser);
-  g_signal_connect (chooser, "destroy",
-      G_CALLBACK (ogmrip_pref_dialog_disconnect), ogmrip_pref_dialog_lang_setting_changed);
-
-  chooser = ogmrip_language_chooser_widget_new ();
-  gtk_grid_attach (GTK_GRID (area), chooser, 1, 5, 1, 1);
-  gtk_widget_set_hexpand (chooser, TRUE);
-  gtk_widget_show (chooser);
-
-  model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
+  model = gtk_combo_box_get_model (GTK_COMBO_BOX (dialog->priv->subp_lang_chooser));
   gtk_list_store_append (GTK_LIST_STORE (model), &iter);
   gtk_list_store_set (GTK_LIST_STORE (model), &iter,
       OGMRIP_LANGUAGE_STORE_NAME_COLUMN, _("No favorite subtitle language"),
       OGMRIP_LANGUAGE_STORE_CODE_COLUMN, 0, -1);
 
-  ogmrip_pref_dialog_lang_setting_changed (chooser, OGMRIP_SETTINGS_PREF_SUBP);
-
-  g_signal_connect (chooser, "changed",
-      G_CALLBACK (ogmrip_pref_dialog_lang_chooser_changed), OGMRIP_SETTINGS_PREF_SUBP);
-  g_signal_connect_swapped (settings, "changed::" OGMRIP_SETTINGS_PREF_SUBP,
-      G_CALLBACK (ogmrip_pref_dialog_lang_setting_changed), chooser);
-  g_signal_connect (chooser, "destroy",
-      G_CALLBACK (ogmrip_pref_dialog_disconnect), ogmrip_pref_dialog_lang_setting_changed);
-
-  chooser = ogmrip_language_chooser_widget_new ();
-  gtk_grid_attach (GTK_GRID (area), chooser, 1, 6, 1, 1);
-  gtk_widget_set_hexpand (chooser, TRUE);
-  gtk_widget_show (chooser);
-
-  model = gtk_combo_box_get_model (GTK_COMBO_BOX (chooser));
+  model = gtk_combo_box_get_model (GTK_COMBO_BOX (dialog->priv->chapters_lang_chooser));
   gtk_list_store_append (GTK_LIST_STORE (model), &iter);
   gtk_list_store_set (GTK_LIST_STORE (model), &iter,
       OGMRIP_LANGUAGE_STORE_NAME_COLUMN, _("No chapters language"),
       OGMRIP_LANGUAGE_STORE_CODE_COLUMN, 0, -1);
 
-  ogmrip_pref_dialog_lang_setting_changed (chooser, OGMRIP_SETTINGS_CHAPTER_LANG);
+  ogmrip_pref_dialog_folder_setting_changed (dialog->priv->output_dir_chooser, OGMRIP_SETTINGS_OUTPUT_DIR);
 
-  g_signal_connect (chooser, "changed",
-      G_CALLBACK (ogmrip_pref_dialog_lang_chooser_changed), OGMRIP_SETTINGS_CHAPTER_LANG);
-  g_signal_connect_swapped (settings, "changed::" OGMRIP_SETTINGS_CHAPTER_LANG,
-      G_CALLBACK (ogmrip_pref_dialog_lang_setting_changed), chooser);
-  g_signal_connect (chooser, "destroy",
-      G_CALLBACK (ogmrip_pref_dialog_disconnect), ogmrip_pref_dialog_lang_setting_changed);
-
-  /*
-   * Advanced
-   */
-
-  widget = gtk_builder_get_widget (builder, "copy-dvd-check");
-  g_settings_bind (settings, OGMRIP_SETTINGS_COPY_DVD, widget, "active", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "after-enc-combo");
-  g_settings_bind (settings, OGMRIP_SETTINGS_AFTER_ENC, widget, "active", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "threads-spin");
-  g_settings_bind (settings, OGMRIP_SETTINGS_THREADS, widget, "value", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "keep-tmp-check");
-  g_settings_bind (settings, OGMRIP_SETTINGS_KEEP_TMP, widget, "active", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "log-check");
-  g_settings_bind (settings, OGMRIP_SETTINGS_LOG_OUTPUT, widget, "active", G_SETTINGS_BIND_DEFAULT);
-
-  widget = gtk_builder_get_widget (builder, "tmp-dir-chooser");
-
-  ogmrip_pref_dialog_folder_setting_changed (widget, OGMRIP_SETTINGS_TMP_DIR);
-
-  g_signal_connect (widget, "current-folder-changed",
-      G_CALLBACK (ogmrip_pref_dialog_folder_chooser_changed), OGMRIP_SETTINGS_TMP_DIR);
-  g_signal_connect_swapped (settings, "changed::" OGMRIP_SETTINGS_TMP_DIR,
-      G_CALLBACK (ogmrip_pref_dialog_folder_setting_changed), widget);
-  g_signal_connect (widget, "destroy",
+  g_signal_connect (dialog->priv->output_dir_chooser, "current-folder-changed",
+      G_CALLBACK (ogmrip_pref_dialog_folder_chooser_changed), OGMRIP_SETTINGS_OUTPUT_DIR);
+  g_signal_connect_swapped (settings, "changed::" OGMRIP_SETTINGS_OUTPUT_DIR,
+      G_CALLBACK (ogmrip_pref_dialog_folder_setting_changed), dialog->priv->output_dir_chooser);
+  g_signal_connect (dialog->priv->output_dir_chooser, "destroy",
       G_CALLBACK (ogmrip_pref_dialog_disconnect), ogmrip_pref_dialog_folder_setting_changed);
 
-  gtk_file_chooser_set_action (GTK_FILE_CHOOSER (widget), 
-      GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER);
+  ogmrip_pref_dialog_folder_setting_changed (dialog->priv->tmp_dir_chooser, OGMRIP_SETTINGS_TMP_DIR);
 
-  g_object_unref (builder);
+  g_signal_connect (dialog->priv->tmp_dir_chooser, "current-folder-changed",
+      G_CALLBACK (ogmrip_pref_dialog_folder_chooser_changed), OGMRIP_SETTINGS_TMP_DIR);
+  g_signal_connect_swapped (settings, "changed::" OGMRIP_SETTINGS_TMP_DIR,
+      G_CALLBACK (ogmrip_pref_dialog_folder_setting_changed), dialog->priv->tmp_dir_chooser);
+  g_signal_connect (dialog->priv->tmp_dir_chooser, "destroy",
+      G_CALLBACK (ogmrip_pref_dialog_disconnect), ogmrip_pref_dialog_folder_setting_changed);
+
+  g_settings_bind (settings, OGMRIP_SETTINGS_PREF_AUDIO,
+                   dialog->priv->audio_lang_chooser, "language",
+                   G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (settings, OGMRIP_SETTINGS_PREF_SUBP,
+                   dialog->priv->subp_lang_chooser, "language",
+                   G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (settings, OGMRIP_SETTINGS_CHAPTER_LANG,
+                   dialog->priv->chapters_lang_chooser, "language",
+                   G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (settings, OGMRIP_SETTINGS_FILENAME,
+                   dialog->priv->filename_combo, "active",
+                   G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (settings, OGMRIP_SETTINGS_COPY_DVD,
+                   dialog->priv->copy_dvd_check, "active",
+                   G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (settings, OGMRIP_SETTINGS_AFTER_ENC,
+                   dialog->priv->after_enc_combo, "active",
+                   G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (settings, OGMRIP_SETTINGS_THREADS,
+                   dialog->priv->threads_spin, "value",
+                   G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (settings, OGMRIP_SETTINGS_KEEP_TMP,
+                   dialog->priv->keep_tmp_check, "active",
+                   G_SETTINGS_BIND_DEFAULT);
+  g_settings_bind (settings, OGMRIP_SETTINGS_LOG_OUTPUT,
+                   dialog->priv->log_check, "active",
+                   G_SETTINGS_BIND_DEFAULT);
 }
 
 GtkWidget *
