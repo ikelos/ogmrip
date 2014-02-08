@@ -74,14 +74,24 @@ ogmrip_language_chooser_widget_dispose (GObject *gobject)
 }
 
 static void
+ogmrip_language_chooser_widget_changed (GtkComboBox *combo_box)
+{
+  g_object_notify (G_OBJECT (combo_box), "language");
+}
+
+static void
 ogmrip_language_chooser_widget_class_init (OGMRipLanguageChooserWidgetClass *klass)
 {
   GObjectClass *gobject_class;
+  GtkComboBoxClass *combo_box_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->get_property = ogmrip_language_chooser_widget_get_property;
   gobject_class->set_property = ogmrip_language_chooser_widget_set_property;
   gobject_class->dispose      = ogmrip_language_chooser_widget_dispose;
+
+  combo_box_class = GTK_COMBO_BOX_CLASS (klass);
+  combo_box_class->changed = ogmrip_language_chooser_widget_changed;
 
   g_object_class_install_property (gobject_class, PROP_LANG,
       g_param_spec_uint ("language", "Language property", "Language property",
