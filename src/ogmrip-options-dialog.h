@@ -38,13 +38,13 @@ enum
 
 typedef struct _OGMRipOptionsDialog      OGMRipOptionsDialog;
 typedef struct _OGMRipOptionsDialogClass OGMRipOptionsDialogClass;
-typedef struct _OGMRipOptionsDialogPriv  OGMRipOptionsDialogPriv;
+typedef struct _OGMRipOptionsDialogPriv  OGMRipOptionsDialogPrivate;
 
 struct _OGMRipOptionsDialog
 {
   GtkDialog parent_instance;
 
-  OGMRipOptionsDialogPriv *priv;
+  OGMRipOptionsDialogPrivate *priv;
 };
 
 struct _OGMRipOptionsDialogClass
