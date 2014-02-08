@@ -31,13 +31,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipSpellDialog      OGMRipSpellDialog;
 typedef struct _OGMRipSpellDialogClass OGMRipSpellDialogClass;
-typedef struct _OGMRipSpellDialogPriv  OGMRipSpellDialogPriv;
+typedef struct _OGMRipSpellDialogPriv  OGMRipSpellDialogPrivate;
 
 struct _OGMRipSpellDialog
 {
   GtkDialog parent_instance;
 
-  OGMRipSpellDialogPriv *priv;
+  OGMRipSpellDialogPrivate *priv;
 };
 
 struct _OGMRipSpellDialogClass
