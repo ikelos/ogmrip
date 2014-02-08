@@ -147,6 +147,8 @@ ogmrip_pref_dialog_init (OGMRipPrefDialog *dialog)
   GtkTreeModel *model;
   GtkTreeIter iter;
 
+  g_type_ensure (OGMRIP_TYPE_LANGUAGE_CHOOSER_WIDGET);
+
   gtk_widget_init_template (GTK_WIDGET (dialog));
 
   dialog->priv = ogmrip_pref_dialog_get_instance_private (dialog);
