@@ -30,6 +30,9 @@ G_BEGIN_DECLS
 #define gtk_builder_get_widget(builder, name) \
     (GtkWidget *) gtk_builder_get_object ((builder), (name))
 
+#define gtk_widget_get_template_widget(widget, name) \
+    (GtkWidget *) gtk_widget_get_template_child ((widget), G_TYPE_FROM_INSTANCE ((widget)), (name))
+
 gboolean ogmrip_open_title (GtkWindow   *parent,
                             OGMRipTitle *title,
                             GError      **error);
