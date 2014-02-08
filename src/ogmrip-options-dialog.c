@@ -35,9 +35,6 @@
 
 #define ROUND(x) ((gint) ((x) + 0.5) != (gint) (x) ? ((gint) ((x) + 0.5)) : ((gint) (x)))
 
-#define OGMRIP_OPTIONS_DIALOG_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_OPTIONS_DIALOG, OGMRipOptionsDialogPriv))
-
 enum
 {
   PROP_0,

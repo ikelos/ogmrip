@@ -34,9 +34,6 @@
 
 #define SCALE_FACTOR 2 / 3
 
-#define OGMRIP_CROP_DIALOG_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_CROP_DIALOG, OGMRipCropDialogPriv))
-
 struct _OGMRipCropDialogPriv
 {
   OGMRipTitle *title;
