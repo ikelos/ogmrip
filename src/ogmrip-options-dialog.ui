@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.16.0 on Sat Feb  8 14:15:30 2014 -->
+<!-- Generated with glade 3.16.0 on Sat Feb  8 15:20:26 2014 -->
 <interface>
-  <!-- interface-requires OGMRipEncode 0.0 -->
   <!-- interface-requires gtk+ 3.10 -->
+  <!-- interface-requires OGMRipEncode 0.0 -->
   <object class="GtkAdjustment" id="scale_height_adj">
     <property name="upper">10000</property>
     <property name="step_increment">1</property>
@@ -70,7 +70,7 @@
             <property name="can_focus">False</property>
             <property name="layout_style">end</property>
             <child>
-              <object class="GtkButton" id="close-button">
+              <object class="GtkButton" id="close_button">
                 <property name="label">gtk-close</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -84,7 +84,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="cancel-button">
+              <object class="GtkButton" id="cancel_button">
                 <property name="label">gtk-cancel</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -98,7 +98,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="enqueue-button">
+              <object class="GtkButton" id="enqueue_button">
                 <property name="label" translatable="yes">En_queue</property>
                 <property name="visible">True</property>
                 <property name="sensitive">False</property>
@@ -113,7 +113,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="extract-button">
+              <object class="GtkButton" id="extract_button">
                 <property name="label" translatable="yes">E_xtract</property>
                 <property name="visible">True</property>
                 <property name="sensitive">False</property>
@@ -621,10 +621,10 @@
       </object>
     </child>
     <action-widgets>
-      <action-widget response="-7">close-button</action-widget>
-      <action-widget response="-6">cancel-button</action-widget>
-      <action-widget response="1">enqueue-button</action-widget>
-      <action-widget response="0">extract-button</action-widget>
+      <action-widget response="-7">close_button</action-widget>
+      <action-widget response="-6">cancel_button</action-widget>
+      <action-widget response="1">enqueue_button</action-widget>
+      <action-widget response="0">extract_button</action-widget>
     </action-widgets>
   </template>
 </interface>

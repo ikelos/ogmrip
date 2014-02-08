@@ -621,7 +621,25 @@ ogmrip_options_dialog_set_property (GObject *gobject, guint property_id, const G
 static void
 ogmrip_options_dialog_constructed (GObject *gobject)
 {
-  ogmrip_options_dialog_update_scale_combo (OGMRIP_OPTIONS_DIALOG (gobject));
+  OGMRipOptionsDialog *dialog = OGMRIP_OPTIONS_DIALOG (gobject);
+  OGMRipProfile *profile;
+  GtkWidget *button;
+
+  profile = ogmrip_encoding_get_profile (dialog->priv->encoding);
+
+  button = gtk_dialog_get_widget_for_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
+  gtk_widget_set_visible (button, profile != NULL);
+
+  button = gtk_dialog_get_widget_for_response (GTK_DIALOG (dialog), GTK_RESPONSE_CANCEL);
+  gtk_widget_set_visible (button, profile == NULL);
+
+  button = gtk_dialog_get_widget_for_response (GTK_DIALOG (dialog), OGMRIP_RESPONSE_EXTRACT);
+  gtk_widget_set_visible (button, profile == NULL);
+
+  button = gtk_dialog_get_widget_for_response (GTK_DIALOG (dialog), OGMRIP_RESPONSE_ENQUEUE);
+  gtk_widget_set_visible (button, profile == NULL);
+
+  ogmrip_options_dialog_update_scale_combo (dialog);
 
   G_OBJECT_CLASS (ogmrip_options_dialog_parent_class)->constructed (gobject);
 }
