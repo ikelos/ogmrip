@@ -203,7 +203,7 @@ ogmrip_type_add_extension (GType gtype, GType extension)
   GList *values, *link;
 
   G_LOCK (table);
-  values = g_hash_table_get_values (table);
+  values = table ? g_hash_table_get_values (table) : NULL;
   G_UNLOCK (table);
 
   for (link = values; link; link = link->next)
@@ -296,22 +296,22 @@ ogmrip_type_children (GType gtype, guint *n)
   GHashTableIter iter;
   OGMRipTypeInfo *info;
 
-  if (!table)
-    return NULL;
-
   types = g_array_new (FALSE, FALSE, sizeof (GType));
 
-  G_LOCK (table);
+  if (table)
+  {
+    G_LOCK (table);
 
-  g_hash_table_iter_init (&iter, table);
-  while (g_hash_table_iter_next (&iter, NULL, (gpointer*) &info))
-    if (g_type_is_a (*(info->priv->gtype), gtype))
-      g_array_append_val (types, *(info->priv->gtype));
+    g_hash_table_iter_init (&iter, table);
+    while (g_hash_table_iter_next (&iter, NULL, (gpointer*) &info))
+      if (g_type_is_a (*(info->priv->gtype), gtype))
+        g_array_append_val (types, *(info->priv->gtype));
+
+    G_UNLOCK (table);
+  }
 
   gtype = G_TYPE_NONE;
   g_array_append_val (types, gtype);
-
-  G_UNLOCK (table);
 
   if (n)
     *n = types->len;
