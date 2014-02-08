@@ -12,6 +12,6 @@ Name: ogmrip-encode
 Description: A library for media ripping and encoding.
 Requires: ogmrip-base ogmrip-job ogmrip-media ogmrip-file ogmrip-dvd enca
 Version: @VERSION@
-Libs: -L${libdir} -logmrip-encode -logmrip-mplayer -logmrip-lavc
+Libs: -L${libdir} -logmrip-encode -logmrip-mplayer
 Cflags: -I${includedir}/ogmrip-encode
 
