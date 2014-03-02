@@ -12,4 +12,7 @@
   <gresource prefix="/org/ogmrip">
     <file preprocess="xml-stripblanks">ogmrip-progress-dialog.ui</file>
   </gresource>
+  <gresource prefix="/org/ogmrip">
+    <file preprocess="xml-stripblanks">ogmrip-profile-manager-menu.ui</file>
+  </gresource>
 </gresources>

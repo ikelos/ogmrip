@@ -24,9 +24,11 @@
 #include <ogmrip-encoding-manager-dialog.h>
 #include <ogmrip-list-item.h>
 #include <ogmrip-options-editable.h>
+#include <ogmrip-profile-chooser-widget.h>
 #include <ogmrip-profile-editor-dialog.h>
 #include <ogmrip-profile-manager-dialog.h>
 #include <ogmrip-profile-store.h>
+#include <ogmrip-profile-view.h>
 #include <ogmrip-progress-dialog.h>
 #include <ogmrip-subp-chooser-widget.h>
 #include <ogmrip-type-store.h>

@@ -1,201 +1,150 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.16.1 -->
 <interface>
-  <!-- interface-requires gtk+ 3.0 -->
-  <object class="GtkAction" id="add-action">
-    <property name="label" translatable="yes">_New</property>
-    <property name="tooltip" translatable="yes">Create a new profile</property>
-    <property name="icon_name">list-add-symbolic</property>
-  </object>
-  <object class="GtkAction" id="copy-action">
-    <property name="label" translatable="yes">_Duplicate</property>
-    <property name="tooltip" translatable="yes">Duplicate the current profile</property>
-    <property name="icon_name">edit-copy-symbolic</property>
-    <property name="sensitive">False</property>
-  </object>
-  <object class="GtkAction" id="edit-action">
-    <property name="label" translatable="yes">_Edit</property>
-    <property name="tooltip" translatable="yes">Edit the current profile</property>
-    <property name="icon_name">emblem-system-symbolic</property>
-    <property name="sensitive">False</property>
-  </object>
-  <object class="GtkAction" id="export-action">
-    <property name="label" translatable="yes">_Save</property>
-    <property name="tooltip" translatable="yes">Save the current profile</property>
-    <property name="icon_name">document-save-symbolic</property>
-    <property name="sensitive">False</property>
-  </object>
-  <object class="GtkAction" id="import-action">
-    <property name="label" translatable="yes">_Load</property>
-    <property name="tooltip" translatable="yes">Load an existing profile</property>
-    <property name="icon_name">document-open-symbolic</property>
-  </object>
-  <object class="GtkAction" id="remove-action">
-    <property name="label" translatable="yes">_Remove</property>
-    <property name="tooltip" translatable="yes">Remove the current profile</property>
-    <property name="icon_name">list-remove-symbolic</property>
-    <property name="sensitive">False</property>
-  </object>
-  <object class="GtkAction" id="rename-action">
-    <property name="label" translatable="yes">_Rename</property>
-    <property name="tooltip" translatable="yes">Rename the current profile</property>
-    <property name="icon_name">emblem-synchronizing-symbolic</property>
-    <property name="sensitive">False</property>
-  </object>
-  <object class="GtkMenu" id="popup">
-    <property name="visible">True</property>
+  <requires lib="gtk+" version="3.10"/>
+  <template class="OGMRipProfileManagerDialog" parent="GtkDialog">
     <property name="can_focus">False</property>
-    <child>
-      <object class="GtkMenuItem" id="edit-menu">
-        <property name="related_action">edit-action</property>
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="rename-menu">
-        <property name="related_action">rename-action</property>
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="copy-menu">
-        <property name="related_action">copy-action</property>
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="export-menu">
-        <property name="related_action">export-action</property>
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-      </object>
-    </child>
-    <child>
-      <object class="GtkMenuItem" id="remove-menu">
-        <property name="related_action">remove-action</property>
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-      </object>
-    </child>
-  </object>
-  <object class="GtkBox" id="root">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="border_width">6</property>
-    <property name="orientation">vertical</property>
-    <property name="spacing">6</property>
-    <child>
-      <object class="GtkLabel" id="label">
-        <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-        <property name="hexpand">True</property>
-        <property name="xalign">0</property>
-        <property name="label" translatable="yes">&lt;b&gt;_Profiles:&lt;/b&gt;</property>
-        <property name="use_markup">True</property>
-        <property name="use_underline">True</property>
-      </object>
-      <packing>
-        <property name="expand">False</property>
-        <property name="fill">True</property>
-        <property name="position">0</property>
-      </packing>
-    </child>
-    <child>
-      <object class="GtkBox" id="box2">
-        <property name="visible">True</property>
+    <property name="title" translatable="yes">Profile Manager</property>
+    <property name="default_width">450</property>
+    <property name="type_hint">dialog</property>
+    <child internal-child="vbox">
+      <object class="GtkBox" id="dialog-vbox">
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
-        <child>
-          <object class="GtkScrolledWindow" id="swin">
-            <property name="height_request">250</property>
-            <property name="visible">True</property>
-            <property name="can_focus">True</property>
-            <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-            <property name="hexpand">True</property>
-            <property name="vexpand">True</property>
-            <property name="shadow_type">in</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox" id="dialog-action_area">
+            <property name="can_focus">False</property>
+            <property name="layout_style">end</property>
             <child>
-              <object class="GtkTreeView" id="treeview">
+              <object class="GtkButton" id="close_button">
+                <property name="label">gtk-close</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                <property name="headers_visible">False</property>
-                <child internal-child="selection">
-                  <object class="GtkTreeSelection" id="treeview-selection"/>
-                </child>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
               </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
             </child>
           </object>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
+            <property name="pack_type">end</property>
             <property name="position">0</property>
           </packing>
         </child>
         <child>
-          <object class="GtkToolbar" id="toolbar">
+          <object class="GtkBox" id="root">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="icon_size">1</property>
+            <property name="border_width">6</property>
+            <property name="orientation">vertical</property>
+            <property name="spacing">6</property>
             <child>
-              <object class="GtkToolButton" id="new-button">
-                <property name="related_action">add-action</property>
+              <object class="GtkLabel" id="label">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
-                <property name="has_tooltip">True</property>
-                <property name="tooltip_markup" translatable="yes">Create</property>
+                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="hexpand">True</property>
+                <property name="xalign">0</property>
+                <property name="label" translatable="yes">&lt;b&gt;_Profiles:&lt;/b&gt;</property>
+                <property name="use_markup">True</property>
                 <property name="use_underline">True</property>
               </object>
               <packing>
                 <property name="expand">False</property>
-                <property name="homogeneous">True</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
               </packing>
             </child>
             <child>
-              <object class="GtkToolButton" id="delete-button">
-                <property name="related_action">remove-action</property>
+              <object class="GtkBox" id="box2">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkScrolledWindow" id="profile_swin">
+                    <property name="height_request">250</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                    <property name="hexpand">True</property>
+                    <property name="vexpand">True</property>
+                    <property name="shadow_type">in</property>
+                    <child>
+                      <placeholder/>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkToolbar" id="toolbar">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="icon_size">1</property>
+                    <child>
+                      <object class="GtkToolButton" id="add_button">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="tooltip_text" translatable="yes">Create a new profile</property>
+                        <property name="label" translatable="yes">_New</property>
+                        <property name="use_underline">True</property>
+                        <property name="icon_name">list-add-symbolic</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="homogeneous">True</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkToolButton" id="remove_button">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="tooltip_text" translatable="yes">Remove the current profile</property>
+                        <property name="label" translatable="yes">_Remove</property>
+                        <property name="use_underline">True</property>
+                        <property name="icon_name">list-remove-symbolic</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="homogeneous">True</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkToolButton" id="import_button">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="tooltip_text" translatable="yes">Load an existing profile</property>
+                        <property name="label" translatable="yes">_Load</property>
+                        <property name="use_underline">True</property>
+                        <property name="icon_name">document-open-symbolic</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="homogeneous">True</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
               </object>
               <packing>
                 <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkToolButton" id="import-button">
-                <property name="related_action">import-action</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkToolButton" id="export-button">
-                <property name="related_action">export-action</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkToolButton" id="edit-button">
-                <property name="related_action">edit-action</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="homogeneous">True</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
               </packing>
             </child>
           </object>
@@ -206,11 +155,124 @@
           </packing>
         </child>
       </object>
-      <packing>
-        <property name="expand">False</property>
-        <property name="fill">True</property>
-        <property name="position">1</property>
-      </packing>
     </child>
+    <action-widgets>
+      <action-widget response="-7">close_button</action-widget>
+    </action-widgets>
+  </template>
+  <object class="GtkTextBuffer" id="name_buffer"/>
+  <object class="GtkDialog" id="name_dialog">
+    <property name="can_focus">False</property>
+    <property name="modal">True</property>
+    <property name="default_width">250</property>
+    <property name="default_height">125</property>
+    <property name="destroy_with_parent">True</property>
+    <property name="type_hint">dialog</property>
+    <property name="transient_for">OGMRipProfileManagerDialog</property>
+    <property name="has_resize_grip">False</property>
+    <child internal-child="vbox">
+      <object class="GtkBox" id="dialog-vbox2">
+        <property name="can_focus">False</property>
+        <property name="orientation">vertical</property>
+        <property name="spacing">2</property>
+        <child internal-child="action_area">
+          <object class="GtkButtonBox" id="dialog-action_area2">
+            <property name="can_focus">False</property>
+            <property name="layout_style">end</property>
+            <child>
+              <object class="GtkButton" id="action_button">
+                <property name="label">gtk-cancel</property>
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="use_stock">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="cancel_button">
+                <property name="label">Action</property>
+                <property name="visible">True</property>
+                <property name="sensitive">False</property>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="pack_type">end</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox" id="box3">
+            <property name="visible">True</property>
+            <property name="can_focus">False</property>
+            <property name="border_width">6</property>
+            <property name="orientation">vertical</property>
+            <property name="spacing">6</property>
+            <child>
+              <object class="GtkLabel" id="label1">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="xalign">0</property>
+                <property name="label" translatable="yes">&lt;b&gt;_Profile name:&lt;/b&gt;</property>
+                <property name="use_markup">True</property>
+                <property name="use_underline">True</property>
+                <property name="mnemonic_widget">name_entry</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkScrolledWindow" id="scrolledwindow1">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="hscrollbar_policy">never</property>
+                <property name="vscrollbar_policy">never</property>
+                <property name="shadow_type">etched-in</property>
+                <child>
+                  <object class="GtkTextView" id="name_entry">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="hexpand">True</property>
+                    <property name="vexpand">True</property>
+                    <property name="buffer">name_buffer</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+    <action-widgets>
+      <action-widget response="-6">action_button</action-widget>
+      <action-widget response="-5">cancel_button</action-widget>
+    </action-widgets>
   </object>
 </interface>

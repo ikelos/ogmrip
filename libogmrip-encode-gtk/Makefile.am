@@ -8,9 +8,11 @@ libogmrip_encode_gtk_la_SOURCES =    \
   ogmrip-encoding-manager-dialog.c   \
   ogmrip-list-item.c                 \
   ogmrip-options-editable.c          \
+	ogmrip-profile-chooser-widget.c    \
   ogmrip-profile-editor-dialog.c     \
   ogmrip-profile-manager-dialog.c    \
   ogmrip-profile-store.c             \
+	ogmrip-profile-view.c              \
   ogmrip-progress-dialog.c           \
   ogmrip-subp-chooser-widget.c       \
   ogmrip-subp-options.c              \
@@ -28,9 +30,11 @@ libogmrip_encode_gtk_la_HEADERS =    \
   ogmrip-encoding-manager-dialog.h   \
   ogmrip-list-item.h                 \
   ogmrip-options-editable.h          \
+	ogmrip-profile-chooser-widget.h    \
   ogmrip-profile-editor-dialog.h     \
   ogmrip-profile-manager-dialog.h    \
   ogmrip-profile-store.h             \
+	ogmrip-profile-view.h              \
   ogmrip-progress-dialog.h           \
   ogmrip-subp-chooser-widget.h       \
   ogmrip-subp-options.h              \
@@ -66,6 +70,7 @@ BUILT_SOURCES = \
 ui_FILES = \
   ogmrip-profile-editor-dialog.ui   \
   ogmrip-profile-manager-dialog.ui  \
+  ogmrip-profile-manager-menu.ui    \
   ogmrip-progress-dialog.ui         \
   ogmrip-encoding-manager-dialog.ui
 
