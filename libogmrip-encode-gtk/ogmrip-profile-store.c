@@ -83,6 +83,8 @@ ogmrip_profile_store_add (OGMRipProfileStore *store, OGMRipProfile *profile)
       OGMRIP_PROFILE_STORE_PROFILE_COLUMN, profile,
       -1);
 
+  g_free (name);
+
   g_signal_connect_swapped (profile, "changed::" OGMRIP_PROFILE_NAME,
       G_CALLBACK (ogmrip_profile_store_name_changed), store);
 }
