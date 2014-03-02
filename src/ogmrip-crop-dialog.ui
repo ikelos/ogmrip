@@ -126,7 +126,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="invisible_char">●</property>
-                    <property name="text" translatable="yes">1</property>
+                    <property name="text">1</property>
                     <property name="adjustment">top_adj</property>
                     <property name="climb_rate">1</property>
                     <property name="value">1</property>
@@ -174,7 +174,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="invisible_char">●</property>
-                    <property name="text" translatable="yes">1</property>
+                    <property name="text">1</property>
                     <property name="adjustment">left_adj</property>
                     <property name="climb_rate">1</property>
                     <property name="value">1</property>
@@ -222,7 +222,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="invisible_char">●</property>
-                    <property name="text" translatable="yes">1</property>
+                    <property name="text">1</property>
                     <property name="adjustment">bottom_adj</property>
                     <property name="climb_rate">1</property>
                     <property name="value">1</property>
@@ -270,7 +270,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="invisible_char">●</property>
-                    <property name="text" translatable="yes">1</property>
+                    <property name="text">1</property>
                     <property name="adjustment">right_adj</property>
                     <property name="climb_rate">1</property>
                     <property name="value">1</property>

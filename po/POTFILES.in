@@ -1,19 +1,22 @@
 [encoding: UTF-8]
 
-[type: gettext/glade]data/ui/ogmrip-menu.ui
-[type: gettext/glade]data/ui/ogmrip-crop-dialog.ui
-[type: gettext/glade]data/ui/ogmrip-encoding-manager-dialog.ui
-[type: gettext/glade]data/ui/ogmrip-lavc-options-dialog.ui
-[type: gettext/glade]data/ui/ogmrip-main-window.ui
-[type: gettext/glade]data/ui/ogmrip-mp4-options-dialog.ui
-[type: gettext/glade]data/ui/ogmrip-options-dialog.ui
-[type: gettext/glade]data/ui/ogmrip-pref-dialog.ui
-[type: gettext/glade]data/ui/ogmrip-profile-editor.ui
-[type: gettext/glade]data/ui/ogmrip-profile-manager-dialog.ui
-[type: gettext/glade]data/ui/ogmrip-progress-dialog.ui
-[type: gettext/glade]data/ui/ogmrip-spell-dialog.ui
-[type: gettext/glade]data/ui/ogmrip-x264-options-dialog.ui
-[type: gettext/glade]data/ui/ogmrip-xvid-options-dialog.ui
+[type: gettext/glade]libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.ui
+[type: gettext/glade]libogmrip-encode-gtk/ogmrip-profile-editor-dialog.ui
+[type: gettext/glade]libogmrip-encode-gtk/ogmrip-profile-manager-dialog.ui
+[type: gettext/glade]libogmrip-encode-gtk/ogmrip-profile-manager-menu.ui
+[type: gettext/glade]libogmrip-encode-gtk/ogmrip-progress-dialog.ui
+
+[type: gettext/glade]plugins/ogmrip-lavc-options-dialog.ui
+[type: gettext/glade]plugins/ogmrip-mp4-options-dialog.ui
+[type: gettext/glade]plugins/ogmrip-x264-options-dialog.ui
+[type: gettext/glade]plugins/ogmrip-xvid-options-dialog.ui
+
+[type: gettext/glade]src/ogmrip-menu.ui
+[type: gettext/glade]src/ogmrip-crop-dialog.ui
+[type: gettext/glade]src/ogmrip-main-window.ui
+[type: gettext/glade]src/ogmrip-options-dialog.ui
+[type: gettext/glade]src/ogmrip-pref-dialog.ui
+[type: gettext/glade]src/ogmrip-spell-dialog.ui
 
 data/ui/ogmrip.desktop.in
 

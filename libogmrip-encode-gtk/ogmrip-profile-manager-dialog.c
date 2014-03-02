@@ -222,7 +222,7 @@ ogmrip_profile_manager_dialog_rename_activated (GSimpleAction *action, GVariant 
     gtk_window_set_title (GTK_WINDOW (dialog->priv->name_dialog), _("Rename profile"));
 
     button = gtk_dialog_get_widget_for_response (GTK_DIALOG (dialog->priv->name_dialog), GTK_RESPONSE_OK);
-    gtk_button_set_label (GTK_BUTTON (button), _("Rename"));
+    gtk_button_set_label (GTK_BUTTON (button), _("_Rename"));
 
     profile = ogmrip_profile_store_get_profile (OGMRIP_PROFILE_STORE (model), &iter);
 

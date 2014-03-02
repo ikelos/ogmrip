@@ -18,35 +18,35 @@
     <data>
       <row>
         <col id="0" translatable="yes">None</col>
-        <col id="1" translatable="yes"> </col>
+        <col id="1"> </col>
       </row>
       <row>
         <col id="0" translatable="yes">Extra Small</col>
-        <col id="1" translatable="yes"> </col>
+        <col id="1"> </col>
       </row>
       <row>
         <col id="0" translatable="yes">Small</col>
-        <col id="1" translatable="yes"> </col>
+        <col id="1"> </col>
       </row>
       <row>
         <col id="0" translatable="yes">Medium</col>
-        <col id="1" translatable="yes"> </col>
+        <col id="1"> </col>
       </row>
       <row>
         <col id="0" translatable="yes">Large</col>
-        <col id="1" translatable="yes"> </col>
+        <col id="1"> </col>
       </row>
       <row>
         <col id="0" translatable="yes">Extra Large</col>
-        <col id="1" translatable="yes"> </col>
+        <col id="1"> </col>
       </row>
       <row>
         <col id="0" translatable="yes">Full</col>
-        <col id="1" translatable="yes"> </col>
+        <col id="1"> </col>
       </row>
       <row>
         <col id="0" translatable="yes">User Defined</col>
-        <col id="1" translatable="yes"> </col>
+        <col id="1"> </col>
       </row>
     </data>
   </object>
@@ -568,7 +568,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="invisible_char">●</property>
-                        <property name="text" translatable="yes">0</property>
+                        <property name="text">0</property>
                         <property name="adjustment">scale_width_adj</property>
                         <property name="climb_rate">1</property>
                       </object>
@@ -584,7 +584,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="invisible_char">●</property>
-                        <property name="text" translatable="yes">0</property>
+                        <property name="text">0</property>
                         <property name="adjustment">scale_height_adj</property>
                         <property name="climb_rate">1</property>
                       </object>
