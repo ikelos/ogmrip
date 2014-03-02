@@ -30,9 +30,6 @@
 #define OGMRIP_UI_RES  "/org/ogmrip/ogmrip-mp4-options-dialog.ui"
 #define OGMRIP_UI_ROOT "root"
 
-#define gtk_builder_get_widget(builder, name) \
-    (GtkWidget *) gtk_builder_get_object ((builder), (name))
-
 #define OGMRIP_TYPE_MP4_DIALOG          (ogmrip_mp4_dialog_get_type ())
 #define OGMRIP_MP4_DIALOG(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_MP4_DIALOG, OGMRipMp4Dialog))
 #define OGMRIP_MP4_DIALOG_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_MP4_DIALOG, OGMRipMp4DialogClass))
@@ -65,7 +62,7 @@ enum
 
 static void ogmrip_options_editable_init (OGMRipOptionsEditableInterface *iface);
 
-G_DEFINE_TYPE_EXTENDED (OGMRipMp4Dialog, ogmrip_mp4_dialog, GTK_TYPE_DIALOG, 0,
+G_DEFINE_TYPE_WITH_CODE (OGMRipMp4Dialog, ogmrip_mp4_dialog, GTK_TYPE_DIALOG,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_OPTIONS_EDITABLE, ogmrip_options_editable_init));
 
 static void
@@ -147,38 +144,21 @@ ogmrip_mp4_dialog_class_init (OGMRipMp4DialogClass *klass)
   gobject_class->set_property = ogmrip_mp4_dialog_set_property;
 
   g_object_class_override_property (gobject_class, PROP_PROFILE, "profile");
+
+  gtk_widget_class_set_template_from_resource (GTK_WIDGET_CLASS (klass), OGMRIP_UI_RES);
+
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipMp4Dialog, format_combo);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipMp4Dialog, hint_check);
 }
 
 static void
 ogmrip_mp4_dialog_init (OGMRipMp4Dialog *dialog)
 {
-  GError *error = NULL;
-
-  GtkBuilder *builder;
   GtkWidget *misc, *widget;
 
-  gtk_dialog_add_buttons (GTK_DIALOG (dialog),
-      _("_Close"), GTK_RESPONSE_CLOSE,
-      NULL);
-  gtk_window_set_title (GTK_WINDOW (dialog), _("MP4 Options"));
-  gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
-  gtk_container_set_border_width (GTK_CONTAINER (dialog), 6);
+  gtk_widget_init_template (GTK_WIDGET (dialog));
+
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
-
-  builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_resource (builder, OGMRIP_UI_RES, &error))
-    g_error ("Couldn't load builder file: %s", error->message);
-
-  misc = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
-
-  widget = gtk_builder_get_widget (builder, OGMRIP_UI_ROOT);
-  gtk_container_add (GTK_CONTAINER (misc), widget);
-  gtk_widget_show (widget);
-
-  dialog->format_combo = gtk_builder_get_widget (builder, "format-combo");
-  dialog->hint_check = gtk_builder_get_widget (builder, "hint-check");
-
-  g_object_unref (builder);
 }
 
 static void
