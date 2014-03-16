@@ -31,7 +31,6 @@
 
 #define OGMRIP_UI_RES   "/org/ogmrip/ogmrip-profile-manager-dialog.ui"
 #define OGMRIP_MENU_RES "/org/ogmrip/ogmrip-profile-manager-menu.ui"
-#define OGMRIP_UI_ROOT "root"
 
 struct _OGMRipProfileManagerDialogPriv
 {
