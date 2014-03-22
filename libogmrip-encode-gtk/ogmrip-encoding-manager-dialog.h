@@ -33,13 +33,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipEncodingManagerDialog      OGMRipEncodingManagerDialog;
 typedef struct _OGMRipEncodingManagerDialogClass OGMRipEncodingManagerDialogClass;
-typedef struct _OGMRipEncodingManagerDialogPriv  OGMRipEncodingManagerDialogPriv;
+typedef struct _OGMRipEncodingManagerDialogPriv  OGMRipEncodingManagerDialogPrivate;
 
 struct _OGMRipEncodingManagerDialog
 {
   GtkDialog parent_instance;
 
-  OGMRipEncodingManagerDialogPriv *priv;
+  OGMRipEncodingManagerDialogPrivate *priv;
 };
 
 struct _OGMRipEncodingManagerDialogClass

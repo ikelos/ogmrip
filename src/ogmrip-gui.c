@@ -1550,7 +1550,7 @@ ogmrip_gui_export_chapters_activated (OGMRipData *data)
 static void
 ogmrip_gui_encodings_responsed (OGMRipData *data, gint response_id, GtkWidget *dialog)
 {
-  if (response_id != GTK_RESPONSE_ACCEPT)
+  if (response_id != GTK_RESPONSE_APPLY)
     gtk_widget_destroy (dialog);
   else
   {
