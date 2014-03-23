@@ -119,6 +119,7 @@ ogmrip_codec_dispose (GObject *gobject)
 
   if (codec->priv->output)
   {
+    ogmrip_file_delete (codec->priv->output, NULL);
     g_object_unref (codec->priv->output);
     codec->priv->output = NULL;
   }

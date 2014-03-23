@@ -26,7 +26,6 @@
 
 struct _OGMRipStubPriv
 {
-  gchar *uri;
   OGMRipCodec *codec;
   gint format;
 };
@@ -147,14 +146,6 @@ G_DEFINE_TYPE_WITH_CODE (OGMRipStub, ogmrip_stub, OGMRIP_TYPE_FILE,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_STREAM, ogmrip_stream_iface_init));
 
 static void
-ogmrip_stub_finalize (GObject *gobject)
-{
-  g_free (OGMRIP_STUB (gobject)->priv->uri);
-
-  G_OBJECT_CLASS (ogmrip_stub_parent_class)->finalize (gobject);
-}
-
-static void
 ogmrip_stub_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
 {
   OGMRipStub *stub = OGMRIP_STUB (gobject);
@@ -199,7 +190,6 @@ ogmrip_stub_class_init (OGMRipStubClass *klass)
   GObjectClass *gobject_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->finalize     = ogmrip_stub_finalize;
   gobject_class->get_property = ogmrip_stub_get_property;
   gobject_class->set_property = ogmrip_stub_set_property;
 

@@ -48,6 +48,8 @@ struct _OGMRipFileClass
 
 GType         ogmrip_file_get_type (void);
 const gchar * ogmrip_file_get_path (OGMRipFile *file);
+gboolean      ogmrip_file_delete   (OGMRipFile *file,
+                                    GError     **error);
 
 G_END_DECLS
 

@@ -16,8 +16,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "ogmrip-file-object.h"
 #include "ogmrip-file-priv.h"
+
+#include <errno.h>
+#include <glib/gstdio.h>
+#include <glib/gi18n-lib.h>
 
 enum
 {
@@ -319,5 +327,25 @@ ogmrip_file_get_path (OGMRipFile *file)
   g_return_val_if_fail (OGMRIP_IS_FILE (file), NULL);
 
   return file->priv->path;
+}
+
+gboolean
+ogmrip_file_delete (OGMRipFile *file, GError **error)
+{
+  const gchar *filename;
+
+  g_return_val_if_fail (OGMRIP_IS_FILE (file), FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE); 
+
+  filename = ogmrip_file_get_path (file);
+
+  if (g_unlink (filename) < 0)
+  {
+    g_set_error (error, G_FILE_ERROR, g_file_error_from_errno (errno),
+        _("Failed to unlink file '%s': %s"), filename, g_strerror (errno));
+    return FALSE;
+  }
+
+  return TRUE;
 }
 
