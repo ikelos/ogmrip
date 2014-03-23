@@ -31,13 +31,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipProgressDialog      OGMRipProgressDialog;
 typedef struct _OGMRipProgressDialogClass OGMRipProgressDialogClass;
-typedef struct _OGMRipProgressDialogPriv  OGMRipProgressDialogPriv;
+typedef struct _OGMRipProgressDialogPriv  OGMRipProgressDialogPrivate;
 
 struct _OGMRipProgressDialog
 {
   GtkDialog parent_instance;
 
-  OGMRipProgressDialogPriv *priv;
+  OGMRipProgressDialogPrivate *priv;
 };
 
 struct _OGMRipProgressDialogClass

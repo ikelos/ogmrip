@@ -72,6 +72,7 @@ ui_FILES = \
   ogmrip-profile-manager-dialog.ui  \
   ogmrip-profile-manager-menu.ui    \
   ogmrip-progress-dialog.ui         \
+  ogmrip-progress-menu.ui           \
   ogmrip-encoding-manager-dialog.ui
 
 ogmrip-encode-gresource.c: ogmrip-encode.gresource.xml $(ui_FILES) $(GLIB_COMPILE_RESOURCES)

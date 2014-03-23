@@ -2,17 +2,10 @@
 <gresources>
   <gresource prefix="/org/ogmrip">
     <file preprocess="xml-stripblanks">ogmrip-encoding-manager-dialog.ui</file>
-  </gresource>
-  <gresource prefix="/org/ogmrip">
     <file preprocess="xml-stripblanks">ogmrip-profile-editor-dialog.ui</file>
-  </gresource>
-  <gresource prefix="/org/ogmrip">
     <file preprocess="xml-stripblanks">ogmrip-profile-manager-dialog.ui</file>
-  </gresource>
-  <gresource prefix="/org/ogmrip">
-    <file preprocess="xml-stripblanks">ogmrip-progress-dialog.ui</file>
-  </gresource>
-  <gresource prefix="/org/ogmrip">
     <file preprocess="xml-stripblanks">ogmrip-profile-manager-menu.ui</file>
+    <file preprocess="xml-stripblanks">ogmrip-progress-dialog.ui</file>
+    <file preprocess="xml-stripblanks">ogmrip-progress-menu.ui</file>
   </gresource>
 </gresources>

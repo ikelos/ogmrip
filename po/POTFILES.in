@@ -28,6 +28,8 @@ libogmrip-media/ogmrip-media-object.c
 libogmrip-dvd/ogmdvd-disc.c
 libogmrip-dvd/ogmdvd-title.c
 
+libogmrip-file/ogmrip-file-object.c
+
 libogmrip-encode/ogmrip-container.c
 libogmrip-encode/ogmrip-encoding.c
 libogmrip-encode/ogmrip-hardsub.c
@@ -51,7 +53,9 @@ libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c
 libogmrip-encode-gtk/ogmrip-list-item.c
 libogmrip-encode-gtk/ogmrip-profile-editor-dialog.c
 libogmrip-encode-gtk/ogmrip-profile-manager-dialog.c
+libogmrip-encode-gtk/ogmrip-profile-view.c
 libogmrip-encode-gtk/ogmrip-progress-dialog.c
+libogmrip-encode-gtk/ogmrip-progress-menu.ui
 libogmrip-encode-gtk/ogmrip-subp-options-dialog.c
 
 libogmrip-mplayer/ogmrip-mplayer-commands.c

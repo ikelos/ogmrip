@@ -2,20 +2,10 @@
 <gresources>
   <gresource prefix="/org/ogmrip">
     <file preprocess="xml-stripblanks">ogmrip-main-window.ui</file>
-  </gresource>
-  <gresource prefix="/org/ogmrip">
     <file preprocess="xml-stripblanks">ogmrip-menu.ui</file>
-  </gresource>
-  <gresource prefix="/org/ogmrip">
     <file preprocess="xml-stripblanks">ogmrip-crop-dialog.ui</file>
-  </gresource>
-  <gresource prefix="/org/ogmrip">
     <file preprocess="xml-stripblanks">ogmrip-options-dialog.ui</file>
-  </gresource>
-  <gresource prefix="/org/ogmrip">
     <file preprocess="xml-stripblanks">ogmrip-pref-dialog.ui</file>
-  </gresource>
-  <gresource prefix="/org/ogmrip">
     <file preprocess="xml-stripblanks">ogmrip-spell-dialog.ui</file>
   </gresource>
 </gresources>
