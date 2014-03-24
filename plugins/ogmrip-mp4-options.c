@@ -154,8 +154,6 @@ ogmrip_mp4_dialog_class_init (OGMRipMp4DialogClass *klass)
 static void
 ogmrip_mp4_dialog_init (OGMRipMp4Dialog *dialog)
 {
-  GtkWidget *misc, *widget;
-
   gtk_widget_init_template (GTK_WIDGET (dialog));
 
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
