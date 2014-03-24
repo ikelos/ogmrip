@@ -31,10 +31,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipGui      OGMRipGui;
 typedef struct _OGMRipGuiClass OGMRipGuiClass;
+typedef struct _OGMRipGuiPriv  OGMRipGuiPrivate;
 
 struct _OGMRipGui
 {
   GtkApplication parent_instance;
+
+  OGMRipGuiPrivate *priv;
 };
 
 struct _OGMRipGuiClass
@@ -46,7 +49,6 @@ struct _OGMRipGuiClass
 
 GType          ogmrip_gui_get_type (void);
 GApplication * ogmrip_gui_new      (const gchar *app_id);
-void           ogmrip_gui_prepare  (OGMRipGui   *gui);
 
 G_END_DECLS
 

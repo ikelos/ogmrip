@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.16.0 on Sun Feb  2 12:10:56 2014 -->
+<!-- Generated with glade 3.16.1 -->
 <interface>
-  <!-- interface-requires gtk+ 3.0 -->
+  <requires lib="gtk+" version="3.10"/>
+  <!-- interface-requires OGMRipMedia 0.0 -->
   <object class="GtkAdjustment" id="adjustment1">
     <property name="lower">1</property>
     <property name="upper">100</property>
@@ -9,21 +10,11 @@
     <property name="step_increment">1</property>
     <property name="page_increment">10</property>
   </object>
-  <object class="GtkImage" id="image4">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-convert</property>
-  </object>
-  <object class="GtkImage" id="image6">
-    <property name="visible">True</property>
-    <property name="can_focus">False</property>
-    <property name="stock">gtk-cdrom</property>
-  </object>
-  <object class="GtkApplicationWindow" id="main-window">
+  <template class="OGMRipMainWindow" parent="GtkApplicationWindow">
     <property name="can_focus">False</property>
     <property name="title" translatable="yes">OGMRip</property>
     <property name="default_width">350</property>
-    <property name="default_height">450</property>
+    <property name="default_height">500</property>
     <child>
       <object class="GtkGrid" id="root">
         <property name="visible">True</property>
@@ -46,7 +37,15 @@
                 <property name="vexpand">True</property>
                 <property name="shadow_type">in</property>
                 <child>
-                  <placeholder/>
+                  <object class="OGMRipChapterView" id="chapter_view">
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="headers_clickable">False</property>
+                    <property name="search_column">0</property>
+                    <child internal-child="selection">
+                      <object class="GtkTreeSelection" id="chapter_view-selection1"/>
+                    </child>
+                  </object>
                 </child>
               </object>
               <packing>
@@ -57,14 +56,14 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="title-label">
+              <object class="GtkLabel" id="title_label">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="xalign">0</property>
                 <property name="label" translatable="yes">&lt;b&gt;_Title:&lt;/b&gt;</property>
                 <property name="use_markup">True</property>
                 <property name="use_underline">True</property>
-                <property name="mnemonic_widget">title-entry</property>
+                <property name="mnemonic_widget">title_entry</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -74,13 +73,14 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="video-label">
+              <object class="GtkLabel" id="video_label">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="xalign">0</property>
                 <property name="label" translatable="yes">&lt;b&gt;_Video Stream:&lt;/b&gt;</property>
                 <property name="use_markup">True</property>
                 <property name="use_underline">True</property>
+                <property name="mnemonic_widget">title_chooser</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -90,7 +90,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="audio-label">
+              <object class="GtkLabel" id="audio_label">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="valign">center</property>
@@ -107,7 +107,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="subp-label">
+              <object class="GtkLabel" id="subp_label">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="valign">center</property>
@@ -124,7 +124,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="duration-label">
+              <object class="GtkLabel" id="duration_label">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="xalign">0</property>
@@ -139,7 +139,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="title-entry">
+              <object class="GtkEntry" id="title_entry">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="invisible_char">•</property>
@@ -152,7 +152,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="length-label">
+              <object class="GtkLabel" id="length_label">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="hexpand">True</property>
@@ -166,7 +166,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkCheckButton" id="relative-check">
+              <object class="GtkCheckButton" id="relative_check">
                 <property name="label" translatable="yes">_Relative mode</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -183,7 +183,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkBox" id="audio-list">
+              <object class="GtkBox" id="audio_list">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="orientation">vertical</property>
@@ -201,7 +201,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkBox" id="subp-list">
+              <object class="GtkBox" id="subp_list">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="orientation">vertical</property>
@@ -230,7 +230,7 @@
                     <property name="halign">end</property>
                     <property name="column_spacing">6</property>
                     <child>
-                      <object class="GtkSpinButton" id="angle-spin">
+                      <object class="GtkSpinButton" id="angle_spin">
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
@@ -249,7 +249,8 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                        <property name="label" translatable="yes">Angle:</property>
+                        <property name="label" translatable="yes">_Angle:</property>
+                        <property name="use_underline">True</property>
                       </object>
                       <packing>
                         <property name="left_attach">0</property>
@@ -267,7 +268,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkToggleButton" id="play-button">
+                  <object class="GtkToggleButton" id="play_button">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
@@ -290,7 +291,17 @@
                   </packing>
                 </child>
                 <child>
-                  <placeholder/>
+                  <object class="OGMRipTitleChooserWidget" id="title_chooser">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="hexpand">True</property>
+                  </object>
+                  <packing>
+                    <property name="left_attach">0</property>
+                    <property name="top_attach">0</property>
+                    <property name="width">1</property>
+                    <property name="height">1</property>
+                  </packing>
                 </child>
               </object>
               <packing>
@@ -307,12 +318,11 @@
                 <property name="spacing">6</property>
                 <property name="layout_style">end</property>
                 <child>
-                  <object class="GtkButton" id="load-button">
+                  <object class="GtkButton" id="load_button">
                     <property name="label" translatable="yes">_Load</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <property name="image">image6</property>
                     <property name="use_underline">True</property>
                   </object>
                   <packing>
@@ -322,12 +332,11 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkButton" id="extract-button">
+                  <object class="GtkButton" id="extract_button">
                     <property name="label" translatable="yes">E_xtract</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>
-                    <property name="image">image4</property>
                     <property name="use_underline">True</property>
                   </object>
                   <packing>
@@ -354,5 +363,5 @@
         </child>
       </object>
     </child>
-  </object>
+  </template>
 </interface>

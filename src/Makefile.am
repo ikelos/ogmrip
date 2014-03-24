@@ -13,6 +13,7 @@ ogmrip_SOURCES += \
   ogmrip-crop-dialog.c    \
   ogmrip-gui.c            \
   ogmrip-helper.c         \
+  ogmrip-main-window.c    \
   ogmrip-options-dialog.c \
   ogmrip-pref-dialog.c    \
   ogmrip-spell-dialog.c
@@ -49,6 +50,7 @@ EXTRA_DIST = \
   ogmrip-crop-dialog.h    \
   ogmrip-gui.h            \
   ogmrip-helper.h         \
+  ogmrip-main-window.h    \
   ogmrip-options-dialog.h \
   ogmrip-pref-dialog.h    \
   ogmrip-settings.h       \

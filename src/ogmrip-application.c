@@ -49,3 +49,18 @@ ogmrip_application_prepare (OGMRipApplication *app)
   g_signal_emit (app, signals[PREPARE], 0);
 }
 
+gboolean
+ogmrip_application_get_is_prepared (OGMRipApplication *app)
+{
+  OGMRipApplicationInterface *iface;
+
+  g_return_val_if_fail (OGMRIP_IS_APPLICATION (app), FALSE);
+
+  iface = OGMRIP_APPLICATION_GET_IFACE (app);
+
+  if (!iface->get_is_prepared)
+    return FALSE;
+
+  return iface->get_is_prepared (app);
+}
+
