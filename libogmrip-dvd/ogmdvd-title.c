@@ -113,8 +113,6 @@ ogmdvd_title_finalize (GObject *gobject)
     title->priv->length_of_chapters = NULL;
   }
 
-  title->priv->disc = NULL;
-
   G_OBJECT_CLASS (ogmdvd_title_parent_class)->dispose (gobject);
 }
 
@@ -299,7 +297,7 @@ ogmdvd_title_close (OGMRipTitle *title)
     dtitle->priv->vts_file = NULL;
   }
 
-  if (dtitle->priv->close_disc)
+  if (dtitle->priv->close_disc && dtitle->priv->disc)
   {
     ogmrip_media_close (OGMRIP_MEDIA (dtitle->priv->disc));
     dtitle->priv->close_disc = FALSE;

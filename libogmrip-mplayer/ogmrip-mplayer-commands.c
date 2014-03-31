@@ -60,7 +60,7 @@ ogmrip_command_new (const gchar *command, gboolean lavf)
 {
   GPtrArray *argv;
 
-  argv = g_ptr_array_new ();
+  argv = g_ptr_array_new_full (20, g_free);
   g_ptr_array_add (argv, g_strdup (command));
 
   g_ptr_array_add (argv, g_strdup ("-nocache"));

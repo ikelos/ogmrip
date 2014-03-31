@@ -78,10 +78,11 @@ ogmrip_codec_set_input (OGMRipCodec *codec, OGMRipStream *input)
       g_return_if_fail (ogmrip_stream_is_copy (codec->priv->input, input));
 
       g_object_unref (codec->priv->input);
+      g_object_unref (codec->priv->title);
     }
 
     codec->priv->input = g_object_ref (input);
-    codec->priv->title = ogmrip_stream_get_title (input);
+    codec->priv->title = g_object_ref (ogmrip_stream_get_title (input));
   }
 }
 
@@ -122,6 +123,12 @@ ogmrip_codec_dispose (GObject *gobject)
     ogmrip_file_delete (codec->priv->output, NULL);
     g_object_unref (codec->priv->output);
     codec->priv->output = NULL;
+  }
+
+  if (codec->priv->title)
+  {
+    g_object_unref (codec->priv->title);
+    codec->priv->title = NULL;
   }
 
   G_OBJECT_CLASS (ogmrip_codec_parent_class)->dispose (gobject);

@@ -56,6 +56,7 @@
 
 struct _OGMRipEncodingPriv
 {
+  OGMRipMedia *media;
   OGMRipTitle *title;
 
   OGMRipEncodingMethod method;
@@ -198,6 +199,24 @@ ogmrip_encoding_get_codec_array (OGMRipEncoding *encoding, GList *codecs)
   return array;
 }
 
+static void
+ogmrip_encoding_set_title (OGMRipEncoding *encoding, OGMRipTitle *title)
+{
+  OGMRipMedia *media;
+
+  g_object_ref (title);
+  if (encoding->priv->title)
+    g_object_unref (encoding->priv->title);
+  encoding->priv->title = title;
+
+  media = ogmrip_title_get_media (title);
+
+  g_object_ref (media);
+  if (encoding->priv->media)
+    g_object_unref (encoding->priv->media);
+  encoding->priv->media = media;
+}
+
 G_DEFINE_TYPE (OGMRipEncoding, ogmrip_encoding, G_TYPE_OBJECT)
 
 static void
@@ -231,6 +250,12 @@ ogmrip_encoding_dispose (GObject *gobject)
   {
     g_object_unref (encoding->priv->title);
     encoding->priv->title = NULL;
+  }
+
+  if (encoding->priv->media)
+  {
+    g_object_unref (encoding->priv->media);
+    encoding->priv->media = NULL;
   }
 
   (*G_OBJECT_CLASS (ogmrip_encoding_parent_class)->dispose) (gobject);
@@ -341,7 +366,7 @@ ogmrip_encoding_set_property (GObject *gobject, guint property_id, const GValue 
       encoding->priv->test = g_value_get_boolean (value);
       break;
     case PROP_TITLE:
-      encoding->priv->title = g_value_dup_object (value);
+      ogmrip_encoding_set_title (encoding, g_value_get_object (value));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -476,12 +501,6 @@ ogmrip_encoding_new (OGMRipTitle *title)
   return g_object_new (OGMRIP_TYPE_ENCODING, "title", title, NULL);
 }
 
-static void
-weak_notify (gpointer media, GObject *where_the_object_was)
-{
-  g_object_unref (media);
-}
-
 OGMRipEncoding *
 ogmrip_encoding_new_from_xml (OGMRipXML *xml, GError **error)
 {
@@ -533,10 +552,7 @@ ogmrip_encoding_new_from_xml (OGMRipXML *xml, GError **error)
     {
       encoding = ogmrip_encoding_new (title);
       if (encoding)
-      {
-        g_object_weak_ref (G_OBJECT (encoding), weak_notify, g_object_ref (media));
         ogmrip_encoding_parse (encoding, xml, NULL);
-      }
     }
   }
   g_free (str);
@@ -1088,7 +1104,7 @@ ogmrip_encoding_set_copy (OGMRipEncoding *encoding, gboolean copy)
 
     copy = FALSE;
 
-    uri = ogmrip_media_get_uri (ogmrip_title_get_media (encoding->priv->title));
+    uri = ogmrip_media_get_uri (encoding->priv->media);
     if (g_str_has_prefix (uri, "dvd://"))
     {
       if (g_stat (uri + 6, &buf) == 0)
@@ -1644,18 +1660,15 @@ ogmrip_encoding_task_progressed (OGMRipEncoding *encoding, GParamSpec *pspec, OG
 static gboolean
 ogmrip_encoding_copy (OGMRipEncoding *encoding, GCancellable *cancellable, GError **error)
 {
-  OGMRipMedia *media;
   OGMJobTask *task;
 
   gchar *name, *output;
   gboolean result;
   gulong id;
 
-  media = ogmrip_title_get_media (encoding->priv->title);
+  ogmrip_log_printf ("Copying %s\n\n", ogmrip_media_get_label (encoding->priv->media));
 
-  ogmrip_log_printf ("Copying %s\n\n", ogmrip_media_get_label (media));
-
-  name = g_strdup_printf ("%s-%d", ogmrip_media_get_id (media), ogmrip_title_get_id (encoding->priv->title));
+  name = g_strdup_printf ("%s-%d", ogmrip_media_get_id (encoding->priv->media), ogmrip_title_get_id (encoding->priv->title));
   output = g_build_filename (ogmrip_fs_get_tmp_dir (), name, NULL);
   g_free (name);
 
@@ -1671,13 +1684,14 @@ ogmrip_encoding_copy (OGMRipEncoding *encoding, GCancellable *cancellable, GErro
 
   if (result)
   {
+    OGMRipMedia *new_media;
     OGMRipTitle *new_title;
     gint id;
 
     id = ogmrip_title_get_id (encoding->priv->title);
 
-    media = ogmrip_copy_get_destination (OGMRIP_COPY (task));
-    new_title = ogmrip_media_get_title (media, id);
+    new_media = ogmrip_copy_get_destination (OGMRIP_COPY (task));
+    new_title = ogmrip_media_get_title (new_media, id);
 
     if (!ogmrip_title_open (new_title, NULL, NULL, NULL, error))
       result = FALSE;
@@ -1687,32 +1701,30 @@ ogmrip_encoding_copy (OGMRipEncoding *encoding, GCancellable *cancellable, GErro
       GList *link;
 
       ogmrip_title_close (encoding->priv->title);
-      g_object_unref (encoding->priv->title);
 
-      g_object_ref (new_title);
-      encoding->priv->title = new_title;
+      ogmrip_encoding_set_title (encoding, new_title);
 
-      g_object_set (encoding->priv->video_codec, "input", ogmrip_title_get_video_stream (encoding->priv->title), NULL);
+      g_object_set (encoding->priv->video_codec, "input", ogmrip_title_get_video_stream (new_title), NULL);
 
       for (link = encoding->priv->audio_codecs; link; link = link->next)
       {
         stream = ogmrip_codec_get_input (link->data);
         id = ogmrip_stream_get_id (stream);
-        g_object_set (link->data, "input", ogmrip_title_get_audio_stream (encoding->priv->title, id), NULL);
+        g_object_set (link->data, "input", ogmrip_title_get_audio_stream (new_title, id), NULL);
       }
 
       for (link = encoding->priv->subp_codecs; link; link = link->next)
       {
         stream = ogmrip_codec_get_input (link->data);
         id = ogmrip_stream_get_id (stream);
-        g_object_set (link->data, "input", ogmrip_title_get_subp_stream (encoding->priv->title, id), NULL);
+        g_object_set (link->data, "input", ogmrip_title_get_subp_stream (new_title, id), NULL);
       }
 
       for (link = encoding->priv->chapters; link; link = link->next)
-        g_object_set (link->data, "input", ogmrip_title_get_video_stream (encoding->priv->title), NULL);
-
-      g_object_set_data_full (G_OBJECT (encoding), "media", g_object_ref (media), (GDestroyNotify) g_object_unref);
+        g_object_set (link->data, "input", ogmrip_title_get_video_stream (new_title), NULL);
     }
+
+    g_object_unref (new_media);
   }
 
   g_signal_handler_disconnect (task, id);
@@ -2116,11 +2128,9 @@ ogmrip_encoding_clean (OGMRipEncoding *encoding, gboolean temporary, gboolean co
 */
   if (copy && encoding->priv->copy)
   {
-    OGMRipTitle *title;
     const gchar *uri;
 
-    title = ogmrip_encoding_get_title (encoding);
-    uri = ogmrip_media_get_uri (ogmrip_title_get_media (title));
+    uri = ogmrip_media_get_uri (encoding->priv->media);
     if (g_str_has_prefix (uri, "dvd://"))
       ogmrip_fs_rmdir (uri + 6, TRUE, NULL);
   }

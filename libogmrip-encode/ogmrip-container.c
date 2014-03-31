@@ -245,11 +245,13 @@ ogmrip_container_get_property (GObject *gobject, guint property_id, GValue *valu
 GType
 ogmrip_container_get_default (void)
 {
-  GType *types;
+  GType *types, default_type;
 
   types = ogmrip_type_children (OGMRIP_TYPE_CONTAINER, NULL);
+  default_type = types[0];
+  g_free (types);
 
-  return types[0];
+  return default_type;
 }
 
 OGMRipContainer *

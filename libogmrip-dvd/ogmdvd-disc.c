@@ -594,9 +594,13 @@ ogmdvd_disc_initable_init (GInitable *initable, GCancellable *cancellable, GErro
   reader = dvd_open_reader (disc->priv->device, NULL);
   if (!reader)
     return FALSE;
+
   id = dvd_reader_get_id (reader);
   if (!id)
+  {
+    DVDClose (reader);
     return FALSE;
+  }
 /*
   old = ogmdvd_disc_get_open (disc->priv->device);
   if (old)
@@ -616,7 +620,10 @@ ogmdvd_disc_initable_init (GInitable *initable, GCancellable *cancellable, GErro
 */
   vmg_file = ifoOpen (reader, 0);
   if (!vmg_file)
+  {
+    DVDClose (reader);
     return FALSE;
+  }
 
   disc->priv->id = g_strdup (id);
   disc->priv->label = ogmdvd_disc_get_title_name (disc);

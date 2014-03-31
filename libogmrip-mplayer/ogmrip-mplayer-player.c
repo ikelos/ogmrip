@@ -92,7 +92,7 @@ ogmrip_mplayer_play_command (OGMRipPlayer *player)
 {
   GPtrArray *argv;
 
-  argv = g_ptr_array_new ();
+  argv = g_ptr_array_new_full (20, g_free);
   g_ptr_array_add (argv, g_strdup ("mplayer"));
 
   g_ptr_array_add (argv, g_strdup ("-slave"));

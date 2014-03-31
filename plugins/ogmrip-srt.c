@@ -125,7 +125,7 @@ ogmrip_subp2pgm_command (OGMRipSubpCodec *subp, const gchar *input)
   OGMJobTask *task;
   GPtrArray *argv;
 
-  argv = g_ptr_array_new ();
+  argv = g_ptr_array_new_full (20, g_free);
 
   if (use_tesseract)
     g_ptr_array_add (argv, g_strdup ("subp2tiff"));
@@ -155,7 +155,7 @@ ogmrip_gocr_command (OGMRipSubpCodec *subp, const gchar *input)
   OGMJobTask *task;
   GPtrArray *argv;
 
-  argv = g_ptr_array_new ();
+  argv = g_ptr_array_new_full (20, g_free);
   g_ptr_array_add (argv, g_strdup ("gocr"));
   g_ptr_array_add (argv, g_strdup ("-v"));
   g_ptr_array_add (argv, g_strdup ("1"));
@@ -198,7 +198,7 @@ ogmrip_ocrad_command (OGMRipSubpCodec *subp, const gchar *input)
   OGMJobTask *task;
   GPtrArray *argv;
 
-  argv = g_ptr_array_new ();
+  argv = g_ptr_array_new_full (20, g_free);
   g_ptr_array_add (argv, g_strdup ("ocrad"));
   g_ptr_array_add (argv, g_strdup ("-v"));
   g_ptr_array_add (argv, g_strdup ("-f"));
@@ -237,7 +237,7 @@ ogmrip_tesseract_command (OGMRipSubpCodec *subp, const gchar *input, gboolean la
   OGMJobTask *task;
   GPtrArray *argv;
 
-  argv = g_ptr_array_new ();
+  argv = g_ptr_array_new_full (20, g_free);
   g_ptr_array_add (argv, g_strdup ("tesseract"));
   g_ptr_array_add (argv, g_strdup (input));
   g_ptr_array_add (argv, g_strdup (input));
@@ -285,7 +285,7 @@ ogmrip_srt_command (OGMRipSubpCodec *subp, const gchar *input)
 
   output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (subp)));
 
-  argv = g_ptr_array_new ();
+  argv = g_ptr_array_new_full (20, g_free);
   g_ptr_array_add (argv, g_strdup ("subptools"));
   g_ptr_array_add (argv, g_strdup ("-s"));
 

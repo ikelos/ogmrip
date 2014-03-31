@@ -91,7 +91,7 @@ ogmrip_theora_command (OGMRipVideoCodec *video, const gchar *input)
 
   output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (video)));
 
-  argv = g_ptr_array_new ();
+  argv = g_ptr_array_new_full (20, g_free);
 
   g_ptr_array_add (argv, g_strdup (THEORAENC));
 

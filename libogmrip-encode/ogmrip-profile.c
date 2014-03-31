@@ -303,24 +303,32 @@ ogmrip_profile_dispose (GObject *gobject)
 
   if (profile->priv->general_settings)
   {
+    g_signal_handlers_disconnect_by_func (profile->priv->general_settings,
+        ogmrip_profile_check, profile);
     g_object_unref (profile->priv->general_settings);
     profile->priv->general_settings = NULL;
   }
 
   if (profile->priv->video_settings)
   {
+    g_signal_handlers_disconnect_by_func (profile->priv->video_settings,
+        ogmrip_profile_check, profile);
     g_object_unref (profile->priv->video_settings);
     profile->priv->video_settings = NULL;
   }
 
   if (profile->priv->audio_settings)
   {
+    g_signal_handlers_disconnect_by_func (profile->priv->audio_settings,
+        ogmrip_profile_check, profile);
     g_object_unref (profile->priv->audio_settings);
     profile->priv->audio_settings = NULL;
   }
 
   if (profile->priv->subp_settings)
   {
+    g_signal_handlers_disconnect_by_func (profile->priv->subp_settings,
+        ogmrip_profile_check, profile);
     g_object_unref (profile->priv->subp_settings);
     profile->priv->subp_settings = NULL;
   }
@@ -337,6 +345,10 @@ ogmrip_profile_dispose (GObject *gobject)
 static void
 ogmrip_profile_finalize (GObject *gobject)
 {
+#ifdef G_ENABLE_DEBUG
+  g_debug ("Finalizing profile '%s'", OGMRIP_PROFILE (gobject)->priv->name);
+#endif
+
   g_free (OGMRIP_PROFILE (gobject)->priv->name);
   g_free (OGMRIP_PROFILE (gobject)->priv->path);
 

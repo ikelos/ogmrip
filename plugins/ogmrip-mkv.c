@@ -300,7 +300,7 @@ ogmrip_matroska_command (OGMRipContainer *matroska)
   const gchar *label, *fourcc;
   guint tsize, tnumber;
 
-  argv = g_ptr_array_new ();
+  argv = g_ptr_array_new_full (20, g_free);
   g_ptr_array_add (argv, g_strdup (MKVMERGE));
 
   if (OGMRIP_MATROSKA (matroska)->webm)

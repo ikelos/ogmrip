@@ -170,7 +170,7 @@ ogmrip_stub_set_property (GObject *gobject, guint property_id, const GValue *val
   {
     case PROP_CODEC:
       stub->priv->codec = g_value_get_object (value);
-      g_object_add_weak_pointer (G_OBJECT (stub->priv->codec), (gpointer *) &stub->priv->codec);
+      /* g_object_add_weak_pointer (G_OBJECT (stub->priv->codec), (gpointer *) &stub->priv->codec); */
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);

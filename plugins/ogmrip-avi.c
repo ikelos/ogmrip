@@ -129,7 +129,7 @@ ogmrip_avi_command (OGMRipContainer *avi, GError **error)
   const gchar *fourcc;
   guint tsize, tnumber;
 
-  argv = g_ptr_array_new ();
+  argv = g_ptr_array_new_full (20, g_free);
   g_ptr_array_add (argv, g_strdup ("avibox"));
 
   g_ptr_array_add (argv, g_strdup ("-o"));
@@ -177,7 +177,7 @@ ogmrip_copy_command (OGMRipContainer *container, const gchar *input, const gchar
   output = ogmrip_fs_set_extension (filename, ext);
   g_free (filename);
 
-  argv = g_ptr_array_new ();
+  argv = g_ptr_array_new_full (20, g_free);
   g_ptr_array_add (argv, g_strdup ("cp"));
   g_ptr_array_add (argv, g_strdup ("-f"));
   g_ptr_array_add (argv, g_strdup (input));

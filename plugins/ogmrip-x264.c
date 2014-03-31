@@ -1030,7 +1030,7 @@ ogmrip_x264_check_option (const gchar *option)
   gchar *options, *output = NULL;
   gint status;
 
-  argv = g_ptr_array_new ();
+  argv = g_ptr_array_new_full (20, NULL);
 
   g_ptr_array_add (argv, "mencoder");
   g_ptr_array_add (argv, "-nocache");

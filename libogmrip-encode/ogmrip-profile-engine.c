@@ -92,6 +92,7 @@ ogmrip_profile_engine_set_profiles (OGMRipProfileEngine *engine, const gchar **p
     g_object_unref (profile);
   }
 }
+
 static gboolean
 compare_by_name (const gchar *key, OGMRipProfile *value, const gchar *name)
 {
@@ -161,7 +162,7 @@ ogmrip_profile_engine_dispose (GObject *gobject)
 
   if (engine->priv->profiles)
   {
-    g_hash_table_destroy (engine->priv->profiles);
+    g_hash_table_unref (engine->priv->profiles);
     engine->priv->profiles = NULL;
   }
 

@@ -79,7 +79,7 @@ ogmrip_copy_class_init (OGMRipCopyClass *klass)
 
   g_object_class_install_property (gobject_class, PROP_MEDIA, 
         g_param_spec_object ("media", "Media property", "Set media", 
-           OGMRIP_TYPE_MEDIA, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+           OGMRIP_TYPE_MEDIA, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_TITLE, 
         g_param_spec_object ("title", "Title property", "Set title", 
@@ -156,10 +156,10 @@ ogmrip_copy_set_property (GObject *gobject, guint property_id, const GValue *val
   switch (property_id) 
   {
     case PROP_MEDIA:
-      copy->priv->src = g_value_dup_object (value);
       break;
     case PROP_TITLE:
       copy->priv->title = g_value_dup_object (value);
+      copy->priv->src = g_object_ref (ogmrip_title_get_media (copy->priv->title));
       break;
     case PROP_PATH:
       g_free (copy->priv->path);
@@ -232,8 +232,7 @@ ogmrip_copy_new_from_title (OGMRipTitle *title, const gchar *path)
   g_return_val_if_fail (OGMRIP_IS_TITLE (title), NULL);
   g_return_val_if_fail (path && *path, NULL);
 
-  return g_object_new (OGMRIP_TYPE_COPY,
-      "media", ogmrip_title_get_media (title), "title", title, "path", path, NULL);
+  return g_object_new (OGMRIP_TYPE_COPY, "title", title, "path", path, NULL);
 }
 
 OGMRipMedia *

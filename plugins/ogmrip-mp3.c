@@ -79,7 +79,7 @@ ogmrip_mp3_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input
 
   quality = ogmrip_audio_codec_get_quality (audio);
 
-  argv = g_ptr_array_new ();
+  argv = g_ptr_array_new_full (10, g_free);
   g_ptr_array_add (argv, g_strdup (LAME));
   g_ptr_array_add (argv, g_strdup ("--nohist"));
   g_ptr_array_add (argv, g_strdup ("-h"));
