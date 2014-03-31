@@ -416,6 +416,9 @@ ogmrip_encoding_manager_dialog_export_activated (GSimpleAction *action, GVariant
           if (!status)
             break;
         }
+
+        if (link->next)
+          ogmrip_xml_parent (xml);
       }
 
       if (status)
