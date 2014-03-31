@@ -31,9 +31,6 @@
 
 #include <glib/gi18n-lib.h>
 
-#define OGMRIP_LIST_ITEM_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_LIST_ITEM, OGMRipListItemPriv))
-
 struct _OGMRipListItemPriv
 {
   GtkWidget *add_button;
@@ -57,17 +54,6 @@ enum
   N_SIGNALS
 };
 
-static void ogmrip_list_item_constructed  (GObject      *gobject);
-static void ogmrip_list_item_finalize     (GObject      *gobject);
-static void ogmrip_list_item_get_property (GObject      *gobject,
-                                           guint        param_id,
-                                           GValue       *value,
-                                           GParamSpec   *pspec);
-static void ogmrip_list_item_set_property (GObject      *gobject,
-                                           guint        param_id,
-                                           const GValue *value,
-                                           GParamSpec   *pspec);
-
 static guint signals[N_SIGNALS] = { 0 };
 
 static void
@@ -88,49 +74,7 @@ ogmrip_list_item_rem_button_clicked_cb (OGMRipListItem *item)
   g_signal_emit (G_OBJECT (item), signals[REMOVE], 0);
 }
 
-G_DEFINE_TYPE (OGMRipListItem, ogmrip_list_item, GTK_TYPE_BOX)
-
-static void
-ogmrip_list_item_class_init (OGMRipListItemClass *klass)
-{
-  GObjectClass *gobject_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->constructed = ogmrip_list_item_constructed;
-  gobject_class->finalize = ogmrip_list_item_finalize;
-  gobject_class->get_property = ogmrip_list_item_get_property;
-  gobject_class->set_property = ogmrip_list_item_set_property;
-
-  g_object_class_install_property (gobject_class, PROP_ADD_TOOLTIP,
-      g_param_spec_string ("add-tooltip", "add-tooltip", "add-tooltip",
-        NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_REMOVE_TOOLTIP,
-      g_param_spec_string ("remove-tooltip", "remove-tooltip", "remove-tooltip",
-        NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
-
-  signals[ADD] = g_signal_new ("add-clicked", G_TYPE_FROM_CLASS (klass), 
-      G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
-      G_STRUCT_OFFSET (OGMRipListItemClass, add_clicked), NULL, NULL,
-      g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
-
-  signals[REMOVE] = g_signal_new ("remove-clicked", G_TYPE_FROM_CLASS (klass), 
-      G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
-      G_STRUCT_OFFSET (OGMRipListItemClass, remove_clicked), NULL, NULL,
-      g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
-
-  g_type_class_add_private (klass, sizeof (OGMRipListItemPriv));
-}
-
-static void
-ogmrip_list_item_init (OGMRipListItem *item)
-{
-  item->priv = OGMRIP_LIST_ITEM_GET_PRIVATE (item);
-
-  gtk_widget_set_vexpand (GTK_WIDGET (item), FALSE);
-
-  item->priv->group = gtk_size_group_new (GTK_SIZE_GROUP_BOTH);
-}
+G_DEFINE_TYPE_WITH_PRIVATE (OGMRipListItem, ogmrip_list_item, GTK_TYPE_BOX)
 
 static void
 ogmrip_list_item_constructed (GObject *gobject)
@@ -183,12 +127,26 @@ ogmrip_list_item_constructed (GObject *gobject)
 }
 
 static void
+ogmrip_list_item_dispose (GObject *gobject)
+{
+  OGMRipListItem *item = OGMRIP_LIST_ITEM (gobject);
+
+  if (item->priv->group)
+  {
+    g_object_unref (item->priv->group);
+    item->priv->group = NULL;
+  }
+
+  G_OBJECT_CLASS (ogmrip_list_item_parent_class)->dispose (gobject);
+}
+
+static void
 ogmrip_list_item_finalize (GObject *gobject)
 {
-  OGMRipListItem *list = OGMRIP_LIST_ITEM (gobject);
+  OGMRipListItem *item = OGMRIP_LIST_ITEM (gobject);
 
-  g_free (list->priv->add_tooltip);
-  g_free (list->priv->remove_tooltip);
+  g_free (item->priv->add_tooltip);
+  g_free (item->priv->remove_tooltip);
 
   G_OBJECT_CLASS (ogmrip_list_item_parent_class)->finalize (gobject);
 }
@@ -196,16 +154,16 @@ ogmrip_list_item_finalize (GObject *gobject)
 static void
 ogmrip_list_item_get_property (GObject *gobject, guint prop_id, GValue *value, GParamSpec *pspec)
 {
-  OGMRipListItem *list = OGMRIP_LIST_ITEM (gobject);
+  OGMRipListItem *item = OGMRIP_LIST_ITEM (gobject);
 
   switch (prop_id)
   {
     case PROP_ADD_TOOLTIP:
-      g_value_set_string (value, list->priv->add_tooltip);
+      g_value_set_string (value, item->priv->add_tooltip);
       break;
     case PROP_REMOVE_TOOLTIP:
       break;
-      g_value_set_string (value, list->priv->remove_tooltip);
+      g_value_set_string (value, item->priv->remove_tooltip);
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
       break;
@@ -215,20 +173,61 @@ ogmrip_list_item_get_property (GObject *gobject, guint prop_id, GValue *value, G
 static void
 ogmrip_list_item_set_property (GObject *gobject, guint prop_id, const GValue *value, GParamSpec *pspec)
 {
-  OGMRipListItem *list = OGMRIP_LIST_ITEM (gobject);
+  OGMRipListItem *item = OGMRIP_LIST_ITEM (gobject);
 
   switch (prop_id)
   {
     case PROP_ADD_TOOLTIP:
-      list->priv->add_tooltip = g_value_dup_string (value);
+      item->priv->add_tooltip = g_value_dup_string (value);
       break;
     case PROP_REMOVE_TOOLTIP:
-      list->priv->remove_tooltip = g_value_dup_string (value);
+      item->priv->remove_tooltip = g_value_dup_string (value);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
       break;
   }
+}
+
+static void
+ogmrip_list_item_class_init (OGMRipListItemClass *klass)
+{
+  GObjectClass *gobject_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->constructed = ogmrip_list_item_constructed;
+  gobject_class->dispose = ogmrip_list_item_dispose;
+  gobject_class->finalize = ogmrip_list_item_finalize;
+  gobject_class->get_property = ogmrip_list_item_get_property;
+  gobject_class->set_property = ogmrip_list_item_set_property;
+
+  g_object_class_install_property (gobject_class, PROP_ADD_TOOLTIP,
+      g_param_spec_string ("add-tooltip", "add-tooltip", "add-tooltip",
+        NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_REMOVE_TOOLTIP,
+      g_param_spec_string ("remove-tooltip", "remove-tooltip", "remove-tooltip",
+        NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+
+  signals[ADD] = g_signal_new ("add-clicked", G_TYPE_FROM_CLASS (klass), 
+      G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+      G_STRUCT_OFFSET (OGMRipListItemClass, add_clicked), NULL, NULL,
+      g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+
+  signals[REMOVE] = g_signal_new ("remove-clicked", G_TYPE_FROM_CLASS (klass), 
+      G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+      G_STRUCT_OFFSET (OGMRipListItemClass, remove_clicked), NULL, NULL,
+      g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+}
+
+static void
+ogmrip_list_item_init (OGMRipListItem *item)
+{
+  item->priv = ogmrip_list_item_get_instance_private (item);
+
+  gtk_widget_set_vexpand (GTK_WIDGET (item), FALSE);
+
+  item->priv->group = gtk_size_group_new (GTK_SIZE_GROUP_BOTH);
 }
 
 GtkWidget *
@@ -238,10 +237,10 @@ ogmrip_list_item_new (void)
 }
 
 GtkSizeGroup *
-ogmrip_list_item_get_size_group (OGMRipListItem *list)
+ogmrip_list_item_get_size_group (OGMRipListItem *item)
 {
-  g_return_val_if_fail (OGMRIP_IS_LIST_ITEM (list), NULL);
+  g_return_val_if_fail (OGMRIP_IS_LIST_ITEM (item), NULL);
 
-  return list->priv->group;
+  return item->priv->group;
 }
 

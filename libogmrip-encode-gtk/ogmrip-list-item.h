@@ -31,13 +31,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipListItem      OGMRipListItem;
 typedef struct _OGMRipListItemClass OGMRipListItemClass;
-typedef struct _OGMRipListItemPriv  OGMRipListItemPriv;
+typedef struct _OGMRipListItemPriv  OGMRipListItemPrivate;
 
 struct _OGMRipListItem
 {
   GtkBox parent_instance;
 
-  OGMRipListItemPriv *priv;
+  OGMRipListItemPrivate *priv;
 };
 
 struct _OGMRipListItemClass
