@@ -32,13 +32,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMDvdAudioStream      OGMDvdAudioStream;
 typedef struct _OGMDvdAudioStreamClass OGMDvdAudioStreamClass;
-typedef struct _OGMDvdAudioStreamPriv  OGMDvdAudioStreamPriv;
+typedef struct _OGMDvdAudioStreamPriv  OGMDvdAudioStreamPrivate;
 
 struct _OGMDvdAudioStream
 {
   GObject parent_instance;
 
-  OGMDvdAudioStreamPriv *priv;
+  OGMDvdAudioStreamPrivate *priv;
 };
 
 struct _OGMDvdAudioStreamClass

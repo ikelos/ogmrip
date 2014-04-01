@@ -46,22 +46,37 @@ static void ogmrip_audio_stream_iface_init (OGMRipAudioStreamInterface *iface);
 
 G_DEFINE_TYPE_WITH_CODE (OGMDvdAudioStream, ogmdvd_audio_stream, G_TYPE_OBJECT,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_STREAM, ogmrip_stream_iface_init)
-    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_AUDIO_STREAM, ogmrip_audio_stream_iface_init));
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_AUDIO_STREAM, ogmrip_audio_stream_iface_init)
+    G_ADD_PRIVATE (OGMDvdAudioStream));
 
+static void
+ogmdvd_audio_stream_dispose (GObject *gobject)
+{
+  OGMDvdAudioStream *stream = OGMDVD_AUDIO_STREAM (gobject);
+
+  if (stream->priv->title)
+  {
+    g_object_remove_weak_pointer (G_OBJECT (stream->priv->title), (gpointer *) &stream->priv->title);
+    stream->priv->title = NULL;
+  }
+
+  G_OBJECT_CLASS (ogmdvd_audio_stream_parent_class)->dispose (gobject);
+}  
+
+#ifdef G_ENABLE_DEBUG
 static void
 ogmdvd_audio_stream_finalize (GObject *gobject)
 {
-#ifdef G_ENABLE_DEBUG
   g_debug ("Finalizing %s (%d)", G_OBJECT_TYPE_NAME (gobject), OGMDVD_AUDIO_STREAM (gobject)->priv->id);
-#endif
 
   G_OBJECT_CLASS (ogmdvd_audio_stream_parent_class)->finalize (gobject);
 }  
+#endif
 
 static void
 ogmdvd_audio_stream_init (OGMDvdAudioStream *stream)
 {
-  stream->priv = G_TYPE_INSTANCE_GET_PRIVATE (stream, OGMDVD_TYPE_AUDIO_STREAM, OGMDvdAudioStreamPriv);
+  stream->priv = ogmdvd_audio_stream_get_instance_private (stream);
 }
 
 static void
@@ -70,9 +85,11 @@ ogmdvd_audio_stream_class_init (OGMDvdAudioStreamClass *klass)
   GObjectClass *gobject_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->finalize = ogmdvd_audio_stream_finalize;
+  gobject_class->dispose = ogmdvd_audio_stream_dispose;
 
-  g_type_class_add_private (klass, sizeof (OGMDvdAudioStreamPriv));
+#ifdef G_ENABLE_DEBUG
+  gobject_class->finalize = ogmdvd_audio_stream_finalize;
+#endif
 }
 
 static gint

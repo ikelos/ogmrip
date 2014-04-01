@@ -63,13 +63,13 @@ typedef enum
 
 typedef struct _OGMDvdDisc      OGMDvdDisc;
 typedef struct _OGMDvdDiscClass OGMDvdDiscClass;
-typedef struct _OGMDvdDiscPriv  OGMDvdDiscPriv;
+typedef struct _OGMDvdDiscPriv  OGMDvdDiscPrivate;
 
 struct _OGMDvdDisc
 {
   GObject parent_instance;
 
-  OGMDvdDiscPriv *priv;
+  OGMDvdDiscPrivate *priv;
 };
 
 struct _OGMDvdDiscClass

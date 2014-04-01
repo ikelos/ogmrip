@@ -32,13 +32,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMDvdTitle      OGMDvdTitle;
 typedef struct _OGMDvdTitleClass OGMDvdTitleClass;
-typedef struct _OGMDvdTitlePriv  OGMDvdTitlePriv;
+typedef struct _OGMDvdTitlePriv  OGMDvdTitlePrivate;
 
 struct _OGMDvdTitle
 {
   GObject parent_instance;
 
-  OGMDvdTitlePriv *priv;
+  OGMDvdTitlePrivate *priv;
 };
 
 struct _OGMDvdTitleClass

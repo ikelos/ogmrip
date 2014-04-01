@@ -32,13 +32,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMDvdSubpStream      OGMDvdSubpStream;
 typedef struct _OGMDvdSubpStreamClass OGMDvdSubpStreamClass;
-typedef struct _OGMDvdSubpStreamPriv  OGMDvdSubpStreamPriv;
+typedef struct _OGMDvdSubpStreamPriv  OGMDvdSubpStreamPrivate;
 
 struct _OGMDvdSubpStream
 {
   GObject parent_instance;
 
-  OGMDvdSubpStreamPriv *priv;
+  OGMDvdSubpStreamPrivate *priv;
 };
 
 struct _OGMDvdSubpStreamClass
