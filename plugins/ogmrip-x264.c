@@ -1037,7 +1037,7 @@ ogmrip_x264_check_option (const gchar *option)
   g_ptr_array_add (argv, "-nosound");
   g_ptr_array_add (argv, "-quiet");
   g_ptr_array_add (argv, "-frames");
-  g_ptr_array_add (argv, "1");
+  g_ptr_array_add (argv, "0");
   g_ptr_array_add (argv, "-rawvideo");
   g_ptr_array_add (argv, "pal:fps=25");
   g_ptr_array_add (argv, "-demuxer");
