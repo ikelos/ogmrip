@@ -170,6 +170,7 @@ ogmrip_subp_chooser_widget_init (OGMRipSubpChooserWidget *widget)
       G_CALLBACK (ogmrip_subp_chooser_widget_combo_title_notified), widget);
 
   widget->priv->button = gtk_button_new_with_label ("...");
+  gtk_widget_set_tooltip_text (widget->priv->button, _("Options"));
   gtk_box_pack_start (GTK_BOX (widget), widget->priv->button, FALSE, FALSE, 0);
   gtk_widget_set_sensitive (widget->priv->button, FALSE);
   gtk_widget_show (widget->priv->button);
@@ -243,7 +244,10 @@ ogmrip_subp_chooser_widget_destroy (GtkWidget *widget)
 GtkWidget *
 ogmrip_subp_chooser_widget_new (void)
 {
-  return g_object_new (OGMRIP_TYPE_SUBP_CHOOSER_WIDGET, NULL);
+  return g_object_new (OGMRIP_TYPE_SUBP_CHOOSER_WIDGET,
+      "add-tooltip",    _("Add an subtitle stream"),
+      "remove-tooltip", _("Remove the subtitle stream"),
+      NULL);
 }
 
 OGMRipSubpOptions *

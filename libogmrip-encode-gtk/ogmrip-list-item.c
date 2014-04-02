@@ -104,7 +104,7 @@ ogmrip_list_item_constructed (GObject *gobject)
   g_signal_connect_swapped (item->priv->add_button, "clicked",
       G_CALLBACK (ogmrip_list_item_add_button_clicked_cb), item);
 
-  image = gtk_image_new_from_icon_name ("list-add", GTK_ICON_SIZE_MENU);
+  image = gtk_image_new_from_icon_name ("list-add-symbolic", GTK_ICON_SIZE_MENU);
   gtk_container_add (GTK_CONTAINER (item->priv->add_button), image);
   gtk_widget_show (image);
 
@@ -119,7 +119,7 @@ ogmrip_list_item_constructed (GObject *gobject)
   g_signal_connect_swapped (item->priv->remove_button, "clicked",
       G_CALLBACK (ogmrip_list_item_rem_button_clicked_cb), item);
 
-  image = gtk_image_new_from_icon_name ("list-remove", GTK_ICON_SIZE_MENU);
+  image = gtk_image_new_from_icon_name ("list-remove-symbolic", GTK_ICON_SIZE_MENU);
   gtk_container_add (GTK_CONTAINER (item->priv->remove_button), image);
   gtk_widget_show (image);
 

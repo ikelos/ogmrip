@@ -48,6 +48,7 @@ libogmrip-file-gtk/ogmrip-file-chooser-dialog.c
 libogmrip-file-gtk/ogmrip-source-chooser-widget.c
 libogmrip-file-gtk/ogmrip-subp-file-chooser-dialog.c
 
+libogmrip-encode-gtk/ogmrip-audio-chooser-widget.c
 libogmrip-encode-gtk/ogmrip-audio-options-dialog.c
 libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c
 libogmrip-encode-gtk/ogmrip-list-item.c
@@ -56,6 +57,7 @@ libogmrip-encode-gtk/ogmrip-profile-manager-dialog.c
 libogmrip-encode-gtk/ogmrip-profile-view.c
 libogmrip-encode-gtk/ogmrip-progress-dialog.c
 libogmrip-encode-gtk/ogmrip-progress-menu.ui
+libogmrip-encode-gtk/ogmrip-subp-chooser-widget.c
 libogmrip-encode-gtk/ogmrip-subp-options-dialog.c
 
 libogmrip-mplayer/ogmrip-mplayer-commands.c
@@ -65,6 +67,7 @@ src/ogmrip-crop-dialog.c
 src/ogmrip-gui.c
 src/ogmrip-helper.c
 src/ogmrip-main.c
+src/ogmrip-main-window.c
 src/ogmrip-options-dialog.c
 src/ogmrip-pref-dialog.c
 src/ogmrip-spell-dialog.c
