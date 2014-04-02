@@ -39,14 +39,14 @@ typedef enum
 } OGMRipDirection;
 
 typedef struct _OGMRipEncodingManager      OGMRipEncodingManager;
-typedef struct _OGMRipEncodingManagerPriv  OGMRipEncodingManagerPriv;
+typedef struct _OGMRipEncodingManagerPriv  OGMRipEncodingManagerPrivate;
 typedef struct _OGMRipEncodingManagerClass OGMRipEncodingManagerClass;
 
 struct _OGMRipEncodingManager
 {
   GObject parent_instance;
 
-  OGMRipEncodingManagerPriv *priv;
+  OGMRipEncodingManagerPrivate *priv;
 };
 
 struct _OGMRipEncodingManagerClass

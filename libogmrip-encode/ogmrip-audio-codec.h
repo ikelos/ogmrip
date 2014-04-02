@@ -32,14 +32,14 @@ G_BEGIN_DECLS
 #define OGMRIP_AUDIO_CODEC_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), OGMRIP_TYPE_AUDIO_CODEC, OGMRipAudioCodecClass))
 
 typedef struct _OGMRipAudioCodec      OGMRipAudioCodec;
-typedef struct _OGMRipAudioCodecPriv  OGMRipAudioCodecPriv;
+typedef struct _OGMRipAudioCodecPriv  OGMRipAudioCodecPrivate;
 typedef struct _OGMRipAudioCodecClass OGMRipAudioCodecClass;
 
 struct _OGMRipAudioCodec
 {
   OGMRipCodec parent_instance;
 
-  OGMRipAudioCodecPriv *priv;
+  OGMRipAudioCodecPrivate *priv;
 };
 
 struct _OGMRipAudioCodecClass

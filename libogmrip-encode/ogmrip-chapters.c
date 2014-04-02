@@ -25,23 +25,6 @@
 
 #include "ogmrip-chapters.h"
 
-#define OGMRIP_CHAPTERS_GET_PRIVATE(o) \
-    (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_CHAPTERS, OGMRipChaptersPriv))
-
-static void     ogmrip_chapters_constructed  (GObject      *gobject);
-static void     ogmrip_chapters_finalize     (GObject      *gobject);
-static void     ogmrip_chapters_set_property (GObject      *gobject,
-                                              guint        property_id,
-                                              const GValue *value,
-                                              GParamSpec   *pspec);
-static void     ogmrip_chapters_get_property (GObject      *gobject,
-                                              guint        property_id,
-                                              GValue       *value,
-                                              GParamSpec   *pspec);
-static gboolean ogmrip_chapters_run          (OGMJobTask   *task,
-                                              GCancellable *cancellable,
-                                              GError       **error);
-
 struct _OGMRipChaptersPriv
 {
   gint nchapters;
@@ -55,35 +38,7 @@ enum
   PROP_LANGUAGE
 };
 
-G_DEFINE_TYPE (OGMRipChapters, ogmrip_chapters, OGMRIP_TYPE_CODEC)
-
-static void
-ogmrip_chapters_class_init (OGMRipChaptersClass *klass)
-{
-  GObjectClass *gobject_class;
-  OGMJobTaskClass *task_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->constructed = ogmrip_chapters_constructed;
-  gobject_class->finalize = ogmrip_chapters_finalize;
-  gobject_class->get_property = ogmrip_chapters_get_property;
-  gobject_class->set_property = ogmrip_chapters_set_property;
-
-  task_class = OGMJOB_TASK_CLASS (klass);
-  task_class->run = ogmrip_chapters_run;
-
-  g_object_class_install_property (gobject_class, PROP_LANGUAGE, 
-        g_param_spec_uint ("language", "Language property", "Set language", 
-           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_type_class_add_private (klass, sizeof (OGMRipChaptersPriv));
-}
-
-static void
-ogmrip_chapters_init (OGMRipChapters *chapters)
-{
-  chapters->priv = OGMRIP_CHAPTERS_GET_PRIVATE (chapters);
-}
+G_DEFINE_TYPE_WITH_PRIVATE (OGMRipChapters, ogmrip_chapters, OGMRIP_TYPE_CODEC)
 
 static void
 ogmrip_chapters_constructed (GObject *gobject)
@@ -204,6 +159,32 @@ ogmrip_chapters_run (OGMJobTask *task, GCancellable *cancellable, GError **error
   g_io_channel_unref (channel);
 
   return TRUE;
+}
+
+static void
+ogmrip_chapters_class_init (OGMRipChaptersClass *klass)
+{
+  GObjectClass *gobject_class;
+  OGMJobTaskClass *task_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->constructed = ogmrip_chapters_constructed;
+  gobject_class->finalize = ogmrip_chapters_finalize;
+  gobject_class->get_property = ogmrip_chapters_get_property;
+  gobject_class->set_property = ogmrip_chapters_set_property;
+
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_chapters_run;
+
+  g_object_class_install_property (gobject_class, PROP_LANGUAGE, 
+        g_param_spec_uint ("language", "Language property", "Set language", 
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+}
+
+static void
+ogmrip_chapters_init (OGMRipChapters *chapters)
+{
+  chapters->priv = ogmrip_chapters_get_instance_private (chapters);
 }
 
 /**

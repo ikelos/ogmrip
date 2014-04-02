@@ -41,14 +41,14 @@ GQuark ogmrip_codec_error_quark (void);
 #define OGMRIP_CODEC_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), OGMRIP_TYPE_CODEC, OGMRipCodecClass))
 
 typedef struct _OGMRipCodec      OGMRipCodec;
-typedef struct _OGMRipCodecPriv  OGMRipCodecPriv;
+typedef struct _OGMRipCodecPriv  OGMRipCodecPrivate;
 typedef struct _OGMRipCodecClass OGMRipCodecClass;
 
 struct _OGMRipCodec
 {
   OGMJobBin parent_instance;
 
-  OGMRipCodecPriv *priv;
+  OGMRipCodecPrivate *priv;
 };
 
 struct _OGMRipCodecClass

@@ -32,13 +32,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipStub      OGMRipStub;
 typedef struct _OGMRipStubClass OGMRipStubClass;
-typedef struct _OGMRipStubPriv  OGMRipStubPriv;
+typedef struct _OGMRipStubPriv  OGMRipStubPrivate;
 
 struct _OGMRipStub
 {
   OGMRipFile parent_instance;
 
-  OGMRipStubPriv *priv;
+  OGMRipStubPrivate *priv;
 };
 
 struct _OGMRipStubClass

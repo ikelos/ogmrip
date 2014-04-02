@@ -33,14 +33,14 @@ G_BEGIN_DECLS
 #define OGMRIP_CONTAINER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), OGMRIP_TYPE_CONTAINER, OGMRipContainerClass))
 
 typedef struct _OGMRipContainer      OGMRipContainer;
-typedef struct _OGMRipContainerPriv  OGMRipContainerPriv;
+typedef struct _OGMRipContainerPriv  OGMRipContainerPrivate;
 typedef struct _OGMRipContainerClass OGMRipContainerClass;
 
 struct _OGMRipContainer
 {
   OGMJobBin parent_instance;
 
-  OGMRipContainerPriv *priv;
+  OGMRipContainerPrivate *priv;
 };
 
 struct _OGMRipContainerClass

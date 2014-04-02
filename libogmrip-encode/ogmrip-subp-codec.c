@@ -29,9 +29,6 @@
 
 #include <ogmrip-base.h>
 
-#define OGMRIP_SUBP_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_SUBP_CODEC, OGMRipSubpCodecPriv))
-
 struct _OGMRipSubpCodecPriv
 {
   gboolean forced_only;
@@ -53,61 +50,7 @@ enum
   PROP_LANGUAGE
 };
 
-static void ogmrip_subp_codec_constructed  (GObject      *gobject);
-static void ogmrip_subp_codec_finalize     (GObject      *gobject);
-static void ogmrip_subp_codec_set_property (GObject      *gobject,
-                                            guint        property_id,
-                                            const GValue *value,
-                                            GParamSpec   *pspec);
-static void ogmrip_subp_codec_get_property (GObject      *gobject,
-                                            guint        property_id,
-                                            GValue       *value,
-                                            GParamSpec   *pspec);
-
-G_DEFINE_ABSTRACT_TYPE (OGMRipSubpCodec, ogmrip_subp_codec, OGMRIP_TYPE_CODEC)
-
-static void
-ogmrip_subp_codec_class_init (OGMRipSubpCodecClass *klass)
-{
-  GObjectClass *gobject_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-
-  gobject_class->constructed = ogmrip_subp_codec_constructed;
-  gobject_class->finalize = ogmrip_subp_codec_finalize;
-  gobject_class->set_property = ogmrip_subp_codec_set_property;
-  gobject_class->get_property = ogmrip_subp_codec_get_property;
-
-  g_object_class_install_property (gobject_class, PROP_FORCED_ONLY, 
-        g_param_spec_boolean ("forced-only", "Forced only property", "Set forced only", 
-           FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_CHARSET,
-      g_param_spec_int ("charset", "Charset property", "Set charset",
-        OGMRIP_CHARSET_UNDEFINED, OGMRIP_CHARSET_ASCII, OGMRIP_CHARSET_UNDEFINED,
-        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_NEWLINE,
-      g_param_spec_int ("newline", "Newline property", "Set newline",
-        OGMRIP_NEWLINE_UNDEFINED, OGMRIP_NEWLINE_CR_LF, OGMRIP_NEWLINE_UNDEFINED,
-        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_LABEL, 
-        g_param_spec_string ("label", "Label property", "Set label", 
-           NULL, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_LANGUAGE, 
-        g_param_spec_uint ("language", "Language property", "Set language", 
-           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_type_class_add_private (klass, sizeof (OGMRipSubpCodecPriv));
-}
-
-static void
-ogmrip_subp_codec_init (OGMRipSubpCodec *subp)
-{
-  subp->priv = OGMRIP_SUBP_GET_PRIVATE (subp);
-}
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (OGMRipSubpCodec, ogmrip_subp_codec, OGMRIP_TYPE_CODEC)
 
 static void
 ogmrip_subp_codec_constructed (GObject *gobject)
@@ -190,6 +133,47 @@ ogmrip_subp_codec_get_property (GObject *gobject, guint property_id, GValue *val
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
   }
+}
+
+static void
+ogmrip_subp_codec_class_init (OGMRipSubpCodecClass *klass)
+{
+  GObjectClass *gobject_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+
+  gobject_class->constructed = ogmrip_subp_codec_constructed;
+  gobject_class->finalize = ogmrip_subp_codec_finalize;
+  gobject_class->set_property = ogmrip_subp_codec_set_property;
+  gobject_class->get_property = ogmrip_subp_codec_get_property;
+
+  g_object_class_install_property (gobject_class, PROP_FORCED_ONLY, 
+        g_param_spec_boolean ("forced-only", "Forced only property", "Set forced only", 
+           FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_CHARSET,
+      g_param_spec_int ("charset", "Charset property", "Set charset",
+        OGMRIP_CHARSET_UNDEFINED, OGMRIP_CHARSET_ASCII, OGMRIP_CHARSET_UNDEFINED,
+        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_NEWLINE,
+      g_param_spec_int ("newline", "Newline property", "Set newline",
+        OGMRIP_NEWLINE_UNDEFINED, OGMRIP_NEWLINE_CR_LF, OGMRIP_NEWLINE_UNDEFINED,
+        G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_LABEL, 
+        g_param_spec_string ("label", "Label property", "Set label", 
+           NULL, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_LANGUAGE, 
+        g_param_spec_uint ("language", "Language property", "Set language", 
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+}
+
+static void
+ogmrip_subp_codec_init (OGMRipSubpCodec *subp)
+{
+  subp->priv = ogmrip_subp_codec_get_instance_private (subp);
 }
 
 GType

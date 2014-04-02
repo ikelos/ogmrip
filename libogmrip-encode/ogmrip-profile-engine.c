@@ -25,9 +25,6 @@
 
 #include <string.h>
 
-#define OGMRIP_PROFILE_ENGINE_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_PROFILE_ENGINE, OGMRipProfileEnginePriv))
-
 struct _OGMRipProfileEnginePriv
 {
   GSettings *settings;
@@ -99,7 +96,7 @@ compare_by_name (const gchar *key, OGMRipProfile *value, const gchar *name)
   return g_str_equal (key, name);
 }
 
-G_DEFINE_TYPE (OGMRipProfileEngine, ogmrip_profile_engine, G_TYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (OGMRipProfileEngine, ogmrip_profile_engine, G_TYPE_OBJECT)
 
 static GObject *
 ogmrip_profile_engine_constructor (GType type, guint n_params, GObjectConstructParam *params)
@@ -218,7 +215,7 @@ ogmrip_profile_engine_update_internal (OGMRipProfileEngine *engine, OGMRipProfil
 static void
 ogmrip_profile_engine_init (OGMRipProfileEngine *engine)
 {
-  engine->priv = OGMRIP_PROFILE_ENGINE_GET_PRIVATE (engine);
+  engine->priv = ogmrip_profile_engine_get_instance_private (engine);
 
   engine->priv->settings = g_settings_new_with_path ("org.ogmrip.profiles", "/apps/ogmrip/preferences/");
   engine->priv->profiles = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
@@ -261,8 +258,6 @@ ogmrip_profile_engine_class_init (OGMRipProfileEngineClass *klass)
       G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
       G_STRUCT_OFFSET (OGMRipProfileEngineClass, update), NULL, NULL,
       ogmrip_cclosure_marshal_BOOLEAN__OBJECT, G_TYPE_BOOLEAN, 1, OGMRIP_TYPE_PROFILE);
-
-  g_type_class_add_private (klass, sizeof (OGMRipProfileEnginePriv));
 }
 
 OGMRipProfileEngine *

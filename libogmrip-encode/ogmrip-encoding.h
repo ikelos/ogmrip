@@ -88,14 +88,14 @@ typedef enum
 } OGMRipEncodingStatus;
 
 typedef struct _OGMRipEncoding      OGMRipEncoding;
-typedef struct _OGMRipEncodingPriv  OGMRipEncodingPriv;
+typedef struct _OGMRipEncodingPriv  OGMRipEncodingPrivate;
 typedef struct _OGMRipEncodingClass OGMRipEncodingClass;
 
 struct _OGMRipEncoding
 {
   GObject parent_instance;
 
-  OGMRipEncodingPriv *priv;
+  OGMRipEncodingPrivate *priv;
 };
 
 struct _OGMRipEncodingClass

@@ -31,14 +31,14 @@ G_BEGIN_DECLS
 #define OGMRIP_CHAPTERS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), OGMRIP_TYPE_CHAPTERS, OGMRipChaptersClass))
 
 typedef struct _OGMRipChapters      OGMRipChapters;
-typedef struct _OGMRipChaptersPriv  OGMRipChaptersPriv;
+typedef struct _OGMRipChaptersPriv  OGMRipChaptersPrivate;
 typedef struct _OGMRipChaptersClass OGMRipChaptersClass;
 
 struct _OGMRipChapters
 {
   OGMRipCodec parent_instance;
 
-  OGMRipChaptersPriv *priv;
+  OGMRipChaptersPrivate *priv;
 };
 
 struct _OGMRipChaptersClass

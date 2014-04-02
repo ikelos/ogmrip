@@ -30,9 +30,6 @@
 #include <unistd.h>
 #include <glib/gstdio.h>
 
-#define OGMRIP_CODEC_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_CODEC, OGMRipCodecPriv))
-
 struct _OGMRipCodecPriv
 {
   OGMRipTitle *title;
@@ -86,7 +83,7 @@ ogmrip_codec_set_input (OGMRipCodec *codec, OGMRipStream *input)
   }
 }
 
-G_DEFINE_ABSTRACT_TYPE (OGMRipCodec, ogmrip_codec, OGMJOB_TYPE_BIN)
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (OGMRipCodec, ogmrip_codec, OGMJOB_TYPE_BIN)
 
 static void
 ogmrip_codec_constructed (GObject *gobject)
@@ -140,7 +137,7 @@ ogmrip_codec_finalize (GObject *gobject)
 {
   g_debug ("Finalizing %s", G_OBJECT_TYPE_NAME (gobject));
 
-  G_OBJECT_CLASS (ogmrip_codec_parent_class)->dispose (gobject);
+  G_OBJECT_CLASS (ogmrip_codec_parent_class)->finalize (gobject);
 }
 #endif
 
@@ -272,14 +269,12 @@ ogmrip_codec_class_init (OGMRipCodecClass *klass)
   g_object_class_install_property (gobject_class, PROP_START_POSITION, 
         g_param_spec_double ("start-position", "Start position property", "Get start position", 
            0.0, G_MAXDOUBLE, 0.0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_type_class_add_private (klass, sizeof (OGMRipCodecPriv));
 }
 
 static void
 ogmrip_codec_init (OGMRipCodec *codec)
 {
-  codec->priv = OGMRIP_CODEC_GET_PRIVATE (codec);
+  codec->priv = ogmrip_codec_get_instance_private (codec);
 
   codec->priv->end_chap = -1;
   codec->priv->play_length = -1.0;

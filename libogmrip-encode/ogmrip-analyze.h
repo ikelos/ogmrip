@@ -32,13 +32,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipAnalyze      OGMRipAnalyze;
 typedef struct _OGMRipAnalyzeClass OGMRipAnalyzeClass;
-typedef struct _OGMRipAnalyzePriv  OGMRipAnalyzePriv;
+typedef struct _OGMRipAnalyzePriv  OGMRipAnalyzePrivate;
 
 struct _OGMRipAnalyze
 {
   OGMJobSpawn parent_instance;
 
-  OGMRipAnalyzePriv *priv;
+  OGMRipAnalyzePrivate *priv;
 };
 
 struct _OGMRipAnalyzeClass

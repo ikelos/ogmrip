@@ -48,9 +48,6 @@
 
 #define OGMRIP_TYPE_CODEC_ARRAY (ogmrip_codec_array_get_type ())
 
-#define OGMRIP_ENCODING_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_ENCODING, OGMRipEncodingPriv))
-
 #define OGMRIP_ENCODING_STATUS(result, cancellable) \
   ((result) ? OGMRIP_ENCODING_SUCCESS : g_cancellable_is_cancelled (cancellable) ? OGMRIP_ENCODING_CANCELLED : OGMRIP_ENCODING_FAILURE)
 
@@ -217,7 +214,7 @@ ogmrip_encoding_set_title (OGMRipEncoding *encoding, OGMRipTitle *title)
   encoding->priv->media = media;
 }
 
-G_DEFINE_TYPE (OGMRipEncoding, ogmrip_encoding, G_TYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (OGMRipEncoding, ogmrip_encoding, G_TYPE_OBJECT)
 
 static void
 ogmrip_encoding_constructed (GObject *gobject)
@@ -472,14 +469,12 @@ ogmrip_encoding_class_init (OGMRipEncodingClass *klass)
   g_object_class_install_property (gobject_class, PROP_VIDEO_CODEC, 
         g_param_spec_object ("video-codec", "Video codec property", "Set video codec", 
            OGMRIP_TYPE_VIDEO_CODEC, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-
-  g_type_class_add_private (klass, sizeof (OGMRipEncodingPriv));
 }
 
 static void
 ogmrip_encoding_init (OGMRipEncoding *encoding)
 {
-  encoding->priv = OGMRIP_ENCODING_GET_PRIVATE (encoding);
+  encoding->priv = ogmrip_encoding_get_instance_private (encoding);
 
   encoding->priv->ensure_sync = TRUE;
   encoding->priv->autocrop = TRUE;

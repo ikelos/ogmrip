@@ -35,9 +35,6 @@
 
 #include <stdio.h>
 
-#define OGMRIP_PROFILE_GET_PRIVATE(o) \
-    (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_PROFILE, OGMRipProfilePriv))
-
 struct _OGMRipProfilePriv
 {
   gboolean is_valid;
@@ -58,18 +55,6 @@ enum
   PROP_FILE,
   PROP_VALID
 };
-
-static void ogmrip_profile_constructed  (GObject      *gobject);
-static void ogmrip_profile_dispose      (GObject      *gobject);
-static void ogmrip_profile_finalize     (GObject      *gobject);
-static void ogmrip_profile_get_property (GObject      *gobject,
-                                         guint        property_id,
-                                         GValue       *value,
-                                         GParamSpec   *pspec);
-static void ogmrip_profile_set_property (GObject      *gobject,
-                                         guint        property_id,
-                                         const GValue *value,
-                                         GParamSpec   *pspec);
 
 GQuark
 ogmrip_profile_error_quark (void)
@@ -191,40 +176,7 @@ ogmrip_profile_check (OGMRipProfile *profile)
   }
 }
 
-G_DEFINE_TYPE (OGMRipProfile, ogmrip_profile, G_TYPE_SETTINGS)
-
-static void
-ogmrip_profile_class_init (OGMRipProfileClass *klass)
-{
-  GObjectClass *gobject_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->constructed = ogmrip_profile_constructed;
-  gobject_class->dispose = ogmrip_profile_dispose;
-  gobject_class->finalize = ogmrip_profile_finalize;
-  gobject_class->get_property = ogmrip_profile_get_property;
-  gobject_class->set_property = ogmrip_profile_set_property;
-
-  g_object_class_install_property (gobject_class, PROP_NAME,
-      g_param_spec_string ("name", "Name property", "Get name",
-        NULL, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_FILE,
-      g_param_spec_object ("file", "File property", "Get file",
-        G_TYPE_FILE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_VALID,
-      g_param_spec_boolean ("validity", "Validity property", "Get validity",
-        FALSE, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-
-  g_type_class_add_private (klass, sizeof (OGMRipProfilePriv));
-}
-
-static void
-ogmrip_profile_init (OGMRipProfile *profile)
-{
-  profile->priv = OGMRIP_PROFILE_GET_PRIVATE (profile);
-}
+G_DEFINE_TYPE_WITH_PRIVATE (OGMRipProfile, ogmrip_profile, G_TYPE_SETTINGS)
 
 static void
 ogmrip_profile_constructed (GObject *gobject)
@@ -392,6 +344,37 @@ ogmrip_profile_set_property (GObject *gobject, guint property_id, const GValue *
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
   }
+}
+
+static void
+ogmrip_profile_class_init (OGMRipProfileClass *klass)
+{
+  GObjectClass *gobject_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->constructed = ogmrip_profile_constructed;
+  gobject_class->dispose = ogmrip_profile_dispose;
+  gobject_class->finalize = ogmrip_profile_finalize;
+  gobject_class->get_property = ogmrip_profile_get_property;
+  gobject_class->set_property = ogmrip_profile_set_property;
+
+  g_object_class_install_property (gobject_class, PROP_NAME,
+      g_param_spec_string ("name", "Name property", "Get name",
+        NULL, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_FILE,
+      g_param_spec_object ("file", "File property", "Get file",
+        G_TYPE_FILE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_VALID,
+      g_param_spec_boolean ("validity", "Validity property", "Get validity",
+        FALSE, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+}
+
+static void
+ogmrip_profile_init (OGMRipProfile *profile)
+{
+  profile->priv = ogmrip_profile_get_instance_private (profile);
 }
 
 static gchar *

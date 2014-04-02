@@ -143,7 +143,22 @@ ogmrip_stream_iface_init (OGMRipStreamInterface *iface)
 G_DEFINE_TYPE_WITH_CODE (OGMRipStub, ogmrip_stub, OGMRIP_TYPE_FILE,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_MEDIA, ogmrip_media_iface_init)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_TITLE, ogmrip_title_iface_init)
-    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_STREAM, ogmrip_stream_iface_init));
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_STREAM, ogmrip_stream_iface_init)
+    G_ADD_PRIVATE (OGMRipStub));
+
+static void
+ogmrip_stub_dispose (GObject *gobject)
+{
+  OGMRipStub *stub = OGMRIP_STUB (gobject);
+
+  if (stub->priv->codec)
+  {
+    g_object_remove_weak_pointer (G_OBJECT (stub->priv->codec), (gpointer *) &stub->priv->codec);
+    stub->priv->codec = NULL;
+  }
+
+  G_OBJECT_CLASS (ogmrip_stub_parent_class)->dispose (gobject);
+}
 
 static void
 ogmrip_stub_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
@@ -170,7 +185,7 @@ ogmrip_stub_set_property (GObject *gobject, guint property_id, const GValue *val
   {
     case PROP_CODEC:
       stub->priv->codec = g_value_get_object (value);
-      /* g_object_add_weak_pointer (G_OBJECT (stub->priv->codec), (gpointer *) &stub->priv->codec); */
+      g_object_add_weak_pointer (G_OBJECT (stub->priv->codec), (gpointer *) &stub->priv->codec);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -179,25 +194,24 @@ ogmrip_stub_set_property (GObject *gobject, guint property_id, const GValue *val
 }
 
 static void
-ogmrip_stub_init (OGMRipStub *stub)
-{
-  stub->priv = G_TYPE_INSTANCE_GET_PRIVATE (stub, OGMRIP_TYPE_STUB, OGMRipStubPriv);
-}
-
-static void
 ogmrip_stub_class_init (OGMRipStubClass *klass)
 {
   GObjectClass *gobject_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->dispose = ogmrip_stub_dispose;
   gobject_class->get_property = ogmrip_stub_get_property;
   gobject_class->set_property = ogmrip_stub_set_property;
 
   g_object_class_install_property (gobject_class, PROP_CODEC,
       g_param_spec_object ("codec", "Codec property", "Set codec",
         OGMRIP_TYPE_CODEC, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+}
 
-  g_type_class_add_private (klass, sizeof (OGMRipStubPriv));
+static void
+ogmrip_stub_init (OGMRipStub *stub)
+{
+  stub->priv = ogmrip_stub_get_instance_private (stub);
 }
 
 /*

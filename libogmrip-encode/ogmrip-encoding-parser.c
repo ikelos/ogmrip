@@ -47,6 +47,18 @@ ogmrip_encoding_parse_property (OGMRipXML *xml, gpointer gobject, gpointer klass
       if (profile)
         ogmrip_encoding_set_profile (gobject, profile);
     }
+    else if (g_str_equal (property, "output"))
+    {
+      GFile *file;
+      gchar *filename;
+
+      filename = ogmrip_xml_get_string (xml, NULL);
+      file = g_file_parse_name (filename);
+      g_free (filename);
+
+      ogmrip_container_set_output (gobject, file);
+      g_object_unref (file);
+    }
     else if (g_str_equal (property, "log-file"))
     {
       gchar *utf8, *filename;
@@ -471,6 +483,7 @@ static void
 ogmrip_encoding_dump_container (OGMRipXML *xml, OGMRipContainer *container)
 {
   OGMRipContainerClass *klass;
+  GFile *file;
 
   if (!container)
     return;
@@ -479,6 +492,21 @@ ogmrip_encoding_dump_container (OGMRipXML *xml, OGMRipContainer *container)
 
   ogmrip_xml_set_string (xml, "type",
       ogmrip_type_name (G_OBJECT_TYPE (container)));
+
+  file = ogmrip_container_get_output (container);
+  if (file)
+  {
+    gchar *filename;
+
+    ogmrip_xml_append (xml, "property");
+    ogmrip_xml_set_string (xml, "name", "output");
+
+    filename = g_file_get_parse_name (file);
+    ogmrip_xml_set_string (xml, NULL, filename);
+    g_free (filename);
+
+    ogmrip_xml_parent (xml);
+  }
 
   klass = OGMRIP_CONTAINER_GET_CLASS (container);
 
@@ -708,9 +736,14 @@ ogmrip_encoding_dump (OGMRipEncoding *encoding, OGMRipXML *xml, GError **error)
   log = ogmrip_encoding_get_log_file (encoding);
   if (log)
   {
+    ogmrip_xml_append (xml, "property");
+    ogmrip_xml_set_string (xml, "name", "log-file");
+
     utf8 = g_filename_to_utf8 (log, -1, NULL, NULL, NULL);
-    ogmrip_xml_set_string (xml, "log-file", utf8);
+    ogmrip_xml_set_string (xml, NULL, utf8);
     g_free (utf8);
+
+    ogmrip_xml_parent (xml);
   }
 
   ogmrip_encoding_dump_property (xml, encoding, klass, "autocrop");

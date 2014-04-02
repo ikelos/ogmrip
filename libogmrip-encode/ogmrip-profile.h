@@ -41,14 +41,14 @@ GQuark ogmrip_profile_error_quark (void);
 #define OGMRIP_IS_PROFILE_CLASS(obj) (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_PROFILE))
 
 typedef struct _OGMRipProfile        OGMRipProfile;
-typedef struct _OGMRipProfilePriv    OGMRipProfilePriv;
+typedef struct _OGMRipProfilePriv    OGMRipProfilePrivate;
 typedef struct _OGMRipProfileClass   OGMRipProfileClass;
 
 struct _OGMRipProfile
 {
   GSettings parent_instance;
 
-  OGMRipProfilePriv *priv;
+  OGMRipProfilePrivate *priv;
 };
 
 struct _OGMRipProfileClass

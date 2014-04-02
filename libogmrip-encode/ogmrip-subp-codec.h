@@ -33,14 +33,14 @@ G_BEGIN_DECLS
 #define OGMRIP_SUBP_CODEC_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), OGMRIP_TYPE_SUBP_CODEC, OGMRipSubpCodecClass))
 
 typedef struct _OGMRipSubpCodec      OGMRipSubpCodec;
-typedef struct _OGMRipSubpCodecPriv  OGMRipSubpCodecPriv;
+typedef struct _OGMRipSubpCodecPriv  OGMRipSubpCodecPrivate;
 typedef struct _OGMRipSubpCodecClass OGMRipSubpCodecClass;
 
 struct _OGMRipSubpCodec
 {
   OGMRipCodec parent_instance;
 
-  OGMRipSubpCodecPriv *priv;
+  OGMRipSubpCodecPrivate *priv;
 };
 
 struct _OGMRipSubpCodecClass

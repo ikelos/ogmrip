@@ -32,13 +32,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipCopy      OGMRipCopy;
 typedef struct _OGMRipCopyClass OGMRipCopyClass;
-typedef struct _OGMRipCopyPriv  OGMRipCopyPriv;
+typedef struct _OGMRipCopyPriv  OGMRipCopyPrivate;
 
 struct _OGMRipCopy
 {
   OGMJobSpawn parent_instance;
 
-  OGMRipCopyPriv *priv;
+  OGMRipCopyPrivate *priv;
 };
 
 struct _OGMRipCopyClass

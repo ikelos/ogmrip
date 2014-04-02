@@ -33,9 +33,6 @@
 #include <string.h>
 #include <stdio.h>
 
-#define OGMRIP_VIDEO_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_VIDEO_CODEC, OGMRipVideoCodecPriv))
-
 #define DEFAULT_BPP 0.15
 
 #define ROUND(x) ((gint) ((x) + 0.5) != (gint) (x) ? ((gint) ((x) + 0.5)) : ((gint) (x)))
@@ -108,155 +105,7 @@ enum
   PROP_SCALE_HEIGHT
 };
 
-static void ogmrip_video_codec_constructed  (GObject      *gobject);
-static void ogmrip_video_codec_dispose      (GObject      *gobject);
-static void ogmrip_video_codec_set_property (GObject      *gobject,
-                                             guint        property_id,
-                                             const GValue *value,
-                                             GParamSpec   *pspec);
-static void ogmrip_video_codec_get_property (GObject      *gobject,
-                                             guint        property_id,
-                                             GValue       *value,
-                                             GParamSpec   *pspec);
-
-G_DEFINE_ABSTRACT_TYPE (OGMRipVideoCodec, ogmrip_video_codec, OGMRIP_TYPE_CODEC)
-
-static void
-ogmrip_video_codec_class_init (OGMRipVideoCodecClass *klass)
-{
-  GObjectClass *gobject_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->constructed = ogmrip_video_codec_constructed;
-  gobject_class->dispose = ogmrip_video_codec_dispose;
-  gobject_class->set_property = ogmrip_video_codec_set_property;
-  gobject_class->get_property = ogmrip_video_codec_get_property;
-
-  g_object_class_install_property (gobject_class, PROP_ANGLE, 
-        g_param_spec_uint ("angle", "Angle property", "Set angle", 
-           1, G_MAXUINT, 1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_BITRATE, 
-        g_param_spec_uint ("bitrate", "Bitrate property", "Set bitrate", 
-           0, G_MAXUINT, 800000, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_CAN_CROP, 
-        g_param_spec_boolean ("can-crop", "Can crop property", "Set can crop", 
-           TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_QUANTIZER, 
-        g_param_spec_double ("quantizer", "Quantizer property", "Set quantizer", 
-           0.0, 31.0, 0.0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_BPP, 
-        g_param_spec_double ("bpp", "Bits per pixel property", "Set bits per pixel", 
-           0.0, 1.0, DEFAULT_BPP, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_PASSES, 
-        g_param_spec_uint ("passes", "Passes property", "Set the number of passes", 
-           1, G_MAXUINT, 1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_THREADS, 
-        g_param_spec_uint ("threads", "Threads property", "Set the number of threads", 
-           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_SCALER, 
-        g_param_spec_uint ("scaler", "Scaler property", "Set the scaler", 
-           OGMRIP_SCALER_NONE, OGMRIP_SCALER_BICUBIC_SPLINE, OGMRIP_SCALER_GAUSS,
-           G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_DEINT, 
-        g_param_spec_uint ("deinterlacer", "Deinterlacer property", "Set the deinterlacer", 
-           OGMRIP_DEINT_NONE, OGMRIP_DEINT_YADIF, OGMRIP_DEINT_NONE,
-           G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_QUALITY, 
-        g_param_spec_uint ("quality", "Quality property", "Set the quality", 
-           OGMRIP_QUALITY_EXTREME, OGMRIP_QUALITY_USER, OGMRIP_QUALITY_NORMAL,
-           G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_TURBO, 
-        g_param_spec_boolean ("turbo", "Turbo property", "Set turbo", 
-           FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_DENOISE, 
-        g_param_spec_boolean ("denoise", "Denoise property", "Set denoise", 
-           FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_DEBLOCK, 
-        g_param_spec_boolean ("deblock", "Deblock property", "Set deblock", 
-           TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_DERING, 
-        g_param_spec_boolean ("dering", "Dering property", "Set dering", 
-           TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_DELAY, 
-        g_param_spec_uint ("start-delay", "Start delay property", "Set start delay", 
-           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_MIN_WIDTH, 
-        g_param_spec_uint ("min-width", "Min width property", "Set min width", 
-           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_MIN_HEIGHT, 
-        g_param_spec_uint ("min-height", "Min height property", "Set min height", 
-           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_MAX_WIDTH, 
-        g_param_spec_uint ("max-width", "Max width property", "Set max width", 
-           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_MAX_HEIGHT, 
-        g_param_spec_uint ("max-height", "Max height property", "Set max height", 
-           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_EXPAND, 
-        g_param_spec_boolean ("expand", "Expand property", "Set expand", 
-           FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_CROP_X, 
-        g_param_spec_uint ("crop-x", "Crop x property", "Set crop x", 
-           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_CROP_Y, 
-        g_param_spec_uint ("crop-y", "Crop y property", "Set crop y", 
-           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_CROP_WIDTH, 
-        g_param_spec_uint ("crop-width", "Crop width property", "Set crop width", 
-           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_CROP_HEIGHT, 
-        g_param_spec_uint ("crop-height", "Crop height property", "Set crop height", 
-           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_SCALE_WIDTH, 
-        g_param_spec_uint ("scale-width", "Scale width property", "Set scale width", 
-           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_SCALE_HEIGHT, 
-        g_param_spec_uint ("scale-height", "Scale height property", "Set scale height", 
-           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_type_class_add_private (klass, sizeof (OGMRipVideoCodecPriv));
-}
-
-static void
-ogmrip_video_codec_init (OGMRipVideoCodec *video)
-{
-  video->priv = OGMRIP_VIDEO_GET_PRIVATE (video);
-  video->priv->scaler = OGMRIP_SCALER_GAUSS;
-  video->priv->quality = OGMRIP_QUALITY_NORMAL;
-  video->priv->astream = NULL;
-  video->priv->bitrate = 800000;
-  video->priv->turbo = TRUE;
-  video->priv->can_crop = TRUE;
-  video->priv->angle = 1;
-  video->priv->bpp = DEFAULT_BPP;
-  video->priv->passes = 1;
-  video->priv->can_crop = TRUE;
-}
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (OGMRipVideoCodec, ogmrip_video_codec, OGMRIP_TYPE_CODEC)
 
 static void
 ogmrip_video_codec_constructed (GObject *gobject)
@@ -467,6 +316,142 @@ ogmrip_video_codec_get_property (GObject *gobject, guint property_id, GValue *va
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
   }
+}
+
+static void
+ogmrip_video_codec_class_init (OGMRipVideoCodecClass *klass)
+{
+  GObjectClass *gobject_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->constructed = ogmrip_video_codec_constructed;
+  gobject_class->dispose = ogmrip_video_codec_dispose;
+  gobject_class->set_property = ogmrip_video_codec_set_property;
+  gobject_class->get_property = ogmrip_video_codec_get_property;
+
+  g_object_class_install_property (gobject_class, PROP_ANGLE, 
+        g_param_spec_uint ("angle", "Angle property", "Set angle", 
+           1, G_MAXUINT, 1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_BITRATE, 
+        g_param_spec_uint ("bitrate", "Bitrate property", "Set bitrate", 
+           0, G_MAXUINT, 800000, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_CAN_CROP, 
+        g_param_spec_boolean ("can-crop", "Can crop property", "Set can crop", 
+           TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_QUANTIZER, 
+        g_param_spec_double ("quantizer", "Quantizer property", "Set quantizer", 
+           0.0, 31.0, 0.0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_BPP, 
+        g_param_spec_double ("bpp", "Bits per pixel property", "Set bits per pixel", 
+           0.0, 1.0, DEFAULT_BPP, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_PASSES, 
+        g_param_spec_uint ("passes", "Passes property", "Set the number of passes", 
+           1, G_MAXUINT, 1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_THREADS, 
+        g_param_spec_uint ("threads", "Threads property", "Set the number of threads", 
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_SCALER, 
+        g_param_spec_uint ("scaler", "Scaler property", "Set the scaler", 
+           OGMRIP_SCALER_NONE, OGMRIP_SCALER_BICUBIC_SPLINE, OGMRIP_SCALER_GAUSS,
+           G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_DEINT, 
+        g_param_spec_uint ("deinterlacer", "Deinterlacer property", "Set the deinterlacer", 
+           OGMRIP_DEINT_NONE, OGMRIP_DEINT_YADIF, OGMRIP_DEINT_NONE,
+           G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_QUALITY, 
+        g_param_spec_uint ("quality", "Quality property", "Set the quality", 
+           OGMRIP_QUALITY_EXTREME, OGMRIP_QUALITY_USER, OGMRIP_QUALITY_NORMAL,
+           G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_TURBO, 
+        g_param_spec_boolean ("turbo", "Turbo property", "Set turbo", 
+           FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_DENOISE, 
+        g_param_spec_boolean ("denoise", "Denoise property", "Set denoise", 
+           FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_DEBLOCK, 
+        g_param_spec_boolean ("deblock", "Deblock property", "Set deblock", 
+           TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_DERING, 
+        g_param_spec_boolean ("dering", "Dering property", "Set dering", 
+           TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_DELAY, 
+        g_param_spec_uint ("start-delay", "Start delay property", "Set start delay", 
+           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_MIN_WIDTH, 
+        g_param_spec_uint ("min-width", "Min width property", "Set min width", 
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_MIN_HEIGHT, 
+        g_param_spec_uint ("min-height", "Min height property", "Set min height", 
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_MAX_WIDTH, 
+        g_param_spec_uint ("max-width", "Max width property", "Set max width", 
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_MAX_HEIGHT, 
+        g_param_spec_uint ("max-height", "Max height property", "Set max height", 
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_EXPAND, 
+        g_param_spec_boolean ("expand", "Expand property", "Set expand", 
+           FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_CROP_X, 
+        g_param_spec_uint ("crop-x", "Crop x property", "Set crop x", 
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_CROP_Y, 
+        g_param_spec_uint ("crop-y", "Crop y property", "Set crop y", 
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_CROP_WIDTH, 
+        g_param_spec_uint ("crop-width", "Crop width property", "Set crop width", 
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_CROP_HEIGHT, 
+        g_param_spec_uint ("crop-height", "Crop height property", "Set crop height", 
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_SCALE_WIDTH, 
+        g_param_spec_uint ("scale-width", "Scale width property", "Set scale width", 
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_SCALE_HEIGHT, 
+        g_param_spec_uint ("scale-height", "Scale height property", "Set scale height", 
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+}
+
+static void
+ogmrip_video_codec_init (OGMRipVideoCodec *video)
+{
+  video->priv = ogmrip_video_codec_get_instance_private (video);
+
+  video->priv->scaler = OGMRIP_SCALER_GAUSS;
+  video->priv->quality = OGMRIP_QUALITY_NORMAL;
+  video->priv->astream = NULL;
+  video->priv->bitrate = 800000;
+  video->priv->turbo = TRUE;
+  video->priv->can_crop = TRUE;
+  video->priv->angle = 1;
+  video->priv->bpp = DEFAULT_BPP;
+  video->priv->passes = 1;
+  video->priv->can_crop = TRUE;
 }
 
 static void

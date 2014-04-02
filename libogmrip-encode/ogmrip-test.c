@@ -40,9 +40,6 @@
 
 #define ROUND(x) ((gint) ((x) + 0.5) != (gint) (x) ? ((gint) ((x) + 0.5)) : ((gint) (x)))
 
-#define OGMRIP_TEST_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_TEST, OGMRipTestPriv))
-
 struct _OGMRipTestPriv
 {
   OGMRipEncoding *encoding;
@@ -57,20 +54,6 @@ enum
   PROP_ENCODING
 };
 
-static void     ogmrip_test_constructed  (GObject      *gobject);
-static void     ogmrip_test_dispose      (GObject      *gobject);
-static void     ogmrip_test_get_property (GObject      *gobject,
-                                          guint        property_id,
-                                          GValue       *value,
-                                          GParamSpec   *pspec);
-static void     ogmrip_test_set_property (GObject      *gobject,
-                                          guint        property_id,
-                                          const GValue *value,
-                                          GParamSpec   *pspec);
-static gboolean ogmrip_test_run          (OGMJobTask   *task,
-                                          GCancellable *cancellable,
-                                          GError       **error);
-
 GQuark
 ogmrip_test_error_quark (void)
 {
@@ -80,91 +63,6 @@ ogmrip_test_error_quark (void)
     quark = g_quark_from_static_string ("ogmrip-test-error-quark");
 
   return quark;
-}
-
-G_DEFINE_TYPE (OGMRipTest, ogmrip_test, OGMJOB_TYPE_TASK)
-
-static void
-ogmrip_test_class_init (OGMRipTestClass *klass)
-{
-  GObjectClass *gobject_class;
-  OGMJobTaskClass *task_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->constructed = ogmrip_test_constructed;
-  gobject_class->dispose = ogmrip_test_dispose;
-  gobject_class->get_property = ogmrip_test_get_property;
-  gobject_class->set_property = ogmrip_test_set_property;
-
-  task_class = OGMJOB_TASK_CLASS (klass);
-  task_class->run = ogmrip_test_run;
-
-  g_object_class_install_property (gobject_class, PROP_ENCODING, 
-        g_param_spec_object ("encoding", "Encoding property", "Set encoding", 
-           OGMRIP_TYPE_ENCODING, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
-
-  g_type_class_add_private (klass, sizeof (OGMRipTestPriv));
-}
-
-static void
-ogmrip_test_init (OGMRipTest *test)
-{
-  test->priv = OGMRIP_TEST_GET_PRIVATE (test);
-}
-
-static void
-ogmrip_test_constructed (GObject *gobject)
-{
-  if (!OGMRIP_TEST (gobject)->priv->encoding)
-    g_error ("No encoding specified");
-
-  G_OBJECT_CLASS (ogmrip_test_parent_class)->constructed (gobject);
-}
-
-static void
-ogmrip_test_dispose (GObject *gobject)
-{
-  OGMRipTest *test = OGMRIP_TEST (gobject);
-
-  if (test->priv->encoding)
-  {
-    g_object_unref (test->priv->encoding);
-    test->priv->encoding = NULL;
-  }
-
-  G_OBJECT_CLASS (ogmrip_test_parent_class)->dispose (gobject);
-}
-
-static void
-ogmrip_test_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
-{
-  OGMRipTest *test = OGMRIP_TEST (gobject);
-
-  switch (property_id) 
-  {
-    case PROP_ENCODING:
-      g_value_set_object (value, test->priv->encoding);
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
-      break;
-  }
-}
-
-static void
-ogmrip_test_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
-{
-  OGMRipTest *test = OGMRIP_TEST (gobject);
-
-  switch (property_id) 
-  {
-    case PROP_ENCODING:
-      test->priv->encoding = g_value_dup_object (value);
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
-      break;
-  }
 }
 
 typedef struct
@@ -398,6 +296,63 @@ ogmrip_test_set_scale_size (OGMRipTest *test, guint optimal_bitrate, guint user_
   ogmrip_video_codec_set_scale_size (OGMRIP_VIDEO_CODEC (codec), scale_w, scale_h);
 }
 
+G_DEFINE_TYPE_WITH_PRIVATE (OGMRipTest, ogmrip_test, OGMJOB_TYPE_TASK)
+
+static void
+ogmrip_test_constructed (GObject *gobject)
+{
+  if (!OGMRIP_TEST (gobject)->priv->encoding)
+    g_error ("No encoding specified");
+
+  G_OBJECT_CLASS (ogmrip_test_parent_class)->constructed (gobject);
+}
+
+static void
+ogmrip_test_dispose (GObject *gobject)
+{
+  OGMRipTest *test = OGMRIP_TEST (gobject);
+
+  if (test->priv->encoding)
+  {
+    g_object_unref (test->priv->encoding);
+    test->priv->encoding = NULL;
+  }
+
+  G_OBJECT_CLASS (ogmrip_test_parent_class)->dispose (gobject);
+}
+
+static void
+ogmrip_test_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
+{
+  OGMRipTest *test = OGMRIP_TEST (gobject);
+
+  switch (property_id) 
+  {
+    case PROP_ENCODING:
+      g_value_set_object (value, test->priv->encoding);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
+      break;
+  }
+}
+
+static void
+ogmrip_test_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
+{
+  OGMRipTest *test = OGMRIP_TEST (gobject);
+
+  switch (property_id) 
+  {
+    case PROP_ENCODING:
+      test->priv->encoding = g_value_dup_object (value);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
+      break;
+  }
+}
+
 static gboolean
 ogmrip_test_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
@@ -515,6 +470,32 @@ ogmrip_test_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   ogmrip_test_restore_encoding_info (test->priv->encoding, &info);
 
   return result;
+}
+
+static void
+ogmrip_test_class_init (OGMRipTestClass *klass)
+{
+  GObjectClass *gobject_class;
+  OGMJobTaskClass *task_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->constructed = ogmrip_test_constructed;
+  gobject_class->dispose = ogmrip_test_dispose;
+  gobject_class->get_property = ogmrip_test_get_property;
+  gobject_class->set_property = ogmrip_test_set_property;
+
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_test_run;
+
+  g_object_class_install_property (gobject_class, PROP_ENCODING, 
+        g_param_spec_object ("encoding", "Encoding property", "Set encoding", 
+           OGMRIP_TYPE_ENCODING, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+}
+
+static void
+ogmrip_test_init (OGMRipTest *test)
+{
+  test->priv = ogmrip_test_get_instance_private (test);
 }
 
 OGMJobTask *

@@ -41,13 +41,13 @@ GQuark ogmrip_test_error_quark (void);
 
 typedef struct _OGMRipTest      OGMRipTest;
 typedef struct _OGMRipTestClass OGMRipTestClass;
-typedef struct _OGMRipTestPriv  OGMRipTestPriv;
+typedef struct _OGMRipTestPriv  OGMRipTestPrivate;
 
 struct _OGMRipTest
 {
   OGMJobTask parent_instance;
 
-  OGMRipTestPriv *priv;
+  OGMRipTestPrivate *priv;
 };
 
 struct _OGMRipTestClass

@@ -32,13 +32,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipProfileEngine       OGMRipProfileEngine;
 typedef struct _OGMRipProfileEngineClass  OGMRipProfileEngineClass;
-typedef struct _OGMRipProfileEnginePriv   OGMRipProfileEnginePriv;
+typedef struct _OGMRipProfileEnginePriv   OGMRipProfileEnginePrivate;
 
 struct _OGMRipProfileEngine
 {
   GObject parent_instance;
 
-  OGMRipProfileEnginePriv *priv;
+  OGMRipProfileEnginePrivate *priv;
 };
 
 struct _OGMRipProfileEngineClass
