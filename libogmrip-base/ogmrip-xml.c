@@ -98,7 +98,8 @@ ogmrip_xml_new_from_file (GFile *file, GError **error)
   }
 
   xml->doc = xmlReadIO ((xmlInputReadCallback) xmlReadInputStream,
-      (xmlInputCloseCallback) xmlCloseInputStream, xml->istream, NULL, NULL, 0);
+      (xmlInputCloseCallback) xmlCloseInputStream, xml->istream, NULL, "UTF-8",
+      XML_PARSE_NOENT | XML_PARSE_NOBLANKS);
 
   xml->root = xml->doc ? xmlDocGetRootElement (xml->doc) : NULL;
   if (!xml->root)
@@ -148,11 +149,11 @@ ogmrip_xml_save (OGMRipXML *xml, GFile *file, GError **error)
     return FALSE;
 
   ctxt = xmlSaveToIO ((xmlOutputWriteCallback) xmlWriteOutputStream,
-      (xmlOutputCloseCallback) xmlCloseOutputStream, ostream, NULL, 0);
+      (xmlOutputCloseCallback) xmlCloseOutputStream, ostream, "UTF-8", XML_SAVE_FORMAT);
   if (ctxt)
   {
-    if (xml->root)
-      len = xmlSaveTree (ctxt, xml->root);
+    if (xml->doc)
+      len = xmlSaveDoc (ctxt, xml->doc);
     xmlSaveFlush (ctxt);
     xmlSaveClose (ctxt);
   }
@@ -431,14 +432,10 @@ ogmrip_xml_set_string (OGMRipXML *xml, const gchar *property, const gchar *value
 {
   if (xml->node)
   {
-    xmlChar *escaped;
-
-    escaped = xmlEncodeEntitiesReentrant (xml->doc, BAD_CAST value);
     if (property)
-      xmlSetProp (xml->node, BAD_CAST property, escaped);
+      xmlSetProp (xml->node, BAD_CAST property, BAD_CAST value);
     else
-      xmlNodeSetContent (xml->node, escaped);
-    xmlFree (escaped);
+      xmlNodeSetContent (xml->node, BAD_CAST value);
   }
 }
 
