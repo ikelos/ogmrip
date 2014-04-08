@@ -32,7 +32,7 @@ ogmrip_encoding_parse_property (OGMRipXML *xml, gpointer gobject, gpointer klass
   property = ogmrip_xml_get_string (xml, "name");
   if (property)
   {
-    if (g_str_equal (property, "profile"))
+    if (g_str_equal (property, "profile") && OGMRIP_IS_ENCODING (gobject))
     {
       OGMRipProfileEngine *engine;
       OGMRipProfile *profile;
@@ -47,7 +47,18 @@ ogmrip_encoding_parse_property (OGMRipXML *xml, gpointer gobject, gpointer klass
       if (profile)
         ogmrip_encoding_set_profile (gobject, profile);
     }
-    else if (g_str_equal (property, "output"))
+    else if (g_str_equal (property, "log-file") && OGMRIP_IS_ENCODING (gobject))
+    {
+      gchar *utf8, *filename;
+
+      utf8 = ogmrip_xml_get_string (xml, NULL);
+      filename = utf8 ? g_filename_from_utf8 (utf8, -1, NULL, NULL, NULL) : NULL;
+      g_free (utf8);
+
+      ogmrip_encoding_set_log_file (gobject, filename);
+      g_free (filename);
+    }
+    else if (g_str_equal (property, "output") && OGMRIP_IS_CONTAINER (gobject))
     {
       GFile *file;
       gchar *filename;
@@ -59,16 +70,16 @@ ogmrip_encoding_parse_property (OGMRipXML *xml, gpointer gobject, gpointer klass
       ogmrip_container_set_output (gobject, file);
       g_object_unref (file);
     }
-    else if (g_str_equal (property, "log-file"))
+    else if (g_str_equal (property, "hardsub") && OGMRIP_IS_VIDEO_CODEC (gobject))
     {
-      gchar *utf8, *filename;
+      OGMRipTitle *title;
+      OGMRipSubpStream *subp;
 
-      utf8 = ogmrip_xml_get_string (xml, NULL);
-      filename = utf8 ? g_filename_from_utf8 (utf8, -1, NULL, NULL, NULL) : NULL;
-      g_free (utf8);
+      title = ogmrip_stream_get_title (ogmrip_codec_get_input (gobject));
 
-      ogmrip_encoding_set_log_file (gobject, filename);
-      g_free (filename);
+      subp = ogmrip_title_get_subp_stream (title, ogmrip_xml_get_uint (xml, NULL));
+      if (subp)
+        ogmrip_video_codec_set_hard_subp (gobject, subp, ogmrip_xml_get_boolean (xml, "forced"));
     }
     else
     {
@@ -523,6 +534,8 @@ static void
 ogmrip_encoding_dump_video_codec (OGMRipXML *xml, OGMRipCodec *codec)
 {
   OGMRipVideoCodecClass *klass;
+  OGMRipSubpStream *subp;
+  gboolean forced;
 
   if (!codec)
     return;
@@ -531,6 +544,20 @@ ogmrip_encoding_dump_video_codec (OGMRipXML *xml, OGMRipCodec *codec)
 
   ogmrip_xml_set_string (xml, "type",
       ogmrip_type_name (G_OBJECT_TYPE (codec)));
+
+  subp = ogmrip_video_codec_get_hard_subp (OGMRIP_VIDEO_CODEC (codec), &forced);
+  if (subp)
+  {
+    ogmrip_xml_append (xml, "property");
+
+    ogmrip_xml_set_string (xml, "name", "hardsub");
+    ogmrip_xml_set_boolean (xml, "forced", forced);
+
+    ogmrip_xml_set_uint (xml, NULL,
+        ogmrip_stream_get_id (OGMRIP_STREAM (subp)));
+
+    ogmrip_xml_parent (xml);
+  }
 
   klass = OGMRIP_VIDEO_CODEC_GET_CLASS (codec);
 

@@ -64,105 +64,6 @@ struct _OGMRipMainWindowPriv
 
 extern GSettings *settings;
 
-static void
-gtk_container_clear (GtkContainer *container)
-{
-  GList *list, *link;
-
-  g_return_if_fail (GTK_IS_CONTAINER (container));
-
-  list = gtk_container_get_children (container);
-  for (link = list; link; link = link->next)
-    gtk_container_remove (container, GTK_WIDGET (link->data));
-  g_list_free (list);
-}
-
-static void
-ogmrip_media_open_progress_cb (OGMRipMedia *media, gdouble percent, gpointer pbar)
-{
-  gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (pbar), percent);
-}
-
-static void
-ogmrip_encoding_run_cb (OGMRipEncoding *encoding, OGMJobSpawn *spawn, OGMRipProgressDialog *dialog)
-{
-  OGMRipStream *stream;
-  gchar *message;
-
-  if (spawn)
-  {
-    if (OGMRIP_IS_VIDEO_CODEC (spawn))
-      ogmrip_progress_dialog_set_message (dialog, _("Encoding video title"));
-    else if (OGMRIP_IS_CHAPTERS (spawn))
-      ogmrip_progress_dialog_set_message (dialog, _("Extracting chapters information"));
-    else if (OGMRIP_IS_CONTAINER (spawn))
-      ogmrip_progress_dialog_set_message (dialog, _("Merging audio and video streams"));
-    else if (OGMRIP_IS_COPY (spawn))
-      ogmrip_progress_dialog_set_message (dialog, _("Copying media"));
-    else if (OGMRIP_IS_ANALYZE (spawn))
-      ogmrip_progress_dialog_set_message (dialog, _("Analyzing video stream"));
-    else if (OGMRIP_IS_TEST (spawn))
-      ogmrip_progress_dialog_set_message (dialog, _("Running the compressibility test"));
-    else if (OGMRIP_IS_AUDIO_CODEC (spawn))
-    {
-      stream = ogmrip_codec_get_input (OGMRIP_CODEC (spawn));
-      message = g_strdup_printf (_("Extracting audio stream %d"),
-          ogmrip_stream_get_id (stream) + 1);
-      ogmrip_progress_dialog_set_message (dialog, message);
-      g_free (message);
-    }
-    else if (OGMRIP_IS_SUBP_CODEC (spawn))
-    {
-      stream = ogmrip_codec_get_input (OGMRIP_CODEC (spawn));
-      message = g_strdup_printf (_("Extracting subtitle stream %d"),
-          ogmrip_stream_get_id (stream) + 1);
-      ogmrip_progress_dialog_set_message (dialog, message);
-      g_free (message);
-    }
-  }
-
-  ogmrip_progress_dialog_set_fraction (dialog, -1.0);
-}
-
-static void
-ogmrip_encoding_progress_cb (OGMRipEncoding *encoding, OGMJobSpawn *spawn, gdouble fraction, OGMRipProgressDialog *dialog)
-{
-  ogmrip_progress_dialog_set_fraction (dialog, fraction);
-}
-
-static void
-ogmrip_progress_dialog_response_cb (GtkWidget *parent, gint response_id, OGMRipEncoding *encoding)
-{
-  GtkWidget *dialog;
-
-  switch (response_id)
-  {
-    case OGMRIP_RESPONSE_SUSPEND:
-      ogmrip_encoding_suspend (encoding);
-      break;
-    case OGMRIP_RESPONSE_RESUME:
-      ogmrip_encoding_resume (encoding);
-      break;
-    default:
-      dialog = gtk_message_dialog_new (GTK_WINDOW (parent),
-          GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
-          GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
-          _("Are you sure you want to cancel the encoding process?"));
-      if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES)
-      {
-        GCancellable *cancellable;
-
-        cancellable = g_object_get_data (G_OBJECT (encoding), "cancellable");
-        if (cancellable)
-          g_cancellable_cancel (cancellable);
-      }
-      gtk_widget_destroy (dialog);
-      break;
-  }
-}
-
-G_DEFINE_TYPE_WITH_PRIVATE (OGMRipMainWindow, ogmrip_main_window, GTK_TYPE_APPLICATION_WINDOW)
-
 #ifdef HAVE_ENCHANT_SUPPORT
 static void
 ogmrip_main_window_spell_check (OGMRipMainWindow *window, const gchar *filename, gint lang)
@@ -247,6 +148,127 @@ spell_check_cleanup:
   g_free (new_file);
 }
 #endif /* HAVE_ENCHANT_SUPPORT */
+
+static void
+gtk_container_clear (GtkContainer *container)
+{
+  GList *list, *link;
+
+  g_return_if_fail (GTK_IS_CONTAINER (container));
+
+  list = gtk_container_get_children (container);
+  for (link = list; link; link = link->next)
+    gtk_container_remove (container, GTK_WIDGET (link->data));
+  g_list_free (list);
+}
+
+static void
+ogmrip_media_open_progress_cb (OGMRipMedia *media, gdouble percent, gpointer pbar)
+{
+  gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (pbar), percent);
+}
+
+static void
+ogmrip_encoding_run_cb (OGMRipEncoding *encoding, OGMJobSpawn *spawn, OGMRipProgressDialog *dialog)
+{
+  OGMRipStream *stream;
+  gchar *message;
+
+  if (spawn)
+  {
+    if (OGMRIP_IS_VIDEO_CODEC (spawn))
+      ogmrip_progress_dialog_set_message (dialog, _("Encoding video title"));
+    else if (OGMRIP_IS_CHAPTERS (spawn))
+      ogmrip_progress_dialog_set_message (dialog, _("Extracting chapters information"));
+    else if (OGMRIP_IS_CONTAINER (spawn))
+      ogmrip_progress_dialog_set_message (dialog, _("Merging audio and video streams"));
+    else if (OGMRIP_IS_COPY (spawn))
+      ogmrip_progress_dialog_set_message (dialog, _("Copying media"));
+    else if (OGMRIP_IS_ANALYZE (spawn))
+      ogmrip_progress_dialog_set_message (dialog, _("Analyzing video stream"));
+    else if (OGMRIP_IS_TEST (spawn))
+      ogmrip_progress_dialog_set_message (dialog, _("Running the compressibility test"));
+    else if (OGMRIP_IS_AUDIO_CODEC (spawn))
+    {
+      stream = ogmrip_codec_get_input (OGMRIP_CODEC (spawn));
+      message = g_strdup_printf (_("Extracting audio stream %d"),
+          ogmrip_stream_get_id (stream) + 1);
+      ogmrip_progress_dialog_set_message (dialog, message);
+      g_free (message);
+    }
+    else if (OGMRIP_IS_SUBP_CODEC (spawn))
+    {
+      stream = ogmrip_codec_get_input (OGMRIP_CODEC (spawn));
+      message = g_strdup_printf (_("Extracting subtitle stream %d"),
+          ogmrip_stream_get_id (stream) + 1);
+      ogmrip_progress_dialog_set_message (dialog, message);
+      g_free (message);
+    }
+  }
+
+  ogmrip_progress_dialog_set_fraction (dialog, -1.0);
+}
+
+static void
+ogmrip_encoding_progress_cb (OGMRipEncoding *encoding, OGMJobSpawn *spawn, gdouble fraction, OGMRipProgressDialog *dialog)
+{
+  ogmrip_progress_dialog_set_fraction (dialog, fraction);
+}
+
+#ifdef HAVE_ENCHANT_SUPPORT
+static void
+ogmrip_encoding_complete_cb (OGMRipEncoding *encoding, OGMJobSpawn *spawn, OGMRipEncodingStatus status, OGMRipMainWindow *window)
+{
+  if (status == OGMRIP_ENCODING_SUCCESS &&
+      spawn && OGMRIP_IS_SUBP_CODEC (spawn) &&
+      ogmrip_codec_format (G_OBJECT_TYPE (spawn)) != OGMRIP_FORMAT_VOBSUB)
+  {
+    OGMRipProfile *profile;
+    gboolean spell_check;
+
+    profile = ogmrip_encoding_get_profile (encoding);
+    ogmrip_profile_get (profile, OGMRIP_PROFILE_SUBP, OGMRIP_PROFILE_SPELL_CHECK, "b", &spell_check);
+
+    if (spell_check)
+      ogmrip_main_window_spell_check (window,
+          ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (spawn))),
+          ogmrip_subp_codec_get_language (OGMRIP_SUBP_CODEC (spawn)));
+  }
+}
+#endif
+
+static void
+ogmrip_progress_dialog_response_cb (GtkWidget *parent, gint response_id, OGMRipEncoding *encoding)
+{
+  GtkWidget *dialog;
+
+  switch (response_id)
+  {
+    case OGMRIP_RESPONSE_SUSPEND:
+      ogmrip_encoding_suspend (encoding);
+      break;
+    case OGMRIP_RESPONSE_RESUME:
+      ogmrip_encoding_resume (encoding);
+      break;
+    default:
+      dialog = gtk_message_dialog_new (GTK_WINDOW (parent),
+          GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+          GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO,
+          _("Are you sure you want to cancel the encoding process?"));
+      if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES)
+      {
+        GCancellable *cancellable;
+
+        cancellable = g_object_get_data (G_OBJECT (encoding), "cancellable");
+        if (cancellable)
+          g_cancellable_cancel (cancellable);
+      }
+      gtk_widget_destroy (dialog);
+      break;
+  }
+}
+
+G_DEFINE_TYPE_WITH_PRIVATE (OGMRipMainWindow, ogmrip_main_window, GTK_TYPE_APPLICATION_WINDOW)
 
 static void
 ogmrip_main_window_add_audio_chooser (OGMRipMainWindow *window)
@@ -549,6 +571,11 @@ ogmrip_main_window_encode (OGMRipMainWindow *window, OGMRipEncoding *encoding)
     g_signal_connect (encoding, "progress",
         G_CALLBACK (ogmrip_encoding_progress_cb), dialog);
 
+#ifdef HAVE_ENCHANT_SUPPORT
+    g_signal_connect (encoding, "complete",
+        G_CALLBACK (ogmrip_encoding_complete_cb), window);
+#endif
+
     cancellable = g_cancellable_new ();
     g_object_set_data_full (G_OBJECT (encoding), "cancellable", cancellable, g_object_unref);
 
@@ -572,6 +599,11 @@ ogmrip_main_window_encode (OGMRipMainWindow *window, OGMRipEncoding *encoding)
         ogmrip_encoding_run_cb, dialog);
     g_signal_handlers_disconnect_by_func (encoding,
         ogmrip_encoding_progress_cb, dialog);
+
+#ifdef HAVE_ENCHANT_SUPPORT
+    g_signal_handlers_disconnect_by_func (encoding,
+        ogmrip_encoding_complete_cb, window);
+#endif
 
     gtk_widget_destroy (dialog);
 
@@ -866,32 +898,6 @@ ogmrip_main_window_set_filename (OGMRipMainWindow *window, OGMRipEncoding *encod
   g_free (path);
 }
 
-static void
-ogmrip_main_window_encoding_completed (OGMRipMainWindow *window, OGMJobSpawn *spawn, OGMRipEncodingStatus status, OGMRipEncoding *encoding)
-{
-  if (spawn != NULL && status == OGMRIP_ENCODING_SUCCESS)
-  {
-    if (OGMRIP_IS_SUBP_CODEC (spawn))
-    {
-#ifdef HAVE_ENCHANT_SUPPORT
-      if (ogmrip_codec_format (G_OBJECT_TYPE (spawn)) != OGMRIP_FORMAT_VOBSUB)
-      {
-        OGMRipProfile *profile;
-        gboolean spell_check;
-
-        profile = ogmrip_encoding_get_profile (encoding);
-        ogmrip_profile_get (profile, OGMRIP_PROFILE_SUBP, OGMRIP_PROFILE_SPELL_CHECK, "b", &spell_check);
-
-        if (spell_check)
-          ogmrip_main_window_spell_check (window,
-              ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (spawn))),
-              ogmrip_subp_codec_get_language (OGMRIP_SUBP_CODEC (spawn)));
-      }
-#endif
-    }
-  }
-}
-
 static gboolean
 ogmrip_main_window_run_options_dialog (OGMRipMainWindow *window, OGMRipEncoding *encoding, guint width, guint height, GError **error)
 {
@@ -1086,9 +1092,6 @@ ogmrip_main_window_run_options_dialog (OGMRipMainWindow *window, OGMRipEncoding 
       g_list_free (list);
     }
   }
-
-  g_signal_connect_swapped (encoding, "complete",
-      G_CALLBACK (ogmrip_main_window_encoding_completed), window);
 
   ogmrip_main_window_set_filename (window, encoding);
 
