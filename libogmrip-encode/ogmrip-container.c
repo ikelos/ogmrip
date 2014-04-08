@@ -392,7 +392,7 @@ ogmrip_container_set_fourcc (OGMRipContainer *container, const gchar *fourcc)
     g_free (container->priv->fourcc);
   container->priv->fourcc = NULL;
 
-  if (fourcc)
+  if (fourcc && *fourcc)
   {
     str = g_utf8_strup (fourcc, -1);
     container->priv->fourcc = g_strndup (str, 4);
