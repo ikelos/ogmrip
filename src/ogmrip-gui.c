@@ -1,5 +1,5 @@
 /* OGMRip - A media encoder for GNOME
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -98,7 +98,7 @@ ogmrip_gui_about_activated (GSimpleAction *action, GVariant *parameter, gpointer
       "name", PACKAGE_NAME,
       "version", PACKAGE_VERSION,
       "comments", _("A Media Encoder for GNOME"),
-      "copyright", "(c) 2004-2012 Olivier Rolland",
+      "copyright", "(c) 2004-2014 Olivier Rolland",
       "website", "http://ogmrip.sourceforge.net",
       "translator-credits", translator_credits,
       "documenters", documenters,

@@ -1,5 +1,5 @@
 /* OGMRipBase - A foundation library for OGMRip
- * Copyright (C) 2010-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2010-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public

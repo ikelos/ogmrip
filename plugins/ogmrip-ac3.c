@@ -1,4 +1,4 @@
-/* OGMRipAac - An AAC plugin for OGMRip
+/* OGMRipAc3 - An AC3 plugin for OGMRip
  * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -28,67 +28,69 @@
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
 
-#define FAAC "faac"
+#define AFTEN "aften"
 
-#define OGMRIP_TYPE_AAC          (ogmrip_aac_get_type ())
-#define OGMRIP_AAC(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_AAC, OGMRipAac))
-#define OGMRIP_AAC_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_AAC, OGMRipAacClass))
-#define OGMRIP_IS_AAC(obj)       (G_TYPE_CHECK_INSTANCE_TYPE ((obj), OGMRIP_TYPE_AAC))
-#define OGMRIP_IS_AAC_CLASS(obj) (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_AAC))
+#define OGMRIP_TYPE_AC3          (ogmrip_ac3_get_type ())
+#define OGMRIP_AC3(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_AC3, OGMRipAc3))
+#define OGMRIP_AC3_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_AC3, OGMRipAc3Class))
+#define OGMRIP_IS_AC3(obj)       (G_TYPE_CHECK_INSTANCE_TYPE ((obj), OGMRIP_TYPE_AC3))
+#define OGMRIP_IS_AC3_CLASS(obj) (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_AC3))
 
-typedef struct _OGMRipAac      OGMRipAac;
-typedef struct _OGMRipAacClass OGMRipAacClass;
+typedef struct _OGMRipAc3      OGMRipAc3;
+typedef struct _OGMRipAc3Class OGMRipAc3Class;
 
-struct _OGMRipAac
+struct _OGMRipAc3
 {
   OGMRipAudioCodec parent_instance;
 };
 
-struct _OGMRipAacClass
+struct _OGMRipAc3Class
 {
   OGMRipAudioCodecClass parent_class;
 };
 
-static gboolean ogmrip_aac_run (OGMJobTask   *task,
+static gboolean ogmrip_ac3_run (OGMJobTask   *task,
                                 GCancellable *cancellable,
                                 GError       **error);
 
+static const guint16 a52_bitratetab[] =
+{
+   32,  40,  48,  56,  64,  80,  96, 112, 128, 160,
+  192, 224, 256, 320, 384, 448, 512, 576, 640,   0
+};
+
 static OGMJobTask *
-ogmrip_aac_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input)
+ogmrip_aften_command (OGMRipAudioCodec *audio, const gchar *input)
 {
   OGMJobTask *task;
+  OGMRipStream *stream;
 
   GPtrArray *argv;
   const gchar *output;
-  gint quality;
-
-  quality = ogmrip_audio_codec_get_quality (audio);
+  gint i, bitrate;
 
   argv = g_ptr_array_new_full (20, g_free);
-  g_ptr_array_add (argv, g_strdup (FAAC));
+  g_ptr_array_add (argv, g_strdup (AFTEN));
 
-  if (!header)
-  {
-    g_ptr_array_add (argv, g_strdup ("-P"));
-    g_ptr_array_add (argv, g_strdup ("-R"));
-    g_ptr_array_add (argv, g_strdup_printf ("%d",
-          ogmrip_audio_codec_get_sample_rate (audio)));
-    g_ptr_array_add (argv, g_strdup ("-C"));
-    g_ptr_array_add (argv, g_strdup_printf ("%d",
-          ogmrip_audio_codec_get_channels (audio) + 1));
-    g_ptr_array_add (argv, g_strdup ("-X"));
-  }
+  stream = ogmrip_codec_get_input (OGMRIP_CODEC (audio));
 
-  g_ptr_array_add (argv, g_strdup ("-q"));
-  g_ptr_array_add (argv, g_strdup_printf ("%d", quality * 49 + 10));
-  g_ptr_array_add (argv, g_strdup ("--mpeg-vers"));
-  g_ptr_array_add (argv, g_strdup ("4"));
-  g_ptr_array_add (argv, g_strdup ("-o"));
+  bitrate = ogmrip_audio_stream_get_bitrate (OGMRIP_AUDIO_STREAM (stream)) / 1000;
+  bitrate = 128 + ((bitrate - 128) * ogmrip_audio_codec_get_quality (audio) / 10);
+
+  for (i = 0; a52_bitratetab[i]; i++)
+    if (a52_bitratetab[i] > bitrate)
+      break;
+
+  bitrate = a52_bitratetab[i] ? a52_bitratetab[i] : 640;
+
+  g_ptr_array_add (argv, g_strdup ("-b"));
+  g_ptr_array_add (argv, g_strdup_printf ("%d", bitrate));
+
+  g_ptr_array_add (argv, g_strdup (input));
 
   output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (audio)));
   g_ptr_array_add (argv, g_strdup (output));
 
-  g_ptr_array_add (argv, g_strdup (input));
   g_ptr_array_add (argv, NULL);
 
   task = ogmjob_spawn_newv ((gchar **) argv->pdata);
@@ -97,25 +99,25 @@ ogmrip_aac_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input
   return task;
 }
 
-G_DEFINE_TYPE (OGMRipAac, ogmrip_aac, OGMRIP_TYPE_AUDIO_CODEC);
+G_DEFINE_TYPE (OGMRipAc3, ogmrip_ac3, OGMRIP_TYPE_AUDIO_CODEC);
 
 static void
-ogmrip_aac_class_init (OGMRipAacClass *klass)
+ogmrip_ac3_class_init (OGMRipAc3Class *klass)
 {
   OGMJobTaskClass *task_class;
 
   task_class = OGMJOB_TASK_CLASS (klass);
 
-  task_class->run = ogmrip_aac_run;
+  task_class->run = ogmrip_ac3_run;
 }
 
 static void
-ogmrip_aac_init (OGMRipAac *aac)
+ogmrip_ac3_init (OGMRipAc3 *ac3)
 {
 }
 
 static gboolean
-ogmrip_aac_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
+ogmrip_ac3_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
   OGMJobTask *pipeline;
   OGMJobTask *child;
@@ -137,11 +139,11 @@ ogmrip_aac_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
   g_object_unref (child);
 
-  child = ogmrip_aac_command (OGMRIP_AUDIO_CODEC (task), FALSE, fifo);
+  child = ogmrip_aften_command (OGMRIP_AUDIO_CODEC (task), fifo);
   ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
   g_object_unref (child);
 
-  result = OGMJOB_TASK_CLASS (ogmrip_aac_parent_class)->run (task, cancellable, error);
+  result = OGMJOB_TASK_CLASS (ogmrip_ac3_parent_class)->run (task, cancellable, error);
 
   ogmjob_container_remove (OGMJOB_CONTAINER (task), pipeline);
 
@@ -154,18 +156,18 @@ ogmrip_aac_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 void
 ogmrip_module_load (OGMRipModule *module)
 {
-  gboolean have_mplayer, have_faac;
+  gboolean have_mplayer, have_aften;
   gchar *fullname;
 
   have_mplayer = ogmrip_check_mplayer ();
 
-  fullname = g_find_program_in_path (FAAC);
-  have_faac = fullname != NULL;
+  fullname = g_find_program_in_path (AFTEN);
+  have_aften = fullname != NULL;
   g_free (fullname);
 
-  if (!have_mplayer && !have_faac)
+  if (!have_mplayer && !have_aften)
   {
-    g_warning (_("MPlayer and FAAC are missing"));
+    g_warning (_("MPlayer and aften are missing"));
     return;
   }
 
@@ -175,13 +177,13 @@ ogmrip_module_load (OGMRipModule *module)
     return;
   }
 
-  if (!have_faac)
+  if (!have_aften)
   {
-    g_warning (_("FAAC is missing"));
+    g_warning (_("aften is missing"));
     return;
   }
 
-  ogmrip_register_codec (OGMRIP_TYPE_AAC,
-      "aac", _("Advanced Audio Coding (AAC)"), OGMRIP_FORMAT_AAC, NULL);
+  ogmrip_register_codec (OGMRIP_TYPE_AC3,
+      "ac3", _("Dolby Digital (AC3)"), OGMRIP_FORMAT_AC3, NULL);
 }
 
