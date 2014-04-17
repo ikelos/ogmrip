@@ -301,6 +301,14 @@ AM_CONDITIONAL(HAVE_FLAC_SUPPORT, [test x"$have_flac_support" = x"yes"])
 
 dnl **************************************************************
 
+AC_ARG_ENABLE(ac3-support,
+  AC_HELP_STRING([--disable-ac3-support], [disable AC3 support]),
+  [have_ac3_support="$enableval"], [have_ac3_support="yes"])
+
+AM_CONDITIONAL(HAVE_AC3_SUPPORT, [test x"$have_ac3_support" = x"yes"])
+
+dnl **************************************************************
+
 AC_ARG_ENABLE(srt-support,
   AC_HELP_STRING([--disable-srt-support], [disable SRT support]),
   [have_srt_support="$enableval"], [have_srt_support="yes"])
