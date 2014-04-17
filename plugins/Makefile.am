@@ -253,6 +253,26 @@ ogmrip_flac_la_LIBADD = \
   $(top_builddir)/libogmrip-mplayer/libogmrip-mplayer.la
 endif
 
+if HAVE_AC3_SUPPORT
+plugins_LTLIBRARIES += \
+  ogmrip-ac3.la
+
+ogmrip_ac3_la_SOURCES = \
+  ogmrip-ac3.c
+
+ogmrip_ac3_la_LDFLAGS = \
+  -export-dynamic -module -avoid-version
+
+ogmrip_ac3_la_LIBTOOLFLAGS = \
+  --tag=disable-static
+
+ogmrip_ac3_la_LIBADD = \
+  $(top_builddir)/libogmrip-base/libogmrip-base.la \
+  $(top_builddir)/libogmrip-job/libogmrip-job.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
+  $(top_builddir)/libogmrip-mplayer/libogmrip-mplayer.la
+endif
+
 #
 # Subp Codecs
 #
