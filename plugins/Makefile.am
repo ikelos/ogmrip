@@ -547,7 +547,7 @@ BUILT_SOURCES = \
 # Misc
 #
 
-INCLUDES = \
+AM_CPPFLAGS = \
   -I$(top_srcdir)/libogmrip-base      \
   -I$(top_srcdir)/libogmrip-job       \
   -I$(top_srcdir)/libogmrip-media     \
@@ -564,12 +564,12 @@ INCLUDES = \
   -DOGMRIP_DATA_DIR=\""$(datadir)"\"
 
 if HAVE_GTK_SUPPORT
-INCLUDES += \
+AM_CPPFLAGS += \
   -I$(top_srcdir)/libogmrip-encode-gtk
 endif
 
 if MAINTAINER_MODE
-INCLUDES += \
+AM_CPPFLAGS += \
   -DG_ENABLE_DEBUG
 endif
 

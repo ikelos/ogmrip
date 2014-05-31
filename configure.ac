@@ -28,6 +28,7 @@ AC_SUBST(OGMRIP_VERSION)
 dnl **************************************************************
 
 AC_PROG_CC
+AM_PROG_CC_C_O
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 AC_PROG_LN_S
@@ -366,12 +367,12 @@ fi
 
 dnl **************************************************************
 
+AM_GLIB_GNU_GETTEXT
+IT_PROG_INTLTOOL([0.40.0], [no-xml])
+
 GETTEXT_PACKAGE=ogmrip
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [GetText Package])
-
-AM_GLIB_GNU_GETTEXT
-IT_PROG_INTLTOOL([0.40.0], [no-xml])
 
 if test "x${prefix}" = "xNONE"; then 
   AC_DEFINE_UNQUOTED(LOCALEDIR, "${ac_default_prefix}/${DATADIRNAME}/locale", [Locale directory])
