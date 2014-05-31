@@ -38,7 +38,7 @@ libogmrip_media_gtk_la_LIBADD = \
   $(top_builddir)/libogmrip-base/libogmrip-base.la \
   $(top_builddir)/libogmrip-media/libogmrip-media.la
 
-INCLUDES = \
+libogmrip_media_gtk_la_CPPFLAGS = \
   -I$(top_srcdir)/libogmrip-base \
   -I$(top_srcdir)/libogmrip-media
 

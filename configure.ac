@@ -9,7 +9,7 @@ m4_define([ogmrip_version], [ogmrip_major_version.ogmrip_minor_version.ogmrip_mi
 
 AC_INIT([OGMRip], [ogmrip_version])
 AC_CONFIG_SRCDIR(src/ogmrip-main.c)
-AM_INIT_AUTOMAKE(ogmrip, AC_PACKAGE_VERSION)
+AM_INIT_AUTOMAKE
 
 AC_CONFIG_HEADERS(config.h)
 AC_CONFIG_MACRO_DIR(m4)

@@ -73,7 +73,7 @@ ogmrip_LDADD += \
   $(top_builddir)/libogmrip-encode-gtk/libogmrip-encode-gtk.la
 endif
 
-INCLUDES = \
+ogmrip_CPPFLAGS = \
   -I$(top_srcdir)/libogmrip-base       \
   -I$(top_srcdir)/libogmrip-job        \
   -I$(top_srcdir)/libogmrip-media      \
@@ -87,14 +87,14 @@ INCLUDES = \
   -DOGMRIP_LIB_DIR=\""$(libdir)"\"
 
 if HAVE_GTK_SUPPORT
-INCLUDES += \
+ogmrip_CPPFLAGS += \
   -I$(top_srcdir)/libogmrip-media-gtk  \
   -I$(top_srcdir)/libogmrip-file-gtk   \
   -I$(top_srcdir)/libogmrip-encode-gtk
 endif
 
 if MAINTAINER_MODE
-INCLUDES += \
+ogmrip_CPPFLAGS += \
   -DG_ENABLE_DEBUG
 endif
 

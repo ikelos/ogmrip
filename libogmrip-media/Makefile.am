@@ -38,7 +38,7 @@ libogmrip_media_la_LIBADD = \
   $(top_builddir)/libogmrip-base/libogmrip-base.la \
   $(top_builddir)/libogmrip-job/libogmrip-job.la
 
-INCLUDES = \
+libogmrip_media_la_CPPFLAGS = \
   -I$(top_srcdir)/libogmrip-base \
   -I$(top_srcdir)/libogmrip-job
 

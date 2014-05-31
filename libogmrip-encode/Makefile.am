@@ -78,7 +78,7 @@ EXTRA_DIST = \
   ogmrip-stub.h       \
   ogmrip-version.h.in
 
-INCLUDES = \
+libogmrip_encode_la_CPPFLAGS = \
   -I$(top_srcdir)/libogmrip-base     \
   -I$(top_srcdir)/libogmrip-job      \
   -I$(top_srcdir)/libogmrip-media    \
@@ -89,7 +89,7 @@ INCLUDES = \
   -DOGMRIP_DATA_DIR=\""$(datadir)"\"
 
 if MAINTAINER_MODE
-INCLUDES += \
+libogmrip_encode_la_CPPFLAGS += \
   -DG_ENABLE_DEBUG
 endif
 

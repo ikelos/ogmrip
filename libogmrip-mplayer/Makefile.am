@@ -26,7 +26,7 @@ libogmrip_mplayer_la_HEADERS = \
   ogmrip-mplayer-version.h  \
   ogmrip-mplayer.h
 
-INCLUDES = \
+libogmrip_mplayer_la_CPPFLAGS = \
   -I$(top_srcdir)/libogmrip-base   \
   -I$(top_srcdir)/libogmrip-job    \
   -I$(top_srcdir)/libogmrip-media  \
@@ -35,7 +35,7 @@ INCLUDES = \
   -I$(top_builddir)/libogmrip-encode
 
 if MAINTAINER_MODE
-INCLUDES += \
+libogmrip_mplayer_la_CPPFLAGS += \
   -DG_ENABLE_DEBUG
 endif
 

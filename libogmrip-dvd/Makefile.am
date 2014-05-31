@@ -35,13 +35,13 @@ EXTRA_DIST = \
   ogmdvd-contrib.h   \
   ogmdvd-priv.h
 
-INCLUDES = \
+libogmrip_dvd_la_CPPFLAGS = \
   -I$(top_srcdir)/libogmrip-base  \
   -I$(top_srcdir)/libogmrip-media \
   -I$(top_srcdir)/libogmrip-job
 
 if MAINTAINER_MODE
-INCLUDES += \
+libogmrip_dvd_la_CPPFLAGS += \
   -DG_ENABLE_DEBUG
 endif
 

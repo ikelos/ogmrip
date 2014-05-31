@@ -29,7 +29,7 @@ libogmrip_file_la_LIBADD = \
 libogmrip_file_ladir = \
   $(includedir)/ogmrip-file
 
-INCLUDES = \
+libogmrip_file_la_CPPFLAGS = \
   -I$(top_srcdir)/libogmrip-base \
   -I$(top_srcdir)/libogmrip-media
 

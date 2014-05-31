@@ -78,7 +78,7 @@ ui_FILES = \
 ogmrip-encode-gresource.c: ogmrip-encode.gresource.xml $(ui_FILES) $(GLIB_COMPILE_RESOURCES)
 	$(GLIB_COMPILE_RESOURCES) --sourcedir=$(top_srcdir)/libogmrip-encode-gtk --generate-source --target=$@ $<
 
-INCLUDES = \
+libogmrip_encode_gtk_la_CPPFLAGS = \
   -I$(top_srcdir)/libogmrip-base      \
   -I$(top_srcdir)/libogmrip-job       \
   -I$(top_srcdir)/libogmrip-media     \
