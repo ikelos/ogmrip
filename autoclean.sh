@@ -9,6 +9,7 @@ rm -f intltool-update
 rm -f intltool-extract.in
 rm -f intltool-merge.in
 rm -f intltool-update.in
+rm -f compile
 rm -f configure
 rm -f depcomp
 rm -f config.h.in
