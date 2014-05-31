@@ -1,5 +1,5 @@
 /* OGMRipMedia - A media library for OGMRip
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,13 +31,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipLanguageChooserWidget      OGMRipLanguageChooserWidget;
 typedef struct _OGMRipLanguageChooserWidgetClass OGMRipLanguageChooserWidgetClass;
-typedef struct _OGMRipLanguageChooserWidgetPriv  OGMRipLanguageChooserWidgetPriv;
+typedef struct _OGMRipLanguageChooserWidgetPriv  OGMRipLanguageChooserWidgetPrivate;
 
 struct _OGMRipLanguageChooserWidget
 {
   GtkComboBox parent_instance;
 
-  OGMRipLanguageChooserWidgetPriv *priv;
+  OGMRipLanguageChooserWidgetPrivate *priv;
 };
 
 struct _OGMRipLanguageChooserWidgetClass

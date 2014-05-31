@@ -6,7 +6,7 @@ SUBDIRS = \
   libogmrip-dvd     \
   libogmrip-file    \
   libogmrip-encode  \
-	libogmrip-mplayer \
+  libogmrip-mplayer \
   avibox \
   dvdcpy
 

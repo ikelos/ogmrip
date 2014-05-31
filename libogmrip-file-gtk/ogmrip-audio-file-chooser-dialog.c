@@ -1,5 +1,5 @@
 /* OGMRipFile - A file library for OGMRip
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -75,7 +75,7 @@ ogmrip_audio_file_chooser_dialog_constructed (GObject *gobject)
 
   gtk_file_chooser_set_action (GTK_FILE_CHOOSER (dialog), GTK_FILE_CHOOSER_ACTION_OPEN);
   gtk_dialog_add_buttons (GTK_DIALOG (dialog),
-      GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT, GTK_STOCK_OPEN, GTK_RESPONSE_ACCEPT, NULL);
+      _("_Cancel"), GTK_RESPONSE_REJECT, _("_Open"), GTK_RESPONSE_ACCEPT, NULL);
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
   gtk_dialog_set_alternative_button_order (GTK_DIALOG (dialog),
       GTK_RESPONSE_ACCEPT, GTK_RESPONSE_REJECT, -1);

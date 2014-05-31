@@ -11,6 +11,10 @@ plugin_includedir = \
 
 plugin_include_HEADERS =
 
+resourcefiles =
+
+ui_FILES =
+
 if HAVE_LAVC_SUPPORT
 plugins_LTLIBRARIES += \
   ogmrip-lavc-mpeg.la
@@ -249,6 +253,26 @@ ogmrip_flac_la_LIBADD = \
   $(top_builddir)/libogmrip-mplayer/libogmrip-mplayer.la
 endif
 
+if HAVE_AC3_SUPPORT
+plugins_LTLIBRARIES += \
+  ogmrip-ac3.la
+
+ogmrip_ac3_la_SOURCES = \
+  ogmrip-ac3.c
+
+ogmrip_ac3_la_LDFLAGS = \
+  -export-dynamic -module -avoid-version
+
+ogmrip_ac3_la_LIBTOOLFLAGS = \
+  --tag=disable-static
+
+ogmrip_ac3_la_LIBADD = \
+  $(top_builddir)/libogmrip-base/libogmrip-base.la \
+  $(top_builddir)/libogmrip-job/libogmrip-job.la \
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
+  $(top_builddir)/libogmrip-mplayer/libogmrip-mplayer.la
+endif
+
 #
 # Subp Codecs
 #
@@ -396,7 +420,8 @@ extensions_LTLIBRARIES += \
   ogmrip-lavc-options.la
 
 ogmrip_lavc_options_la_SOURCES = \
-  ogmrip-lavc-options.c
+  ogmrip-lavc-options.c \
+  ogmrip-lavc-gresource.c
 
 ogmrip_lavc_options_la_LDFLAGS = \
   -export-dynamic -module -avoid-version
@@ -410,6 +435,15 @@ ogmrip_lavc_options_la_LIBADD = \
   $(top_builddir)/libogmrip-module/libogmrip-module.la  \
   $(top_builddir)/libogmrip-mplayer/libogmrip-mplayer.la \
   $(top_builddir)/libogmrip-encode-gtk/libogmrip-encode-gtk.la
+
+resourcefiles += \
+  ogmrip-lavc.gresource.xml
+
+ui_FILES += \
+  ogmrip-lavc-options-dialog.ui
+
+ogmrip-lavc-gresource.c: ogmrip-lavc.gresource.xml ogmrip-lavc-options-dialog.ui $(GLIB_COMPILE_RESOURCES)
+	$(GLIB_COMPILE_RESOURCES) --sourcedir=$(top_srcdir)/plugins --generate-source --target=$@ $<
 endif
 
 if HAVE_XVID_SUPPORT
@@ -417,7 +451,8 @@ extensions_LTLIBRARIES += \
   ogmrip-xvid-options.la
 
 ogmrip_xvid_options_la_SOURCES = \
-  ogmrip-xvid-options.c
+  ogmrip-xvid-options.c \
+  ogmrip-xvid-gresource.c
 
 ogmrip_xvid_options_la_LDFLAGS = \
   -export-dynamic -module -avoid-version
@@ -430,6 +465,15 @@ ogmrip_xvid_options_la_LIBADD = \
   $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
   $(top_builddir)/libogmrip-module/libogmrip-module.la \
   $(top_builddir)/libogmrip-encode-gtk/libogmrip-encode-gtk.la
+
+resourcefiles += \
+  ogmrip-xvid.gresource.xml
+
+ui_FILES += \
+  ogmrip-xvid-options-dialog.ui
+
+ogmrip-xvid-gresource.c: ogmrip-xvid.gresource.xml ogmrip-xvid-options-dialog.ui $(GLIB_COMPILE_RESOURCES)
+	$(GLIB_COMPILE_RESOURCES) --sourcedir=$(top_srcdir)/plugins --generate-source --target=$@ $<
 endif
 
 if HAVE_X264_SUPPORT
@@ -437,7 +481,8 @@ extensions_LTLIBRARIES += \
   ogmrip-x264-options.la
 
 ogmrip_x264_options_la_SOURCES = \
-  ogmrip-x264-options.c
+  ogmrip-x264-options.c \
+  ogmrip-x264-gresource.c
 
 ogmrip_x264_options_la_LDFLAGS = \
   -export-dynamic -module -avoid-version
@@ -450,6 +495,15 @@ ogmrip_x264_options_la_LIBADD = \
   $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
   $(top_builddir)/libogmrip-module/libogmrip-module.la \
   $(top_builddir)/libogmrip-encode-gtk/libogmrip-encode-gtk.la
+
+resourcefiles += \
+  ogmrip-x264.gresource.xml
+
+ui_FILES += \
+  ogmrip-x264-options-dialog.ui
+
+ogmrip-x264-gresource.c: ogmrip-x264.gresource.xml ogmrip-x264-options-dialog.ui $(GLIB_COMPILE_RESOURCES)
+	$(GLIB_COMPILE_RESOURCES) --sourcedir=$(top_srcdir)/plugins --generate-source --target=$@ $<
 endif
 
 if HAVE_MP4_SUPPORT
@@ -457,7 +511,8 @@ extensions_LTLIBRARIES += \
   ogmrip-mp4-options.la
 
 ogmrip_mp4_options_la_SOURCES = \
-  ogmrip-mp4-options.c
+  ogmrip-mp4-options.c \
+  ogmrip-mp4-gresource.c
 
 ogmrip_mp4_options_la_LDFLAGS = \
   -export-dynamic -module -avoid-version
@@ -470,14 +525,29 @@ ogmrip_mp4_options_la_LIBADD = \
   $(top_builddir)/libogmrip-encode/libogmrip-encode.la \
   $(top_builddir)/libogmrip-module/libogmrip-module.la \
   $(top_builddir)/libogmrip-encode-gtk/libogmrip-encode-gtk.la
+
+resourcefiles += \
+  ogmrip-mp4.gresource.xml
+
+ui_FILES += \
+  ogmrip-mp4-options-dialog.ui
+
+ogmrip-mp4-gresource.c: ogmrip-mp4.gresource.xml ogmrip-mp4-options-dialog.ui $(GLIB_COMPILE_RESOURCES)
+	$(GLIB_COMPILE_RESOURCES) --sourcedir=$(top_srcdir)/plugins --generate-source --target=$@ $<
 endif
 endif
+
+RESOURCES = \
+  $(resourcefiles:.gresource.xml=-gresource.c)
+
+BUILT_SOURCES = \
+  $(RESOURCES)
 
 #
 # Misc
 #
 
-INCLUDES = \
+AM_CPPFLAGS = \
   -I$(top_srcdir)/libogmrip-base      \
   -I$(top_srcdir)/libogmrip-job       \
   -I$(top_srcdir)/libogmrip-media     \
@@ -489,16 +559,24 @@ INCLUDES = \
   -I$(top_srcdir)/libogmrip-encode    \
   -I$(top_srcdir)/libogmrip-mplayer   \
   -I$(top_srcdir)/libogmrip-module    \
+  -I$(top_builddir)/libogmrip-encode  \
   -DOGMRIP_LIB_DIR=\""$(libdir)"\"    \
   -DOGMRIP_DATA_DIR=\""$(datadir)"\"
 
 if HAVE_GTK_SUPPORT
-INCLUDES += \
+AM_CPPFLAGS += \
   -I$(top_srcdir)/libogmrip-encode-gtk
 endif
 
 if MAINTAINER_MODE
-INCLUDES += \
+AM_CPPFLAGS += \
   -DG_ENABLE_DEBUG
 endif
+
+CLEANFILES = \
+  $(RESOURCES)
+
+EXTRA_DIST = \
+  $(resourcefiles) \
+  $(ui_FILES)
 

@@ -1,5 +1,5 @@
 /* OGMRip - A library for media ripping and encoding
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,13 +31,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipListItem      OGMRipListItem;
 typedef struct _OGMRipListItemClass OGMRipListItemClass;
-typedef struct _OGMRipListItemPriv  OGMRipListItemPriv;
+typedef struct _OGMRipListItemPriv  OGMRipListItemPrivate;
 
 struct _OGMRipListItem
 {
   GtkBox parent_instance;
 
-  OGMRipListItemPriv *priv;
+  OGMRipListItemPrivate *priv;
 };
 
 struct _OGMRipListItemClass

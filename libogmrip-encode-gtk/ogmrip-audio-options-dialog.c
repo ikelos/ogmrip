@@ -1,5 +1,5 @@
 /* OGMRip - A library for media ripping and encoding
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,7 +28,7 @@
 
 #include <glib/gi18n-lib.h>
 
-#define OGMRIP_UI_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-profile-editor.ui"
+#define OGMRIP_UI_RES  "/org/ogmrip/ogmrip-profile-editor-dialog.ui"
 #define OGMRIP_UI_ROOT "audio-page"
 
 #define gtk_builder_get_widget(builder, name) \
@@ -187,10 +187,10 @@ ogmrip_audio_options_dialog_init (OGMRipAudioOptionsDialog *dialog)
       OGMRIP_TYPE_AUDIO_OPTIONS_DIALOG, OGMRipAudioOptionsDialogPriv);
 
   builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_UI_FILE, &error))
+  if (!gtk_builder_add_from_resource (builder, OGMRIP_UI_RES, &error))
     g_error ("Couldn't load builder file: %s", error->message);
 
-  gtk_dialog_add_button (GTK_DIALOG (dialog), GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE);
+  gtk_dialog_add_button (GTK_DIALOG (dialog), _("_Close"), GTK_RESPONSE_CLOSE);
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
   gtk_container_set_border_width (GTK_CONTAINER (dialog), 6);
 

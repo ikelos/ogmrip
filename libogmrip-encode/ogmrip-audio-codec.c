@@ -1,5 +1,5 @@
 /* OGMRip - A library for media ripping and encoding
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,13 +25,11 @@
 
 #include "ogmrip-audio-codec.h"
 #include "ogmrip-profile-keys.h"
+#include "ogmrip-container.h"
 
 #include <ogmrip-base.h>
 
 #define DEFAULT_SPF 1024
-
-#define OGMRIP_AUDIO_CODEC_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_AUDIO_CODEC, OGMRipAudioCodecPriv))
 
 struct _OGMRipAudioCodecPriv
 {
@@ -59,72 +57,7 @@ enum
   PROP_LANGUAGE
 };
 
-static void ogmrip_audio_codec_constructed  (GObject      *gobject);
-static void ogmrip_audio_codec_finalize     (GObject      *gobject);
-static void ogmrip_audio_codec_set_property (GObject      *gobject,
-                                             guint        property_id,
-                                             const GValue *value,
-                                             GParamSpec   *pspec);
-static void ogmrip_audio_codec_get_property (GObject      *gobject,
-                                             guint        property_id,
-                                             GValue       *value,
-                                             GParamSpec   *pspec);
-
-G_DEFINE_ABSTRACT_TYPE (OGMRipAudioCodec, ogmrip_audio_codec, OGMRIP_TYPE_CODEC)
-
-static void
-ogmrip_audio_codec_class_init (OGMRipAudioCodecClass *klass)
-{
-  GObjectClass *gobject_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-
-  gobject_class->constructed = ogmrip_audio_codec_constructed;
-  gobject_class->finalize = ogmrip_audio_codec_finalize;
-  gobject_class->set_property = ogmrip_audio_codec_set_property;
-  gobject_class->get_property = ogmrip_audio_codec_get_property;
-
-  g_object_class_install_property (gobject_class, PROP_QUALITY, 
-        g_param_spec_uint ("quality", "Quality property", "Set quality", 
-           0, 10, 3, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_NORMALIZE, 
-        g_param_spec_boolean ("normalize", "Normalize property", "Set normalize", 
-           FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_CHANNELS, 
-        g_param_spec_int ("channels", "Channels property", "Set channels", 
-           OGMRIP_CHANNELS_UNDEFINED, OGMRIP_CHANNELS_7_1, OGMRIP_CHANNELS_STEREO,
-           G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_SRATE, 
-        g_param_spec_uint ("sample-rate", "Sample rate property", "Set sample rate", 
-           0, G_MAXUINT, 48000, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_FAST, 
-        g_param_spec_boolean ("fast", "Fast property", "Set fast", 
-           FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_LABEL, 
-        g_param_spec_string ("label", "Label property", "Set label", 
-           NULL, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_LANGUAGE, 
-        g_param_spec_uint ("language", "Language property", "Set language", 
-           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_type_class_add_private (klass, sizeof (OGMRipAudioCodecPriv));
-}
-
-static void
-ogmrip_audio_codec_init (OGMRipAudioCodec *audio)
-{
-  audio->priv = OGMRIP_AUDIO_CODEC_GET_PRIVATE (audio);
-  audio->priv->channels = OGMRIP_CHANNELS_STEREO;
-
-  audio->priv->srate = 48000;
-  audio->priv->quality = 3;
-}
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (OGMRipAudioCodec, ogmrip_audio_codec, OGMRIP_TYPE_CODEC)
 
 static void
 ogmrip_audio_codec_constructed (GObject *gobject)
@@ -219,6 +152,74 @@ ogmrip_audio_codec_get_property (GObject *gobject, guint property_id, GValue *va
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
   }
+}
+
+static void
+ogmrip_audio_codec_class_init (OGMRipAudioCodecClass *klass)
+{
+  GObjectClass *gobject_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+
+  gobject_class->constructed = ogmrip_audio_codec_constructed;
+  gobject_class->finalize = ogmrip_audio_codec_finalize;
+  gobject_class->set_property = ogmrip_audio_codec_set_property;
+  gobject_class->get_property = ogmrip_audio_codec_get_property;
+
+  g_object_class_install_property (gobject_class, PROP_QUALITY, 
+        g_param_spec_uint ("quality", "Quality property", "Set quality", 
+           0, 10, 3, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_NORMALIZE, 
+        g_param_spec_boolean ("normalize", "Normalize property", "Set normalize", 
+           FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_CHANNELS, 
+        g_param_spec_int ("channels", "Channels property", "Set channels", 
+           OGMRIP_CHANNELS_UNDEFINED, OGMRIP_CHANNELS_7_1, OGMRIP_CHANNELS_STEREO,
+           G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_SRATE, 
+        g_param_spec_uint ("sample-rate", "Sample rate property", "Set sample rate", 
+           0, G_MAXUINT, 48000, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_FAST, 
+        g_param_spec_boolean ("fast", "Fast property", "Set fast", 
+           FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_LABEL, 
+        g_param_spec_string ("label", "Label property", "Set label", 
+           NULL, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_LANGUAGE, 
+        g_param_spec_uint ("language", "Language property", "Set language", 
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+}
+
+static void
+ogmrip_audio_codec_init (OGMRipAudioCodec *audio)
+{
+  audio->priv = ogmrip_audio_codec_get_instance_private (audio);
+
+  audio->priv->channels = OGMRIP_CHANNELS_STEREO;
+  audio->priv->srate = 48000;
+  audio->priv->quality = 3;
+}
+
+GType
+ogmrip_audio_codec_get_default (GType container)
+{
+  GType *types;
+  guint i;
+
+  g_return_val_if_fail (g_type_is_a (container, OGMRIP_TYPE_CONTAINER), G_TYPE_NONE);
+
+  types = ogmrip_type_children (OGMRIP_TYPE_AUDIO_CODEC, NULL);
+  for (i = 0; types[i] != G_TYPE_NONE; i ++)
+    if (ogmrip_container_contains (container, types[i]))
+      return types[i];
+
+  return G_TYPE_NONE;
 }
 
 OGMRipCodec *

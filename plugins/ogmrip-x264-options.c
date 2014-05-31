@@ -1,5 +1,5 @@
 /* OGMRipX264Options - An X264 options plugin for OGMRip
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,20 +27,14 @@
 
 #include <glib/gi18n.h>
 
-#define OGMRIP_UI_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-x264-options-dialog.ui"
+#define OGMRIP_UI_RES  "/org/ogmrip/ogmrip-x264-options-dialog.ui"
 #define OGMRIP_UI_ROOT "root"
-
-#define gtk_builder_get_widget(builder, name) \
-    (GtkWidget *) gtk_builder_get_object ((builder), (name))
 
 #define OGMRIP_TYPE_X264_DIALOG          (ogmrip_x264_dialog_get_type ())
 #define OGMRIP_X264_DIALOG(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_X264_DIALOG, OGMRipX264Dialog))
 #define OGMRIP_X264_DIALOG_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_X264_DIALOG, OGMRipX264DialogClass))
 #define OGMRIP_IS_X264_DIALOG(obj)       (G_TYPE_CHECK_INSTANCE_TYPE ((obj), OGMRIP_TYPE_X264_DIALOG))
 #define OGMRIP_IS_X264_DIALOG_CLASS(obj) (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_X264_DIALOG))
-
-#define OGMRIP_X264_PROP_PROFILE      "profile"
-#define OGMRIP_X264_DEFAULT_PROFILE   HIGH
 
 typedef struct _OGMRipX264Dialog      OGMRipX264Dialog;
 typedef struct _OGMRipX264DialogClass OGMRipX264DialogClass;
@@ -67,6 +61,7 @@ struct _OGMRipX264Dialog
   GtkWidget *fast_pskip_check;
   GtkWidget *force_cfr_check;
   GtkWidget *frameref_spin;
+  GtkWidget *global_header_check;
   GtkWidget *keyint_spin;
   GtkWidget *level_idc_spin;
   GtkWidget *me_combo;
@@ -82,7 +77,11 @@ struct _OGMRipX264Dialog
   GtkWidget *vbv_maxrate_spin;
   GtkWidget *weight_b_check;
   GtkWidget *weight_p_combo;
-  GtkWidget *partitions_check[5];
+  GtkWidget *b8x8_check;
+  GtkWidget *i8x8_check;
+  GtkWidget *p8x8_check;
+  GtkWidget *i4x4_check;
+  GtkWidget *p4x4_check;
 };
 
 struct _OGMRipX264DialogClass
@@ -125,15 +124,6 @@ static gboolean x264_have_psy        = FALSE;
 static gboolean x264_have_weight_p   = FALSE;
 
 static void ogmrip_options_editable_init (OGMRipOptionsEditableInterface *iface);
-
-static const gchar *partitions[] =
-{
-  "b8x8",
-  "i8x8",
-  "p8x8",
-  "i4x4",
-  "p4x4"
-};
 
 static gboolean
 ogmrip_x264_get_b8x8 (GValue *value, GVariant *variant, gpointer user_data)
@@ -218,15 +208,26 @@ ogmrip_x264_get_p4x4 (GValue *value, GVariant *variant, gpointer user_data)
 static GVariant *
 ogmrip_x264_set_partitions (const GValue *value, const GVariantType *type, gpointer user_data)
 {
-  GtkWidget **checks = user_data;
+  OGMRipX264Dialog *dialog = user_data;
   const gchar *strv[LAST];
-  guint i, j;
+  guint i = 0;
 
-  for (i = 0, j = 0; i < LAST; i ++)
-    if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (checks[i])))
-      strv[j ++] = partitions[i];
+  if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (dialog->b8x8_check)))
+    strv[i ++] = "b8x8";
 
-  return g_variant_new_strv (strv, j);
+  if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (dialog->i8x8_check)))
+    strv[i ++] = "i8x8";
+
+  if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (dialog->p8x8_check)))
+    strv[i ++] = "p8x8";
+
+  if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (dialog->i4x4_check)))
+    strv[i ++] = "i4x4";
+
+  if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (dialog->p4x4_check)))
+    strv[i ++] = "p4x4";
+
+  return g_variant_new_strv (strv, i);
 }
 
 static gboolean
@@ -331,7 +332,7 @@ ogmrip_x264_dialog_set_vbv_bufsize_sensitivity (GBinding *binding,
   return TRUE;
 }
 
-G_DEFINE_TYPE_EXTENDED (OGMRipX264Dialog, ogmrip_x264_dialog, GTK_TYPE_DIALOG, 0,
+G_DEFINE_TYPE_WITH_CODE (OGMRipX264Dialog, ogmrip_x264_dialog, GTK_TYPE_DIALOG,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_OPTIONS_EDITABLE, ogmrip_options_editable_init));
 
 static void
@@ -370,22 +371,24 @@ ogmrip_x264_dialog_set_profile (OGMRipX264Dialog *dialog, OGMRipProfile *profile
         dialog->fast_pskip_check, "active", G_SETTINGS_BIND_DEFAULT);
     g_settings_bind (settings, OGMRIP_X264_PROP_FORCE_CFR,
         dialog->force_cfr_check, "active", G_SETTINGS_BIND_DEFAULT);
+    g_settings_bind (settings, OGMRIP_X264_PROP_GLOBAL_HEADER,
+        dialog->global_header_check, "active", G_SETTINGS_BIND_DEFAULT);
 
     g_settings_bind_with_mapping (settings, OGMRIP_X264_PROP_PARTITIONS,
-        dialog->partitions_check[B8X8], "active", G_SETTINGS_BIND_DEFAULT,
-        ogmrip_x264_get_b8x8, ogmrip_x264_set_partitions, dialog->partitions_check, NULL);
+        dialog->b8x8_check, "active", G_SETTINGS_BIND_DEFAULT,
+        ogmrip_x264_get_b8x8, ogmrip_x264_set_partitions, dialog, NULL);
     g_settings_bind_with_mapping (settings, OGMRIP_X264_PROP_PARTITIONS,
-        dialog->partitions_check[I8X8], "active", G_SETTINGS_BIND_DEFAULT,
-        ogmrip_x264_get_i8x8, ogmrip_x264_set_partitions, dialog->partitions_check, NULL);
+        dialog->i8x8_check, "active", G_SETTINGS_BIND_DEFAULT,
+        ogmrip_x264_get_i8x8, ogmrip_x264_set_partitions, dialog, NULL);
     g_settings_bind_with_mapping (settings, OGMRIP_X264_PROP_PARTITIONS,
-        dialog->partitions_check[P8X8], "active", G_SETTINGS_BIND_DEFAULT,
-        ogmrip_x264_get_p8x8, ogmrip_x264_set_partitions, dialog->partitions_check, NULL);
+        dialog->p8x8_check, "active", G_SETTINGS_BIND_DEFAULT,
+        ogmrip_x264_get_p8x8, ogmrip_x264_set_partitions, dialog, NULL);
     g_settings_bind_with_mapping (settings, OGMRIP_X264_PROP_PARTITIONS,
-        dialog->partitions_check[I4X4], "active", G_SETTINGS_BIND_DEFAULT,
-        ogmrip_x264_get_i4x4, ogmrip_x264_set_partitions, dialog->partitions_check, NULL);
+        dialog->i4x4_check, "active", G_SETTINGS_BIND_DEFAULT,
+        ogmrip_x264_get_i4x4, ogmrip_x264_set_partitions, dialog, NULL);
     g_settings_bind_with_mapping (settings, OGMRIP_X264_PROP_PARTITIONS,
-        dialog->partitions_check[P4X4], "active", G_SETTINGS_BIND_DEFAULT,
-        ogmrip_x264_get_p4x4, ogmrip_x264_set_partitions, dialog->partitions_check, NULL);
+        dialog->p4x4_check, "active", G_SETTINGS_BIND_DEFAULT,
+        ogmrip_x264_get_p4x4, ogmrip_x264_set_partitions, dialog, NULL);
 
     g_settings_bind (settings, OGMRIP_X264_PROP_WEIGHT_P,
         dialog->weight_p_combo, "active", G_SETTINGS_BIND_DEFAULT);
@@ -491,122 +494,87 @@ ogmrip_x264_dialog_class_init (OGMRipX264DialogClass *klass)
   gobject_class->set_property = ogmrip_x264_dialog_set_property;
 
   g_object_class_override_property (gobject_class, PROP_PROFILE, "profile");
+
+  gtk_widget_class_set_template_from_resource (GTK_WIDGET_CLASS (klass), OGMRIP_UI_RES);
+
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, aq_mode_combo);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, aud_check);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, b_adapt_spin);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, bframes_spin);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, b_pyramid_check);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, b_pyramid_combo);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, b_pyramid_label);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, brdo_check);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, cabac_check);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, cqm_combo);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, dct8x8_check);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, dct_decimate_check);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, direct_combo);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, fast_pskip_check);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, force_cfr_check);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, frameref_spin);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, global_header_check);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, keyint_spin);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, level_idc_spin);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, me_combo);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, merange_spin);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, mixed_refs_check);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, profile_combo);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, psy_rd_spin);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, psy_trellis_spin);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, rc_lookahead_spin);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, subq_spin);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, trellis_combo);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, vbv_bufsize_spin);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, vbv_maxrate_spin);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, weight_b_check);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, weight_p_combo);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, b8x8_check);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, i8x8_check);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, p8x8_check);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, i4x4_check);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipX264Dialog, p4x4_check);
 }
 
 static void
 ogmrip_x264_dialog_init (OGMRipX264Dialog *dialog)
 {
-  GError *error = NULL;
+  gtk_widget_init_template (GTK_WIDGET (dialog));
 
-  GtkBuilder *builder;
-  GtkWidget *misc, *widget;
-
-  gtk_dialog_add_buttons (GTK_DIALOG (dialog),
-      GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
-      NULL);
-  gtk_window_set_title (GTK_WINDOW (dialog), _("X264 Options"));
-  gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
-  gtk_container_set_border_width (GTK_CONTAINER (dialog), 6);
-  gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
-
-  builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_UI_FILE, &error))
-    g_error ("Couldn't load builder file: %s", error->message);
-
-  misc = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
-
-  widget = gtk_builder_get_widget (builder, OGMRIP_UI_ROOT);
-  gtk_container_add (GTK_CONTAINER (misc), widget);
-  gtk_widget_show (widget);
-
-  dialog->profile_combo = gtk_builder_get_widget (builder, "profile-combo");
-  g_signal_connect_swapped (dialog->profile_combo, "changed",
-      G_CALLBACK (ogmrip_x264_dialog_profile_changed), dialog);
-
-  dialog->bframes_spin = gtk_builder_get_widget (builder, "bframes-spin");
-  g_signal_connect_swapped (dialog->bframes_spin, "value-changed",
-      G_CALLBACK (ogmrip_x264_dialog_bframes_changed), dialog);
-
-  dialog->cabac_check = gtk_builder_get_widget (builder, "cabac-check");
-  dialog->cqm_combo = gtk_builder_get_widget (builder, "cqm-combo");
-
-  dialog->subq_spin = gtk_builder_get_widget (builder, "subq-spin");
-  g_signal_connect_swapped (dialog->subq_spin, "value-changed",
-      G_CALLBACK (ogmrip_x264_dialog_subq_changed), dialog);
-
-  dialog->weight_b_check = gtk_builder_get_widget (builder, "weight_b-check");
-  dialog->partitions_check[B8X8] = gtk_builder_get_widget (builder, "b8x8-check");
-  dialog->partitions_check[I8X8] = gtk_builder_get_widget (builder, "i8x8-check");
-  dialog->partitions_check[P8X8] = gtk_builder_get_widget (builder, "p8x8-check");
-  dialog->partitions_check[I4X4] = gtk_builder_get_widget (builder, "i4x4-check");
-  dialog->partitions_check[P4X4] = gtk_builder_get_widget (builder, "p4x4-check");
-
-  dialog->weight_p_combo = gtk_builder_get_widget (builder, "weight_p-combo");
   gtk_widget_set_sensitive (dialog->weight_p_combo, x264_have_weight_p);
-  
-  dialog->b_pyramid_check = gtk_builder_get_widget (builder, "b_pyramid-check");
-  gtk_widget_set_visible (dialog->b_pyramid_check, !x264_have_b_pyramid);
-
-  dialog->b_pyramid_combo = gtk_builder_get_widget (builder, "b_pyramid-combo");
-  gtk_widget_set_visible (dialog->b_pyramid_combo, x264_have_b_pyramid);
-
-  dialog->b_pyramid_label = gtk_builder_get_widget (builder, "b_pyramid-label");
-  gtk_widget_set_visible (dialog->b_pyramid_label, x264_have_b_pyramid);
-
-  dialog->frameref_spin = gtk_builder_get_widget (builder, "frameref-spin");
-  g_signal_connect_swapped (dialog->frameref_spin, "value-changed",
-      G_CALLBACK (ogmrip_x264_dialog_frameref_changed), dialog);
-
-  dialog->me_combo = gtk_builder_get_widget (builder, "me-combo");
   gtk_widget_set_sensitive (dialog->me_combo, x264_have_me);
+  gtk_widget_set_sensitive (dialog->merange_spin, x264_have_me);
+  gtk_widget_set_sensitive (dialog->dct8x8_check, x264_have_8x8dct);
+  gtk_widget_set_sensitive (dialog->mixed_refs_check, x264_have_mixed_refs);
+  gtk_widget_set_sensitive (dialog->brdo_check, x264_have_brdo);
+  gtk_widget_set_sensitive (dialog->psy_rd_spin, x264_have_psy);
+  gtk_widget_set_sensitive (dialog->psy_trellis_spin, x264_have_psy);
+  gtk_widget_set_sensitive (dialog->aud_check, x264_have_aud);
+  gtk_widget_set_sensitive (dialog->rc_lookahead_spin, x264_have_lookahead);
+  
+  gtk_widget_set_visible (dialog->b_pyramid_check, !x264_have_b_pyramid);
+  gtk_widget_set_visible (dialog->b_pyramid_combo, x264_have_b_pyramid);
+  gtk_widget_set_visible (dialog->b_pyramid_label, x264_have_b_pyramid);
 
   if (x264_have_me_tesa)
     gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (dialog->me_combo),
         _("Transformed Exhaustive search (tesa - even slower)"));
 
-  dialog->merange_spin = gtk_builder_get_widget (builder, "merange-spin");
-  gtk_widget_set_sensitive (dialog->merange_spin, x264_have_me);
-
-  dialog->dct8x8_check = gtk_builder_get_widget (builder, "dct8x8-check");
-  gtk_widget_set_sensitive (dialog->dct8x8_check, x264_have_8x8dct);
-
-  dialog->mixed_refs_check = gtk_builder_get_widget (builder, "mixed_refs-check");
-  gtk_widget_set_sensitive (dialog->mixed_refs_check, x264_have_mixed_refs);
-  
-  dialog->brdo_check = gtk_builder_get_widget (builder, "brdo-check");
-  gtk_widget_set_sensitive (dialog->brdo_check, x264_have_brdo);
-
-  dialog->vbv_maxrate_spin = gtk_builder_get_widget (builder, "vbv_maxrate-spin");
-  dialog->vbv_bufsize_spin = gtk_builder_get_widget (builder, "vbv_bufsize-spin");
-
   g_object_bind_property_full (dialog->vbv_maxrate_spin, "value",
       dialog->vbv_bufsize_spin, "sensitive", G_BINDING_SYNC_CREATE,
       ogmrip_x264_dialog_set_vbv_bufsize_sensitivity, NULL, NULL, NULL);
 
-  dialog->level_idc_spin = gtk_builder_get_widget (builder, "level_idc-spin");
-  dialog->direct_combo = gtk_builder_get_widget (builder, "direct-combo");
-  dialog->b_adapt_spin = gtk_builder_get_widget (builder, "b_adapt-spin");
-  dialog->keyint_spin = gtk_builder_get_widget (builder, "keyint-spin");
-  dialog->aq_mode_combo = gtk_builder_get_widget (builder, "aq_mode-combo");
-  dialog->dct_decimate_check = gtk_builder_get_widget (builder, "dct_decimate-check");
-  dialog->fast_pskip_check = gtk_builder_get_widget (builder, "fast_pskip-check");
-  dialog->force_cfr_check = gtk_builder_get_widget (builder, "force_cfr-check");
+  g_signal_connect_swapped (dialog->frameref_spin, "value-changed",
+      G_CALLBACK (ogmrip_x264_dialog_frameref_changed), dialog);
 
-  dialog->psy_rd_spin = gtk_builder_get_widget (builder, "psy_rd-spin");
-  gtk_widget_set_sensitive (dialog->psy_rd_spin, x264_have_psy);
+  g_signal_connect_swapped (dialog->profile_combo, "changed",
+      G_CALLBACK (ogmrip_x264_dialog_profile_changed), dialog);
 
-  dialog->psy_trellis_spin = gtk_builder_get_widget (builder, "psy_trellis-spin");
-  gtk_widget_set_sensitive (dialog->psy_trellis_spin, x264_have_psy);
+  g_signal_connect_swapped (dialog->bframes_spin, "value-changed",
+      G_CALLBACK (ogmrip_x264_dialog_bframes_changed), dialog);
 
-  dialog->aud_check = gtk_builder_get_widget (builder, "aud-check");
-  gtk_widget_set_sensitive (dialog->aud_check, x264_have_aud);
-
-  dialog->rc_lookahead_spin = gtk_builder_get_widget (builder, "rc_lookahead-spin");
-  gtk_widget_set_sensitive (dialog->rc_lookahead_spin, x264_have_lookahead);
-
-  dialog->trellis_combo = gtk_builder_get_widget (builder, "trellis-combo");
-
-  g_object_unref (builder);
+  g_signal_connect_swapped (dialog->subq_spin, "value-changed",
+      G_CALLBACK (ogmrip_x264_dialog_subq_changed), dialog);
 }
 
 static void

@@ -1,0 +1,23 @@
+<interface>
+  <menu id="menu">
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">_Duplicate</attribute>
+        <attribute name="action">profile.copy</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">_Edit</attribute>
+        <attribute name="action">profile.edit</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">_Save</attribute>
+        <attribute name="action">profile.export</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">_Rename</attribute>
+        <attribute name="action">profile.rename</attribute>
+      </item>
+    </section>
+  </menu>
+</interface>
+

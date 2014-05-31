@@ -1,5 +1,5 @@
 /* OGMRip - A media encoder for GNOME
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,13 +38,13 @@ enum
 
 typedef struct _OGMRipOptionsDialog      OGMRipOptionsDialog;
 typedef struct _OGMRipOptionsDialogClass OGMRipOptionsDialogClass;
-typedef struct _OGMRipOptionsDialogPriv  OGMRipOptionsDialogPriv;
+typedef struct _OGMRipOptionsDialogPriv  OGMRipOptionsDialogPrivate;
 
 struct _OGMRipOptionsDialog
 {
   GtkDialog parent_instance;
 
-  OGMRipOptionsDialogPriv *priv;
+  OGMRipOptionsDialogPrivate *priv;
 };
 
 struct _OGMRipOptionsDialogClass

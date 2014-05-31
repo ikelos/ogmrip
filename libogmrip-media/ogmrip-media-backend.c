@@ -1,5 +1,5 @@
 /* OGMRipMedia - A media library for OGMRip
- * Copyright (C) 2010-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2010-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -173,8 +173,7 @@ ogmrip_title_benchmark_command (OGMRipTitle *title, gulong nframes)
 {
   GPtrArray *argv;
 
-  argv = g_ptr_array_new ();
-
+  argv = g_ptr_array_new_full (15, g_free);
   g_ptr_array_add (argv, g_strdup ("mplayer"));
   g_ptr_array_add (argv, g_strdup ("-nolirc"));
   g_ptr_array_add (argv, g_strdup ("-nosound"));
@@ -374,8 +373,7 @@ ogmrip_title_crop_command (OGMRipTitle *title, gdouble start, gulong nframes)
   GPtrArray *argv;
   GString *filter;
 
-  argv = g_ptr_array_new ();
-
+  argv = g_ptr_array_new_full (20, g_free);
   g_ptr_array_add (argv, g_strdup ("mplayer"));
   g_ptr_array_add (argv, g_strdup ("-nolirc"));
   g_ptr_array_add (argv, g_strdup ("-nosound"));
@@ -567,7 +565,7 @@ ogmrip_title_grab_frame_command (OGMRipTitle *title, guint pos, gboolean deint)
 {
   GPtrArray *argv;
 
-  argv = g_ptr_array_new ();
+  argv = g_ptr_array_new_full (20, g_free);
   g_ptr_array_add (argv, g_strdup ("mplayer"));
   g_ptr_array_add (argv, g_strdup ("-nolirc"));
   g_ptr_array_add (argv, g_strdup ("-nocache"));

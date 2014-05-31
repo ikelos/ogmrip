@@ -1,5 +1,5 @@
 /* OGMRip - A library for media ripping and encoding
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -56,7 +56,7 @@ struct _OGMRipProfileStoreClass
 
 GType                ogmrip_profile_store_get_type    (void);
 OGMRipProfileStore * ogmrip_profile_store_new         (OGMRipProfileEngine *engine,
-                                                       gboolean    available_only);
+                                                       gboolean            valid_only);
 void                 ogmrip_profile_store_reload      (OGMRipProfileStore  *store);
 OGMRipProfile *      ogmrip_profile_store_get_profile (OGMRipProfileStore  *store,
                                                        GtkTreeIter         *iter);

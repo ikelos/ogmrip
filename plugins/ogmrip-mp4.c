@@ -1,5 +1,5 @@
 /* OGMRipMp4 - An MP4 plugin for OGMRip
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -265,7 +265,7 @@ ogmrip_mp4_create_command (OGMRipContainer *container, const gchar *input)
   if (!fmt)
     return NULL;
 
-  argv = g_ptr_array_new ();
+  argv = g_ptr_array_new_full (20, g_free);
   g_ptr_array_add (argv, g_strdup (MP4BOX));
 
   switch (mp4->format)
@@ -363,7 +363,7 @@ ogmrip_mp4_split_command (OGMRipContainer *mp4)
   GPtrArray *argv;
   guint tsize;
 
-  argv = g_ptr_array_new ();
+  argv = g_ptr_array_new_full (20, g_free);
   g_ptr_array_add (argv, g_strdup (MP4BOX));
 
   g_ptr_array_add (argv, g_strdup ("-tmp"));

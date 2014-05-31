@@ -1,5 +1,5 @@
 /* OGMRip - A media encoder for GNOME
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,35 +29,33 @@
 #include <enchant.h>
 #include <glib/gi18n.h>
 
-#define OGMRIP_UI_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-spell-dialog.ui"
+#define OGMRIP_UI_RES  "/org/ogmrip/ogmrip-spell-dialog.ui"
 #define OGMRIP_UI_ROOT "root"
-
-#define OGMRIP_SPELL_DIALOG_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_SPELL_DIALOG, OGMRipSpellDialogPriv))
 
 enum
 {
-  OGMRIP_SPELL_RESPONSE_NONE       = GTK_RESPONSE_NONE,
-  OGMRIP_SPELL_RESPONSE_CANCEL     = GTK_RESPONSE_CANCEL,
-  OGMRIP_SPELL_RESPONSE_REPLACE    = -12,
-  OGMRIP_SPELL_RESPONSE_IGNORE     = -13,
-  OGMRIP_SPELL_RESPONSE_IGNORE_ALL = -14,
-  OGMRIP_SPELL_RESPONSE_ADD_WORD   = -15
+  OGMRIP_SPELL_RESPONSE_REPLACE    = 0,
+  OGMRIP_SPELL_RESPONSE_IGNORE     = 1,
+  OGMRIP_SPELL_RESPONSE_IGNORE_ALL = 2,
+  OGMRIP_SPELL_RESPONSE_ADD_WORD   = 4
 };
 
 struct _OGMRipSpellDialogPriv
 {
   EnchantBroker *broker;
   EnchantDict *dict;
-/*
-  GtkWidget *dialog;
-*/
-  GtkTextBuffer *buffer;
+
+  GtkTextBuffer *text_buffer;
 
   GtkWidget *word_entry;
   GtkWidget *replace_entry;
+  GtkWidget *replace_button;
+  GtkWidget *ignore_button;
+  GtkWidget *ignore_all_button;
+  GtkWidget *add_word_button;
+  GtkWidget *word_list;
 
-  GtkTreeSelection *select;
+  GtkTreeSelection *word_selection;
   GtkListStore *word_store;
 
   const gchar *word;
@@ -120,7 +118,7 @@ ogmrip_spell_dialog_row_activated (OGMRipSpellDialog *dialog, GtkTreePath *path,
 void
 ogmrip_spell_dialog_set_text (OGMRipSpellDialog *dialog, const gchar *text)
 {
-  gtk_text_buffer_set_text (dialog->priv->buffer, text, -1);
+  gtk_text_buffer_set_text (dialog->priv->text_buffer, text, -1);
 }
 
 void
@@ -137,9 +135,9 @@ ogmrip_spell_dialog_set_word (OGMRipSpellDialog *dialog, const gchar *word, gint
   {
     GtkTextIter ins, bound;
 
-    gtk_text_buffer_get_iter_at_offset (dialog->priv->buffer, &ins, offset);
-    gtk_text_buffer_get_iter_at_offset (dialog->priv->buffer, &bound, offset + g_utf8_strlen (word, -1));
-    gtk_text_buffer_select_range (dialog->priv->buffer, &ins, &bound);
+    gtk_text_buffer_get_iter_at_offset (dialog->priv->text_buffer, &ins, offset);
+    gtk_text_buffer_get_iter_at_offset (dialog->priv->text_buffer, &bound, offset + g_utf8_strlen (word, -1));
+    gtk_text_buffer_select_range (dialog->priv->text_buffer, &ins, &bound);
   }
 
   gtk_list_store_clear (dialog->priv->word_store);
@@ -150,11 +148,11 @@ ogmrip_spell_dialog_set_word (OGMRipSpellDialog *dialog, const gchar *word, gint
     gtk_list_store_set (dialog->priv->word_store, &iter, 0, suggs[i], -1);
 
     if (i == 0)
-      gtk_tree_selection_select_iter (dialog->priv->select, &iter);
+      gtk_tree_selection_select_iter (dialog->priv->word_selection, &iter);
   }
 
   if (gtk_tree_model_get_iter_first (GTK_TREE_MODEL (dialog->priv->word_store), &iter))
-    gtk_tree_selection_select_iter (dialog->priv->select, &iter);
+    gtk_tree_selection_select_iter (dialog->priv->word_selection, &iter);
   else
     gtk_entry_set_text (GTK_ENTRY (dialog->priv->replace_entry), word);
 }
@@ -165,7 +163,7 @@ ogmrip_spell_dialog_get_word (OGMRipSpellDialog *dialog)
   return g_strdup (dialog->priv->word);
 }
 
-G_DEFINE_TYPE (OGMRipSpellDialog, ogmrip_spell_dialog, GTK_TYPE_DIALOG);
+G_DEFINE_TYPE_WITH_PRIVATE (OGMRipSpellDialog, ogmrip_spell_dialog, GTK_TYPE_DIALOG);
 
 static void
 ogmrip_spell_dialog_class_init (OGMRipSpellDialogClass *klass)
@@ -174,73 +172,39 @@ ogmrip_spell_dialog_class_init (OGMRipSpellDialogClass *klass)
 
   gobject_class->dispose = ogmrip_spell_dialog_dispose;
 
-  g_type_class_add_private (klass, sizeof (OGMRipSpellDialogPriv));
+  gtk_widget_class_set_template_from_resource (GTK_WIDGET_CLASS (klass), OGMRIP_UI_RES);
+
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipSpellDialog, text_buffer);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipSpellDialog, word_entry);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipSpellDialog, replace_entry);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipSpellDialog, replace_button);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipSpellDialog, ignore_button);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipSpellDialog, ignore_all_button);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipSpellDialog, add_word_button);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipSpellDialog, word_list);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipSpellDialog, word_store);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipSpellDialog, word_selection);
 }
 
 static void
 ogmrip_spell_dialog_init (OGMRipSpellDialog *dialog)
 {
-  GError *error = NULL;
+  gtk_widget_init_template (GTK_WIDGET (dialog));
 
-  GtkCellRenderer *renderer;
-  GtkTreeViewColumn *column;
-  GtkWidget *area, *widget;
-  GtkBuilder *builder;
+  dialog->priv = ogmrip_spell_dialog_get_instance_private (dialog);
 
-  dialog->priv = OGMRIP_SPELL_DIALOG_GET_PRIVATE (dialog);
-
-  builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_UI_FILE, &error))
-  {
-    g_warning ("Couldn't load builder file: %s", error->message);
-    g_object_unref (builder);
-    g_error_free (error);
-    return;
-  }
-
-  gtk_dialog_add_buttons (GTK_DIALOG (dialog),
-      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-      NULL);
-  gtk_window_set_title (GTK_WINDOW (dialog), _("Spell Checking"));
-
-  area = gtk_dialog_get_action_area (GTK_DIALOG (dialog));
-
-  widget = gtk_builder_get_widget (builder, OGMRIP_UI_ROOT);
-  gtk_container_add (GTK_CONTAINER (area), widget);
-  gtk_widget_show (widget);
-
-  widget = gtk_builder_get_widget (builder, "text-view");
-  dialog->priv->buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (widget));
-  dialog->priv->word_entry = gtk_builder_get_widget (builder, "word-entry");
-  dialog->priv->replace_entry = gtk_builder_get_widget (builder, "replace-entry");
-
-  widget = gtk_builder_get_widget (builder, "replace-button");
-  g_signal_connect_swapped (widget, "clicked", G_CALLBACK (ogmrip_spell_dialog_replace), dialog);
-
-  widget = gtk_builder_get_widget (builder, "ignore-button");
-  g_signal_connect_swapped (widget, "clicked", G_CALLBACK (ogmrip_spell_dialog_ignore), dialog);
-
-  widget = gtk_builder_get_widget (builder, "ignore-all-button");
-  g_signal_connect_swapped (widget, "clicked", G_CALLBACK (ogmrip_spell_dialog_ignore_all), dialog);
-
-  widget = gtk_builder_get_widget (builder, "add-word-button");
-  g_signal_connect_swapped (widget, "clicked", G_CALLBACK (ogmrip_spell_dialog_add_word), dialog);
-
-  widget = gtk_builder_get_widget (builder, "word-list");
-  g_signal_connect_swapped (widget, "row-activated", G_CALLBACK (ogmrip_spell_dialog_row_activated), dialog);
-
-  dialog->priv->select = gtk_tree_view_get_selection (GTK_TREE_VIEW (widget));
-  g_signal_connect_swapped (dialog->priv->select, "changed", G_CALLBACK (ogmrip_spell_dialog_changed), dialog);
-
-  dialog->priv->word_store = gtk_list_store_new (1, G_TYPE_STRING);
-  gtk_tree_view_set_model (GTK_TREE_VIEW (widget), GTK_TREE_MODEL (dialog->priv->word_store));
-  g_object_unref (dialog->priv->word_store);
-
-  renderer = gtk_cell_renderer_text_new ();
-  column = gtk_tree_view_column_new_with_attributes ("Word", renderer, "text", 0, NULL);
-  gtk_tree_view_append_column (GTK_TREE_VIEW (widget), column);
-
-  g_object_unref (builder);
+  g_signal_connect_swapped (dialog->priv->replace_button, "clicked",
+                            G_CALLBACK (ogmrip_spell_dialog_replace), dialog);
+  g_signal_connect_swapped (dialog->priv->ignore_button, "clicked",
+                            G_CALLBACK (ogmrip_spell_dialog_ignore), dialog);
+  g_signal_connect_swapped (dialog->priv->ignore_all_button, "clicked",
+                            G_CALLBACK (ogmrip_spell_dialog_ignore_all), dialog);
+  g_signal_connect_swapped (dialog->priv->add_word_button, "clicked",
+                            G_CALLBACK (ogmrip_spell_dialog_add_word), dialog);
+  g_signal_connect_swapped (dialog->priv->word_list, "row-activated",
+                            G_CALLBACK (ogmrip_spell_dialog_row_activated), dialog);
+  g_signal_connect_swapped (dialog->priv->word_selection, "changed",
+                            G_CALLBACK (ogmrip_spell_dialog_changed), dialog);
 }
 
 static void 
@@ -305,8 +269,8 @@ ogmrip_spell_dialog_check_word (OGMRipSpellDialog *dialog, const gchar *word, gi
     ogmrip_spell_dialog_set_word (dialog, word, offset, suggs, n_suggs);
     switch (gtk_dialog_run (GTK_DIALOG (dialog)))
     {
-      case OGMRIP_SPELL_RESPONSE_NONE:
-      case OGMRIP_SPELL_RESPONSE_CANCEL:
+      case GTK_RESPONSE_NONE:
+      case GTK_RESPONSE_CANCEL:
         status = FALSE;
         break;
       case OGMRIP_SPELL_RESPONSE_REPLACE:

@@ -1,5 +1,5 @@
 /* OGMJob - A library to spawn processes
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -45,7 +45,7 @@ typedef struct _OGMJobSpawnClass OGMJobSpawnClass;
  * Specifies the type of functions passed to ogmjob_spawn_add_watch(), and
  * ogmjob_spawn_add_watch_full().
  *
- * Returns: The progress made, or -1
+ * Returns: %TRUE to stop watching
  */
 typedef gboolean (* OGMJobWatch) (OGMJobSpawn *spawn,
                                   const gchar *buffer,

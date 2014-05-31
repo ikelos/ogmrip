@@ -1,5 +1,5 @@
 /* OGMRip - A library for media ripping and encoding
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,9 +25,6 @@
 
 #include "ogmrip-analyze.h"
 
-#define OGMRIP_ANALYZE_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_ANALYZE, OGMRipAnalyzePriv))
-
 struct _OGMRipAnalyzePriv
 {
   OGMRipTitle *title;
@@ -40,47 +37,7 @@ enum
   PROP_TITLE
 };
 
-static void     ogmrip_analyze_dispose      (GObject      *gobject);
-static void     ogmrip_analyze_set_property (GObject      *gobject,
-                                             guint        property_id,
-                                             const GValue *value,
-                                             GParamSpec   *pspec);
-static void     ogmrip_analyze_get_property (GObject      *gobject,
-                                             guint        property_id,
-                                             GValue       *value,
-                                             GParamSpec   *pspec);
-static gboolean ogmrip_analyze_run          (OGMJobTask   *task,
-                                             GCancellable *cancellable,
-                                             GError       **error);
-
-G_DEFINE_TYPE (OGMRipAnalyze, ogmrip_analyze, OGMJOB_TYPE_TASK)
-
-static void
-ogmrip_analyze_class_init (OGMRipAnalyzeClass *klass)
-{
-  GObjectClass *gobject_class;
-  OGMJobTaskClass *task_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->dispose = ogmrip_analyze_dispose;
-  gobject_class->get_property = ogmrip_analyze_get_property;
-  gobject_class->set_property = ogmrip_analyze_set_property;
-
-  task_class = OGMJOB_TASK_CLASS (klass);
-  task_class->run = ogmrip_analyze_run;
-
-  g_object_class_install_property (gobject_class, PROP_TITLE, 
-        g_param_spec_object ("title", "Title property", "Set title", 
-           OGMRIP_TYPE_TITLE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
-
-  g_type_class_add_private (klass, sizeof (OGMRipAnalyzePriv));
-}
-
-static void
-ogmrip_analyze_init (OGMRipAnalyze *analyze)
-{
-  analyze->priv = OGMRIP_ANALYZE_GET_PRIVATE (analyze);
-}
+G_DEFINE_TYPE_WITH_PRIVATE (OGMRipAnalyze, ogmrip_analyze, OGMJOB_TYPE_TASK)
 
 static void
 ogmrip_analyze_dispose (GObject *gobject)
@@ -142,10 +99,34 @@ ogmrip_analyze_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   return ogmrip_title_analyze (analyze->priv->title, cancellable, ogmrip_analyze_progress, task, error);
 }
 
+static void
+ogmrip_analyze_class_init (OGMRipAnalyzeClass *klass)
+{
+  GObjectClass *gobject_class;
+  OGMJobTaskClass *task_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->dispose = ogmrip_analyze_dispose;
+  gobject_class->get_property = ogmrip_analyze_get_property;
+  gobject_class->set_property = ogmrip_analyze_set_property;
+
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_analyze_run;
+
+  g_object_class_install_property (gobject_class, PROP_TITLE,
+      g_param_spec_object ("title", "Title property", "Set title",
+        OGMRIP_TYPE_TITLE, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+}
+
+static void
+ogmrip_analyze_init (OGMRipAnalyze *analyze)
+{
+  analyze->priv = ogmrip_analyze_get_instance_private (analyze);
+}
+
 /**
  * ogmrip_analyze_new:
  * @title: An #OGMRipTitle
- * @path: The output path
  *
  * Creates a new #OGMRipAnalyze.
  *

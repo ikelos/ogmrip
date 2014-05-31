@@ -1,5 +1,5 @@
 /* OGMRip - A library for media ripping and encoding
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,9 +24,11 @@
 #include <ogmrip-encoding-manager-dialog.h>
 #include <ogmrip-list-item.h>
 #include <ogmrip-options-editable.h>
+#include <ogmrip-profile-chooser-widget.h>
 #include <ogmrip-profile-editor-dialog.h>
 #include <ogmrip-profile-manager-dialog.h>
 #include <ogmrip-profile-store.h>
+#include <ogmrip-profile-view.h>
 #include <ogmrip-progress-dialog.h>
 #include <ogmrip-subp-chooser-widget.h>
 #include <ogmrip-type-store.h>

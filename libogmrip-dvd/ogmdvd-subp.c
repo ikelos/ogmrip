@@ -1,5 +1,5 @@
 /* OGMRipDvd - A DVD library for OGMRip
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -35,18 +35,50 @@ static void ogmrip_subp_stream_iface_init (OGMRipSubpStreamInterface *iface);
 
 G_DEFINE_TYPE_WITH_CODE (OGMDvdSubpStream, ogmdvd_subp_stream, G_TYPE_OBJECT,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_STREAM, ogmrip_stream_iface_init)
-    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_SUBP_STREAM, ogmrip_subp_stream_iface_init));
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_SUBP_STREAM, ogmrip_subp_stream_iface_init)
+    G_ADD_PRIVATE (OGMDvdSubpStream));
+
+static void
+ogmdvd_subp_stream_dispose (GObject *gobject)
+{
+  OGMDvdSubpStream *stream = OGMDVD_SUBP_STREAM (gobject);
+
+  if (stream->priv->title)
+  {
+    g_object_remove_weak_pointer (G_OBJECT (stream->priv->title), (gpointer *) &stream->priv->title);
+    stream->priv->title = NULL;
+  }
+
+  G_OBJECT_CLASS (ogmdvd_subp_stream_parent_class)->dispose (gobject);
+}  
+
+#ifdef G_ENABLE_DEBUG
+static void
+ogmdvd_subp_stream_finalize (GObject *gobject)
+{
+  g_debug ("Finalizing %s (%d)", G_OBJECT_TYPE_NAME (gobject), OGMDVD_SUBP_STREAM (gobject)->priv->id);
+
+  G_OBJECT_CLASS (ogmdvd_subp_stream_parent_class)->finalize (gobject);
+}  
+#endif
 
 static void
 ogmdvd_subp_stream_init (OGMDvdSubpStream *stream)
 {
-  stream->priv = G_TYPE_INSTANCE_GET_PRIVATE (stream, OGMDVD_TYPE_SUBP_STREAM, OGMDvdSubpStreamPriv);
+  stream->priv = ogmdvd_subp_stream_get_instance_private (stream);
 }
 
 static void
 ogmdvd_subp_stream_class_init (OGMDvdSubpStreamClass *klass)
 {
-  g_type_class_add_private (klass, sizeof (OGMDvdSubpStreamPriv));
+  GObjectClass *gobject_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->dispose = ogmdvd_subp_stream_dispose;
+
+#ifdef G_ENABLE_DEBUG
+  gobject_class->finalize = ogmdvd_subp_stream_finalize;
+#endif
 }
 
 static gint

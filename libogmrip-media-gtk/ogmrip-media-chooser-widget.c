@@ -1,5 +1,5 @@
 /* OGMRipMedia - A media library for OGMRip
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -170,17 +170,12 @@ ogmrip_media_chooser_widget_volume_added (OGMRipMediaChooserWidget *chooser, GVo
       GtkTreeModel *model;
       GtkTreeIter sibling, iter;
       gchar *text, *name, *title;
-      const gchar *label;
 
       name = g_volume_get_name (volume);
       if (!name)
         name = g_strdup (_("Unknown media"));
 
-      label = ogmrip_media_get_label (media);
-      if (label)
-        title = g_markup_escape_text (label, -1);
-      else
-        title = g_strdup (_("Untitled"));
+      title = g_markup_escape_text (ogmrip_media_get_label (media), -1);
       text = g_strdup_printf ("<b>%s</b>\n%s", title, name);
       g_free (title);
 
@@ -346,6 +341,7 @@ ogmrip_media_chooser_widget_add_media (GtkComboBox *combo, OGMRipMedia *media, g
 {
   GtkTreeModel *model;
   GtkTreeIter sibling, iter;
+
   gchar *title, *text;
   gint type;
 
@@ -403,7 +399,7 @@ ogmrip_media_chooser_widget_select_file (GtkComboBox *combo, gboolean file)
 
   dialog = gtk_file_chooser_dialog_new (file ? _("Select an media file") : _("Select a media directory"),
       NULL, file ? GTK_FILE_CHOOSER_ACTION_OPEN : GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
-      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_OK, NULL);
+      _("_Cancel"), GTK_RESPONSE_CANCEL, _("_Open"), GTK_RESPONSE_OK, NULL);
 
   toplevel = gtk_widget_get_toplevel (GTK_WIDGET (combo));
   if (gtk_widget_is_toplevel (toplevel) && GTK_IS_WINDOW (toplevel))

@@ -1,5 +1,5 @@
 /* OGMRip - A media encoder for GNOME
- * Copyright (C) 2004-2012 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,5 +47,20 @@ ogmrip_application_prepare (OGMRipApplication *app)
   g_return_if_fail (OGMRIP_IS_APPLICATION (app));
 
   g_signal_emit (app, signals[PREPARE], 0);
+}
+
+gboolean
+ogmrip_application_get_is_prepared (OGMRipApplication *app)
+{
+  OGMRipApplicationInterface *iface;
+
+  g_return_val_if_fail (OGMRIP_IS_APPLICATION (app), FALSE);
+
+  iface = OGMRIP_APPLICATION_GET_IFACE (app);
+
+  if (!iface->get_is_prepared)
+    return FALSE;
+
+  return iface->get_is_prepared (app);
 }
 

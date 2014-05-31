@@ -1,5 +1,5 @@
 /* OGMRip - A library for media ripping and encoding
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -34,9 +34,6 @@
 
 #include <string.h>
 
-#define OGMRIP_ENCODING_MANAGER_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_ENCODING_MANAGER, OGMRipEncodingManagerPriv))
-
 typedef struct
 {
   OGMRipEncoding *encoding;
@@ -56,15 +53,6 @@ enum
   MOVE,
   LAST_SIGNAL
 };
-
-static void ogmrip_encoding_manager_dispose         (GObject               *gobject);
-static void ogmrip_encoding_manager_add_internal    (OGMRipEncodingManager *manager,
-                                                     OGMRipEncoding        *encoding);
-static void ogmrip_encoding_manager_remove_internal (OGMRipEncodingManager *manager,
-                                                     OGMRipEncoding        *encoding);
-static void ogmrip_encoding_manager_move_internal   (OGMRipEncodingManager *manager,
-                                                     OGMRipEncoding        *encoding,
-                                                     OGMRipDirection       direction);
 
 static guint signals[LAST_SIGNAL] = { 0 };
 
@@ -104,43 +92,7 @@ ogmrip_encoding_data_compare_with_encoding (OGMRipEncodingData *data, OGMRipEnco
   return data->encoding - encoding;
 }
 
-G_DEFINE_TYPE (OGMRipEncodingManager, ogmrip_encoding_manager, G_TYPE_OBJECT)
-
-static void
-ogmrip_encoding_manager_class_init (OGMRipEncodingManagerClass *klass)
-{
-  GObjectClass *gobject_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->dispose = ogmrip_encoding_manager_dispose;
-
-  klass->add = ogmrip_encoding_manager_add_internal;
-  klass->remove = ogmrip_encoding_manager_remove_internal;
-  klass->move = ogmrip_encoding_manager_move_internal;
-
-  signals[ADD] = g_signal_new ("add", G_TYPE_FROM_CLASS (klass),
-      G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
-      G_STRUCT_OFFSET (OGMRipEncodingManagerClass, add), NULL, NULL,
-      g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, OGMRIP_TYPE_ENCODING);
-
-  signals[REMOVE] = g_signal_new ("remove", G_TYPE_FROM_CLASS (klass),
-      G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
-      G_STRUCT_OFFSET (OGMRipEncodingManagerClass, remove), NULL, NULL,
-      g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, OGMRIP_TYPE_ENCODING);
-
-  signals[MOVE] = g_signal_new ("move", G_TYPE_FROM_CLASS (klass),
-      G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
-      G_STRUCT_OFFSET (OGMRipEncodingManagerClass, move), NULL, NULL,
-      ogmrip_cclosure_marshal_VOID__OBJECT_UINT, G_TYPE_NONE, 2, OGMRIP_TYPE_ENCODING, G_TYPE_UINT);
-
-  g_type_class_add_private (klass, sizeof (OGMRipEncodingManagerPriv));
-}
-
-static void
-ogmrip_encoding_manager_init (OGMRipEncodingManager *manager)
-{
-  manager->priv = OGMRIP_ENCODING_MANAGER_GET_PRIVATE (manager);
-}
+G_DEFINE_TYPE_WITH_PRIVATE (OGMRipEncodingManager, ogmrip_encoding_manager, G_TYPE_OBJECT)
 
 static void
 ogmrip_encoding_manager_dispose (GObject *gobject)
@@ -223,6 +175,40 @@ ogmrip_encoding_manager_move_internal (OGMRipEncodingManager *manager, OGMRipEnc
         break;
     }
   }
+}
+
+static void
+ogmrip_encoding_manager_class_init (OGMRipEncodingManagerClass *klass)
+{
+  GObjectClass *gobject_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->dispose = ogmrip_encoding_manager_dispose;
+
+  klass->add = ogmrip_encoding_manager_add_internal;
+  klass->remove = ogmrip_encoding_manager_remove_internal;
+  klass->move = ogmrip_encoding_manager_move_internal;
+
+  signals[ADD] = g_signal_new ("add", G_TYPE_FROM_CLASS (klass),
+      G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+      G_STRUCT_OFFSET (OGMRipEncodingManagerClass, add), NULL, NULL,
+      g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, OGMRIP_TYPE_ENCODING);
+
+  signals[REMOVE] = g_signal_new ("remove", G_TYPE_FROM_CLASS (klass),
+      G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+      G_STRUCT_OFFSET (OGMRipEncodingManagerClass, remove), NULL, NULL,
+      g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, OGMRIP_TYPE_ENCODING);
+
+  signals[MOVE] = g_signal_new ("move", G_TYPE_FROM_CLASS (klass),
+      G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+      G_STRUCT_OFFSET (OGMRipEncodingManagerClass, move), NULL, NULL,
+      ogmrip_cclosure_marshal_VOID__OBJECT_UINT, G_TYPE_NONE, 2, OGMRIP_TYPE_ENCODING, G_TYPE_UINT);
+}
+
+static void
+ogmrip_encoding_manager_init (OGMRipEncodingManager *manager)
+{
+  manager->priv = ogmrip_encoding_manager_get_instance_private (manager);
 }
 
 /**

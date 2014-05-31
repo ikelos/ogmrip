@@ -8,7 +8,7 @@ avibox_SOURCES = \
   aud_scan.c \
   platform.c
 
-INCLUDES = \
+avibox_CPPFLAGS = \
   -D_LARGEFILE_SOURCE   \
   -D_LARGEFILE64_SOURCE \
   -D_FILE_OFFSET_BITS=64

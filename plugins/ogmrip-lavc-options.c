@@ -1,5 +1,5 @@
 /* OGMRipLavcOptions - An LAVC options plugin for OGMRip
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,11 +26,8 @@
 
 #include <glib/gi18n.h>
 
-#define OGMRIP_UI_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-lavc-options-dialog.ui"
+#define OGMRIP_UI_RES  "/org/ogmrip/ogmrip-lavc-options-dialog.ui"
 #define OGMRIP_UI_ROOT "root"
-
-#define gtk_builder_get_widget(builder, name) \
-    (GtkWidget *) gtk_builder_get_object ((builder), (name))
 
 #define OGMRIP_TYPE_LAVC_DIALOG          (ogmrip_lavc_dialog_get_type ())
 #define OGMRIP_LAVC_DIALOG(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_LAVC_DIALOG, OGMRipLavcDialog))
@@ -85,7 +82,7 @@ enum
 
 static void ogmrip_options_editable_init (OGMRipOptionsEditableInterface *iface);
 
-G_DEFINE_TYPE_EXTENDED (OGMRipLavcDialog, ogmrip_lavc_dialog, GTK_TYPE_DIALOG, 0,
+G_DEFINE_TYPE_WITH_CODE (OGMRipLavcDialog, ogmrip_lavc_dialog, GTK_TYPE_DIALOG,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_OPTIONS_EDITABLE, ogmrip_options_editable_init));
 
 static void
@@ -192,58 +189,37 @@ ogmrip_lavc_dialog_class_init (OGMRipLavcDialogClass *klass)
   gobject_class->set_property = ogmrip_lavc_dialog_set_property;
 
   g_object_class_override_property (gobject_class, PROP_PROFILE, "profile");
+
+  gtk_widget_class_set_template_from_resource (GTK_WIDGET_CLASS (klass), OGMRIP_UI_RES);
+
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipLavcDialog, buf_size_spin);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipLavcDialog, cmp_spin);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipLavcDialog, dc_spin);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipLavcDialog, dia_spin);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipLavcDialog, grayscale_check);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipLavcDialog, keyint_spin);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipLavcDialog, last_pred_spin);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipLavcDialog, max_bframes_spin);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipLavcDialog, max_rate_spin);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipLavcDialog, mbd_combo);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipLavcDialog, min_rate_spin);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipLavcDialog, mv0_check);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipLavcDialog, precmp_spin);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipLavcDialog, predia_spin);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipLavcDialog, preme_combo);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipLavcDialog, qns_combo);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipLavcDialog, qpel_check);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipLavcDialog, strict_combo);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipLavcDialog, subcmp_spin);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipLavcDialog, trellis_check);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipLavcDialog, v4mv_check);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipLavcDialog, vb_strategy_combo);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipLavcDialog, vqcomp_spin);
 }
 
 static void
 ogmrip_lavc_dialog_init (OGMRipLavcDialog *dialog)
 {
-  GError *error = NULL;
-
-  GtkBuilder *builder;
-  GtkWidget *misc, *widget;
-
-  gtk_dialog_add_buttons (GTK_DIALOG (dialog),
-      GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
-      NULL);
-  gtk_window_set_title (GTK_WINDOW (dialog), _("Lavc Options"));
-  gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
-  gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
-
-  builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_UI_FILE, &error))
-    g_error ("Couldn't load builder file: %s", error->message);
-
-  misc = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
-
-  widget = gtk_builder_get_widget (builder, OGMRIP_UI_ROOT);
-  gtk_container_add (GTK_CONTAINER (misc), widget);
-  gtk_widget_show (widget);
-
-  dialog->buf_size_spin = gtk_builder_get_widget (builder, "buf_size-spin");
-  dialog->cmp_spin = gtk_builder_get_widget (builder, "cmp-spin");
-  dialog->dc_spin = gtk_builder_get_widget (builder, "dc-spin");
-  dialog->dia_spin = gtk_builder_get_widget (builder, "dia-spin");
-  dialog->grayscale_check = gtk_builder_get_widget (builder, "grayscale-check");
-  dialog->keyint_spin = gtk_builder_get_widget (builder, "keyint-spin");
-  dialog->last_pred_spin = gtk_builder_get_widget (builder, "last_pred-spin");
-  dialog->max_bframes_spin = gtk_builder_get_widget (builder, "max_bframes-spin");
-  dialog->max_rate_spin = gtk_builder_get_widget (builder, "max_rate-spin");
-  dialog->mbd_combo = gtk_builder_get_widget (builder, "mbd-combo");
-  dialog->min_rate_spin = gtk_builder_get_widget (builder, "min_rate-spin");
-  dialog->mv0_check = gtk_builder_get_widget (builder, "mv0-check");
-  dialog->precmp_spin = gtk_builder_get_widget (builder, "precmp-spin");
-  dialog->predia_spin = gtk_builder_get_widget (builder, "predia-spin");
-  dialog->preme_combo = gtk_builder_get_widget (builder, "preme-combo");
-  dialog->qns_combo = gtk_builder_get_widget (builder, "qns-combo");
-  dialog->qpel_check = gtk_builder_get_widget (builder, "qpel-check");
-  dialog->strict_combo = gtk_builder_get_widget (builder, "strict-combo");
-  dialog->subcmp_spin = gtk_builder_get_widget (builder, "subcmp-spin");
-  dialog->trellis_check = gtk_builder_get_widget (builder, "trellis-check");
-  dialog->v4mv_check = gtk_builder_get_widget (builder, "v4mv-check");
-  dialog->vb_strategy_combo = gtk_builder_get_widget (builder, "vb_strategy-combo");
-  dialog->vqcomp_spin = gtk_builder_get_widget (builder, "vqcomp-spin");
-
-  g_object_unref (builder);
 }
 
 static void

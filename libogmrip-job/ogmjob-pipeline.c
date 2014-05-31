@@ -1,5 +1,5 @@
 /* OGMJob - A library to spawn processes
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,38 +30,6 @@ struct _OGMJobPipelinePriv
   GList *children;
   gdouble progress;
 };
-
-static gboolean ogmjob_pipeline_run    (OGMJobTask      *task,
-                                        GCancellable    *cancellable,
-                                        GError          **error);
-static void     ogmjob_pipeline_add    (OGMJobContainer *container, 
-                                        OGMJobTask      *task);
-static void     ogmjob_pipeline_remove (OGMJobContainer *container, 
-                                        OGMJobTask      *task);
-
-G_DEFINE_TYPE (OGMJobPipeline, ogmjob_pipeline, OGMJOB_TYPE_CONTAINER)
-
-static void
-ogmjob_pipeline_class_init (OGMJobPipelineClass *klass)
-{
-  OGMJobTaskClass *task_class;
-  OGMJobContainerClass *container_class;
-
-  task_class = OGMJOB_TASK_CLASS (klass);
-  task_class->run = ogmjob_pipeline_run;
-
-  container_class = OGMJOB_CONTAINER_CLASS (klass);
-  container_class->add = ogmjob_pipeline_add;
-  container_class->remove = ogmjob_pipeline_remove;
-
-  g_type_class_add_private (klass, sizeof (OGMJobPipelinePriv));
-}
-
-static void
-ogmjob_pipeline_init (OGMJobPipeline *pipeline)
-{
-  pipeline->priv = G_TYPE_INSTANCE_GET_PRIVATE (pipeline, OGMJOB_TYPE_PIPELINE, OGMJobPipelinePriv);
-}
 
 static gboolean
 ogmjob_pipeline_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
@@ -123,6 +91,46 @@ ogmjob_pipeline_remove (OGMJobContainer *container, OGMJobTask *task)
     pipeline->priv->children = g_list_remove_link (pipeline->priv->children, link);
     g_list_free (link);
   }
+}
+
+static void
+ogmjob_pipeline_forall (OGMJobContainer *container, OGMJobCallback callback, gpointer data)
+{
+  GList *children = OGMJOB_PIPELINE (container)->priv->children;
+  OGMJobTask *child;
+
+  while (children)
+  {
+    child = children->data;
+    children = children->next;
+
+    (* callback) (child, data);
+  }
+}
+
+G_DEFINE_TYPE (OGMJobPipeline, ogmjob_pipeline, OGMJOB_TYPE_CONTAINER)
+
+static void
+ogmjob_pipeline_class_init (OGMJobPipelineClass *klass)
+{
+  OGMJobTaskClass *task_class;
+  OGMJobContainerClass *container_class;
+
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmjob_pipeline_run;
+
+  container_class = OGMJOB_CONTAINER_CLASS (klass);
+  container_class->add = ogmjob_pipeline_add;
+  container_class->remove = ogmjob_pipeline_remove;
+  container_class->forall = ogmjob_pipeline_forall;
+
+  g_type_class_add_private (klass, sizeof (OGMJobPipelinePriv));
+}
+
+static void
+ogmjob_pipeline_init (OGMJobPipeline *pipeline)
+{
+  pipeline->priv = G_TYPE_INSTANCE_GET_PRIVATE (pipeline, OGMJOB_TYPE_PIPELINE, OGMJobPipelinePriv);
 }
 
 /**

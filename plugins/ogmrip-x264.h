@@ -1,5 +1,5 @@
 /* OGMRipX264 - A X264 plugin for OGMRip
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -37,12 +37,14 @@ G_BEGIN_DECLS
 #define OGMRIP_X264_PROP_FORCE_CFR        "force-cfr"
 #define OGMRIP_X264_PROP_FAST_PSKIP       "fast-pskip"
 #define OGMRIP_X264_PROP_FRAMEREF         "frameref"
+#define OGMRIP_X264_PROP_GLOBAL_HEADER    "global-header"
 #define OGMRIP_X264_PROP_KEYINT           "keyint"
 #define OGMRIP_X264_PROP_LEVEL_IDC        "level-idc"
 #define OGMRIP_X264_PROP_ME               "me"
 #define OGMRIP_X264_PROP_MERANGE          "merange"
 #define OGMRIP_X264_PROP_MIXED_REFS       "mixed-refs"
 #define OGMRIP_X264_PROP_PARTITIONS       "partitions"
+#define OGMRIP_X264_PROP_PROFILE          "profile"
 #define OGMRIP_X264_PROP_PSY_RD           "psy-rd"
 #define OGMRIP_X264_PROP_PSY_TRELLIS      "psy-trellis"
 #define OGMRIP_X264_PROP_RC_LOOKAHEAD     "rc-lookahead"
@@ -67,12 +69,14 @@ G_BEGIN_DECLS
 #define OGMRIP_X264_DEFAULT_FAST_PSKIP    TRUE
 #define OGMRIP_X264_DEFAULT_FORCE_CFR     FALSE
 #define OGMRIP_X264_DEFAULT_FRAMEREF      3
+#define OGMRIP_X264_DEFAULT_GLOBAL_HEADER FALSE
 #define OGMRIP_X264_DEFAULT_KEYINT        250
 #define OGMRIP_X264_DEFAULT_LEVEL_IDC     51
 #define OGMRIP_X264_DEFAULT_ME            2
 #define OGMRIP_X264_DEFAULT_MERANGE       16
 #define OGMRIP_X264_DEFAULT_MIXED_REFS    TRUE
 #define OGMRIP_X264_DEFAULT_PARTITIONS    "p8x8,b8x8,i8x8,i4x4"
+#define OGMRIP_X264_DEFAULT_PROFILE       2
 #define OGMRIP_X264_DEFAULT_PSY_RD        1
 #define OGMRIP_X264_DEFAULT_PSY_TRELLIS   0.15
 #define OGMRIP_X264_DEFAULT_RC_LOOKAHEAD  40

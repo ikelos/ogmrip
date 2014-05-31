@@ -1,5 +1,5 @@
 /* OGMRip - A library for media ripping and encoding
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -32,13 +32,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipCopy      OGMRipCopy;
 typedef struct _OGMRipCopyClass OGMRipCopyClass;
-typedef struct _OGMRipCopyPriv  OGMRipCopyPriv;
+typedef struct _OGMRipCopyPriv  OGMRipCopyPrivate;
 
 struct _OGMRipCopy
 {
   OGMJobSpawn parent_instance;
 
-  OGMRipCopyPriv *priv;
+  OGMRipCopyPrivate *priv;
 };
 
 struct _OGMRipCopyClass

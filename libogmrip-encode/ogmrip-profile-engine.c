@@ -1,5 +1,5 @@
 /* OGMRip - A library for media ripping and encoding
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -24,9 +24,6 @@
 #include <ogmrip-base.h>
 
 #include <string.h>
-
-#define OGMRIP_PROFILE_ENGINE_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_PROFILE_ENGINE, OGMRipProfileEnginePriv))
 
 struct _OGMRipProfileEnginePriv
 {
@@ -92,13 +89,14 @@ ogmrip_profile_engine_set_profiles (OGMRipProfileEngine *engine, const gchar **p
     g_object_unref (profile);
   }
 }
+
 static gboolean
 compare_by_name (const gchar *key, OGMRipProfile *value, const gchar *name)
 {
   return g_str_equal (key, name);
 }
 
-G_DEFINE_TYPE (OGMRipProfileEngine, ogmrip_profile_engine, G_TYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (OGMRipProfileEngine, ogmrip_profile_engine, G_TYPE_OBJECT)
 
 static GObject *
 ogmrip_profile_engine_constructor (GType type, guint n_params, GObjectConstructParam *params)
@@ -161,7 +159,7 @@ ogmrip_profile_engine_dispose (GObject *gobject)
 
   if (engine->priv->profiles)
   {
-    g_hash_table_destroy (engine->priv->profiles);
+    g_hash_table_unref (engine->priv->profiles);
     engine->priv->profiles = NULL;
   }
 
@@ -202,7 +200,7 @@ ogmrip_profile_engine_remove_internal (OGMRipProfileEngine *engine, OGMRipProfil
 {
   gchar *name;
 
-  name = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_NAME);
+  g_object_get (profile, "name", &name, NULL);
   if (g_hash_table_remove (engine->priv->profiles, name))
     g_object_notify (G_OBJECT (engine), "profiles");
   g_free (name);
@@ -217,14 +215,13 @@ ogmrip_profile_engine_update_internal (OGMRipProfileEngine *engine, OGMRipProfil
 static void
 ogmrip_profile_engine_init (OGMRipProfileEngine *engine)
 {
-  engine->priv = OGMRIP_PROFILE_ENGINE_GET_PRIVATE (engine);
+  engine->priv = ogmrip_profile_engine_get_instance_private (engine);
 
   engine->priv->settings = g_settings_new_with_path ("org.ogmrip.profiles", "/apps/ogmrip/preferences/");
   engine->priv->profiles = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
 
   g_settings_bind (engine->priv->settings, "profiles",
       engine, "profiles", G_SETTINGS_BIND_GET | G_SETTINGS_BIND_SET | G_SETTINGS_BIND_GET_NO_CHANGES);
-
 }
 
 static void
@@ -261,8 +258,6 @@ ogmrip_profile_engine_class_init (OGMRipProfileEngineClass *klass)
       G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
       G_STRUCT_OFFSET (OGMRipProfileEngineClass, update), NULL, NULL,
       ogmrip_cclosure_marshal_BOOLEAN__OBJECT, G_TYPE_BOOLEAN, 1, OGMRIP_TYPE_PROFILE);
-
-  g_type_class_add_private (klass, sizeof (OGMRipProfileEnginePriv));
 }
 
 OGMRipProfileEngine *

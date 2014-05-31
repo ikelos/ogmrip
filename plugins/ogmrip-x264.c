@@ -1,5 +1,5 @@
 /* OGMRipX264 - An X264 plugin for OGMRip
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -53,6 +53,7 @@ struct _OGMRipX264
   guint level_idc;
   guint me;
   guint merange;
+  guint profile;
   guint rc_lookahead;
   guint subq;
   guint trellis;
@@ -66,6 +67,7 @@ struct _OGMRipX264
   gboolean dct_decimate;
   gboolean fast_pskip;
   gboolean force_cfr;
+  gboolean global_header;
   gboolean mixed_refs;
   gboolean weight_b;
   gboolean x88dct;
@@ -96,12 +98,14 @@ enum
   PROP_FAST_PSKIP,
   PROP_FORCE_CFR,
   PROP_FRAMEREF,
+  PROP_GLOBAL_HEADER,
   PROP_KEYINT,
   PROP_LEVEL_IDC,
   PROP_ME,
   PROP_MERANGE,
   PROP_MIXED_REFS,
   PROP_PARTITIONS,
+  PROP_PROFILE,
   PROP_PSY_RD,
   PROP_PSY_TRELLIS,
   PROP_RC_LOOKAHEAD,
@@ -139,6 +143,13 @@ enum
   B_PYRAMID_NORMAL
 };
 
+enum
+{
+  PROFILE_BASELINE,
+  PROFILE_MAIN,
+  PROFILE_HIGH
+};
+
 static void     ogmrip_x264_finalize     (GObject      *gobject);
 static void     ogmrip_x264_notify       (GObject      *gobject,
                                           GParamSpec   *pspec);
@@ -172,6 +183,11 @@ static const gchar *b_pyramid_name[] =
 static const gchar *cqm_name[] =
 {
   "flat", "jvm"
+};
+
+static const gchar *profile_name[] =
+{
+  "baseline", "main", "high"
 };
 
 gboolean x264_have_8x8dct         = FALSE;
@@ -273,6 +289,9 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   quality = ogmrip_video_codec_get_quality (video);
   if (quality == OGMRIP_QUALITY_USER)
   {
+    g_string_append_printf (options, ":profile=%s",
+        profile_name[CLAMP (x264->profile, PROFILE_BASELINE, PROFILE_HIGH)]);
+
     g_string_append_printf (options, ":keyint=%u", x264->keyint);
     g_string_append_printf (options, ":cqm=%s", cqm_name[CLAMP (x264->cqm, 0, 1)]);
     g_string_append_printf (options, ":aq_mode=%u", x264->aq_mode);
@@ -282,6 +301,17 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
     g_string_append (options, x264->dct_decimate ? ":dct_decimate" : ":nodct_decimate");
     g_string_append (options, x264->fast_pskip ? ":fast_pskip" : ":nofast_pskip");
     g_string_append (options, x264->force_cfr ? ":force_cfr" : ":noforce_cfr");
+    g_string_append (options, x264->global_header ? ":global_header" : ":noglobal_header");
+
+    switch (x264->profile)
+    {
+      case 0:
+        break;
+      case 1:
+        break;
+      case 2:
+        break;
+    }
 
     if (x264_have_weight_p)
       g_string_append_printf (options, ":weightp=%d", CLAMP (x264->weight_p, 0, 2));
@@ -453,6 +483,8 @@ ogmrip_x264_configure (OGMRipConfigurable *configurable, OGMRipProfile *profile)
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
     g_settings_bind (settings, "frameref", configurable, OGMRIP_X264_PROP_FRAMEREF,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "global-header", configurable, OGMRIP_X264_PROP_GLOBAL_HEADER,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
     g_settings_bind (settings, "keyint", configurable, OGMRIP_X264_PROP_KEYINT,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
     g_settings_bind (settings, "level-idc", configurable, OGMRIP_X264_PROP_LEVEL_IDC,
@@ -464,6 +496,8 @@ ogmrip_x264_configure (OGMRipConfigurable *configurable, OGMRipProfile *profile)
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES,
         ogmrip_x264_get_merange, NULL, NULL, NULL);
     g_settings_bind (settings, "mixed-refs", configurable, OGMRIP_X264_PROP_MIXED_REFS,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "profile", configurable, OGMRIP_X264_PROP_PROFILE,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
     g_settings_bind (settings, "psy-rd", configurable, OGMRIP_X264_PROP_PSY_RD,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
@@ -572,6 +606,10 @@ ogmrip_x264_class_init (OGMRipX264Class *klass)
       g_param_spec_uint (OGMRIP_X264_PROP_FRAMEREF, "Frameref property", "Set frameref",
         1, 16, OGMRIP_X264_DEFAULT_FRAMEREF, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
+  g_object_class_install_property (gobject_class, PROP_GLOBAL_HEADER,
+      g_param_spec_boolean (OGMRIP_X264_PROP_GLOBAL_HEADER, "Global header property", "Set global header",
+        OGMRIP_X264_DEFAULT_GLOBAL_HEADER, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_property (gobject_class, PROP_KEYINT,
       g_param_spec_uint (OGMRIP_X264_PROP_KEYINT, "Keyint property", "Set keyint",
         0, G_MAXUINT, OGMRIP_X264_DEFAULT_KEYINT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
@@ -599,6 +637,10 @@ ogmrip_x264_class_init (OGMRipX264Class *klass)
   g_object_class_install_property (gobject_class, PROP_PARTITIONS,
       g_param_spec_string (OGMRIP_X264_PROP_PARTITIONS, "Partitions property", "Set partitions",
         OGMRIP_X264_DEFAULT_PARTITIONS, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_PROFILE,
+      g_param_spec_uint (OGMRIP_X264_PROP_PROFILE, "Profile property", "Set profile",
+        0, 2, OGMRIP_X264_DEFAULT_PROFILE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_PSY_RD,
       g_param_spec_double (OGMRIP_X264_PROP_PSY_RD, "Psy RD property", "Set psy-rd",
@@ -657,11 +699,13 @@ ogmrip_x264_init (OGMRipX264 *x264)
   x264->fast_pskip = OGMRIP_X264_DEFAULT_FAST_PSKIP;
   x264->force_cfr = OGMRIP_X264_DEFAULT_FORCE_CFR;
   x264->frameref = OGMRIP_X264_DEFAULT_FRAMEREF;
+  x264->global_header = OGMRIP_X264_DEFAULT_GLOBAL_HEADER;
   x264->keyint = OGMRIP_X264_DEFAULT_KEYINT;
   x264->level_idc = OGMRIP_X264_DEFAULT_LEVEL_IDC;
   x264->me = OGMRIP_X264_DEFAULT_ME;
   x264->merange = OGMRIP_X264_DEFAULT_MERANGE;
   x264->mixed_refs = OGMRIP_X264_DEFAULT_MIXED_REFS;
+  x264->profile = OGMRIP_X264_DEFAULT_PROFILE;
   x264->psy_rd = OGMRIP_X264_DEFAULT_PSY_RD;
   x264->psy_trellis = OGMRIP_X264_DEFAULT_PSY_TRELLIS;
   x264->rc_lookahead = OGMRIP_X264_DEFAULT_RC_LOOKAHEAD;
@@ -769,6 +813,9 @@ ogmrip_x264_get_property (GObject *gobject, guint property_id, GValue *value, GP
     case PROP_FRAMEREF:
       g_value_set_uint (value, x264->frameref);
       break;
+    case PROP_GLOBAL_HEADER:
+      g_value_set_boolean (value, x264->global_header);
+      break;
     case PROP_KEYINT:
       g_value_set_uint (value, x264->keyint);
       break;
@@ -786,6 +833,9 @@ ogmrip_x264_get_property (GObject *gobject, guint property_id, GValue *value, GP
       break;
     case PROP_PARTITIONS:
       g_value_set_string (value, x264->partitions);
+      break;
+    case PROP_PROFILE:
+      g_value_set_uint (value, x264->profile);
       break;
     case PROP_PSY_RD:
       g_value_set_double (value, x264->psy_rd);
@@ -872,6 +922,9 @@ ogmrip_x264_set_property (GObject *gobject, guint property_id, const GValue *val
     case PROP_FRAMEREF:
       x264->frameref = g_value_get_uint (value);
       break;
+    case PROP_GLOBAL_HEADER:
+      x264->global_header = g_value_get_boolean (value);
+      break;
     case PROP_KEYINT:
       x264->keyint = g_value_get_uint (value);
       break;
@@ -890,6 +943,9 @@ ogmrip_x264_set_property (GObject *gobject, guint property_id, const GValue *val
     case PROP_PARTITIONS:
       g_free (x264->partitions);
       x264->partitions = g_value_dup_string (value);
+      break;
+    case PROP_PROFILE:
+      x264->profile = g_value_get_uint (value);
       break;
     case PROP_PSY_RD:
       x264->psy_rd = g_value_get_double (value);
@@ -974,14 +1030,14 @@ ogmrip_x264_check_option (const gchar *option)
   gchar *options, *output = NULL;
   gint status;
 
-  argv = g_ptr_array_new ();
+  argv = g_ptr_array_new_full (20, NULL);
 
   g_ptr_array_add (argv, "mencoder");
   g_ptr_array_add (argv, "-nocache");
   g_ptr_array_add (argv, "-nosound");
   g_ptr_array_add (argv, "-quiet");
   g_ptr_array_add (argv, "-frames");
-  g_ptr_array_add (argv, "1");
+  g_ptr_array_add (argv, "0");
   g_ptr_array_add (argv, "-rawvideo");
   g_ptr_array_add (argv, "pal:fps=25");
   g_ptr_array_add (argv, "-demuxer");

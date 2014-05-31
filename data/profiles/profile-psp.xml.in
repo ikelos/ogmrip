@@ -1,0 +1,43 @@
+<profile name="default-psp" version="(1,0)">
+  <key name="name">'&lt;b&gt;Sony PSP&lt;/b&gt;&#xA;quantizer 2 (MP4 + X264 + AAC)'</key>
+  <section name="general">
+    <key name="container">'mp4'</key>
+    <key name="encoding-method">2</key>
+  </section>
+  <section name="video">
+    <key name="codec">'x264'</key>
+    <key name="expand">true</key>
+    <key name="max-width">480</key>
+    <key name="max-height">272</key>
+    <key name="quality">3</key>
+  </section>
+  <section name="audio">
+    <key name="codec">'aac'</key>
+    <key name="channels">1</key>
+  </section>
+  <section name="subp">
+    <key name="codec">'srt'</key>
+  </section>
+  <section name="mp4">
+    <key name="format">3</key>
+  </section>
+  <section name="x264">
+    <key name="b-adapt">2</key>
+    <key name="b-frames">3</key>
+    <key name="b-pyramid">2</key>
+    <key name="cabac">true</key>
+    <key name="dct8x8">false</key>
+    <key name="frameref">5</key>
+    <key name="global-header">true</key>
+    <key name="level-idc">21</key>
+    <key name="me">3</key>
+    <key name="mixed-refs">true</key>
+    <key name="profile">1</key>
+    <key name="rc-lookahead">50</key>
+    <key name="subq">8</key>
+    <key name="trellis">1</key>
+    <key name="vbv-bufsize">4000</key>
+    <key name="vbv-maxrate">4000</key>
+    <key name="weight-b">true</key>
+  </section>
+</profile>

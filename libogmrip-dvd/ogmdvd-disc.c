@@ -1,5 +1,5 @@
 /* OGMRipDvd - A DVD library for OGMRip
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -65,25 +65,9 @@ enum
   PROP_URI
 };
 
-static void      ogmrip_media_iface_init  (OGMRipMediaInterface  *iface);
-static GObject * ogmdvd_disc_constructor  (GType                 gtype,
-                                           guint                 n_properties,
-                                           GObjectConstructParam *properties);
-static void      ogmdvd_disc_dispose      (GObject               *gobject);
-static void      ogmdvd_disc_finalize     (GObject               *gobject);
-static void      ogmdvd_disc_get_property (GObject               *gobject,
-                                           guint                 prop_id,
-                                           GValue                *value,
-                                           GParamSpec            *pspec);
-static void      ogmdvd_disc_set_property (GObject               *gobject,
-                                           guint                 prop_id,
-                                           const GValue          *value,
-                                           GParamSpec            *pspec);
-static void      ogmdvd_disc_close        (OGMRipMedia           *media);
-static gboolean  ogmdvd_disc_is_open      (OGMRipMedia           *media);
-
-
-static GHashTable *open_discs;
+static void g_initable_iface_init    (GInitableIface        *iface);
+static void ogmrip_media_iface_init  (OGMRipMediaInterface  *iface);
+static void ogmdvd_disc_close        (OGMRipMedia           *media);
 
 static gboolean
 ogmdvd_device_tray_is_open (const gchar *device)
@@ -256,15 +240,6 @@ dvd_reader_get_vts_size (dvd_reader_t *reader, guint vts)
   return fullsize;
 }
 
-static OGMDvdDisc *
-ogmdvd_disc_get_open (const gchar *device)
-{
-  if (!open_discs)
-    return NULL;
-
-  return g_hash_table_lookup (open_discs, device);
-}
-
 static gchar *
 ogmdvd_disc_get_title_name (OGMDvdDisc *disc)
 {
@@ -274,19 +249,19 @@ ogmdvd_disc_get_title_name (OGMDvdDisc *disc)
 
   f = fopen (disc->priv->device, "r");
   if (!f)
-    return g_strdup ("Unknown");
+    return NULL;
 
 
   if (fseek (f, 32808, SEEK_SET) < 0)
   {
     fclose (f);
-    return g_strdup ("Unknown");
+    return NULL;
   }
 
   if (32 != (i = fread (label, 1, 32, f)))
   {
     fclose (f);
-    return g_strdup ("Unknown");
+    return NULL;
   }
 
   fclose (f);
@@ -459,116 +434,30 @@ ogmdvd_title_new (OGMDvdDisc *disc, dvd_reader_t *reader, ifo_handle_t *vmg_file
   return title;
 }
 
+static void
+ogmdvd_disc_set_uri (OGMDvdDisc *disc, const gchar *str)
+{
+  gchar *name, *path;
+
+  name = g_path_get_basename (str);
+  if (g_ascii_strcasecmp (name, "video_ts") != 0)
+    path = g_strdup (str);
+  else
+    path = g_path_get_dirname (str);
+  g_free (name);
+
+  if (g_str_has_prefix (path, "dvd://"))
+    disc->priv->uri = g_strdup (path);
+  else
+    disc->priv->uri = g_strdup_printf ("dvd://%s", path);
+
+  g_free (path);
+}
+
 G_DEFINE_TYPE_WITH_CODE (OGMDvdDisc, ogmdvd_disc, G_TYPE_OBJECT,
-    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_MEDIA, ogmrip_media_iface_init));
-
-static void
-ogmdvd_disc_init (OGMDvdDisc *disc)
-{
-  disc->priv = G_TYPE_INSTANCE_GET_PRIVATE (disc, OGMDVD_TYPE_DISC, OGMDvdDiscPriv);
-}
-
-static void
-ogmdvd_disc_class_init (OGMDvdDiscClass *klass)
-{
-  GObjectClass *gobject_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->constructor = ogmdvd_disc_constructor;
-  gobject_class->dispose = ogmdvd_disc_dispose;
-  gobject_class->finalize = ogmdvd_disc_finalize;
-  gobject_class->set_property = ogmdvd_disc_set_property;
-  gobject_class->get_property = ogmdvd_disc_get_property;
-
-  g_object_class_override_property (gobject_class, PROP_URI, "uri");
-
-  g_type_class_add_private (klass, sizeof (OGMDvdDiscPriv));
-}
-
-static GObject *
-ogmdvd_disc_constructor (GType gtype, guint n_properties, GObjectConstructParam *properties)
-{
-  GObject *gobject;
-  OGMDvdDisc *disc, *old;
-  OGMDvdTitle *title;
-  dvd_reader_t *reader;
-  ifo_handle_t *vmg_file;
-
-  const gchar *id;
-  guint nr;
-
-  gobject = G_OBJECT_CLASS (ogmdvd_disc_parent_class)->constructor (gtype, n_properties, properties);
-
-  disc = OGMDVD_DISC (gobject);
-
-  if (!disc->priv->uri)
-    disc->priv->uri = g_strdup ("dvd:///dev/dvd");
-
-  if (!g_str_has_prefix (disc->priv->uri, "dvd://"))
-  {
-    g_object_unref (disc);
-    return NULL;
-  }
-
-  disc->priv->device = g_strdup (disc->priv->uri + 6);
-
-  reader = dvd_open_reader (disc->priv->device, NULL);
-  if (!reader)
-  {
-    g_object_unref (disc);
-    return NULL;
-  }
-  id = dvd_reader_get_id (reader);
-  if (!id)
-    return NULL;
-
-  old = ogmdvd_disc_get_open (disc->priv->device);
-  if (old)
-  {
-    gchar *old_id = old->priv->real_id ? old->priv->real_id : old->priv->id;
-
-    if (g_str_equal (old_id, id))
-    {
-      DVDClose (reader);
-      g_object_ref (old);
-      g_object_unref (disc);
-      return G_OBJECT (old);
-    }
-
-    ogmdvd_disc_close (OGMRIP_MEDIA (old));
-  }
-
-  vmg_file = ifoOpen (reader, 0);
-  if (!vmg_file)
-  {
-    g_object_unref (disc);
-    return NULL;
-  }
-
-  disc->priv->id = g_strdup (id);
-  disc->priv->label = ogmdvd_disc_get_title_name (disc);
-
-  disc->priv->ntitles = vmg_file->tt_srpt->nr_of_srpts;
-  for (nr = 0; nr < disc->priv->ntitles; nr ++)
-  {
-    title = ogmdvd_title_new (disc, reader, vmg_file, nr);
-    if (title)
-      disc->priv->titles = g_list_append (disc->priv->titles, title);
-  }
-
-  disc->priv->vmg_size = dvd_reader_get_vts_size (reader, 0);
-
-  ifoClose (vmg_file);
-  DVDClose (reader);
-
-  if (!disc->priv->titles)
-  {
-    g_object_unref (disc);
-    return NULL;
-  }
-
-  return gobject;
-}
+    G_IMPLEMENT_INTERFACE (G_TYPE_INITABLE, g_initable_iface_init)
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_MEDIA, ogmrip_media_iface_init)
+    G_ADD_PRIVATE (OGMDvdDisc));
 
 static void
 ogmdvd_disc_dispose (GObject *gobject)
@@ -589,6 +478,10 @@ static void
 ogmdvd_disc_finalize (GObject *gobject)
 {
   OGMDvdDisc *disc = OGMDVD_DISC (gobject);
+
+#ifdef G_ENABLE_DEBUG
+  g_debug ("Finalizing %s", G_OBJECT_TYPE_NAME (gobject));
+#endif
 
   ogmdvd_disc_close (OGMRIP_MEDIA (disc));
 
@@ -618,26 +511,6 @@ ogmdvd_disc_get_property (GObject *gobject, guint prop_id, GValue *value, GParam
 }
 
 static void
-ogmdvd_disc_set_uri (OGMDvdDisc *disc, const gchar *str)
-{
-  gchar *name, *path;
-
-  name = g_path_get_basename (str);
-  if (g_ascii_strcasecmp (name, "video_ts") != 0)
-    path = g_strdup (str);
-  else
-    path = g_path_get_dirname (str);
-  g_free (name);
-
-  if (g_str_has_prefix (path, "dvd://"))
-    disc->priv->uri = g_strdup (path);
-  else
-    disc->priv->uri = g_strdup_printf ("dvd://%s", path);
-
-  g_free (path);
-}
-
-static void
 ogmdvd_disc_set_property (GObject *gobject, guint prop_id, const GValue *value, GParamSpec *pspec)
 {
   OGMDvdDisc *disc = OGMDVD_DISC (gobject);
@@ -651,6 +524,99 @@ ogmdvd_disc_set_property (GObject *gobject, guint prop_id, const GValue *value, 
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
       break;
   }
+}
+
+static void
+ogmdvd_disc_init (OGMDvdDisc *disc)
+{
+  disc->priv = ogmdvd_disc_get_instance_private (disc);
+}
+
+static void
+ogmdvd_disc_class_init (OGMDvdDiscClass *klass)
+{
+  GObjectClass *gobject_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->dispose = ogmdvd_disc_dispose;
+  gobject_class->finalize = ogmdvd_disc_finalize;
+  gobject_class->set_property = ogmdvd_disc_set_property;
+  gobject_class->get_property = ogmdvd_disc_get_property;
+
+  g_object_class_override_property (gobject_class, PROP_URI, "uri");
+}
+
+static gboolean
+ogmdvd_disc_initable_init (GInitable *initable, GCancellable *cancellable, GError **error)
+{
+  OGMDvdDisc *disc;
+  OGMDvdTitle *title;
+  dvd_reader_t *reader;
+  ifo_handle_t *vmg_file;
+
+  const gchar *id;
+  guint nr;
+
+  disc = OGMDVD_DISC (initable);
+
+  if (!disc->priv->uri)
+    disc->priv->uri = g_strdup ("dvd:///dev/dvd");
+
+  if (!g_str_has_prefix (disc->priv->uri, "dvd://"))
+    return FALSE;
+
+  disc->priv->device = g_strdup (disc->priv->uri + 6);
+
+  reader = dvd_open_reader (disc->priv->device, NULL);
+  if (!reader)
+    return FALSE;
+
+  id = dvd_reader_get_id (reader);
+  if (!id)
+  {
+    DVDClose (reader);
+    return FALSE;
+  }
+
+  vmg_file = ifoOpen (reader, 0);
+  if (!vmg_file)
+  {
+    DVDClose (reader);
+    return FALSE;
+  }
+
+  disc->priv->id = g_strdup (id);
+  disc->priv->label = ogmdvd_disc_get_title_name (disc);
+
+  disc->priv->ntitles = vmg_file->tt_srpt->nr_of_srpts;
+  for (nr = 0; nr < disc->priv->ntitles; nr ++)
+  {
+    title = ogmdvd_title_new (disc, reader, vmg_file, nr);
+    if (title)
+      disc->priv->titles = g_list_append (disc->priv->titles, title);
+  }
+
+  disc->priv->vmg_size = dvd_reader_get_vts_size (reader, 0);
+
+  ifoClose (vmg_file);
+  DVDClose (reader);
+
+  if (!disc->priv->titles)
+    return FALSE;
+
+  return TRUE;
+}
+
+static void
+g_initable_iface_init (GInitableIface *iface)
+{
+  iface->init = ogmdvd_disc_initable_init;
+}
+
+static gboolean
+ogmdvd_disc_is_open (OGMRipMedia *media)
+{
+  return OGMDVD_DISC (media)->priv->reader != NULL;
 }
 
 static gboolean
@@ -683,11 +649,6 @@ ogmdvd_disc_open (OGMRipMedia *media, GCancellable *cancellable, OGMRipMediaCall
   disc->priv->reader = reader;
   disc->priv->vmg_file = ifoOpen (disc->priv->reader, 0);
 
-  if (!open_discs)
-    open_discs = g_hash_table_new (g_str_hash, g_str_equal);
-
-  g_hash_table_insert (open_discs, disc->priv->device, disc);
-
   return TRUE;
 }
 
@@ -707,15 +668,6 @@ ogmdvd_disc_close (OGMRipMedia *media)
     DVDClose (disc->priv->reader);
     disc->priv->reader = NULL;
   }
-
-  if (open_discs)
-    g_hash_table_remove (open_discs, disc->priv->device);
-}
-
-static gboolean
-ogmdvd_disc_is_open (OGMRipMedia *media)
-{
-  return OGMDVD_DISC (media)->priv->reader != NULL;
 }
 
 static const gchar *
@@ -829,7 +781,7 @@ ogmdvd_disc_new (const gchar *device, GError **error)
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   uri = g_strdup_printf ("dvd://%s", device);
-  media = g_object_new (OGMDVD_TYPE_DISC, "uri", uri, NULL);
+  media = g_initable_new (OGMDVD_TYPE_DISC, NULL, NULL, "uri", uri, NULL);
   g_free (uri);
 
   return media;

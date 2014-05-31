@@ -1,5 +1,5 @@
 /* OGMRip - A media encoder for GNOME
- * Copyright (C) 2004-2012 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -81,6 +81,7 @@ static GSList   *slang     = NULL;
 static gboolean relative   = FALSE;
 static gint     start_chap = 0;
 static gint     end_chap   = -1;
+static gboolean test       = FALSE;
 
 static gint     naid       = 0;
 static gint     nsid       = 0;
@@ -526,7 +527,7 @@ ogmrip_cli_create_encoding (OGMRipTitle *title, OGMRipProfile *profile)
   guint method;
 
   encoding = ogmrip_encoding_new (title);
-  ogmrip_encoding_set_test (encoding, FALSE);
+  ogmrip_encoding_set_test (encoding, test);
   ogmrip_encoding_set_autocrop (encoding, TRUE);
   ogmrip_encoding_set_autoscale (encoding, TRUE);
   ogmrip_encoding_set_relative (encoding, relative);
@@ -901,6 +902,7 @@ static const GOptionEntry encode_opts[] =
   { "chapters", 'c', 0, G_OPTION_ARG_CALLBACK,  parse_chap,  N_("Specify which chapters to extract. (default: all)"), "<start>[-<end>]" },
   { "relative", 'r', 0, G_OPTION_ARG_NONE,      &relative,   N_("Extract selected chapters in relative mode"),        NULL              },
   { "profile",  'p', 0, G_OPTION_ARG_STRING,    &preset,     N_("Specify the encoding profile"),                      "<profile>"       },
+  { "test",      0,  0, G_OPTION_ARG_NONE,      &test,       N_("Perform a compressibility test"),                    NULL,             },
   { NULL,        0,  0, 0,                      NULL,        NULL,                                                    NULL              }
 };
 

@@ -1,5 +1,5 @@
 /* OGMRip - A library for media ripping and encoding
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -37,9 +37,6 @@
 
 #define DEFAULT_OVERHEAD 6
 
-#define OGMRIP_CONTAINER_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_CONTAINER, OGMRipContainerPriv))
-
 struct _OGMRipContainerPriv
 {
   gchar *label;
@@ -70,76 +67,7 @@ enum
   PROP_NSUBP
 };
 
-static void ogmrip_container_dispose      (GObject      *gobject);
-static void ogmrip_container_finalize     (GObject      *gobject);
-static void ogmrip_container_set_property (GObject      *gobject,
-                                           guint        property_id,
-                                           const GValue *value,
-                                           GParamSpec   *pspec);
-static void ogmrip_container_get_property (GObject      *gobject,
-                                           guint        property_id,
-                                           GValue       *value,
-                                           GParamSpec   *pspec);
-
-G_DEFINE_ABSTRACT_TYPE (OGMRipContainer, ogmrip_container, OGMJOB_TYPE_BIN)
-
-static void
-ogmrip_container_class_init (OGMRipContainerClass *klass)
-{
-  GObjectClass *gobject_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->dispose = ogmrip_container_dispose;
-  gobject_class->finalize = ogmrip_container_finalize;
-  gobject_class->set_property = ogmrip_container_set_property;
-  gobject_class->get_property = ogmrip_container_get_property;
-
-  g_object_class_install_property (gobject_class, PROP_OUTPUT, 
-        g_param_spec_object ("output", "Output property", "Set output file", 
-           G_TYPE_FILE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_LABEL, 
-        g_param_spec_string ("label", "Label property", "Set label", 
-           NULL, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_FOURCC, 
-        g_param_spec_string ("fourcc", "FourCC property", "Set fourcc", 
-           NULL, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_TSIZE, 
-        g_param_spec_uint ("target-size", "Target size property", "Set target size", 
-           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_TNUMBER, 
-        g_param_spec_uint ("target-number", "Target number property", "Set target number", 
-           0, G_MAXUINT, 1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_OVERHEAD, 
-        g_param_spec_uint ("overhead", "Overhead property", "Get overhead", 
-           0, G_MAXUINT, DEFAULT_OVERHEAD, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_NVIDEO, 
-        g_param_spec_uint ("nvideo", "Number of video streams property", "Get number of video streams", 
-           0, 1, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_NAUDIO, 
-        g_param_spec_uint ("naudio", "Number of audio streams property", "Get number of audio streams", 
-           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_NSUBP, 
-        g_param_spec_uint ("nsubp", "Number of subp streams property", "Get number of subp streams", 
-           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-
-  g_type_class_add_private (klass, sizeof (OGMRipContainerPriv));
-}
-
-static void
-ogmrip_container_init (OGMRipContainer *container)
-{
-  container->priv = OGMRIP_CONTAINER_GET_PRIVATE (container);
-  container->priv->tnumber = 1;
-  container->priv->tsize = 0;
-}
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (OGMRipContainer, ogmrip_container, OGMJOB_TYPE_BIN)
 
 static void
 ogmrip_container_dispose (GObject *gobject)
@@ -240,6 +168,75 @@ ogmrip_container_get_property (GObject *gobject, guint property_id, GValue *valu
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
   }
+}
+
+static void
+ogmrip_container_class_init (OGMRipContainerClass *klass)
+{
+  GObjectClass *gobject_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->dispose = ogmrip_container_dispose;
+  gobject_class->finalize = ogmrip_container_finalize;
+  gobject_class->set_property = ogmrip_container_set_property;
+  gobject_class->get_property = ogmrip_container_get_property;
+
+  g_object_class_install_property (gobject_class, PROP_OUTPUT, 
+        g_param_spec_object ("output", "Output property", "Set output file", 
+           G_TYPE_FILE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_LABEL, 
+        g_param_spec_string ("label", "Label property", "Set label", 
+           NULL, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_FOURCC, 
+        g_param_spec_string ("fourcc", "FourCC property", "Set fourcc", 
+           NULL, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_TSIZE, 
+        g_param_spec_uint ("target-size", "Target size property", "Set target size", 
+           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_TNUMBER, 
+        g_param_spec_uint ("target-number", "Target number property", "Set target number", 
+           0, G_MAXUINT, 1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_OVERHEAD, 
+        g_param_spec_uint ("overhead", "Overhead property", "Get overhead", 
+           0, G_MAXUINT, DEFAULT_OVERHEAD, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_NVIDEO, 
+        g_param_spec_uint ("nvideo", "Number of video streams property", "Get number of video streams", 
+           0, 1, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_NAUDIO, 
+        g_param_spec_uint ("naudio", "Number of audio streams property", "Get number of audio streams", 
+           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_NSUBP, 
+        g_param_spec_uint ("nsubp", "Number of subp streams property", "Get number of subp streams", 
+           0, G_MAXUINT, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+}
+
+static void
+ogmrip_container_init (OGMRipContainer *container)
+{
+  container->priv = ogmrip_container_get_instance_private (container);
+
+  container->priv->tnumber = 1;
+  container->priv->tsize = 0;
+}
+
+GType
+ogmrip_container_get_default (void)
+{
+  GType *types, default_type;
+
+  types = ogmrip_type_children (OGMRIP_TYPE_CONTAINER, NULL);
+  default_type = types[0];
+  g_free (types);
+
+  return default_type;
 }
 
 OGMRipContainer *
@@ -395,7 +392,7 @@ ogmrip_container_set_fourcc (OGMRipContainer *container, const gchar *fourcc)
     g_free (container->priv->fourcc);
   container->priv->fourcc = NULL;
 
-  if (fourcc)
+  if (fourcc && *fourcc)
   {
     str = g_utf8_strup (fourcc, -1);
     container->priv->fourcc = g_strndup (str, 4);

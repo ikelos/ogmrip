@@ -1,5 +1,5 @@
 /* OGMRip - A library for media ripping and encoding
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -170,6 +170,7 @@ ogmrip_audio_chooser_widget_init (OGMRipAudioChooserWidget *widget)
       G_CALLBACK (ogmrip_audio_chooser_widget_combo_title_notified), widget);
 
   widget->priv->button = gtk_button_new_with_label ("...");
+  gtk_widget_set_tooltip_text (widget->priv->button, _("Options"));
   gtk_box_pack_start (GTK_BOX (widget), widget->priv->button, FALSE, FALSE, 0);
   gtk_widget_set_sensitive (widget->priv->button, FALSE);
   gtk_widget_show (widget->priv->button);
@@ -243,7 +244,10 @@ ogmrip_audio_chooser_widget_destroy (GtkWidget *widget)
 GtkWidget *
 ogmrip_audio_chooser_widget_new (void)
 {
-  return g_object_new (OGMRIP_TYPE_AUDIO_CHOOSER_WIDGET, NULL);
+  return g_object_new (OGMRIP_TYPE_AUDIO_CHOOSER_WIDGET,
+      "add-tooltip",    _("Add an audio stream"),
+      "remove-tooltip", _("Remove the audio stream"),
+      NULL);
 }
 
 OGMRipAudioOptions *

@@ -1,5 +1,5 @@
 /* OGMRip - A media encoder for GNOME
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -227,6 +227,8 @@ main (int argc, char *argv[])
 #ifdef HAVE_GTK_SUPPORT
   gtk_init (&argc, &argv);
 #endif
+
+  setlocale (LC_ALL, "");
 
   g_set_application_name (_("OGMRip"));
 

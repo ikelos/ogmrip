@@ -1,5 +1,5 @@
 /* OGMRip - A library for media ripping and encoding
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -32,14 +32,14 @@ G_BEGIN_DECLS
 #define OGMRIP_AUDIO_CODEC_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), OGMRIP_TYPE_AUDIO_CODEC, OGMRipAudioCodecClass))
 
 typedef struct _OGMRipAudioCodec      OGMRipAudioCodec;
-typedef struct _OGMRipAudioCodecPriv  OGMRipAudioCodecPriv;
+typedef struct _OGMRipAudioCodecPriv  OGMRipAudioCodecPrivate;
 typedef struct _OGMRipAudioCodecClass OGMRipAudioCodecClass;
 
 struct _OGMRipAudioCodec
 {
   OGMRipCodec parent_instance;
 
-  OGMRipAudioCodecPriv *priv;
+  OGMRipAudioCodecPrivate *priv;
 };
 
 struct _OGMRipAudioCodecClass
@@ -48,6 +48,7 @@ struct _OGMRipAudioCodecClass
 };
 
 GType         ogmrip_audio_codec_get_type         (void);
+GType         ogmrip_audio_codec_get_default      (GType             container);
 OGMRipCodec * ogmrip_audio_codec_new              (GType             type,
                                                    OGMRipAudioStream *stream);
 OGMRipCodec * ogmrip_audio_codec_new_from_profile (OGMRipAudioStream *stream,

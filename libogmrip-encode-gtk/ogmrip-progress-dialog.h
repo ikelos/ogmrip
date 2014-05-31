@@ -1,5 +1,5 @@
 /* OGMRip - A library for media ripping and encoding
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,13 +31,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipProgressDialog      OGMRipProgressDialog;
 typedef struct _OGMRipProgressDialogClass OGMRipProgressDialogClass;
-typedef struct _OGMRipProgressDialogPriv  OGMRipProgressDialogPriv;
+typedef struct _OGMRipProgressDialogPriv  OGMRipProgressDialogPrivate;
 
 struct _OGMRipProgressDialog
 {
   GtkDialog parent_instance;
 
-  OGMRipProgressDialogPriv *priv;
+  OGMRipProgressDialogPrivate *priv;
 };
 
 struct _OGMRipProgressDialogClass

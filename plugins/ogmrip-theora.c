@@ -1,5 +1,5 @@
 /* OGMRipTheora - A Theora plugin for OGMRip
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -91,7 +91,7 @@ ogmrip_theora_command (OGMRipVideoCodec *video, const gchar *input)
 
   output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (video)));
 
-  argv = g_ptr_array_new ();
+  argv = g_ptr_array_new_full (20, g_free);
 
   g_ptr_array_add (argv, g_strdup (THEORAENC));
 

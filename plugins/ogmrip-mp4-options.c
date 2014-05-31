@@ -1,5 +1,5 @@
 /* OGMRipMp4Options - An MP4 options plugin for OGMRip
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,11 +27,8 @@
 
 #include <glib/gi18n.h>
 
-#define OGMRIP_UI_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-mp4-options-dialog.ui"
+#define OGMRIP_UI_RES  "/org/ogmrip/ogmrip-mp4-options-dialog.ui"
 #define OGMRIP_UI_ROOT "root"
-
-#define gtk_builder_get_widget(builder, name) \
-    (GtkWidget *) gtk_builder_get_object ((builder), (name))
 
 #define OGMRIP_TYPE_MP4_DIALOG          (ogmrip_mp4_dialog_get_type ())
 #define OGMRIP_MP4_DIALOG(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_MP4_DIALOG, OGMRipMp4Dialog))
@@ -65,7 +62,7 @@ enum
 
 static void ogmrip_options_editable_init (OGMRipOptionsEditableInterface *iface);
 
-G_DEFINE_TYPE_EXTENDED (OGMRipMp4Dialog, ogmrip_mp4_dialog, GTK_TYPE_DIALOG, 0,
+G_DEFINE_TYPE_WITH_CODE (OGMRipMp4Dialog, ogmrip_mp4_dialog, GTK_TYPE_DIALOG,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_OPTIONS_EDITABLE, ogmrip_options_editable_init));
 
 static void
@@ -147,38 +144,19 @@ ogmrip_mp4_dialog_class_init (OGMRipMp4DialogClass *klass)
   gobject_class->set_property = ogmrip_mp4_dialog_set_property;
 
   g_object_class_override_property (gobject_class, PROP_PROFILE, "profile");
+
+  gtk_widget_class_set_template_from_resource (GTK_WIDGET_CLASS (klass), OGMRIP_UI_RES);
+
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipMp4Dialog, format_combo);
+  gtk_widget_class_bind_template_child (GTK_WIDGET_CLASS (klass), OGMRipMp4Dialog, hint_check);
 }
 
 static void
 ogmrip_mp4_dialog_init (OGMRipMp4Dialog *dialog)
 {
-  GError *error = NULL;
+  gtk_widget_init_template (GTK_WIDGET (dialog));
 
-  GtkBuilder *builder;
-  GtkWidget *misc, *widget;
-
-  gtk_dialog_add_buttons (GTK_DIALOG (dialog),
-      GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
-      NULL);
-  gtk_window_set_title (GTK_WINDOW (dialog), _("MP4 Options"));
-  gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
-  gtk_container_set_border_width (GTK_CONTAINER (dialog), 6);
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
-
-  builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_UI_FILE, &error))
-    g_error ("Couldn't load builder file: %s", error->message);
-
-  misc = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
-
-  widget = gtk_builder_get_widget (builder, OGMRIP_UI_ROOT);
-  gtk_container_add (GTK_CONTAINER (misc), widget);
-  gtk_widget_show (widget);
-
-  dialog->format_combo = gtk_builder_get_widget (builder, "format-combo");
-  dialog->hint_check = gtk_builder_get_widget (builder, "hint-check");
-
-  g_object_unref (builder);
 }
 
 static void

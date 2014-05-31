@@ -1,5 +1,5 @@
 /* OGMRip - A library for media ripping and encoding
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -39,14 +39,14 @@ typedef enum
 } OGMRipDirection;
 
 typedef struct _OGMRipEncodingManager      OGMRipEncodingManager;
-typedef struct _OGMRipEncodingManagerPriv  OGMRipEncodingManagerPriv;
+typedef struct _OGMRipEncodingManagerPriv  OGMRipEncodingManagerPrivate;
 typedef struct _OGMRipEncodingManagerClass OGMRipEncodingManagerClass;
 
 struct _OGMRipEncodingManager
 {
   GObject parent_instance;
 
-  OGMRipEncodingManagerPriv *priv;
+  OGMRipEncodingManagerPrivate *priv;
 };
 
 struct _OGMRipEncodingManagerClass

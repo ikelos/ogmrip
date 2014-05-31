@@ -1,5 +1,5 @@
 /* OGMRip - A library for media ripping and encoding
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -26,7 +26,7 @@
 
 #include <glib/gi18n-lib.h>
 
-#define OGMRIP_UI_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-profile-editor.ui"
+#define OGMRIP_UI_RES  "/org/ogmrip/ogmrip-profile-editor-dialog.ui"
 #define OGMRIP_UI_ROOT "root"
 
 #define gtk_builder_get_widget(builder, name) \
@@ -438,7 +438,7 @@ ogmrip_profile_editor_set_passes_sensitivity (GBinding *binding, const GValue *s
   codec = ogmrip_type_chooser_widget_get_active (GTK_COMBO_BOX (dialog->priv->video_chooser));
 
   g_value_set_boolean (target_value, method != OGMRIP_ENCODING_QUANTIZER &&
-      ogmrip_codec_format (codec) != OGMRIP_FORMAT_COPY);
+      codec != G_TYPE_NONE && ogmrip_codec_format (codec) != OGMRIP_FORMAT_COPY);
 
   return TRUE;
 }
@@ -534,14 +534,14 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
       G_CALLBACK (ogmrip_profile_editor_reset_button_clicked), dialog);
 
   gtk_dialog_add_buttons (GTK_DIALOG (dialog),
-      GTK_STOCK_CLOSE, GTK_RESPONSE_CLOSE,
+      _("_Close"), GTK_RESPONSE_CLOSE,
       NULL);
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
   gtk_container_set_border_width (GTK_CONTAINER (dialog), 6);
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
 
   builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_UI_FILE, &error))
+  if (!gtk_builder_add_from_resource (builder, OGMRIP_UI_RES, &error))
     g_error ("Couldn't load builder file: %s", error->message);
 
   misc = gtk_dialog_get_content_area (GTK_DIALOG (dialog));

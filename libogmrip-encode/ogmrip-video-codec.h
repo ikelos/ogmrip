@@ -1,5 +1,5 @@
 /* OGMRip - A library for media ripping and encoding
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -33,14 +33,14 @@ G_BEGIN_DECLS
 #define OGMRIP_VIDEO_CODEC_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), OGMRIP_TYPE_VIDEO_CODEC, OGMRipVideoCodecClass))
 
 typedef struct _OGMRipVideoCodec      OGMRipVideoCodec;
-typedef struct _OGMRipVideoCodecPriv  OGMRipVideoCodecPriv;
+typedef struct _OGMRipVideoCodecPriv  OGMRipVideoCodecPrivate;
 typedef struct _OGMRipVideoCodecClass OGMRipVideoCodecClass;
 
 struct _OGMRipVideoCodec
 {
   OGMRipCodec parent_instance;
 
-  OGMRipVideoCodecPriv *priv;
+  OGMRipVideoCodecPrivate *priv;
 };
 
 struct _OGMRipVideoCodecClass
@@ -53,6 +53,7 @@ struct _OGMRipVideoCodecClass
 };
 
 GType               ogmrip_video_codec_get_type           (void);
+GType               ogmrip_video_codec_get_default        (GType             container);
 OGMRipCodec *       ogmrip_video_codec_new                (GType             type,
                                                            OGMRipVideoStream *stream);
 OGMRipCodec *       ogmrip_video_codec_new_from_profile   (OGMRipVideoStream *stream,

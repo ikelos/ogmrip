@@ -1,5 +1,5 @@
 /* OGMRipMkv - A Matroska plugin for OGMRip
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -300,7 +300,7 @@ ogmrip_matroska_command (OGMRipContainer *matroska)
   const gchar *label, *fourcc;
   guint tsize, tnumber;
 
-  argv = g_ptr_array_new ();
+  argv = g_ptr_array_new_full (20, g_free);
   g_ptr_array_add (argv, g_strdup (MKVMERGE));
 
   if (OGMRIP_MATROSKA (matroska)->webm)

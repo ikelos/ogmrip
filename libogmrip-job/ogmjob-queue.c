@@ -1,5 +1,5 @@
 /* OGMJob - A library to spawn processes
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -35,38 +35,6 @@ struct _OGMJobQueuePriv
   guint completed;
   gdouble progress;
 };
-
-static gboolean ogmjob_queue_run    (OGMJobTask      *task,
-                                     GCancellable    *cancellable,
-                                     GError          **error);
-static void     ogmjob_queue_add    (OGMJobContainer *container,
-                                     OGMJobTask      *task);
-static void     ogmjob_queue_remove (OGMJobContainer *container,
-                                     OGMJobTask      *task);
-
-G_DEFINE_TYPE (OGMJobQueue, ogmjob_queue, OGMJOB_TYPE_CONTAINER)
-
-static void
-ogmjob_queue_class_init (OGMJobQueueClass *klass)
-{
-  OGMJobTaskClass *task_class;
-  OGMJobContainerClass *container_class;
-
-  task_class = OGMJOB_TASK_CLASS (klass);
-  task_class->run = ogmjob_queue_run;
-
-  container_class = OGMJOB_CONTAINER_CLASS (klass);
-  container_class->add = ogmjob_queue_add;
-  container_class->remove = ogmjob_queue_remove;
-
-  g_type_class_add_private (klass, sizeof (OGMJobQueuePriv));
-}
-
-static void
-ogmjob_queue_init (OGMJobQueue *queue)
-{
-  queue->priv = G_TYPE_INSTANCE_GET_PRIVATE (queue, OGMJOB_TYPE_QUEUE, OGMJobQueuePriv);
-}
 
 static gboolean
 ogmjob_queue_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
@@ -126,6 +94,46 @@ ogmjob_queue_remove (OGMJobContainer *container, OGMJobTask *task)
     queue->priv->children = g_list_remove_link (queue->priv->children, link);
     g_list_free (link);
   }
+}
+
+static void
+ogmjob_queue_forall (OGMJobContainer *container, OGMJobCallback callback, gpointer data)
+{
+  GList *children = OGMJOB_QUEUE (container)->priv->children;
+  OGMJobTask *child;
+
+  while (children)
+  {
+    child = children->data;
+    children = children->next;
+
+    (* callback) (child, data);
+  }
+}
+
+G_DEFINE_TYPE (OGMJobQueue, ogmjob_queue, OGMJOB_TYPE_CONTAINER)
+
+static void
+ogmjob_queue_class_init (OGMJobQueueClass *klass)
+{
+  OGMJobTaskClass *task_class;
+  OGMJobContainerClass *container_class;
+
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmjob_queue_run;
+
+  container_class = OGMJOB_CONTAINER_CLASS (klass);
+  container_class->add = ogmjob_queue_add;
+  container_class->remove = ogmjob_queue_remove;
+  container_class->forall = ogmjob_queue_forall;
+
+  g_type_class_add_private (klass, sizeof (OGMJobQueuePriv));
+}
+
+static void
+ogmjob_queue_init (OGMJobQueue *queue)
+{
+  queue->priv = G_TYPE_INSTANCE_GET_PRIVATE (queue, OGMJOB_TYPE_QUEUE, OGMJobQueuePriv);
 }
 
 /**

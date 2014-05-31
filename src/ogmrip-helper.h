@@ -1,5 +1,5 @@
 /* OGMRip - A media encoder for GNOME
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,9 @@ G_BEGIN_DECLS
 
 #define gtk_builder_get_widget(builder, name) \
     (GtkWidget *) gtk_builder_get_object ((builder), (name))
+
+#define gtk_widget_get_template_widget(widget, name) \
+    (GtkWidget *) gtk_widget_get_template_child ((widget), G_TYPE_FROM_INSTANCE ((widget)), (name))
 
 gboolean ogmrip_open_title (GtkWindow   *parent,
                             OGMRipTitle *title,

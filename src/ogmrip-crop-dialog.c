@@ -1,5 +1,5 @@
 /* OGMRip - A media encoder for GNOME
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,13 +29,10 @@
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 
-#define OGMRIP_UI_FILE "ogmrip" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip-crop-dialog.ui"
+#define OGMRIP_UI_RES  "/org/ogmrip/ogmrip-crop-dialog.ui"
 #define OGMRIP_UI_ROOT "root"
 
 #define SCALE_FACTOR 2 / 3
-
-#define OGMRIP_CROP_DIALOG_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_CROP_DIALOG, OGMRipCropDialogPriv))
 
 struct _OGMRipCropDialogPriv
 {
@@ -46,10 +43,9 @@ struct _OGMRipCropDialogPriv
   GtkWidget *top_spin;
   GtkWidget *bottom_spin;
 
-  GtkWidget *image;
-  GtkWidget *scale;
-  GtkWidget *label;
-  GtkWidget *aspect;
+  GtkWidget *frame_image;
+  GtkWidget *frame_scale;
+  GtkWidget *frame_label;
 
   GdkPixbuf *pixbuf;
 
@@ -61,10 +57,17 @@ struct _OGMRipCropDialogPriv
   guint raw_height;
 
   gboolean deint;
-
 };
 
-static void ogmrip_crop_dialog_dispose (GObject *gobject);
+enum
+{
+  PROP_0,
+  PROP_TITLE,
+  PROP_LEFT,
+  PROP_TOP,
+  PROP_RIGHT,
+  PROP_BOTTOM
+};
 
 static void
 ogmrip_crop_dialog_crop_frame (OGMRipCropDialog *dialog)
@@ -83,7 +86,7 @@ ogmrip_crop_dialog_crop_frame (OGMRipCropDialog *dialog)
     h = gdk_pixbuf_get_height (dialog->priv->pixbuf) - top - bottom;
 
     pixbuf = gdk_pixbuf_new_subpixbuf (dialog->priv->pixbuf, left, top, w, h);
-    gtk_image_set_from_pixbuf (GTK_IMAGE (dialog->priv->image), pixbuf);
+    gtk_image_set_from_pixbuf (GTK_IMAGE (dialog->priv->frame_image), pixbuf);
     g_object_unref (pixbuf);
   }
 }
@@ -128,7 +131,7 @@ ogmrip_crop_dialog_scale_value_changed (OGMRipCropDialog *dialog, GtkWidget *sca
 
   frame = (gulong) gtk_range_get_value (GTK_RANGE (scale));
   text = g_strdup_printf (_("Frame %lu of %lu"), frame, dialog->priv->length);
-  gtk_label_set_text (GTK_LABEL (dialog->priv->label), text);
+  gtk_label_set_text (GTK_LABEL (dialog->priv->frame_label), text);
   g_free (text);
 }
 
@@ -146,70 +149,97 @@ ogmrip_crop_dialog_scale_button_released (OGMRipCropDialog *dialog, GdkEventButt
   return FALSE;
 }
 
-G_DEFINE_TYPE (OGMRipCropDialog, ogmrip_crop_dialog, GTK_TYPE_DIALOG)
+static void g_initable_iface_init (GInitableIface *iface);
+
+G_DEFINE_TYPE_WITH_CODE (OGMRipCropDialog, ogmrip_crop_dialog, GTK_TYPE_DIALOG,
+    G_ADD_PRIVATE (OGMRipCropDialog)
+    G_IMPLEMENT_INTERFACE (G_TYPE_INITABLE, g_initable_iface_init))
 
 static void
-ogmrip_crop_dialog_class_init (OGMRipCropDialogClass *klass)
+ogmrip_crop_dialog_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
 {
-  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
+  OGMRipCropDialog *dialog = OGMRIP_CROP_DIALOG (gobject);
 
-  gobject_class->dispose = ogmrip_crop_dialog_dispose;
-
-  g_type_class_add_private (klass, sizeof (OGMRipCropDialogPriv));
+  switch (property_id)
+  {
+    case PROP_TITLE:
+      g_value_set_object (value, dialog->priv->title);
+      break;
+    case PROP_LEFT:
+      g_value_set_uint (value, gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (dialog->priv->left_spin)));
+      break;
+    case PROP_TOP:
+      g_value_set_uint (value, gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (dialog->priv->top_spin)));
+      break;
+    case PROP_RIGHT:
+      g_value_set_uint (value, gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (dialog->priv->right_spin)));
+      break;
+    case PROP_BOTTOM:
+      g_value_set_uint (value, gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (dialog->priv->bottom_spin)));
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
+      break;
+  }
 }
 
 static void
-ogmrip_crop_dialog_init (OGMRipCropDialog *dialog)
+ogmrip_crop_dialog_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
 {
-  GError *error = NULL;
+  OGMRipCropDialog *dialog = OGMRIP_CROP_DIALOG (gobject);
 
-  GtkBuilder *builder;
-  GtkWidget *area, *root;
+  switch (property_id)
+  {
+    case PROP_TITLE:
+      dialog->priv->title = g_value_dup_object (value);
+      break;
+    case PROP_LEFT:
+      gtk_spin_button_set_value (GTK_SPIN_BUTTON (dialog->priv->left_spin), (gdouble) g_value_get_uint (value));
+      break;
+    case PROP_TOP:
+      gtk_spin_button_set_value (GTK_SPIN_BUTTON (dialog->priv->top_spin), (gdouble) g_value_get_uint (value));
+      break;
+    case PROP_RIGHT:
+      gtk_spin_button_set_value (GTK_SPIN_BUTTON (dialog->priv->right_spin), (gdouble) g_value_get_uint (value));
+      break;
+    case PROP_BOTTOM:
+      gtk_spin_button_set_value (GTK_SPIN_BUTTON (dialog->priv->bottom_spin), (gdouble) g_value_get_uint (value));
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
+      break;
+  }
+}
 
-  dialog->priv = OGMRIP_CROP_DIALOG_GET_PRIVATE (dialog);
+static void
+ogmrip_crop_dialog_constructed (GObject *gobject)
+{
+  OGMRipCropDialog *dialog = OGMRIP_CROP_DIALOG (gobject);
+  gdouble framerate;
+  gint32 frame;
 
-  builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_file (builder, OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_UI_FILE, &error))
-    g_error ("Couldn't load builder file: %s", error->message);
+  ogmrip_video_stream_get_resolution (ogmrip_title_get_video_stream (dialog->priv->title),
+      &dialog->priv->raw_width, &dialog->priv->raw_height);
+  ogmrip_video_stream_get_framerate (ogmrip_title_get_video_stream (dialog->priv->title),
+      &dialog->priv->rate_numerator, &dialog->priv->rate_denominator);
 
-  gtk_dialog_add_buttons (GTK_DIALOG (dialog),
-      GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-      GTK_STOCK_OK, GTK_RESPONSE_OK,
-      NULL);
-  gtk_window_set_title (GTK_WINDOW (dialog), _("Cropping"));
+  framerate = dialog->priv->rate_numerator / (gdouble) dialog->priv->rate_denominator;
+  dialog->priv->length = ogmrip_title_get_length (dialog->priv->title, NULL) * framerate;
 
-  area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+  gtk_spin_button_set_range (GTK_SPIN_BUTTON (dialog->priv->left_spin),   0.0, (gdouble) dialog->priv->raw_width);
+  gtk_spin_button_set_range (GTK_SPIN_BUTTON (dialog->priv->right_spin),  0.0, (gdouble) dialog->priv->raw_width);
+  gtk_spin_button_set_range (GTK_SPIN_BUTTON (dialog->priv->top_spin),    0.0, (gdouble) dialog->priv->raw_height);
+  gtk_spin_button_set_range (GTK_SPIN_BUTTON (dialog->priv->bottom_spin), 0.0, (gdouble) dialog->priv->raw_height);
 
-  root = gtk_builder_get_widget (builder, OGMRIP_UI_ROOT);
-  gtk_container_add (GTK_CONTAINER (area), root);
-  gtk_widget_show (root);
+  gtk_range_set_range (GTK_RANGE (dialog->priv->frame_scale), 1.0, dialog->priv->length);
+  gtk_range_set_increments (GTK_RANGE (dialog->priv->frame_scale), 1.0, dialog->priv->length / 25);
 
-  dialog->priv->left_spin = gtk_builder_get_widget (builder, "left-spin");
-  g_signal_connect_swapped (dialog->priv->left_spin, "value-changed",
-      G_CALLBACK (ogmrip_crop_dialog_spin_value_changed), dialog);
+  frame = g_random_int_range (1, dialog->priv->length);
+  gtk_range_set_value (GTK_RANGE (dialog->priv->frame_scale), frame);
 
-  dialog->priv->top_spin = gtk_builder_get_widget (builder, "top-spin");
-  g_signal_connect_swapped (dialog->priv->top_spin, "value-changed",
-      G_CALLBACK (ogmrip_crop_dialog_spin_value_changed), dialog);
+  ogmrip_crop_dialog_scale_button_released (dialog, NULL, dialog->priv->frame_scale);
 
-  dialog->priv->right_spin = gtk_builder_get_widget (builder, "right-spin");
-  g_signal_connect_swapped (dialog->priv->right_spin, "value-changed",
-      G_CALLBACK (ogmrip_crop_dialog_spin_value_changed), dialog);
-
-  dialog->priv->bottom_spin = gtk_builder_get_widget (builder, "bottom-spin");
-  g_signal_connect_swapped (dialog->priv->bottom_spin, "value-changed",
-      G_CALLBACK (ogmrip_crop_dialog_spin_value_changed), dialog);
-
-  dialog->priv->image = gtk_builder_get_widget (builder, "frame-image");
-  dialog->priv->label = gtk_builder_get_widget (builder, "frame-label");
-
-  dialog->priv->scale = gtk_builder_get_widget (builder, "frame-scale");
-  g_signal_connect_swapped (dialog->priv->scale, "value-changed",
-      G_CALLBACK (ogmrip_crop_dialog_scale_value_changed), dialog);
-  g_signal_connect_swapped (dialog->priv->scale, "button-release-event",
-      G_CALLBACK (ogmrip_crop_dialog_scale_button_released), dialog);
-
-  g_object_unref (builder);
+  G_OBJECT_CLASS (ogmrip_crop_dialog_parent_class)->constructed (gobject);
 }
 
 static void
@@ -232,49 +262,93 @@ ogmrip_crop_dialog_dispose (GObject *gobject)
   G_OBJECT_CLASS (ogmrip_crop_dialog_parent_class)->dispose (gobject);
 }
 
+static void
+ogmrip_crop_dialog_class_init (OGMRipCropDialogClass *klass)
+{
+  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
+
+  gobject_class->get_property = ogmrip_crop_dialog_get_property;
+  gobject_class->set_property = ogmrip_crop_dialog_set_property;
+  gobject_class->constructed = ogmrip_crop_dialog_constructed;
+  gobject_class->dispose = ogmrip_crop_dialog_dispose;
+
+  g_object_class_install_property (G_OBJECT_CLASS (klass), PROP_TITLE,
+      g_param_spec_object ("title", "title", "title",
+        OGMRIP_TYPE_TITLE, G_PARAM_STATIC_STRINGS | G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
+
+  g_object_class_install_property (G_OBJECT_CLASS (klass), PROP_LEFT,
+      g_param_spec_uint ("crop-left", "crop-left", "crop-left",
+        0, G_MAXUINT, 0, G_PARAM_STATIC_STRINGS | G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+
+  g_object_class_install_property (G_OBJECT_CLASS (klass), PROP_TOP,
+      g_param_spec_uint ("crop-top", "crop-top", "crop-top",
+        0, G_MAXUINT, 0, G_PARAM_STATIC_STRINGS | G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+
+  g_object_class_install_property (G_OBJECT_CLASS (klass), PROP_RIGHT,
+      g_param_spec_uint ("crop-right", "crop-right", "crop-right",
+        0, G_MAXUINT, 0, G_PARAM_STATIC_STRINGS | G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+
+  g_object_class_install_property (G_OBJECT_CLASS (klass), PROP_BOTTOM,
+      g_param_spec_uint ("crop-bottom", "crop-bottom", "crop-bottom",
+        0, G_MAXUINT, 0, G_PARAM_STATIC_STRINGS | G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
+
+  gtk_widget_class_set_template_from_resource (GTK_WIDGET_CLASS (klass), OGMRIP_UI_RES);
+
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipCropDialog, left_spin);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipCropDialog, top_spin);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipCropDialog, right_spin);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipCropDialog, bottom_spin);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipCropDialog, frame_image);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipCropDialog, frame_label);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipCropDialog, frame_scale);
+}
+
+static void
+ogmrip_crop_dialog_init (OGMRipCropDialog *dialog)
+{
+  dialog->priv = ogmrip_crop_dialog_get_instance_private (dialog);
+
+  gtk_widget_init_template (GTK_WIDGET (dialog));
+
+  g_signal_connect_swapped (dialog->priv->left_spin, "value-changed",
+      G_CALLBACK (ogmrip_crop_dialog_spin_value_changed), dialog);
+
+  g_signal_connect_swapped (dialog->priv->top_spin, "value-changed",
+      G_CALLBACK (ogmrip_crop_dialog_spin_value_changed), dialog);
+
+  g_signal_connect_swapped (dialog->priv->right_spin, "value-changed",
+      G_CALLBACK (ogmrip_crop_dialog_spin_value_changed), dialog);
+
+  g_signal_connect_swapped (dialog->priv->bottom_spin, "value-changed",
+      G_CALLBACK (ogmrip_crop_dialog_spin_value_changed), dialog);
+
+  g_signal_connect_swapped (dialog->priv->frame_scale, "value-changed",
+      G_CALLBACK (ogmrip_crop_dialog_scale_value_changed), dialog);
+
+  g_signal_connect_swapped (dialog->priv->frame_scale, "button-release-event",
+      G_CALLBACK (ogmrip_crop_dialog_scale_button_released), dialog);
+}
+
+static gboolean
+ogmrip_crop_dialog_initable_init (GInitable *initable, GCancellable *cancellable, GError **error)
+{
+  if (!OGMRIP_CROP_DIALOG (initable)->priv->title)
+    return FALSE;
+
+  return TRUE;
+}
+
+static void
+g_initable_iface_init (GInitableIface *iface)
+{
+  iface->init = ogmrip_crop_dialog_initable_init;
+}
+
 GtkWidget *
 ogmrip_crop_dialog_new (OGMRipTitle *title, guint left, guint top, guint right, guint bottom)
 {
-  OGMRipCropDialog *dialog;
-  gdouble framerate;
-  gint32 frame;
-
-  dialog = g_object_new (OGMRIP_TYPE_CROP_DIALOG, NULL);
-
-  g_object_ref (title);
-  if (dialog->priv->title)
-    g_object_unref (dialog->priv->title);
-  dialog->priv->title = title;
-
-  ogmrip_video_stream_get_resolution (ogmrip_title_get_video_stream (title),
-      &dialog->priv->raw_width, &dialog->priv->raw_height);
-  ogmrip_video_stream_get_framerate (ogmrip_title_get_video_stream (title),
-      &dialog->priv->rate_numerator, &dialog->priv->rate_denominator);
-
-  framerate = dialog->priv->rate_numerator / (gdouble) dialog->priv->rate_denominator;
-  dialog->priv->length = ogmrip_title_get_length (title, NULL) * framerate;
-
-  gtk_spin_button_set_range (GTK_SPIN_BUTTON (dialog->priv->left_spin), 0.0, (gdouble) dialog->priv->raw_width);
-  gtk_spin_button_set_value (GTK_SPIN_BUTTON (dialog->priv->left_spin), (gdouble) left);
-
-  gtk_spin_button_set_range (GTK_SPIN_BUTTON (dialog->priv->top_spin), 0.0, (gdouble) dialog->priv->raw_height);
-  gtk_spin_button_set_value (GTK_SPIN_BUTTON (dialog->priv->top_spin), (gdouble) top);
-
-  gtk_spin_button_set_range (GTK_SPIN_BUTTON (dialog->priv->right_spin), 0.0, (gdouble) dialog->priv->raw_width);
-  gtk_spin_button_set_value (GTK_SPIN_BUTTON (dialog->priv->right_spin), (gdouble) right);
-
-  gtk_spin_button_set_range (GTK_SPIN_BUTTON (dialog->priv->bottom_spin), 0.0, (gdouble) dialog->priv->raw_height);
-  gtk_spin_button_set_value (GTK_SPIN_BUTTON (dialog->priv->bottom_spin), (gdouble) bottom);
-
-  gtk_range_set_range (GTK_RANGE (dialog->priv->scale), 1.0, dialog->priv->length);
-  gtk_range_set_increments (GTK_RANGE (dialog->priv->scale), 1.0, dialog->priv->length / 25);
-
-  frame = g_random_int_range (1, dialog->priv->length);
-  gtk_range_set_value (GTK_RANGE (dialog->priv->scale), frame);
-
-  ogmrip_crop_dialog_scale_button_released (dialog, NULL, dialog->priv->scale);
-
-  return GTK_WIDGET (dialog);
+  return g_object_new (OGMRIP_TYPE_CROP_DIALOG, "title", title,
+      "crop-left", left, "crop-top", top, "crop-right", right, "crop-bottom", bottom, NULL);
 }
 
 void
@@ -300,7 +374,7 @@ ogmrip_crop_dialog_set_deinterlacer (OGMRipCropDialog *dialog, gboolean deint)
 
     dialog->priv->deint = deint;
     frame = g_random_int_range (1, dialog->priv->length);
-    gtk_range_set_value (GTK_RANGE (dialog->priv->scale), frame);
+    gtk_range_set_value (GTK_RANGE (dialog->priv->frame_scale), frame);
   }
 }
 

@@ -1,5 +1,5 @@
 /* OGMRip - A media encoder for GNOME
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,10 +31,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipGui      OGMRipGui;
 typedef struct _OGMRipGuiClass OGMRipGuiClass;
+typedef struct _OGMRipGuiPriv  OGMRipGuiPrivate;
 
 struct _OGMRipGui
 {
   GtkApplication parent_instance;
+
+  OGMRipGuiPrivate *priv;
 };
 
 struct _OGMRipGuiClass
@@ -46,7 +49,6 @@ struct _OGMRipGuiClass
 
 GType          ogmrip_gui_get_type (void);
 GApplication * ogmrip_gui_new      (const gchar *app_id);
-void           ogmrip_gui_prepare  (OGMRipGui   *gui);
 
 G_END_DECLS
 

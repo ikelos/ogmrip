@@ -1,5 +1,5 @@
 /* OGMRipFlac - A Flac plugin for OGMRip
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -63,7 +63,7 @@ ogmrip_flac_command (OGMRipAudioCodec *audio, gboolean header, const gchar *inpu
 
   output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (audio)));
 
-  argv = g_ptr_array_new ();
+  argv = g_ptr_array_new_full (20, g_free);
   g_ptr_array_add (argv, g_strdup ("flac"));
 
   g_ptr_array_add (argv, g_strdup_printf ("--force"));

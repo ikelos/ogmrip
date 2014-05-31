@@ -3,25 +3,54 @@ bin_PROGRAMS = \
 
 ogmrip_SOURCES = \
   ogmrip-application.c \
-	ogmrip-cli.c   \
+  ogmrip-cli.c   \
   ogmrip-main.c
+
+resourcefiles =
 
 if HAVE_GTK_SUPPORT
 ogmrip_SOURCES += \
   ogmrip-crop-dialog.c    \
   ogmrip-gui.c            \
   ogmrip-helper.c         \
+  ogmrip-main-window.c    \
   ogmrip-options-dialog.c \
   ogmrip-pref-dialog.c    \
   ogmrip-spell-dialog.c
+
+resourcefiles += \
+  ogmrip.gresource.xml
 endif
 
+ogmrip_RESOURCES = \
+  $(resourcefiles:.gresource.xml=-gresource.c)
+
+ogmrip_SOURCES += \
+  $(ogmrip_RESOURCES)
+
+BUILT_SOURCES = \
+  $(ogmrip_RESOURCES)
+
+ui_FILES = \
+  ogmrip-crop-dialog.ui    \
+  ogmrip-main-window.ui    \
+  ogmrip-menu.ui           \
+  ogmrip-options-dialog.ui \
+  ogmrip-pref-dialog.ui    \
+  ogmrip-spell-dialog.ui
+
+ogmrip-gresource.c: ogmrip.gresource.xml $(ui_FILES) $(GLIB_COMPILE_RESOURCES)
+	$(GLIB_COMPILE_RESOURCES) --sourcedir=$(top_srcdir)/src --generate-source --target=$@ $<
+
 EXTRA_DIST = \
+  $(ui_FILES)             \
+  $(resourcefiles)        \
   ogmrip-application.h    \
   ogmrip-cli.h            \
   ogmrip-crop-dialog.h    \
   ogmrip-gui.h            \
   ogmrip-helper.h         \
+  ogmrip-main-window.h    \
   ogmrip-options-dialog.h \
   ogmrip-pref-dialog.h    \
   ogmrip-settings.h       \
@@ -45,7 +74,7 @@ ogmrip_LDADD += \
   $(top_builddir)/libogmrip-encode-gtk/libogmrip-encode-gtk.la
 endif
 
-INCLUDES = \
+ogmrip_CPPFLAGS = \
   -I$(top_srcdir)/libogmrip-base       \
   -I$(top_srcdir)/libogmrip-job        \
   -I$(top_srcdir)/libogmrip-media      \
@@ -54,23 +83,24 @@ INCLUDES = \
   -I$(top_srcdir)/libogmrip-bluray     \
   -I$(top_srcdir)/libogmrip-encode     \
   -I$(top_srcdir)/libogmrip-module     \
+  -I$(top_srcdir)/libogmrip-mplayer    \
   -I$(top_builddir)/libogmrip-encode   \
-  -I$(top_builddir)/libogmrip-mplayer  \
   -DOGMRIP_DATA_DIR=\""$(datadir)"\"   \
   -DOGMRIP_LIB_DIR=\""$(libdir)"\"
 
 if HAVE_GTK_SUPPORT
-INCLUDES += \
+ogmrip_CPPFLAGS += \
   -I$(top_srcdir)/libogmrip-media-gtk  \
   -I$(top_srcdir)/libogmrip-file-gtk   \
   -I$(top_srcdir)/libogmrip-encode-gtk
 endif
 
 if MAINTAINER_MODE
-INCLUDES += \
+ogmrip_CPPFLAGS += \
   -DG_ENABLE_DEBUG
 endif
 
 CLEANFILES = \
-  $(BUILT_SOURCES) *~ *.bak
+  $(ogmrip_RESOURCES) \
+  *~ *.bak
 

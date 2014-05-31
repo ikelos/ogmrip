@@ -1,5 +1,5 @@
 /* OGMRipFile - A file library for OGMRip
- * Copyright (C) 2010-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2010-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,13 +22,12 @@
 
 #include <stdlib.h>
 
-static void ogmrip_video_iface_init  (OGMRipVideoStreamInterface *iface);
-static GObject * ogmrip_video_file_constructor  (GType type,
-                                                 guint n_properties,
-                                                 GObjectConstructParam *properties);
+static void g_initable_iface_init           (GInitableIface             *iface);
+static void ogmrip_video_stream_iface_init  (OGMRipVideoStreamInterface *iface);
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipVideoFile, ogmrip_video_file, OGMRIP_TYPE_FILE,
-    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_VIDEO_STREAM, ogmrip_video_iface_init));
+    G_IMPLEMENT_INTERFACE (G_TYPE_INITABLE, g_initable_iface_init)
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_VIDEO_STREAM, ogmrip_video_stream_iface_init));
 
 static void
 ogmrip_video_file_init (OGMRipVideoFile *stream)
@@ -43,71 +42,58 @@ ogmrip_video_file_init (OGMRipVideoFile *stream)
 static void
 ogmrip_video_file_class_init (OGMRipVideoFileClass *klass)
 {
-  GObjectClass *gobject_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->constructor = ogmrip_video_file_constructor;
-
   g_type_class_add_private (klass, sizeof (OGMRipVideoFilePriv));
 }
 
-static GObject *
-ogmrip_video_file_constructor (GType type, guint n_properties, GObjectConstructParam *properties)
+static gboolean
+ogmrip_video_file_initable_init (GInitable *initable, GCancellable *cancellable, GError **error)
 {
   GFile *file;
-  GObject *gobject;
   OGMRipMediaInfo *info;
   const gchar *str;
 
-  gobject = G_OBJECT_CLASS (ogmrip_video_file_parent_class)->constructor (type, n_properties, properties);
-
   info = ogmrip_media_info_get_default ();
-  if (!info || !OGMRIP_FILE (gobject)->priv->path)
-  {
-    g_object_unref (gobject);
-    return NULL;
-  }
+  if (!info || !OGMRIP_FILE (initable)->priv->path)
+    return FALSE;
 
-  file = g_file_new_for_path (OGMRIP_FILE (gobject)->priv->path);
-  OGMRIP_FILE (gobject)->priv->id = g_file_get_id (file);
+  file = g_file_new_for_path (OGMRIP_FILE (initable)->priv->path);
+  OGMRIP_FILE (initable)->priv->id = g_file_get_id (file);
   g_object_unref (file);
 
-  if (!OGMRIP_FILE (gobject)->priv->id)
-  {
-    g_object_unref (gobject);
-    return NULL;
-  }
+  if (!OGMRIP_FILE (initable)->priv->id)
+    return FALSE;
 
-  if (!ogmrip_media_info_open (info, OGMRIP_FILE (gobject)->priv->path))
-  {
-    g_object_unref (gobject);
-    return NULL;
-  }
+  if (!ogmrip_media_info_open (info, OGMRIP_FILE (initable)->priv->path))
+    return FALSE;
 
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "VideoCount");
   if (!str || !g_str_equal (str, "1"))
   {
     g_object_unref (info);
-    g_object_unref (gobject);
-    return NULL;
+    return FALSE;
   }
 
-  OGMRIP_FILE (gobject)->priv->format = ogmrip_media_info_get_video_format (info, 0);
-  if (OGMRIP_FILE (gobject)->priv->format < 0)
+  OGMRIP_FILE (initable)->priv->format = ogmrip_media_info_get_video_format (info, 0);
+  if (OGMRIP_FILE (initable)->priv->format < 0)
   {
     g_object_unref (info);
-    g_object_unref (gobject);
-    return NULL;
+    return FALSE;
   }
 
-  ogmrip_media_info_get_file_info (info,  OGMRIP_FILE (gobject)->priv);
-  ogmrip_media_info_get_video_info (info, 0, OGMRIP_VIDEO_FILE (gobject)->priv);
+  ogmrip_media_info_get_file_info (info,  OGMRIP_FILE (initable)->priv);
+  ogmrip_media_info_get_video_info (info, 0, OGMRIP_VIDEO_FILE (initable)->priv);
 
-  OGMRIP_FILE (gobject)->priv->title_size = OGMRIP_VIDEO_FILE (gobject)->priv->size;
+  OGMRIP_FILE (initable)->priv->title_size = OGMRIP_VIDEO_FILE (initable)->priv->size;
 
   ogmrip_media_info_close (info);
 
-  return gobject;
+  return TRUE;
+}
+
+static void
+g_initable_iface_init (GInitableIface *iface)
+{
+  iface->init = ogmrip_video_file_initable_init;
 }
 
 static void
@@ -169,7 +155,7 @@ ogmrip_video_file_get_resolution (OGMRipVideoStream *video, guint *w, guint *h)
 }
 
 static void
-ogmrip_video_iface_init (OGMRipVideoStreamInterface *iface)
+ogmrip_video_stream_iface_init (OGMRipVideoStreamInterface *iface)
 {
   iface->get_aspect_ratio = ogmrip_video_file_get_aspect_ratio;
   iface->get_bitrate = ogmrip_video_file_get_bitrate;
@@ -184,6 +170,6 @@ ogmrip_video_file_new (const gchar *uri)
 {
   g_return_val_if_fail (uri != NULL, NULL);
 
-  return g_object_new (OGMRIP_TYPE_VIDEO_FILE, "uri", uri, NULL);
+  return g_initable_new (OGMRIP_TYPE_VIDEO_FILE, NULL, NULL, "uri", uri, NULL);
 }
 

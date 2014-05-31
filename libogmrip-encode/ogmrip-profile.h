@@ -1,5 +1,5 @@
 /* OGMRip - A library for media ripping and encoding
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -41,14 +41,14 @@ GQuark ogmrip_profile_error_quark (void);
 #define OGMRIP_IS_PROFILE_CLASS(obj) (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_PROFILE))
 
 typedef struct _OGMRipProfile        OGMRipProfile;
-typedef struct _OGMRipProfilePriv    OGMRipProfilePriv;
+typedef struct _OGMRipProfilePriv    OGMRipProfilePrivate;
 typedef struct _OGMRipProfileClass   OGMRipProfileClass;
 
 struct _OGMRipProfile
 {
   GSettings parent_instance;
 
-  OGMRipProfilePriv *priv;
+  OGMRipProfilePrivate *priv;
 };
 
 struct _OGMRipProfileClass
@@ -60,7 +60,7 @@ GType           ogmrip_profile_get_type      (void);
 OGMRipProfile * ogmrip_profile_new           (const gchar   *name);
 OGMRipProfile * ogmrip_profile_new_from_file (GFile         *file,
                                               GError        **error);
-gboolean        ogmrip_profile_is_available  (OGMRipProfile *profile);
+gboolean        ogmrip_profile_is_valid      (OGMRipProfile *profile);
 OGMRipProfile * ogmrip_profile_copy          (OGMRipProfile *profile,
                                               gchar         *name);
 gboolean        ogmrip_profile_export        (OGMRipProfile *profile,

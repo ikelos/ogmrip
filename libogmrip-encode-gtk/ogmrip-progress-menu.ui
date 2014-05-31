@@ -1,0 +1,19 @@
+<interface>
+  <menu id="menu">
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">_Suspend</attribute>
+        <attribute name="action">progress.suspend</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">_Resume</attribute>
+        <attribute name="action">progress.resume</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">_Cancel</attribute>
+        <attribute name="action">progress.cancel</attribute>
+      </item>
+    </section>
+  </menu>
+</interface>
+

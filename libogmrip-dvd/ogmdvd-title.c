@@ -1,5 +1,5 @@
 /* OGMRipDvd - A DVD library for OGMRip
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -41,37 +41,24 @@
 static void ogmdvd_stream_iface_init       (OGMRipStreamInterface      *iface);
 static void ogmdvd_video_stream_iface_init (OGMRipVideoStreamInterface *iface);
 static void ogmdvd_title_iface_init        (OGMRipTitleInterface       *iface);
-static void ogmdvd_title_dispose           (GObject                    *gobject);
-static void ogmdvd_title_finalize          (GObject                    *gobject);
 static void ogmdvd_title_close             (OGMRipTitle                *title);
 
 G_DEFINE_TYPE_WITH_CODE (OGMDvdTitle, ogmdvd_title, G_TYPE_OBJECT,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_TITLE, ogmdvd_title_iface_init)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_STREAM, ogmdvd_stream_iface_init)
-    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_VIDEO_STREAM, ogmdvd_video_stream_iface_init));
-
-static void
-ogmdvd_title_init (OGMDvdTitle *title)
-{
-  title->priv = G_TYPE_INSTANCE_GET_PRIVATE (title, OGMDVD_TYPE_TITLE, OGMDvdTitlePriv);
-}
-
-static void
-ogmdvd_title_class_init (OGMDvdTitleClass *klass)
-{
-  GObjectClass *gobject_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->dispose = ogmdvd_title_dispose;
-  gobject_class->finalize = ogmdvd_title_finalize;
-
-  g_type_class_add_private (klass, sizeof (OGMDvdTitlePriv));
-}
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_VIDEO_STREAM, ogmdvd_video_stream_iface_init)
+    G_ADD_PRIVATE (OGMDvdTitle));
 
 static void
 ogmdvd_title_dispose (GObject *gobject)
 {
   OGMDvdTitle *title = OGMDVD_TITLE (gobject);
+
+  if (title->priv->disc)
+  {
+    g_object_remove_weak_pointer (G_OBJECT (title->priv->disc), (gpointer *) &title->priv->disc);
+    title->priv->disc = NULL;
+  }
 
   if (title->priv->audio_streams)
   {
@@ -95,6 +82,10 @@ ogmdvd_title_finalize (GObject *gobject)
 {
   OGMDvdTitle *title = OGMDVD_TITLE (gobject);
 
+#ifdef G_ENABLE_DEBUG
+  g_debug ("Finalizing %s (%d)", G_OBJECT_TYPE_NAME (gobject), OGMDVD_TITLE (gobject)->priv->nr);
+#endif
+
   ogmdvd_title_close (OGMRIP_TITLE (title));
 
   if (title->priv->bitrates)
@@ -109,9 +100,23 @@ ogmdvd_title_finalize (GObject *gobject)
     title->priv->length_of_chapters = NULL;
   }
 
-  title->priv->disc = NULL;
+  G_OBJECT_CLASS (ogmdvd_title_parent_class)->finalize (gobject);
+}
 
-  G_OBJECT_CLASS (ogmdvd_title_parent_class)->dispose (gobject);
+static void
+ogmdvd_title_init (OGMDvdTitle *title)
+{
+  title->priv = ogmdvd_title_get_instance_private (title);
+}
+
+static void
+ogmdvd_title_class_init (OGMDvdTitleClass *klass)
+{
+  GObjectClass *gobject_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->dispose = ogmdvd_title_dispose;
+  gobject_class->finalize = ogmdvd_title_finalize;
 }
 
 static gint
@@ -295,7 +300,7 @@ ogmdvd_title_close (OGMRipTitle *title)
     dtitle->priv->vts_file = NULL;
   }
 
-  if (dtitle->priv->close_disc)
+  if (dtitle->priv->close_disc && dtitle->priv->disc)
   {
     ogmrip_media_close (OGMRIP_MEDIA (dtitle->priv->disc));
     dtitle->priv->close_disc = FALSE;

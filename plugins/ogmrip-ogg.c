@@ -1,5 +1,5 @@
 /* OGMRipOgg - An OGG plugin for OGMRip
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -201,7 +201,7 @@ ogmrip_ogg_merge_command (OGMRipContainer *ogg, const gchar *output)
   GPtrArray *argv;
   const gchar *label, *fourcc;
 
-  argv = g_ptr_array_new ();
+  argv = g_ptr_array_new_full (20, g_free);
   g_ptr_array_add (argv, g_strdup ("ogmmerge"));
 
   g_ptr_array_add (argv, g_strdup ("-o"));
@@ -245,7 +245,7 @@ ogmrip_ogg_split_command (OGMRipContainer *ogg, const gchar *input)
 
   ogmrip_container_get_split (OGMRIP_CONTAINER (ogg), NULL, &tsize);
 
-  argv = g_ptr_array_new ();
+  argv = g_ptr_array_new_full (20, g_free);
   g_ptr_array_add (argv, g_strdup ("ogmsplit"));
   g_ptr_array_add (argv, g_strdup ("--frontend"));
   g_ptr_array_add (argv, g_strdup ("-s"));

@@ -1,5 +1,5 @@
 /* OGMRip - A library for media ripping and encoding
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,9 +30,6 @@
 #include <unistd.h>
 #include <glib/gstdio.h>
 
-#define OGMRIP_CODEC_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_CODEC, OGMRipCodecPriv))
-
 struct _OGMRipCodecPriv
 {
   OGMRipTitle *title;
@@ -57,20 +54,6 @@ enum
   PROP_START_POSITION
 };
 
-static void     ogmrip_codec_constructed  (GObject      *gobject);
-static void     ogmrip_codec_dispose      (GObject      *gobject);
-static void     ogmrip_codec_set_property (GObject      *gobject,
-                                           guint        property_id,
-                                           const GValue *value,
-                                           GParamSpec   *pspec);
-static void     ogmrip_codec_get_property (GObject      *gobject,
-                                           guint        property_id,
-                                           GValue       *value,
-                                           GParamSpec   *pspec);
-static gboolean ogmrip_codec_run          (OGMJobTask   *task,
-                                           GCancellable *cancellable,
-                                           GError       **error);
-
 GQuark
 ogmrip_codec_error_quark (void)
 {
@@ -92,65 +75,15 @@ ogmrip_codec_set_input (OGMRipCodec *codec, OGMRipStream *input)
       g_return_if_fail (ogmrip_stream_is_copy (codec->priv->input, input));
 
       g_object_unref (codec->priv->input);
+      g_object_unref (codec->priv->title);
     }
 
     codec->priv->input = g_object_ref (input);
-    codec->priv->title = ogmrip_stream_get_title (input);
+    codec->priv->title = g_object_ref (ogmrip_stream_get_title (input));
   }
 }
 
-G_DEFINE_ABSTRACT_TYPE (OGMRipCodec, ogmrip_codec, OGMJOB_TYPE_BIN)
-
-static void
-ogmrip_codec_class_init (OGMRipCodecClass *klass)
-{
-  GObjectClass *gobject_class;
-  OGMJobTaskClass *task_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->constructed = ogmrip_codec_constructed;
-  gobject_class->dispose = ogmrip_codec_dispose;
-  gobject_class->set_property = ogmrip_codec_set_property;
-  gobject_class->get_property = ogmrip_codec_get_property;
-
-  task_class = OGMJOB_TASK_CLASS (klass);
-  task_class->run = ogmrip_codec_run;
-
-  g_object_class_install_property (gobject_class, PROP_INPUT, 
-        g_param_spec_object ("input", "Input property", "Set input stream", 
-           OGMRIP_TYPE_STREAM, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_OUTPUT, 
-        g_param_spec_object ("output", "Output property", "Set output file", 
-           OGMRIP_TYPE_FILE, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_START_CHAPTER, 
-        g_param_spec_int ("start-chapter", "Start chapter property", "Set start chapter", 
-           0, G_MAXINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_END_CHAPTER, 
-        g_param_spec_int ("end-chapter", "End chapter property", "Set end chapter", 
-           -1, G_MAXINT, -1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_PLAY_LENGTH, 
-        g_param_spec_double ("play-length", "Play length property", "Get play length", 
-           -1.0, G_MAXDOUBLE, -1.0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_START_POSITION, 
-        g_param_spec_double ("start-position", "Start position property", "Get start position", 
-           0.0, G_MAXDOUBLE, 0.0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_type_class_add_private (klass, sizeof (OGMRipCodecPriv));
-}
-
-static void
-ogmrip_codec_init (OGMRipCodec *codec)
-{
-  codec->priv = OGMRIP_CODEC_GET_PRIVATE (codec);
-
-  codec->priv->end_chap = -1;
-  codec->priv->play_length = -1.0;
-}
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (OGMRipCodec, ogmrip_codec, OGMJOB_TYPE_BIN)
 
 static void
 ogmrip_codec_constructed (GObject *gobject)
@@ -184,12 +117,29 @@ ogmrip_codec_dispose (GObject *gobject)
 
   if (codec->priv->output)
   {
+    ogmrip_file_delete (codec->priv->output, NULL);
     g_object_unref (codec->priv->output);
     codec->priv->output = NULL;
   }
 
+  if (codec->priv->title)
+  {
+    g_object_unref (codec->priv->title);
+    codec->priv->title = NULL;
+  }
+
   G_OBJECT_CLASS (ogmrip_codec_parent_class)->dispose (gobject);
 }
+
+#ifdef G_ENABLE_DEBUG
+static void
+ogmrip_codec_finalize (GObject *gobject)
+{
+  g_debug ("Finalizing %s", G_OBJECT_TYPE_NAME (gobject));
+
+  G_OBJECT_CLASS (ogmrip_codec_parent_class)->finalize (gobject);
+}
+#endif
 
 static void
 ogmrip_codec_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
@@ -275,6 +225,59 @@ ogmrip_codec_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   }
 
   return OGMJOB_TASK_CLASS (ogmrip_codec_parent_class)->run (task, cancellable, error);
+}
+
+static void
+ogmrip_codec_class_init (OGMRipCodecClass *klass)
+{
+  GObjectClass *gobject_class;
+  OGMJobTaskClass *task_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->constructed = ogmrip_codec_constructed;
+  gobject_class->dispose = ogmrip_codec_dispose;
+  gobject_class->set_property = ogmrip_codec_set_property;
+  gobject_class->get_property = ogmrip_codec_get_property;
+
+#ifdef G_ENABLE_DEBUG
+  gobject_class->finalize = ogmrip_codec_finalize;
+#endif
+
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_codec_run;
+
+  g_object_class_install_property (gobject_class, PROP_INPUT, 
+        g_param_spec_object ("input", "Input property", "Set input stream", 
+           OGMRIP_TYPE_STREAM, G_PARAM_READWRITE | G_PARAM_CONSTRUCT | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_OUTPUT, 
+        g_param_spec_object ("output", "Output property", "Set output file", 
+           OGMRIP_TYPE_FILE, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_START_CHAPTER, 
+        g_param_spec_int ("start-chapter", "Start chapter property", "Set start chapter", 
+           0, G_MAXINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_END_CHAPTER, 
+        g_param_spec_int ("end-chapter", "End chapter property", "Set end chapter", 
+           -1, G_MAXINT, -1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_PLAY_LENGTH, 
+        g_param_spec_double ("play-length", "Play length property", "Get play length", 
+           -1.0, G_MAXDOUBLE, -1.0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_START_POSITION, 
+        g_param_spec_double ("start-position", "Start position property", "Get start position", 
+           0.0, G_MAXDOUBLE, 0.0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+}
+
+static void
+ogmrip_codec_init (OGMRipCodec *codec)
+{
+  codec->priv = ogmrip_codec_get_instance_private (codec);
+
+  codec->priv->end_chap = -1;
+  codec->priv->play_length = -1.0;
 }
 
 /**

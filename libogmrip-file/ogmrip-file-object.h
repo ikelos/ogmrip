@@ -1,5 +1,5 @@
 /* OGMRipFile - A file library for OGMRip
- * Copyright (C) 2010-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2010-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -48,6 +48,8 @@ struct _OGMRipFileClass
 
 GType         ogmrip_file_get_type (void);
 const gchar * ogmrip_file_get_path (OGMRipFile *file);
+gboolean      ogmrip_file_delete   (OGMRipFile *file,
+                                    GError     **error);
 
 G_END_DECLS
 

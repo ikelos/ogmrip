@@ -1,5 +1,5 @@
 /* OGMRip - A library for media ripping and encoding
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -33,14 +33,14 @@ G_BEGIN_DECLS
 #define OGMRIP_SUBP_CODEC_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), OGMRIP_TYPE_SUBP_CODEC, OGMRipSubpCodecClass))
 
 typedef struct _OGMRipSubpCodec      OGMRipSubpCodec;
-typedef struct _OGMRipSubpCodecPriv  OGMRipSubpCodecPriv;
+typedef struct _OGMRipSubpCodecPriv  OGMRipSubpCodecPrivate;
 typedef struct _OGMRipSubpCodecClass OGMRipSubpCodecClass;
 
 struct _OGMRipSubpCodec
 {
   OGMRipCodec parent_instance;
 
-  OGMRipSubpCodecPriv *priv;
+  OGMRipSubpCodecPrivate *priv;
 };
 
 struct _OGMRipSubpCodecClass
@@ -49,6 +49,7 @@ struct _OGMRipSubpCodecClass
 };
 
 GType         ogmrip_subp_codec_get_type         (void);
+GType         ogmrip_subp_codec_get_default      (GType            container);
 OGMRipCodec * ogmrip_subp_codec_new              (GType            type,
                                                   OGMRipSubpStream *stream);
 OGMRipCodec * ogmrip_subp_codec_new_from_profile (OGMRipSubpStream *stream,

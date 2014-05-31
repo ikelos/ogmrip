@@ -1,5 +1,5 @@
 /* OGMRipMp3 - An MP3 plugin for OGMRip
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -79,7 +79,7 @@ ogmrip_mp3_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input
 
   quality = ogmrip_audio_codec_get_quality (audio);
 
-  argv = g_ptr_array_new ();
+  argv = g_ptr_array_new_full (10, g_free);
   g_ptr_array_add (argv, g_strdup (LAME));
   g_ptr_array_add (argv, g_strdup ("--nohist"));
   g_ptr_array_add (argv, g_strdup ("-h"));
@@ -90,6 +90,12 @@ ogmrip_mp3_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input
     g_ptr_array_add (argv, g_strdup ("-s"));
     g_ptr_array_add (argv, g_strdup_printf ("%.1f",
           ogmrip_audio_codec_get_sample_rate (audio) / 1000.0));
+
+    if (ogmrip_audio_codec_get_channels (audio) == OGMRIP_CHANNELS_MONO)
+    {
+      g_ptr_array_add (argv, g_strdup ("-m"));
+      g_ptr_array_add (argv, g_strdup ("m"));
+    }
   }
 
   g_ptr_array_add (argv, g_strdup ("--preset"));

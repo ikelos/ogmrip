@@ -9,7 +9,7 @@ m4_define([ogmrip_version], [ogmrip_major_version.ogmrip_minor_version.ogmrip_mi
 
 AC_INIT([OGMRip], [ogmrip_version])
 AC_CONFIG_SRCDIR(src/ogmrip-main.c)
-AM_INIT_AUTOMAKE(ogmrip, AC_PACKAGE_VERSION)
+AM_INIT_AUTOMAKE
 
 AC_CONFIG_HEADERS(config.h)
 AC_CONFIG_MACRO_DIR(m4)
@@ -28,6 +28,7 @@ AC_SUBST(OGMRIP_VERSION)
 dnl **************************************************************
 
 AC_PROG_CC
+AM_PROG_CC_C_O
 AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 AC_PROG_LN_S
@@ -313,6 +314,14 @@ AM_CONDITIONAL(HAVE_FLAC_SUPPORT, [test x"$have_flac_support" = x"yes"])
 
 dnl **************************************************************
 
+AC_ARG_ENABLE(ac3-support,
+  AC_HELP_STRING([--disable-ac3-support], [disable AC3 support]),
+  [have_ac3_support="$enableval"], [have_ac3_support="yes"])
+
+AM_CONDITIONAL(HAVE_AC3_SUPPORT, [test x"$have_ac3_support" = x"yes"])
+
+dnl **************************************************************
+
 AC_ARG_ENABLE(srt-support,
   AC_HELP_STRING([--disable-srt-support], [disable SRT support]),
   [have_srt_support="$enableval"], [have_srt_support="yes"])
@@ -370,12 +379,12 @@ fi
 
 dnl **************************************************************
 
+AM_GLIB_GNU_GETTEXT
+IT_PROG_INTLTOOL([0.40.0], [no-xml])
+
 GETTEXT_PACKAGE=ogmrip
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [GetText Package])
-
-AM_GLIB_GNU_GETTEXT
-IT_PROG_INTLTOOL([0.40.0], [no-xml])
 
 if test "x${prefix}" = "xNONE"; then 
   AC_DEFINE_UNQUOTED(LOCALEDIR, "${ac_default_prefix}/${DATADIRNAME}/locale", [Locale directory])
@@ -386,6 +395,7 @@ fi
 dnl **************************************************************
 
 AC_PATH_PROG(GLIB_GENMARSHAL, glib-genmarshal)
+AC_PATH_PROG(GLIB_COMPILE_RESOURCES, glib-compile-resources)
 
 dnl **************************************************************
 

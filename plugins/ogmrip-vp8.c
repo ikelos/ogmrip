@@ -1,5 +1,5 @@
 /* OGMRipVp8 - A VP8 plugin for OGMRip
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -103,7 +103,7 @@ ogmrip_vp8_command (OGMRipVideoCodec *video, const gchar *fifo, guint pass, guin
   guint width, height, num, denom;
   gint bitrate, threads;
 
-  argv = g_ptr_array_new ();
+  argv = g_ptr_array_new_full (20, g_free);
 
   g_ptr_array_add (argv, g_strdup ("vpxenc"));
 

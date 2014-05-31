@@ -1,5 +1,5 @@
 /* OGMRip - A library for media ripping and encoding
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -35,16 +35,6 @@ enum
   PROP_0,
   PROP_CODEC
 };
-
-static void ogmrip_stub_dispose      (GObject      *gobject);
-static void ogmrip_stub_get_property (GObject      *gobject,
-                                      guint        property_id,
-                                      GValue       *value,
-                                      GParamSpec   *pspec);
-static void ogmrip_stub_set_property (GObject      *gobject,
-                                      guint        property_id,
-                                      const GValue *value,
-                                      GParamSpec   *pspec);
 
 static gint64
 ogmrip_codec_get_size (OGMRipCodec *codec)
@@ -115,6 +105,12 @@ ogmrip_stub_get_title_size (OGMRipTitle *title)
   return ogmrip_codec_get_size (stub->priv->codec);
 }
 
+static OGMRipMedia *
+ogmrip_stub_get_media (OGMRipTitle *title)
+{
+  return OGMRIP_MEDIA (title);
+}
+
 static void
 ogmrip_title_iface_init (OGMRipTitleInterface *iface)
 {
@@ -122,6 +118,7 @@ ogmrip_title_iface_init (OGMRipTitleInterface *iface)
   iface->get_length = ogmrip_stub_get_length;
   iface->get_n_chapters = ogmrip_stub_get_n_chapters;
   iface->get_size = ogmrip_stub_get_title_size;
+  iface->get_media = ogmrip_stub_get_media;
 }
 
 static gint
@@ -130,39 +127,24 @@ ogmrip_stub_get_format (OGMRipStream *stream)
   return OGMRIP_STUB (stream)->priv->format;
 }
 
+static OGMRipTitle *
+ogmrip_stub_get_title (OGMRipStream *stream)
+{
+  return OGMRIP_TITLE (stream);
+}
+
 static void
 ogmrip_stream_iface_init (OGMRipStreamInterface *iface)
 {
   iface->get_format = ogmrip_stub_get_format;
-}
-
-static void
-ogmrip_stub_init (OGMRipStub *stub)
-{
-  stub->priv = G_TYPE_INSTANCE_GET_PRIVATE (stub, OGMRIP_TYPE_STUB, OGMRipStubPriv);
-}
-
-static void
-ogmrip_stub_class_init (OGMRipStubClass *klass)
-{
-  GObjectClass *gobject_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->dispose = ogmrip_stub_dispose;
-  gobject_class->get_property = ogmrip_stub_get_property;
-  gobject_class->set_property = ogmrip_stub_set_property;
-
-  g_object_class_install_property (gobject_class, PROP_CODEC,
-      g_param_spec_object ("codec", "Codec property", "Set codec",
-        OGMRIP_TYPE_CODEC, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
-
-  g_type_class_add_private (klass, sizeof (OGMRipStubPriv));
+  iface->get_title  = ogmrip_stub_get_title;
 }
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipStub, ogmrip_stub, OGMRIP_TYPE_FILE,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_MEDIA, ogmrip_media_iface_init)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_TITLE, ogmrip_title_iface_init)
-    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_STREAM, ogmrip_stream_iface_init));
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_STREAM, ogmrip_stream_iface_init)
+    G_ADD_PRIVATE (OGMRipStub));
 
 static void
 ogmrip_stub_dispose (GObject *gobject)
@@ -171,7 +153,7 @@ ogmrip_stub_dispose (GObject *gobject)
 
   if (stub->priv->codec)
   {
-    g_object_unref (stub->priv->codec);
+    g_object_remove_weak_pointer (G_OBJECT (stub->priv->codec), (gpointer *) &stub->priv->codec);
     stub->priv->codec = NULL;
   }
 
@@ -202,12 +184,34 @@ ogmrip_stub_set_property (GObject *gobject, guint property_id, const GValue *val
   switch (property_id)
   {
     case PROP_CODEC:
-      stub->priv->codec = g_value_dup_object (value);
+      stub->priv->codec = g_value_get_object (value);
+      g_object_add_weak_pointer (G_OBJECT (stub->priv->codec), (gpointer *) &stub->priv->codec);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
   }
+}
+
+static void
+ogmrip_stub_class_init (OGMRipStubClass *klass)
+{
+  GObjectClass *gobject_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->dispose = ogmrip_stub_dispose;
+  gobject_class->get_property = ogmrip_stub_get_property;
+  gobject_class->set_property = ogmrip_stub_set_property;
+
+  g_object_class_install_property (gobject_class, PROP_CODEC,
+      g_param_spec_object ("codec", "Codec property", "Set codec",
+        OGMRIP_TYPE_CODEC, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+}
+
+static void
+ogmrip_stub_init (OGMRipStub *stub)
+{
+  stub->priv = ogmrip_stub_get_instance_private (stub);
 }
 
 /*

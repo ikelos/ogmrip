@@ -1,5 +1,5 @@
 /* OGMRip - A library for media ripping and encoding
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -41,14 +41,14 @@ GQuark ogmrip_codec_error_quark (void);
 #define OGMRIP_CODEC_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), OGMRIP_TYPE_CODEC, OGMRipCodecClass))
 
 typedef struct _OGMRipCodec      OGMRipCodec;
-typedef struct _OGMRipCodecPriv  OGMRipCodecPriv;
+typedef struct _OGMRipCodecPriv  OGMRipCodecPrivate;
 typedef struct _OGMRipCodecClass OGMRipCodecClass;
 
 struct _OGMRipCodec
 {
   OGMJobBin parent_instance;
 
-  OGMRipCodecPriv *priv;
+  OGMRipCodecPrivate *priv;
 };
 
 struct _OGMRipCodecClass

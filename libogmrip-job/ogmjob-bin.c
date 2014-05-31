@@ -1,5 +1,5 @@
 /* OGMJob - A library to spawn processes
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -105,7 +105,7 @@ ogmjob_bin_forall (OGMJobContainer *container, OGMJobCallback callback, gpointer
   OGMJobBin *bin;
 
   bin = OGMJOB_BIN (container);
-  if (callback && bin->priv->child)
+  if (bin->priv->child)
     (* callback) (bin->priv->child, data);
 }
 

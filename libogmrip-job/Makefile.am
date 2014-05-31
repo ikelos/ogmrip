@@ -27,11 +27,11 @@ libogmrip_job_la_LDFLAGS = \
 libogmrip_job_la_LIBADD = \
   $(top_builddir)/libogmrip-base/libogmrip-base.la
 
-INCLUDES = \
+libogmrip_job_la_CPPFLAGS = \
   -I$(top_srcdir)/libogmrip-base
 
 if MAINTAINER_MODE
-INCLUDES += \
+libogmrip_job_la_CPPFLAGS += \
   -DG_ENABLE_DEBUG
 endif
 

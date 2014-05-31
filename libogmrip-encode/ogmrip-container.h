@@ -1,5 +1,5 @@
 /* OGMRip - A library for media ripping and encoding
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -33,14 +33,14 @@ G_BEGIN_DECLS
 #define OGMRIP_CONTAINER_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), OGMRIP_TYPE_CONTAINER, OGMRipContainerClass))
 
 typedef struct _OGMRipContainer      OGMRipContainer;
-typedef struct _OGMRipContainerPriv  OGMRipContainerPriv;
+typedef struct _OGMRipContainerPriv  OGMRipContainerPrivate;
 typedef struct _OGMRipContainerClass OGMRipContainerClass;
 
 struct _OGMRipContainer
 {
   OGMJobBin parent_instance;
 
-  OGMRipContainerPriv *priv;
+  OGMRipContainerPrivate *priv;
 };
 
 struct _OGMRipContainerClass
@@ -56,6 +56,7 @@ typedef void (* OGMRipContainerFunc) (OGMRipContainer  *container,
                                       gpointer         data);
 
 GType             ogmrip_container_get_type         (void);
+GType             ogmrip_container_get_default      (void);
 OGMRipContainer * ogmrip_container_new              (GType               type);
 OGMRipContainer * ogmrip_container_new_from_profile (OGMRipProfile       *profile);
 GFile *           ogmrip_container_get_output       (OGMRipContainer     *container);

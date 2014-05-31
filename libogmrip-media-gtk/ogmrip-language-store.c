@@ -1,5 +1,5 @@
 /* OGMRipMedia - A media library for OGMRip
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -74,10 +74,13 @@ ogmrip_language_store_init (OGMRipLanguageStore *store)
   {
     lang = ogmdvd_languages[i][OGMRIP_LANGUAGE_ISO639_1];
 
-    gtk_list_store_append (GTK_LIST_STORE (store), &iter);
-    gtk_list_store_set (GTK_LIST_STORE (store), &iter,
-        OGMRIP_LANGUAGE_STORE_NAME_COLUMN, ogmdvd_languages[i][OGMRIP_LANGUAGE_NAME],
-        OGMRIP_LANGUAGE_STORE_CODE_COLUMN, (lang[0] << 8) | lang[1], -1);
+    if (!g_str_equal (lang, ogmdvd_languages[i - 1][OGMRIP_LANGUAGE_ISO639_1]))
+    {
+      gtk_list_store_append (GTK_LIST_STORE (store), &iter);
+      gtk_list_store_set (GTK_LIST_STORE (store), &iter,
+          OGMRIP_LANGUAGE_STORE_NAME_COLUMN, ogmdvd_languages[i][OGMRIP_LANGUAGE_NAME],
+          OGMRIP_LANGUAGE_STORE_CODE_COLUMN, (lang[0] << 8) | lang[1], -1);
+    }
   }
 }
 

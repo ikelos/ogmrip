@@ -1,5 +1,5 @@
 /* OGMRip - A library for media ripping and encoding
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,14 +31,14 @@ G_BEGIN_DECLS
 #define OGMRIP_CHAPTERS_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), OGMRIP_TYPE_CHAPTERS, OGMRipChaptersClass))
 
 typedef struct _OGMRipChapters      OGMRipChapters;
-typedef struct _OGMRipChaptersPriv  OGMRipChaptersPriv;
+typedef struct _OGMRipChaptersPriv  OGMRipChaptersPrivate;
 typedef struct _OGMRipChaptersClass OGMRipChaptersClass;
 
 struct _OGMRipChapters
 {
   OGMRipCodec parent_instance;
 
-  OGMRipChaptersPriv *priv;
+  OGMRipChaptersPrivate *priv;
 };
 
 struct _OGMRipChaptersClass

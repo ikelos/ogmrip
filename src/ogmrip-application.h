@@ -1,5 +1,5 @@
-/* OGMRip - A DVD Encoder for GNOME
- * Copyright (C) 2004-2012 Olivier Rolland <billl@users.sourceforge.net>
+/* OGMRip - A media encoder for GNOME
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,11 +35,16 @@ struct _OGMRipApplicationInterface
 {
   GTypeInterface base_iface;
 
-  void (* prepare) (GApplication *app);
+  /* signals */
+  void (* prepare) (OGMRipApplication *app);
+
+  /* funcs */
+  gboolean (* get_is_prepared) (OGMRipApplication *app);
 };
 
-GType ogmrip_application_get_type (void);
-void  ogmrip_application_prepare  (OGMRipApplication *app);
+GType    ogmrip_application_get_type        (void);
+void     ogmrip_application_prepare         (OGMRipApplication *app);
+gboolean ogmrip_application_get_is_prepared (OGMRipApplication *app);
 
 G_END_DECLS
 

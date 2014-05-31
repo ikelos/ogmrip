@@ -1,5 +1,5 @@
 /* OGMJob - A library to spawn processes
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -51,6 +51,16 @@ ogmjob_task_set_state (OGMJobTask *task, OGMJobState state)
 }
 
 G_DEFINE_ABSTRACT_TYPE (OGMJobTask, ogmjob_task, G_TYPE_OBJECT)
+
+static void
+ogmjob_task_finalize (GObject *gobject)
+{
+#ifdef G_ENABLE_DEBUG
+  g_debug ("Finalizing %s", G_OBJECT_TYPE_NAME (gobject));
+#endif
+
+  G_OBJECT_CLASS (ogmjob_task_parent_class)->finalize (gobject);
+}
 
 static void
 ogmjob_task_get_property (GObject *gobject, guint prop_id, GValue *value, GParamSpec *pspec)
@@ -123,6 +133,7 @@ ogmjob_task_class_init (OGMJobTaskClass *klass)
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->get_property = ogmjob_task_get_property;
   gobject_class->set_property = ogmjob_task_set_property;
+  gobject_class->finalize = ogmjob_task_finalize;
 
   klass->run_async = ogmjob_task_real_run_async;
   klass->run_finish = ogmjob_task_real_run_finish;

@@ -25,7 +25,7 @@ libogmrip_base_la_LDFLAGS = \
   -version-info $(OGMRIP_BASE_LT_VERSION)
 
 if MAINTAINER_MODE
-INCLUDES = \
+libogmrip_base_la_CPPFLAGS = \
   -DG_ENABLE_DEBUG
 endif
 

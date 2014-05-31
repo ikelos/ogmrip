@@ -26,14 +26,11 @@ libogmrip_file_gtk_la_LIBADD = \
   $(top_builddir)/libogmrip-media/libogmrip-media.la \
   $(top_builddir)/libogmrip-media-gtk/libogmrip-media-gtk.la
 
-INCLUDES = \
+libogmrip_file_gtk_la_CPPFLAGS = \
   -I$(top_srcdir)/libogmrip-base      \
   -I$(top_srcdir)/libogmrip-media     \
   -I$(top_srcdir)/libogmrip-media-gtk \
   -I$(top_srcdir)/libogmrip-file      \
   -DOGMRIP_LIB_DIR=\""$(libdir)"\"    \
   -DOGMRIP_DATA_DIR=\""$(datadir)"\"
-
-CLEANFILES = \
-  $(BUILT_SOURCES)
 

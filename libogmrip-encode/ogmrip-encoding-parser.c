@@ -1,5 +1,5 @@
 /* OGMRip - A library for media ripping and encoding
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -32,7 +32,7 @@ ogmrip_encoding_parse_property (OGMRipXML *xml, gpointer gobject, gpointer klass
   property = ogmrip_xml_get_string (xml, "name");
   if (property)
   {
-    if (g_str_equal (property, "profile"))
+    if (g_str_equal (property, "profile") && OGMRIP_IS_ENCODING (gobject))
     {
       OGMRipProfileEngine *engine;
       OGMRipProfile *profile;
@@ -47,7 +47,7 @@ ogmrip_encoding_parse_property (OGMRipXML *xml, gpointer gobject, gpointer klass
       if (profile)
         ogmrip_encoding_set_profile (gobject, profile);
     }
-    else if (g_str_equal (property, "log-file"))
+    else if (g_str_equal (property, "log-file") && OGMRIP_IS_ENCODING (gobject))
     {
       gchar *utf8, *filename;
 
@@ -57,6 +57,29 @@ ogmrip_encoding_parse_property (OGMRipXML *xml, gpointer gobject, gpointer klass
 
       ogmrip_encoding_set_log_file (gobject, filename);
       g_free (filename);
+    }
+    else if (g_str_equal (property, "output") && OGMRIP_IS_CONTAINER (gobject))
+    {
+      GFile *file;
+      gchar *filename;
+
+      filename = ogmrip_xml_get_string (xml, NULL);
+      file = g_file_parse_name (filename);
+      g_free (filename);
+
+      ogmrip_container_set_output (gobject, file);
+      g_object_unref (file);
+    }
+    else if (g_str_equal (property, "hardsub") && OGMRIP_IS_VIDEO_CODEC (gobject))
+    {
+      OGMRipTitle *title;
+      OGMRipSubpStream *subp;
+
+      title = ogmrip_stream_get_title (ogmrip_codec_get_input (gobject));
+
+      subp = ogmrip_title_get_subp_stream (title, ogmrip_xml_get_uint (xml, NULL));
+      if (subp)
+        ogmrip_video_codec_set_hard_subp (gobject, subp, ogmrip_xml_get_boolean (xml, "forced"));
     }
     else
     {
@@ -471,6 +494,7 @@ static void
 ogmrip_encoding_dump_container (OGMRipXML *xml, OGMRipContainer *container)
 {
   OGMRipContainerClass *klass;
+  GFile *file;
 
   if (!container)
     return;
@@ -479,6 +503,21 @@ ogmrip_encoding_dump_container (OGMRipXML *xml, OGMRipContainer *container)
 
   ogmrip_xml_set_string (xml, "type",
       ogmrip_type_name (G_OBJECT_TYPE (container)));
+
+  file = ogmrip_container_get_output (container);
+  if (file)
+  {
+    gchar *filename;
+
+    ogmrip_xml_append (xml, "property");
+    ogmrip_xml_set_string (xml, "name", "output");
+
+    filename = g_file_get_parse_name (file);
+    ogmrip_xml_set_string (xml, NULL, filename);
+    g_free (filename);
+
+    ogmrip_xml_parent (xml);
+  }
 
   klass = OGMRIP_CONTAINER_GET_CLASS (container);
 
@@ -495,6 +534,8 @@ static void
 ogmrip_encoding_dump_video_codec (OGMRipXML *xml, OGMRipCodec *codec)
 {
   OGMRipVideoCodecClass *klass;
+  OGMRipSubpStream *subp;
+  gboolean forced;
 
   if (!codec)
     return;
@@ -503,6 +544,20 @@ ogmrip_encoding_dump_video_codec (OGMRipXML *xml, OGMRipCodec *codec)
 
   ogmrip_xml_set_string (xml, "type",
       ogmrip_type_name (G_OBJECT_TYPE (codec)));
+
+  subp = ogmrip_video_codec_get_hard_subp (OGMRIP_VIDEO_CODEC (codec), &forced);
+  if (subp)
+  {
+    ogmrip_xml_append (xml, "property");
+
+    ogmrip_xml_set_string (xml, "name", "hardsub");
+    ogmrip_xml_set_boolean (xml, "forced", forced);
+
+    ogmrip_xml_set_uint (xml, NULL,
+        ogmrip_stream_get_id (OGMRIP_STREAM (subp)));
+
+    ogmrip_xml_parent (xml);
+  }
 
   klass = OGMRIP_VIDEO_CODEC_GET_CLASS (codec);
 
@@ -708,9 +763,14 @@ ogmrip_encoding_dump (OGMRipEncoding *encoding, OGMRipXML *xml, GError **error)
   log = ogmrip_encoding_get_log_file (encoding);
   if (log)
   {
+    ogmrip_xml_append (xml, "property");
+    ogmrip_xml_set_string (xml, "name", "log-file");
+
     utf8 = g_filename_to_utf8 (log, -1, NULL, NULL, NULL);
-    ogmrip_xml_set_string (xml, "log-file", utf8);
+    ogmrip_xml_set_string (xml, NULL, utf8);
     g_free (utf8);
+
+    ogmrip_xml_parent (xml);
   }
 
   ogmrip_encoding_dump_property (xml, encoding, klass, "autocrop");

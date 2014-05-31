@@ -1,5 +1,5 @@
 /* OGMRipDvd - A DVD library for OGMRip
- * Copyright (C) 2004-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -99,7 +99,7 @@ ogmdvd_disc_copy_command (OGMDvdDisc *disc, OGMDvdTitle *title, const gchar *pat
 {
   GPtrArray *argv;
 
-  argv = g_ptr_array_new ();
+  argv = g_ptr_array_new_full (10, g_free);
   g_ptr_array_add (argv, g_strdup ("dvdcpy"));
   g_ptr_array_add (argv, g_strdup ("-s"));
   g_ptr_array_add (argv, g_strdup ("skip"));

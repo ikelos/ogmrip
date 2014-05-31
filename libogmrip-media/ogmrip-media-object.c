@@ -1,5 +1,5 @@
 /* OGMRipMedia - A media library for OGMRip
- * Copyright (C) 2010-2013 Olivier Rolland <billl@users.sourceforge.net>
+ * Copyright (C) 2010-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,6 +19,10 @@
 #include "ogmrip-media-object.h"
 
 #include <ogmrip-base.h>
+
+#include <glib/gi18n.h>
+
+static const gchar *untitled = N_("Untitled");
 
 G_DEFINE_INTERFACE (OGMRipMedia, ogmrip_media, G_TYPE_OBJECT)
 
@@ -94,15 +98,18 @@ const gchar *
 ogmrip_media_get_label (OGMRipMedia *media)
 {
   OGMRipMediaInterface *iface;
+  const gchar *label;
 
   g_return_val_if_fail (OGMRIP_IS_MEDIA (media), NULL);
 
   iface = OGMRIP_MEDIA_GET_IFACE (media);
 
   if (!iface->get_label)
-    return NULL;
+    return untitled;
 
-  return iface->get_label (media);
+  label = iface->get_label (media);
+
+  return label ? label : untitled;
 }
 
 const gchar *
@@ -252,7 +259,10 @@ ogmrip_media_new (const gchar *path)
 
   for (i = 0; types[i] != G_TYPE_NONE; i ++)
   {
-    media = g_object_new (types[i], "uri", path, NULL);
+    if (g_type_is_a (types[i], G_TYPE_INITABLE))
+      media = g_initable_new (types[i], NULL, NULL, "uri", path, NULL);
+    else
+      media = g_object_new (types[i], "uri", path, NULL);
     if (media)
       break;
   }
