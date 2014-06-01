@@ -30,7 +30,7 @@ EXTRA_DIST = \
   ogmrip-bluray-makemkv.h \
   ogmrip-bluray-priv.h
 
-INCLUDES = \
+libogmrip_bluray_la_CPPFLAGS = \
   -I$(top_srcdir)/libogmrip-base  \
   -I$(top_srcdir)/libogmrip-media \
   -I$(top_srcdir)/libogmrip-job
