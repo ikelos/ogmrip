@@ -303,13 +303,13 @@ ogmrip_title_iface_init (OGMRipTitleInterface *iface)
 }
 
 static gint
-ogmrip_file_get_format (OGMRipStream *stream)
+ogmrip_file_get_stream_format (OGMRipStream *stream)
 {
   return OGMRIP_FILE (stream)->priv->format;
 }
 
-OGMRipTitle *
-ogmrip_stream_get_title (OGMRipStream *stream)
+static OGMRipTitle *
+ogmrip_file_get_stream_title (OGMRipStream *stream)
 {
   return OGMRIP_TITLE (stream);
 }
@@ -317,8 +317,8 @@ ogmrip_stream_get_title (OGMRipStream *stream)
 static void
 ogmrip_stream_iface_init (OGMRipStreamInterface *iface)
 {
-  iface->get_format = ogmrip_file_get_format;
-  iface->get_title  = ogmrip_stream_get_title;
+  iface->get_format = ogmrip_file_get_stream_format;
+  iface->get_title  = ogmrip_file_get_stream_title;
 }
 
 const gchar *
