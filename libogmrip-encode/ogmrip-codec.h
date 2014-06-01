@@ -59,6 +59,8 @@ struct _OGMRipCodecClass
 GType          ogmrip_codec_get_type           (void);
 OGMRipStream * ogmrip_codec_get_input          (OGMRipCodec   *codec);
 OGMRipFile *   ogmrip_codec_get_output         (OGMRipCodec   *codec);
+void           ogmrip_codec_set_output         (OGMRipCodec   *codec,
+                                                OGMRipFile    *file);
 gdouble        ogmrip_codec_get_length         (OGMRipCodec   *codec,
                                                 OGMRipTime    *time_);
 void           ogmrip_codec_get_chapters       (OGMRipCodec   *codec,

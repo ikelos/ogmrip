@@ -35,6 +35,7 @@ struct _OGMRipCodecPriv
   OGMRipTitle *title;
   OGMRipStream *input;
   OGMRipFile *output;
+  gboolean internal;
 
   guint start_chap;
   gint end_chap;
@@ -98,6 +99,7 @@ ogmrip_codec_constructed (GObject *gobject)
   uri = g_filename_to_uri (filename, NULL, NULL);
   g_free (filename);
 
+  codec->priv->internal = TRUE;
   codec->priv->output = ogmrip_stub_new (codec, uri);
   g_free (uri);
 
@@ -115,7 +117,7 @@ ogmrip_codec_dispose (GObject *gobject)
     codec->priv->input = NULL;
   }
 
-  if (codec->priv->output)
+  if (codec->priv->output && codec->priv->internal)
   {
     ogmrip_file_delete (codec->priv->output, NULL);
     g_object_unref (codec->priv->output);
@@ -150,6 +152,9 @@ ogmrip_codec_set_property (GObject *gobject, guint property_id, const GValue *va
   {
     case PROP_INPUT:
       ogmrip_codec_set_input (codec, g_value_get_object (value));
+      break;
+    case PROP_OUTPUT:
+      ogmrip_codec_set_output (codec, g_value_get_object (value));
       break;
     case PROP_START_CHAPTER: 
       ogmrip_codec_set_chapters (codec, g_value_get_int (value), codec->priv->end_chap);
@@ -252,7 +257,7 @@ ogmrip_codec_class_init (OGMRipCodecClass *klass)
 
   g_object_class_install_property (gobject_class, PROP_OUTPUT, 
         g_param_spec_object ("output", "Output property", "Set output file", 
-           OGMRIP_TYPE_FILE, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+           OGMRIP_TYPE_FILE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_START_CHAPTER, 
         g_param_spec_int ("start-chapter", "Start chapter property", "Set start chapter", 
@@ -294,6 +299,23 @@ ogmrip_codec_get_output (OGMRipCodec *codec)
   g_return_val_if_fail (OGMRIP_IS_CODEC (codec), NULL);
 
   return codec->priv->output;
+}
+
+void
+ogmrip_codec_set_output (OGMRipCodec *codec, OGMRipFile *file)
+{
+  g_return_if_fail (OGMRIP_IS_CODEC (codec));
+  g_return_if_fail (OGMRIP_IS_FILE (file));
+
+  if (codec->priv->output != file)
+  {
+    if (codec->priv->output)
+      g_object_unref (codec->priv->output);
+    codec->priv->output = g_object_ref (file);
+    codec->priv->internal = FALSE;
+
+    g_object_notify (G_OBJECT (codec), "output");
+  }
 }
 
 /**
