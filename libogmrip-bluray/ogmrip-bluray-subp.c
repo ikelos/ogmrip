@@ -77,19 +77,10 @@ ogmbr_subp_stream_get_language (OGMRipSubpStream *subp)
   return OGMBR_SUBP_STREAM (subp)->priv->language;
 }
 
-static gint
-ogmbr_subp_stream_get_nr (OGMRipSubpStream *subp)
-{
-  OGMRipTitle *title = OGMBR_SUBP_STREAM (subp)->priv->title;
-
-  return g_list_index (OGMBR_TITLE (title)->priv->subp_streams, subp);
-}
-
 static void
 ogmbr_subp_stream_iface_init (OGMRipSubpStreamInterface *iface)
 {
   iface->get_content  = ogmbr_subp_stream_get_content;
   iface->get_language = ogmbr_subp_stream_get_language;
-  iface->get_nr = ogmbr_subp_stream_get_nr;
 }
 

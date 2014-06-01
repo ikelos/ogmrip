@@ -214,14 +214,6 @@ ogmbr_title_get_size (OGMRipTitle *title)
   return OGMBR_TITLE (title)->priv->size;
 }
 
-static gint
-ogmbr_title_get_nr (OGMRipTitle *title)
-{
-  OGMRipMedia *media = OGMBR_TITLE (title)->priv->media;
-
-  return g_list_index (OGMBR_DISC (media)->priv->titles, title);
-}
-
 static gdouble
 ogmbr_title_get_length (OGMRipTitle *title, OGMRipTime *length)
 {
@@ -251,22 +243,10 @@ ogmbr_title_get_n_audio_streams (OGMRipTitle *title)
   return OGMBR_TITLE (title)->priv->naudio_streams;
 }
 
-static OGMRipAudioStream *
-ogmbr_title_get_nth_audio_stream (OGMRipTitle *title, guint nr)
-{
-  return g_list_nth_data (OGMBR_TITLE (title)->priv->audio_streams, nr);
-}
-
 static gint
 ogmbr_title_get_n_subp_streams (OGMRipTitle *title)
 {
   return OGMBR_TITLE (title)->priv->nsubp_streams;
-}
-
-static OGMRipSubpStream *
-ogmbr_title_get_nth_subp_stream (OGMRipTitle *title, guint nr)
-{
-  return g_list_nth_data (OGMBR_TITLE (title)->priv->subp_streams, nr);
 }
 
 static gboolean
@@ -334,26 +314,18 @@ ogmbr_title_analyze (OGMRipTitle *title, GCancellable *cancellable, OGMRipTitleC
 static void
 ogmbr_title_iface_init (OGMRipTitleInterface *iface)
 {
-  iface->open                 = ogmbr_title_open;
-  iface->is_open              = ogmbr_title_is_open;
-  iface->get_media            = ogmbr_title_get_media;
-  iface->get_size             = ogmbr_title_get_size;
-  iface->get_nr               = ogmbr_title_get_nr;
-  iface->get_length           = ogmbr_title_get_length;
-/*
-  iface->get_chapters_length  = ogmbr_title_get_chapters_length;
-  iface->get_palette          = ogmbr_title_get_palette;
-  iface->get_n_angles         = ogmbr_title_get_n_angles;
-*/
-  iface->get_n_chapters       = ogmbr_title_get_n_chapters;
-  iface->get_video_stream     = ogmbr_title_get_video_stream;
-  iface->get_n_audio_streams  = ogmbr_title_get_n_audio_streams;
-  iface->get_nth_audio_stream = ogmbr_title_get_nth_audio_stream;
-  iface->get_n_subp_streams   = ogmbr_title_get_n_subp_streams;
-  iface->get_nth_subp_stream  = ogmbr_title_get_nth_subp_stream;
-  iface->get_progressive      = ogmbr_title_get_progressive;
-  iface->get_telecine         = ogmbr_title_get_telecine;
-  iface->get_interlaced       = ogmbr_title_get_interlaced;
-  iface->analyze              = ogmbr_title_analyze;
+  iface->open                = ogmbr_title_open;
+  iface->is_open             = ogmbr_title_is_open;
+  iface->get_media           = ogmbr_title_get_media;
+  iface->get_size            = ogmbr_title_get_size;
+  iface->get_length          = ogmbr_title_get_length;
+  iface->get_n_chapters      = ogmbr_title_get_n_chapters;
+  iface->get_video_stream    = ogmbr_title_get_video_stream;
+  iface->get_n_audio_streams = ogmbr_title_get_n_audio_streams;
+  iface->get_n_subp_streams  = ogmbr_title_get_n_subp_streams;
+  iface->get_progressive     = ogmbr_title_get_progressive;
+  iface->get_telecine        = ogmbr_title_get_telecine;
+  iface->get_interlaced      = ogmbr_title_get_interlaced;
+  iface->analyze             = ogmbr_title_analyze;
 }
 

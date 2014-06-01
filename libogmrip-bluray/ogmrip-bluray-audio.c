@@ -106,14 +106,6 @@ ogmbr_audio_stream_get_language (OGMRipAudioStream *audio)
 }
 
 static gint
-ogmbr_audio_stream_get_nr (OGMRipAudioStream *audio)
-{
-  OGMRipTitle *title = OGMBR_AUDIO_STREAM (audio)->priv->title;
-
-  return g_list_index (OGMBR_TITLE (title)->priv->audio_streams, audio);
-}
-
-static gint
 ogmbr_audio_sterma_get_sample_rate (OGMRipAudioStream *audio)
 {
   return OGMBR_AUDIO_STREAM (audio)->priv->samplerate;
@@ -126,7 +118,6 @@ ogmbr_audio_stream_iface_init (OGMRipAudioStreamInterface *iface)
   iface->get_channels    = ogmbr_audio_stream_get_channels;
   iface->get_content     = ogmbr_audio_stream_get_content;
   iface->get_language    = ogmbr_audio_stream_get_language;
-  iface->get_nr          = ogmbr_audio_stream_get_nr;
   iface->get_sample_rate = ogmbr_audio_sterma_get_sample_rate;
 }
 

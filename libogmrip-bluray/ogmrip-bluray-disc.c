@@ -317,12 +317,6 @@ ogmbr_disc_get_n_titles (OGMRipMedia *media)
   return OGMBR_DISC (media)->priv->ntitles;
 }
 
-static OGMRipTitle *
-ogmbr_disc_get_nth_title (OGMRipMedia *media, guint nr)
-{
-  return g_list_nth_data (OGMBR_DISC (media)->priv->titles, nr);
-}
-
 static gboolean
 ogmbr_disc_copy_exists (OGMBrDisc *disc, const gchar *path)
 {
@@ -401,15 +395,14 @@ ogmbr_disc_copy (OGMRipMedia *media, const gchar *path, GCancellable *cancellabl
 static void
 ogmbr_media_iface_init (OGMRipMediaInterface *iface)
 {
-  iface->open          = ogmbr_disc_open;
-  iface->is_open       = ogmbr_disc_is_open;
-  iface->get_label     = ogmbr_disc_get_label;
-  iface->get_id        = ogmbr_disc_get_id;
-  iface->get_uri       = ogmbr_disc_get_uri;
-  iface->get_size      = ogmbr_disc_get_size;
-  iface->get_n_titles  = ogmbr_disc_get_n_titles;
-  iface->get_nth_title = ogmbr_disc_get_nth_title;
-  iface->copy          = ogmbr_disc_copy;
+  iface->open         = ogmbr_disc_open;
+  iface->is_open      = ogmbr_disc_is_open;
+  iface->get_label    = ogmbr_disc_get_label;
+  iface->get_id       = ogmbr_disc_get_id;
+  iface->get_uri      = ogmbr_disc_get_uri;
+  iface->get_size     = ogmbr_disc_get_size;
+  iface->get_n_titles = ogmbr_disc_get_n_titles;
+  iface->copy         = ogmbr_disc_copy;
 }
 
 void
