@@ -1,4 +1,4 @@
-/* OGMRipMplayer - A library around mplayer/mencoder for OGMRip
+/* OGMRipMedia - A media library for OGMRip
  * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -16,13 +16,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#ifndef __OGMRIP_MPLAYER_PLAYER_H__
-#define __OGMRIP_MPLAYER_PLAYER_H__
+#ifndef __OGMRIP_MEDIA_PLAYER_H__
+#define __OGMRIP_MEDIA_PLAYER_H__
 
-#include <glib-object.h>
-
-#include <ogmrip-media.h>
-#include <ogmrip-file.h>
+#include <ogmrip-media-types.h>
 
 G_BEGIN_DECLS
 
@@ -70,5 +67,5 @@ void           ogmrip_player_stop             (OGMRipPlayer      *player);
 
 G_END_DECLS
 
-#endif /* __OGMRIP_MPLAYER_PLAYER_H__ */
+#endif /* __OGMRIP_MEDIA_PLAYER_H__ */
 

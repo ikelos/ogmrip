@@ -25,6 +25,7 @@
 #include <ogmrip-media-enums.h>
 #include <ogmrip-media-labels.h>
 #include <ogmrip-media-object.h>
+#include <ogmrip-media-player.h>
 #include <ogmrip-media-stream.h>
 #include <ogmrip-media-subp.h>
 #include <ogmrip-media-time.h>

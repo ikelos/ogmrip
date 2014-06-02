@@ -29,8 +29,6 @@
 #include "ogmrip-spell-dialog.h"
 #endif /* HAVE_ENCHANT_SUPPORT */
 
-#include <ogmrip-mplayer.h>
-
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 

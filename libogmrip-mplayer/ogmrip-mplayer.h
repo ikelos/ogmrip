@@ -25,7 +25,6 @@ G_BEGIN_DECLS
 
 #include <ogmrip-mplayer-commands.h>
 #include <ogmrip-mplayer-lavc.h>
-#include <ogmrip-mplayer-player.h>
 #include <ogmrip-mplayer-version.h>
 
 G_END_DECLS

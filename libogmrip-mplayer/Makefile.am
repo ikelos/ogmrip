@@ -4,7 +4,6 @@ lib_LTLIBRARIES =   \
 libogmrip_mplayer_la_SOURCES = \
   ogmrip-mplayer-commands.c \
   ogmrip-mplayer-lavc.c     \
-  ogmrip-mplayer-player.c   \
   ogmrip-mplayer-version.c
   
 libogmrip_mplayer_la_LDFLAGS = \
@@ -22,7 +21,6 @@ libogmrip_mplayer_ladir = \
 libogmrip_mplayer_la_HEADERS = \
   ogmrip-mplayer-commands.h \
   ogmrip-mplayer-lavc.h     \
-  ogmrip-mplayer-player.h   \
   ogmrip-mplayer-version.h  \
   ogmrip-mplayer.h
 
