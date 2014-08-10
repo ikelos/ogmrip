@@ -305,9 +305,11 @@ ogmrip_crop_dialog_class_init (OGMRipCropDialogClass *klass)
 static void
 ogmrip_crop_dialog_init (OGMRipCropDialog *dialog)
 {
+  gtk_widget_init_template (GTK_WIDGET (dialog));
+
   dialog->priv = ogmrip_crop_dialog_get_instance_private (dialog);
 
-  gtk_widget_init_template (GTK_WIDGET (dialog));
+  gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_OK);
 
   g_signal_connect_swapped (dialog->priv->left_spin, "value-changed",
       G_CALLBACK (ogmrip_crop_dialog_spin_value_changed), dialog);

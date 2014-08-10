@@ -134,6 +134,8 @@ ogmrip_media_chooser_dialog_init (OGMRipMediaChooserDialog *dialog)
 
   dialog->priv = ogmrip_media_chooser_dialog_get_instance_private (dialog);
 
+  gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_OK);
+
   g_signal_connect_swapped (dialog->priv->media_chooser, "media-changed", 
       G_CALLBACK (ogmrip_media_chooser_dialog_media_changed), dialog);
 
