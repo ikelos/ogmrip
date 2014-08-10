@@ -423,7 +423,7 @@ msgstr "Normal"
 
 #: ../libogmrip-encode-gtk/ogmrip-profile-manager-dialog.ui.h:1
 msgid "Profile Manager"
-msgstr "Gestionnaire de profiles"
+msgstr "Gestionnaire de profils"
 
 #: ../libogmrip-encode-gtk/ogmrip-profile-manager-dialog.ui.h:2
 msgid "Create a new profile"
