@@ -753,6 +753,8 @@ ogmrip_options_dialog_init (OGMRipOptionsDialog *dialog)
 
   dialog->priv = ogmrip_options_dialog_get_instance_private (dialog);
 
+  gtk_dialog_set_default_response (GTK_DIALOG (dialog), OGMRIP_RESPONSE_EXTRACT);
+
   g_object_bind_property_full (dialog->priv->profile_chooser, "active",
       dialog->priv->edit_button, "sensitive", G_BINDING_SYNC_CREATE,
       ogmrip_options_dialog_set_edit_button_sensitivity, NULL, NULL, NULL);

@@ -222,6 +222,7 @@ ogmrip_profile_manager_dialog_rename_activated (GSimpleAction *action, GVariant 
 
     button = gtk_dialog_get_widget_for_response (GTK_DIALOG (dialog->priv->name_dialog), GTK_RESPONSE_OK);
     gtk_button_set_label (GTK_BUTTON (button), _("_Rename"));
+    gtk_button_set_use_underline (GTK_BUTTON (button), TRUE);
 
     profile = ogmrip_profile_store_get_profile (OGMRIP_PROFILE_STORE (model), &iter);
 
@@ -397,6 +398,9 @@ ogmrip_profile_manager_dialog_init (OGMRipProfileManagerDialog *dialog)
   gtk_widget_init_template (GTK_WIDGET (dialog));
 
   dialog->priv = ogmrip_profile_manager_dialog_get_instance_private (dialog);
+
+  gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
+  gtk_dialog_set_default_response (GTK_DIALOG (dialog->priv->name_dialog), GTK_RESPONSE_OK);
 
   dialog->priv->engine = ogmrip_profile_engine_get_default ();
   g_object_ref (dialog->priv->engine);
