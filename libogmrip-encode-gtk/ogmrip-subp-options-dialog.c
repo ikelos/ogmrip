@@ -216,7 +216,7 @@ ogmrip_subp_options_dialog_init (OGMRipSubpOptionsDialog *dialog)
   label = gtk_label_new_with_mnemonic (_("_Name:"));
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
   gtk_grid_attach (GTK_GRID (grid1), label, 0, 1, 1, 1);
-  gtk_widget_set_margin_left (label, 12);
+  gtk_widget_set_margin_start (label, 12);
   gtk_widget_show (label);
 
   dialog->priv->label_entry = gtk_entry_new ();
@@ -229,7 +229,7 @@ ogmrip_subp_options_dialog_init (OGMRipSubpOptionsDialog *dialog)
   label = gtk_label_new_with_mnemonic (_("_Language:"));
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
   gtk_grid_attach (GTK_GRID (grid1), label, 0, 2, 1, 1);
-  gtk_widget_set_margin_left (label, 12);
+  gtk_widget_set_margin_start (label, 12);
   gtk_widget_show (label);
 
   dialog->priv->lang_chooser = ogmrip_language_chooser_widget_new ();
@@ -245,7 +245,7 @@ ogmrip_subp_options_dialog_init (OGMRipSubpOptionsDialog *dialog)
 
   dialog->priv->default_check = gtk_check_button_new_with_mnemonic (_("Use _profile settings"));
   gtk_grid_attach (GTK_GRID (grid1), dialog->priv->default_check, 0, 3, 2, 1);
-  gtk_widget_set_margin_left (dialog->priv->default_check, 12);
+  gtk_widget_set_margin_start (dialog->priv->default_check, 12);
   gtk_widget_show (dialog->priv->default_check);
 
   grid2 = gtk_builder_get_widget (builder, OGMRIP_UI_ROOT);

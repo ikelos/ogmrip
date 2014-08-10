@@ -76,7 +76,7 @@ fi
 
 dnl **************************************************************
 
-GLIB_REQUIRED=2.36.0
+GLIB_REQUIRED=2.40.0
 
 PKG_CHECK_MODULES(GLIB, [glib-2.0 >= $GLIB_REQUIRED gobject-2.0 >= $GLIB_REQUIRED gmodule-2.0 >= $GLIB_REQUIRED gio-2.0 >= $GLIB_REQUIRED])
 CFLAGS="$CFLAGS $GLIB_CFLAGS"
@@ -115,7 +115,7 @@ AM_CONDITIONAL(HAVE_TIFF_SUPPORT, [test x"$have_tiff_support" = x"yes"])
 
 dnl **************************************************************
 
-GTK_REQUIRED=3.6
+GTK_REQUIRED=3.10
 
 AC_ARG_ENABLE(gtk-support,
   AC_HELP_STRING([--disable-gtk-support], [disable GTK+ support]),

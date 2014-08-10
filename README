@@ -24,7 +24,7 @@ OGMRip
 Requirements
 ------------
 
-    glib         >= 2.30.0: http://www.gtk.org
+    glib         >= 2.40.0: http://www.gtk.org
     dvdread      >= 0.9.4:  http://www.dtek.chalmers.se/groups/dvd
     mplayer      >= 0.92:   http://www.mplayerhq.hu
     mencoder     >= 0.92:   http://www.mplayerhq.hu
@@ -39,7 +39,7 @@ Optional
 
     For the GUI:
 
-        GTK+ >= 2.24.0: http://www.gtk.org
+        GTK+ >= 3.10.0: http://www.gtk.org
 
     For notification support:
         

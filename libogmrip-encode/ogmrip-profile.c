@@ -70,14 +70,10 @@ ogmrip_profile_error_quark (void)
 static gboolean
 ogmrip_profile_has_schema (const gchar *schema)
 {
-  const gchar * const *schemas;
+  gchar **schemas;
   guint i;
 
-#if GLIB_CHECK_VERSION(2, 28, 0)
-  schemas = g_settings_list_relocatable_schemas ();
-#else
-  schemas = g_settings_list_schemas ();
-#endif
+  g_settings_schema_source_list_schemas (g_settings_schema_source_get_default (), TRUE, NULL, &schemas);
 
   for (i = 0; schemas[i]; i ++)
     if (g_str_equal (schemas[i], schema))
