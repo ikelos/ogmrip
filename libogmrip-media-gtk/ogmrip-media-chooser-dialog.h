@@ -31,12 +31,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipMediaChooserDialog      OGMRipMediaChooserDialog;
 typedef struct _OGMRipMediaChooserDialogClass OGMRipMediaChooserDialogClass;
-typedef struct _OGMRipMediaChooserDialogPriv  OGMRipMediaChooserDialogPriv;
+typedef struct _OGMRipMediaChooserDialogPriv  OGMRipMediaChooserDialogPrivate;
 
 struct _OGMRipMediaChooserDialog
 {
   GtkDialog parent_instance;
-  OGMRipMediaChooserDialogPriv *priv;
+
+  OGMRipMediaChooserDialogPrivate *priv;
 };
 
 struct _OGMRipMediaChooserDialogClass
