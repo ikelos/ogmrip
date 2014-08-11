@@ -14,8 +14,12 @@
         <attribute name="action">profile.export</attribute>
       </item>
       <item>
-        <attribute name="label" translatable="yes">_Rename</attribute>
+        <attribute name="label" translatable="yes">Re_name</attribute>
         <attribute name="action">profile.rename</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">_Reset</attribute>
+        <attribute name="action">profile.reset</attribute>
       </item>
     </section>
   </menu>

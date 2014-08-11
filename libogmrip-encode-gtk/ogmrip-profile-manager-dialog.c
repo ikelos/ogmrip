@@ -250,6 +250,17 @@ ogmrip_profile_manager_dialog_rename_activated (GSimpleAction *action, GVariant 
 }
 
 static void
+ogmrip_profile_manager_dialog_reset_activated (GSimpleAction *action, GVariant *parameter, gpointer data)
+{
+  OGMRipProfileManagerDialog *dialog = data;
+  GtkTreeModel *model;
+  GtkTreeIter iter;
+
+  if (gtk_tree_selection_get_selected (dialog->priv->selection, &model, &iter))
+    ogmrip_profile_reset (ogmrip_profile_store_get_profile (OGMRIP_PROFILE_STORE (model), &iter));
+}
+
+static void
 ogmrip_profile_manager_dialog_import_activated (GSimpleAction *action, GVariant *parameter, gpointer data)
 {
   OGMRipProfileManagerDialog *parent = data;
@@ -384,7 +395,8 @@ static GActionEntry entries[] =
   { "copy",   ogmrip_profile_manager_dialog_copy_activated,   NULL, NULL, NULL },
   { "import", ogmrip_profile_manager_dialog_import_activated, NULL, NULL, NULL },
   { "export", ogmrip_profile_manager_dialog_export_activated, NULL, NULL, NULL },
-  { "rename", ogmrip_profile_manager_dialog_rename_activated, NULL, NULL, NULL }
+  { "rename", ogmrip_profile_manager_dialog_rename_activated, NULL, NULL, NULL },
+  { "reset",  ogmrip_profile_manager_dialog_reset_activated,  NULL, NULL, NULL }
 };
 
 static void

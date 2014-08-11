@@ -116,12 +116,6 @@ ogmrip_profile_editor_dialog_update_codecs (OGMRipProfileEditorDialog *editor)
 }
 
 static void
-ogmrip_profile_editor_reset_button_clicked (OGMRipProfileEditorDialog *editor)
-{
-  ogmrip_profile_reset (editor->priv->profile);
-}
-
-static void
 ogmrip_profile_editor_container_options_button_clicked (OGMRipProfileEditorDialog *editor)
 {
   GType type;
@@ -524,18 +518,7 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
   if (!dialog->priv->profile)
     g_error ("No profile specified");
 
-  misc = gtk_dialog_get_action_area (GTK_DIALOG (gobject));
-
-  widget = gtk_button_new_with_mnemonic (_("_Reset"));
-  gtk_container_add (GTK_CONTAINER (misc), widget);
-  gtk_widget_show (widget);
-
-  g_signal_connect_swapped (widget, "clicked",
-      G_CALLBACK (ogmrip_profile_editor_reset_button_clicked), dialog);
-
-  gtk_dialog_add_buttons (GTK_DIALOG (dialog),
-      _("_Close"), GTK_RESPONSE_CLOSE,
-      NULL);
+  gtk_dialog_add_button (GTK_DIALOG (dialog), _("_Close"), GTK_RESPONSE_CLOSE);
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
   gtk_container_set_border_width (GTK_CONTAINER (dialog), 6);
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
