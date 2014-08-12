@@ -24,10 +24,6 @@
 
 #include <glib/gi18n.h>
 
-#ifdef HAVE_LIBNOTIFY_SUPPORT
-#include <libnotify/notify.h>
-#endif /* HAVE_LIBNOTIFY_SUPPORT */
-
 #define OGMRIP_ICON_FILE "pixmaps" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip.png"
 #define OGMRIP_UI_RES    "/org/ogmrip/ogmrip-progress-dialog.ui"
 #define OGMRIP_MENU_RES  "/org/ogmrip/ogmrip-progress-menu.ui"
@@ -49,33 +45,9 @@ struct _OGMRipProgressDialogPriv
 
   gulong start_time;
   gulong suspend_time;
-
-#ifdef HAVE_LIBNOTIFY_SUPPORT
-  NotifyNotification *notification;
-#endif /* HAVE_LIBNOTIFY_SUPPORT */
 };
 
 static void ogmrip_progress_dialog_dispose (GObject *gobject);
-
-#ifdef HAVE_LIBNOTIFY_SUPPORT
-static gboolean
-ogmrip_progress_dialog_get_visibility (OGMRipProgressDialog *dialog)
-{
-  GdkWindowState state;
-
-  if (!gtk_widget_get_realized (GTK_WIDGET (dialog)))
-    return FALSE;
-
-  if (dialog->priv->iconified)
-    return FALSE;
-
-  state = gdk_window_get_state (gtk_widget_get_window (GTK_WIDGET (dialog)));
-  if (state & (GDK_WINDOW_STATE_WITHDRAWN | GDK_WINDOW_STATE_ICONIFIED))
-    return FALSE;
-
-  return TRUE;
-}
-#endif
 
 static gboolean
 ogmrip_progress_dialog_state_changed (OGMRipProgressDialog *dialog, GdkEventWindowState *event)
@@ -84,13 +56,7 @@ ogmrip_progress_dialog_state_changed (OGMRipProgressDialog *dialog, GdkEventWind
 
   return FALSE;
 }
-/*
-static void
-ogmrip_progress_dialog_iconify (OGMRipProgressDialog *dialog)
-{
-  gtk_window_iconify (gtk_window_get_transient_for (GTK_WINDOW (dialog)));
-}
-*/
+
 static void
 ogmrip_progress_dialog_suspend_activated (GSimpleAction *action, GVariant *parameter, gpointer data)
 {
@@ -204,20 +170,12 @@ ogmrip_progress_dialog_init (OGMRipProgressDialog *dialog)
   g_object_unref (builder);
 
   dialog->priv->popup_menu = gtk_menu_new_from_model (G_MENU_MODEL (model));
-/*
-  closure = g_cclosure_new_swap (G_CALLBACK (ogmrip_progress_dialog_iconify), dialog, NULL);
-  gtk_accel_group_connect (accel_group, 'w', GDK_CONTROL_MASK, 0, closure);
-  g_closure_unref (closure);
-*/
+
   dialog->priv->status_icon = gtk_status_icon_new_from_file (OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_ICON_FILE);
   gtk_status_icon_set_visible(dialog->priv->status_icon, TRUE);
 
   g_signal_connect_swapped (dialog->priv->status_icon, "popup_menu",
       G_CALLBACK (ogmrip_progress_dialog_status_icon_popup_menu), dialog);
-
-#ifdef HAVE_LIBNOTIFY_SUPPORT
-  dialog->priv->notification = notify_notification_new ("Dummy", "Dummy", NULL);
-#endif /* HAVE_LIBNOTIFY_SUPPORT */
 }
 
 static void
@@ -230,14 +188,6 @@ ogmrip_progress_dialog_dispose (GObject *gobject)
     g_object_unref (dialog->priv->status_icon);
     dialog->priv->status_icon = NULL;
   }
-
-#ifdef HAVE_LIBNOTIFY_SUPPORT
-  if (dialog->priv->notification)
-  {
-    g_object_unref (dialog->priv->notification);
-    dialog->priv->notification = NULL;
-  }
-#endif /* HAVE_LIBNOTIFY_SUPPORT */
 
   G_OBJECT_CLASS (ogmrip_progress_dialog_parent_class)->dispose (gobject);
 }
@@ -278,11 +228,6 @@ ogmrip_progress_dialog_set_title (OGMRipProgressDialog *dialog, const gchar *tit
     gtk_label_set_markup (GTK_LABEL (dialog->priv->title_label), str);
     g_free (str);
   }
-
-#ifdef HAVE_LIBNOTIFY_SUPPORT
-  notify_notification_update (dialog->priv->notification, title, "Dummy",
-      OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_ICON_FILE);
-#endif /* HAVE_LIBNOTIFY_SUPPORT */
 }
 
 void
@@ -300,14 +245,6 @@ ogmrip_progress_dialog_set_message (OGMRipProgressDialog *dialog, const gchar *m
     gtk_label_set_markup (GTK_LABEL (dialog->priv->message_label), str);
     g_free (str);
   }
-
-#ifdef HAVE_LIBNOTIFY_SUPPORT
-  if (dialog->priv->notification && !ogmrip_progress_dialog_get_visibility (dialog))
-  {
-    g_object_set (dialog->priv->notification, "body", message, NULL);
-    notify_notification_show (dialog->priv->notification, NULL);
-  }
-#endif
 }
 
 void
@@ -349,16 +286,5 @@ ogmrip_progress_dialog_set_fraction (OGMRipProgressDialog *dialog, gdouble fract
     gtk_status_icon_set_tooltip_text (dialog->priv->status_icon, str);
     g_free (str);
   }
-/*
-  parent = gtk_window_get_transient_for (GTK_WINDOW (dialog));
-  if (parent)
-  {
-    gchar *title;
-
-    title = g_strdup_printf ("OGMRip: %s: %.0f%%", dialog->priv->label, CLAMP (fraction, 0.0, 1.0) * 100);
-    gtk_window_set_title (parent, title);
-    g_free (title);
-  }
-*/
 }
 
