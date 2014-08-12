@@ -37,10 +37,6 @@
 
 #include <locale.h>
 
-#ifdef HAVE_LIBNOTIFY_SUPPORT
-#include <libnotify/notify.h>
-#endif /* HAVE_LIBNOTIFY_SUPPORT */
-
 GSettings *settings = NULL;
 
 static void
@@ -196,10 +192,6 @@ ogmrip_gui_startup_cb (GApplication *app)
 
   g_signal_connect (settings, "changed::" OGMRIP_SETTINGS_TMP_DIR,
       G_CALLBACK (ogmrip_tmp_dir_changed_cb), NULL);
-
-#ifdef HAVE_LIBNOTIFY_SUPPORT
-  notify_init (PACKAGE_NAME);
-#endif /* HAVE_LIBNOTIFY_SUPPORT */
 
   task = g_task_new (app, NULL, NULL, NULL);
   g_task_run_in_thread (task, (GTaskThreadFunc) ogmrip_startup_thread);
