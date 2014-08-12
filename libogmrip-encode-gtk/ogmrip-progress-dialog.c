@@ -24,9 +24,7 @@
 
 #include <glib/gi18n.h>
 
-#define OGMRIP_ICON_FILE "pixmaps" G_DIR_SEPARATOR_S "ui" G_DIR_SEPARATOR_S "ogmrip.png"
-#define OGMRIP_UI_RES    "/org/ogmrip/ogmrip-progress-dialog.ui"
-#define OGMRIP_MENU_RES  "/org/ogmrip/ogmrip-progress-menu.ui"
+#define OGMRIP_UI_RES "/org/ogmrip/ogmrip-progress-dialog.ui"
 
 struct _OGMRipProgressDialogPriv
 {
@@ -38,64 +36,31 @@ struct _OGMRipProgressDialogPriv
   GtkWidget *resume_button;
   GtkWidget *suspend_button;
 
-  GtkWidget *popup_menu;
-  GtkStatusIcon *status_icon;
-
-  gboolean iconified;
-
   gulong start_time;
   gulong suspend_time;
 };
 
-static void ogmrip_progress_dialog_dispose (GObject *gobject);
-
-static gboolean
-ogmrip_progress_dialog_state_changed (OGMRipProgressDialog *dialog, GdkEventWindowState *event)
-{
-  dialog->priv->iconified = ((event->new_window_state & GDK_WINDOW_STATE_ICONIFIED) != 0);
-
-  return FALSE;
-}
-
 static void
-ogmrip_progress_dialog_suspend_activated (GSimpleAction *action, GVariant *parameter, gpointer data)
+ogmrip_progress_dialog_response (GtkDialog *dialog, gint response_id)
 {
-  OGMRipProgressDialog *dialog = data;
+  OGMRipProgressDialog *progress = OGMRIP_PROGRESS_DIALOG (dialog);
   GTimeVal tv;
 
   g_get_current_time (&tv);
-  dialog->priv->suspend_time = tv.tv_sec;
 
-  gtk_widget_hide (dialog->priv->suspend_button);
-
-  gtk_dialog_response (GTK_DIALOG (dialog), OGMRIP_RESPONSE_SUSPEND);
-}
-
-static void
-ogmrip_progress_dialog_resume_activated (GSimpleAction *action, GVariant *parameter, gpointer data)
-{
-  OGMRipProgressDialog *dialog = data;
-  GTimeVal tv;
-
-  g_get_current_time (&tv);
-  dialog->priv->start_time += tv.tv_sec - dialog->priv->suspend_time;
-
-  gtk_widget_show (dialog->priv->suspend_button);
-
-  gtk_dialog_response (GTK_DIALOG (dialog), OGMRIP_RESPONSE_RESUME);
-}
-
-static void
-ogmrip_progress_dialog_cancel_activated (GSimpleAction *action, GVariant *parameter, gpointer data)
-{
-  gtk_dialog_response (GTK_DIALOG (data), GTK_RESPONSE_CANCEL);
-}
-
-static void
-ogmrip_progress_dialog_status_icon_popup_menu (OGMRipProgressDialog *dialog, guint button, guint activate_time)
-{
-  gtk_menu_popup (GTK_MENU (dialog->priv->popup_menu), NULL, NULL, gtk_status_icon_position_menu,
-      dialog->priv->status_icon, button, activate_time);
+  switch (response_id)
+  {
+    case OGMRIP_RESPONSE_SUSPEND:
+      progress->priv->suspend_time = tv.tv_sec;
+      gtk_widget_hide (progress->priv->suspend_button);
+      break;
+    case OGMRIP_RESPONSE_RESUME:
+      progress->priv->start_time += tv.tv_sec - progress->priv->suspend_time;
+      gtk_widget_show (progress->priv->suspend_button);
+      break;
+    default:
+      break;
+  }
 }
 
 G_DEFINE_TYPE_WITH_PRIVATE (OGMRipProgressDialog, ogmrip_progress_dialog, GTK_TYPE_DIALOG)
@@ -103,10 +68,10 @@ G_DEFINE_TYPE_WITH_PRIVATE (OGMRipProgressDialog, ogmrip_progress_dialog, GTK_TY
 static void
 ogmrip_progress_dialog_class_init (OGMRipProgressDialogClass *klass)
 {
-  GObjectClass *gobject_class;
-  
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->dispose = ogmrip_progress_dialog_dispose;
+  GtkDialogClass *dialog_class;
+
+  dialog_class = GTK_DIALOG_CLASS (klass);
+  dialog_class->response = ogmrip_progress_dialog_response;
 
   gtk_widget_class_set_template_from_resource (GTK_WIDGET_CLASS (klass), OGMRIP_UI_RES);
 
@@ -119,77 +84,17 @@ ogmrip_progress_dialog_class_init (OGMRipProgressDialogClass *klass)
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipProgressDialog, resume_button);
 }
 
-static GActionEntry entries[] =
-{
-  { "suspend", ogmrip_progress_dialog_suspend_activated, NULL, NULL, NULL },
-  { "resume",  ogmrip_progress_dialog_resume_activated,  NULL, NULL, NULL },
-  { "cancel",  ogmrip_progress_dialog_cancel_activated,  NULL, NULL, NULL },
-};
-
 static void
 ogmrip_progress_dialog_init (OGMRipProgressDialog *dialog)
 {
-  GtkBuilder *builder;
-  GSimpleActionGroup *group;
-  GAction *action;
-  GObject *model;
-
   gtk_widget_init_template (GTK_WIDGET (dialog));
 
   dialog->priv = ogmrip_progress_dialog_get_instance_private (dialog);
 
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CANCEL);
 
-  g_signal_connect (dialog, "window-state-event",
-      G_CALLBACK (ogmrip_progress_dialog_state_changed), NULL);
-
   g_object_bind_property (dialog->priv->suspend_button, "visible",
       dialog->priv->resume_button, "visible", G_BINDING_SYNC_CREATE | G_BINDING_INVERT_BOOLEAN);
-
-  group = g_simple_action_group_new ();
-  gtk_widget_insert_action_group (GTK_WIDGET (dialog), "progress", G_ACTION_GROUP (group));
-  g_object_unref (group);
-
-  g_action_map_add_action_entries (G_ACTION_MAP (group),
-      entries, G_N_ELEMENTS (entries), dialog);
-
-  action = g_action_map_lookup_action (G_ACTION_MAP (group), "resume");
-  g_object_bind_property (dialog->priv->resume_button, "visible",
-      action, "enabled", G_BINDING_SYNC_CREATE);
-
-  action = g_action_map_lookup_action (G_ACTION_MAP (group), "suspend");
-  g_object_bind_property (dialog->priv->suspend_button, "visible",
-      action, "enabled", G_BINDING_SYNC_CREATE);
-
-  gtk_actionable_set_action_name (GTK_ACTIONABLE (dialog->priv->cancel_button), "progress.cancel");
-  gtk_actionable_set_action_name (GTK_ACTIONABLE (dialog->priv->resume_button), "progress.resume");
-  gtk_actionable_set_action_name (GTK_ACTIONABLE (dialog->priv->suspend_button), "progress.suspend");
-
-  builder = gtk_builder_new_from_resource (OGMRIP_MENU_RES);
-  model = gtk_builder_get_object (builder, "menu");
-  g_object_unref (builder);
-
-  dialog->priv->popup_menu = gtk_menu_new_from_model (G_MENU_MODEL (model));
-
-  dialog->priv->status_icon = gtk_status_icon_new_from_file (OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_ICON_FILE);
-  gtk_status_icon_set_visible(dialog->priv->status_icon, TRUE);
-
-  g_signal_connect_swapped (dialog->priv->status_icon, "popup_menu",
-      G_CALLBACK (ogmrip_progress_dialog_status_icon_popup_menu), dialog);
-}
-
-static void
-ogmrip_progress_dialog_dispose (GObject *gobject)
-{
-  OGMRipProgressDialog *dialog = OGMRIP_PROGRESS_DIALOG (gobject);
-
-  if (dialog->priv->status_icon)
-  {
-    g_object_unref (dialog->priv->status_icon);
-    dialog->priv->status_icon = NULL;
-  }
-
-  G_OBJECT_CLASS (ogmrip_progress_dialog_parent_class)->dispose (gobject);
 }
 
 GtkWidget *
@@ -278,13 +183,5 @@ ogmrip_progress_dialog_set_fraction (OGMRipProgressDialog *dialog, gdouble fract
 
   gtk_label_set_text (GTK_LABEL (dialog->priv->eta_label), str ? str : "");
   g_free (str);
-
-  if (dialog->priv->status_icon)
-  {
-    str = g_strdup_printf (_("%s: %02.0lf%% done"),
-        gtk_label_get_text (GTK_LABEL (dialog->priv->title_label)), fraction * 100);
-    gtk_status_icon_set_tooltip_text (dialog->priv->status_icon, str);
-    g_free (str);
-  }
 }
 
