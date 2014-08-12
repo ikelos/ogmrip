@@ -137,9 +137,9 @@ ogmrip_progress_dialog_init (OGMRipProgressDialog *dialog)
   gtk_widget_init_template (GTK_WIDGET (dialog));
 
   dialog->priv = ogmrip_progress_dialog_get_instance_private (dialog);
-/*
+
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CANCEL);
-*/
+
   g_signal_connect (dialog, "window-state-event",
       G_CALLBACK (ogmrip_progress_dialog_state_changed), NULL);
 
