@@ -25,9 +25,6 @@
 
 #include <glib/gi18n-lib.h>
 
-#define OGMRIP_FILE_CHOOSER_DIALOG_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_FILE_CHOOSER_DIALOG, OGMRipFileChooserDialogPriv))
-
 struct _OGMRipFileChooserDialogPriv
 {
   GtkWidget *lang_chooser;
@@ -35,7 +32,7 @@ struct _OGMRipFileChooserDialogPriv
 
 static void ogmrip_file_chooser_dialog_constructed (GObject *gobject);
 
-G_DEFINE_ABSTRACT_TYPE (OGMRipFileChooserDialog, ogmrip_file_chooser_dialog, GTK_TYPE_FILE_CHOOSER_DIALOG);
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (OGMRipFileChooserDialog, ogmrip_file_chooser_dialog, GTK_TYPE_FILE_CHOOSER_DIALOG);
 
 static void
 ogmrip_file_chooser_dialog_class_init (OGMRipFileChooserDialogClass *klass)
@@ -44,14 +41,12 @@ ogmrip_file_chooser_dialog_class_init (OGMRipFileChooserDialogClass *klass)
 
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->constructed = ogmrip_file_chooser_dialog_constructed;
-
-  g_type_class_add_private (klass, sizeof (OGMRipFileChooserDialogPriv));
 }
 
 static void
 ogmrip_file_chooser_dialog_init (OGMRipFileChooserDialog *dialog)
 {
-  dialog->priv = OGMRIP_FILE_CHOOSER_DIALOG_GET_PRIVATE (dialog);
+  dialog->priv = ogmrip_file_chooser_dialog_get_instance_private (dialog);
 
 }
 
@@ -68,17 +63,16 @@ ogmrip_file_chooser_dialog_constructed (GObject *gobject)
   gtk_file_chooser_set_extra_widget (GTK_FILE_CHOOSER (dialog), alignment);
   gtk_widget_show (alignment);
 
-  hbox = gtk_grid_new ();
-  gtk_grid_set_row_spacing (GTK_GRID (hbox), 6);
+  hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
   gtk_container_add (GTK_CONTAINER (alignment), hbox);
   gtk_widget_show (hbox);
 
   label = gtk_label_new_with_mnemonic (_("_Language:"));
-  gtk_grid_attach (GTK_GRID (hbox), label, 0, 0, 1, 1);
+  gtk_box_pack_start (GTK_BOX (hbox), label, FALSE, FALSE, 0);
   gtk_widget_show (label);
 
   dialog->priv->lang_chooser = ogmrip_language_chooser_widget_new ();
-  gtk_grid_attach (GTK_GRID (hbox), dialog->priv->lang_chooser, 1, 0, 1, 1);
+  gtk_box_pack_start (GTK_BOX (hbox), dialog->priv->lang_chooser, TRUE, TRUE, 0);
   gtk_widget_show (dialog->priv->lang_chooser);
 
   model = gtk_combo_box_get_model (GTK_COMBO_BOX (dialog->priv->lang_chooser));

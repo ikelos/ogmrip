@@ -472,7 +472,7 @@ ogmrip_profile_editor_set_passes_spin_adjustment (GBinding *binding, const GValu
   return TRUE;
 }
 
-G_DEFINE_TYPE (OGMRipProfileEditorDialog, ogmrip_profile_editor_dialog, GTK_TYPE_DIALOG)
+G_DEFINE_TYPE_WITH_PRIVATE (OGMRipProfileEditorDialog, ogmrip_profile_editor_dialog, GTK_TYPE_DIALOG)
 
 static void
 ogmrip_profile_editor_dialog_class_init (OGMRipProfileEditorDialogClass *klass)
@@ -488,15 +488,12 @@ ogmrip_profile_editor_dialog_class_init (OGMRipProfileEditorDialogClass *klass)
   g_object_class_install_property (G_OBJECT_CLASS (klass), PROP_PROFILE,
       g_param_spec_object ("profile", "profile", "profile", OGMRIP_TYPE_PROFILE,
         G_PARAM_STATIC_STRINGS | G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
-
-  g_type_class_add_private (klass, sizeof (OGMRipProfileEditorDialogPriv));
 }
 
 static void
 ogmrip_profile_editor_dialog_init (OGMRipProfileEditorDialog *dialog)
 {
-  dialog->priv = G_TYPE_INSTANCE_GET_PRIVATE (dialog,
-      OGMRIP_TYPE_PROFILE_EDITOR_DIALOG, OGMRipProfileEditorDialogPriv);
+  dialog->priv = ogmrip_profile_editor_dialog_get_instance_private (dialog);
 }
 
 static void

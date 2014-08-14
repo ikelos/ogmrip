@@ -31,13 +31,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipAudioOptionsDialog      OGMRipAudioOptionsDialog;
 typedef struct _OGMRipAudioOptionsDialogClass OGMRipAudioOptionsDialogClass;
-typedef struct _OGMRipAudioOptionsDialogPriv  OGMRipAudioOptionsDialogPriv;
+typedef struct _OGMRipAudioOptionsDialogPriv  OGMRipAudioOptionsDialogPrivate;
 
 struct _OGMRipAudioOptionsDialog
 {
   GtkDialog parent_instance;
 
-  OGMRipAudioOptionsDialogPriv *priv;
+  OGMRipAudioOptionsDialogPrivate *priv;
 };
 
 struct _OGMRipAudioOptionsDialogClass

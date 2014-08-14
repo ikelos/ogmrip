@@ -32,13 +32,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipModule       OGMRipModule;
 typedef struct _OGMRipModuleClass  OGMRipModuleClass;
-typedef struct _OGMRipModulePriv   OGMRipModulePriv;
+typedef struct _OGMRipModulePriv   OGMRipModulePrivate;
 
 struct _OGMRipModule
 {
   GTypeModule parent_instance;
 
-  OGMRipModulePriv *priv;
+  OGMRipModulePrivate *priv;
 };
 
 struct _OGMRipModuleClass

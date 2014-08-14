@@ -29,9 +29,6 @@
 
 #include <unistd.h>
 
-#define OGMRIP_PLAYER_GET_PRIVATE(o) \
-    (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_PLAYER, OGMRipPlayerPriv))
-
 struct _OGMRipPlayerPriv
 {
   OGMRipTitle *title;
@@ -151,7 +148,7 @@ ogmrip_mplayer_play_command (OGMRipPlayer *player)
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
-G_DEFINE_TYPE (OGMRipPlayer, ogmrip_player, G_TYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (OGMRipPlayer, ogmrip_player, G_TYPE_OBJECT)
 
 static void
 ogmrip_player_class_init (OGMRipPlayerClass *klass)
@@ -185,14 +182,12 @@ ogmrip_player_class_init (OGMRipPlayerClass *klass)
       G_STRUCT_OFFSET (OGMRipPlayerClass, stop), NULL, NULL,
       g_cclosure_marshal_VOID__VOID,
       G_TYPE_NONE, 0);
-
-  g_type_class_add_private (klass, sizeof (OGMRipPlayerPriv));
 }
 
 static void
 ogmrip_player_init (OGMRipPlayer *player)
 {
-  player->priv = OGMRIP_PLAYER_GET_PRIVATE (player);
+  player->priv = ogmrip_player_get_instance_private (player);
 
   player->priv->start_chap = 0;
   player->priv->end_chap = -1;

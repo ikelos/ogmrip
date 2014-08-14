@@ -24,7 +24,7 @@
 #include <stdlib.h>
 
 void
-ogmrip_media_info_get_file_info (OGMRipMediaInfo *info, OGMRipFilePriv *file)
+ogmrip_media_info_get_file_info (OGMRipMediaInfo *info, OGMRipFilePrivate *file)
 {
   const gchar *str;
 
@@ -89,7 +89,7 @@ ogmrip_media_info_get_video_format (OGMRipMediaInfo *info, guint track)
 }
 
 void
-ogmrip_media_info_get_video_info (OGMRipMediaInfo *info, guint track, OGMRipVideoFilePriv *video)
+ogmrip_media_info_get_video_info (OGMRipMediaInfo *info, guint track, OGMRipVideoFilePrivate *video)
 {
   const gchar *str;
 
@@ -215,7 +215,7 @@ ogmrip_media_info_get_audio_format (OGMRipMediaInfo *info, guint track)
 }
 
 void
-ogmrip_media_info_get_audio_info (OGMRipMediaInfo *info, guint track, OGMRipAudioFilePriv *audio)
+ogmrip_media_info_get_audio_info (OGMRipMediaInfo *info, guint track, OGMRipAudioFilePrivate *audio)
 {
   const gchar *str;
   gint channels;
@@ -285,7 +285,7 @@ ogmrip_media_info_get_subp_format (OGMRipMediaInfo *info, guint track)
 }
 
 void
-ogmrip_media_info_get_subp_info (OGMRipMediaInfo *info, guint track, OGMRipSubpFilePriv *subp)
+ogmrip_media_info_get_subp_info (OGMRipMediaInfo *info, guint track, OGMRipSubpFilePrivate *subp)
 {
   const gchar *str;
 

@@ -32,13 +32,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipAudioFile      OGMRipAudioFile;
 typedef struct _OGMRipAudioFileClass OGMRipAudioFileClass;
-typedef struct _OGMRipAudioFilePriv  OGMRipAudioFilePriv;
+typedef struct _OGMRipAudioFilePriv  OGMRipAudioFilePrivate;
 
 struct _OGMRipAudioFile
 {
   OGMRipFile parent_instance;
 
-  OGMRipAudioFilePriv *priv;
+  OGMRipAudioFilePrivate *priv;
 };
 
 struct _OGMRipAudioFileClass

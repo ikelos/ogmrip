@@ -37,14 +37,14 @@ typedef enum
 } OGMJobState;
 
 typedef struct _OGMJobTask      OGMJobTask;
-typedef struct _OGMJobTaskPriv  OGMJobTaskPriv;
+typedef struct _OGMJobTaskPriv  OGMJobTaskPrivate;
 typedef struct _OGMJobTaskClass OGMJobTaskClass;
 
 struct _OGMJobTask
 {
   GObject parent_instance;
 
-  OGMJobTaskPriv *priv;
+  OGMJobTaskPrivate *priv;
 };
 
 struct _OGMJobTaskClass

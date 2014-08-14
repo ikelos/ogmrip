@@ -111,7 +111,7 @@ ogmjob_queue_forall (OGMJobContainer *container, OGMJobCallback callback, gpoint
   }
 }
 
-G_DEFINE_TYPE (OGMJobQueue, ogmjob_queue, OGMJOB_TYPE_CONTAINER)
+G_DEFINE_TYPE_WITH_PRIVATE (OGMJobQueue, ogmjob_queue, OGMJOB_TYPE_CONTAINER)
 
 static void
 ogmjob_queue_class_init (OGMJobQueueClass *klass)
@@ -126,14 +126,12 @@ ogmjob_queue_class_init (OGMJobQueueClass *klass)
   container_class->add = ogmjob_queue_add;
   container_class->remove = ogmjob_queue_remove;
   container_class->forall = ogmjob_queue_forall;
-
-  g_type_class_add_private (klass, sizeof (OGMJobQueuePriv));
 }
 
 static void
 ogmjob_queue_init (OGMJobQueue *queue)
 {
-  queue->priv = G_TYPE_INSTANCE_GET_PRIVATE (queue, OGMJOB_TYPE_QUEUE, OGMJobQueuePriv);
+  queue->priv = ogmjob_queue_get_instance_private (queue);
 }
 
 /**

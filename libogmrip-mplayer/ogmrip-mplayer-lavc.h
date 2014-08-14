@@ -56,14 +56,14 @@ G_BEGIN_DECLS
 #define OGMRIP_LAVC_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), OGMRIP_TYPE_LAVC, OGMRipLavcClass))
 
 typedef struct _OGMRipLavc      OGMRipLavc;
-typedef struct _OGMRipLavcPriv  OGMRipLavcPriv;
 typedef struct _OGMRipLavcClass OGMRipLavcClass;
+typedef struct _OGMRipLavcPriv  OGMRipLavcPrivate;
 
 struct _OGMRipLavc
 {
   OGMRipVideoCodec parent_instance;
 
-  OGMRipLavcPriv *priv;
+  OGMRipLavcPrivate *priv;
 };
 
 struct _OGMRipLavcClass

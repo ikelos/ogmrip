@@ -137,6 +137,7 @@ ogmrip_subp_options_dialog_set_spell_check (OGMRipSubpOptionsDialog *dialog, gbo
 }
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipSubpOptionsDialog, ogmrip_subp_options_dialog, GTK_TYPE_DIALOG,
+    G_ADD_PRIVATE (OGMRipSubpOptionsDialog)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_SUBP_OPTIONS, ogmrip_subp_options_init))
 
 static void
@@ -161,8 +162,6 @@ ogmrip_subp_options_dialog_class_init (OGMRipSubpOptionsDialogClass *klass)
   g_object_class_install_property (gobject_class, PROP_LANGUAGE,
       g_param_spec_uint ("language", "Language property", "Set language",
         0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_type_class_add_private (klass, sizeof (OGMRipSubpOptionsDialogPriv));
 }
 
 static void
@@ -181,8 +180,7 @@ ogmrip_subp_options_dialog_init (OGMRipSubpOptionsDialog *dialog)
   GtkTreeModel *model;
   GtkTreeIter iter;
 
-  dialog->priv = G_TYPE_INSTANCE_GET_PRIVATE (dialog,
-      OGMRIP_TYPE_SUBP_OPTIONS_DIALOG, OGMRipSubpOptionsDialogPriv);
+  dialog->priv = ogmrip_subp_options_dialog_get_instance_private (dialog);
 
   builder = gtk_builder_new ();
   if (!gtk_builder_add_from_resource (builder, OGMRIP_UI_RES, &error))

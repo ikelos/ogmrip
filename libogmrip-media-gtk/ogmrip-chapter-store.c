@@ -65,7 +65,7 @@ static void ogmrip_chapter_store_set_property (GObject      *gobject,
 
 static guint signals[LAST_SIGNAL] = { 0 };
 
-G_DEFINE_TYPE (OGMRipChapterStore, ogmrip_chapter_store, GTK_TYPE_LIST_STORE);
+G_DEFINE_TYPE_WITH_PRIVATE (OGMRipChapterStore, ogmrip_chapter_store, GTK_TYPE_LIST_STORE);
 
 static void
 ogmrip_chapter_store_class_init (OGMRipChapterStoreClass *klass)
@@ -89,14 +89,12 @@ ogmrip_chapter_store_class_init (OGMRipChapterStoreClass *klass)
       G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
       G_STRUCT_OFFSET (OGMRipChapterStoreClass, selection_changed), NULL, NULL,
       g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
-
-  g_type_class_add_private (klass, sizeof (OGMRipChapterStorePriv));
 }
 
 static void
 ogmrip_chapter_store_init (OGMRipChapterStore *store)
 {
-  store->priv = G_TYPE_INSTANCE_GET_PRIVATE (store, OGMRIP_TYPE_CHAPTER_STORE, OGMRipChapterStorePriv);
+  store->priv = ogmrip_chapter_store_get_instance_private (store);
 
   gtk_list_store_set_column_types (GTK_LIST_STORE (store),
       OGMRIP_CHAPTER_STORE_N_COLUMNS, (GType *) column_types);

@@ -34,9 +34,6 @@
 
 #include <glib/gi18n-lib.h>
 
-#define OGMRIP_MEDIA_CHOOSER_WIDGET_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_MEDIA_CHOOSER_WIDGET, OGMRipMediaChooserWidgetPriv))
-
 enum
 {
   TEXT_COLUMN,
@@ -238,6 +235,7 @@ ogmrip_media_chooser_widget_volume_added (OGMRipMediaChooserWidget *chooser, GVo
 }
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipMediaChooserWidget, ogmrip_media_chooser_widget, GTK_TYPE_COMBO_BOX,
+    G_ADD_PRIVATE (OGMRipMediaChooserWidget)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_MEDIA_CHOOSER, ogmrip_media_chooser_init))
 
 static void
@@ -251,8 +249,6 @@ ogmrip_media_chooser_widget_class_init (OGMRipMediaChooserWidgetClass *klass)
 
   combo_box_class = GTK_COMBO_BOX_CLASS (klass);
   combo_box_class->changed = ogmrip_media_chooser_widget_changed;
-
-  g_type_class_add_private (klass, sizeof (OGMRipMediaChooserWidgetPriv));
 }
 
 static void
@@ -270,7 +266,7 @@ ogmrip_media_chooser_widget_init (OGMRipMediaChooserWidget *chooser)
 
   GList *volumes, *volume;
 
-  chooser->priv = OGMRIP_MEDIA_CHOOSER_WIDGET_GET_PRIVATE (chooser);
+  chooser->priv = ogmrip_media_chooser_widget_get_instance_private (chooser);
 
   store = gtk_list_store_new (N_COLUMNS, G_TYPE_STRING, G_TYPE_INT, OGMRIP_TYPE_MEDIA, G_TYPE_VOLUME);
   gtk_combo_box_set_model (GTK_COMBO_BOX (chooser), GTK_TREE_MODEL (store));

@@ -32,13 +32,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipMediaFile      OGMRipMediaFile;
 typedef struct _OGMRipMediaFileClass OGMRipMediaFileClass;
-typedef struct _OGMRipMediaFilePriv  OGMRipMediaFilePriv;
+typedef struct _OGMRipMediaFilePriv  OGMRipMediaFilePrivate;
 
 struct _OGMRipMediaFile
 {
   OGMRipVideoFile parent_instance;
 
-  OGMRipMediaFilePriv *priv;
+  OGMRipMediaFilePrivate *priv;
 };
 
 struct _OGMRipMediaFileClass

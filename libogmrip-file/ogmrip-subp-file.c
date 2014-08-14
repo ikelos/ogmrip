@@ -26,19 +26,19 @@ static void g_initable_iface_init         (GInitableIface            *iface);
 static void ogmrip_subp_stream_iface_init (OGMRipSubpStreamInterface *iface);
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipSubpFile, ogmrip_subp_file, OGMRIP_TYPE_FILE,
+    G_ADD_PRIVATE (OGMRipSubpFile)
     G_IMPLEMENT_INTERFACE (G_TYPE_INITABLE, g_initable_iface_init)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_SUBP_STREAM, ogmrip_subp_stream_iface_init));
 
 static void
 ogmrip_subp_file_init (OGMRipSubpFile *stream)
 {
-  stream->priv = G_TYPE_INSTANCE_GET_PRIVATE (stream, OGMRIP_TYPE_SUBP_FILE, OGMRipSubpFilePriv);
+  stream->priv = ogmrip_subp_file_get_instance_private (stream);
 }
 
 static void
 ogmrip_subp_file_class_init (OGMRipSubpFileClass *klass)
 {
-  g_type_class_add_private (klass, sizeof (OGMRipSubpFilePriv));
 }
 
 static gboolean

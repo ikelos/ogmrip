@@ -33,13 +33,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipProfileEditorDialog      OGMRipProfileEditorDialog;
 typedef struct _OGMRipProfileEditorDialogClass OGMRipProfileEditorDialogClass;
-typedef struct _OGMRipProfileEditorDialogPriv  OGMRipProfileEditorDialogPriv;
+typedef struct _OGMRipProfileEditorDialogPriv  OGMRipProfileEditorDialogPrivate;
 
 struct _OGMRipProfileEditorDialog
 {
   GtkDialog parent_instance;
 
-  OGMRipProfileEditorDialogPriv *priv;
+  OGMRipProfileEditorDialogPrivate *priv;
 };
 
 struct _OGMRipProfileEditorDialogClass

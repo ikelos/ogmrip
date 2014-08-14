@@ -50,7 +50,7 @@ ogmjob_task_set_state (OGMJobTask *task, OGMJobState state)
   g_object_notify (G_OBJECT (task), "state");
 }
 
-G_DEFINE_ABSTRACT_TYPE (OGMJobTask, ogmjob_task, G_TYPE_OBJECT)
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (OGMJobTask, ogmjob_task, G_TYPE_OBJECT)
 
 static void
 ogmjob_task_finalize (GObject *gobject)
@@ -146,14 +146,12 @@ ogmjob_task_class_init (OGMJobTaskClass *klass)
   g_object_class_install_property (gobject_class, PROP_PROGRESS,
       g_param_spec_double ("progress", "Progress", "The fraction of total work that has been completed",
         0.0, 1.0, 0.0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_type_class_add_private (klass, sizeof (OGMJobTaskPriv));
 }
 
 static void
 ogmjob_task_init (OGMJobTask *task)
 {
-  task->priv = G_TYPE_INSTANCE_GET_PRIVATE (task, OGMJOB_TYPE_TASK, OGMJobTaskPriv);
+  task->priv = ogmjob_task_get_instance_private (task);
 }
 
 void

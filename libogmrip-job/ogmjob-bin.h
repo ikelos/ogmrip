@@ -31,14 +31,14 @@ G_BEGIN_DECLS
 #define OGMJOB_BIN_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), OGMJOB_TYPE_BIN, OGMJobBinClass))
 
 typedef struct _OGMJobBin      OGMJobBin;
-typedef struct _OGMJobBinPriv  OGMJobBinPriv;
+typedef struct _OGMJobBinPriv  OGMJobBinPrivate;
 typedef struct _OGMJobBinClass OGMJobBinClass;
 
 struct _OGMJobBin
 {
   OGMJobContainer parent_instance;
 
-  OGMJobBinPriv *priv;
+  OGMJobBinPrivate *priv;
 };
 
 struct _OGMJobBinClass

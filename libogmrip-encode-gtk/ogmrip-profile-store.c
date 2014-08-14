@@ -19,9 +19,6 @@
 #include "ogmrip-profile-store.h"
 #include "ogmrip-profile-keys.h"
 
-#define OGMRIP_PROFILE_STORE_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_PROFILE_STORE, OGMRipProfileStorePriv))
-
 struct _OGMRipProfileStorePriv
 {
   OGMRipProfileEngine *engine;
@@ -140,7 +137,7 @@ ogmrip_profile_store_name_sort_func (OGMRipProfileStore *store, GtkTreeIter *ite
   return retval;
 }
 
-G_DEFINE_TYPE (OGMRipProfileStore, ogmrip_profile_store, GTK_TYPE_LIST_STORE);
+G_DEFINE_TYPE_WITH_PRIVATE (OGMRipProfileStore, ogmrip_profile_store, GTK_TYPE_LIST_STORE);
 
 static void
 ogmrip_profile_store_class_init (OGMRipProfileStoreClass *klass)
@@ -160,14 +157,12 @@ ogmrip_profile_store_class_init (OGMRipProfileStoreClass *klass)
   g_object_class_install_property (gobject_class, PROP_VALID_ONLY,
       g_param_spec_boolean ("valid-only", "valid-only", "valid-only", FALSE,
         G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
-
-  g_type_class_add_private (klass, sizeof (OGMRipProfileStorePriv));
 }
 
 static void
 ogmrip_profile_store_init (OGMRipProfileStore *store)
 {
-  store->priv = OGMRIP_PROFILE_STORE_GET_PRIVATE (store);
+  store->priv = ogmrip_profile_store_get_instance_private (store);
 
   gtk_list_store_set_column_types (GTK_LIST_STORE (store),
       OGMRIP_PROFILE_STORE_N_COLUMNS, (GType *) column_types);

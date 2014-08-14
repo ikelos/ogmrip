@@ -27,9 +27,6 @@
 
 #include <glib/gi18n-lib.h>
 
-#define OGMRIP_AUDIO_CHOOSER_WIDGET_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_AUDIO_CHOOSER_WIDGET, OGMRipAudioChooserWidgetPriv))
-
 struct _OGMRipAudioChooserWidgetPriv
 {
   GtkWidget *chooser;
@@ -128,6 +125,7 @@ ogmrip_audio_chooser_widget_button_clicked (OGMRipAudioChooserWidget *widget)
 }
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipAudioChooserWidget, ogmrip_audio_chooser_widget, OGMRIP_TYPE_LIST_ITEM,
+    G_ADD_PRIVATE (OGMRipAudioChooserWidget)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_SOURCE_CHOOSER, ogmrip_source_chooser_init))
 
 static void
@@ -144,8 +142,6 @@ ogmrip_audio_chooser_widget_class_init (OGMRipAudioChooserWidgetClass *klass)
   widget_class->destroy = ogmrip_audio_chooser_widget_destroy;
 
   g_object_class_override_property (gobject_class, PROP_TITLE, "title");
-
-  g_type_class_add_private (klass, sizeof (OGMRipAudioChooserWidgetPriv));
 }
 
 static void
@@ -154,7 +150,7 @@ ogmrip_audio_chooser_widget_init (OGMRipAudioChooserWidget *widget)
   GtkWidget *dialog;
   GtkSizeGroup *group;
 
-  widget->priv = OGMRIP_AUDIO_CHOOSER_WIDGET_GET_PRIVATE (widget);
+  widget->priv = ogmrip_audio_chooser_widget_get_instance_private (widget);
 
   dialog = ogmrip_audio_file_chooser_dialog_new ();
 

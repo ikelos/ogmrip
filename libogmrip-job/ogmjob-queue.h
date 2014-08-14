@@ -31,14 +31,14 @@ G_BEGIN_DECLS
 #define OGMJOB_QUEUE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), OGMJOB_TYPE_QUEUE, OGMJobQueueClass))
 
 typedef struct _OGMJobQueue      OGMJobQueue;
-typedef struct _OGMJobQueuePriv  OGMJobQueuePriv;
+typedef struct _OGMJobQueuePriv  OGMJobQueuePrivate;
 typedef struct _OGMJobQueueClass OGMJobQueueClass;
 
 struct _OGMJobQueue
 {
   OGMJobContainer parent_instance;
 
-  OGMJobQueuePriv *priv;
+  OGMJobQueuePrivate *priv;
 };
 
 struct _OGMJobQueueClass

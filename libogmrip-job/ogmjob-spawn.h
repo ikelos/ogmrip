@@ -33,7 +33,7 @@ G_BEGIN_DECLS
 #define OGMJOB_IS_SPAWN_CLASS(obj) (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMJOB_TYPE_SPAWN))
 
 typedef struct _OGMJobSpawn      OGMJobSpawn;
-typedef struct _OGMJobSpawnPriv  OGMJobSpawnPriv;
+typedef struct _OGMJobSpawnPriv  OGMJobSpawnPrivate;
 typedef struct _OGMJobSpawnClass OGMJobSpawnClass;
 
 /**
@@ -56,7 +56,7 @@ struct _OGMJobSpawn
 {
   OGMJobTask parent_instance;
 
-  OGMJobSpawnPriv *priv;
+  OGMJobSpawnPrivate *priv;
 };
 
 struct _OGMJobSpawnClass

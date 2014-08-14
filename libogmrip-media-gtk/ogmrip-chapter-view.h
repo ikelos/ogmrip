@@ -31,13 +31,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipChapterView      OGMRipChapterView;
 typedef struct _OGMRipChapterViewClass OGMRipChapterViewClass;
-typedef struct _OGMRipChapterViewPriv  OGMRipChapterViewPriv;
+typedef struct _OGMRipChapterViewPriv  OGMRipChapterViewPrivate;
 
 struct _OGMRipChapterView
 {
   GtkTreeView parent_instance;
 
-  OGMRipChapterViewPriv *priv;
+  OGMRipChapterViewPrivate *priv;
 };
 
 struct _OGMRipChapterViewClass

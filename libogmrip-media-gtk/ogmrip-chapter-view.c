@@ -24,9 +24,6 @@
 
 #include <glib/gi18n-lib.h>
 
-#define OGMRIP_CHAPTER_VIEW_GET_PRIVATE(o) \
-    (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_CHAPTER_VIEW, OGMRipChapterViewPriv))
-
 struct _OGMRipChapterViewPriv
 {
   OGMRipChapterStore *store;
@@ -34,7 +31,7 @@ struct _OGMRipChapterViewPriv
 
 static void ogmrip_chapter_view_dispose (GObject *gobject);
 
-G_DEFINE_TYPE (OGMRipChapterView, ogmrip_chapter_view, GTK_TYPE_TREE_VIEW)
+G_DEFINE_TYPE_WITH_PRIVATE (OGMRipChapterView, ogmrip_chapter_view, GTK_TYPE_TREE_VIEW)
 
 static void
 ogmrip_chapter_view_class_init (OGMRipChapterViewClass *klass)
@@ -43,8 +40,6 @@ ogmrip_chapter_view_class_init (OGMRipChapterViewClass *klass)
 
   gobject_class = (GObjectClass *) klass;
   gobject_class->dispose = ogmrip_chapter_view_dispose;
-
-  g_type_class_add_private (klass, sizeof (OGMRipChapterViewPriv));
 }
 
 static void
@@ -99,7 +94,7 @@ ogmrip_chapter_view_init (OGMRipChapterView *view)
   GtkCellRenderer *renderer;
   GtkTreeViewColumn *column;
 
-  view->priv = OGMRIP_CHAPTER_VIEW_GET_PRIVATE (view);
+  view->priv = ogmrip_chapter_view_get_instance_private (view);
 
   view->priv->store = ogmrip_chapter_store_new ();
   gtk_tree_view_set_model (GTK_TREE_VIEW (view), GTK_TREE_MODEL (view->priv->store));

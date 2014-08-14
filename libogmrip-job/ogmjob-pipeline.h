@@ -31,14 +31,14 @@ G_BEGIN_DECLS
 #define OGMJOB_PIPELINE_GET_CLASS(obj) (G_TYPE_INSTANCE_GET_CLASS ((obj), OGMJOB_TYPE_PIPELINE, OGMJobPipelineClass))
 
 typedef struct _OGMJobPipeline      OGMJobPipeline;
-typedef struct _OGMJobPipelinePriv  OGMJobPipelinePriv;
+typedef struct _OGMJobPipelinePriv  OGMJobPipelinePrivate;
 typedef struct _OGMJobPipelineClass OGMJobPipelineClass;
 
 struct _OGMJobPipeline
 {
   OGMJobContainer parent_instance;
 
-  OGMJobPipelinePriv *priv;
+  OGMJobPipelinePrivate *priv;
 };
 
 struct _OGMJobPipelineClass

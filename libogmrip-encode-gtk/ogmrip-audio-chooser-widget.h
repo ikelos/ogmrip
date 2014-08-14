@@ -33,13 +33,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipAudioChooserWidget      OGMRipAudioChooserWidget;
 typedef struct _OGMRipAudioChooserWidgetClass OGMRipAudioChooserWidgetClass;
-typedef struct _OGMRipAudioChooserWidgetPriv  OGMRipAudioChooserWidgetPriv;
+typedef struct _OGMRipAudioChooserWidgetPriv  OGMRipAudioChooserWidgetPrivate;
 
 struct _OGMRipAudioChooserWidget
 {
   OGMRipListItem parent_instance;
 
-  OGMRipAudioChooserWidgetPriv *priv;
+  OGMRipAudioChooserWidgetPrivate *priv;
 };
 
 struct _OGMRipAudioChooserWidgetClass

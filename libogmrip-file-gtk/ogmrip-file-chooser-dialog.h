@@ -34,13 +34,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipFileChooserDialog      OGMRipFileChooserDialog;
 typedef struct _OGMRipFileChooserDialogClass OGMRipFileChooserDialogClass;
-typedef struct _OGMRipFileChooserDialogPriv  OGMRipFileChooserDialogPriv;
+typedef struct _OGMRipFileChooserDialogPriv  OGMRipFileChooserDialogPrivate;
 
 struct _OGMRipFileChooserDialog
 {
   GtkFileChooserDialog parent_instance;
 
-  OGMRipFileChooserDialogPriv *priv;
+  OGMRipFileChooserDialogPrivate *priv;
 };
 
 struct _OGMRipFileChooserDialogClass

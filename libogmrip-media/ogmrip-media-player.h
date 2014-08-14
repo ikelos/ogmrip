@@ -30,14 +30,14 @@ G_BEGIN_DECLS
 #define OGMRIP_IS_PLAYER_CLASS(obj) (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_PLAYER))
 
 typedef struct _OGMRipPlayer      OGMRipPlayer;
-typedef struct _OGMRipPlayerPriv  OGMRipPlayerPriv;
 typedef struct _OGMRipPlayerClass OGMRipPlayerClass;
+typedef struct _OGMRipPlayerPriv  OGMRipPlayerPrivate;
 
 struct _OGMRipPlayer
 {
   GObject parent_instance;
 
-  OGMRipPlayerPriv *priv;
+  OGMRipPlayerPrivate *priv;
 };
 
 struct _OGMRipPlayerClass

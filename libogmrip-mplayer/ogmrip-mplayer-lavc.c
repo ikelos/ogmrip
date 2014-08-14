@@ -36,9 +36,6 @@
 #include <stdio.h>
 #include <glib/gstdio.h>
 
-#define OGMRIP_LAVC_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_LAVC, OGMRipLavcPriv))
-
 enum
 {
   PROP_0,
@@ -324,6 +321,7 @@ ogmrip_configurable_iface_init (OGMRipConfigurableInterface *iface)
 }
 
 G_DEFINE_ABSTRACT_TYPE_WITH_CODE (OGMRipLavc, ogmrip_lavc, OGMRIP_TYPE_VIDEO_CODEC,
+    G_ADD_PRIVATE (OGMRipLavc)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_CONFIGURABLE, ogmrip_configurable_iface_init))
 
 static void
@@ -435,14 +433,13 @@ ogmrip_lavc_class_init (OGMRipLavcClass *klass)
   g_object_class_install_property (gobject_class, PROP_V4MV,
       g_param_spec_boolean (OGMRIP_LAVC_PROP_V4MV, "4MV property", "Set 4mv",
         TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_type_class_add_private (klass, sizeof (OGMRipLavcPriv));
 }
 
 static void
 ogmrip_lavc_init (OGMRipLavc *lavc)
 {
-  lavc->priv = OGMRIP_LAVC_GET_PRIVATE (lavc);
+  lavc->priv = ogmrip_lavc_get_instance_private (lavc);
+
   lavc->priv->cmp = 2;
   lavc->priv->precmp = 2;
   lavc->priv->subcmp = 2;

@@ -31,9 +31,6 @@
 
 #include <glib/gi18n-lib.h>
 
-#define OGMRIP_TITLE_CHOOSER_WIDGET_GET_PRIVATE(o) \
-    (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_TITLE_CHOOSER_WIDGET, OGMRipTitleChooserWidgetPriv))
-
 enum
 {
   PROP_0,
@@ -188,6 +185,7 @@ ogmrip_title_chooser_widget_set_active (OGMRipTitleChooser *chooser, OGMRipTitle
 }
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipTitleChooserWidget, ogmrip_title_chooser_widget, GTK_TYPE_COMBO_BOX,
+    G_ADD_PRIVATE (OGMRipTitleChooserWidget)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_TITLE_CHOOSER, ogmrip_title_chooser_init))
 
 static void
@@ -201,8 +199,6 @@ ogmrip_title_chooser_widget_class_init (OGMRipTitleChooserWidgetClass *klass)
   object_class->set_property = ogmrip_title_chooser_widget_set_property;
 
   g_object_class_override_property (object_class, PROP_MEDIA, "media");
-
-  g_type_class_add_private (klass, sizeof (OGMRipTitleChooserWidgetPriv));
 }
 
 static void
@@ -218,7 +214,7 @@ ogmrip_title_chooser_widget_init (OGMRipTitleChooserWidget *chooser)
   GtkCellRenderer *cell;
   GtkListStore *store;
 
-  chooser->priv = OGMRIP_TITLE_CHOOSER_WIDGET_GET_PRIVATE (chooser);
+  chooser->priv = ogmrip_title_chooser_widget_get_instance_private (chooser);
 
   store = gtk_list_store_new (NUM_COLUMNS, G_TYPE_STRING, G_TYPE_INT);
   gtk_combo_box_set_model (GTK_COMBO_BOX (chooser), GTK_TREE_MODEL (store));

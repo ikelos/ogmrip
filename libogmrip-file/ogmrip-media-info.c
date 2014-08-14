@@ -81,7 +81,7 @@ g_locale_to_wstring (const gchar *str)
 }
 #endif
 
-G_DEFINE_TYPE (OGMRipMediaInfo, ogmrip_media_info, G_TYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (OGMRipMediaInfo, ogmrip_media_info, G_TYPE_OBJECT)
 
 static void
 ogmrip_media_info_class_init (OGMRipMediaInfoClass *klass)
@@ -91,14 +91,12 @@ ogmrip_media_info_class_init (OGMRipMediaInfoClass *klass)
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->constructed = ogmrip_media_info_constructed;
   gobject_class->finalize = ogmrip_media_info_finalize;
-
-  g_type_class_add_private (klass, sizeof (OGMRipMediaInfoPriv));
 }
 
 static void
 ogmrip_media_info_init (OGMRipMediaInfo *info)
 {
-  info->priv = G_TYPE_INSTANCE_GET_PRIVATE (info, OGMRIP_TYPE_MEDIA_INFO, OGMRipMediaInfoPriv);
+  info->priv = ogmrip_media_info_get_instance_private (info);
 }
 
 static void

@@ -271,7 +271,7 @@ task_ready_cb (OGMJobTask *task, GAsyncResult *res, TaskSyncData *data)
   data->complete = TRUE;
 }
 
-G_DEFINE_TYPE (OGMJobSpawn, ogmjob_spawn, OGMJOB_TYPE_TASK);
+G_DEFINE_TYPE_WITH_PRIVATE (OGMJobSpawn, ogmjob_spawn, OGMJOB_TYPE_TASK);
 
 static void
 ogmjob_spawn_run_async (OGMJobTask *task, GCancellable *cancellable, GAsyncReadyCallback callback, gpointer user_data)
@@ -417,14 +417,12 @@ ogmjob_spawn_class_init (OGMJobSpawnClass *klass)
   g_object_class_install_property (gobject_class, PROP_ARGV,
       g_param_spec_boxed ("argv", "argv", "argv", G_TYPE_STRV,
         G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
-
-  g_type_class_add_private (klass, sizeof (OGMJobSpawnPriv));
 }
 
 static void
 ogmjob_spawn_init (OGMJobSpawn *spawn)
 {
-  spawn->priv = G_TYPE_INSTANCE_GET_PRIVATE (spawn, OGMJOB_TYPE_SPAWN, OGMJobSpawnPriv);
+  spawn->priv = ogmjob_spawn_get_instance_private (spawn);
 }
 
 OGMJobTask *

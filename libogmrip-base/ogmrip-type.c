@@ -39,7 +39,7 @@ enum
 static GHashTable *table;
 G_LOCK_DEFINE_STATIC (table);
 
-G_DEFINE_TYPE (OGMRipTypeInfo, ogmrip_type_info, G_TYPE_INITIALLY_UNOWNED);
+G_DEFINE_TYPE_WITH_PRIVATE (OGMRipTypeInfo, ogmrip_type_info, G_TYPE_INITIALLY_UNOWNED);
 
 static void
 ogmrip_type_info_constructed (GObject *gobject)
@@ -137,14 +137,12 @@ ogmrip_type_info_class_init (OGMRipTypeInfoClass *klass)
   g_object_class_install_property (gobject_class, PROP_DESCRIPTION,
       g_param_spec_string ("description", "description", "description", NULL,
         G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
-
-  g_type_class_add_private (klass, sizeof (OGMRipTypeInfoPriv));
 }
 
 static void
 ogmrip_type_info_init (OGMRipTypeInfo *info)
 {
-  info->priv = G_TYPE_INSTANCE_GET_PRIVATE (info, OGMRIP_TYPE_TYPE_INFO, OGMRipTypeInfoPriv);
+  info->priv = ogmrip_type_info_get_instance_private (info);
 
   info->priv->gtype = g_new0 (GType, 1);
   *(info->priv->gtype) = G_TYPE_NONE;

@@ -32,9 +32,6 @@
 #include <errno.h>
 #include <stdlib.h>
 
-#define OGMRIP_CLI_GET_PRIVATE(o) \
-    (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_CLI, OGMRipCliPriv))
-
 struct _OGMRipCliPriv
 {
   GCancellable *cancellable;
@@ -869,6 +866,7 @@ ogmrip_application_iface_init (OGMRipApplicationInterface *iface)
 }
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipCli, ogmrip_cli, G_TYPE_APPLICATION,
+    G_ADD_PRIVATE (OGMRipCli)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_APPLICATION, ogmrip_application_iface_init));
 
 static const GOptionEntry main_opts[] =
@@ -1057,14 +1055,12 @@ ogmrip_cli_class_init (OGMRipCliClass *klass)
 
   cli_class = G_APPLICATION_CLASS (klass);
   cli_class->local_command_line = ogmrip_cli_local_cmdline;
-
-  g_type_class_add_private (klass, sizeof (OGMRipCliPriv));
 }
 
 static void
 ogmrip_cli_init (OGMRipCli *app)
 {
-  app->priv = OGMRIP_CLI_GET_PRIVATE (app);
+  app->priv = ogmrip_cli_get_instance_private (app);
 
   app->priv->cancellable = g_cancellable_new ();
 }

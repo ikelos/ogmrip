@@ -35,9 +35,6 @@
 
 #include <glib/gi18n-lib.h>
 
-#define OGMRIP_SOURCE_CHOOSER_WIDGET_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_SOURCE_CHOOSER_WIDGET, OGMRipSourceChooserWidgetPriv))
-
 enum
 {
   PROP_0,
@@ -282,6 +279,7 @@ ogmrip_source_chooser_widget_changed (GtkComboBox *combo)
 }
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipSourceChooserWidget, ogmrip_source_chooser_widget, GTK_TYPE_COMBO_BOX,
+    G_ADD_PRIVATE (OGMRipSourceChooserWidget)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_SOURCE_CHOOSER, ogmrip_source_chooser_init))
 
 static void
@@ -309,8 +307,6 @@ ogmrip_source_chooser_widget_class_init (OGMRipSourceChooserWidgetClass *klass)
   g_object_class_install_property (gobject_class, PROP_DIALOG,
       g_param_spec_object ("dialog", "dialog", "dialog",
         OGMRIP_TYPE_FILE_CHOOSER_DIALOG, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
-
-  g_type_class_add_private (klass, sizeof (OGMRipSourceChooserWidgetPriv));
 }
 
 static void
@@ -318,7 +314,7 @@ ogmrip_source_chooser_widget_init (OGMRipSourceChooserWidget *chooser)
 {
   GtkCellRenderer *cell;
 
-  chooser->priv = OGMRIP_SOURCE_CHOOSER_WIDGET_GET_PRIVATE (chooser);
+  chooser->priv = ogmrip_source_chooser_widget_get_instance_private (chooser);
 
   chooser->priv->store = gtk_list_store_new (NUM_COLUMNS, G_TYPE_STRING, G_TYPE_INT, G_TYPE_INT, G_TYPE_OBJECT);
   gtk_combo_box_set_model (GTK_COMBO_BOX (chooser), GTK_TREE_MODEL (chooser->priv->store));

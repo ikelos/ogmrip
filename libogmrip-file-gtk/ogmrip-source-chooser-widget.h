@@ -32,13 +32,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipSourceChooserWidget      OGMRipSourceChooserWidget;
 typedef struct _OGMRipSourceChooserWidgetClass OGMRipSourceChooserWidgetClass;
-typedef struct _OGMRipSourceChooserWidgetPriv  OGMRipSourceChooserWidgetPriv;
+typedef struct _OGMRipSourceChooserWidgetPriv  OGMRipSourceChooserWidgetPrivate;
 
 struct _OGMRipSourceChooserWidget
 {
   GtkComboBox parent_instance;
 
-  OGMRipSourceChooserWidgetPriv *priv;
+  OGMRipSourceChooserWidgetPrivate *priv;
 };
 
 struct _OGMRipSourceChooserWidgetClass

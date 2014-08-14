@@ -50,12 +50,13 @@ struct _OGMRipMediaFileStreamClass
 
 typedef struct _OGMRipMediaFileAudio      OGMRipMediaFileAudio;
 typedef struct _OGMRipMediaFileAudioClass OGMRipMediaFileAudioClass;
+typedef struct _OGMRipAudioFilePriv       OGMRipMediaFileAudioPrivate;
 
 struct _OGMRipMediaFileAudio
 {
   OGMRipMediaFileStream parent_instance;
 
-  OGMRipAudioFilePriv *priv;
+  OGMRipAudioFilePrivate *priv;
 };
 
 struct _OGMRipMediaFileAudioClass
@@ -68,12 +69,13 @@ struct _OGMRipMediaFileAudioClass
 
 typedef struct _OGMRipMediaFileSubp      OGMRipMediaFileSubp;
 typedef struct _OGMRipMediaFileSubpClass OGMRipMediaFileSubpClass;
+typedef struct _OGMRipSubpFilePriv       OGMRipMediaFileSubpPrivate;
 
 struct _OGMRipMediaFileSubp
 {
   OGMRipMediaFileStream parent_instance;
 
-  OGMRipSubpFilePriv *priv;
+  OGMRipSubpFilePrivate *priv;
 };
 
 struct _OGMRipMediaFileSubpClass
@@ -127,18 +129,18 @@ ogmrip_stream_iface_init (OGMRipStreamInterface *iface)
 }
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipMediaFileAudio, ogmrip_media_file_audio, OGMRIP_TYPE_MEDIA_FILE_STREAM,
+    G_ADD_PRIVATE (OGMRipMediaFileAudio)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_AUDIO_STREAM, ogmrip_audio_stream_iface_init));
 
 static void
 ogmrip_media_file_audio_init (OGMRipMediaFileAudio *audio)
 {
-  audio->priv = G_TYPE_INSTANCE_GET_PRIVATE (audio, OGMRIP_TYPE_MEDIA_FILE_AUDIO, OGMRipAudioFilePriv);
+  audio->priv = ogmrip_media_file_audio_get_instance_private (audio);
 }
 
 static void
 ogmrip_media_file_audio_class_init (OGMRipMediaFileAudioClass *klass)
 {
-  g_type_class_add_private (klass, sizeof (OGMRipAudioFilePriv));
 }
 
 static gint
@@ -182,18 +184,18 @@ ogmrip_audio_stream_iface_init (OGMRipAudioStreamInterface *iface)
 }
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipMediaFileSubp, ogmrip_media_file_subp, OGMRIP_TYPE_MEDIA_FILE_STREAM,
+    G_ADD_PRIVATE (OGMRipMediaFileSubp)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_SUBP_STREAM, ogmrip_subp_stream_iface_init));
 
 static void
 ogmrip_media_file_subp_init (OGMRipMediaFileSubp *subp)
 {
-  subp->priv = G_TYPE_INSTANCE_GET_PRIVATE (subp, OGMRIP_TYPE_MEDIA_FILE_SUBP, OGMRipSubpFilePriv);
+  subp->priv = ogmrip_media_file_subp_get_instance_private (subp);
 }
 
 static void
 ogmrip_media_file_subp_class_init (OGMRipMediaFileSubpClass *klass)
 {
-  g_type_class_add_private (klass, sizeof (OGMRipSubpFilePriv));
 }
 
 static const gchar *
@@ -216,19 +218,19 @@ ogmrip_subp_stream_iface_init (OGMRipSubpStreamInterface *iface)
 }
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipMediaFile, ogmrip_media_file, OGMRIP_TYPE_VIDEO_FILE,
+    G_ADD_PRIVATE (OGMRipMediaFile)
     G_IMPLEMENT_INTERFACE (G_TYPE_INITABLE, g_initable_iface_init)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_TITLE, ogmrip_title_iface_init));
 
 static void
 ogmrip_media_file_init (OGMRipMediaFile *media)
 {
-  media->priv = G_TYPE_INSTANCE_GET_PRIVATE (media, OGMRIP_TYPE_MEDIA_FILE, OGMRipMediaFilePriv);
+  media->priv = ogmrip_media_file_get_instance_private (media);
 }
 
 static void
 ogmrip_media_file_class_init (OGMRipMediaFileClass *klass)
 {
-  g_type_class_add_private (klass, sizeof (OGMRipMediaFilePriv));
 }
 
 static gboolean
