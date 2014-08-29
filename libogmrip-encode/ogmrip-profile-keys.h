@@ -22,6 +22,7 @@
 G_BEGIN_DECLS
 
 #define OGMRIP_PROFILE_NAME                  "name"
+#define OGMRIP_PROFILE_DESCRIPTION           "description"
 #define OGMRIP_PROFILE_VERSION               "version"
 
 #define OGMRIP_PROFILE_GENERAL               "general"

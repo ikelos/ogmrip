@@ -1,10 +1,13 @@
 [encoding: UTF-8]
 
+[type: gettext/glade]libogmrip-media-gtk/ogmrip-media-chooser-dialog.ui
+
 [type: gettext/glade]libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.ui
 [type: gettext/glade]libogmrip-encode-gtk/ogmrip-profile-editor-dialog.ui
 [type: gettext/glade]libogmrip-encode-gtk/ogmrip-profile-manager-dialog.ui
 [type: gettext/glade]libogmrip-encode-gtk/ogmrip-profile-manager-menu.ui
 [type: gettext/glade]libogmrip-encode-gtk/ogmrip-progress-dialog.ui
+[type: gettext/glade]libogmrip-encode-gtk/ogmrip-progress-menu.ui
 
 [type: gettext/glade]plugins/ogmrip-lavc-options-dialog.ui
 [type: gettext/glade]plugins/ogmrip-mp4-options-dialog.ui
@@ -56,7 +59,6 @@ libogmrip-encode-gtk/ogmrip-profile-editor-dialog.c
 libogmrip-encode-gtk/ogmrip-profile-manager-dialog.c
 libogmrip-encode-gtk/ogmrip-profile-view.c
 libogmrip-encode-gtk/ogmrip-progress-dialog.c
-libogmrip-encode-gtk/ogmrip-progress-menu.ui
 libogmrip-encode-gtk/ogmrip-subp-chooser-widget.c
 libogmrip-encode-gtk/ogmrip-subp-options-dialog.c
 
@@ -73,6 +75,7 @@ src/ogmrip-pref-dialog.c
 src/ogmrip-spell-dialog.c
 
 plugins/ogmrip-aac.c
+plugins/ogmrip-ac3.c
 plugins/ogmrip-avi.c
 plugins/ogmrip-copy.c
 plugins/ogmrip-dirac.c

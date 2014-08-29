@@ -16,6 +16,10 @@
       <default>(0,0)</default>
       <summary>The version of the profile</summary>
     </key>
+    <key name="description" type="s">
+      <default>''</default>
+      <summary>The description of the profile</summary>
+    </key>
     <child name="general" schema="org.ogmrip.profile.general"/>
     <child name="video" schema="org.ogmrip.profile.video"/>
     <child name="audio" schema="org.ogmrip.profile.audio"/>

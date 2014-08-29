@@ -34,7 +34,7 @@ enum
 
 static const GType column_types[] =
 {
-  G_TYPE_STRING,  /* name */
+  G_TYPE_STRING,  /* name + description */
   G_TYPE_POINTER  /* profile */
 };
 
@@ -52,17 +52,24 @@ static void ogmrip_profile_store_set_property (GObject      *gobject,
                                                GParamSpec   *pspec);
 
 static void
-ogmrip_profile_store_name_changed (OGMRipProfileStore *store, gchar *key, OGMRipProfile *profile)
+ogmrip_profile_store_info_changed (OGMRipProfileStore *store, gchar *key, OGMRipProfile *profile)
 {
   GtkTreeIter iter;
 
   if (ogmrip_profile_store_get_iter (store, &iter, profile))
   {
-    gchar *name;
+    gchar *name, *desc, *info;
 
-    name = g_settings_get_string (G_SETTINGS (profile), key);
-    gtk_list_store_set (GTK_LIST_STORE (store), &iter, OGMRIP_PROFILE_STORE_NAME_COLUMN, name, -1);
+    name = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_NAME);
+    desc = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_DESCRIPTION);
+
+    info = g_strdup_printf ("<b>%s</b>\n%s", name, desc);
+
     g_free (name);
+    g_free (desc);
+
+    gtk_list_store_set (GTK_LIST_STORE (store), &iter, OGMRIP_PROFILE_STORE_INFO_COLUMN, info, -1);
+    g_free (info);
   }
 }
 
@@ -70,20 +77,28 @@ static void
 ogmrip_profile_store_add (OGMRipProfileStore *store, OGMRipProfile *profile)
 {
   GtkTreeIter iter;
-  gchar *name;
+  gchar *name, *desc, *info;
 
   name = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_NAME);
+  desc = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_DESCRIPTION);
+
+  info = g_strdup_printf ("<b>%s</b>\n%s", name, desc);
+
+  g_free (name);
+  g_free (desc);
 
   gtk_list_store_append (GTK_LIST_STORE (store), &iter);
   gtk_list_store_set (GTK_LIST_STORE (store), &iter,
-      OGMRIP_PROFILE_STORE_NAME_COLUMN,    name,
+      OGMRIP_PROFILE_STORE_INFO_COLUMN,    info,
       OGMRIP_PROFILE_STORE_PROFILE_COLUMN, profile,
       -1);
 
-  g_free (name);
+  g_free (info);
 
   g_signal_connect_swapped (profile, "changed::" OGMRIP_PROFILE_NAME,
-      G_CALLBACK (ogmrip_profile_store_name_changed), store);
+      G_CALLBACK (ogmrip_profile_store_info_changed), store);
+  g_signal_connect_swapped (profile, "changed::" OGMRIP_PROFILE_DESCRIPTION,
+      G_CALLBACK (ogmrip_profile_store_info_changed), store);
 }
 
 static void
@@ -95,7 +110,7 @@ ogmrip_profile_store_remove (OGMRipProfileStore *store, OGMRipProfile *profile)
   {
     gtk_list_store_remove (GTK_LIST_STORE (store), &iter);
     g_signal_handlers_disconnect_by_func (profile,
-        ogmrip_profile_store_name_changed, store);
+        ogmrip_profile_store_info_changed, store);
   }
 }
 
@@ -114,7 +129,7 @@ ogmrip_profile_store_clear (OGMRipProfileStore *store)
           OGMRIP_PROFILE_STORE_PROFILE_COLUMN, &profile, -1);
       if (profile)
         g_signal_handlers_disconnect_by_func (profile,
-            ogmrip_profile_store_name_changed, store);
+            ogmrip_profile_store_info_changed, store);
     }
     while (gtk_list_store_remove (GTK_LIST_STORE (store), &iter));
   }
@@ -126,8 +141,8 @@ ogmrip_profile_store_name_sort_func (OGMRipProfileStore *store, GtkTreeIter *ite
   gchar *name1, *name2;
   gint retval;
 
-  gtk_tree_model_get (GTK_TREE_MODEL (store), iter1, OGMRIP_PROFILE_STORE_NAME_COLUMN, &name1, -1);
-  gtk_tree_model_get (GTK_TREE_MODEL (store), iter2, OGMRIP_PROFILE_STORE_NAME_COLUMN, &name2, -1);
+  gtk_tree_model_get (GTK_TREE_MODEL (store), iter1, OGMRIP_PROFILE_STORE_INFO_COLUMN, &name1, -1);
+  gtk_tree_model_get (GTK_TREE_MODEL (store), iter2, OGMRIP_PROFILE_STORE_INFO_COLUMN, &name2, -1);
 
   retval = g_utf8_collate (name1, name2);
 
@@ -170,7 +185,7 @@ ogmrip_profile_store_init (OGMRipProfileStore *store)
   gtk_tree_sortable_set_default_sort_func (GTK_TREE_SORTABLE (store),
       (GtkTreeIterCompareFunc) ogmrip_profile_store_name_sort_func, NULL, NULL);
   gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (store),
-      OGMRIP_PROFILE_STORE_NAME_COLUMN, GTK_SORT_ASCENDING);
+      OGMRIP_PROFILE_STORE_INFO_COLUMN, GTK_SORT_ASCENDING);
 }
 
 static void

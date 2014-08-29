@@ -57,7 +57,7 @@ ogmrip_profile_view_init (OGMRipProfileView *view)
 
   renderer = gtk_cell_renderer_text_new ();
   column = gtk_tree_view_column_new_with_attributes (_("Profile"),
-      renderer, "markup", OGMRIP_PROFILE_STORE_NAME_COLUMN, NULL);
+      renderer, "markup", OGMRIP_PROFILE_STORE_INFO_COLUMN, NULL);
   gtk_tree_view_append_column (GTK_TREE_VIEW (view), column);
 }
 

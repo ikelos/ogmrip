@@ -1,5 +1,6 @@
 <profile name="default-ios" version="(1,0)">
-  <key name="name">'&lt;b&gt;Apple iOS&lt;/b&gt;&#xA;quantizer 2 (MP4 + X264 + AAC)'</key>
+  <key name="name">'Apple iOS'</key>
+  <key name="description">'Quantizer 2 (MP4 + X264 + AAC)'</key>
   <section name="general">
     <key name="container">'mp4'</key>
     <key name="encoding-method">2</key>
