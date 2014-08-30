@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <schemalist>
-  <schema id="org.ogmrip.preferences" path="/apps/ogmrip/preferences/">
+  <schema id="org.ogmrip.preferences" path="/org/gnome/ogmrip/preferences/">
     <!-- General -->
     <key name="chapters-language" type="u">
       <default>0</default>
@@ -24,7 +24,7 @@
       <summary>The preferred language of the subtitles</summary>
     </key>
     <key name="profile" type="s">
-      <default>'default-ogm'</default>
+      <default>''</default>
       <summary>The current profile</summary>
     </key>
     <!-- Advanced -->

@@ -23,7 +23,7 @@
 
 G_BEGIN_DECLS
 
-#define OGMRIP_PROFILE_PATH "/apps/ogmrip/profiles/"
+#define OGMRIP_PROFILE_PATH "/org/gnome/ogmrip/profiles/"
 
 #define OGMRIP_PROFILE_ERROR ogmrip_profile_error_quark ()
 
