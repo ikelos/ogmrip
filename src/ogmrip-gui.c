@@ -33,8 +33,8 @@ static gboolean debug = TRUE;
 static gboolean debug = FALSE;
 #endif
 
-#define OGMRIP_MENU_RES  "/org/ogmrip/ogmrip-menu.ui"
-#define OGMRIP_ICON_FILE "pixmaps" G_DIR_SEPARATOR_S "ogmrip.png"
+#define OGMRIP_MENU_RES "/org/ogmrip/ogmrip-menu.ui"
+#define OGMRIP_ICON_RES "/org/ogmrip/ogmrip.png"
 
 struct _OGMRipGuiPriv
 {
@@ -72,7 +72,7 @@ ogmrip_gui_pref_activated (GSimpleAction *action, GVariant *parameter, gpointer 
 static void
 ogmrip_gui_about_activated (GSimpleAction *action, GVariant *parameter, gpointer app)
 {
-  static GdkPixbuf *icon = NULL;
+  GdkPixbuf *icon = NULL;
 
   const gchar *authors[] =
   {
@@ -87,8 +87,7 @@ ogmrip_gui_about_activated (GSimpleAction *action, GVariant *parameter, gpointer
     NULL
   };
 
-  if (!icon)
-    icon = gdk_pixbuf_new_from_file (OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_ICON_FILE, NULL);
+  icon = gdk_pixbuf_new_from_resource (OGMRIP_ICON_RES, NULL);
 
   if (g_str_equal (translator_credits, "translator-credits"))
     translator_credits = NULL;
@@ -105,6 +104,9 @@ ogmrip_gui_about_activated (GSimpleAction *action, GVariant *parameter, gpointer
       "authors", authors,
       "logo", icon,
       NULL);
+
+  if (icon)
+    g_object_unref (icon);
 }
 
 static void

@@ -32,8 +32,8 @@
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 
-#define OGMRIP_UI_RES    "/org/ogmrip/ogmrip-main-window.ui"
-#define OGMRIP_ICON_FILE "pixmaps" G_DIR_SEPARATOR_S "ogmrip.png"
+#define OGMRIP_UI_RES   "/org/ogmrip/ogmrip-main-window.ui"
+#define OGMRIP_ICON_RES "/org/ogmrip/ogmrip.png"
 
 struct _OGMRipMainWindowPriv
 {
@@ -1670,6 +1670,7 @@ static void
 ogmrip_main_window_init (OGMRipMainWindow *window)
 {
   GAction *action;
+  GdkPixbuf *icon;
 
   g_type_ensure (OGMRIP_TYPE_CHAPTER_VIEW);
   g_type_ensure (OGMRIP_TYPE_TITLE_CHOOSER_WIDGET);
@@ -1678,8 +1679,12 @@ ogmrip_main_window_init (OGMRipMainWindow *window)
 
   window->priv = ogmrip_main_window_get_instance_private (window);
 
-  gtk_window_set_icon_from_file (GTK_WINDOW (window),
-      OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_ICON_FILE, NULL);
+  icon = gdk_pixbuf_new_from_resource (OGMRIP_ICON_RES, NULL);
+  if (icon)
+  {
+    gtk_window_set_icon (GTK_WINDOW (window), icon);
+    g_object_unref (icon);
+  }
 
   g_signal_connect_swapped (window->priv->title_chooser, "changed",
       G_CALLBACK (ogmrip_main_window_title_chooser_changed), window);
