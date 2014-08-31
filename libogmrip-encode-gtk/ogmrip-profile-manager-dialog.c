@@ -49,13 +49,27 @@ struct _OGMRipProfileManagerDialogPriv
   GtkWidget *name_dialog;
   GtkWidget *name_entry;
   GtkTextBuffer *desc_buffer;
+
+  GAction *remove_action;
 };
 
 static gboolean
 gtk_widget_button_press_cb (GtkWidget *widget, GdkEventButton *event, GtkWidget *menu)
 {
+  GtkTreePath *path;
+
   if (event->button != 3 || event->type != GDK_BUTTON_PRESS)
     return FALSE;
+
+  if (event->window != gtk_tree_view_get_bin_window (GTK_TREE_VIEW (widget)))
+    return FALSE;
+
+  if (!gtk_tree_view_get_path_at_pos (GTK_TREE_VIEW (widget), event->x, event->y, &path, NULL, NULL, NULL))
+    return FALSE;
+
+  gtk_tree_selection_select_path (gtk_tree_view_get_selection (GTK_TREE_VIEW (widget)), path);
+
+  gtk_tree_path_free (path);
 
   gtk_menu_popup (GTK_MENU (menu), NULL, NULL, NULL, NULL, event->button, event->time);
 
@@ -362,6 +376,13 @@ ogmrip_profile_manager_dialog_export_activated (GSimpleAction *action, GVariant 
 }
 
 static void
+ogmrip_encoding_manager_dialog_selection_changed_cb (OGMRipProfileManagerDialog *dialog)
+{
+  g_simple_action_set_enabled (G_SIMPLE_ACTION (dialog->priv->remove_action),
+      gtk_tree_selection_count_selected_rows (dialog->priv->selection) > 0);
+}
+
+static void
 ogmrip_profile_manager_dialog_row_activated (OGMRipProfileManagerDialog *dialog)
 {
   ogmrip_profile_manager_dialog_edit_activated (NULL, NULL, dialog);
@@ -446,6 +467,9 @@ ogmrip_profile_manager_dialog_init (OGMRipProfileManagerDialog *dialog)
 
   dialog->priv->selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (dialog->priv->profile_view));
 
+  g_signal_connect_swapped (dialog->priv->selection, "changed",
+      G_CALLBACK (ogmrip_encoding_manager_dialog_selection_changed_cb), dialog);
+
   g_signal_connect_swapped (dialog->priv->profile_view, "row-activated",
       G_CALLBACK (ogmrip_profile_manager_dialog_row_activated), dialog);
 
@@ -455,6 +479,9 @@ ogmrip_profile_manager_dialog_init (OGMRipProfileManagerDialog *dialog)
 
   g_action_map_add_action_entries (G_ACTION_MAP (group),
       entries, G_N_ELEMENTS (entries), dialog);
+
+  dialog->priv->remove_action = g_action_map_lookup_action (G_ACTION_MAP (group), "remove");
+  g_simple_action_set_enabled (G_SIMPLE_ACTION (dialog->priv->remove_action), FALSE);
 
   builder = gtk_builder_new_from_resource (OGMRIP_MENU_RES);
 
