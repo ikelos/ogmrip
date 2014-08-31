@@ -1,9 +1,3 @@
-pixmapdir = \
-  $(datadir)/pixmaps
-
-pixmap_DATA = \
-  ogmrip.png
-
 desktopdir  = \
   $(datadir)/applications
 
@@ -16,7 +10,6 @@ desktop_DATA = \
 @INTLTOOL_DESKTOP_RULE@
 
 EXTRA_DIST =     \
-  $(pixmap_DATA) \
   $(desktopfile)
 
 DISTCLEANFILES = \
