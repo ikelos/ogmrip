@@ -62,7 +62,7 @@ static void ogmrip_title_chooser_widget_set_property (GObject                   
 
 
 static void
-ogmrip_title_chooser_widget_set_disc (OGMRipTitleChooserWidget *chooser, OGMRipMedia *media)
+ogmrip_title_chooser_widget_set_media (OGMRipTitleChooserWidget *chooser, OGMRipMedia *media)
 {
   GtkTreeModel *model;
 
@@ -99,38 +99,41 @@ ogmrip_title_chooser_widget_set_disc (OGMRipTitleChooserWidget *chooser, OGMRipM
       g_string_printf (string, "%s %02d", _("Title"), ogmrip_title_get_id (link->data) + 1);
 
       length = ogmrip_title_get_length (link->data, &time_);
-      if (time_.hour > 0)
-        g_string_append_printf (string, " (%02lu:%02lu %s", time_.hour, time_.min, _("hours"));
-      else if (time_.min > 0)
-        g_string_append_printf (string, " (%02lu:%02lu %s", time_.min, time_.sec, _("minutes"));
-      else
-        g_string_append_printf (string, " (%02lu %s", time_.sec, _("seconds"));
-
-      standard = ogmrip_video_stream_get_standard (stream);
-      if (standard != OGMRIP_STANDARD_UNDEFINED)
-        g_string_append_printf (string, ", %s", ogmrip_standard_get_label (standard));
-
-      ogmrip_video_stream_get_aspect_ratio (stream, &num, &denom);
-      if (num > 0 && denom > 0)
+      if (length > 0)
       {
-        if (denom == 1000)
-        {
-          gchar aspect[G_ASCII_DTOSTR_BUF_SIZE];
-
-          g_string_append_printf (string, ", %s:1", g_ascii_formatd (aspect, G_ASCII_DTOSTR_BUF_SIZE, "%.02lf", num / 1000.));
-        }
+        if (time_.hour > 0)
+          g_string_append_printf (string, " (%02lu:%02lu %s", time_.hour, time_.min, _("hours"));
+        else if (time_.min > 0)
+          g_string_append_printf (string, " (%02lu:%02lu %s", time_.min, time_.sec, _("minutes"));
         else
-          g_string_append_printf (string, ", %u/%u", num, denom);
-      }
+          g_string_append_printf (string, " (%02lu %s", time_.sec, _("seconds"));
 
-      g_string_append_c (string, ')');
+        standard = ogmrip_video_stream_get_standard (stream);
+        if (standard != OGMRIP_STANDARD_UNDEFINED)
+          g_string_append_printf (string, ", %s", ogmrip_standard_get_label (standard));
+
+        ogmrip_video_stream_get_aspect_ratio (stream, &num, &denom);
+        if (num > 0 && denom > 0)
+        {
+          if (denom == 1000)
+          {
+            gchar aspect[G_ASCII_DTOSTR_BUF_SIZE];
+
+            g_string_append_printf (string, ", %s:1", g_ascii_formatd (aspect, G_ASCII_DTOSTR_BUF_SIZE, "%.02lf", num / 1000.));
+          }
+          else
+            g_string_append_printf (string, ", %u/%u", num, denom);
+        }
+
+        g_string_append_c (string, ')');
+      }
 
       gtk_list_store_append (GTK_LIST_STORE (model), &iter);
       gtk_list_store_set (GTK_LIST_STORE (model), &iter, TEXT_COLUMN, string->str,
           ID_COLUMN, ogmrip_title_get_id (link->data), -1);
       g_string_free (string, TRUE);
 
-      if (length > longest)
+      if (length <= 0 || length > longest)
       {
         longest = length;
         gtk_combo_box_set_active_iter (GTK_COMBO_BOX (chooser), &iter);
@@ -265,7 +268,7 @@ ogmrip_title_chooser_widget_set_property (GObject *gobject, guint property_id, c
   switch (property_id) 
   {
     case PROP_MEDIA:
-      ogmrip_title_chooser_widget_set_disc (chooser, g_value_get_object (value));
+      ogmrip_title_chooser_widget_set_media (chooser, g_value_get_object (value));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
