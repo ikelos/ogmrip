@@ -218,9 +218,9 @@ ogmrip_subp_stream_iface_init (OGMRipSubpStreamInterface *iface)
 }
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipMediaFile, ogmrip_media_file, OGMRIP_TYPE_VIDEO_FILE,
-    G_ADD_PRIVATE (OGMRipMediaFile)
     G_IMPLEMENT_INTERFACE (G_TYPE_INITABLE, g_initable_iface_init)
-    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_TITLE, ogmrip_title_iface_init));
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_TITLE, ogmrip_title_iface_init)
+    G_ADD_PRIVATE (OGMRipMediaFile));
 
 static void
 ogmrip_media_file_init (OGMRipMediaFile *media)
@@ -236,9 +236,10 @@ ogmrip_media_file_class_init (OGMRipMediaFileClass *klass)
 static gboolean
 ogmrip_media_file_initable_init (GInitable *initable, GCancellable *cancellable, GError **error)
 {
+  OGMRipMediaFile *media = OGMRIP_MEDIA_FILE (initable);
+
   GFile *file;
   OGMRipMediaInfo *info;
-  OGMRipMediaFile *media;
   OGMRipMediaFileStream *stream;
   const gchar *str;
   gint i, n;
@@ -257,7 +258,24 @@ ogmrip_media_file_initable_init (GInitable *initable, GCancellable *cancellable,
   if (!ogmrip_media_info_open (info, OGMRIP_FILE (initable)->priv->path))
     return FALSE;
 
-  media = OGMRIP_MEDIA_FILE (initable);
+  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "VideoCount");
+  if (!str || !g_str_equal (str, "1"))
+  {
+    g_object_unref (info);
+    return FALSE;
+  }
+
+  OGMRIP_FILE (initable)->priv->format = ogmrip_media_info_get_video_format (info, 0);
+  if (OGMRIP_FILE (initable)->priv->format < 0)
+  {
+    g_object_unref (info);
+    return FALSE;
+  }
+
+  ogmrip_media_info_get_file_info (info,  OGMRIP_FILE (initable)->priv);
+  ogmrip_media_info_get_video_info (info, 0, OGMRIP_VIDEO_FILE (initable)->priv);
+
+  OGMRIP_FILE (initable)->priv->title_size = OGMRIP_VIDEO_FILE (initable)->priv->size;
 
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "AudioCount");
 
