@@ -211,3 +211,33 @@ ogmrip_media_info_get (OGMRipMediaInfo *info, OGMRipCategoryType category, guint
   return *value ? value : NULL;
 }
 
+const gchar *
+ogmrip_media_info_geti (OGMRipMediaInfo *info, OGMRipCategoryType category, guint stream, guint param)
+{
+  const gchar *value;
+
+  g_return_val_if_fail (OGMRIP_IS_MEDIA_INFO (info), NULL);
+
+  if (!info->priv->handle)
+    return NULL;
+
+#if defined(UNICODE) || defined (_UNICODE)
+  const wchar_t *wstr;
+  char *str;
+
+  wstr = MediaInfo_GetI (info->priv->handle, category, stream, param, MediaInfo_Info_Text);
+
+  if (info->priv->value)
+    g_free (info->priv->value);
+
+  str = g_locale_from_wstring (wstr);
+  value = info->priv->value = g_locale_to_utf8 (str, -1, NULL, NULL, NULL);
+  g_free (str);
+#else
+  value = MediaInfo_GetI (info->priv->handle, category, stream, param, MediaInfo_Info_Text);
+#endif
+
+
+  return *value ? value : NULL;
+}
+

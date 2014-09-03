@@ -65,6 +65,10 @@ const gchar *     ogmrip_media_info_get         (OGMRipMediaInfo    *info,
                                                  OGMRipCategoryType category,
                                                  guint              stream,
                                                  const gchar        *name);
+const gchar *     ogmrip_media_info_geti        (OGMRipMediaInfo    *info,
+                                                 OGMRipCategoryType category,
+                                                 guint              stream,
+                                                 guint              param);
 
 G_END_DECLS
 

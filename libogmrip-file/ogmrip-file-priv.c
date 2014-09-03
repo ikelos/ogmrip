@@ -318,3 +318,41 @@ g_file_get_id (GFile *file)
   return id;
 }
 
+void
+ogmrip_media_info_get_chapters_info (OGMRipMediaInfo *info, guint track, OGMRipMediaFilePrivate *media)
+{
+  const gchar *str;
+  gint begin, end, pos;
+
+  OGMRipTime dtime;
+  gchar lang1, lang2;
+  gulong msec;
+
+  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_MENU, track, "Chapters_Pos_Begin");
+  begin = str ? atoi (str) : 0;
+
+  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_MENU, track, "Chapters_Pos_End");
+  end = str ? atoi (str) : 0;
+
+  if (end > begin)
+  {
+    media->nr_of_chapters = end - begin;
+    media->length_of_chapters = g_new0 (gulong, media->nr_of_chapters);
+
+    for (msec = 0, pos = begin; pos < end; pos ++)
+    {
+      str = ogmrip_media_info_geti (info, OGMRIP_CATEGORY_MENU, track, pos);
+      if (str && sscanf (str, "%c%c:%lu:%lu:%lu.%lu", &lang1, &lang2, &dtime.hour, &dtime.min, &dtime.sec, &dtime.msec) == 6)
+      {
+        if (pos > begin)
+          media->length_of_chapters[pos - begin - 1] = ogmrip_time_to_msec (&dtime) - msec;
+
+        msec = ogmrip_time_to_msec (&dtime);
+      }
+    }
+
+    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "Duration");
+    media->length_of_chapters[end - begin - 1] = atoi (str) - msec;
+  }
+}
+

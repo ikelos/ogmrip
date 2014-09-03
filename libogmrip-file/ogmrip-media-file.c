@@ -309,6 +309,12 @@ ogmrip_media_file_initable_init (GInitable *initable, GCancellable *cancellable,
     media->priv->subp_streams = g_list_append (media->priv->subp_streams, stream);
   }
 
+  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "MenuCount");
+
+  n = str ? atoi (str) : 0;
+  for (i = 0; i < n; i ++)
+    ogmrip_media_info_get_chapters_info (info, i, media->priv);
+
   ogmrip_media_info_close (info);
 
   return TRUE;
@@ -356,6 +362,27 @@ ogmrip_media_file_get_subp_streams (OGMRipTitle *title)
   return g_list_copy (OGMRIP_MEDIA_FILE (title)->priv->subp_streams);
 }
 
+static gint
+ogmrip_media_file_get_n_chapters (OGMRipTitle *title)
+{
+  return OGMRIP_MEDIA_FILE (title)->priv->nr_of_chapters;
+}
+
+static gdouble
+ogmrip_media_file_get_chapters_length (OGMRipTitle *title, guint start, guint end, OGMRipTime *length)
+{
+  OGMRipMediaFile *file = OGMRIP_MEDIA_FILE (title);
+  gulong total;
+
+  for (total = 0; start <= end; start ++)
+    total += file->priv->length_of_chapters[start];
+
+  if (length)
+    ogmrip_msec_to_time (total, length);
+
+  return total / 1000.0;
+}
+
 static void
 ogmrip_title_iface_init (OGMRipTitleInterface *iface)
 {
@@ -365,6 +392,8 @@ ogmrip_title_iface_init (OGMRipTitleInterface *iface)
   iface->get_n_subp_streams = ogmrip_media_file_get_n_subp_streams;
   iface->get_subp_stream = ogmrip_media_file_get_subp_stream;
   iface->get_subp_streams = ogmrip_media_file_get_subp_streams;
+  iface->get_n_chapters = ogmrip_media_file_get_n_chapters;
+  iface->get_chapters_length = ogmrip_media_file_get_chapters_length;
 }
 
 OGMRipMedia *
