@@ -29,7 +29,7 @@ ogmrip_media_info_get_file_info (OGMRipMediaInfo *info, OGMRipFilePrivate *file)
   const gchar *str;
 
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "Duration");
-  file->length = str ? atoi (str) : -1.0;
+  file->length = str ? atoi (str) / 1000. : -1.0;
 
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "FileSize");
   file->media_size = str ? atoll (str) : -1;
