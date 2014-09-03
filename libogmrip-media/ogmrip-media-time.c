@@ -27,3 +27,9 @@ ogmrip_msec_to_time (gulong msec, OGMRipTime *dtime)
   dtime->msec = msec % 1000;
 }
 
+gulong
+ogmrip_time_to_msec (OGMRipTime *dtime)
+{
+  return (((dtime->hour * 60) + dtime->min) * 60 + dtime->sec) * 1000 + dtime->msec;
+}
+
