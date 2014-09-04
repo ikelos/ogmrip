@@ -1944,7 +1944,7 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GCancellable *cancellable, GEr
   }
 
   /*
-   * Extract all subtitles except harsubed ones
+   * Extract all subtitles except hardsubed ones
    */
   for (link = encoding->priv->subp_codecs; link; link = link->next)
   {
