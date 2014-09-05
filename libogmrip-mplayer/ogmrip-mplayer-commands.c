@@ -43,14 +43,18 @@
 static glong
 ogmrip_mplayer_get_frames (OGMRipCodec *codec)
 {
-  OGMRipStream *stream;
+  OGMRipVideoStream *stream;
+  OGMRipTitle *title;
+
   guint num, denom;
   gdouble length;
 
   length = ogmrip_codec_get_length (codec, NULL);
 
-  stream = ogmrip_codec_get_input (codec);
-  ogmrip_video_stream_get_framerate (OGMRIP_VIDEO_STREAM (stream), &num, &denom);
+  title = ogmrip_stream_get_title (ogmrip_codec_get_input (codec));
+  stream = ogmrip_title_get_video_stream (title);
+
+  ogmrip_video_stream_get_framerate (stream, &num, &denom);
 
   return length / (gdouble) denom * num;
 }
@@ -368,22 +372,37 @@ ogmrip_mplayer_watch_stderr (OGMJobTask *task, const gchar *buffer, OGMRipVideoC
 }
 
 static gboolean
-ogmrip_mplayer_wav_watch (OGMJobTask *task, const gchar *buffer, OGMRipAudioCodec *audio, GError **error)
+ogmrip_mplayer_watch_stdout (OGMJobTask *task, const gchar *buffer, OGMRipCodec *codec, GError **error)
 {
-  gchar a[12], v[12];
-  static gdouble start;
-  gdouble secs;
+  gchar v_pts[12], a_pts[12], a_v[12], ct[12];
+  gulong frames, decoded;
 
-  if (g_str_equal (buffer, "Starting playback..."))
-    start = 0;
-  else if (sscanf (buffer, "A: %s V: %s", a, v) == 2)
-  {
-    secs = strtod (a, NULL);
-    if (!start)
-      start = secs;
+  if (sscanf (buffer, "A:%s V:%s A-V:%s ct: %s %lu/%lu", v_pts, a_pts, a_v, ct, &frames, &decoded) == 6)
+    ogmjob_task_set_progress (task, decoded / (gdouble) ogmrip_mplayer_get_frames (codec));
 
-    ogmjob_task_set_progress (task, (secs - start) / ogmrip_codec_get_length (OGMRIP_CODEC (audio), NULL));
-  }
+  return TRUE;
+}
+
+static gboolean
+ogmrip_mplayer_video_watch (OGMJobTask *task, const gchar *buffer, OGMRipCodec *codec, GError **error)
+{
+  gchar v[10];
+  gint frame, decoded;
+
+  if (sscanf (buffer, "V:%s %d/%d", v, &frame, &decoded) == 3)
+    ogmjob_task_set_progress (task, decoded / (gdouble) ogmrip_mplayer_get_frames (codec));
+
+  return TRUE;
+}
+
+static gboolean
+ogmrip_mencoder_watch_stdout (OGMJobTask *task, const gchar *buffer, OGMRipCodec *codec, GError **error)
+{
+  gint frames, progress;
+  gchar pos[10];
+
+  if (sscanf (buffer, "Pos:%s %df (%d%%)", pos, &frames, &progress) == 3)
+    ogmjob_task_set_progress (task, frames / (gdouble) ogmrip_mplayer_get_frames (codec));
 
   return TRUE;
 }
@@ -448,27 +467,11 @@ ogmrip_mplayer_wav_command (OGMRipAudioCodec *audio, gboolean header, const gcha
   g_ptr_array_free (argv, TRUE);
 
   ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (task),
-      (OGMJobWatch) ogmrip_mplayer_wav_watch, audio);
+      (OGMJobWatch) ogmrip_mplayer_watch_stdout, audio);
   ogmjob_spawn_set_watch_stderr (OGMJOB_SPAWN (task),
       (OGMJobWatch) ogmrip_mplayer_watch_stderr, audio);
 
   return task;
-}
-
-static gboolean
-ogmrip_mencoder_codec_watch (OGMJobTask *task, const gchar *buffer, OGMRipCodec *codec, GError **error)
-{
-  gint frames, progress;
-  gdouble seconds;
-  gchar pos[10];
-
-  if (sscanf (buffer, "Pos:%s %df (%d%%)", pos, &frames, &progress) == 3)
-  {
-    seconds = strtod (pos, NULL);
-    ogmjob_task_set_progress (task, seconds / ogmrip_codec_get_length (codec, NULL));
-  }
-
-  return TRUE;
 }
 
 OGMJobTask *
@@ -506,7 +509,7 @@ ogmrip_mencoder_audio_command (OGMRipAudioCodec *audio, const gchar * const *opt
   g_ptr_array_free (argv, TRUE);
 
   ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (task),
-      (OGMJobWatch) ogmrip_mencoder_codec_watch, audio);
+      (OGMJobWatch) ogmrip_mencoder_watch_stdout, audio);
   ogmjob_spawn_set_watch_stderr (OGMJOB_SPAWN (task),
       (OGMJobWatch) ogmrip_mplayer_watch_stderr, audio);
 
@@ -585,23 +588,11 @@ ogmrip_mencoder_video_command (OGMRipVideoCodec *video, const gchar * const *opt
   g_ptr_array_free (argv, TRUE);
 
   ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (task),
-      (OGMJobWatch) ogmrip_mencoder_codec_watch, video);
+      (OGMJobWatch) ogmrip_mencoder_watch_stdout, video);
   ogmjob_spawn_set_watch_stderr (OGMJOB_SPAWN (task),
       (OGMJobWatch) ogmrip_mplayer_watch_stderr, video);
 
   return task;
-}
-
-static gboolean
-ogmrip_mplayer_video_watch (OGMJobTask *task, const gchar *buffer, OGMRipVideoCodec *video, GError **error)
-{
-  gchar v[10];
-  gint frame, decoded;
-
-  if (sscanf (buffer, "V:%s %d/%d", v, &frame, &decoded) == 3)
-    ogmjob_task_set_progress (task, decoded / (gdouble) ogmrip_mplayer_get_frames (OGMRIP_CODEC (video)));
-
-  return TRUE;
 }
 
 OGMJobTask *
@@ -664,22 +655,6 @@ ogmrip_mplayer_video_command (OGMRipVideoCodec *video, const gchar * const *opti
   return task;
 }
 
-static gboolean
-ogmrip_mencoder_vobsub_watch (OGMJobTask *task, const gchar *buffer, OGMRipSubpCodec *subp, GError **error)
-{
-  gint frames, progress;
-  gdouble seconds;
-  gchar pos[10];
-
-  if (sscanf (buffer, "Pos:%s %df (%d%%)", pos, &frames, &progress) == 3)
-  {
-    seconds = strtod (pos, NULL);
-    ogmjob_task_set_progress (task, 0.98 * seconds / ogmrip_codec_get_length (OGMRIP_CODEC (subp), NULL));
-  }
-
-  return TRUE;
-}
-
 OGMJobTask *
 ogmrip_mencoder_vobsub_command (OGMRipSubpCodec *subp, const gchar *output)
 {
@@ -719,23 +694,11 @@ ogmrip_mencoder_vobsub_command (OGMRipSubpCodec *subp, const gchar *output)
   g_ptr_array_free (argv, TRUE);
 
   ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (task),
-      (OGMJobWatch) ogmrip_mencoder_vobsub_watch, subp);
+      (OGMJobWatch) ogmrip_mencoder_watch_stdout, subp);
   ogmjob_spawn_set_watch_stderr (OGMJOB_SPAWN (task),
       (OGMJobWatch) ogmrip_mplayer_watch_stderr, subp);
 
   return task;
-}
-
-static gboolean
-ogmrip_mencoder_container_watch (OGMJobTask *task, const gchar *buffer, OGMRipContainer *container, GError **error)
-{
-  gint frames, progress;
-  gchar pos[10];
-
-  if (sscanf (buffer, "Pos:%s %df (%d%%)", pos, &frames, &progress) == 3)
-    ogmjob_task_set_progress (task, progress / 100.);
-
-  return TRUE;
 }
 
 OGMJobTask *
@@ -769,7 +732,7 @@ ogmrip_mencoder_extract_command (OGMRipContainer *container, const gchar *input,
   g_ptr_array_free (argv, TRUE);
 
   ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (task),
-      (OGMJobWatch) ogmrip_mencoder_container_watch, container);
+      (OGMJobWatch) ogmrip_mencoder_watch_stdout, container);
 
   return task;
 }
