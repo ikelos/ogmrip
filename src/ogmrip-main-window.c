@@ -1464,6 +1464,7 @@ ogmrip_main_window_title_chooser_changed (OGMRipMainWindow *window)
 
   title = ogmrip_title_chooser_get_active (OGMRIP_TITLE_CHOOSER (window->priv->title_chooser));
   gtk_widget_set_sensitive (window->priv->title_chooser, title != NULL);
+  gtk_widget_set_sensitive (window->priv->relative_check, title != NULL);
 
   gtk_container_clear (GTK_CONTAINER (window->priv->audio_list));
   ogmrip_main_window_add_audio_chooser (window);
@@ -1746,9 +1747,6 @@ ogmrip_main_window_init (OGMRipMainWindow *window)
   action = g_action_map_lookup_action (G_ACTION_MAP (window), "deselect_all");
   g_object_bind_property (window->priv->title_chooser, "sensitive",
       action, "enabled", G_BINDING_SYNC_CREATE);
-
-  g_object_bind_property (window->priv->title_chooser, "sensitive",
-      window->priv->relative_check, "sensitive", G_BINDING_SYNC_CREATE);
 
   window->priv->manager = ogmrip_encoding_manager_new ();
 
