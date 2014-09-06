@@ -50,6 +50,7 @@ struct _OGMRipVideoFilePriv
   guint aspect_num;
   guint aspect_denom;
   gint64 size;
+  gboolean progressive;
 };
 
 struct _OGMRipAudioFilePriv

@@ -154,6 +154,12 @@ ogmrip_video_file_get_resolution (OGMRipVideoStream *video, guint *w, guint *h)
     *h = OGMRIP_VIDEO_FILE (video)->priv->height;
 }
 
+static gboolean
+ogmrip_video_file_get_progressive (OGMRipVideoStream *video)
+{
+  return OGMRIP_VIDEO_FILE (video)->priv->progressive;
+}
+
 static void
 ogmrip_video_stream_iface_init (OGMRipVideoStreamInterface *iface)
 {
@@ -163,6 +169,7 @@ ogmrip_video_stream_iface_init (OGMRipVideoStreamInterface *iface)
   iface->get_framerate = ogmrip_video_file_get_framerate;
   iface->get_standard = ogmrip_video_file_get_standard;
   iface->get_resolution = ogmrip_video_file_get_resolution;
+  iface->get_progressive = ogmrip_video_file_get_progressive;
 }
 
 OGMRipMedia *

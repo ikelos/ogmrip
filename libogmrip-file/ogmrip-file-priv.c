@@ -170,6 +170,9 @@ ogmrip_media_info_get_video_info (OGMRipMediaInfo *info, guint track, OGMRipVide
     }
   }
 
+  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, track, "ScanType");
+  video->progressive = g_str_equal (str, "Progressive");
+
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, track, "StreamSize");
   video->size = str ? atoll (str) : -1;
 }
