@@ -569,7 +569,7 @@ ogmrip_video_codec_new_from_profile (OGMRipVideoStream *stream, OGMRipProfile *p
   w = g_settings_get_uint (settings, OGMRIP_PROFILE_MIN_WIDTH);
   h = g_settings_get_uint (settings, OGMRIP_PROFILE_MIN_HEIGHT);
 
-  if (w > 0 && h > 0)
+  if (w > 0 || h > 0)
     ogmrip_video_codec_set_min_size (OGMRIP_VIDEO_CODEC (codec), w, h);
 
   w = g_settings_get_uint (settings, OGMRIP_PROFILE_MAX_WIDTH);
