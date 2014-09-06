@@ -115,16 +115,19 @@ ogmrip_media_info_get_video_info (OGMRipMediaInfo *info, guint track, OGMRipVide
   if (str)
   {
     if (g_str_equal (str, "25.000"))
+    {
       video->framerate_num = 25;
+      video->framerate_denom = 1;
+    }
     else if (g_str_equal (str, "23.976"))
     {
       video->framerate_num = 24000;
-      video->framerate_num = 1001;
+      video->framerate_denom = 1001;
     }
     else if (g_str_equal (str, "29.970"))
     {
       video->framerate_num = 30000;
-      video->framerate_num = 1001;
+      video->framerate_denom = 1001;
     }
     else
     {
@@ -132,7 +135,7 @@ ogmrip_media_info_get_video_info (OGMRipMediaInfo *info, guint track, OGMRipVide
       
       framerate = strtod (str, NULL);
       video->framerate_num = framerate * 1000;
-      video->framerate_num = 1000;
+      video->framerate_denom = 1000;
     }
   }
 
