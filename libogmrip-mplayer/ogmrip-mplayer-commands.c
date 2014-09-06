@@ -120,7 +120,7 @@ ogmrip_command_set_fps (GPtrArray *argv, OGMRipTitle *title)
   stream = ogmrip_title_get_video_stream (title);
   ogmrip_video_stream_get_framerate (stream, &num1, &denom1);
 
-  if (ogmrip_title_get_telecine (title) || ogmrip_title_get_progressive (title))
+  if (ogmrip_video_stream_get_telecine (stream) || ogmrip_video_stream_get_progressive (stream))
   {
     num2 = 24000;
     denom2 = 1001;
@@ -248,8 +248,8 @@ ogmrip_command_set_video_filter (GPtrArray *argv, OGMRipVideoCodec *video)
     g_string_append (postproc, "dr");
   }
 
-  if (ogmrip_title_get_progressive (ogmrip_stream_get_title (stream)) ||
-      ogmrip_title_get_telecine (ogmrip_stream_get_title (stream)))
+  if (ogmrip_video_stream_get_progressive (OGMRIP_VIDEO_STREAM (stream)) ||
+      ogmrip_video_stream_get_telecine (OGMRIP_VIDEO_STREAM (stream)))
   {
     if (options->len > 0)
       g_string_append_c (options, ',');
@@ -289,7 +289,7 @@ ogmrip_command_set_video_filter (GPtrArray *argv, OGMRipVideoCodec *video)
       g_string_append_c (options, ',');
     g_string_append_printf (options, "scale=%u:%u", scale_width, scale_height);
 
-    if (ogmrip_title_get_interlaced (ogmrip_stream_get_title (stream)) &&
+    if (ogmrip_video_stream_get_interlaced (OGMRIP_VIDEO_STREAM (stream)) &&
         ogmrip_video_codec_get_deinterlacer (video) == OGMRIP_DEINT_NONE)
       g_string_append (options, ":1");
   }

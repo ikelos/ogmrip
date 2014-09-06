@@ -45,9 +45,6 @@ struct _OGMRipTitleInterface
   OGMRipMedia *       (* get_media)            (OGMRipTitle         *title);
   gint64              (* get_size)             (OGMRipTitle         *title);
   gint                (* get_id)               (OGMRipTitle         *title);
-  gboolean            (* get_progressive)      (OGMRipTitle         *title);
-  gboolean            (* get_telecine)         (OGMRipTitle         *title);
-  gboolean            (* get_interlaced)       (OGMRipTitle         *title);
   gdouble             (* get_length)           (OGMRipTitle         *title,
                                                 OGMRipTime          *length);
   gdouble             (* get_chapters_length)  (OGMRipTitle         *title, 
@@ -92,9 +89,6 @@ gboolean            ogmrip_title_is_open              (OGMRipTitle         *titl
 OGMRipMedia *       ogmrip_title_get_media            (OGMRipTitle         *title);
 gint64              ogmrip_title_get_size             (OGMRipTitle         *title);
 gint                ogmrip_title_get_id               (OGMRipTitle         *title);
-gboolean            ogmrip_title_get_progressive      (OGMRipTitle         *title);
-gboolean            ogmrip_title_get_telecine         (OGMRipTitle         *title);
-gboolean            ogmrip_title_get_interlaced       (OGMRipTitle         *title);
 gdouble             ogmrip_title_get_length           (OGMRipTitle         *title,
                                                        OGMRipTime          *length);
 gdouble             ogmrip_title_get_chapters_length  (OGMRipTitle         *title, 

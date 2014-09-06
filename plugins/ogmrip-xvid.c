@@ -217,7 +217,7 @@ ogmrip_xvid_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
     else
       g_string_append (options, ":nogmc");
 
-    interlaced = ogmrip_title_get_interlaced (title);
+    interlaced = ogmrip_video_stream_get_interlaced (ogmrip_title_get_video_stream (title));
     if (interlaced > 0 && ogmrip_video_codec_get_deinterlacer (video) != OGMRIP_DEINT_NONE)
       interlaced = 0;
 

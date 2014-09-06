@@ -370,8 +370,11 @@ typedef struct
 static gchar **
 ogmrip_title_crop_command (OGMRipTitle *title, gdouble start, gulong nframes)
 {
+  OGMRipVideoStream *stream;
   GPtrArray *argv;
   GString *filter;
+
+  stream = ogmrip_title_get_video_stream (title);
 
   argv = g_ptr_array_new_full (20, g_free);
   g_ptr_array_add (argv, g_strdup ("mplayer"));
@@ -391,7 +394,7 @@ ogmrip_title_crop_command (OGMRipTitle *title, gdouble start, gulong nframes)
 
   filter = g_string_new (NULL);
 
-  if (ogmrip_title_get_interlaced (title))
+  if (stream && ogmrip_video_stream_get_interlaced (stream))
     g_string_append (filter, "yadif=0");
 
   if (filter->len > 0)

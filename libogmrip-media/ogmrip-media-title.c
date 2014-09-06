@@ -100,51 +100,6 @@ ogmrip_title_get_id (OGMRipTitle *title)
   return iface->get_id (title);
 }
 
-gboolean
-ogmrip_title_get_progressive (OGMRipTitle *title)
-{
-  OGMRipTitleInterface *iface;
-
-  g_return_val_if_fail (OGMRIP_IS_TITLE (title), -1);
-
-  iface = OGMRIP_TITLE_GET_IFACE (title);
-
-  if (!iface->get_progressive)
-    return FALSE;
-
-  return iface->get_progressive (title);
-}
-
-gboolean
-ogmrip_title_get_telecine (OGMRipTitle *title)
-{
-  OGMRipTitleInterface *iface;
-
-  g_return_val_if_fail (OGMRIP_IS_TITLE (title), -1);
-
-  iface = OGMRIP_TITLE_GET_IFACE (title);
-
-  if (!iface->get_telecine)
-    return FALSE;
-
-  return iface->get_telecine (title);
-}
-
-gboolean
-ogmrip_title_get_interlaced (OGMRipTitle *title)
-{
-  OGMRipTitleInterface *iface;
-
-  g_return_val_if_fail (OGMRIP_IS_TITLE (title), -1);
-
-  iface = OGMRIP_TITLE_GET_IFACE (title);
-
-  if (!iface->get_interlaced)
-    return FALSE;
-
-  return iface->get_interlaced (title);
-}
-
 gint64
 ogmrip_title_get_size (OGMRipTitle *title)
 {

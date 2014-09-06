@@ -1751,12 +1751,17 @@ ogmrip_encoding_analyze (OGMRipEncoding *encoding, GCancellable *cancellable, GE
 
   if (result)
   {
-    ogmrip_log_printf ("\nTelecine: %s\n",
-        ogmrip_title_get_telecine (encoding->priv->title) ? "true" : "false");
-    ogmrip_log_printf ("Progressive: %s\n",
-        ogmrip_title_get_progressive (encoding->priv->title) ? "true" : "false");
-    ogmrip_log_printf ("Interlaced: %s\n\n",
-        ogmrip_title_get_interlaced (encoding->priv->title) ? "true" : "false");
+    OGMRipVideoStream *stream = ogmrip_title_get_video_stream (encoding->priv->title);
+
+    if (stream)
+    {
+      ogmrip_log_printf ("\nTelecine: %s\n",
+          ogmrip_video_stream_get_telecine (stream) ? "true" : "false");
+      ogmrip_log_printf ("Progressive: %s\n",
+          ogmrip_video_stream_get_progressive (stream) ? "true" : "false");
+      ogmrip_log_printf ("Interlaced: %s\n\n",
+          ogmrip_video_stream_get_interlaced (stream) ? "true" : "false");
+    }
   }
 
   return result;

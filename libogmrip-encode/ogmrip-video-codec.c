@@ -1445,8 +1445,8 @@ ogmrip_video_codec_get_framerate (OGMRipVideoCodec *video, guint *num, guint *de
   stream = ogmrip_codec_get_input (OGMRIP_CODEC (video));
   ogmrip_video_stream_get_framerate (OGMRIP_VIDEO_STREAM (stream), num, denom);
 
-  if (ogmrip_title_get_telecine (ogmrip_stream_get_title (stream)) ||
-      ogmrip_title_get_progressive (ogmrip_stream_get_title (stream)))
+  if (ogmrip_video_stream_get_telecine (OGMRIP_VIDEO_STREAM (stream)) ||
+      ogmrip_video_stream_get_progressive (OGMRIP_VIDEO_STREAM (stream)))
   {
     *num = 24000;
     *denom = 1001;

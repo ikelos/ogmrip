@@ -132,3 +132,48 @@ ogmrip_video_stream_get_start_delay (OGMRipVideoStream *video)
   return iface->get_start_delay (video);
 }
 
+gboolean
+ogmrip_video_stream_get_progressive (OGMRipVideoStream *video)
+{
+  OGMRipVideoStreamInterface *iface;
+
+  g_return_val_if_fail (OGMRIP_IS_VIDEO_STREAM (video), -1);
+
+  iface = OGMRIP_VIDEO_STREAM_GET_IFACE (video);
+
+  if (!iface->get_progressive)
+    return FALSE;
+
+  return iface->get_progressive (video);
+}
+
+gboolean
+ogmrip_video_stream_get_telecine (OGMRipVideoStream *video)
+{
+  OGMRipVideoStreamInterface *iface;
+
+  g_return_val_if_fail (OGMRIP_IS_VIDEO_STREAM (video), -1);
+
+  iface = OGMRIP_VIDEO_STREAM_GET_IFACE (video);
+
+  if (!iface->get_telecine)
+    return FALSE;
+
+  return iface->get_telecine (video);
+}
+
+gboolean
+ogmrip_video_stream_get_interlaced (OGMRipVideoStream *video)
+{
+  OGMRipVideoStreamInterface *iface;
+
+  g_return_val_if_fail (OGMRIP_IS_VIDEO_STREAM (video), -1);
+
+  iface = OGMRIP_VIDEO_STREAM_GET_IFACE (video);
+
+  if (!iface->get_interlaced)
+    return FALSE;
+
+  return iface->get_interlaced (video);
+}
+
