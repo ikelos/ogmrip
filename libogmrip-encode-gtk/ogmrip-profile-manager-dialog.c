@@ -207,7 +207,7 @@ ogmrip_profile_manager_dialog_copy_activated (GSimpleAction *action, GVariant *p
   if (gtk_tree_selection_get_selected (dialog->priv->selection, &model, &iter))
   {
     OGMRipProfile *profile, *new_profile;
-    gchar *name, *new_name;
+    gchar *name, *desc, *new_name;
 
     profile = ogmrip_profile_store_get_profile (OGMRIP_PROFILE_STORE (model), &iter);
 
@@ -221,6 +221,10 @@ ogmrip_profile_manager_dialog_copy_activated (GSimpleAction *action, GVariant *p
 
     g_settings_set_string (G_SETTINGS (new_profile), OGMRIP_PROFILE_NAME, new_name);
     g_free (new_name);
+
+    desc = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_DESCRIPTION);
+    g_settings_set_string (G_SETTINGS (new_profile), OGMRIP_PROFILE_DESCRIPTION, desc);
+    g_free (desc);
   }
 }
 
