@@ -143,8 +143,8 @@ ogmrip_subp2pgm_command (OGMRipSubpCodec *subp, const gchar *input)
   task = ogmjob_spawn_newv ((gchar **) argv->pdata);
   g_ptr_array_free (argv, TRUE);
 
-  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (task),
-      (OGMJobWatch) ogmrip_subp2pgm_watch, subp);
+  ogmjob_spawn_set_watch (OGMJOB_SPAWN (task), OGMJOB_STREAM_OUTPUT,
+      (OGMJobWatch) ogmrip_subp2pgm_watch, subp, NULL);
 
   return task;
 }
@@ -186,8 +186,8 @@ ogmrip_gocr_command (OGMRipSubpCodec *subp, const gchar *input)
   task = ogmjob_spawn_newv ((gchar **) argv->pdata);
   g_ptr_array_free (argv, TRUE);
 
-  ogmjob_spawn_set_watch_stderr (OGMJOB_SPAWN (task),
-      (OGMJobWatch) ogmrip_gocr_watch, subp);
+  ogmjob_spawn_set_watch (OGMJOB_SPAWN (task), OGMJOB_STREAM_ERROR,
+      (OGMJobWatch) ogmrip_gocr_watch, subp, NULL);
 
   return task;
 }
@@ -225,8 +225,8 @@ ogmrip_ocrad_command (OGMRipSubpCodec *subp, const gchar *input)
   task = ogmjob_spawn_newv ((gchar **) argv->pdata);
   g_ptr_array_free (argv, TRUE);
 
-  ogmjob_spawn_set_watch_stderr (OGMJOB_SPAWN (task),
-      (OGMJobWatch) ogmrip_ocrad_watch, subp);
+  ogmjob_spawn_set_watch (OGMJOB_SPAWN (task), OGMJOB_STREAM_ERROR,
+      (OGMJobWatch) ogmrip_ocrad_watch, subp, NULL);
 
   return task;
 }
@@ -269,8 +269,8 @@ ogmrip_tesseract_command (OGMRipSubpCodec *subp, const gchar *input, gboolean la
   task = ogmjob_spawn_newv ((gchar **) argv->pdata);
   g_ptr_array_free (argv, TRUE);
 
-  ogmjob_spawn_set_watch_stderr (OGMJOB_SPAWN (task),
-      (OGMJobWatch) ogmrip_tesseract_watch, subp);
+  ogmjob_spawn_set_watch (OGMJOB_SPAWN (task), OGMJOB_STREAM_ERROR,
+      (OGMJobWatch) ogmrip_tesseract_watch, subp, NULL);
 
   return task;
 }

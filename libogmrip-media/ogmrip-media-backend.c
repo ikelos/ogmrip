@@ -292,8 +292,8 @@ ogmrip_title_benchmark (OGMRipTitle *title, gboolean *progressive, gboolean *tel
   spawn = ogmjob_spawn_newv (argv);
   g_strfreev (argv);
 
-  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (spawn),
-      (OGMJobWatch) ogmrip_title_benchmark_watch, &benchmark);
+  ogmjob_spawn_set_watch (OGMJOB_SPAWN (spawn), OGMJOB_STREAM_OUTPUT,
+      (OGMJobWatch) ogmrip_title_benchmark_watch, &benchmark, NULL);
 
   if (callback)
     g_signal_connect (spawn, "notify::progress",
@@ -512,8 +512,8 @@ ogmrip_title_crop_detect (OGMRipTitle *title, guint *crop_x, guint *crop_y, guin
     spawn = ogmjob_spawn_newv (argv);
     g_strfreev (argv);
 
-    ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (spawn),
-        (OGMJobWatch) ogmrip_title_crop_watch, &crop);
+    ogmjob_spawn_set_watch (OGMJOB_SPAWN (spawn), OGMJOB_STREAM_OUTPUT,
+        (OGMJobWatch) ogmrip_title_crop_watch, &crop, NULL);
 
     ogmjob_container_add (OGMJOB_CONTAINER (queue), spawn);
     g_object_unref (spawn);

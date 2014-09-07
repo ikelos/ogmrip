@@ -229,8 +229,8 @@ ogmrip_ogg_merge_command (OGMRipContainer *ogg, const gchar *output)
   task = ogmjob_spawn_newv ((gchar **) argv->pdata);
   g_ptr_array_free (argv, TRUE);
 
-  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (task),
-      (OGMJobWatch) ogmrip_ogg_merge_watch, ogg);
+  ogmjob_spawn_set_watch (OGMJOB_SPAWN (task), OGMJOB_STREAM_OUTPUT,
+      (OGMJobWatch) ogmrip_ogg_merge_watch, ogg, NULL);
 
   return task;
 }
@@ -258,8 +258,8 @@ ogmrip_ogg_split_command (OGMRipContainer *ogg, const gchar *input)
   task = ogmjob_spawn_newv ((gchar **) argv->pdata);
   g_ptr_array_free (argv, TRUE);
 
-  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (task),
-      (OGMJobWatch) ogmrip_ogg_split_watch, ogg);
+  ogmjob_spawn_set_watch (OGMJOB_SPAWN (task), OGMJOB_STREAM_OUTPUT,
+      (OGMJobWatch) ogmrip_ogg_split_watch, ogg, NULL);
 
   return task;
 }

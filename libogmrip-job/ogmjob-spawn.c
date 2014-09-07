@@ -47,9 +47,11 @@ struct _OGMJobSpawnPriv
   gchar **argv;
 
   OGMJobWatch watch_out;
+  GDestroyNotify notify_out;
   gpointer data_out;
 
   OGMJobWatch watch_err;
+  GDestroyNotify notify_err;
   gpointer data_err;
 };
 
@@ -173,6 +175,9 @@ task_pid_watch (GPid pid, gint status, TaskAsyncData *data)
 static void
 task_stdout_notify (TaskAsyncData *data)
 {
+  if (data->spawn->priv->notify_out)
+    (* data->spawn->priv->notify_out) (data->spawn->priv->data_out);
+
   data->src_out = 0;
   complete_task (data);
 }
@@ -180,6 +185,9 @@ task_stdout_notify (TaskAsyncData *data)
 static void
 task_stderr_notify (TaskAsyncData *data)
 {
+  if (data->spawn->priv->notify_err)
+    (* data->spawn->priv->notify_err) (data->spawn->priv->data_err);
+
   data->src_err = 0;
   complete_task (data);
 }
@@ -448,21 +456,24 @@ ogmjob_spawn_newv (gchar **argv)
 }
 
 void
-ogmjob_spawn_set_watch_stdout (OGMJobSpawn *spawn, OGMJobWatch watch_func, gpointer watch_data)
+ogmjob_spawn_set_watch (OGMJobSpawn *spawn, OGMJobStream stream,
+    OGMJobWatch func, gpointer data, GDestroyNotify notify)
 {
   g_return_if_fail (OGMJOB_IS_SPAWN (spawn));
 
-  spawn->priv->watch_out = watch_func;
-  spawn->priv->data_out = watch_data;
-}
-
-void
-ogmjob_spawn_set_watch_stderr (OGMJobSpawn *spawn, OGMJobWatch watch_func, gpointer watch_data)
-{
-  g_return_if_fail (OGMJOB_IS_SPAWN (spawn));
-
-  spawn->priv->watch_err = watch_func;
-  spawn->priv->data_err = watch_data;
+  switch (stream)
+  {
+    case OGMJOB_STREAM_OUTPUT:
+      spawn->priv->watch_out = func;
+      spawn->priv->data_out = data;
+      spawn->priv->notify_out = notify;
+      break;
+    case OGMJOB_STREAM_ERROR:
+      spawn->priv->watch_err = func;
+      spawn->priv->data_err = data;
+      spawn->priv->notify_err = notify;
+      break;
+  }
 }
 
 gint

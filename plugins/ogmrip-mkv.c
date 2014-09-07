@@ -338,8 +338,8 @@ ogmrip_matroska_command (OGMRipContainer *matroska)
   task = ogmjob_spawn_newv ((gchar **) argv->pdata);
   g_ptr_array_free (argv, TRUE);
 
-  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (task),
-      (OGMJobWatch) ogmrip_matroska_watch, matroska);
+  ogmjob_spawn_set_watch (OGMJOB_SPAWN (task), OGMJOB_STREAM_OUTPUT,
+      (OGMJobWatch) ogmrip_matroska_watch, matroska, NULL);
 
   return task;
 }

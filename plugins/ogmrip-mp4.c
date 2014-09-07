@@ -324,8 +324,8 @@ ogmrip_mp4_create_command (OGMRipContainer *container, const gchar *input)
   task = ogmjob_spawn_newv ((gchar **) argv->pdata);
   g_ptr_array_free (argv, TRUE);
 
-  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (task),
-      (OGMJobWatch) ogmrip_mp4_create_watch, mp4);
+  ogmjob_spawn_set_watch (OGMJOB_SPAWN (task), OGMJOB_STREAM_OUTPUT,
+      (OGMJobWatch) ogmrip_mp4_create_watch, mp4, NULL);
 
   return task;
 }
@@ -380,8 +380,8 @@ ogmrip_mp4_split_command (OGMRipContainer *mp4)
   task = ogmjob_spawn_newv ((gchar **) argv->pdata);
   g_ptr_array_free (argv, TRUE);
 
-  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (task),
-      (OGMJobWatch) ogmrip_mp4_split_watch, mp4);
+  ogmjob_spawn_set_watch (OGMJOB_SPAWN (task), OGMJOB_STREAM_OUTPUT,
+      (OGMJobWatch) ogmrip_mp4_split_watch, mp4, NULL);
 
   return task;
 }
