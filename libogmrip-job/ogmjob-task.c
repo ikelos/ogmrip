@@ -266,8 +266,11 @@ ogmjob_task_set_progress (OGMJobTask *task, gdouble progress)
 {
   g_return_if_fail (OGMJOB_IS_TASK (task));
 
-  task->priv->progress = progress;
+  if (progress > task->priv->progress)
+  {
+    task->priv->progress = progress;
 
-  g_object_notify (G_OBJECT (task), "progress");
+    g_object_notify (G_OBJECT (task), "progress");
+  }
 }
 
