@@ -81,16 +81,7 @@ static gboolean ogmrip_vp8_run          (OGMJobTask   *task,
 static OGMJobTask *
 ogmrip_yuv4mpeg_command (OGMRipVideoCodec *video, const gchar *fifo)
 {
-  OGMJobTask *task;
-  gchar *options[] = { "-vo", NULL, NULL };
-
-  options[1] = g_strdup_printf ("yuv4mpeg:file=%s", fifo);
-
-  task = ogmrip_mplayer_video_command (video, (const gchar * const *) options, fifo);
-
-  g_free (options[1]);
-
-  return task;
+  return ogmrip_video_encoder_new (video, OGMRIP_ENCODER_YUV, NULL, NULL, fifo);
 }
 
 static OGMJobTask *

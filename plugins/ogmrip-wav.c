@@ -76,7 +76,7 @@ ogmrip_wav_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   OGMJobTask *child;
   gboolean result;
 
-  child = ogmrip_mplayer_wav_command (OGMRIP_AUDIO_CODEC (task), TRUE,
+  child = ogmrip_audio_encoder_new (OGMRIP_AUDIO_CODEC (task), OGMRIP_ENCODER_WAV, NULL,
       ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (task))));
   ogmjob_container_add (OGMJOB_CONTAINER (task), child);
   g_object_unref (child);

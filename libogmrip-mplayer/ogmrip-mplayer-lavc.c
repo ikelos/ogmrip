@@ -134,7 +134,6 @@ ogmrip_lavc_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   static const gint strict[] = { 0, 1, -1, -2 };
 
   OGMRipLavc *lavc = OGMRIP_LAVC (video);
-  gchar *opts[] = { "-ovc", "lavc", "-lavcopts", NULL, NULL, NULL, NULL };
 
   OGMJobTask *task;
   GString *options;
@@ -220,9 +219,6 @@ ogmrip_lavc_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
       else
         g_string_append (options, ":vpass=3");
     }
-
-    opts[4] = "-passlogfile";
-    opts[5] = (gchar *) log_file;
   }
 
   threads = ogmrip_video_codec_get_threads (video);
@@ -231,9 +227,8 @@ ogmrip_lavc_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   if (threads > 0)
     g_string_append_printf (options, ":threads=%u", CLAMP (threads, 1, 8));
 
-  opts[3] = options->str;
-
-  task = ogmrip_mencoder_video_command (video, (const gchar * const *) opts, pass == passes ? output : "/dev/null");
+  task = ogmrip_video_encoder_new (video, OGMRIP_ENCODER_LAVC,
+      options->str, log_file, pass == passes ? output : "/dev/null");
 
   g_string_free (options, TRUE);
 

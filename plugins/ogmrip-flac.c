@@ -129,7 +129,7 @@ ogmrip_flac_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   ogmjob_container_add (OGMJOB_CONTAINER (task), pipeline);
   g_object_unref (pipeline);
 
-  child = ogmrip_mplayer_wav_command (OGMRIP_AUDIO_CODEC (task), TRUE, fifo);
+  child = ogmrip_audio_encoder_new (OGMRIP_AUDIO_CODEC (task), OGMRIP_ENCODER_WAV, NULL, fifo);
   ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
   g_object_unref (child);
 

@@ -223,7 +223,6 @@ static OGMJobTask *
 ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gchar *log_file)
 {
   OGMRipX264 *x264 = OGMRIP_X264 (video);
-  gchar *opts[] = { "-ovc", "x264", "-x264encopts", NULL, NULL, NULL, NULL };
 
   OGMJobTask *task;
   GString *options;
@@ -372,12 +371,7 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   }
 
   if (passes > 1 && log_file)
-  {
     g_string_append_printf (options, ":pass=%u", pass == 1 ? 1 : pass == passes ? 2 : 3);
-
-    opts[4] = "-passlogfile";
-    opts[5] = (gchar *) log_file;
-  }
   
   threads = ogmrip_video_codec_get_threads (video);
   if (threads > 0)
@@ -385,9 +379,8 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   else
     g_string_append (options, ":threads=auto");
 
-  opts[3] = options->str;
-
-  task = ogmrip_mencoder_video_command (video, (const gchar * const *) opts, pass == passes ? output : "/dev/null");
+  task = ogmrip_video_encoder_new (video, OGMRIP_ENCODER_X264,
+      options->str, log_file, pass == passes ? output : "/dev/null");
 
   g_string_free (options, TRUE);
 

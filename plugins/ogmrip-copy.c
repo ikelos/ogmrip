@@ -54,7 +54,9 @@ ogmrip_audio_copy_command (OGMRipAudioCodec *audio)
   input  = ogmrip_codec_get_input (OGMRIP_CODEC (audio));
   output = ogmrip_codec_get_output (OGMRIP_CODEC (audio));
 
-  if (ogmrip_stream_get_format (input) == OGMRIP_FORMAT_PCM)
+  if (ogmrip_stream_get_format (input) != OGMRIP_FORMAT_PCM)
+    task = ogmrip_audio_encoder_new (audio, OGMRIP_ENCODER_COPY, NULL, ogmrip_file_get_path (output));
+  else
   {
     ogmrip_audio_codec_set_fast (audio, FALSE);
     ogmrip_audio_codec_set_normalize (audio, FALSE);
@@ -63,13 +65,7 @@ ogmrip_audio_copy_command (OGMRipAudioCodec *audio)
     ogmrip_audio_codec_set_channels (audio,
         ogmrip_audio_stream_get_channels (OGMRIP_AUDIO_STREAM (input)));
 
-    task = ogmrip_mplayer_wav_command (audio, FALSE, ogmrip_file_get_path (output));
-  }
-  else
-  {
-    const gchar * const options[] = { "-mc", "0", "-noskip", "-ovc", "copy", "-oac", "copy", NULL };
-
-    task = ogmrip_mencoder_audio_command (audio, options, ogmrip_file_get_path (output));
+    task = ogmrip_audio_encoder_new (audio, OGMRIP_ENCODER_PCM, NULL, ogmrip_file_get_path (output));
   }
 
   return task;
@@ -195,14 +191,11 @@ ogmrip_copy_set_property (GObject *gobject, guint property_id, const GValue *val
 static OGMJobTask *
 ogmrip_video_copy_command (OGMRipVideoCodec *video)
 {
-  const gchar * const options[] =
-  { "-mc", "0", "-noskip", "-ovc", "copy", "-oac", "copy", "-of", "mpeg", "-mpegopts", "format=dvd:tsaf", NULL };
-
   g_return_val_if_fail (OGMRIP_IS_VIDEO_CODEC (video), NULL);
 
   ogmrip_video_codec_set_ensure_sync (video, NULL);
 
-  return ogmrip_mencoder_video_command (video, options,
+  return ogmrip_video_encoder_new (video, OGMRIP_ENCODER_COPY, NULL, NULL,
       ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (video))));
 }
 

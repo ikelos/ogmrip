@@ -70,14 +70,7 @@ static gboolean ogmrip_theora_run          (OGMJobTask   *task,
 static OGMJobTask *
 ogmrip_yuv4mpeg_command (OGMRipVideoCodec *video, const gchar *output)
 {
-  OGMJobTask *task;
-  gchar *options[] = { "-vo", NULL, NULL };
-
-  options[1] = g_strdup_printf ("yuv4mpeg:file=%s", output);
-  task = ogmrip_mplayer_video_command (video, (const gchar * const *) options, output);
-  g_free (options[1]);
-
-  return task;
+  return ogmrip_video_encoder_new (video, OGMRIP_ENCODER_YUV, NULL, NULL, output);
 }
 
 static OGMJobTask *

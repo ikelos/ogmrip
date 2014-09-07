@@ -191,7 +191,7 @@ ogmrip_vobsub_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   OGMJobTask *child;
   gboolean result;
 
-  child = ogmrip_mencoder_vobsub_command (OGMRIP_SUBP_CODEC (task),
+  child = ogmrip_subp_encoder_new (OGMRIP_SUBP_CODEC (task), OGMRIP_ENCODER_VOBSUB, NULL,
       ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (task))));
   ogmjob_container_add (OGMJOB_CONTAINER (task), child);
   g_object_unref (child);

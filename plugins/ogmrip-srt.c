@@ -376,7 +376,7 @@ ogmrip_srt_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 
   xml_file = g_strconcat (tmp_file, ".xml", NULL);
 
-  child = ogmrip_mencoder_vobsub_command (OGMRIP_SUBP_CODEC (task), tmp_file);
+  child = ogmrip_subp_encoder_new (OGMRIP_SUBP_CODEC (task), OGMRIP_ENCODER_VOBSUB, NULL, tmp_file);
   ogmjob_container_add (OGMJOB_CONTAINER (task), child);
   g_object_unref (child);
 
