@@ -499,8 +499,8 @@ ogmrip_mp4_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   OGMRipMp4 *mp4 = OGMRIP_MP4 (task);
   OGMJobTask *queue, *child;
 
-  gchar *filename = NULL;
   gboolean result = FALSE;
+  gchar *filename;
 
   ogmrip_container_get_split (OGMRIP_CONTAINER (task), &mp4->nsplits, NULL);
 
@@ -512,14 +512,11 @@ ogmrip_mp4_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   ogmjob_container_add (OGMJOB_CONTAINER (task), queue);
   g_object_unref (queue);
 
-  if (ogmrip_stream_get_format (OGMRIP_STREAM (mp4->video)) == OGMRIP_FORMAT_H264)
-  {
-    filename = ogmrip_fs_mktemp ("video.XXXXXX", NULL);
+  filename = ogmrip_fs_mktemp ("video.XXXXXX", NULL);
 
-    child = ogmrip_video_extractor_new (OGMRIP_CONTAINER (task), mp4->video, filename);
-    ogmjob_container_add (OGMJOB_CONTAINER (queue), child);
-    g_object_unref (child);
-  }
+  child = ogmrip_video_extractor_new (OGMRIP_CONTAINER (task), mp4->video, filename);
+  ogmjob_container_add (OGMJOB_CONTAINER (queue), child);
+  g_object_unref (child);
 
   mp4->old_percent = 0;
   mp4->nstreams = 2 + mp4->naudio + mp4->nvobsub;
@@ -543,11 +540,8 @@ ogmrip_mp4_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 
   ogmjob_container_remove (OGMJOB_CONTAINER (task), queue);
 
-  if (filename)
-  {
-    g_unlink (filename);
-    g_free (filename);
-  }
+  g_unlink (filename);
+  g_free (filename);
 
   if (mp4->nsplits > 1)
     g_file_delete (ogmrip_container_get_output (OGMRIP_CONTAINER (task)), NULL, NULL);
