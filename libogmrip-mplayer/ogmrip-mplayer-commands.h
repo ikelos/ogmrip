@@ -45,7 +45,7 @@ OGMJobTask * ogmrip_mencoder_video_command   (OGMRipVideoCodec    *video,
                                               const gchar * const *options,
                                               const gchar         *output);
 OGMJobTask * ogmrip_mencoder_extract_command (OGMRipContainer     *container,
-                                              const gchar         *input,
+                                              OGMRipFile          *file,
                                               const gchar         *output);
 
 G_END_DECLS

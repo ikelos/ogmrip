@@ -516,7 +516,7 @@ ogmrip_mp4_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   {
     filename = ogmrip_fs_mktemp ("video.XXXXXX", NULL);
 
-    child = ogmrip_mencoder_extract_command (OGMRIP_CONTAINER (task), ogmrip_file_get_path (mp4->video), filename);
+    child = ogmrip_mencoder_extract_command (OGMRIP_CONTAINER (task), mp4->video, filename);
     ogmjob_container_add (OGMJOB_CONTAINER (queue), child);
     g_object_unref (child);
   }

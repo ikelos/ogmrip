@@ -709,10 +709,13 @@ ogmrip_mencoder_vobsub_command (OGMRipSubpCodec *subp, const gchar *output)
 }
 
 OGMJobTask *
-ogmrip_mencoder_extract_command (OGMRipContainer *container, const gchar *input, const gchar *output)
+ogmrip_mencoder_extract_command (OGMRipContainer *container, OGMRipFile *file, const gchar *output)
 {
   OGMJobTask *task;
   GPtrArray *argv;
+
+  guint num, denom;
+  glong *frames;
 
   g_return_val_if_fail (OGMRIP_IS_CONTAINER (container), NULL);
   g_return_val_if_fail (output != NULL, NULL);
@@ -731,16 +734,21 @@ ogmrip_mencoder_extract_command (OGMRipContainer *container, const gchar *input,
   g_ptr_array_add (argv, g_strdup ("-of"));
   g_ptr_array_add (argv, g_strdup ("rawvideo"));
 
-  g_ptr_array_add (argv, g_strdup (input));
+  g_ptr_array_add (argv, g_strdup (ogmrip_file_get_path (file)));
 
   g_ptr_array_add (argv, NULL);
 
   task = ogmjob_spawn_newv ((gchar **) argv->pdata);
   g_ptr_array_free (argv, TRUE);
-/*
+
+  ogmrip_video_stream_get_framerate (OGMRIP_VIDEO_STREAM (file), &num, &denom);
+
+  frames = g_new0 (glong, 1);
+  *frames = ogmrip_title_get_length (ogmrip_stream_get_title (OGMRIP_STREAM (file)), NULL) / (gdouble) denom * num;
+
   ogmjob_spawn_set_watch (OGMJOB_SPAWN (task), OGMJOB_STREAM_OUTPUT,
-      (OGMJobWatch) ogmrip_mencoder_watch_stdout, container, NULL);
-*/
+      (OGMJobWatch) ogmrip_mencoder_watch_stdout, frames, g_free);
+
   return task;
 }
 
