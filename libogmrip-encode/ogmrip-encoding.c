@@ -2100,32 +2100,17 @@ void
 ogmrip_encoding_clean (OGMRipEncoding *encoding, gboolean temporary, gboolean copy, gboolean log)
 {
   g_return_if_fail (OGMRIP_IS_ENCODING (encoding));
-/*
+
   if (temporary)
   {
-    OGMRipCodec *codec;
-    GList *list, *link;
+    if (encoding->priv->video_codec)
+      ogmrip_codec_clean (OGMRIP_CODEC (encoding->priv->video_codec));
 
-    codec = ogmrip_encoding_get_video_codec (encoding);
-    if (codec)
-      ogmrip_file_delete (ogmrip_codec_get_output (codec), NULL);
-
-    list = ogmrip_encoding_get_audio_codecs (encoding);
-    for (link = list; link; link = link->next)
-      ogmrip_file_delete (ogmrip_codec_get_output (link->data), NULL);
-    g_list_free (list);
-
-    list = ogmrip_encoding_get_subp_codecs (encoding);
-    for (link = list; link; link = link->next)
-      ogmrip_file_delete (ogmrip_codec_get_output (link->data), NULL);
-    g_list_free (list);
-
-    list = ogmrip_encoding_get_chapters (encoding);
-    for (link = list; link; link = link->next)
-      ogmrip_file_delete (ogmrip_codec_get_output (link->data), NULL);
-    g_list_free (list);
+    g_list_foreach (encoding->priv->audio_codecs, (GFunc) ogmrip_codec_clean, NULL);
+    g_list_foreach (encoding->priv->subp_codecs, (GFunc) ogmrip_codec_clean, NULL);
+    g_list_foreach (encoding->priv->chapters, (GFunc) ogmrip_codec_clean, NULL);
   }
-*/
+
   if (copy && encoding->priv->copy)
   {
     const gchar *uri;

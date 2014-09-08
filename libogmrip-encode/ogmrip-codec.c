@@ -36,6 +36,7 @@ struct _OGMRipCodecPriv
   OGMRipStream *input;
   OGMRipFile *output;
   gboolean internal;
+  gboolean autoclean;
 
   guint start_chap;
   gint end_chap;
@@ -52,7 +53,8 @@ enum
   PROP_START_CHAPTER,
   PROP_END_CHAPTER,
   PROP_PLAY_LENGTH,
-  PROP_START_POSITION
+  PROP_START_POSITION,
+  PROP_AUTOCLEAN
 };
 
 GQuark
@@ -119,8 +121,8 @@ ogmrip_codec_dispose (GObject *gobject)
 
   if (codec->priv->output)
   {
-    if (codec->priv->internal)
-      ogmrip_file_delete (codec->priv->output, NULL);
+    if (codec->priv->autoclean)
+      ogmrip_codec_clean (codec);
     g_object_unref (codec->priv->output);
     codec->priv->output = NULL;
   }
@@ -169,6 +171,9 @@ ogmrip_codec_set_property (GObject *gobject, guint property_id, const GValue *va
     case PROP_START_POSITION:
       ogmrip_codec_set_start_position (codec, g_value_get_double (value));
       break;
+    case PROP_AUTOCLEAN:
+      codec->priv->autoclean = g_value_get_boolean (value);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
@@ -199,6 +204,9 @@ ogmrip_codec_get_property (GObject *gobject, guint property_id, GValue *value, G
       break;
     case PROP_START_POSITION:
       g_value_set_double (value, codec->priv->start_position);
+      break;
+    case PROP_AUTOCLEAN:
+      g_value_set_boolean (value, codec->priv->autoclean);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -275,6 +283,10 @@ ogmrip_codec_class_init (OGMRipCodecClass *klass)
   g_object_class_install_property (gobject_class, PROP_START_POSITION, 
         g_param_spec_double ("start-position", "Start position property", "Get start position", 
            0.0, G_MAXDOUBLE, 0.0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_AUTOCLEAN, 
+        g_param_spec_boolean ("autoclean", "Autoclean property", "Set automatic cleaning of temporary files", 
+           TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 }
 
 static void
@@ -284,6 +296,7 @@ ogmrip_codec_init (OGMRipCodec *codec)
 
   codec->priv->end_chap = -1;
   codec->priv->play_length = -1.0;
+  codec->priv->autoclean = TRUE;
 }
 
 /**
@@ -483,5 +496,35 @@ ogmrip_codec_get_start_position (OGMRipCodec *codec)
   g_return_val_if_fail (OGMRIP_IS_CODEC (codec), -1);
 
   return codec->priv->start_position;
+}
+
+void
+ogmrip_codec_set_autoclean (OGMRipCodec *codec, gboolean autoclean)
+{
+  g_return_if_fail (OGMRIP_IS_CODEC (codec));
+
+  if (codec->priv->autoclean != autoclean)
+  {
+    codec->priv->autoclean = autoclean;
+
+    g_object_notify (G_OBJECT (codec), "autoclean");
+  }
+}
+
+gboolean
+ogmrip_codec_get_autoclean (OGMRipCodec *codec)
+{
+  g_return_val_if_fail (OGMRIP_IS_CODEC (codec), FALSE);
+
+  return codec->priv->autoclean;
+}
+
+void
+ogmrip_codec_clean (OGMRipCodec *codec)
+{
+  g_return_if_fail (OGMRIP_IS_CODEC (codec));
+
+  if (codec->priv->output && codec->priv->internal)
+    ogmrip_file_delete (codec->priv->output, NULL);
 }
 

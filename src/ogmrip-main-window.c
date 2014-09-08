@@ -711,6 +711,7 @@ ogmrip_main_window_create_video_codec (OGMRipMainWindow *window, OGMRipProfile *
   if (!codec)
     return NULL;
 
+  ogmrip_codec_set_autoclean (codec, FALSE);
   ogmrip_codec_set_chapters (codec, start_chap, end_chap);
 
   return codec;
@@ -741,6 +742,7 @@ ogmrip_main_window_create_audio_codec (OGMRipMainWindow *window, OGMRipProfile *
   if (!codec)
     return NULL;
 
+  ogmrip_codec_set_autoclean (codec, FALSE);
   ogmrip_codec_set_chapters (codec, start_chap, end_chap);
   ogmrip_audio_codec_set_label (OGMRIP_AUDIO_CODEC (codec),
       ogmrip_audio_chooser_widget_get_label (OGMRIP_AUDIO_CHOOSER_WIDGET (chooser)));
@@ -784,6 +786,7 @@ ogmrip_main_window_create_subp_codec (OGMRipMainWindow *window, OGMRipProfile *p
   if (!codec)
     return NULL;
 
+  ogmrip_codec_set_autoclean (codec, FALSE);
   ogmrip_codec_set_chapters (codec, start_chap, end_chap);
   ogmrip_subp_codec_set_label (OGMRIP_SUBP_CODEC (codec),
       ogmrip_subp_chooser_widget_get_label (OGMRIP_SUBP_CHOOSER_WIDGET (chooser)));
@@ -820,6 +823,7 @@ ogmrip_main_window_create_chapters_codec (OGMRipMainWindow *window, OGMRipVideoS
   ogmrip_chapters_set_language (OGMRIP_CHAPTERS (codec),
       g_settings_get_uint (settings, OGMRIP_SETTINGS_CHAPTER_LANG));
 
+  ogmrip_codec_set_autoclean (codec, FALSE);
   ogmrip_codec_set_chapters (codec, start_chap, end_chap);
 
   ogmrip_codec_get_chapters (codec, &start_chap, &last_chap);

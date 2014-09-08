@@ -75,6 +75,10 @@ void           ogmrip_codec_set_play_length    (OGMRipCodec   *codec,
 gdouble        ogmrip_codec_get_start_position (OGMRipCodec   *codec);
 void           ogmrip_codec_set_start_position (OGMRipCodec   *codec,
                                                 gdouble       start);
+gboolean       ogmrip_codec_get_autoclean      (OGMRipCodec   *codec);
+void           ogmrip_codec_set_autoclean      (OGMRipCodec   *codec,
+                                                gboolean      autoclean);
+void           ogmrip_codec_clean              (OGMRipCodec   *codec);
 
 void           ogmrip_register_codec           (GType         gtype,
                                                 const gchar   *name,
