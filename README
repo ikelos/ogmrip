@@ -7,8 +7,8 @@ OGMRip
     OGMRip:
 
         * transcodes from DVD or files
-        * outputs ogm, avi, matroska or mp4 files
-        * supports a lot of codecs (vorbis, mp3, pcm, ac3, dts, aac, xvid, lavc, x264, theora)
+        * outputs ogm, avi, matroska, webm or mp4 files
+        * supports a lot of codecs (vorbis, mp3, pcm, ac3, dts, aac, xvid, lavc, x264, theora, vp8)
         * determines video bitrate for a given filesize
         * autodetects cropping parameters and scaling factors
         * supports multiple audio and subtitles streams encoding
@@ -106,11 +106,6 @@ Optional
 
         enchant >= 1.1: http://www.abisource.com/enchant/
 
-    For the documentation:
-
-        gtk-doc >= 1.0: http://www.gtk.org/gtk-doc
-        xsltproc      : http://www.xmlsoft.org
-
 Install
 -------
 
@@ -121,13 +116,6 @@ Usage
 
     $ ogmrip
 
-Notes
------
-
-    For FreeBSD users, libbacon relies on the Common Access Method user library. If you 
-    have an ATAPI drive, you've got to install the CAM XPT module (atapicam) otherwise
-    your drive will never be detected. 
-
 License
 -------
 
@@ -137,10 +125,8 @@ License
 Thanks
 ------
     Arpi and the mplayer team for such a great piece of software.
-    Moritz Bunkus for ogmtools and mktoolnix. Do you plan to add support for theora ?
+    Moritz Bunkus for ogmtools and mktoolnix.
     Mike Cheng and Mark Taylor for the best mp3 encoder ever.
     Chris Phillips for lsdvd from which I have learned libdvdread's API.
-    Ross Burton, sound juicer was an inspiration for both the gui and the code.
-    Bastien Nocera for his bacon-cd-selection
     The Xiph Foundation for vorbis and theora.
 
