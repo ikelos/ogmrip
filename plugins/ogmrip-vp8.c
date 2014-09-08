@@ -319,10 +319,6 @@ ogmrip_vp8_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   if (!fifo)
     return FALSE;
 
-  queue = ogmjob_queue_new ();
-  ogmjob_container_add (OGMJOB_CONTAINER (task), queue);
-  g_object_unref (queue);
-
   passes = ogmrip_video_codec_get_passes (OGMRIP_VIDEO_CODEC (task));
 
   log_file = NULL;
@@ -330,8 +326,17 @@ ogmrip_vp8_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   {
     log_file = ogmrip_fs_mktemp ("log.XXXXXX", error);
     if (!log_file)
+    {
+      g_unlink (fifo);
+      g_free (fifo);
+
       return FALSE;
+    }
   }
+
+  queue = ogmjob_queue_new ();
+  ogmjob_container_add (OGMJOB_CONTAINER (task), queue);
+  g_object_unref (queue);
 
   for (pass = 0; pass < passes; pass ++)
   {

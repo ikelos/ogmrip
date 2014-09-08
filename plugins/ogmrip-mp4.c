@@ -502,6 +502,10 @@ ogmrip_mp4_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   gboolean result = FALSE;
   gchar *filename;
 
+  filename = ogmrip_fs_mktemp ("video.XXXXXX", error);
+  if (!filename)
+    return FALSE;
+
   ogmrip_container_get_split (OGMRIP_CONTAINER (task), &mp4->nsplits, NULL);
 
   mp4->naudio = mp4->nsubp = mp4->nvobsub = 0;
@@ -511,8 +515,6 @@ ogmrip_mp4_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   queue = ogmjob_queue_new ();
   ogmjob_container_add (OGMJOB_CONTAINER (task), queue);
   g_object_unref (queue);
-
-  filename = ogmrip_fs_mktemp ("video.XXXXXX", NULL);
 
   child = ogmrip_video_extractor_new (OGMRIP_CONTAINER (task), mp4->video, filename);
   ogmjob_container_add (OGMJOB_CONTAINER (queue), child);
