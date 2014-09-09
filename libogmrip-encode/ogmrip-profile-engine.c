@@ -151,11 +151,7 @@ ogmrip_profile_engine_dispose (GObject *gobject)
 {
   OGMRipProfileEngine *engine = OGMRIP_PROFILE_ENGINE (gobject);
 
-  if (engine->priv->settings)
-  {
-    g_object_unref (engine->priv->settings);
-    engine->priv->settings= NULL;
-  }
+  g_clear_object (&engine->priv->settings);
 
   if (engine->priv->profiles)
   {

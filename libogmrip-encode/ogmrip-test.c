@@ -312,11 +312,7 @@ ogmrip_test_dispose (GObject *gobject)
 {
   OGMRipTest *test = OGMRIP_TEST (gobject);
 
-  if (test->priv->encoding)
-  {
-    g_object_unref (test->priv->encoding);
-    test->priv->encoding = NULL;
-  }
+  g_clear_object (&test->priv->encoding);
 
   G_OBJECT_CLASS (ogmrip_test_parent_class)->dispose (gobject);
 }

@@ -646,11 +646,7 @@ ogmrip_options_dialog_dispose (GObject *gobject)
 {
   OGMRipOptionsDialog *dialog = OGMRIP_OPTIONS_DIALOG (gobject);
 
-  if (dialog->priv->encoding)
-  {
-    g_object_unref (dialog->priv->encoding);
-    dialog->priv->encoding = NULL;
-  }
+  g_clear_object (&dialog->priv->encoding);
 
   G_OBJECT_CLASS (ogmrip_options_dialog_parent_class)->dispose (gobject);
 }

@@ -113,25 +113,12 @@ ogmrip_codec_dispose (GObject *gobject)
 {
   OGMRipCodec *codec = OGMRIP_CODEC (gobject);
 
-  if (codec->priv->input)
-  {
-    g_object_unref (codec->priv->input);
-    codec->priv->input = NULL;
-  }
+  if (codec->priv->output && codec->priv->autoclean)
+    ogmrip_codec_clean (codec);
 
-  if (codec->priv->output)
-  {
-    if (codec->priv->autoclean)
-      ogmrip_codec_clean (codec);
-    g_object_unref (codec->priv->output);
-    codec->priv->output = NULL;
-  }
-
-  if (codec->priv->title)
-  {
-    g_object_unref (codec->priv->title);
-    codec->priv->title = NULL;
-  }
+  g_clear_object (&codec->priv->input);
+  g_clear_object (&codec->priv->output);
+  g_clear_object (&codec->priv->title);
 
   G_OBJECT_CLASS (ogmrip_codec_parent_class)->dispose (gobject);
 }

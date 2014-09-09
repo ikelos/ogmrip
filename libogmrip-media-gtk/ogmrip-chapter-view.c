@@ -29,9 +29,17 @@ struct _OGMRipChapterViewPriv
   OGMRipChapterStore *store;
 };
 
-static void ogmrip_chapter_view_dispose (GObject *gobject);
-
 G_DEFINE_TYPE_WITH_PRIVATE (OGMRipChapterView, ogmrip_chapter_view, GTK_TYPE_TREE_VIEW)
+
+static void
+ogmrip_chapter_view_dispose (GObject *gobject)
+{
+  OGMRipChapterView *view = OGMRIP_CHAPTER_VIEW (gobject);
+
+  g_clear_object (&view->priv->store);
+
+  G_OBJECT_CLASS (ogmrip_chapter_view_parent_class)->dispose (gobject);
+}
 
 static void
 ogmrip_chapter_view_class_init (OGMRipChapterViewClass *klass)
@@ -127,20 +135,6 @@ ogmrip_chapter_view_init (OGMRipChapterView *view)
 
   g_signal_connect_swapped (renderer, "edited",
       G_CALLBACK (ogmrip_chapter_view_label_edited), view);
-}
-
-static void
-ogmrip_chapter_view_dispose (GObject *gobject)
-{
-  OGMRipChapterView *view = OGMRIP_CHAPTER_VIEW (gobject);
-
-  if (view->priv->store)
-  {
-    g_object_unref (view->priv->store);
-    view->priv->store = NULL;
-  }
-
-  (*G_OBJECT_CLASS (ogmrip_chapter_view_parent_class)->dispose) (gobject);
 }
 
 /**

@@ -217,11 +217,7 @@ ogmrip_xvid_dialog_dispose (GObject *gobject)
 {
   OGMRipXvidDialog *dialog = OGMRIP_XVID_DIALOG (gobject);
 
-  if (dialog->profile)
-  {
-    g_object_unref (dialog->profile);
-    dialog->profile = NULL;
-  }
+  g_clear_object (&dialog->profile);
 
   G_OBJECT_CLASS (ogmrip_xvid_dialog_parent_class)->dispose (gobject);
 }

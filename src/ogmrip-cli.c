@@ -932,11 +932,7 @@ ogmrip_cli_dispose (GObject *gobject)
 {
   OGMRipCli *cli = OGMRIP_CLI (gobject);
 
-  if (cli->priv->cancellable)
-  {
-    g_object_unref (cli->priv->cancellable);
-    cli->priv->cancellable = NULL;
-  }
+  g_clear_object (&cli->priv->cancellable);
 
   G_OBJECT_CLASS (ogmrip_cli_parent_class)->dispose (gobject);
 }

@@ -40,17 +40,6 @@ static const GType column_types[] =
 
 G_STATIC_ASSERT (G_N_ELEMENTS (column_types) == OGMRIP_PROFILE_STORE_N_COLUMNS);
 
-static void ogmrip_profile_store_constructed  (GObject      *gobject);
-static void ogmrip_profile_store_dispose      (GObject      *gobject);
-static void ogmrip_profile_store_get_property (GObject      *gobject,
-                                               guint        property_id,
-                                               GValue       *value,
-                                               GParamSpec   *pspec);
-static void ogmrip_profile_store_set_property (GObject      *gobject,
-                                               guint        property_id,
-                                               const GValue *value,
-                                               GParamSpec   *pspec);
-
 static void
 ogmrip_profile_store_info_changed (OGMRipProfileStore *store, gchar *key, OGMRipProfile *profile)
 {
@@ -155,40 +144,6 @@ ogmrip_profile_store_name_sort_func (OGMRipProfileStore *store, GtkTreeIter *ite
 G_DEFINE_TYPE_WITH_PRIVATE (OGMRipProfileStore, ogmrip_profile_store, GTK_TYPE_LIST_STORE);
 
 static void
-ogmrip_profile_store_class_init (OGMRipProfileStoreClass *klass)
-{
-  GObjectClass *gobject_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->constructed = ogmrip_profile_store_constructed;
-  gobject_class->dispose = ogmrip_profile_store_dispose;
-  gobject_class->get_property = ogmrip_profile_store_get_property;
-  gobject_class->set_property = ogmrip_profile_store_set_property;
-
-  g_object_class_install_property (gobject_class, PROP_ENGINE,
-      g_param_spec_object ("engine", "engine", "engine", OGMRIP_TYPE_PROFILE_ENGINE,
-        G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_VALID_ONLY,
-      g_param_spec_boolean ("valid-only", "valid-only", "valid-only", FALSE,
-        G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
-}
-
-static void
-ogmrip_profile_store_init (OGMRipProfileStore *store)
-{
-  store->priv = ogmrip_profile_store_get_instance_private (store);
-
-  gtk_list_store_set_column_types (GTK_LIST_STORE (store),
-      OGMRIP_PROFILE_STORE_N_COLUMNS, (GType *) column_types);
-
-  gtk_tree_sortable_set_default_sort_func (GTK_TREE_SORTABLE (store),
-      (GtkTreeIterCompareFunc) ogmrip_profile_store_name_sort_func, NULL, NULL);
-  gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (store),
-      OGMRIP_PROFILE_STORE_INFO_COLUMN, GTK_SORT_ASCENDING);
-}
-
-static void
 ogmrip_profile_store_constructed (GObject *gobject)
 {
   OGMRipProfileStore *store = OGMRIP_PROFILE_STORE (gobject);
@@ -223,8 +178,7 @@ ogmrip_profile_store_dispose (GObject *gobject)
     g_signal_handlers_disconnect_by_func (store->priv->engine,
         ogmrip_profile_store_remove, store);
 
-    g_object_unref (store->priv->engine);
-    store->priv->engine = NULL;
+    g_clear_object (&store->priv->engine);
   }
 
   G_OBJECT_CLASS (ogmrip_profile_store_parent_class)->dispose (gobject);
@@ -266,6 +220,40 @@ ogmrip_profile_store_set_property (GObject *gobject, guint property_id, const GV
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
   }
+}
+
+static void
+ogmrip_profile_store_class_init (OGMRipProfileStoreClass *klass)
+{
+  GObjectClass *gobject_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->constructed = ogmrip_profile_store_constructed;
+  gobject_class->dispose = ogmrip_profile_store_dispose;
+  gobject_class->get_property = ogmrip_profile_store_get_property;
+  gobject_class->set_property = ogmrip_profile_store_set_property;
+
+  g_object_class_install_property (gobject_class, PROP_ENGINE,
+      g_param_spec_object ("engine", "engine", "engine", OGMRIP_TYPE_PROFILE_ENGINE,
+        G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_VALID_ONLY,
+      g_param_spec_boolean ("valid-only", "valid-only", "valid-only", FALSE,
+        G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+}
+
+static void
+ogmrip_profile_store_init (OGMRipProfileStore *store)
+{
+  store->priv = ogmrip_profile_store_get_instance_private (store);
+
+  gtk_list_store_set_column_types (GTK_LIST_STORE (store),
+      OGMRIP_PROFILE_STORE_N_COLUMNS, (GType *) column_types);
+
+  gtk_tree_sortable_set_default_sort_func (GTK_TREE_SORTABLE (store),
+      (GtkTreeIterCompareFunc) ogmrip_profile_store_name_sort_func, NULL, NULL);
+  gtk_tree_sortable_set_sort_column_id (GTK_TREE_SORTABLE (store),
+      OGMRIP_PROFILE_STORE_INFO_COLUMN, GTK_SORT_ASCENDING);
 }
 
 OGMRipProfileStore *

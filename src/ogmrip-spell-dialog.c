@@ -61,8 +61,6 @@ struct _OGMRipSpellDialogPriv
   const gchar *word;
 };
 
-static void ogmrip_spell_dialog_dispose (GObject *gobject);
-
 static void
 ogmrip_spell_dialog_changed (OGMRipSpellDialog *dialog, GtkTreeSelection *select)
 {
@@ -165,6 +163,24 @@ ogmrip_spell_dialog_get_word (OGMRipSpellDialog *dialog)
 
 G_DEFINE_TYPE_WITH_PRIVATE (OGMRipSpellDialog, ogmrip_spell_dialog, GTK_TYPE_DIALOG);
 
+static void 
+ogmrip_spell_dialog_dispose (GObject *gobject)
+{
+  OGMRipSpellDialog *dialog = OGMRIP_SPELL_DIALOG (gobject);
+
+  if (dialog->priv->broker)
+  {
+    if (dialog->priv->dict);
+      enchant_broker_free_dict (dialog->priv->broker, dialog->priv->dict);
+      dialog->priv->dict = NULL;
+
+    enchant_broker_free (dialog->priv->broker);
+    dialog->priv->broker = NULL;
+  }
+
+  G_OBJECT_CLASS (ogmrip_spell_dialog_parent_class)->dispose (gobject);
+}
+
 static void
 ogmrip_spell_dialog_class_init (OGMRipSpellDialogClass *klass)
 {
@@ -205,24 +221,6 @@ ogmrip_spell_dialog_init (OGMRipSpellDialog *dialog)
                             G_CALLBACK (ogmrip_spell_dialog_row_activated), dialog);
   g_signal_connect_swapped (dialog->priv->word_selection, "changed",
                             G_CALLBACK (ogmrip_spell_dialog_changed), dialog);
-}
-
-static void 
-ogmrip_spell_dialog_dispose (GObject *gobject)
-{
-  OGMRipSpellDialog *dialog = OGMRIP_SPELL_DIALOG (gobject);
-
-  if (dialog->priv->broker)
-  {
-    if (dialog->priv->dict);
-      enchant_broker_free_dict (dialog->priv->broker, dialog->priv->dict);
-      dialog->priv->dict = NULL;
-
-    enchant_broker_free (dialog->priv->broker);
-    dialog->priv->broker = NULL;
-  }
-
-  G_OBJECT_CLASS (ogmrip_spell_dialog_parent_class)->dispose (gobject);
 }
 
 GtkWidget *

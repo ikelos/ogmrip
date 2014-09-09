@@ -73,19 +73,6 @@ struct _OGMRipSourceChooserWidgetPriv
 };
 
 static void ogmrip_source_chooser_init (OGMRipSourceChooserInterface   *iface);
-static void ogmrip_source_chooser_widget_constructed  (GObject      *gobject);
-static void ogmrip_source_chooser_widget_dispose      (GObject      *gobject);
-static void ogmrip_source_chooser_widget_finalize     (GObject      *gobject);
-static void ogmrip_source_chooser_widget_get_property (GObject      *gobject,
-                                                       guint        property_id,
-                                                       GValue       *value,
-                                                       GParamSpec   *pspec);
-static void ogmrip_source_chooser_widget_set_property (GObject      *gobject,
-                                                       guint        property_id,
-                                                       const GValue *value,
-                                                       GParamSpec   *pspec);
-static void ogmrip_source_chooser_widget_destroy      (GtkWidget    *widget);
-static void ogmrip_source_chooser_widget_changed      (GtkComboBox  *combo);
 
 static gboolean
 ogmrip_source_chooser_widget_sep_func (GtkTreeModel *model, GtkTreeIter *iter, gpointer data)
@@ -216,118 +203,9 @@ ogmrip_source_chooser_widget_set_file (OGMRipSourceChooserWidget *chooser, OGMRi
   gtk_combo_box_set_active_iter (GTK_COMBO_BOX (chooser), &iter);
 }
 
-static void
-ogmrip_source_chooser_widget_changed (GtkComboBox *combo)
-{
-  OGMRipSourceChooserWidget *chooser = OGMRIP_SOURCE_CHOOSER_WIDGET (combo);
-  GtkTreeIter iter;
-
-  if (gtk_combo_box_get_active_iter (GTK_COMBO_BOX (chooser), &iter))
-  {
-    gint type;
-
-    gtk_tree_model_get (GTK_TREE_MODEL (chooser->priv->store), &iter, TYPE_COLUMN, &type, -1);
-
-    if (type == ROW_TYPE_OTHER && chooser->priv->dialog)
-    {
-      GtkWidget *toplevel;
-      gboolean select_prev = TRUE;
-
-      toplevel = gtk_widget_get_toplevel (GTK_WIDGET (chooser));
-      if (gtk_widget_is_toplevel (toplevel) && GTK_IS_WINDOW (toplevel))
-        gtk_window_set_transient_for (GTK_WINDOW (chooser->priv->dialog), GTK_WINDOW (toplevel));
-
-      if (gtk_dialog_run (GTK_DIALOG (chooser->priv->dialog)) == GTK_RESPONSE_ACCEPT)
-      {
-        GError *error = NULL;
-        OGMRipFile *file;
-
-        file = ogmrip_file_chooser_dialog_get_file (OGMRIP_FILE_CHOOSER_DIALOG (chooser->priv->dialog), &error);
-        select_prev = file != NULL;
-
-        if (file)
-          ogmrip_source_chooser_widget_set_file (chooser, file);
-        else
-        {
-          GtkWidget *toplevel;
-
-          toplevel = gtk_widget_get_toplevel (GTK_WIDGET (chooser));
-          ogmrip_run_error_dialog (GTK_WINDOW (toplevel), error, _("Cannot open file"));
-          g_clear_error (&error);
-        }
-      }
-      gtk_widget_hide (chooser->priv->dialog);
-
-      if (select_prev)
-      {
-        GtkTreeIter iter;
-
-        if (chooser->priv->prev_path &&
-            gtk_tree_model_get_iter (GTK_TREE_MODEL (chooser->priv->store), &iter, chooser->priv->prev_path))
-          gtk_combo_box_set_active_iter (GTK_COMBO_BOX (chooser), &iter);
-        else
-          gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), -1);
-      }
-    }
-    else
-    {
-      if (chooser->priv->prev_path)
-        gtk_tree_path_free (chooser->priv->prev_path);
-      chooser->priv->prev_path = gtk_tree_model_get_path (GTK_TREE_MODEL (chooser->priv->store), &iter);
-    }
-  }
-}
-
 G_DEFINE_TYPE_WITH_CODE (OGMRipSourceChooserWidget, ogmrip_source_chooser_widget, GTK_TYPE_COMBO_BOX,
     G_ADD_PRIVATE (OGMRipSourceChooserWidget)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_SOURCE_CHOOSER, ogmrip_source_chooser_init))
-
-static void
-ogmrip_source_chooser_widget_class_init (OGMRipSourceChooserWidgetClass *klass)
-{
-  GObjectClass *gobject_class;
-  GtkWidgetClass *widget_class;
-  GtkComboBoxClass *combo_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->constructed = ogmrip_source_chooser_widget_constructed;
-  gobject_class->dispose = ogmrip_source_chooser_widget_dispose;
-  gobject_class->finalize = ogmrip_source_chooser_widget_finalize;
-  gobject_class->get_property = ogmrip_source_chooser_widget_get_property;
-  gobject_class->set_property = ogmrip_source_chooser_widget_set_property;
-
-  widget_class = GTK_WIDGET_CLASS (klass);
-  widget_class->destroy = ogmrip_source_chooser_widget_destroy;
-
-  combo_class = GTK_COMBO_BOX_CLASS (klass);
-  combo_class->changed = ogmrip_source_chooser_widget_changed;
-
-  g_object_class_override_property (gobject_class, PROP_TITLE, "title");
-
-  g_object_class_install_property (gobject_class, PROP_DIALOG,
-      g_param_spec_object ("dialog", "dialog", "dialog",
-        OGMRIP_TYPE_FILE_CHOOSER_DIALOG, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
-}
-
-static void
-ogmrip_source_chooser_widget_init (OGMRipSourceChooserWidget *chooser)
-{
-  GtkCellRenderer *cell;
-
-  chooser->priv = ogmrip_source_chooser_widget_get_instance_private (chooser);
-
-  chooser->priv->store = gtk_list_store_new (NUM_COLUMNS, G_TYPE_STRING, G_TYPE_INT, G_TYPE_INT, G_TYPE_OBJECT);
-  gtk_combo_box_set_model (GTK_COMBO_BOX (chooser), GTK_TREE_MODEL (chooser->priv->store));
-
-  gtk_combo_box_set_row_separator_func (GTK_COMBO_BOX (chooser),
-      ogmrip_source_chooser_widget_sep_func, NULL, NULL);
-
-  cell = gtk_cell_renderer_text_new ();
-  gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (chooser), cell, TRUE);
-  gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (chooser), cell, "text", TEXT_COLUMN, NULL);
-
-  ogmrip_source_chooser_widget_clear (chooser);
-}
 
 static void
 ogmrip_source_chooser_widget_constructed (GObject *gobject)
@@ -347,17 +225,10 @@ ogmrip_source_chooser_widget_dispose (GObject *gobject)
   OGMRipSourceChooserWidget *chooser = OGMRIP_SOURCE_CHOOSER_WIDGET (gobject);
 
   if (chooser->priv->store)
-  {
     ogmrip_source_chooser_widget_clear (chooser);
-    g_object_unref (chooser->priv->store);
-    chooser->priv->store = NULL;
-  }
 
-  if (chooser->priv->title)
-  {
-    g_object_unref (chooser->priv->title);
-    chooser->priv->title = NULL;
-  }
+  g_clear_object (&chooser->priv->store);
+  g_clear_object (&chooser->priv->title);
 
   G_OBJECT_CLASS (ogmrip_source_chooser_widget_parent_class)->dispose (gobject);
 }
@@ -424,6 +295,115 @@ ogmrip_source_chooser_widget_destroy (GtkWidget *widget)
   }
 
   GTK_WIDGET_CLASS (ogmrip_source_chooser_widget_parent_class)->destroy (widget);
+}
+
+static void
+ogmrip_source_chooser_widget_changed (GtkComboBox *combo)
+{
+  OGMRipSourceChooserWidget *chooser = OGMRIP_SOURCE_CHOOSER_WIDGET (combo);
+  GtkTreeIter iter;
+
+  if (gtk_combo_box_get_active_iter (GTK_COMBO_BOX (chooser), &iter))
+  {
+    gint type;
+
+    gtk_tree_model_get (GTK_TREE_MODEL (chooser->priv->store), &iter, TYPE_COLUMN, &type, -1);
+
+    if (type == ROW_TYPE_OTHER && chooser->priv->dialog)
+    {
+      GtkWidget *toplevel;
+      gboolean select_prev = TRUE;
+
+      toplevel = gtk_widget_get_toplevel (GTK_WIDGET (chooser));
+      if (gtk_widget_is_toplevel (toplevel) && GTK_IS_WINDOW (toplevel))
+        gtk_window_set_transient_for (GTK_WINDOW (chooser->priv->dialog), GTK_WINDOW (toplevel));
+
+      if (gtk_dialog_run (GTK_DIALOG (chooser->priv->dialog)) == GTK_RESPONSE_ACCEPT)
+      {
+        GError *error = NULL;
+        OGMRipFile *file;
+
+        file = ogmrip_file_chooser_dialog_get_file (OGMRIP_FILE_CHOOSER_DIALOG (chooser->priv->dialog), &error);
+        select_prev = file != NULL;
+
+        if (file)
+          ogmrip_source_chooser_widget_set_file (chooser, file);
+        else
+        {
+          GtkWidget *toplevel;
+
+          toplevel = gtk_widget_get_toplevel (GTK_WIDGET (chooser));
+          ogmrip_run_error_dialog (GTK_WINDOW (toplevel), error, _("Cannot open file"));
+          g_clear_error (&error);
+        }
+      }
+      gtk_widget_hide (chooser->priv->dialog);
+
+      if (select_prev)
+      {
+        GtkTreeIter iter;
+
+        if (chooser->priv->prev_path &&
+            gtk_tree_model_get_iter (GTK_TREE_MODEL (chooser->priv->store), &iter, chooser->priv->prev_path))
+          gtk_combo_box_set_active_iter (GTK_COMBO_BOX (chooser), &iter);
+        else
+          gtk_combo_box_set_active (GTK_COMBO_BOX (chooser), -1);
+      }
+    }
+    else
+    {
+      if (chooser->priv->prev_path)
+        gtk_tree_path_free (chooser->priv->prev_path);
+      chooser->priv->prev_path = gtk_tree_model_get_path (GTK_TREE_MODEL (chooser->priv->store), &iter);
+    }
+  }
+}
+
+static void
+ogmrip_source_chooser_widget_class_init (OGMRipSourceChooserWidgetClass *klass)
+{
+  GObjectClass *gobject_class;
+  GtkWidgetClass *widget_class;
+  GtkComboBoxClass *combo_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->constructed = ogmrip_source_chooser_widget_constructed;
+  gobject_class->dispose = ogmrip_source_chooser_widget_dispose;
+  gobject_class->finalize = ogmrip_source_chooser_widget_finalize;
+  gobject_class->get_property = ogmrip_source_chooser_widget_get_property;
+  gobject_class->set_property = ogmrip_source_chooser_widget_set_property;
+
+  widget_class = GTK_WIDGET_CLASS (klass);
+  widget_class->destroy = ogmrip_source_chooser_widget_destroy;
+
+  combo_class = GTK_COMBO_BOX_CLASS (klass);
+  combo_class->changed = ogmrip_source_chooser_widget_changed;
+
+  g_object_class_override_property (gobject_class, PROP_TITLE, "title");
+
+  g_object_class_install_property (gobject_class, PROP_DIALOG,
+      g_param_spec_object ("dialog", "dialog", "dialog",
+        OGMRIP_TYPE_FILE_CHOOSER_DIALOG, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
+}
+
+static void
+ogmrip_source_chooser_widget_init (OGMRipSourceChooserWidget *chooser)
+{
+  GtkCellRenderer *cell;
+
+  chooser->priv = ogmrip_source_chooser_widget_get_instance_private (chooser);
+
+  chooser->priv->store = gtk_list_store_new (NUM_COLUMNS, G_TYPE_STRING, G_TYPE_INT, G_TYPE_INT, G_TYPE_OBJECT);
+  gtk_combo_box_set_model (GTK_COMBO_BOX (chooser), GTK_TREE_MODEL (chooser->priv->store));
+
+  gtk_combo_box_set_row_separator_func (GTK_COMBO_BOX (chooser),
+      ogmrip_source_chooser_widget_sep_func, NULL, NULL);
+
+  cell = gtk_cell_renderer_text_new ();
+  gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (chooser), cell, TRUE);
+  gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (chooser), cell, "text", TEXT_COLUMN, NULL);
+
+  ogmrip_source_chooser_widget_clear (chooser);
 }
 
 static OGMRipStream *

@@ -74,11 +74,7 @@ ogmrip_container_dispose (GObject *gobject)
 {
   OGMRipContainer *container = OGMRIP_CONTAINER (gobject);
 
-  if (container->priv->output)
-  {
-    g_object_unref (container->priv->output);
-    container->priv->output = NULL;
-  }
+  g_clear_object (&container->priv->output);
 
   if (container->priv->files)
   {

@@ -96,11 +96,7 @@ ogmrip_mp4_dialog_dispose (GObject *gobject)
 {
   OGMRipMp4Dialog *dialog = OGMRIP_MP4_DIALOG (gobject);
 
-  if (dialog->profile)
-  {
-    g_object_unref (dialog->profile);
-    dialog->profile = NULL;
-  }
+  g_clear_object (&dialog->profile);
 
   G_OBJECT_CLASS (ogmrip_mp4_dialog_parent_class)->dispose (gobject);
 }

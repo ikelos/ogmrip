@@ -61,9 +61,8 @@ struct _OGMRipMediaChooserWidgetPriv
   GtkTreeRowReference *last_row;
 };
 
-static void ogmrip_media_chooser_init (OGMRipMediaChooserInterface *iface);
-static void ogmrip_media_chooser_widget_dispose (GObject     *gobject);
 static void ogmrip_media_chooser_widget_changed (GtkComboBox *combo);
+static void ogmrip_media_chooser_init           (OGMRipMediaChooserInterface *iface);
 
 static OGMRipMedia *
 ogmrip_media_chooser_widget_get_media (OGMRipMediaChooser *chooser)
@@ -234,9 +233,197 @@ ogmrip_media_chooser_widget_volume_added (OGMRipMediaChooserWidget *chooser, GVo
     g_object_unref (drive);
 }
 
+static OGMRipMedia *
+ogmrip_media_chooser_widget_select_file (GtkComboBox *combo, gboolean file)
+{
+  OGMRipMedia *media = NULL;
+  GtkWidget *dialog, *toplevel;
+
+  dialog = gtk_file_chooser_dialog_new (file ? _("Select an media file") : _("Select a media directory"),
+      NULL, file ? GTK_FILE_CHOOSER_ACTION_OPEN : GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
+      _("_Cancel"), GTK_RESPONSE_CANCEL, _("_Open"), GTK_RESPONSE_OK, NULL);
+
+  toplevel = gtk_widget_get_toplevel (GTK_WIDGET (combo));
+  if (gtk_widget_is_toplevel (toplevel) && GTK_IS_WINDOW (toplevel))
+  {
+    gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (toplevel));
+    gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
+  }
+
+  if (file)
+  {
+    GtkFileFilter *filter;
+
+    filter = gtk_file_filter_new ();
+    gtk_file_filter_set_name (filter, _("Supported files"));
+    gtk_file_filter_add_mime_type (filter, "video/*");
+    gtk_file_filter_add_mime_type (filter, "application/x-cd-image");
+    gtk_file_chooser_add_filter (GTK_FILE_CHOOSER (dialog), filter);
+  }
+
+  if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_OK)
+  {
+    gchar *path;
+
+    gtk_widget_hide (dialog);
+
+    path = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
+    if (path)
+    {
+      media = ogmrip_media_new (path);
+      g_free (path);
+    }
+  }
+
+  gtk_widget_destroy (dialog);
+
+  return media;
+}
+
+static gboolean
+ogmrip_media_chooser_widget_add_media (GtkComboBox *combo, OGMRipMedia *media, gboolean file)
+{
+  GtkTreeModel *model;
+  GtkTreeIter sibling, iter;
+
+  gchar *title, *text;
+  gint type;
+
+  model = gtk_combo_box_get_model (combo);
+  if (gtk_tree_model_get_iter_first (model, &sibling))
+  {
+    do
+    {
+      gtk_tree_model_get (model, &sibling, TYPE_COLUMN, &type, -1);
+      if (type != DEVICE_ROW && type != NONE_ROW)
+        break;
+    }
+    while (gtk_tree_model_iter_next (model, &sibling));
+
+    if (type == SEL_SEP_ROW)
+    {
+      gtk_list_store_insert_before (GTK_LIST_STORE (model), &iter, &sibling);
+      gtk_list_store_set (GTK_LIST_STORE (model), &iter,
+          TEXT_COLUMN, NULL, TYPE_COLUMN, FILE_SEP_ROW, -1);
+
+      gtk_list_store_insert_before (GTK_LIST_STORE (model), &iter, &sibling);
+    }
+    else if (type == FILE_SEP_ROW)
+    {
+      if (gtk_tree_model_iter_next (model, &sibling))
+      {
+        gtk_tree_model_get (model, &sibling, TYPE_COLUMN, &type, -1);
+        if (type == FILE_ROW || type == DIR_ROW)
+          iter = sibling;
+      }
+    }
+  }
+
+  if (!gtk_list_store_iter_is_valid (GTK_LIST_STORE (model), &iter))
+    return FALSE;
+
+  title = g_markup_escape_text (ogmrip_media_get_label (media), -1);
+  text = g_strdup_printf ("<b>%s</b>\n%s", title, ogmrip_media_get_uri (media) + 6);
+  g_free (title);
+
+  gtk_list_store_set (GTK_LIST_STORE (model), &iter, TEXT_COLUMN, text,
+      TYPE_COLUMN, file ? FILE_ROW : DIR_ROW, MEDIA_COLUMN, media, VOLUME_COLUMN, NULL, -1);
+  g_free (text);
+
+  gtk_combo_box_set_active_iter (combo, &iter);
+
+  return TRUE;
+}
+
 G_DEFINE_TYPE_WITH_CODE (OGMRipMediaChooserWidget, ogmrip_media_chooser_widget, GTK_TYPE_COMBO_BOX,
     G_ADD_PRIVATE (OGMRipMediaChooserWidget)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_MEDIA_CHOOSER, ogmrip_media_chooser_init))
+
+static void
+ogmrip_media_chooser_widget_dispose (GObject *gobject)
+{
+  OGMRipMediaChooserWidget *chooser = OGMRIP_MEDIA_CHOOSER_WIDGET (gobject);
+
+  if (chooser->priv->monitor)
+    g_signal_handlers_disconnect_by_func (chooser->priv->monitor,
+        ogmrip_media_chooser_widget_volume_added, chooser);
+
+  g_clear_object (&chooser->priv->monitor);
+
+  if (chooser->priv->last_row)
+  {
+    gtk_tree_row_reference_free (chooser->priv->last_row);
+    chooser->priv->last_row = NULL;
+  }
+
+  G_OBJECT_CLASS (ogmrip_media_chooser_widget_parent_class)->dispose (gobject);
+}
+
+static void
+ogmrip_media_chooser_widget_changed (GtkComboBox *combo)
+{
+  OGMRipMediaChooserWidget *chooser;
+  OGMRipMedia *media = NULL;
+  GtkTreeModel *model;
+  GtkTreeIter iter;
+  gint type;
+
+  chooser = OGMRIP_MEDIA_CHOOSER_WIDGET (combo);
+  model = gtk_combo_box_get_model (combo);
+
+  if (gtk_combo_box_get_active_iter (combo, &iter))
+  {
+    gtk_tree_model_get (model, &iter, TYPE_COLUMN, &type, -1);
+    switch (type)
+    {
+      case DEVICE_ROW:
+      case FILE_ROW:
+      case DIR_ROW:
+        gtk_tree_model_get (model, &iter, MEDIA_COLUMN, &media, -1);
+        break;
+      case FILE_SEL_ROW:
+      case DIR_SEL_ROW:
+        media = ogmrip_media_chooser_widget_select_file (combo, type == FILE_SEL_ROW);
+        if (!media || !ogmrip_media_chooser_widget_add_media (combo, media, type == FILE_SEL_ROW))
+        {
+          if (!chooser->priv->last_row)
+            gtk_combo_box_set_active (combo, 0);
+          else
+          {
+            GtkTreePath *path;
+            GtkTreeIter prev;
+
+            path = gtk_tree_row_reference_get_path (chooser->priv->last_row);
+            if (gtk_tree_model_get_iter (model, &prev, path))
+              gtk_combo_box_set_active_iter (combo, &prev);
+            else
+              gtk_combo_box_set_active (combo, 0);
+            gtk_tree_path_free (path);
+          }
+        }
+        break;
+      default:
+        break;
+    }
+
+    if (type <= DIR_ROW)
+    {
+      GtkTreePath *path;
+
+      if (chooser->priv->last_row)
+        gtk_tree_row_reference_free (chooser->priv->last_row);
+
+      path = gtk_tree_model_get_path (model, &iter);
+      chooser->priv->last_row = gtk_tree_row_reference_new (model, path);
+      gtk_tree_path_free (path);
+    }
+  }
+
+  g_signal_emit_by_name (combo, "media-changed", media);
+
+  if (media)
+    g_object_unref (media);
+}
 
 static void
 ogmrip_media_chooser_widget_class_init (OGMRipMediaChooserWidgetClass *klass)
@@ -308,196 +495,6 @@ ogmrip_media_chooser_widget_init (OGMRipMediaChooserWidget *chooser)
   gtk_list_store_append (store, &iter);
   gtk_list_store_set (store, &iter,
       TEXT_COLUMN, _("Select a media file..."), TYPE_COLUMN, FILE_SEL_ROW, -1);
-}
-
-static void
-ogmrip_media_chooser_widget_dispose (GObject *gobject)
-{
-  OGMRipMediaChooserWidget *chooser = OGMRIP_MEDIA_CHOOSER_WIDGET (gobject);
-
-  if (chooser->priv->monitor)
-  {
-    g_signal_handlers_disconnect_by_func (chooser->priv->monitor,
-        ogmrip_media_chooser_widget_volume_added, chooser);
-    g_object_unref (chooser->priv->monitor);
-    chooser->priv->monitor = NULL;
-  }
-
-  if (chooser->priv->last_row)
-  {
-    gtk_tree_row_reference_free (chooser->priv->last_row);
-    chooser->priv->last_row = NULL;
-  }
-
-  G_OBJECT_CLASS (ogmrip_media_chooser_widget_parent_class)->dispose (gobject);
-}
-
-static gboolean
-ogmrip_media_chooser_widget_add_media (GtkComboBox *combo, OGMRipMedia *media, gboolean file)
-{
-  GtkTreeModel *model;
-  GtkTreeIter sibling, iter;
-
-  gchar *title, *text;
-  gint type;
-
-  model = gtk_combo_box_get_model (combo);
-  if (gtk_tree_model_get_iter_first (model, &sibling))
-  {
-    do
-    {
-      gtk_tree_model_get (model, &sibling, TYPE_COLUMN, &type, -1);
-      if (type != DEVICE_ROW && type != NONE_ROW)
-        break;
-    }
-    while (gtk_tree_model_iter_next (model, &sibling));
-
-    if (type == SEL_SEP_ROW)
-    {
-      gtk_list_store_insert_before (GTK_LIST_STORE (model), &iter, &sibling);
-      gtk_list_store_set (GTK_LIST_STORE (model), &iter,
-          TEXT_COLUMN, NULL, TYPE_COLUMN, FILE_SEP_ROW, -1);
-
-      gtk_list_store_insert_before (GTK_LIST_STORE (model), &iter, &sibling);
-    }
-    else if (type == FILE_SEP_ROW)
-    {
-      if (gtk_tree_model_iter_next (model, &sibling))
-      {
-        gtk_tree_model_get (model, &sibling, TYPE_COLUMN, &type, -1);
-        if (type == FILE_ROW || type == DIR_ROW)
-          iter = sibling;
-      }
-    }
-  }
-
-  if (!gtk_list_store_iter_is_valid (GTK_LIST_STORE (model), &iter))
-    return FALSE;
-
-  title = g_markup_escape_text (ogmrip_media_get_label (media), -1);
-  text = g_strdup_printf ("<b>%s</b>\n%s", title, ogmrip_media_get_uri (media) + 6);
-  g_free (title);
-
-  gtk_list_store_set (GTK_LIST_STORE (model), &iter, TEXT_COLUMN, text,
-      TYPE_COLUMN, file ? FILE_ROW : DIR_ROW, MEDIA_COLUMN, media, VOLUME_COLUMN, NULL, -1);
-  g_free (text);
-
-  gtk_combo_box_set_active_iter (combo, &iter);
-
-  return TRUE;
-}
-
-static OGMRipMedia *
-ogmrip_media_chooser_widget_select_file (GtkComboBox *combo, gboolean file)
-{
-  OGMRipMedia *media = NULL;
-  GtkWidget *dialog, *toplevel;
-
-  dialog = gtk_file_chooser_dialog_new (file ? _("Select an media file") : _("Select a media directory"),
-      NULL, file ? GTK_FILE_CHOOSER_ACTION_OPEN : GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
-      _("_Cancel"), GTK_RESPONSE_CANCEL, _("_Open"), GTK_RESPONSE_OK, NULL);
-
-  toplevel = gtk_widget_get_toplevel (GTK_WIDGET (combo));
-  if (gtk_widget_is_toplevel (toplevel) && GTK_IS_WINDOW (toplevel))
-  {
-    gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (toplevel));
-    gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
-  }
-
-  if (file)
-  {
-    GtkFileFilter *filter;
-
-    filter = gtk_file_filter_new ();
-    gtk_file_filter_set_name (filter, _("Supported files"));
-    gtk_file_filter_add_mime_type (filter, "video/*");
-    gtk_file_filter_add_mime_type (filter, "application/x-cd-image");
-    gtk_file_chooser_add_filter (GTK_FILE_CHOOSER (dialog), filter);
-  }
-
-  if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_OK)
-  {
-    gchar *path;
-
-    gtk_widget_hide (dialog);
-
-    path = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
-    if (path)
-    {
-      media = ogmrip_media_new (path);
-      g_free (path);
-    }
-  }
-
-  gtk_widget_destroy (dialog);
-
-  return media;
-}
-
-static void
-ogmrip_media_chooser_widget_changed (GtkComboBox *combo)
-{
-  OGMRipMediaChooserWidget *chooser;
-  OGMRipMedia *media = NULL;
-  GtkTreeModel *model;
-  GtkTreeIter iter;
-  gint type;
-
-  chooser = OGMRIP_MEDIA_CHOOSER_WIDGET (combo);
-  model = gtk_combo_box_get_model (combo);
-
-  if (gtk_combo_box_get_active_iter (combo, &iter))
-  {
-    gtk_tree_model_get (model, &iter, TYPE_COLUMN, &type, -1);
-    switch (type)
-    {
-      case DEVICE_ROW:
-      case FILE_ROW:
-      case DIR_ROW:
-        gtk_tree_model_get (model, &iter, MEDIA_COLUMN, &media, -1);
-        break;
-      case FILE_SEL_ROW:
-      case DIR_SEL_ROW:
-        media = ogmrip_media_chooser_widget_select_file (combo, type == FILE_SEL_ROW);
-        if (!media || !ogmrip_media_chooser_widget_add_media (combo, media, type == FILE_SEL_ROW))
-        {
-          if (!chooser->priv->last_row)
-            gtk_combo_box_set_active (combo, 0);
-          else
-          {
-            GtkTreePath *path;
-            GtkTreeIter prev;
-
-            path = gtk_tree_row_reference_get_path (chooser->priv->last_row);
-            if (gtk_tree_model_get_iter (model, &prev, path))
-              gtk_combo_box_set_active_iter (combo, &prev);
-            else
-              gtk_combo_box_set_active (combo, 0);
-            gtk_tree_path_free (path);
-          }
-        }
-        break;
-      default:
-        break;
-    }
-
-    if (type <= DIR_ROW)
-    {
-      GtkTreePath *path;
-
-      if (chooser->priv->last_row)
-        gtk_tree_row_reference_free (chooser->priv->last_row);
-
-      path = gtk_tree_model_get_path (model, &iter);
-      chooser->priv->last_row = gtk_tree_row_reference_new (model, path);
-      gtk_tree_path_free (path);
-    }
-  }
-
-  g_signal_emit_by_name (combo, "media-changed", media);
-
-  if (media)
-    g_object_unref (media);
 }
 
 /**

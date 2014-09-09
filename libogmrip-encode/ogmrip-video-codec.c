@@ -124,17 +124,8 @@ ogmrip_video_codec_dispose (GObject *gobject)
 {
   OGMRipVideoCodec *video = OGMRIP_VIDEO_CODEC (gobject);
 
-  if (video->priv->astream)
-  {
-    g_object_unref (video->priv->astream);
-    video->priv->astream = NULL;
-  }
-
-  if (video->priv->sstream)
-  {
-    g_object_unref (video->priv->sstream);
-    video->priv->sstream = NULL;
-  }
+  g_clear_object (&video->priv->astream);
+  g_clear_object (&video->priv->sstream);
 
   G_OBJECT_CLASS (ogmrip_video_codec_parent_class)->dispose (gobject);
 }

@@ -399,11 +399,7 @@ ogmrip_profile_manager_dialog_dispose (GObject *gobject)
 {
   OGMRipProfileManagerDialog *dialog = OGMRIP_PROFILE_MANAGER_DIALOG (gobject);
 
-  if (dialog->priv->engine)
-  {
-    g_object_unref (dialog->priv->engine);
-    dialog->priv->engine = NULL;
-  }
+  g_clear_object (&dialog->priv->engine);
 
   G_OBJECT_CLASS (ogmrip_profile_manager_dialog_parent_class)->dispose (gobject);
 }

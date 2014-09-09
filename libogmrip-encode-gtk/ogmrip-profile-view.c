@@ -29,9 +29,17 @@ struct _OGMRipProfileViewPriv
   OGMRipProfileStore *store;
 };
 
-static void ogmrip_profile_view_dispose (GObject *gobject);
-
 G_DEFINE_TYPE_WITH_PRIVATE (OGMRipProfileView, ogmrip_profile_view, GTK_TYPE_TREE_VIEW);
+
+static void
+ogmrip_profile_view_dispose (GObject *gobject)
+{
+  OGMRipProfileView *view = OGMRIP_PROFILE_VIEW (gobject);
+
+  g_clear_object (&view->priv->store);
+
+  G_OBJECT_CLASS (ogmrip_profile_view_parent_class)->dispose (gobject);
+}
 
 static void
 ogmrip_profile_view_class_init (OGMRipProfileViewClass *klass)
@@ -59,20 +67,6 @@ ogmrip_profile_view_init (OGMRipProfileView *view)
   column = gtk_tree_view_column_new_with_attributes (_("Profile"),
       renderer, "markup", OGMRIP_PROFILE_STORE_INFO_COLUMN, NULL);
   gtk_tree_view_append_column (GTK_TREE_VIEW (view), column);
-}
-
-static void
-ogmrip_profile_view_dispose (GObject *gobject)
-{
-  OGMRipProfileView *view = OGMRIP_PROFILE_VIEW (gobject);
-
-  if (view->priv->store)
-  {
-    g_object_unref (view->priv->store);
-    view->priv->store = NULL;
-  }
-
-  (*G_OBJECT_CLASS (ogmrip_profile_view_parent_class)->dispose) (gobject);
 }
 
 GtkWidget *

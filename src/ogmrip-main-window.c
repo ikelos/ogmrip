@@ -1615,23 +1615,9 @@ ogmrip_main_window_dispose (GObject *gobject)
 {
   OGMRipMainWindow *window = OGMRIP_MAIN_WINDOW (gobject);
 
-  if (window->priv->media)
-  {
-    g_object_unref (window->priv->media);
-    window->priv->media = NULL;
-  }
-
-  if (window->priv->player)
-  {
-    g_object_unref (window->priv->player);
-    window->priv->player = NULL;
-  }
-
-  if (window->priv->manager)
-  {
-    g_object_unref (window->priv->manager);
-    window->priv->manager = NULL;
-  }
+  g_clear_object (&window->priv->media);
+  g_clear_object (&window->priv->player);
+  g_clear_object (&window->priv->manager);
 
   G_OBJECT_CLASS (ogmrip_main_window_parent_class)->dispose (gobject);
 }

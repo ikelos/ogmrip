@@ -49,17 +49,7 @@ struct _OGMRipTitleChooserWidgetPriv
   OGMRipMedia *media;
 };
 
-static void ogmrip_title_chooser_init                (OGMRipTitleChooserInterface *iface);
-static void ogmrip_title_chooser_widget_dispose      (GObject                     *object);
-static void ogmrip_title_chooser_widget_get_property (GObject                     *gobject,
-                                                      guint                       property_id,
-                                                      GValue                      *value,
-                                                      GParamSpec                  *pspec);
-static void ogmrip_title_chooser_widget_set_property (GObject                     *gobject,
-                                                      guint                       property_id,
-                                                      const GValue                *value,
-                                                      GParamSpec                  *pspec);
-
+static void ogmrip_title_chooser_init (OGMRipTitleChooserInterface *iface);
 
 static void
 ogmrip_title_chooser_widget_set_media (OGMRipTitleChooserWidget *chooser, OGMRipMedia *media)
@@ -192,6 +182,48 @@ G_DEFINE_TYPE_WITH_CODE (OGMRipTitleChooserWidget, ogmrip_title_chooser_widget, 
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_TITLE_CHOOSER, ogmrip_title_chooser_init))
 
 static void
+ogmrip_title_chooser_widget_dispose (GObject *object)
+{
+  OGMRipTitleChooserWidget *chooser = OGMRIP_TITLE_CHOOSER_WIDGET (object);
+
+  g_clear_object (&chooser->priv->media);
+
+  G_OBJECT_CLASS (ogmrip_title_chooser_widget_parent_class)->dispose (object);
+}
+
+static void
+ogmrip_title_chooser_widget_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
+{
+  OGMRipTitleChooserWidget *chooser = OGMRIP_TITLE_CHOOSER_WIDGET (gobject);
+
+  switch (property_id) 
+  {
+    case PROP_MEDIA:
+      g_value_set_object (value, chooser->priv->media);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
+      break;
+  }
+}
+
+static void
+ogmrip_title_chooser_widget_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
+{
+  OGMRipTitleChooserWidget *chooser = OGMRIP_TITLE_CHOOSER_WIDGET (gobject);
+
+  switch (property_id) 
+  {
+    case PROP_MEDIA:
+      ogmrip_title_chooser_widget_set_media (chooser, g_value_get_object (value));
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
+      break;
+  }
+}
+
+static void
 ogmrip_title_chooser_widget_class_init (OGMRipTitleChooserWidgetClass *klass)
 {
   GObjectClass *object_class;
@@ -226,54 +258,6 @@ ogmrip_title_chooser_widget_init (OGMRipTitleChooserWidget *chooser)
   cell = gtk_cell_renderer_text_new ();
   gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (chooser), cell, TRUE);
   gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (chooser), cell, "text", TEXT_COLUMN, NULL);
-}
-
-static void
-ogmrip_title_chooser_widget_dispose (GObject *object)
-{
-  OGMRipTitleChooserWidget *chooser;
-
-  chooser = OGMRIP_TITLE_CHOOSER_WIDGET (object);
-
-  if (chooser->priv->media)
-  {
-    g_object_unref (chooser->priv->media);
-    chooser->priv->media = NULL;
-  }
-
-  (*G_OBJECT_CLASS (ogmrip_title_chooser_widget_parent_class)->dispose) (object);
-}
-
-static void
-ogmrip_title_chooser_widget_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
-{
-  OGMRipTitleChooserWidget *chooser = OGMRIP_TITLE_CHOOSER_WIDGET (gobject);
-
-  switch (property_id) 
-  {
-    case PROP_MEDIA:
-      g_value_set_object (value, chooser->priv->media);
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
-      break;
-  }
-}
-
-static void
-ogmrip_title_chooser_widget_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
-{
-  OGMRipTitleChooserWidget *chooser = OGMRIP_TITLE_CHOOSER_WIDGET (gobject);
-
-  switch (property_id) 
-  {
-    case PROP_MEDIA:
-      ogmrip_title_chooser_widget_set_media (chooser, g_value_get_object (value));
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
-      break;
-  }
 }
 
 /**

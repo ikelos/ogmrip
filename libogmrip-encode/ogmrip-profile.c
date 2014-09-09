@@ -250,42 +250,30 @@ ogmrip_profile_dispose (GObject *gobject)
   OGMRipProfile *profile = OGMRIP_PROFILE (gobject);
 
   if (profile->priv->general_settings)
-  {
     g_signal_handlers_disconnect_by_func (profile->priv->general_settings,
         ogmrip_profile_check, profile);
-    g_object_unref (profile->priv->general_settings);
-    profile->priv->general_settings = NULL;
-  }
+
+  g_clear_object (&profile->priv->general_settings);
 
   if (profile->priv->video_settings)
-  {
     g_signal_handlers_disconnect_by_func (profile->priv->video_settings,
         ogmrip_profile_check, profile);
-    g_object_unref (profile->priv->video_settings);
-    profile->priv->video_settings = NULL;
-  }
+
+  g_clear_object (&profile->priv->video_settings);
 
   if (profile->priv->audio_settings)
-  {
     g_signal_handlers_disconnect_by_func (profile->priv->audio_settings,
         ogmrip_profile_check, profile);
-    g_object_unref (profile->priv->audio_settings);
-    profile->priv->audio_settings = NULL;
-  }
+
+  g_clear_object (&profile->priv->audio_settings);
 
   if (profile->priv->subp_settings)
-  {
     g_signal_handlers_disconnect_by_func (profile->priv->subp_settings,
         ogmrip_profile_check, profile);
-    g_object_unref (profile->priv->subp_settings);
-    profile->priv->subp_settings = NULL;
-  }
 
-  if (profile->priv->file)
-  {
-    g_object_unref (profile->priv->file);
-    profile->priv->file = NULL;
-  }
+  g_clear_object (&profile->priv->subp_settings);
+
+  g_clear_object (&profile->priv->file);
 
   G_OBJECT_CLASS (ogmrip_profile_parent_class)->dispose (gobject);
 }

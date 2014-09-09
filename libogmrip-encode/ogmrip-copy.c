@@ -62,23 +62,9 @@ ogmrip_copy_dispose (GObject *gobject)
 {
   OGMRipCopy *copy = OGMRIP_COPY (gobject);
 
-  if (copy->priv->title)
-  {
-    g_object_unref (copy->priv->title);
-    copy->priv->title = NULL;
-  }
-
-  if (copy->priv->src)
-  {
-    g_object_unref (copy->priv->src);
-    copy->priv->src = NULL;
-  }
-
-  if (copy->priv->dst)
-  {
-    g_object_unref (copy->priv->dst);
-    copy->priv->dst = NULL;
-  }
+  g_clear_object (&copy->priv->title);
+  g_clear_object (&copy->priv->src);
+  g_clear_object (&copy->priv->dst);
 
   G_OBJECT_CLASS (ogmrip_copy_parent_class)->dispose (gobject);
 }

@@ -64,11 +64,7 @@ ogmrip_profile_chooser_widget_dispose (GObject *gobject)
 {
   OGMRipProfileChooserWidget *chooser = OGMRIP_PROFILE_CHOOSER_WIDGET (gobject);
 
-  if (chooser->priv->store)
-  {
-    g_object_unref (chooser->priv->store);
-    chooser->priv->store = NULL;
-  }
+  g_clear_object (&chooser->priv->store);
 
   G_OBJECT_CLASS (ogmrip_profile_chooser_widget_parent_class)->dispose (gobject);
 }

@@ -246,17 +246,8 @@ ogmrip_crop_dialog_dispose (GObject *gobject)
 {
   OGMRipCropDialog *dialog = OGMRIP_CROP_DIALOG (gobject);
 
-  if (dialog->priv->title)
-  {
-    g_object_unref (dialog->priv->title);
-    dialog->priv->title = NULL;
-  }
-
-  if (dialog->priv->pixbuf)
-  {
-    g_object_unref (dialog->priv->pixbuf);
-    dialog->priv->pixbuf = NULL;
-  }
+  g_clear_object (&dialog->priv->title);
+  g_clear_object (&dialog->priv->pixbuf);
 
   G_OBJECT_CLASS (ogmrip_crop_dialog_parent_class)->dispose (gobject);
 }

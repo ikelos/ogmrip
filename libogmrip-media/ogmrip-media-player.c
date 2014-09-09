@@ -51,8 +51,6 @@ enum
   LAST_SIGNAL
 };
 
-static void ogmrip_player_dispose (GObject *gobject);
-
 static guint signals[LAST_SIGNAL] = { 0 };
 
 static void
@@ -151,6 +149,20 @@ ogmrip_mplayer_play_command (OGMRipPlayer *player)
 G_DEFINE_TYPE_WITH_PRIVATE (OGMRipPlayer, ogmrip_player, G_TYPE_OBJECT)
 
 static void
+ogmrip_player_dispose (GObject *gobject)
+{
+  OGMRipPlayer *player;
+
+  player = OGMRIP_PLAYER (gobject);
+
+  g_clear_object (&player->priv->title);
+  g_clear_object (&player->priv->astream);
+  g_clear_object (&player->priv->sstream);
+
+  G_OBJECT_CLASS (ogmrip_player_parent_class)->dispose (gobject);
+}
+
+static void
 ogmrip_player_class_init (OGMRipPlayerClass *klass)
 {
   GObjectClass *gobject_class;
@@ -191,34 +203,6 @@ ogmrip_player_init (OGMRipPlayer *player)
 
   player->priv->start_chap = 0;
   player->priv->end_chap = -1;
-}
-
-static void
-ogmrip_player_dispose (GObject *gobject)
-{
-  OGMRipPlayer *player;
-
-  player = OGMRIP_PLAYER (gobject);
-
-  if (player->priv->title)
-  {
-    g_object_unref (player->priv->title);
-    player->priv->title = NULL;
-  }
-
-  if (player->priv->astream)
-  {
-    g_object_unref (player->priv->astream);
-    player->priv->astream = NULL;
-  }
-
-  if (player->priv->sstream)
-  {
-    g_object_unref (player->priv->sstream);
-    player->priv->sstream = NULL;
-  }
-
-  G_OBJECT_CLASS (ogmrip_player_parent_class)->dispose (gobject);
 }
 
 /**

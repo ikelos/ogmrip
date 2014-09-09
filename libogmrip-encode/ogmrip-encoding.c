@@ -243,19 +243,10 @@ ogmrip_encoding_dispose (GObject *gobject)
 
   ogmrip_encoding_clear (encoding);
 
-  if (encoding->priv->title)
-  {
-    g_object_unref (encoding->priv->title);
-    encoding->priv->title = NULL;
-  }
+  g_clear_object (&encoding->priv->title);
+  g_clear_object (&encoding->priv->media);
 
-  if (encoding->priv->media)
-  {
-    g_object_unref (encoding->priv->media);
-    encoding->priv->media = NULL;
-  }
-
-  (*G_OBJECT_CLASS (ogmrip_encoding_parent_class)->dispose) (gobject);
+  G_OBJECT_CLASS (ogmrip_encoding_parent_class)->dispose (gobject);
 }
 
 static void
