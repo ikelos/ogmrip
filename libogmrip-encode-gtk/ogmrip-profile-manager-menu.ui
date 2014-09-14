@@ -2,16 +2,20 @@
   <menu id="menu">
     <section>
       <item>
-        <attribute name="label" translatable="yes">_Duplicate</attribute>
-        <attribute name="action">profile.copy</attribute>
-      </item>
-      <item>
         <attribute name="label" translatable="yes">_Edit</attribute>
         <attribute name="action">profile.edit</attribute>
       </item>
       <item>
+        <attribute name="label" translatable="yes">_Load</attribute>
+        <attribute name="action">profile.import</attribute>
+      </item>
+      <item>
         <attribute name="label" translatable="yes">_Save</attribute>
         <attribute name="action">profile.export</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">_Duplicate</attribute>
+        <attribute name="action">profile.copy</attribute>
       </item>
       <item>
         <attribute name="label" translatable="yes">Re_name</attribute>
