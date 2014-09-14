@@ -44,59 +44,12 @@ struct _OGMRipProfileManagerDialogPriv
 
   GtkWidget *add_button;
   GtkWidget *remove_button;
-  GtkWidget *import_button;
+  GtkWidget *gear_button;
 
   GtkWidget *name_dialog;
   GtkWidget *name_entry;
   GtkTextBuffer *desc_buffer;
-
-  GAction *remove_action;
 };
-
-static gboolean
-gtk_widget_button_press_cb (GtkWidget *widget, GdkEventButton *event, GtkWidget *menu)
-{
-  GtkTreePath *path;
-
-  if (event->button != 3 || event->type != GDK_BUTTON_PRESS)
-    return FALSE;
-
-  if (event->window != gtk_tree_view_get_bin_window (GTK_TREE_VIEW (widget)))
-    return FALSE;
-
-  if (!gtk_tree_view_get_path_at_pos (GTK_TREE_VIEW (widget), event->x, event->y, &path, NULL, NULL, NULL))
-    return FALSE;
-
-  gtk_tree_selection_select_path (gtk_tree_view_get_selection (GTK_TREE_VIEW (widget)), path);
-
-  gtk_tree_path_free (path);
-
-  gtk_menu_popup (GTK_MENU (menu), NULL, NULL, NULL, NULL, event->button, event->time);
-
-  return TRUE;
-}
-
-static gboolean
-gtk_widget_popup_menu_cb (GtkWidget *widget, GtkWidget *menu)
-{
-  gtk_menu_popup (GTK_MENU (menu), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time ());
-
-  return TRUE;
-}
-
-static void
-gtk_widget_set_popup_menu (GtkWidget *widget, GMenuModel *model)
-{
-  GtkWidget *menu;
-
-  menu = gtk_menu_new_from_model (G_MENU_MODEL (model));
-  gtk_menu_attach_to_widget (GTK_MENU (menu), widget, NULL);
-
-  g_signal_connect (widget, "button-press-event",
-      G_CALLBACK (gtk_widget_button_press_cb), menu);
-  g_signal_connect (widget, "popup-menu",
-      G_CALLBACK (gtk_widget_popup_menu_cb), menu);
-}
 
 static void
 ogmrip_profile_manager_dialog_profile_desc_changed (GtkTextBuffer *buffer, GtkWidget *dialog)
@@ -382,7 +335,7 @@ ogmrip_profile_manager_dialog_export_activated (GSimpleAction *action, GVariant 
 static void
 ogmrip_encoding_manager_dialog_selection_changed_cb (OGMRipProfileManagerDialog *dialog)
 {
-  g_simple_action_set_enabled (G_SIMPLE_ACTION (dialog->priv->remove_action),
+  gtk_widget_set_sensitive (dialog->priv->gear_button,
       gtk_tree_selection_count_selected_rows (dialog->priv->selection) > 0);
 }
 
@@ -418,7 +371,7 @@ ogmrip_profile_manager_dialog_class_init (OGMRipProfileManagerDialogClass *klass
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipProfileManagerDialog, profile_swin);
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipProfileManagerDialog, add_button);
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipProfileManagerDialog, remove_button);
-  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipProfileManagerDialog, import_button);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipProfileManagerDialog, gear_button);
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipProfileManagerDialog, name_dialog);
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipProfileManagerDialog, name_entry);
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipProfileManagerDialog, desc_buffer);
@@ -441,6 +394,8 @@ ogmrip_profile_manager_dialog_init (OGMRipProfileManagerDialog *dialog)
 {
   GtkStyleContext *context;
   GSimpleActionGroup *group;
+  GAction *action;
+
   GtkBuilder *builder;
   GObject *model;
 
@@ -480,19 +435,18 @@ ogmrip_profile_manager_dialog_init (OGMRipProfileManagerDialog *dialog)
   g_action_map_add_action_entries (G_ACTION_MAP (group),
       entries, G_N_ELEMENTS (entries), dialog);
 
-  dialog->priv->remove_action = g_action_map_lookup_action (G_ACTION_MAP (group), "remove");
-  g_simple_action_set_enabled (G_SIMPLE_ACTION (dialog->priv->remove_action), FALSE);
-
   builder = gtk_builder_new_from_resource (OGMRIP_MENU_RES);
 
   model = gtk_builder_get_object (builder, "menu");
-  gtk_widget_set_popup_menu (dialog->priv->profile_view, G_MENU_MODEL (model));
+  gtk_menu_button_set_menu_model (GTK_MENU_BUTTON (dialog->priv->gear_button), G_MENU_MODEL (model));
 
   g_object_unref (builder);
 
   gtk_actionable_set_action_name (GTK_ACTIONABLE (dialog->priv->add_button),    "profile.add");
   gtk_actionable_set_action_name (GTK_ACTIONABLE (dialog->priv->remove_button), "profile.remove");
-  gtk_actionable_set_action_name (GTK_ACTIONABLE (dialog->priv->import_button), "profile.import");
+
+  action = g_action_map_lookup_action (G_ACTION_MAP (group), "remove");
+  g_object_bind_property (dialog->priv->gear_button, "sensitive", action, "enabled", G_BINDING_SYNC_CREATE);
 
   g_signal_connect (dialog->priv->desc_buffer, "changed",
       G_CALLBACK (ogmrip_profile_manager_dialog_profile_desc_changed), dialog->priv->name_dialog);
