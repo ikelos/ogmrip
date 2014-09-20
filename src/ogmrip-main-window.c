@@ -34,6 +34,7 @@
 
 #define OGMRIP_UI_RES   "/org/ogmrip/ogmrip-main-window.ui"
 #define OGMRIP_ICON_RES "/org/ogmrip/ogmrip.png"
+#define OGMRIP_MENU_RES "/org/ogmrip/ogmrip-menu.ui"
 
 struct _OGMRipMainWindowPriv
 {
@@ -1422,9 +1423,7 @@ ogmrip_main_window_deselect_all_activated (GSimpleAction *action, GVariant *para
 static void
 ogmrip_main_window_close_activated (GSimpleAction *action, GVariant *parameter, gpointer data)
 {
-  OGMRipMainWindow *window = data;
-
-  gtk_widget_destroy (GTK_WIDGET (window));
+  gtk_widget_destroy (data);
 }
 
 static void
@@ -1626,6 +1625,13 @@ static GActionEntry win_entries[] =
 static void
 ogmrip_main_window_init (OGMRipMainWindow *window)
 {
+  GError *error = NULL;
+
+  GtkWidget *hbar, *button, *image;
+
+  GtkBuilder *builder;
+  GObject *menu;
+
   GAction *action;
   GdkPixbuf *icon;
 
@@ -1636,12 +1642,38 @@ ogmrip_main_window_init (OGMRipMainWindow *window)
 
   window->priv = ogmrip_main_window_get_instance_private (window);
 
+  gtk_application_window_set_show_menubar (GTK_APPLICATION_WINDOW (window), FALSE);
+
   icon = gdk_pixbuf_new_from_resource (OGMRIP_ICON_RES, NULL);
   if (icon)
   {
     gtk_window_set_icon (GTK_WINDOW (window), icon);
     g_object_unref (icon);
   }
+
+  hbar = gtk_header_bar_new ();
+  gtk_header_bar_set_show_close_button (GTK_HEADER_BAR (hbar), TRUE);
+  gtk_window_set_titlebar (GTK_WINDOW (window), hbar);
+  gtk_widget_show (hbar);
+
+  gtk_window_set_title (GTK_WINDOW (window), "OGMRip");
+
+  button = gtk_menu_button_new ();
+  gtk_menu_button_set_use_popover (GTK_MENU_BUTTON (button), TRUE);
+  gtk_header_bar_pack_end (GTK_HEADER_BAR (hbar), button);
+  gtk_widget_show (button);
+
+  image = gtk_image_new_from_icon_name ("emblem-system-symbolic", GTK_ICON_SIZE_MENU);
+  gtk_container_add (GTK_CONTAINER (button), image);
+  gtk_widget_show (image);
+
+  builder = gtk_builder_new ();
+  if (!gtk_builder_add_from_resource (builder, OGMRIP_MENU_RES, &error))
+    g_error ("Couldn't load builder file: %s", error->message);
+  menu = gtk_builder_get_object (builder, "win-menu");
+  g_object_unref (builder);
+
+  gtk_menu_button_set_menu_model (GTK_MENU_BUTTON (button), G_MENU_MODEL (menu));
 
   g_signal_connect_swapped (window->priv->title_chooser, "changed",
       G_CALLBACK (ogmrip_main_window_title_chooser_changed), window);

@@ -174,14 +174,10 @@ ogmrip_gui_startup_cb (GApplication *app)
   builder = gtk_builder_new ();
   if (!gtk_builder_add_from_resource (builder, OGMRIP_MENU_RES, &error))
     g_error ("Couldn't load builder file: %s", error->message);
-
   menu = gtk_builder_get_object (builder, "app-menu");
-  gtk_application_set_app_menu (GTK_APPLICATION (app), G_MENU_MODEL (menu));
-
-  menu = gtk_builder_get_object (builder, "win-menu");
-  gtk_application_set_menubar (GTK_APPLICATION (app), G_MENU_MODEL (menu));
-
   g_object_unref (builder);
+
+  gtk_application_set_app_menu (GTK_APPLICATION (app), G_MENU_MODEL (menu));
 }
 
 static void
