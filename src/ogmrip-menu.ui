@@ -7,6 +7,13 @@
         <attribute name="accel">&lt;Primary&gt;f</attribute>
       </item>
       <item>
+        <attribute name="label" translatable="yes">_Encodings</attribute>
+        <attribute name="action">app.encodings</attribute>
+        <attribute name="accel">&lt;Primary&gt;e</attribute>
+      </item>
+    </section>
+    <section>
+      <item>
         <attribute name="label" translatable="yes">_Preferences</attribute>
         <attribute name="action">app.preferences</attribute>
       </item>
@@ -68,13 +75,6 @@
           <attribute name="label" translatable="yes">_Deselect all</attribute>
           <attribute name="action">win.deselect_all</attribute>
           <attribute name="accel">&lt;Primary&gt;d</attribute>
-        </item>
-      </section>
-      <section>
-        <item>
-          <attribute name="label" translatable="yes">_Encodings</attribute>
-          <attribute name="action">win.encodings</attribute>
-          <attribute name="accel">&lt;Primary&gt;e</attribute>
         </item>
       </section>
     </submenu>

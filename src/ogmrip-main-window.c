@@ -536,7 +536,7 @@ ogmrip_main_window_clean (OGMRipMainWindow *window, OGMRipEncoding *encoding, gb
   g_object_unref (encoding);
 }
 
-static void
+void
 ogmrip_main_window_encode (OGMRipMainWindow *window, OGMRipEncoding *encoding)
 {
   GError *error = NULL;
@@ -1420,39 +1420,6 @@ ogmrip_main_window_deselect_all_activated (GSimpleAction *action, GVariant *para
 }
 
 static void
-ogmrip_main_window_encodings_responsed (OGMRipMainWindow *window, gint response_id, GtkWidget *dialog)
-{
-  if (response_id != GTK_RESPONSE_APPLY)
-    gtk_widget_destroy (dialog);
-  else
-  {
-    GSList *list, *link;
-
-    list = ogmrip_encoding_manager_get_list (window->priv->manager);
-    for (link = list; link; link = link->next)
-      if (ogmrip_encoding_manager_get_status (window->priv->manager, link->data) != OGMRIP_ENCODING_SUCCESS)
-        ogmrip_main_window_encode (window, g_object_ref (link->data));
-    g_slist_free (list);
-  }
-}
-
-static void
-ogmrip_main_window_encodings_activated (GSimpleAction *action, GVariant *parameter, gpointer data)
-{
-  OGMRipMainWindow *window = data;
-  GtkWidget *dialog;
-
-  dialog = ogmrip_encoding_manager_dialog_new (window->priv->manager);
-  gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (window));
-  gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
-
-  g_signal_connect_swapped (dialog, "response",
-      G_CALLBACK (ogmrip_main_window_encodings_responsed), window);
-
-  gtk_window_present (GTK_WINDOW (dialog));
-}
-
-static void
 ogmrip_main_window_close_activated (GSimpleAction *action, GVariant *parameter, gpointer data)
 {
   OGMRipMainWindow *window = data;
@@ -1653,7 +1620,6 @@ static GActionEntry win_entries[] =
   { "save_chapters", ogmrip_main_window_save_chapters_activated, NULL, NULL, NULL },
   { "select_all",    ogmrip_main_window_select_all_activated,    NULL, NULL, NULL },
   { "deselect_all",  ogmrip_main_window_deselect_all_activated,  NULL, NULL, NULL },
-  { "encodings",     ogmrip_main_window_encodings_activated,     NULL, NULL, NULL },
   { "close",         ogmrip_main_window_close_activated,         NULL, NULL, NULL }
 };
 
@@ -1738,19 +1704,20 @@ ogmrip_main_window_init (OGMRipMainWindow *window)
   g_object_bind_property (window->priv->title_chooser, "sensitive",
       action, "enabled", G_BINDING_SYNC_CREATE);
 
-  window->priv->manager = ogmrip_encoding_manager_new ();
-
   g_signal_emit_by_name (window->priv->title_chooser, "changed");
 }
 
 GtkWidget *
-ogmrip_main_window_new (OGMRipApplication *application)
+ogmrip_main_window_new (OGMRipApplication *application, OGMRipEncodingManager *manager)
 {
   OGMRipMainWindow *window;
 
   g_return_val_if_fail (OGMRIP_IS_APPLICATION (application), NULL);
 
-  window = g_object_new (OGMRIP_TYPE_MAIN_WINDOW, "application", application, NULL);
+  window = g_object_new (OGMRIP_TYPE_MAIN_WINDOW, NULL);
+  gtk_window_set_application (GTK_WINDOW (window), GTK_APPLICATION (application));
+
+  window->priv->manager = g_object_ref (manager);
 
   if (ogmrip_application_get_is_prepared (application))
     ogmrip_main_window_app_prepared (window, application);
@@ -1778,4 +1745,3 @@ ogmrip_main_window_load_path (OGMRipMainWindow *window, const gchar *path)
 
   return TRUE;
 }
-
