@@ -595,6 +595,6 @@ ogmrip_encoding_manager_dialog_init (OGMRipEncodingManagerDialog *dialog)
 GtkWidget *
 ogmrip_encoding_manager_dialog_new (OGMRipEncodingManager *manager)
 {
-  return g_object_new (OGMRIP_TYPE_ENCODING_MANAGER_DIALOG, "manager", manager, NULL);
+  return g_object_new (OGMRIP_TYPE_ENCODING_MANAGER_DIALOG, "manager", manager, "use-header-bar", TRUE, NULL);
 }
 

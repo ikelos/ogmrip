@@ -117,7 +117,7 @@ ogmrip_profile_editor_container_options_button_clicked (OGMRipProfileEditorDialo
   {
     GtkWidget *dialog;
 
-    dialog = g_object_new (type, "profile", editor->priv->profile, NULL);
+    dialog = g_object_new (type, "use-header-bar", TRUE, "profile", editor->priv->profile, NULL);
     gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (editor));
     gtk_dialog_run (GTK_DIALOG (dialog));
     gtk_widget_destroy (dialog);
@@ -137,7 +137,7 @@ ogmrip_profile_editor_video_options_button_clicked (OGMRipProfileEditorDialog *e
   {
     GtkWidget *dialog;
 
-    dialog = g_object_new (type, "profile", editor->priv->profile, NULL);
+    dialog = g_object_new (type, "use-header-bar", TRUE, "profile", editor->priv->profile, NULL);
     gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (editor));
     gtk_dialog_run (GTK_DIALOG (dialog));
     gtk_widget_destroy (dialog);
@@ -157,7 +157,7 @@ ogmrip_profile_editor_audio_options_button_clicked (OGMRipProfileEditorDialog *e
   {
     GtkWidget *dialog;
 
-    dialog = g_object_new (type, "profile", editor->priv->profile, NULL);
+    dialog = g_object_new (type, "use-header-bar", TRUE, "profile", editor->priv->profile, NULL);
     gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (editor));
     gtk_dialog_run (GTK_DIALOG (dialog));
     gtk_widget_destroy (dialog);
@@ -177,7 +177,7 @@ ogmrip_profile_editor_subp_options_button_clicked (OGMRipProfileEditorDialog *ed
   {
     GtkWidget *dialog;
 
-    dialog = g_object_new (type, "profile", editor->priv->profile, NULL);
+    dialog = g_object_new (type, "use-header-bar", TRUE, "profile", editor->priv->profile, NULL);
     gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (editor));
     gtk_dialog_run (GTK_DIALOG (dialog));
     gtk_widget_destroy (dialog);
@@ -520,10 +520,11 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
   if (!dialog->priv->profile)
     g_error ("No profile specified");
 
-  gtk_dialog_add_button (GTK_DIALOG (dialog), _("_Close"), GTK_RESPONSE_CLOSE);
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
-  gtk_container_set_border_width (GTK_CONTAINER (dialog), 6);
-  gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
+  gtk_container_set_border_width (GTK_CONTAINER (dialog), 0);
+
+  widget = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+  gtk_container_set_border_width (GTK_CONTAINER (widget), 0);
 
   builder = gtk_builder_new ();
   if (!gtk_builder_add_from_resource (builder, OGMRIP_UI_RES, &error))
@@ -901,6 +902,6 @@ ogmrip_profile_editor_dialog_init (OGMRipProfileEditorDialog *dialog)
 GtkWidget *
 ogmrip_profile_editor_dialog_new (OGMRipProfile *profile)
 {
-  return g_object_new (OGMRIP_TYPE_PROFILE_EDITOR_DIALOG, "profile", profile, NULL);
+  return g_object_new (OGMRIP_TYPE_PROFILE_EDITOR_DIALOG, "use-header-bar", TRUE, "profile", profile, NULL);
 }
 

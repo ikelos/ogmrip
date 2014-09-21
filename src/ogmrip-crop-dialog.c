@@ -339,7 +339,7 @@ g_initable_iface_init (GInitableIface *iface)
 GtkWidget *
 ogmrip_crop_dialog_new (OGMRipTitle *title, guint left, guint top, guint right, guint bottom)
 {
-  return g_object_new (OGMRIP_TYPE_CROP_DIALOG, "title", title,
+return g_object_new (OGMRIP_TYPE_CROP_DIALOG, "use-header-bar", TRUE, "title", title,
       "crop-left", left, "crop-top", top, "crop-right", right, "crop-bottom", bottom, NULL);
 }
 

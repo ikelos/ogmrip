@@ -191,11 +191,9 @@ ogmrip_subp_options_dialog_init (OGMRipSubpOptionsDialog *dialog)
     return;
   }
 
-  gtk_dialog_add_button (GTK_DIALOG (dialog), _("_Close"), GTK_RESPONSE_CLOSE);
-  gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
-
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
   gtk_window_set_title (GTK_WINDOW (dialog), _("Subtitles Options"));
+  gtk_container_set_border_width (GTK_CONTAINER (dialog), 12);
 
   area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
 
@@ -351,7 +349,7 @@ ogmrip_subp_options_dialog_set_property (GObject *gobject, guint prop_id, const 
 GtkWidget *
 ogmrip_subp_options_dialog_new (void)
 {
-  return g_object_new (OGMRIP_TYPE_SUBP_OPTIONS_DIALOG, NULL);
+  return g_object_new (OGMRIP_TYPE_SUBP_OPTIONS_DIALOG, "use-header-bar", TRUE, NULL);
 }
 
 gboolean

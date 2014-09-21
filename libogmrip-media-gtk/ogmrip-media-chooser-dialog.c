@@ -157,7 +157,7 @@ ogmrip_media_chooser_dialog_new (void)
 {
   GtkWidget *widget;
 
-  widget = g_object_new (OGMRIP_TYPE_MEDIA_CHOOSER_DIALOG, NULL);
+  widget = g_object_new (OGMRIP_TYPE_MEDIA_CHOOSER_DIALOG, "use-header-bar", TRUE, NULL);
 
   return widget;
 }

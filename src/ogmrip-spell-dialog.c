@@ -238,7 +238,7 @@ ogmrip_spell_dialog_new (const gchar *language)
     return NULL;
   }
 
-  dialog = g_object_new (OGMRIP_TYPE_SPELL_DIALOG, NULL);
+  dialog = g_object_new (OGMRIP_TYPE_SPELL_DIALOG, "use-header-bar", TRUE, NULL);
   dialog->priv->broker = broker;
   dialog->priv->dict = dict;
 

@@ -825,7 +825,7 @@ g_initable_iface_init (GInitableIface *iface)
 GtkWidget *
 ogmrip_options_dialog_new (OGMRipEncoding *encoding)
 {
-  return g_initable_new (OGMRIP_TYPE_OPTIONS_DIALOG, NULL, NULL, "encoding", encoding, NULL);
+  return g_initable_new (OGMRIP_TYPE_OPTIONS_DIALOG, NULL, NULL, "use-header-bar", TRUE, "encoding", encoding, NULL);
 }
 
 GtkWidget *

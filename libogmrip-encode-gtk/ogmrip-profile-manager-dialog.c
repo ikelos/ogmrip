@@ -455,6 +455,6 @@ ogmrip_profile_manager_dialog_init (OGMRipProfileManagerDialog *dialog)
 GtkWidget *
 ogmrip_profile_manager_dialog_new (void)
 {
-  return g_object_new (OGMRIP_TYPE_PROFILE_MANAGER_DIALOG, NULL);
+  return g_object_new (OGMRIP_TYPE_PROFILE_MANAGER_DIALOG, "use-header-bar", TRUE, NULL);
 }
 

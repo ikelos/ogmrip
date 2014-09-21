@@ -188,12 +188,9 @@ ogmrip_audio_options_dialog_init (OGMRipAudioOptionsDialog *dialog)
   if (!gtk_builder_add_from_resource (builder, OGMRIP_UI_RES, &error))
     g_error ("Couldn't load builder file: %s", error->message);
 
-  gtk_dialog_add_button (GTK_DIALOG (dialog), _("_Close"), GTK_RESPONSE_CLOSE);
-  gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
-  gtk_container_set_border_width (GTK_CONTAINER (dialog), 6);
-
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
   gtk_window_set_title (GTK_WINDOW (dialog), _("Audio Track Options"));
+  gtk_container_set_border_width (GTK_CONTAINER (dialog), 12);
 
   area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
 
@@ -349,7 +346,7 @@ ogmrip_audio_options_dialog_set_property (GObject *gobject, guint prop_id, const
 GtkWidget *
 ogmrip_audio_options_dialog_new (void)
 {
-  return g_object_new (OGMRIP_TYPE_AUDIO_OPTIONS_DIALOG, NULL);
+  return g_object_new (OGMRIP_TYPE_AUDIO_OPTIONS_DIALOG, "use-header-bar", TRUE, NULL);
 }
 
 const  gchar *
