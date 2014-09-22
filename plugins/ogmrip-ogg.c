@@ -285,14 +285,11 @@ ogmrip_ogg_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
   OGMJobTask *child;
 
-  gchar *file;
+  gchar *file = NULL;
+  gint fd = 0;
+
   gboolean result;
   guint tnumber;
-  gint fd;
-
-  fd = 0;
-  file = NULL;
-  result = FALSE;
 
   ogmrip_container_get_split (OGMRIP_CONTAINER (task), &tnumber, NULL);
   if (tnumber > 1)

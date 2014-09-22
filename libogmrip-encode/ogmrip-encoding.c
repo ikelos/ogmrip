@@ -1365,9 +1365,6 @@ ogmrip_encoding_get_audio_overhead (OGMRipEncoding *encoding, OGMRipAudioCodec *
   output = ogmrip_codec_get_output (OGMRIP_CODEC (codec));
   samples_per_frame = ogmrip_audio_stream_get_samples_per_frame (OGMRIP_AUDIO_STREAM (output));
 
-  sample_rate = 48000;
-  channels = 1;
-
   if (ogmrip_codec_format (G_OBJECT_TYPE (codec)) == OGMRIP_FORMAT_COPY)
   {
     OGMRipStream *stream;

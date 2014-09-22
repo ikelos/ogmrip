@@ -655,7 +655,6 @@ static void
 ogmrip_options_dialog_response (GtkDialog *dialog, gint response_id)
 {
   OGMRipOptionsDialog *options = OGMRIP_OPTIONS_DIALOG (dialog);
-  OGMRipProfile *profile;
 
   if (response_id != OGMRIP_RESPONSE_EXTRACT &&
       response_id != OGMRIP_RESPONSE_ENQUEUE &&
@@ -663,10 +662,10 @@ ogmrip_options_dialog_response (GtkDialog *dialog, gint response_id)
       response_id != GTK_RESPONSE_CLOSE)
     return;
 
-  if (response_id == GTK_RESPONSE_CLOSE)
-    profile = ogmrip_encoding_get_profile (options->priv->encoding);
-  else
+  if (response_id != GTK_RESPONSE_CLOSE)
   {
+    OGMRipProfile *profile;
+
     profile = ogmrip_profile_chooser_get_active (GTK_COMBO_BOX (options->priv->profile_chooser));
     ogmrip_encoding_set_profile (options->priv->encoding, profile);
   }

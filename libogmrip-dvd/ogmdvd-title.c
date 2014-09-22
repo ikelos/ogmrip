@@ -164,7 +164,6 @@ ogmdvd_video_stream_get_resolution (OGMRipVideoStream *video, guint *width, guin
   OGMDvdTitle *title = OGMDVD_TITLE (video);
   guint w, h;
 
-  w = 0;
   h = 480;
   if (title->priv->video_format != 0)
     h = 576;

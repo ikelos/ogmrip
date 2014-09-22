@@ -123,8 +123,6 @@ ogmrip_aac_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   gchar *fifo;
   gboolean result;
 
-  result = FALSE;
-
   fifo = ogmrip_fs_mkftemp ("fifo.XXXXXX", error);
   if (!fifo)
     return FALSE;
