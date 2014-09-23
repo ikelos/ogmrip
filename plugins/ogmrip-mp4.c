@@ -567,43 +567,62 @@ static OGMRipFormat formats[] =
   -1
 };
 
+static gboolean
+ogmrip_mp4_get_version (const gchar *str, gint *major_version, gint *minor_version, gint *micro_version)
+{
+  gchar *end;
+
+  if (!g_str_has_prefix (str, "MP4Box - GPAC version "))
+    return FALSE;
+
+  errno = 0;
+
+  *major_version = strtoul (str + 22, &end, 10);
+  if (errno || *end != '.')
+    return FALSE;
+
+  *minor_version = strtoul (end + 1, NULL, 10);
+  if (errno || *end != '.')
+    return FALSE;
+
+  *micro_version = strtoul (end + 1, NULL, 10);
+  if (errno)
+    return FALSE;
+
+  return TRUE;
+}
+
 void
 ogmrip_module_load (OGMRipModule *module)
 {
-  gchar *output;
+  gchar *output, *error;
   gint major_version = 0, minor_version = 0, micro_version = 0;
 
-  if (!g_spawn_command_line_sync (MP4BOX " -version", &output, NULL, NULL, NULL))
+  if (!g_spawn_command_line_sync (MP4BOX " -version", &output, &error, NULL, NULL))
   {
     g_warning (_("MP4Box is missing"));
     return;
   }
 
-  if (g_str_has_prefix (output, "MP4Box - GPAC version "))
+  if (ogmrip_mp4_get_version (output, &major_version, &minor_version, &micro_version) ||
+      ogmrip_mp4_get_version (error,  &major_version, &minor_version, &micro_version))
   {
-    gchar *end;
+    if ((major_version > 0) ||
+        (major_version == 0 && minor_version > 4) ||
+        (major_version == 0 && minor_version == 4 && micro_version >= 5))
+    {
+      guint i = 0;
 
-    errno = 0;
-    major_version = strtoul (output + 22, &end, 10);
-    if (!errno && *end == '.')
-      minor_version = strtoul (end + 1, NULL, 10);
-    if (!errno && *end == '.')
-      micro_version = strtoul (end + 1, NULL, 10);
+      while (formats[i] != -1)
+        i++;
+
+      formats[i] = OGMRIP_FORMAT_AC3;
+      formats[i+1] = OGMRIP_FORMAT_COPY;
+    }
   }
+
   g_free (output);
-
-  if ((major_version > 0) ||
-      (major_version == 0 && minor_version > 4) ||
-      (major_version == 0 && minor_version == 4 && micro_version >= 5))
-  {
-    guint i = 0;
-
-    while (formats[i] != -1)
-      i++;
-
-    formats[i] = OGMRIP_FORMAT_AC3;
-    formats[i+1] = OGMRIP_FORMAT_COPY;
-  }
+  g_free (error);
 
   ogmrip_register_container (OGMRIP_TYPE_MP4,
       "mp4", _("Mpeg-4 Media (MP4)"), formats,
