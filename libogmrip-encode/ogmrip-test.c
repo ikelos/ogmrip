@@ -353,7 +353,7 @@ static gboolean
 ogmrip_test_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
   OGMRipTest *test = OGMRIP_TEST (task);
-  gboolean have_bitrate, result;
+  gboolean have_bitrate, result = TRUE;
 
   OGMRipCodec *codec;
   OGMRipEncodingInfo info;
