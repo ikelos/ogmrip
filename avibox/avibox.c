@@ -599,6 +599,8 @@ main (int argc, char *argv[])
         strncpy (basename, optarg, FILENAME_MAX);
         break;
       case 'i':
+        if (input)
+          media_file_free (input);
         input = media_file_new (optarg);
         break;
       case 's':
