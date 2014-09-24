@@ -47,6 +47,7 @@ static void ogmrip_file_set_property (GObject               *gobject,
                                       GParamSpec            *pspec);
 
 G_DEFINE_ABSTRACT_TYPE_WITH_CODE (OGMRipFile, ogmrip_file, G_TYPE_OBJECT,
+    G_ADD_PRIVATE (OGMRipFile)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_MEDIA, ogmrip_media_iface_init)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_TITLE, ogmrip_title_iface_init)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_STREAM, ogmrip_stream_iface_init));
@@ -54,7 +55,7 @@ G_DEFINE_ABSTRACT_TYPE_WITH_CODE (OGMRipFile, ogmrip_file, G_TYPE_OBJECT,
 static void
 ogmrip_file_init (OGMRipFile *stream)
 {
-  stream->priv = G_TYPE_INSTANCE_GET_PRIVATE (stream, OGMRIP_TYPE_FILE, OGMRipFilePriv);
+  stream->priv = ogmrip_file_get_instance_private (stream);
 
   stream->priv->length = -1.0;
   stream->priv->format = OGMRIP_FORMAT_UNDEFINED;
@@ -71,8 +72,6 @@ ogmrip_file_class_init (OGMRipFileClass *klass)
   gobject_class->set_property = ogmrip_file_set_property;
 
   g_object_class_override_property (gobject_class, PROP_URI, "uri");
-
-  g_type_class_add_private (klass, sizeof (OGMRipFilePriv));
 }
 
 static void
@@ -303,13 +302,13 @@ ogmrip_title_iface_init (OGMRipTitleInterface *iface)
 }
 
 static gint
-ogmrip_file_get_format (OGMRipStream *stream)
+ogmrip_file_get_stream_format (OGMRipStream *stream)
 {
   return OGMRIP_FILE (stream)->priv->format;
 }
 
-OGMRipTitle *
-ogmrip_stream_get_title (OGMRipStream *stream)
+static OGMRipTitle *
+ogmrip_file_get_stream_title (OGMRipStream *stream)
 {
   return OGMRIP_TITLE (stream);
 }
@@ -317,8 +316,8 @@ ogmrip_stream_get_title (OGMRipStream *stream)
 static void
 ogmrip_stream_iface_init (OGMRipStreamInterface *iface)
 {
-  iface->get_format = ogmrip_file_get_format;
-  iface->get_title  = ogmrip_stream_get_title;
+  iface->get_format = ogmrip_file_get_stream_format;
+  iface->get_title  = ogmrip_file_get_stream_title;
 }
 
 const gchar *

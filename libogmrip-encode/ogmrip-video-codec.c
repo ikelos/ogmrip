@@ -124,17 +124,8 @@ ogmrip_video_codec_dispose (GObject *gobject)
 {
   OGMRipVideoCodec *video = OGMRIP_VIDEO_CODEC (gobject);
 
-  if (video->priv->astream)
-  {
-    g_object_unref (video->priv->astream);
-    video->priv->astream = NULL;
-  }
-
-  if (video->priv->sstream)
-  {
-    g_object_unref (video->priv->sstream);
-    video->priv->sstream = NULL;
-  }
+  g_clear_object (&video->priv->astream);
+  g_clear_object (&video->priv->sstream);
 
   G_OBJECT_CLASS (ogmrip_video_codec_parent_class)->dispose (gobject);
 }
@@ -569,7 +560,7 @@ ogmrip_video_codec_new_from_profile (OGMRipVideoStream *stream, OGMRipProfile *p
   w = g_settings_get_uint (settings, OGMRIP_PROFILE_MIN_WIDTH);
   h = g_settings_get_uint (settings, OGMRIP_PROFILE_MIN_HEIGHT);
 
-  if (w > 0 && h > 0)
+  if (w > 0 || h > 0)
     ogmrip_video_codec_set_min_size (OGMRIP_VIDEO_CODEC (codec), w, h);
 
   w = g_settings_get_uint (settings, OGMRIP_PROFILE_MAX_WIDTH);
@@ -1445,8 +1436,8 @@ ogmrip_video_codec_get_framerate (OGMRipVideoCodec *video, guint *num, guint *de
   stream = ogmrip_codec_get_input (OGMRIP_CODEC (video));
   ogmrip_video_stream_get_framerate (OGMRIP_VIDEO_STREAM (stream), num, denom);
 
-  if (ogmrip_title_get_telecine (ogmrip_stream_get_title (stream)) ||
-      ogmrip_title_get_progressive (ogmrip_stream_get_title (stream)))
+  if (ogmrip_video_stream_get_telecine (OGMRIP_VIDEO_STREAM (stream)) ||
+      ogmrip_video_stream_get_progressive (OGMRIP_VIDEO_STREAM (stream)))
   {
     *num = 24000;
     *denom = 1001;

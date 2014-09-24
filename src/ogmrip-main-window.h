@@ -19,7 +19,7 @@
 #ifndef __OGMRIP_MAIN_WINDOW_H__
 #define __OGMRIP_MAIN_WINDOW_H__
 
-#include <gtk/gtk.h>
+#include <ogmrip-encode-gtk.h>
 
 #include "ogmrip-application.h"
 
@@ -48,9 +48,12 @@ struct _OGMRipMainWindowClass
 };
 
 GType       ogmrip_main_window_get_type  (void);
-GtkWidget * ogmrip_main_window_new       (OGMRipApplication *application);
-gboolean    ogmrip_main_window_load_path (OGMRipMainWindow  *window,
-                                          const gchar       *path);
+GtkWidget * ogmrip_main_window_new       (OGMRipApplication     *application,
+                                          OGMRipEncodingManager *manager);
+gboolean    ogmrip_main_window_load_path (OGMRipMainWindow      *window,
+                                          const gchar           *path);
+void        ogmrip_main_window_encode    (OGMRipMainWindow      *window,
+                                          OGMRipEncoding        *encoding);
 
 G_END_DECLS
 

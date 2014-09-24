@@ -1318,8 +1318,8 @@ void *vobsub_out_open(const char *basename, const unsigned int *palette,
                 fflush(result->fidx);
             } else
                 perror("Error: vobsub_out_open index file open failed");
-            free(filename);
         }
+        free(filename);
     }
     return result;
 }

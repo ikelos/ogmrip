@@ -108,7 +108,7 @@ ogmrip_encoding_manager_dispose (GObject *gobject)
     manager->priv->encodings = NULL;
   }
 
-  (*G_OBJECT_CLASS (ogmrip_encoding_manager_parent_class)->dispose) (gobject);
+  G_OBJECT_CLASS (ogmrip_encoding_manager_parent_class)->dispose (gobject);
 }
 
 static void

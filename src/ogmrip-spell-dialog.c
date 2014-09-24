@@ -20,8 +20,6 @@
 #include "config.h"
 #endif
 
-#ifdef HAVE_ENCHANT_SUPPORT
-
 #include "ogmrip-spell-dialog.h"
 
 #include "ogmrip-helper.h"
@@ -31,6 +29,12 @@
 
 #define OGMRIP_UI_RES  "/org/ogmrip/ogmrip-spell-dialog.ui"
 #define OGMRIP_UI_ROOT "root"
+
+enum
+{
+  PROP_0,
+  PROP_LANGUAGE
+};
 
 enum
 {
@@ -44,6 +48,7 @@ struct _OGMRipSpellDialogPriv
 {
   EnchantBroker *broker;
   EnchantDict *dict;
+  gchar *language;
 
   GtkTextBuffer *text_buffer;
 
@@ -60,8 +65,6 @@ struct _OGMRipSpellDialogPriv
 
   const gchar *word;
 };
-
-static void ogmrip_spell_dialog_dispose (GObject *gobject);
 
 static void
 ogmrip_spell_dialog_changed (OGMRipSpellDialog *dialog, GtkTreeSelection *select)
@@ -163,14 +166,89 @@ ogmrip_spell_dialog_get_word (OGMRipSpellDialog *dialog)
   return g_strdup (dialog->priv->word);
 }
 
-G_DEFINE_TYPE_WITH_PRIVATE (OGMRipSpellDialog, ogmrip_spell_dialog, GTK_TYPE_DIALOG);
+static void g_initable_iface_init (GInitableIface *iface);
+
+G_DEFINE_TYPE_WITH_CODE (OGMRipSpellDialog, ogmrip_spell_dialog, GTK_TYPE_DIALOG,
+    G_ADD_PRIVATE (OGMRipSpellDialog)
+    G_IMPLEMENT_INTERFACE (G_TYPE_INITABLE, g_initable_iface_init));
+
+static void
+ogmrip_spell_dialog_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
+{
+  OGMRipSpellDialog *dialog = OGMRIP_SPELL_DIALOG (gobject);
+
+  switch (property_id)
+  {
+    case PROP_LANGUAGE:
+      g_value_set_string (value, dialog->priv->language);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
+      break;
+  }
+}
+
+static void
+ogmrip_spell_dialog_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
+{
+  OGMRipSpellDialog *dialog = OGMRIP_SPELL_DIALOG (gobject);
+
+  switch (property_id)
+  {
+    case PROP_LANGUAGE:
+      dialog->priv->language = g_value_dup_string (value);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
+      break;
+  }
+}
+
+static void 
+ogmrip_spell_dialog_constructed (GObject *gobject)
+{
+  OGMRipSpellDialog *dialog = OGMRIP_SPELL_DIALOG (gobject);
+
+  if (dialog->priv->language)
+  {
+    dialog->priv->broker = enchant_broker_init ();
+    dialog->priv->dict = enchant_broker_request_dict (dialog->priv->broker, dialog->priv->language);
+    if (!dialog->priv->dict)
+    {
+      enchant_broker_free (dialog->priv->broker);
+      dialog->priv->broker = NULL;
+    }
+  }
+
+  G_OBJECT_CLASS (ogmrip_spell_dialog_parent_class)->constructed (gobject);
+}
+
+static void 
+ogmrip_spell_dialog_finalize (GObject *gobject)
+{
+  OGMRipSpellDialog *dialog = OGMRIP_SPELL_DIALOG (gobject);
+
+  g_free (dialog->priv->language);
+
+  enchant_broker_free_dict (dialog->priv->broker, dialog->priv->dict);
+  enchant_broker_free (dialog->priv->broker);
+
+  G_OBJECT_CLASS (ogmrip_spell_dialog_parent_class)->finalize (gobject);
+}
 
 static void
 ogmrip_spell_dialog_class_init (OGMRipSpellDialogClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
-  gobject_class->dispose = ogmrip_spell_dialog_dispose;
+  gobject_class->get_property = ogmrip_spell_dialog_get_property;
+  gobject_class->set_property = ogmrip_spell_dialog_set_property;
+  gobject_class->constructed = ogmrip_spell_dialog_constructed;
+  gobject_class->finalize = ogmrip_spell_dialog_finalize;
+
+  g_object_class_install_property (G_OBJECT_CLASS (klass), PROP_LANGUAGE,
+      g_param_spec_string ("encoding", "encoding", "encoding",
+        NULL, G_PARAM_STATIC_STRINGS | G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
 
   gtk_widget_class_set_template_from_resource (GTK_WIDGET_CLASS (klass), OGMRIP_UI_RES);
 
@@ -207,44 +285,24 @@ ogmrip_spell_dialog_init (OGMRipSpellDialog *dialog)
                             G_CALLBACK (ogmrip_spell_dialog_changed), dialog);
 }
 
-static void 
-ogmrip_spell_dialog_dispose (GObject *gobject)
+static gboolean
+ogmrip_spell_dialog_initable_init (GInitable *initable, GCancellable *cancellable, GError **error)
 {
-  OGMRipSpellDialog *dialog = OGMRIP_SPELL_DIALOG (gobject);
+  OGMRipSpellDialog *dialog = OGMRIP_SPELL_DIALOG (initable);
 
-  if (dialog->priv->broker)
-  {
-    if (dialog->priv->dict);
-      enchant_broker_free_dict (dialog->priv->broker, dialog->priv->dict);
-      dialog->priv->dict = NULL;
+  return dialog->priv->broker && dialog->priv->dict;
+}
 
-    enchant_broker_free (dialog->priv->broker);
-    dialog->priv->broker = NULL;
-  }
-
-  G_OBJECT_CLASS (ogmrip_spell_dialog_parent_class)->dispose (gobject);
+static void
+g_initable_iface_init (GInitableIface *iface)
+{
+  iface->init = ogmrip_spell_dialog_initable_init;
 }
 
 GtkWidget *
 ogmrip_spell_dialog_new (const gchar *language)
 {
-  OGMRipSpellDialog *dialog;
-  EnchantBroker *broker;
-  EnchantDict *dict;
-
-  broker = enchant_broker_init ();
-  dict = enchant_broker_request_dict (broker, language);
-  if (!dict)
-  {
-    enchant_broker_free (broker);
-    return NULL;
-  }
-
-  dialog = g_object_new (OGMRIP_TYPE_SPELL_DIALOG, NULL);
-  dialog->priv->broker = broker;
-  dialog->priv->dict = dict;
-
-  return GTK_WIDGET (dialog);
+  return g_initable_new (OGMRIP_TYPE_SPELL_DIALOG, NULL, NULL, "use-header-bar", TRUE, "language", language, NULL);
 }
 
 gboolean
@@ -351,6 +409,4 @@ ogmrip_spell_dialog_check_text (OGMRipSpellDialog *dialog, const gchar *text, gc
 
   return TRUE;
 }
-
-#endif
 

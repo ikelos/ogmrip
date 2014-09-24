@@ -139,6 +139,7 @@ ogmrip_audio_options_dialog_set_sample_rate (OGMRipAudioOptionsDialog *dialog, g
 }
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipAudioOptionsDialog, ogmrip_audio_options_dialog, GTK_TYPE_DIALOG,
+    G_ADD_PRIVATE (OGMRipAudioOptionsDialog)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_AUDIO_OPTIONS, ogmrip_audio_options_init))
 
 static void
@@ -163,8 +164,6 @@ ogmrip_audio_options_dialog_class_init (OGMRipAudioOptionsDialogClass *klass)
   g_object_class_install_property (gobject_class, PROP_LANGUAGE,
       g_param_spec_uint ("language", "Language property", "Set language",
         0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_type_class_add_private (klass, sizeof (OGMRipAudioOptionsDialogPriv));
 }
 
 static void
@@ -183,19 +182,15 @@ ogmrip_audio_options_dialog_init (OGMRipAudioOptionsDialog *dialog)
   GtkTreeModel *model;
   GtkTreeIter iter;
 
-  dialog->priv = G_TYPE_INSTANCE_GET_PRIVATE (dialog,
-      OGMRIP_TYPE_AUDIO_OPTIONS_DIALOG, OGMRipAudioOptionsDialogPriv);
+  dialog->priv = ogmrip_audio_options_dialog_get_instance_private (dialog);
 
   builder = gtk_builder_new ();
   if (!gtk_builder_add_from_resource (builder, OGMRIP_UI_RES, &error))
     g_error ("Couldn't load builder file: %s", error->message);
 
-  gtk_dialog_add_button (GTK_DIALOG (dialog), _("_Close"), GTK_RESPONSE_CLOSE);
-  gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
-  gtk_container_set_border_width (GTK_CONTAINER (dialog), 6);
-
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
   gtk_window_set_title (GTK_WINDOW (dialog), _("Audio Track Options"));
+  gtk_container_set_border_width (GTK_CONTAINER (dialog), 12);
 
   area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
 
@@ -214,7 +209,7 @@ ogmrip_audio_options_dialog_init (OGMRipAudioOptionsDialog *dialog)
   label = gtk_label_new_with_mnemonic (_("_Name:"));
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
   gtk_grid_attach (GTK_GRID (grid1), label, 0, 1, 1, 1);
-  gtk_widget_set_margin_left (label, 12);
+  gtk_widget_set_margin_start (label, 12);
   gtk_widget_show (label);
 
   dialog->priv->label_entry = gtk_entry_new ();
@@ -227,7 +222,7 @@ ogmrip_audio_options_dialog_init (OGMRipAudioOptionsDialog *dialog)
   label = gtk_label_new_with_mnemonic (_("_Language:"));
   gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
   gtk_grid_attach (GTK_GRID (grid1), label, 0, 2, 1, 1);
-  gtk_widget_set_margin_left (label, 12);
+  gtk_widget_set_margin_start (label, 12);
   gtk_widget_show (label);
 
   dialog->priv->lang_chooser = ogmrip_language_chooser_widget_new ();
@@ -243,7 +238,7 @@ ogmrip_audio_options_dialog_init (OGMRipAudioOptionsDialog *dialog)
 
   dialog->priv->default_check = gtk_check_button_new_with_mnemonic (_("Use _profile settings"));
   gtk_grid_attach (GTK_GRID (grid1), dialog->priv->default_check, 0, 3, 2, 1);
-  gtk_widget_set_margin_left (dialog->priv->default_check, 12);
+  gtk_widget_set_margin_start (dialog->priv->default_check, 12);
   gtk_widget_show (dialog->priv->default_check);
 
   grid2 = gtk_builder_get_widget (builder, OGMRIP_UI_ROOT);
@@ -351,7 +346,7 @@ ogmrip_audio_options_dialog_set_property (GObject *gobject, guint prop_id, const
 GtkWidget *
 ogmrip_audio_options_dialog_new (void)
 {
-  return g_object_new (OGMRIP_TYPE_AUDIO_OPTIONS_DIALOG, NULL);
+  return g_object_new (OGMRIP_TYPE_AUDIO_OPTIONS_DIALOG, "use-header-bar", TRUE, NULL);
 }
 
 const  gchar *

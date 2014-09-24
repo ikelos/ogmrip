@@ -49,17 +49,6 @@ enum
   PROP_PROFILE
 };
 
-static void ogmrip_profile_editor_dialog_constructed  (GObject               *gobject);
-static void ogmrip_profile_editor_dialog_get_property (GObject               *gobject,
-                                                       guint                 property_id,
-                                                       GValue                *value,
-                                                       GParamSpec            *pspec);
-static void ogmrip_profile_editor_dialog_set_property (GObject               *gobject,
-                                                       guint                 property_id,
-                                                       const GValue          *value,
-                                                       GParamSpec            *pspec);
-static void ogmrip_profile_editor_dialog_dispose      (GObject               *gobject);
-
 static GtkTreeRowReference *
 gtk_tree_model_get_row_reference (GtkTreeModel *model, GtkTreeIter *iter)
 {
@@ -116,12 +105,6 @@ ogmrip_profile_editor_dialog_update_codecs (OGMRipProfileEditorDialog *editor)
 }
 
 static void
-ogmrip_profile_editor_reset_button_clicked (OGMRipProfileEditorDialog *editor)
-{
-  ogmrip_profile_reset (editor->priv->profile);
-}
-
-static void
 ogmrip_profile_editor_container_options_button_clicked (OGMRipProfileEditorDialog *editor)
 {
   GType type;
@@ -134,7 +117,7 @@ ogmrip_profile_editor_container_options_button_clicked (OGMRipProfileEditorDialo
   {
     GtkWidget *dialog;
 
-    dialog = g_object_new (type, "profile", editor->priv->profile, NULL);
+    dialog = g_object_new (type, "use-header-bar", TRUE, "profile", editor->priv->profile, NULL);
     gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (editor));
     gtk_dialog_run (GTK_DIALOG (dialog));
     gtk_widget_destroy (dialog);
@@ -154,7 +137,7 @@ ogmrip_profile_editor_video_options_button_clicked (OGMRipProfileEditorDialog *e
   {
     GtkWidget *dialog;
 
-    dialog = g_object_new (type, "profile", editor->priv->profile, NULL);
+    dialog = g_object_new (type, "use-header-bar", TRUE, "profile", editor->priv->profile, NULL);
     gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (editor));
     gtk_dialog_run (GTK_DIALOG (dialog));
     gtk_widget_destroy (dialog);
@@ -174,7 +157,7 @@ ogmrip_profile_editor_audio_options_button_clicked (OGMRipProfileEditorDialog *e
   {
     GtkWidget *dialog;
 
-    dialog = g_object_new (type, "profile", editor->priv->profile, NULL);
+    dialog = g_object_new (type, "use-header-bar", TRUE, "profile", editor->priv->profile, NULL);
     gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (editor));
     gtk_dialog_run (GTK_DIALOG (dialog));
     gtk_widget_destroy (dialog);
@@ -194,7 +177,7 @@ ogmrip_profile_editor_subp_options_button_clicked (OGMRipProfileEditorDialog *ed
   {
     GtkWidget *dialog;
 
-    dialog = g_object_new (type, "profile", editor->priv->profile, NULL);
+    dialog = g_object_new (type, "use-header-bar", TRUE, "profile", editor->priv->profile, NULL);
     gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (editor));
     gtk_dialog_run (GTK_DIALOG (dialog));
     gtk_widget_destroy (dialog);
@@ -478,32 +461,45 @@ ogmrip_profile_editor_set_passes_spin_adjustment (GBinding *binding, const GValu
   return TRUE;
 }
 
-G_DEFINE_TYPE (OGMRipProfileEditorDialog, ogmrip_profile_editor_dialog, GTK_TYPE_DIALOG)
-
-static void
-ogmrip_profile_editor_dialog_class_init (OGMRipProfileEditorDialogClass *klass)
+static gchar *
+get_profile_title (const gchar *name)
 {
-  GObjectClass *gobject_class;
+  gchar *str1, *str2;
+  gint i;
 
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->constructed = ogmrip_profile_editor_dialog_constructed;
-  gobject_class->get_property = ogmrip_profile_editor_dialog_get_property;
-  gobject_class->set_property = ogmrip_profile_editor_dialog_set_property;
-  gobject_class->dispose = ogmrip_profile_editor_dialog_dispose;
+  for (i = 0; name[i] != '\0'; i++)
+    if (name[i] == '\n' || name[i] == '\r')
+      break;
 
-  g_object_class_install_property (G_OBJECT_CLASS (klass), PROP_PROFILE,
-      g_param_spec_object ("profile", "profile", "profile", OGMRIP_TYPE_PROFILE,
-        G_PARAM_STATIC_STRINGS | G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
+  str1 = g_strndup (name, i);
 
-  g_type_class_add_private (klass, sizeof (OGMRipProfileEditorDialogPriv));
+  if (!pango_parse_markup (str1, -1, 0, NULL, &str2, NULL, NULL))
+    str2 = g_strdup (name);
+
+  g_free (str1);
+
+  str1 = g_strdup_printf (_("Editing profile \"%s\""), str2);
+  g_free (str2);
+
+  return str1;
 }
 
 static void
-ogmrip_profile_editor_dialog_init (OGMRipProfileEditorDialog *dialog)
+ogmrip_profile_editor_set_profile (OGMRipProfileEditorDialog *dialog, OGMRipProfile *profile)
 {
-  dialog->priv = G_TYPE_INSTANCE_GET_PRIVATE (dialog,
-      OGMRIP_TYPE_PROFILE_EDITOR_DIALOG, OGMRipProfileEditorDialogPriv);
+  gchar *name, *title;
+
+  dialog->priv->profile = g_object_ref (profile);
+
+  name = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_NAME);
+  title = get_profile_title (name);
+  g_free (name);
+
+  gtk_window_set_title (GTK_WINDOW (dialog), title);
+  g_free (title);
 }
+
+G_DEFINE_TYPE_WITH_PRIVATE (OGMRipProfileEditorDialog, ogmrip_profile_editor_dialog, GTK_TYPE_DIALOG)
 
 static void
 ogmrip_profile_editor_dialog_constructed (GObject *gobject)
@@ -524,21 +520,11 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
   if (!dialog->priv->profile)
     g_error ("No profile specified");
 
-  misc = gtk_dialog_get_action_area (GTK_DIALOG (gobject));
-
-  widget = gtk_button_new_with_mnemonic (_("_Reset"));
-  gtk_container_add (GTK_CONTAINER (misc), widget);
-  gtk_widget_show (widget);
-
-  g_signal_connect_swapped (widget, "clicked",
-      G_CALLBACK (ogmrip_profile_editor_reset_button_clicked), dialog);
-
-  gtk_dialog_add_buttons (GTK_DIALOG (dialog),
-      _("_Close"), GTK_RESPONSE_CLOSE,
-      NULL);
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
-  gtk_container_set_border_width (GTK_CONTAINER (dialog), 6);
-  gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
+  gtk_container_set_border_width (GTK_CONTAINER (dialog), 0);
+
+  widget = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+  gtk_container_set_border_width (GTK_CONTAINER (widget), 0);
 
   builder = gtk_builder_new ();
   if (!gtk_builder_add_from_resource (builder, OGMRIP_UI_RES, &error))
@@ -867,44 +853,6 @@ ogmrip_profile_editor_dialog_get_property (GObject *gobject, guint property_id, 
   }
 }
 
-static gchar *
-get_profile_title (const gchar *name)
-{
-  gchar *str1, *str2;
-  gint i;
-
-  for (i = 0; name[i] != '\0'; i++)
-    if (name[i] == '\n' || name[i] == '\r')
-      break;
-
-  str1 = g_strndup (name, i);
-
-  if (!pango_parse_markup (str1, -1, 0, NULL, &str2, NULL, NULL))
-    str2 = g_strdup (name);
-
-  g_free (str1);
-
-  str1 = g_strdup_printf (_("Editing profile \"%s\""), str2);
-  g_free (str2);
-
-  return str1;
-}
-
-static void
-ogmrip_profile_editor_set_profile (OGMRipProfileEditorDialog *dialog, OGMRipProfile *profile)
-{
-  gchar *name, *title;
-
-  dialog->priv->profile = g_object_ref (profile);
-
-  name = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_NAME);
-  title = get_profile_title (name);
-  g_free (name);
-
-  gtk_window_set_title (GTK_WINDOW (dialog), title);
-  g_free (title);
-}
-
 static void
 ogmrip_profile_editor_dialog_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
 {
@@ -922,22 +870,38 @@ ogmrip_profile_editor_dialog_set_property (GObject *gobject, guint property_id, 
 static void
 ogmrip_profile_editor_dialog_dispose (GObject *gobject)
 {
-  OGMRipProfileEditorDialog *dialog;
+  OGMRipProfileEditorDialog *dialog = OGMRIP_PROFILE_EDITOR_DIALOG (gobject);
 
-  dialog = OGMRIP_PROFILE_EDITOR_DIALOG (gobject);
+  g_clear_object (&dialog->priv->profile);
 
-  if (dialog->priv->profile)
-  {
-    g_object_unref (dialog->priv->profile);
-    dialog->priv->profile = NULL;
-  }
+  G_OBJECT_CLASS (ogmrip_profile_editor_dialog_parent_class)->dispose (gobject);
+}
 
-  (*G_OBJECT_CLASS (ogmrip_profile_editor_dialog_parent_class)->dispose) (gobject);
+static void
+ogmrip_profile_editor_dialog_class_init (OGMRipProfileEditorDialogClass *klass)
+{
+  GObjectClass *gobject_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->constructed = ogmrip_profile_editor_dialog_constructed;
+  gobject_class->get_property = ogmrip_profile_editor_dialog_get_property;
+  gobject_class->set_property = ogmrip_profile_editor_dialog_set_property;
+  gobject_class->dispose = ogmrip_profile_editor_dialog_dispose;
+
+  g_object_class_install_property (G_OBJECT_CLASS (klass), PROP_PROFILE,
+      g_param_spec_object ("profile", "profile", "profile", OGMRIP_TYPE_PROFILE,
+        G_PARAM_STATIC_STRINGS | G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY));
+}
+
+static void
+ogmrip_profile_editor_dialog_init (OGMRipProfileEditorDialog *dialog)
+{
+  dialog->priv = ogmrip_profile_editor_dialog_get_instance_private (dialog);
 }
 
 GtkWidget *
 ogmrip_profile_editor_dialog_new (OGMRipProfile *profile)
 {
-  return g_object_new (OGMRIP_TYPE_PROFILE_EDITOR_DIALOG, "profile", profile, NULL);
+  return g_object_new (OGMRIP_TYPE_PROFILE_EDITOR_DIALOG, "use-header-bar", TRUE, "profile", profile, NULL);
 }
 

@@ -26,13 +26,14 @@ static void g_initable_iface_init          (GInitableIface             *iface);
 static void ogmrip_audio_stream_iface_init (OGMRipAudioStreamInterface *iface);
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipAudioFile, ogmrip_audio_file, OGMRIP_TYPE_FILE,
+    G_ADD_PRIVATE (OGMRipAudioFile)
     G_IMPLEMENT_INTERFACE (G_TYPE_INITABLE, g_initable_iface_init)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_AUDIO_STREAM, ogmrip_audio_stream_iface_init));
 
 static void
 ogmrip_audio_file_init (OGMRipAudioFile *stream)
 {
-  stream->priv = G_TYPE_INSTANCE_GET_PRIVATE (stream, OGMRIP_TYPE_AUDIO_FILE, OGMRipAudioFilePriv);
+  stream->priv = ogmrip_audio_file_get_instance_private (stream);
 
   stream->priv->bitrate = -1;
   stream->priv->channels = OGMRIP_CHANNELS_UNDEFINED;
@@ -41,7 +42,6 @@ ogmrip_audio_file_init (OGMRipAudioFile *stream)
 static void
 ogmrip_audio_file_class_init (OGMRipAudioFileClass *klass)
 {
-  g_type_class_add_private (klass, sizeof (OGMRipAudioFilePriv));
 }
 
 static gboolean

@@ -44,11 +44,7 @@ ogmrip_analyze_dispose (GObject *gobject)
 {
   OGMRipAnalyze *analyze = OGMRIP_ANALYZE (gobject);
 
-  if (analyze->priv->title)
-  {
-    g_object_unref (analyze->priv->title);
-    analyze->priv->title = NULL;
-  }
+  g_clear_object (&analyze->priv->title);
 
   G_OBJECT_CLASS (ogmrip_analyze_parent_class)->dispose (gobject);
 }

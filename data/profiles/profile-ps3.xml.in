@@ -1,5 +1,6 @@
 <profile name="default-ps3" version="(1,0)">
-  <key name="name">'&lt;b&gt;Sony PS3&lt;/b&gt;&#xA;quantizer 2 (MP4 + X264 + AAC)'</key>
+  <key name="name">'Sony PS3'</key>
+  <key name="description">'Quantizer 2 (MP4 + X264 + AAC)'</key>
   <section name="general">
     <key name="container">'mp4'</key>
     <key name="encoding-method">2</key>

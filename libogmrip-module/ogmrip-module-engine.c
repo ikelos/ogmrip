@@ -51,7 +51,7 @@ ogmrip_module_engine_get_modules (OGMRipModuleEngine *engine)
   return (gchar **) g_array_free (array, FALSE);
 }
 
-G_DEFINE_TYPE (OGMRipModuleEngine, ogmrip_module_engine, G_TYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (OGMRipModuleEngine, ogmrip_module_engine, G_TYPE_OBJECT)
 
 static GObject *
 ogmrip_module_engine_constructor (GType type, guint n_params, GObjectConstructParam *params)
@@ -106,8 +106,7 @@ ogmrip_module_engine_get_property (GObject *gobject, guint property_id, GValue *
 static void
 ogmrip_module_engine_init (OGMRipModuleEngine *engine)
 {
-  engine->priv = G_TYPE_INSTANCE_GET_PRIVATE (engine,
-      OGMRIP_TYPE_MODULE_ENGINE, OGMRipModuleEnginePriv);
+  engine->priv = ogmrip_module_engine_get_instance_private (engine);
 }
 
 static void
@@ -123,8 +122,6 @@ ogmrip_module_engine_class_init (OGMRipModuleEngineClass *klass)
   g_object_class_install_property (gobject_class, PROP_MODULES,
       g_param_spec_boxed ("modules", "modules", "modules",
         G_TYPE_STRV, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-
-  g_type_class_add_private (klass, sizeof (OGMRipModuleEnginePriv));
 }
 
 OGMRipModuleEngine *

@@ -164,7 +164,6 @@ ogmdvd_video_stream_get_resolution (OGMRipVideoStream *video, guint *width, guin
   OGMDvdTitle *title = OGMDVD_TITLE (video);
   guint w, h;
 
-  w = 0;
   h = 480;
   if (title->priv->video_format != 0)
     h = 576;
@@ -242,6 +241,24 @@ ogmdvd_video_stream_get_standard (OGMRipVideoStream *video)
   return OGMDVD_TITLE (video)->priv->video_format;
 }
 
+static gboolean
+ogmdvd_video_stream_get_progressive (OGMRipVideoStream *video)
+{
+  return OGMDVD_TITLE (video)->priv->progressive;
+}
+
+static gboolean
+ogmdvd_video_stream_get_telecine (OGMRipVideoStream *video)
+{
+  return OGMDVD_TITLE (video)->priv->telecine;
+}
+
+static gboolean
+ogmdvd_video_stream_get_interlaced (OGMRipVideoStream *video)
+{
+  return OGMDVD_TITLE (video)->priv->interlaced;
+}
+
 static void
 ogmdvd_video_stream_iface_init (OGMRipVideoStreamInterface *iface)
 {
@@ -250,6 +267,9 @@ ogmdvd_video_stream_iface_init (OGMRipVideoStreamInterface *iface)
   iface->get_crop_size    = ogmdvd_video_stream_get_crop_size;
   iface->get_aspect_ratio = ogmdvd_video_stream_get_aspect_ratio;
   iface->get_standard     = ogmdvd_video_stream_get_standard;
+  iface->get_progressive  = ogmdvd_video_stream_get_progressive;
+  iface->get_telecine     = ogmdvd_video_stream_get_telecine;
+  iface->get_interlaced   = ogmdvd_video_stream_get_interlaced;
 }
 
 typedef struct
@@ -323,24 +343,6 @@ static gint
 ogmdvd_title_get_id (OGMRipTitle *title)
 {
   return OGMDVD_TITLE (title)->priv->nr;
-}
-
-static gboolean
-ogmdvd_title_get_progressive (OGMRipTitle *title)
-{
-  return OGMDVD_TITLE (title)->priv->progressive;
-}
-
-static gboolean
-ogmdvd_title_get_telecine (OGMRipTitle *title)
-{
-  return OGMDVD_TITLE (title)->priv->telecine;
-}
-
-static gboolean
-ogmdvd_title_get_interlaced (OGMRipTitle *title)
-{
-  return OGMDVD_TITLE (title)->priv->interlaced;
 }
 
 static gint64
@@ -559,9 +561,6 @@ ogmdvd_title_iface_init (OGMRipTitleInterface *iface)
   iface->get_n_subp_streams   = ogmdvd_title_get_n_subp_streams;
   iface->get_subp_stream      = ogmdvd_title_get_subp_stream;
   iface->get_subp_streams     = ogmdvd_title_get_subp_streams;
-  iface->get_progressive      = ogmdvd_title_get_progressive;
-  iface->get_telecine         = ogmdvd_title_get_telecine;
-  iface->get_interlaced       = ogmdvd_title_get_interlaced;
   iface->analyze              = ogmdvd_title_analyze;
   iface->copy                 = ogmdvd_title_copy;
 }

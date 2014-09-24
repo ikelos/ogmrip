@@ -53,65 +53,16 @@ static const GType column_types[] =
 
 G_STATIC_ASSERT (G_N_ELEMENTS (column_types) == OGMRIP_CHAPTER_STORE_N_COLUMNS);
 
-static void ogmrip_chapter_store_dispose      (GObject      *gobject);
-static void ogmrip_chapter_store_get_property (GObject      *gobject,
-                                               guint        property_id,
-                                               GValue       *value,
-                                               GParamSpec   *pspec);
-static void ogmrip_chapter_store_set_property (GObject      *gobject,
-                                               guint        property_id,
-                                               const GValue *value,
-                                               GParamSpec   *pspec);
-
 static guint signals[LAST_SIGNAL] = { 0 };
 
-G_DEFINE_TYPE (OGMRipChapterStore, ogmrip_chapter_store, GTK_TYPE_LIST_STORE);
-
-static void
-ogmrip_chapter_store_class_init (OGMRipChapterStoreClass *klass)
-{
-  GObjectClass *gobject_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->dispose = ogmrip_chapter_store_dispose;
-  gobject_class->get_property = ogmrip_chapter_store_get_property;
-  gobject_class->set_property = ogmrip_chapter_store_set_property;
-
-  g_object_class_install_property (gobject_class, PROP_TITLE,
-      g_param_spec_object ("title", "Title property", "The media title",
-        OGMRIP_TYPE_TITLE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_EDITABLE,
-      g_param_spec_boolean ("editable", "Editable property", "Whether chapters are editable",
-        FALSE, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-
-  signals[SELECTION_CHANGED] = g_signal_new ("selection-changed", G_TYPE_FROM_CLASS (klass),
-      G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
-      G_STRUCT_OFFSET (OGMRipChapterStoreClass, selection_changed), NULL, NULL,
-      g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
-
-  g_type_class_add_private (klass, sizeof (OGMRipChapterStorePriv));
-}
-
-static void
-ogmrip_chapter_store_init (OGMRipChapterStore *store)
-{
-  store->priv = G_TYPE_INSTANCE_GET_PRIVATE (store, OGMRIP_TYPE_CHAPTER_STORE, OGMRipChapterStorePriv);
-
-  gtk_list_store_set_column_types (GTK_LIST_STORE (store),
-      OGMRIP_CHAPTER_STORE_N_COLUMNS, (GType *) column_types);
-}
+G_DEFINE_TYPE_WITH_PRIVATE (OGMRipChapterStore, ogmrip_chapter_store, GTK_TYPE_LIST_STORE);
 
 static void
 ogmrip_chapter_store_dispose (GObject *gobject)
 {
   OGMRipChapterStore *store = OGMRIP_CHAPTER_STORE (gobject);
 
-  if (store->priv->title)
-  {
-    g_object_unref (store->priv->title);
-    store->priv->title = NULL;
-  }
+  g_clear_object (&store->priv->title);
 
   G_OBJECT_CLASS (ogmrip_chapter_store_parent_class)->dispose (gobject);
 }
@@ -145,6 +96,39 @@ ogmrip_chapter_store_set_property (GObject *gobject, guint property_id, const GV
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
   }
+}
+
+static void
+ogmrip_chapter_store_class_init (OGMRipChapterStoreClass *klass)
+{
+  GObjectClass *gobject_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->dispose = ogmrip_chapter_store_dispose;
+  gobject_class->get_property = ogmrip_chapter_store_get_property;
+  gobject_class->set_property = ogmrip_chapter_store_set_property;
+
+  g_object_class_install_property (gobject_class, PROP_TITLE,
+      g_param_spec_object ("title", "Title property", "The media title",
+        OGMRIP_TYPE_TITLE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_EDITABLE,
+      g_param_spec_boolean ("editable", "Editable property", "Whether chapters are editable",
+        FALSE, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  signals[SELECTION_CHANGED] = g_signal_new ("selection-changed", G_TYPE_FROM_CLASS (klass),
+      G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
+      G_STRUCT_OFFSET (OGMRipChapterStoreClass, selection_changed), NULL, NULL,
+      g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+}
+
+static void
+ogmrip_chapter_store_init (OGMRipChapterStore *store)
+{
+  store->priv = ogmrip_chapter_store_get_instance_private (store);
+
+  gtk_list_store_set_column_types (GTK_LIST_STORE (store),
+      OGMRIP_CHAPTER_STORE_N_COLUMNS, (GType *) column_types);
 }
 
 OGMRipChapterStore *

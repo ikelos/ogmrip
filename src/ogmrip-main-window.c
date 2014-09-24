@@ -29,13 +29,12 @@
 #include "ogmrip-spell-dialog.h"
 #endif /* HAVE_ENCHANT_SUPPORT */
 
-#include <ogmrip-mplayer.h>
-
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
 
-#define OGMRIP_UI_RES    "/org/ogmrip/ogmrip-main-window.ui"
-#define OGMRIP_ICON_FILE "pixmaps" G_DIR_SEPARATOR_S "ogmrip.png"
+#define OGMRIP_UI_RES   "/org/ogmrip/ogmrip-main-window.ui"
+#define OGMRIP_ICON_RES "/org/ogmrip/ogmrip.png"
+#define OGMRIP_MENU_RES "/org/ogmrip/ogmrip-menu.ui"
 
 struct _OGMRipMainWindowPriv
 {
@@ -538,7 +537,7 @@ ogmrip_main_window_clean (OGMRipMainWindow *window, OGMRipEncoding *encoding, gb
   g_object_unref (encoding);
 }
 
-static void
+void
 ogmrip_main_window_encode (OGMRipMainWindow *window, OGMRipEncoding *encoding)
 {
   GError *error = NULL;
@@ -713,6 +712,7 @@ ogmrip_main_window_create_video_codec (OGMRipMainWindow *window, OGMRipProfile *
   if (!codec)
     return NULL;
 
+  ogmrip_codec_set_autoclean (codec, FALSE);
   ogmrip_codec_set_chapters (codec, start_chap, end_chap);
 
   return codec;
@@ -743,6 +743,7 @@ ogmrip_main_window_create_audio_codec (OGMRipMainWindow *window, OGMRipProfile *
   if (!codec)
     return NULL;
 
+  ogmrip_codec_set_autoclean (codec, FALSE);
   ogmrip_codec_set_chapters (codec, start_chap, end_chap);
   ogmrip_audio_codec_set_label (OGMRIP_AUDIO_CODEC (codec),
       ogmrip_audio_chooser_widget_get_label (OGMRIP_AUDIO_CHOOSER_WIDGET (chooser)));
@@ -786,6 +787,7 @@ ogmrip_main_window_create_subp_codec (OGMRipMainWindow *window, OGMRipProfile *p
   if (!codec)
     return NULL;
 
+  ogmrip_codec_set_autoclean (codec, FALSE);
   ogmrip_codec_set_chapters (codec, start_chap, end_chap);
   ogmrip_subp_codec_set_label (OGMRIP_SUBP_CODEC (codec),
       ogmrip_subp_chooser_widget_get_label (OGMRIP_SUBP_CHOOSER_WIDGET (chooser)));
@@ -822,6 +824,7 @@ ogmrip_main_window_create_chapters_codec (OGMRipMainWindow *window, OGMRipVideoS
   ogmrip_chapters_set_language (OGMRIP_CHAPTERS (codec),
       g_settings_get_uint (settings, OGMRIP_SETTINGS_CHAPTER_LANG));
 
+  ogmrip_codec_set_autoclean (codec, FALSE);
   ogmrip_codec_set_chapters (codec, start_chap, end_chap);
 
   ogmrip_codec_get_chapters (codec, &start_chap, &last_chap);
@@ -1418,44 +1421,9 @@ ogmrip_main_window_deselect_all_activated (GSimpleAction *action, GVariant *para
 }
 
 static void
-ogmrip_main_window_encodings_responsed (OGMRipMainWindow *window, gint response_id, GtkWidget *dialog)
-{
-  if (response_id != GTK_RESPONSE_APPLY)
-    gtk_widget_destroy (dialog);
-  else
-  {
-    GSList *list, *link;
-
-    list = ogmrip_encoding_manager_get_list (window->priv->manager);
-    for (link = list; link; link = link->next)
-      if (ogmrip_encoding_manager_get_status (window->priv->manager, link->data) != OGMRIP_ENCODING_SUCCESS)
-        ogmrip_main_window_encode (window, g_object_ref (link->data));
-    g_slist_free (list);
-  }
-}
-
-static void
-ogmrip_main_window_encodings_activated (GSimpleAction *action, GVariant *parameter, gpointer data)
-{
-  OGMRipMainWindow *window = data;
-  GtkWidget *dialog;
-
-  dialog = ogmrip_encoding_manager_dialog_new (window->priv->manager);
-  gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (window));
-  gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
-
-  g_signal_connect_swapped (dialog, "response",
-      G_CALLBACK (ogmrip_main_window_encodings_responsed), window);
-
-  gtk_window_present (GTK_WINDOW (dialog));
-}
-
-static void
 ogmrip_main_window_close_activated (GSimpleAction *action, GVariant *parameter, gpointer data)
 {
-  OGMRipMainWindow *window = data;
-
-  gtk_widget_destroy (GTK_WIDGET (window));
+  gtk_widget_destroy (data);
 }
 
 static void
@@ -1466,6 +1434,7 @@ ogmrip_main_window_title_chooser_changed (OGMRipMainWindow *window)
 
   title = ogmrip_title_chooser_get_active (OGMRIP_TITLE_CHOOSER (window->priv->title_chooser));
   gtk_widget_set_sensitive (window->priv->title_chooser, title != NULL);
+  gtk_widget_set_sensitive (window->priv->relative_check, title != NULL);
 
   gtk_container_clear (GTK_CONTAINER (window->priv->audio_list));
   ogmrip_main_window_add_audio_chooser (window);
@@ -1612,23 +1581,9 @@ ogmrip_main_window_dispose (GObject *gobject)
 {
   OGMRipMainWindow *window = OGMRIP_MAIN_WINDOW (gobject);
 
-  if (window->priv->media)
-  {
-    g_object_unref (window->priv->media);
-    window->priv->media = NULL;
-  }
-
-  if (window->priv->player)
-  {
-    g_object_unref (window->priv->player);
-    window->priv->player = NULL;
-  }
-
-  if (window->priv->manager)
-  {
-    g_object_unref (window->priv->manager);
-    window->priv->manager = NULL;
-  }
+  g_clear_object (&window->priv->media);
+  g_clear_object (&window->priv->player);
+  g_clear_object (&window->priv->manager);
 
   G_OBJECT_CLASS (ogmrip_main_window_parent_class)->dispose (gobject);
 }
@@ -1664,14 +1619,21 @@ static GActionEntry win_entries[] =
   { "save_chapters", ogmrip_main_window_save_chapters_activated, NULL, NULL, NULL },
   { "select_all",    ogmrip_main_window_select_all_activated,    NULL, NULL, NULL },
   { "deselect_all",  ogmrip_main_window_deselect_all_activated,  NULL, NULL, NULL },
-  { "encodings",     ogmrip_main_window_encodings_activated,     NULL, NULL, NULL },
   { "close",         ogmrip_main_window_close_activated,         NULL, NULL, NULL }
 };
 
 static void
 ogmrip_main_window_init (OGMRipMainWindow *window)
 {
+  GError *error = NULL;
+
+  GtkWidget *hbar, *button, *image;
+
+  GtkBuilder *builder;
+  GObject *menu;
+
   GAction *action;
+  GdkPixbuf *icon;
 
   g_type_ensure (OGMRIP_TYPE_CHAPTER_VIEW);
   g_type_ensure (OGMRIP_TYPE_TITLE_CHOOSER_WIDGET);
@@ -1680,8 +1642,38 @@ ogmrip_main_window_init (OGMRipMainWindow *window)
 
   window->priv = ogmrip_main_window_get_instance_private (window);
 
-  gtk_window_set_icon_from_file (GTK_WINDOW (window),
-      OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_ICON_FILE, NULL);
+  gtk_application_window_set_show_menubar (GTK_APPLICATION_WINDOW (window), FALSE);
+
+  icon = gdk_pixbuf_new_from_resource (OGMRIP_ICON_RES, NULL);
+  if (icon)
+  {
+    gtk_window_set_icon (GTK_WINDOW (window), icon);
+    g_object_unref (icon);
+  }
+
+  hbar = gtk_header_bar_new ();
+  gtk_header_bar_set_show_close_button (GTK_HEADER_BAR (hbar), TRUE);
+  gtk_window_set_titlebar (GTK_WINDOW (window), hbar);
+  gtk_widget_show (hbar);
+
+  gtk_window_set_title (GTK_WINDOW (window), "OGMRip");
+
+  button = gtk_menu_button_new ();
+  gtk_menu_button_set_use_popover (GTK_MENU_BUTTON (button), TRUE);
+  gtk_header_bar_pack_end (GTK_HEADER_BAR (hbar), button);
+  gtk_widget_show (button);
+
+  image = gtk_image_new_from_icon_name ("emblem-system-symbolic", GTK_ICON_SIZE_MENU);
+  gtk_container_add (GTK_CONTAINER (button), image);
+  gtk_widget_show (image);
+
+  builder = gtk_builder_new ();
+  if (!gtk_builder_add_from_resource (builder, OGMRIP_MENU_RES, &error))
+    g_error ("Couldn't load builder file: %s", error->message);
+  menu = gtk_builder_get_object (builder, "win-menu");
+  g_object_unref (builder);
+
+  gtk_menu_button_set_menu_model (GTK_MENU_BUTTON (button), G_MENU_MODEL (menu));
 
   g_signal_connect_swapped (window->priv->title_chooser, "changed",
       G_CALLBACK (ogmrip_main_window_title_chooser_changed), window);
@@ -1744,22 +1736,20 @@ ogmrip_main_window_init (OGMRipMainWindow *window)
   g_object_bind_property (window->priv->title_chooser, "sensitive",
       action, "enabled", G_BINDING_SYNC_CREATE);
 
-  g_object_bind_property (window->priv->title_chooser, "sensitive",
-      window->priv->relative_check, "sensitive", G_BINDING_SYNC_CREATE);
-
-  window->priv->manager = ogmrip_encoding_manager_new ();
-
   g_signal_emit_by_name (window->priv->title_chooser, "changed");
 }
 
 GtkWidget *
-ogmrip_main_window_new (OGMRipApplication *application)
+ogmrip_main_window_new (OGMRipApplication *application, OGMRipEncodingManager *manager)
 {
   OGMRipMainWindow *window;
 
   g_return_val_if_fail (OGMRIP_IS_APPLICATION (application), NULL);
 
-  window = g_object_new (OGMRIP_TYPE_MAIN_WINDOW, "application", application, NULL);
+  window = g_object_new (OGMRIP_TYPE_MAIN_WINDOW, NULL);
+  gtk_window_set_application (GTK_WINDOW (window), GTK_APPLICATION (application));
+
+  window->priv->manager = g_object_ref (manager);
 
   if (ogmrip_application_get_is_prepared (application))
     ogmrip_main_window_app_prepared (window, application);
@@ -1787,4 +1777,3 @@ ogmrip_main_window_load_path (OGMRipMainWindow *window, const gchar *path)
 
   return TRUE;
 }
-

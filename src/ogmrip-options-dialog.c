@@ -646,11 +646,7 @@ ogmrip_options_dialog_dispose (GObject *gobject)
 {
   OGMRipOptionsDialog *dialog = OGMRIP_OPTIONS_DIALOG (gobject);
 
-  if (dialog->priv->encoding)
-  {
-    g_object_unref (dialog->priv->encoding);
-    dialog->priv->encoding = NULL;
-  }
+  g_clear_object (&dialog->priv->encoding);
 
   G_OBJECT_CLASS (ogmrip_options_dialog_parent_class)->dispose (gobject);
 }
@@ -659,7 +655,6 @@ static void
 ogmrip_options_dialog_response (GtkDialog *dialog, gint response_id)
 {
   OGMRipOptionsDialog *options = OGMRIP_OPTIONS_DIALOG (dialog);
-  OGMRipProfile *profile;
 
   if (response_id != OGMRIP_RESPONSE_EXTRACT &&
       response_id != OGMRIP_RESPONSE_ENQUEUE &&
@@ -667,10 +662,10 @@ ogmrip_options_dialog_response (GtkDialog *dialog, gint response_id)
       response_id != GTK_RESPONSE_CLOSE)
     return;
 
-  if (response_id == GTK_RESPONSE_CLOSE)
-    profile = ogmrip_encoding_get_profile (options->priv->encoding);
-  else
+  if (response_id != GTK_RESPONSE_CLOSE)
   {
+    OGMRipProfile *profile;
+
     profile = ogmrip_profile_chooser_get_active (GTK_COMBO_BOX (options->priv->profile_chooser));
     ogmrip_encoding_set_profile (options->priv->encoding, profile);
   }
@@ -753,6 +748,8 @@ ogmrip_options_dialog_init (OGMRipOptionsDialog *dialog)
 
   dialog->priv = ogmrip_options_dialog_get_instance_private (dialog);
 
+  gtk_dialog_set_default_response (GTK_DIALOG (dialog), OGMRIP_RESPONSE_EXTRACT);
+
   g_object_bind_property_full (dialog->priv->profile_chooser, "active",
       dialog->priv->edit_button, "sensitive", G_BINDING_SYNC_CREATE,
       ogmrip_options_dialog_set_edit_button_sensitivity, NULL, NULL, NULL);
@@ -827,7 +824,7 @@ g_initable_iface_init (GInitableIface *iface)
 GtkWidget *
 ogmrip_options_dialog_new (OGMRipEncoding *encoding)
 {
-  return g_initable_new (OGMRIP_TYPE_OPTIONS_DIALOG, NULL, NULL, "encoding", encoding, NULL);
+  return g_initable_new (OGMRIP_TYPE_OPTIONS_DIALOG, NULL, NULL, "use-header-bar", TRUE, "encoding", encoding, NULL);
 }
 
 GtkWidget *

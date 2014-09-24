@@ -27,9 +27,6 @@
 
 #include <glib/gi18n-lib.h>
 
-#define OGMRIP_SUBP_CHOOSER_WIDGET_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_SUBP_CHOOSER_WIDGET, OGMRipSubpChooserWidgetPriv))
-
 struct _OGMRipSubpChooserWidgetPriv
 {
   GtkWidget *chooser;
@@ -128,6 +125,7 @@ ogmrip_subp_chooser_widget_button_clicked (OGMRipSubpChooserWidget *widget)
 }
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipSubpChooserWidget, ogmrip_subp_chooser_widget, OGMRIP_TYPE_LIST_ITEM,
+    G_ADD_PRIVATE (OGMRipSubpChooserWidget)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_SOURCE_CHOOSER, ogmrip_source_chooser_init))
 
 static void
@@ -144,8 +142,6 @@ ogmrip_subp_chooser_widget_class_init (OGMRipSubpChooserWidgetClass *klass)
   widget_class->destroy = ogmrip_subp_chooser_widget_destroy;
 
   g_object_class_override_property (gobject_class, PROP_TITLE, "title");
-
-  g_type_class_add_private (klass, sizeof (OGMRipSubpChooserWidgetPriv));
 }
 
 static void
@@ -154,7 +150,7 @@ ogmrip_subp_chooser_widget_init (OGMRipSubpChooserWidget *widget)
   GtkWidget *dialog;
   GtkSizeGroup *group;
 
-  widget->priv = OGMRIP_SUBP_CHOOSER_WIDGET_GET_PRIVATE (widget);
+  widget->priv = ogmrip_subp_chooser_widget_get_instance_private (widget);
 
   dialog = ogmrip_subp_file_chooser_dialog_new ();
 

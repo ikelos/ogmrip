@@ -292,8 +292,8 @@ ogmrip_title_benchmark (OGMRipTitle *title, gboolean *progressive, gboolean *tel
   spawn = ogmjob_spawn_newv (argv);
   g_strfreev (argv);
 
-  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (spawn),
-      (OGMJobWatch) ogmrip_title_benchmark_watch, &benchmark);
+  ogmjob_spawn_set_watch (OGMJOB_SPAWN (spawn), OGMJOB_STREAM_OUTPUT,
+      (OGMJobWatch) ogmrip_title_benchmark_watch, &benchmark, NULL);
 
   if (callback)
     g_signal_connect (spawn, "notify::progress",
@@ -370,8 +370,11 @@ typedef struct
 static gchar **
 ogmrip_title_crop_command (OGMRipTitle *title, gdouble start, gulong nframes)
 {
+  OGMRipVideoStream *stream;
   GPtrArray *argv;
   GString *filter;
+
+  stream = ogmrip_title_get_video_stream (title);
 
   argv = g_ptr_array_new_full (20, g_free);
   g_ptr_array_add (argv, g_strdup ("mplayer"));
@@ -391,7 +394,7 @@ ogmrip_title_crop_command (OGMRipTitle *title, gdouble start, gulong nframes)
 
   filter = g_string_new (NULL);
 
-  if (ogmrip_title_get_interlaced (title))
+  if (stream && ogmrip_video_stream_get_interlaced (stream))
     g_string_append (filter, "yadif=0");
 
   if (filter->len > 0)
@@ -509,8 +512,8 @@ ogmrip_title_crop_detect (OGMRipTitle *title, guint *crop_x, guint *crop_y, guin
     spawn = ogmjob_spawn_newv (argv);
     g_strfreev (argv);
 
-    ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (spawn),
-        (OGMJobWatch) ogmrip_title_crop_watch, &crop);
+    ogmjob_spawn_set_watch (OGMJOB_SPAWN (spawn), OGMJOB_STREAM_OUTPUT,
+        (OGMJobWatch) ogmrip_title_crop_watch, &crop, NULL);
 
     ogmjob_container_add (OGMJOB_CONTAINER (queue), spawn);
     g_object_unref (spawn);

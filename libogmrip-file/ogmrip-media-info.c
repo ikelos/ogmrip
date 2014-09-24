@@ -81,7 +81,7 @@ g_locale_to_wstring (const gchar *str)
 }
 #endif
 
-G_DEFINE_TYPE (OGMRipMediaInfo, ogmrip_media_info, G_TYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (OGMRipMediaInfo, ogmrip_media_info, G_TYPE_OBJECT)
 
 static void
 ogmrip_media_info_class_init (OGMRipMediaInfoClass *klass)
@@ -91,14 +91,12 @@ ogmrip_media_info_class_init (OGMRipMediaInfoClass *klass)
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->constructed = ogmrip_media_info_constructed;
   gobject_class->finalize = ogmrip_media_info_finalize;
-
-  g_type_class_add_private (klass, sizeof (OGMRipMediaInfoPriv));
 }
 
 static void
 ogmrip_media_info_init (OGMRipMediaInfo *info)
 {
-  info->priv = G_TYPE_INSTANCE_GET_PRIVATE (info, OGMRIP_TYPE_MEDIA_INFO, OGMRipMediaInfoPriv);
+  info->priv = ogmrip_media_info_get_instance_private (info);
 }
 
 static void
@@ -209,6 +207,36 @@ ogmrip_media_info_get (OGMRipMediaInfo *info, OGMRipCategoryType category, guint
 #else
   value = MediaInfo_Get (info->priv->handle, category, stream, name, MediaInfo_Info_Text, MediaInfo_Info_Name);
 #endif
+
+  return *value ? value : NULL;
+}
+
+const gchar *
+ogmrip_media_info_geti (OGMRipMediaInfo *info, OGMRipCategoryType category, guint stream, guint param)
+{
+  const gchar *value;
+
+  g_return_val_if_fail (OGMRIP_IS_MEDIA_INFO (info), NULL);
+
+  if (!info->priv->handle)
+    return NULL;
+
+#if defined(UNICODE) || defined (_UNICODE)
+  const wchar_t *wstr;
+  char *str;
+
+  wstr = MediaInfo_GetI (info->priv->handle, category, stream, param, MediaInfo_Info_Text);
+
+  if (info->priv->value)
+    g_free (info->priv->value);
+
+  str = g_locale_from_wstring (wstr);
+  value = info->priv->value = g_locale_to_utf8 (str, -1, NULL, NULL, NULL);
+  g_free (str);
+#else
+  value = MediaInfo_GetI (info->priv->handle, category, stream, param, MediaInfo_Info_Text);
+#endif
+
 
   return *value ? value : NULL;
 }

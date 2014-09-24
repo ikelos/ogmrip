@@ -31,9 +31,6 @@
 
 #include <glib/gi18n-lib.h>
 
-#define OGMRIP_TITLE_CHOOSER_WIDGET_GET_PRIVATE(o) \
-    (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_TITLE_CHOOSER_WIDGET, OGMRipTitleChooserWidgetPriv))
-
 enum
 {
   PROP_0,
@@ -52,20 +49,10 @@ struct _OGMRipTitleChooserWidgetPriv
   OGMRipMedia *media;
 };
 
-static void ogmrip_title_chooser_init                (OGMRipTitleChooserInterface *iface);
-static void ogmrip_title_chooser_widget_dispose      (GObject                     *object);
-static void ogmrip_title_chooser_widget_get_property (GObject                     *gobject,
-                                                      guint                       property_id,
-                                                      GValue                      *value,
-                                                      GParamSpec                  *pspec);
-static void ogmrip_title_chooser_widget_set_property (GObject                     *gobject,
-                                                      guint                       property_id,
-                                                      const GValue                *value,
-                                                      GParamSpec                  *pspec);
-
+static void ogmrip_title_chooser_init (OGMRipTitleChooserInterface *iface);
 
 static void
-ogmrip_title_chooser_widget_set_disc (OGMRipTitleChooserWidget *chooser, OGMRipMedia *media)
+ogmrip_title_chooser_widget_set_media (OGMRipTitleChooserWidget *chooser, OGMRipMedia *media)
 {
   GtkTreeModel *model;
 
@@ -102,38 +89,41 @@ ogmrip_title_chooser_widget_set_disc (OGMRipTitleChooserWidget *chooser, OGMRipM
       g_string_printf (string, "%s %02d", _("Title"), ogmrip_title_get_id (link->data) + 1);
 
       length = ogmrip_title_get_length (link->data, &time_);
-      if (time_.hour > 0)
-        g_string_append_printf (string, " (%02lu:%02lu %s", time_.hour, time_.min, _("hours"));
-      else if (time_.min > 0)
-        g_string_append_printf (string, " (%02lu:%02lu %s", time_.min, time_.sec, _("minutes"));
-      else
-        g_string_append_printf (string, " (%02lu %s", time_.sec, _("seconds"));
-
-      standard = ogmrip_video_stream_get_standard (stream);
-      if (standard != OGMRIP_STANDARD_UNDEFINED)
-        g_string_append_printf (string, ", %s", ogmrip_standard_get_label (standard));
-
-      ogmrip_video_stream_get_aspect_ratio (stream, &num, &denom);
-      if (num > 0 && denom > 0)
+      if (length > 0)
       {
-        if (denom == 1000)
-        {
-          gchar aspect[G_ASCII_DTOSTR_BUF_SIZE];
-
-          g_string_append_printf (string, ", %s:1", g_ascii_formatd (aspect, G_ASCII_DTOSTR_BUF_SIZE, "%.02lf", num / 1000.));
-        }
+        if (time_.hour > 0)
+          g_string_append_printf (string, " (%02lu:%02lu %s", time_.hour, time_.min, _("hours"));
+        else if (time_.min > 0)
+          g_string_append_printf (string, " (%02lu:%02lu %s", time_.min, time_.sec, _("minutes"));
         else
-          g_string_append_printf (string, ", %u/%u", num, denom);
-      }
+          g_string_append_printf (string, " (%02lu %s", time_.sec, _("seconds"));
 
-      g_string_append_c (string, ')');
+        standard = ogmrip_video_stream_get_standard (stream);
+        if (standard != OGMRIP_STANDARD_UNDEFINED)
+          g_string_append_printf (string, ", %s", ogmrip_standard_get_label (standard));
+
+        ogmrip_video_stream_get_aspect_ratio (stream, &num, &denom);
+        if (num > 0 && denom > 0)
+        {
+          if (denom == 1000)
+          {
+            gchar aspect[G_ASCII_DTOSTR_BUF_SIZE];
+
+            g_string_append_printf (string, ", %s:1", g_ascii_formatd (aspect, G_ASCII_DTOSTR_BUF_SIZE, "%.02lf", num / 1000.));
+          }
+          else
+            g_string_append_printf (string, ", %u/%u", num, denom);
+        }
+
+        g_string_append_c (string, ')');
+      }
 
       gtk_list_store_append (GTK_LIST_STORE (model), &iter);
       gtk_list_store_set (GTK_LIST_STORE (model), &iter, TEXT_COLUMN, string->str,
           ID_COLUMN, ogmrip_title_get_id (link->data), -1);
       g_string_free (string, TRUE);
 
-      if (length > longest)
+      if (length <= 0 || length > longest)
       {
         longest = length;
         gtk_combo_box_set_active_iter (GTK_COMBO_BOX (chooser), &iter);
@@ -188,61 +178,17 @@ ogmrip_title_chooser_widget_set_active (OGMRipTitleChooser *chooser, OGMRipTitle
 }
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipTitleChooserWidget, ogmrip_title_chooser_widget, GTK_TYPE_COMBO_BOX,
+    G_ADD_PRIVATE (OGMRipTitleChooserWidget)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_TITLE_CHOOSER, ogmrip_title_chooser_init))
-
-static void
-ogmrip_title_chooser_widget_class_init (OGMRipTitleChooserWidgetClass *klass)
-{
-  GObjectClass *object_class;
-
-  object_class = (GObjectClass *) klass;
-  object_class->dispose = ogmrip_title_chooser_widget_dispose;
-  object_class->get_property = ogmrip_title_chooser_widget_get_property;
-  object_class->set_property = ogmrip_title_chooser_widget_set_property;
-
-  g_object_class_override_property (object_class, PROP_MEDIA, "media");
-
-  g_type_class_add_private (klass, sizeof (OGMRipTitleChooserWidgetPriv));
-}
-
-static void
-ogmrip_title_chooser_init (OGMRipTitleChooserInterface *iface)
-{
-  iface->get_active = ogmrip_title_chooser_widget_get_active;
-  iface->set_active = ogmrip_title_chooser_widget_set_active;
-}
-
-static void
-ogmrip_title_chooser_widget_init (OGMRipTitleChooserWidget *chooser)
-{
-  GtkCellRenderer *cell;
-  GtkListStore *store;
-
-  chooser->priv = OGMRIP_TITLE_CHOOSER_WIDGET_GET_PRIVATE (chooser);
-
-  store = gtk_list_store_new (NUM_COLUMNS, G_TYPE_STRING, G_TYPE_INT);
-  gtk_combo_box_set_model (GTK_COMBO_BOX (chooser), GTK_TREE_MODEL (store));
-  g_object_unref (store);
-
-  cell = gtk_cell_renderer_text_new ();
-  gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (chooser), cell, TRUE);
-  gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (chooser), cell, "text", TEXT_COLUMN, NULL);
-}
 
 static void
 ogmrip_title_chooser_widget_dispose (GObject *object)
 {
-  OGMRipTitleChooserWidget *chooser;
+  OGMRipTitleChooserWidget *chooser = OGMRIP_TITLE_CHOOSER_WIDGET (object);
 
-  chooser = OGMRIP_TITLE_CHOOSER_WIDGET (object);
+  g_clear_object (&chooser->priv->media);
 
-  if (chooser->priv->media)
-  {
-    g_object_unref (chooser->priv->media);
-    chooser->priv->media = NULL;
-  }
-
-  (*G_OBJECT_CLASS (ogmrip_title_chooser_widget_parent_class)->dispose) (object);
+  G_OBJECT_CLASS (ogmrip_title_chooser_widget_parent_class)->dispose (object);
 }
 
 static void
@@ -269,12 +215,49 @@ ogmrip_title_chooser_widget_set_property (GObject *gobject, guint property_id, c
   switch (property_id) 
   {
     case PROP_MEDIA:
-      ogmrip_title_chooser_widget_set_disc (chooser, g_value_get_object (value));
+      ogmrip_title_chooser_widget_set_media (chooser, g_value_get_object (value));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
   }
+}
+
+static void
+ogmrip_title_chooser_widget_class_init (OGMRipTitleChooserWidgetClass *klass)
+{
+  GObjectClass *object_class;
+
+  object_class = (GObjectClass *) klass;
+  object_class->dispose = ogmrip_title_chooser_widget_dispose;
+  object_class->get_property = ogmrip_title_chooser_widget_get_property;
+  object_class->set_property = ogmrip_title_chooser_widget_set_property;
+
+  g_object_class_override_property (object_class, PROP_MEDIA, "media");
+}
+
+static void
+ogmrip_title_chooser_init (OGMRipTitleChooserInterface *iface)
+{
+  iface->get_active = ogmrip_title_chooser_widget_get_active;
+  iface->set_active = ogmrip_title_chooser_widget_set_active;
+}
+
+static void
+ogmrip_title_chooser_widget_init (OGMRipTitleChooserWidget *chooser)
+{
+  GtkCellRenderer *cell;
+  GtkListStore *store;
+
+  chooser->priv = ogmrip_title_chooser_widget_get_instance_private (chooser);
+
+  store = gtk_list_store_new (NUM_COLUMNS, G_TYPE_STRING, G_TYPE_INT);
+  gtk_combo_box_set_model (GTK_COMBO_BOX (chooser), GTK_TREE_MODEL (store));
+  g_object_unref (store);
+
+  cell = gtk_cell_renderer_text_new ();
+  gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (chooser), cell, TRUE);
+  gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (chooser), cell, "text", TEXT_COLUMN, NULL);
 }
 
 /**

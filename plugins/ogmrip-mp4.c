@@ -324,8 +324,8 @@ ogmrip_mp4_create_command (OGMRipContainer *container, const gchar *input)
   task = ogmjob_spawn_newv ((gchar **) argv->pdata);
   g_ptr_array_free (argv, TRUE);
 
-  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (task),
-      (OGMJobWatch) ogmrip_mp4_create_watch, mp4);
+  ogmjob_spawn_set_watch (OGMJOB_SPAWN (task), OGMJOB_STREAM_OUTPUT,
+      (OGMJobWatch) ogmrip_mp4_create_watch, mp4, NULL);
 
   return task;
 }
@@ -380,8 +380,8 @@ ogmrip_mp4_split_command (OGMRipContainer *mp4)
   task = ogmjob_spawn_newv ((gchar **) argv->pdata);
   g_ptr_array_free (argv, TRUE);
 
-  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (task),
-      (OGMJobWatch) ogmrip_mp4_split_watch, mp4);
+  ogmjob_spawn_set_watch (OGMJOB_SPAWN (task), OGMJOB_STREAM_OUTPUT,
+      (OGMJobWatch) ogmrip_mp4_split_watch, mp4, NULL);
 
   return task;
 }
@@ -499,8 +499,12 @@ ogmrip_mp4_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   OGMRipMp4 *mp4 = OGMRIP_MP4 (task);
   OGMJobTask *queue, *child;
 
-  gchar *filename = NULL;
   gboolean result = FALSE;
+  gchar *filename;
+
+  filename = ogmrip_fs_mktemp ("video.XXXXXX", error);
+  if (!filename)
+    return FALSE;
 
   ogmrip_container_get_split (OGMRIP_CONTAINER (task), &mp4->nsplits, NULL);
 
@@ -512,14 +516,9 @@ ogmrip_mp4_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   ogmjob_container_add (OGMJOB_CONTAINER (task), queue);
   g_object_unref (queue);
 
-  if (ogmrip_stream_get_format (OGMRIP_STREAM (mp4->video)) == OGMRIP_FORMAT_H264)
-  {
-    filename = ogmrip_fs_mktemp ("video.XXXXXX", NULL);
-
-    child = ogmrip_mencoder_extract_command (OGMRIP_CONTAINER (task), ogmrip_file_get_path (mp4->video), filename);
-    ogmjob_container_add (OGMJOB_CONTAINER (queue), child);
-    g_object_unref (child);
-  }
+  child = ogmrip_video_extractor_new (OGMRIP_CONTAINER (task), mp4->video, filename);
+  ogmjob_container_add (OGMJOB_CONTAINER (queue), child);
+  g_object_unref (child);
 
   mp4->old_percent = 0;
   mp4->nstreams = 2 + mp4->naudio + mp4->nvobsub;
@@ -543,11 +542,8 @@ ogmrip_mp4_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 
   ogmjob_container_remove (OGMJOB_CONTAINER (task), queue);
 
-  if (filename)
-  {
-    g_unlink (filename);
-    g_free (filename);
-  }
+  g_unlink (filename);
+  g_free (filename);
 
   if (mp4->nsplits > 1)
     g_file_delete (ogmrip_container_get_output (OGMRIP_CONTAINER (task)), NULL, NULL);
@@ -571,43 +567,62 @@ static OGMRipFormat formats[] =
   -1
 };
 
+static gboolean
+ogmrip_mp4_get_version (const gchar *str, gint *major_version, gint *minor_version, gint *micro_version)
+{
+  gchar *end;
+
+  if (!g_str_has_prefix (str, "MP4Box - GPAC version "))
+    return FALSE;
+
+  errno = 0;
+
+  *major_version = strtoul (str + 22, &end, 10);
+  if (errno || *end != '.')
+    return FALSE;
+
+  *minor_version = strtoul (end + 1, NULL, 10);
+  if (errno || *end != '.')
+    return FALSE;
+
+  *micro_version = strtoul (end + 1, NULL, 10);
+  if (errno)
+    return FALSE;
+
+  return TRUE;
+}
+
 void
 ogmrip_module_load (OGMRipModule *module)
 {
-  gchar *output;
+  gchar *output, *error;
   gint major_version = 0, minor_version = 0, micro_version = 0;
 
-  if (!g_spawn_command_line_sync (MP4BOX " -version", &output, NULL, NULL, NULL))
+  if (!g_spawn_command_line_sync (MP4BOX " -version", &output, &error, NULL, NULL))
   {
     g_warning (_("MP4Box is missing"));
     return;
   }
 
-  if (g_str_has_prefix (output, "MP4Box - GPAC version "))
+  if (ogmrip_mp4_get_version (output, &major_version, &minor_version, &micro_version) ||
+      ogmrip_mp4_get_version (error,  &major_version, &minor_version, &micro_version))
   {
-    gchar *end;
+    if ((major_version > 0) ||
+        (major_version == 0 && minor_version > 4) ||
+        (major_version == 0 && minor_version == 4 && micro_version >= 5))
+    {
+      guint i = 0;
 
-    errno = 0;
-    major_version = strtoul (output + 22, &end, 10);
-    if (!errno && *end == '.')
-      minor_version = strtoul (end + 1, NULL, 10);
-    if (!errno && *end == '.')
-      micro_version = strtoul (end + 1, NULL, 10);
+      while (formats[i] != -1)
+        i++;
+
+      formats[i] = OGMRIP_FORMAT_AC3;
+      formats[i+1] = OGMRIP_FORMAT_COPY;
+    }
   }
+
   g_free (output);
-
-  if ((major_version > 0) ||
-      (major_version == 0 && minor_version > 4) ||
-      (major_version == 0 && minor_version == 4 && micro_version >= 5))
-  {
-    guint i = 0;
-
-    while (formats[i] != -1)
-      i++;
-
-    formats[i] = OGMRIP_FORMAT_AC3;
-    formats[i+1] = OGMRIP_FORMAT_COPY;
-  }
+  g_free (error);
 
   ogmrip_register_container (OGMRIP_TYPE_MP4,
       "mp4", _("Mpeg-4 Media (MP4)"), formats,

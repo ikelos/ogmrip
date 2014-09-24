@@ -24,12 +24,12 @@
 #include <stdlib.h>
 
 void
-ogmrip_media_info_get_file_info (OGMRipMediaInfo *info, OGMRipFilePriv *file)
+ogmrip_media_info_get_file_info (OGMRipMediaInfo *info, OGMRipFilePrivate *file)
 {
   const gchar *str;
 
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "Duration");
-  file->length = str ? atoi (str) : -1.0;
+  file->length = str ? atoi (str) / 1000. : -1.0;
 
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "FileSize");
   file->media_size = str ? atoll (str) : -1;
@@ -89,7 +89,7 @@ ogmrip_media_info_get_video_format (OGMRipMediaInfo *info, guint track)
 }
 
 void
-ogmrip_media_info_get_video_info (OGMRipMediaInfo *info, guint track, OGMRipVideoFilePriv *video)
+ogmrip_media_info_get_video_info (OGMRipMediaInfo *info, guint track, OGMRipVideoFilePrivate *video)
 {
   const gchar *str;
 
@@ -115,16 +115,19 @@ ogmrip_media_info_get_video_info (OGMRipMediaInfo *info, guint track, OGMRipVide
   if (str)
   {
     if (g_str_equal (str, "25.000"))
+    {
       video->framerate_num = 25;
+      video->framerate_denom = 1;
+    }
     else if (g_str_equal (str, "23.976"))
     {
       video->framerate_num = 24000;
-      video->framerate_num = 1001;
+      video->framerate_denom = 1001;
     }
     else if (g_str_equal (str, "29.970"))
     {
       video->framerate_num = 30000;
-      video->framerate_num = 1001;
+      video->framerate_denom = 1001;
     }
     else
     {
@@ -132,7 +135,7 @@ ogmrip_media_info_get_video_info (OGMRipMediaInfo *info, guint track, OGMRipVide
       
       framerate = strtod (str, NULL);
       video->framerate_num = framerate * 1000;
-      video->framerate_num = 1000;
+      video->framerate_denom = 1000;
     }
   }
 
@@ -166,6 +169,9 @@ ogmrip_media_info_get_video_info (OGMRipMediaInfo *info, guint track, OGMRipVide
       video->aspect_denom = 1000;
     }
   }
+
+  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, track, "ScanType");
+  video->progressive = g_str_equal (str, "Progressive");
 
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, track, "StreamSize");
   video->size = str ? atoll (str) : -1;
@@ -215,7 +221,7 @@ ogmrip_media_info_get_audio_format (OGMRipMediaInfo *info, guint track)
 }
 
 void
-ogmrip_media_info_get_audio_info (OGMRipMediaInfo *info, guint track, OGMRipAudioFilePriv *audio)
+ogmrip_media_info_get_audio_info (OGMRipMediaInfo *info, guint track, OGMRipAudioFilePrivate *audio)
 {
   const gchar *str;
   gint channels;
@@ -285,7 +291,7 @@ ogmrip_media_info_get_subp_format (OGMRipMediaInfo *info, guint track)
 }
 
 void
-ogmrip_media_info_get_subp_info (OGMRipMediaInfo *info, guint track, OGMRipSubpFilePriv *subp)
+ogmrip_media_info_get_subp_info (OGMRipMediaInfo *info, guint track, OGMRipSubpFilePrivate *subp)
 {
   const gchar *str;
 
@@ -316,5 +322,43 @@ g_file_get_id (GFile *file)
   g_object_unref (info);
 
   return id;
+}
+
+void
+ogmrip_media_info_get_chapters_info (OGMRipMediaInfo *info, guint track, OGMRipMediaFilePrivate *media)
+{
+  const gchar *str;
+  gint begin, end, pos;
+
+  OGMRipTime dtime;
+  gchar lang1, lang2;
+  gulong msec;
+
+  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_MENU, track, "Chapters_Pos_Begin");
+  begin = str ? atoi (str) : 0;
+
+  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_MENU, track, "Chapters_Pos_End");
+  end = str ? atoi (str) : 0;
+
+  if (end > begin)
+  {
+    media->nr_of_chapters = end - begin;
+    media->length_of_chapters = g_new0 (gulong, media->nr_of_chapters);
+
+    for (msec = 0, pos = begin; pos < end; pos ++)
+    {
+      str = ogmrip_media_info_geti (info, OGMRIP_CATEGORY_MENU, track, pos);
+      if (str && sscanf (str, "%c%c:%lu:%lu:%lu.%lu", &lang1, &lang2, &dtime.hour, &dtime.min, &dtime.sec, &dtime.msec) == 6)
+      {
+        if (pos > begin)
+          media->length_of_chapters[pos - begin - 1] = ogmrip_time_to_msec (&dtime) - msec;
+
+        msec = ogmrip_time_to_msec (&dtime);
+      }
+    }
+
+    str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "Duration");
+    media->length_of_chapters[end - begin - 1] = atoi (str) - msec;
+  }
 }
 

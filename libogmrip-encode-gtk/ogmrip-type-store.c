@@ -64,7 +64,7 @@ ogmrip_type_store_description_sort_func (OGMRipTypeStore *store, GtkTreeIter *it
   return retval;
 }
 
-G_DEFINE_TYPE (OGMRipTypeStore, ogmrip_type_store, GTK_TYPE_LIST_STORE);
+G_DEFINE_TYPE_WITH_PRIVATE (OGMRipTypeStore, ogmrip_type_store, GTK_TYPE_LIST_STORE);
 
 static void
 ogmrip_type_store_class_init (OGMRipTypeStoreClass *klass)
@@ -79,14 +79,12 @@ ogmrip_type_store_class_init (OGMRipTypeStoreClass *klass)
   g_object_class_install_property (gobject_class, PROP_PARENT,
       g_param_spec_gtype ("parent", "parent", "parent", G_TYPE_OBJECT,
         G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
-
-  g_type_class_add_private (klass, sizeof (OGMRipTypeStorePriv));
 }
 
 static void
 ogmrip_type_store_init (OGMRipTypeStore *store)
 {
-  store->priv = G_TYPE_INSTANCE_GET_PRIVATE (store, OGMRIP_TYPE_TYPE_STORE, OGMRipTypeStorePriv);
+  store->priv = ogmrip_type_store_get_instance_private (store);
 
   column_types[1] = G_TYPE_GTYPE;
 

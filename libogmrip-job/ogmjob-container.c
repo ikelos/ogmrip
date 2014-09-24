@@ -35,17 +35,50 @@ enum
   LAST_SIGNAL
 };
 
-static void ogmjob_container_dispose     (GObject         *object);
-static void ogmjob_container_suspend     (OGMJobTask      *task);
-static void ogmjob_container_resume      (OGMJobTask      *task);
-static void ogmjob_container_real_add    (OGMJobContainer *container, 
-                                          OGMJobTask      *task);
-static void ogmjob_container_real_remove (OGMJobContainer *container,
-                                          OGMJobTask      *task);
-
 static guint signals[LAST_SIGNAL] = { 0 };
 
+static void
+ogmjob_container_remove_from_container (OGMJobTask *child, OGMJobContainer *container)
+{
+  ogmjob_container_remove (container, child);
+}
+
 G_DEFINE_ABSTRACT_TYPE (OGMJobContainer, ogmjob_container, OGMJOB_TYPE_TASK)
+
+static void
+ogmjob_container_dispose (GObject *gobject)
+{
+  ogmjob_container_foreach (OGMJOB_CONTAINER (gobject), 
+      (OGMJobCallback) ogmjob_container_remove_from_container, gobject);
+
+  G_OBJECT_CLASS (ogmjob_container_parent_class)->dispose (gobject);
+}
+
+static void
+ogmjob_container_suspend (OGMJobTask *task)
+{
+  ogmjob_container_foreach (OGMJOB_CONTAINER (task), 
+      (OGMJobCallback) ogmjob_task_suspend, NULL);
+}
+
+static void
+ogmjob_container_resume (OGMJobTask *task)
+{
+  ogmjob_container_foreach (OGMJOB_CONTAINER (task), 
+      (OGMJobCallback) ogmjob_task_resume, NULL);
+}
+
+static void
+ogmjob_container_real_add (OGMJobContainer *container, OGMJobTask *task)
+{
+  g_warning ("Not implemented\n");
+}
+
+static void
+ogmjob_container_real_remove (OGMJobContainer *container, OGMJobTask *task)
+{
+  g_warning ("Not implemented\n");
+}
 
 static void
 ogmjob_container_class_init (OGMJobContainerClass *klass)
@@ -91,47 +124,6 @@ ogmjob_container_class_init (OGMJobContainerClass *klass)
 static void
 ogmjob_container_init (OGMJobContainer *container)
 {
-}
-
-static void
-ogmjob_container_remove_from_container (OGMJobTask *child, OGMJobContainer *container)
-{
-  ogmjob_container_remove (container, child);
-}
-
-static void
-ogmjob_container_dispose (GObject *gobject)
-{
-  ogmjob_container_foreach (OGMJOB_CONTAINER (gobject), 
-      (OGMJobCallback) ogmjob_container_remove_from_container, gobject);
-
-  G_OBJECT_CLASS (ogmjob_container_parent_class)->dispose (gobject);
-}
-
-static void
-ogmjob_container_suspend (OGMJobTask *task)
-{
-  ogmjob_container_foreach (OGMJOB_CONTAINER (task), 
-      (OGMJobCallback) ogmjob_task_suspend, NULL);
-}
-
-static void
-ogmjob_container_resume (OGMJobTask *task)
-{
-  ogmjob_container_foreach (OGMJOB_CONTAINER (task), 
-      (OGMJobCallback) ogmjob_task_resume, NULL);
-}
-
-static void
-ogmjob_container_real_add (OGMJobContainer *container, OGMJobTask *task)
-{
-  g_warning ("Not implemented\n");
-}
-
-static void
-ogmjob_container_real_remove (OGMJobContainer *container, OGMJobTask *task)
-{
-  g_warning ("Not implemented\n");
 }
 
 /**

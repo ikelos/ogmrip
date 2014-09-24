@@ -36,9 +36,6 @@
 #include <stdio.h>
 #include <glib/gstdio.h>
 
-#define OGMRIP_LAVC_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_LAVC, OGMRipLavcPriv))
-
 enum
 {
   PROP_0,
@@ -137,7 +134,6 @@ ogmrip_lavc_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   static const gint strict[] = { 0, 1, -1, -2 };
 
   OGMRipLavc *lavc = OGMRIP_LAVC (video);
-  gchar *opts[] = { "-ovc", "lavc", "-lavcopts", NULL, NULL, NULL, NULL };
 
   OGMJobTask *task;
   GString *options;
@@ -223,9 +219,6 @@ ogmrip_lavc_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
       else
         g_string_append (options, ":vpass=3");
     }
-
-    opts[4] = "-passlogfile";
-    opts[5] = (gchar *) log_file;
   }
 
   threads = ogmrip_video_codec_get_threads (video);
@@ -234,9 +227,8 @@ ogmrip_lavc_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   if (threads > 0)
     g_string_append_printf (options, ":threads=%u", CLAMP (threads, 1, 8));
 
-  opts[3] = options->str;
-
-  task = ogmrip_mencoder_video_command (video, (const gchar * const *) opts, pass == passes ? output : "/dev/null");
+  task = ogmrip_video_encoder_new (video, OGMRIP_ENCODER_LAVC,
+      options->str, log_file, pass == passes ? output : "/dev/null");
 
   g_string_free (options, TRUE);
 
@@ -324,6 +316,7 @@ ogmrip_configurable_iface_init (OGMRipConfigurableInterface *iface)
 }
 
 G_DEFINE_ABSTRACT_TYPE_WITH_CODE (OGMRipLavc, ogmrip_lavc, OGMRIP_TYPE_VIDEO_CODEC,
+    G_ADD_PRIVATE (OGMRipLavc)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_CONFIGURABLE, ogmrip_configurable_iface_init))
 
 static void
@@ -435,14 +428,13 @@ ogmrip_lavc_class_init (OGMRipLavcClass *klass)
   g_object_class_install_property (gobject_class, PROP_V4MV,
       g_param_spec_boolean (OGMRIP_LAVC_PROP_V4MV, "4MV property", "Set 4mv",
         TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_type_class_add_private (klass, sizeof (OGMRipLavcPriv));
 }
 
 static void
 ogmrip_lavc_init (OGMRipLavc *lavc)
 {
-  lavc->priv = OGMRIP_LAVC_GET_PRIVATE (lavc);
+  lavc->priv = ogmrip_lavc_get_instance_private (lavc);
+
   lavc->priv->cmp = 2;
   lavc->priv->precmp = 2;
   lavc->priv->subcmp = 2;

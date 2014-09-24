@@ -81,16 +81,7 @@ static gboolean ogmrip_vp8_run          (OGMJobTask   *task,
 static OGMJobTask *
 ogmrip_yuv4mpeg_command (OGMRipVideoCodec *video, const gchar *fifo)
 {
-  OGMJobTask *task;
-  gchar *options[] = { "-vo", NULL, NULL };
-
-  options[1] = g_strdup_printf ("yuv4mpeg:file=%s", fifo);
-
-  task = ogmrip_mplayer_video_command (video, (const gchar * const *) options, fifo);
-
-  g_free (options[1]);
-
-  return task;
+  return ogmrip_video_encoder_new (video, OGMRIP_ENCODER_YUV, NULL, NULL, fifo);
 }
 
 static OGMJobTask *
@@ -328,10 +319,6 @@ ogmrip_vp8_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   if (!fifo)
     return FALSE;
 
-  queue = ogmjob_queue_new ();
-  ogmjob_container_add (OGMJOB_CONTAINER (task), queue);
-  g_object_unref (queue);
-
   passes = ogmrip_video_codec_get_passes (OGMRIP_VIDEO_CODEC (task));
 
   log_file = NULL;
@@ -339,8 +326,17 @@ ogmrip_vp8_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   {
     log_file = ogmrip_fs_mktemp ("log.XXXXXX", error);
     if (!log_file)
+    {
+      g_unlink (fifo);
+      g_free (fifo);
+
       return FALSE;
+    }
   }
+
+  queue = ogmjob_queue_new ();
+  ogmjob_container_add (OGMJOB_CONTAINER (task), queue);
+  g_object_unref (queue);
 
   for (pass = 0; pass < passes; pass ++)
   {

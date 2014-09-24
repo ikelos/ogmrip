@@ -55,7 +55,7 @@ ogmrip_title_chooser_set_media (OGMRipTitleChooser *chooser, OGMRipMedia *media)
 }
 
 /**
- * ogmrip_title_chooser_get_disc:
+ * ogmrip_title_chooser_get_media:
  * @chooser: An #OGMRipTitleChooser
  *
  * Returns the #OGMRipMedia which was passed to ogmrip_title_chooser_set_media().
@@ -63,7 +63,7 @@ ogmrip_title_chooser_set_media (OGMRipTitleChooser *chooser, OGMRipMedia *media)
  * Returns: The current #OGMRipMedia
  */
 OGMRipMedia *
-ogmrip_title_chooser_get_disc (OGMRipTitleChooser *chooser)
+ogmrip_title_chooser_get_media (OGMRipTitleChooser *chooser)
 {
   OGMRipMedia *media;
 

@@ -1,5 +1,6 @@
 <profile name="default-copy" version="(1,0)">
-  <key name="name">'&lt;b&gt;Copy&lt;/b&gt;&#xA;No reencoding'</key>
+  <key name="name">'Copy'</key>
+  <key name="description">'No reencoding'</key>
   <section name="general">
     <key name="container">'mkv'</key>
   </section>

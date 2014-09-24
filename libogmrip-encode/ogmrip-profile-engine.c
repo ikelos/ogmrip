@@ -151,11 +151,7 @@ ogmrip_profile_engine_dispose (GObject *gobject)
 {
   OGMRipProfileEngine *engine = OGMRIP_PROFILE_ENGINE (gobject);
 
-  if (engine->priv->settings)
-  {
-    g_object_unref (engine->priv->settings);
-    engine->priv->settings= NULL;
-  }
+  g_clear_object (&engine->priv->settings);
 
   if (engine->priv->profiles)
   {
@@ -217,7 +213,7 @@ ogmrip_profile_engine_init (OGMRipProfileEngine *engine)
 {
   engine->priv = ogmrip_profile_engine_get_instance_private (engine);
 
-  engine->priv->settings = g_settings_new_with_path ("org.ogmrip.profiles", "/apps/ogmrip/preferences/");
+  engine->priv->settings = g_settings_new_with_path ("org.ogmrip.profiles", OGMRIP_PROFILE_PATH);
   engine->priv->profiles = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_object_unref);
 
   g_settings_bind (engine->priv->settings, "profiles",

@@ -50,7 +50,7 @@ ogmrip_module_build_path (OGMRipModule *module)
   return path;
 }
 
-G_DEFINE_TYPE (OGMRipModule, ogmrip_module, G_TYPE_TYPE_MODULE)
+G_DEFINE_TYPE_WITH_PRIVATE (OGMRipModule, ogmrip_module, G_TYPE_TYPE_MODULE)
 
 static void
 ogmrip_module_get_property (GObject *gobject, guint prop_id, GValue *value, GParamSpec *pspec)
@@ -168,8 +168,7 @@ ogmrip_module_unload_module (GTypeModule *gmodule)
 static void
 ogmrip_module_init (OGMRipModule *module)
 {
-  module->priv = G_TYPE_INSTANCE_GET_PRIVATE (module,
-      OGMRIP_TYPE_MODULE, OGMRipModulePriv);
+  module->priv = ogmrip_module_get_instance_private (module);
 }
 
 static void
@@ -194,8 +193,6 @@ ogmrip_module_class_init (OGMRipModuleClass *klass)
   g_object_class_install_property (gobject_class, PROP_PATH,
       g_param_spec_string ("path", "Module path", "The path of the module",
         NULL, G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY | G_PARAM_STATIC_STRINGS));
-
-  g_type_class_add_private (klass, sizeof (OGMRipModulePriv));
 }
 
 OGMRipModule *

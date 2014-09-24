@@ -42,13 +42,13 @@ typedef enum
 
 typedef struct _OGMRipChapterStore      OGMRipChapterStore;
 typedef struct _OGMRipChapterStoreClass OGMRipChapterStoreClass;
-typedef struct _OGMRipChapterStorePriv  OGMRipChapterStorePriv;
+typedef struct _OGMRipChapterStorePriv  OGMRipChapterStorePrivate;
 
 struct _OGMRipChapterStore
 {
   GtkListStore parent_instance;
 
-  OGMRipChapterStorePriv *priv;
+  OGMRipChapterStorePrivate *priv;
 };
 
 struct _OGMRipChapterStoreClass

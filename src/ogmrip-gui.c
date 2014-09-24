@@ -33,11 +33,13 @@ static gboolean debug = TRUE;
 static gboolean debug = FALSE;
 #endif
 
-#define OGMRIP_MENU_RES  "/org/ogmrip/ogmrip-menu.ui"
-#define OGMRIP_ICON_FILE "pixmaps" G_DIR_SEPARATOR_S "ogmrip.png"
+#define OGMRIP_MENU_RES "/org/ogmrip/ogmrip-menu.ui"
+#define OGMRIP_ICON_RES "/org/ogmrip/ogmrip.png"
 
 struct _OGMRipGuiPriv
 {
+  OGMRipEncodingManager *manager;
+
   gboolean is_prepared;
 };
 
@@ -53,6 +55,33 @@ ogmrip_gui_profiles_activated (GSimpleAction *action, GVariant *parameter, gpoin
 
   gtk_dialog_run (GTK_DIALOG (dialog));
   gtk_widget_destroy (dialog);
+}
+
+static void
+ogmrip_gui_encodings_activated (GSimpleAction *action, GVariant *parameter, gpointer app)
+{
+  OGMRipGui *gui = app;
+  GtkWindow *window;
+  GtkWidget *dialog;
+
+  window = gtk_application_get_active_window (app);
+
+  dialog = ogmrip_encoding_manager_dialog_new (gui->priv->manager);
+  gtk_window_set_transient_for (GTK_WINDOW (dialog), window);
+  gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
+
+  if (gtk_dialog_run (GTK_DIALOG (dialog)) != GTK_RESPONSE_APPLY)
+    gtk_widget_destroy (dialog);
+  else
+  {
+    GSList *list, *link;
+
+    list = ogmrip_encoding_manager_get_list (gui->priv->manager);
+    for (link = list; link; link = link->next)
+      if (ogmrip_encoding_manager_get_status (gui->priv->manager, link->data) != OGMRIP_ENCODING_SUCCESS)
+        ogmrip_main_window_encode (OGMRIP_MAIN_WINDOW (window), g_object_ref (link->data));
+    g_slist_free (list);
+  }
 }
 
 static void
@@ -72,7 +101,7 @@ ogmrip_gui_pref_activated (GSimpleAction *action, GVariant *parameter, gpointer 
 static void
 ogmrip_gui_about_activated (GSimpleAction *action, GVariant *parameter, gpointer app)
 {
-  static GdkPixbuf *icon = NULL;
+  GdkPixbuf *icon = NULL;
 
   const gchar *authors[] =
   {
@@ -87,8 +116,7 @@ ogmrip_gui_about_activated (GSimpleAction *action, GVariant *parameter, gpointer
     NULL
   };
 
-  if (!icon)
-    icon = gdk_pixbuf_new_from_file (OGMRIP_DATA_DIR G_DIR_SEPARATOR_S OGMRIP_ICON_FILE, NULL);
+  icon = gdk_pixbuf_new_from_resource (OGMRIP_ICON_RES, NULL);
 
   if (g_str_equal (translator_credits, "translator-credits"))
     translator_credits = NULL;
@@ -105,6 +133,9 @@ ogmrip_gui_about_activated (GSimpleAction *action, GVariant *parameter, gpointer
       "authors", authors,
       "logo", icon,
       NULL);
+
+  if (icon)
+    g_object_unref (icon);
 }
 
 static void
@@ -123,10 +154,11 @@ ogmrip_gui_quit_activated (GSimpleAction *action, GVariant *parameter, gpointer 
 
 static GActionEntry app_entries[] =
 {
-  { "profiles",    ogmrip_gui_profiles_activated, NULL, NULL, NULL },
-  { "preferences", ogmrip_gui_pref_activated,     NULL, NULL, NULL },
-  { "about",       ogmrip_gui_about_activated,    NULL, NULL, NULL },
-  { "quit",        ogmrip_gui_quit_activated,     NULL, NULL, NULL }
+  { "profiles",    ogmrip_gui_profiles_activated,  NULL, NULL, NULL },
+  { "encodings",   ogmrip_gui_encodings_activated, NULL, NULL, NULL },
+  { "preferences", ogmrip_gui_pref_activated,      NULL, NULL, NULL },
+  { "about",       ogmrip_gui_about_activated,     NULL, NULL, NULL },
+  { "quit",        ogmrip_gui_quit_activated,      NULL, NULL, NULL }
 };
 
 static void
@@ -136,20 +168,16 @@ ogmrip_gui_startup_cb (GApplication *app)
   GtkBuilder *builder;
   GObject *menu;
 
-  builder = gtk_builder_new ();
-  if (!gtk_builder_add_from_resource (builder, OGMRIP_MENU_RES, &error))
-    g_error ("Couldn't load builder file: %s", error->message);
-
   g_action_map_add_action_entries (G_ACTION_MAP (app),
       app_entries, G_N_ELEMENTS (app_entries), app);
 
+  builder = gtk_builder_new ();
+  if (!gtk_builder_add_from_resource (builder, OGMRIP_MENU_RES, &error))
+    g_error ("Couldn't load builder file: %s", error->message);
   menu = gtk_builder_get_object (builder, "app-menu");
-  gtk_application_set_app_menu (GTK_APPLICATION (app), G_MENU_MODEL (menu));
-
-  menu = gtk_builder_get_object (builder, "win-menu");
-  gtk_application_set_menubar (GTK_APPLICATION (app), G_MENU_MODEL (menu));
-
   g_object_unref (builder);
+
+  gtk_application_set_app_menu (GTK_APPLICATION (app), G_MENU_MODEL (menu));
 }
 
 static void
@@ -157,12 +185,7 @@ ogmrip_gui_activate_cb (GApplication *app)
 {
   GtkWidget *window;
 
-  window = ogmrip_main_window_new (OGMRIP_APPLICATION (app));
-
-  g_application_hold (app);
-  g_signal_connect_swapped (window, "destroy",
-      G_CALLBACK (g_application_release), app);
-
+  window = ogmrip_main_window_new (OGMRIP_APPLICATION (app), OGMRIP_GUI (app)->priv->manager);
   gtk_window_present (GTK_WINDOW (window));
 }
 
@@ -175,19 +198,14 @@ ogmrip_gui_open_cb (GApplication *app, GFile **files, gint n_files, const gchar 
 
   for (i = 0; i < n_files; i ++)
   {
-    window = ogmrip_main_window_new (OGMRIP_APPLICATION (app));
+    window = ogmrip_main_window_new (OGMRIP_APPLICATION (app), OGMRIP_GUI (app)->priv->manager);
 
     filename = g_file_get_path (files[i]);
     if (!g_file_test (filename, G_FILE_TEST_EXISTS) ||
         !ogmrip_main_window_load_path (OGMRIP_MAIN_WINDOW (window), filename))
       gtk_widget_destroy (window);
     else
-    {
-      g_application_hold (app);
-      g_signal_connect_swapped (window, "destroy",
-          G_CALLBACK (g_application_release), app);
       gtk_window_present (GTK_WINDOW (window));
-    }
     g_free (filename);
   }
 }
@@ -282,9 +300,23 @@ ogmrip_gui_local_cmdline (GApplication *application, gchar ***argv, gint *status
 }
 
 static void
+ogmrip_gui_dispose (GObject *gobject)
+{
+  OGMRipGui *gui = OGMRIP_GUI (gobject);
+
+  g_clear_object (&gui->priv->manager);
+
+  G_OBJECT_CLASS (ogmrip_gui_parent_class)->dispose (gobject);
+}
+
+static void
 ogmrip_gui_class_init (OGMRipGuiClass *klass)
 {
+  GObjectClass *gobject_class;
   GApplicationClass *application_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->dispose = ogmrip_gui_dispose;
 
   application_class = G_APPLICATION_CLASS (klass);
   application_class->local_command_line = ogmrip_gui_local_cmdline;
@@ -294,6 +326,8 @@ static void
 ogmrip_gui_init (OGMRipGui *gui)
 {
   gui->priv = ogmrip_gui_get_instance_private (gui);
+
+  gui->priv->manager = ogmrip_encoding_manager_new ();
 }
 
 GApplication *

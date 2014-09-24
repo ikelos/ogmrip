@@ -76,7 +76,7 @@ fi
 
 dnl **************************************************************
 
-GLIB_REQUIRED=2.36.0
+GLIB_REQUIRED=2.40.0
 
 PKG_CHECK_MODULES(GLIB, [glib-2.0 >= $GLIB_REQUIRED gobject-2.0 >= $GLIB_REQUIRED gmodule-2.0 >= $GLIB_REQUIRED gio-2.0 >= $GLIB_REQUIRED])
 CFLAGS="$CFLAGS $GLIB_CFLAGS"
@@ -115,7 +115,7 @@ AM_CONDITIONAL(HAVE_TIFF_SUPPORT, [test x"$have_tiff_support" = x"yes"])
 
 dnl **************************************************************
 
-GTK_REQUIRED=3.6
+GTK_REQUIRED=3.12
 
 AC_ARG_ENABLE(gtk-support,
   AC_HELP_STRING([--disable-gtk-support], [disable GTK+ support]),
@@ -349,23 +349,6 @@ fi
 
 dnl **************************************************************
 
-AC_ARG_ENABLE(libnotify-support,
-  AC_HELP_STRING([--disable-libnotify-support], [disable libnotify support]),
-  [have_libnotify_support="$enableval"], [have_libnotify_support="yes"])
-
-if test x"$have_libnotify_support" != x"no"; then
-  PKG_CHECK_MODULES(LIBNOTIFY, [libnotify >= 0.7], [have_libnotify_support=yes], [have_libnotify_support=no])
-fi
-
-if test x"$have_libnotify_support" = x"yes"; then
-  AC_DEFINE(HAVE_LIBNOTIFY_SUPPORT, 1, [Define to 1 if libnotify is supported.])
-fi
-
-CFLAGS="$CFLAGS $LIBNOTIFY_CFLAGS"
-LIBS="$LIBS $LIBNOTIFY_LIBS"
-
-dnl **************************************************************
-
 AC_LANG(C)
 
 AC_RUN_IFELSE([AC_LANG_SOURCE([[
@@ -483,12 +466,6 @@ if test x"$have_enchant_support" = xyes; then
   AC_MSG_NOTICE([** Enchant support enabled])
 else
   AC_MSG_NOTICE([   Enchant support disabled])
-fi
-
-if test x"$have_libnotify_support" = xyes; then
-  AC_MSG_NOTICE([** Notify support enabled])
-else
-  AC_MSG_NOTICE([   Notify support disabled])
 fi
 
 if test x"$have_ogm_support" = xyes; then

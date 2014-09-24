@@ -44,47 +44,15 @@ struct _OGMRipProfileManagerDialogPriv
 
   GtkWidget *add_button;
   GtkWidget *remove_button;
-  GtkWidget *import_button;
+  GtkWidget *gear_button;
 
   GtkWidget *name_dialog;
-  GtkTextBuffer *name_buffer;
+  GtkWidget *name_entry;
+  GtkTextBuffer *desc_buffer;
 };
 
-static gboolean
-gtk_widget_button_press_cb (GtkWidget *widget, GdkEventButton *event, GtkWidget *menu)
-{
-  if (event->button != 3 || event->type != GDK_BUTTON_PRESS)
-    return FALSE;
-
-  gtk_menu_popup (GTK_MENU (menu), NULL, NULL, NULL, NULL, event->button, event->time);
-
-  return TRUE;
-}
-
-static gboolean
-gtk_widget_popup_menu_cb (GtkWidget *widget, GtkWidget *menu)
-{
-  gtk_menu_popup (GTK_MENU (menu), NULL, NULL, NULL, NULL, 0, gtk_get_current_event_time ());
-
-  return TRUE;
-}
-
 static void
-gtk_widget_set_popup_menu (GtkWidget *widget, GMenuModel *model)
-{
-  GtkWidget *menu;
-
-  menu = gtk_menu_new_from_model (G_MENU_MODEL (model));
-  gtk_menu_attach_to_widget (GTK_MENU (menu), widget, NULL);
-
-  g_signal_connect (widget, "button-press-event",
-      G_CALLBACK (gtk_widget_button_press_cb), menu);
-  g_signal_connect (widget, "popup-menu",
-      G_CALLBACK (gtk_widget_popup_menu_cb), menu);
-}
-
-static void
-ogmrip_profile_manager_dialog_profile_name_changed (GtkTextBuffer *buffer, GtkWidget *dialog)
+ogmrip_profile_manager_dialog_profile_desc_changed (GtkTextBuffer *buffer, GtkWidget *dialog)
 {
   gtk_dialog_set_response_sensitive (GTK_DIALOG (dialog),
       GTK_RESPONSE_OK, gtk_text_buffer_get_char_count (buffer) > 0);
@@ -105,16 +73,20 @@ ogmrip_profile_manager_dialog_add_activated (GSimpleAction *action, GVariant *pa
   {
     OGMRipProfile *profile;
     GtkTextIter start, end;
-    gchar *name;
+    const gchar *name;
+    gchar *desc;
 
     profile = ogmrip_profile_new (NULL);
     ogmrip_profile_engine_add (dialog->priv->engine, profile);
     g_object_unref (profile);
 
-    gtk_text_buffer_get_bounds (dialog->priv->name_buffer, &start, &end);
-    name = gtk_text_buffer_get_text (dialog->priv->name_buffer, &start, &end, TRUE);
+    name = gtk_entry_get_text (GTK_ENTRY (dialog->priv->name_entry));
     g_settings_set_string (G_SETTINGS (profile), OGMRIP_PROFILE_NAME, name);
-    g_free (name);
+
+    gtk_text_buffer_get_bounds (dialog->priv->desc_buffer, &start, &end);
+    desc = gtk_text_buffer_get_text (dialog->priv->desc_buffer, &start, &end, TRUE);
+    g_settings_set_string (G_SETTINGS (profile), OGMRIP_PROFILE_DESCRIPTION, desc);
+    g_free (desc);
   }
 
   gtk_widget_hide (dialog->priv->name_dialog);
@@ -188,7 +160,7 @@ ogmrip_profile_manager_dialog_copy_activated (GSimpleAction *action, GVariant *p
   if (gtk_tree_selection_get_selected (dialog->priv->selection, &model, &iter))
   {
     OGMRipProfile *profile, *new_profile;
-    gchar *name, *new_name;
+    gchar *name, *desc, *new_name;
 
     profile = ogmrip_profile_store_get_profile (OGMRIP_PROFILE_STORE (model), &iter);
 
@@ -202,6 +174,10 @@ ogmrip_profile_manager_dialog_copy_activated (GSimpleAction *action, GVariant *p
 
     g_settings_set_string (G_SETTINGS (new_profile), OGMRIP_PROFILE_NAME, new_name);
     g_free (new_name);
+
+    desc = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_DESCRIPTION);
+    g_settings_set_string (G_SETTINGS (new_profile), OGMRIP_PROFILE_DESCRIPTION, desc);
+    g_free (desc);
   }
 }
 
@@ -216,36 +192,58 @@ ogmrip_profile_manager_dialog_rename_activated (GSimpleAction *action, GVariant 
   {
     OGMRipProfile *profile;
     GtkWidget *button;
-    gchar *old_name;
+    gchar *old_name, *old_desc;
 
     gtk_window_set_title (GTK_WINDOW (dialog->priv->name_dialog), _("Rename profile"));
 
     button = gtk_dialog_get_widget_for_response (GTK_DIALOG (dialog->priv->name_dialog), GTK_RESPONSE_OK);
-    gtk_button_set_label (GTK_BUTTON (button), _("_Rename"));
+    gtk_button_set_label (GTK_BUTTON (button), _("Re_name"));
+    gtk_button_set_use_underline (GTK_BUTTON (button), TRUE);
 
     profile = ogmrip_profile_store_get_profile (OGMRIP_PROFILE_STORE (model), &iter);
 
     old_name = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_NAME);
-    gtk_text_buffer_set_text (dialog->priv->name_buffer, old_name, -1);
+    gtk_entry_set_text (GTK_ENTRY (dialog->priv->name_entry), old_name);
+
+    old_desc = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_DESCRIPTION);
+    gtk_text_buffer_set_text (dialog->priv->desc_buffer, old_desc, -1);
 
     if (gtk_dialog_run (GTK_DIALOG (dialog->priv->name_dialog)) == GTK_RESPONSE_OK)
     {
       GtkTextIter start, end;
-      gchar *new_name;
+      const gchar *new_name;
+      gchar *new_desc;
 
-      gtk_text_buffer_get_bounds (dialog->priv->name_buffer, &start, &end);
-      new_name = gtk_text_buffer_get_text (dialog->priv->name_buffer, &start, &end, TRUE);
+      new_name = gtk_entry_get_text (GTK_ENTRY (dialog->priv->name_entry));
 
       if (new_name && !g_str_equal (new_name, old_name))
         g_settings_set_string (G_SETTINGS (profile), OGMRIP_PROFILE_NAME, new_name);
 
-      g_free (new_name);
+      gtk_text_buffer_get_bounds (dialog->priv->desc_buffer, &start, &end);
+      new_desc = gtk_text_buffer_get_text (dialog->priv->desc_buffer, &start, &end, TRUE);
+
+      if (new_desc && !g_str_equal (new_desc, old_desc))
+        g_settings_set_string (G_SETTINGS (profile), OGMRIP_PROFILE_DESCRIPTION, new_desc);
+
+      g_free (new_desc);
     }
 
     g_free (old_name);
+    g_free (old_desc);
 
     gtk_widget_hide (dialog->priv->name_dialog);
   }
+}
+
+static void
+ogmrip_profile_manager_dialog_reset_activated (GSimpleAction *action, GVariant *parameter, gpointer data)
+{
+  OGMRipProfileManagerDialog *dialog = data;
+  GtkTreeModel *model;
+  GtkTreeIter iter;
+
+  if (gtk_tree_selection_get_selected (dialog->priv->selection, &model, &iter))
+    ogmrip_profile_reset (ogmrip_profile_store_get_profile (OGMRIP_PROFILE_STORE (model), &iter));
 }
 
 static void
@@ -335,6 +333,13 @@ ogmrip_profile_manager_dialog_export_activated (GSimpleAction *action, GVariant 
 }
 
 static void
+ogmrip_encoding_manager_dialog_selection_changed_cb (OGMRipProfileManagerDialog *dialog)
+{
+  gtk_widget_set_sensitive (dialog->priv->gear_button,
+      gtk_tree_selection_count_selected_rows (dialog->priv->selection) > 0);
+}
+
+static void
 ogmrip_profile_manager_dialog_row_activated (OGMRipProfileManagerDialog *dialog)
 {
   ogmrip_profile_manager_dialog_edit_activated (NULL, NULL, dialog);
@@ -347,11 +352,7 @@ ogmrip_profile_manager_dialog_dispose (GObject *gobject)
 {
   OGMRipProfileManagerDialog *dialog = OGMRIP_PROFILE_MANAGER_DIALOG (gobject);
 
-  if (dialog->priv->engine)
-  {
-    g_object_unref (dialog->priv->engine);
-    dialog->priv->engine = NULL;
-  }
+  g_clear_object (&dialog->priv->engine);
 
   G_OBJECT_CLASS (ogmrip_profile_manager_dialog_parent_class)->dispose (gobject);
 }
@@ -370,9 +371,10 @@ ogmrip_profile_manager_dialog_class_init (OGMRipProfileManagerDialogClass *klass
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipProfileManagerDialog, profile_swin);
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipProfileManagerDialog, add_button);
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipProfileManagerDialog, remove_button);
-  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipProfileManagerDialog, import_button);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipProfileManagerDialog, gear_button);
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipProfileManagerDialog, name_dialog);
-  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipProfileManagerDialog, name_buffer);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipProfileManagerDialog, name_entry);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipProfileManagerDialog, desc_buffer);
 }
 
 static GActionEntry entries[] =
@@ -383,7 +385,8 @@ static GActionEntry entries[] =
   { "copy",   ogmrip_profile_manager_dialog_copy_activated,   NULL, NULL, NULL },
   { "import", ogmrip_profile_manager_dialog_import_activated, NULL, NULL, NULL },
   { "export", ogmrip_profile_manager_dialog_export_activated, NULL, NULL, NULL },
-  { "rename", ogmrip_profile_manager_dialog_rename_activated, NULL, NULL, NULL }
+  { "rename", ogmrip_profile_manager_dialog_rename_activated, NULL, NULL, NULL },
+  { "reset",  ogmrip_profile_manager_dialog_reset_activated,  NULL, NULL, NULL }
 };
 
 static void
@@ -391,12 +394,17 @@ ogmrip_profile_manager_dialog_init (OGMRipProfileManagerDialog *dialog)
 {
   GtkStyleContext *context;
   GSimpleActionGroup *group;
+  GAction *action;
+
   GtkBuilder *builder;
   GObject *model;
 
   gtk_widget_init_template (GTK_WIDGET (dialog));
 
   dialog->priv = ogmrip_profile_manager_dialog_get_instance_private (dialog);
+
+  gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
+  gtk_dialog_set_default_response (GTK_DIALOG (dialog->priv->name_dialog), GTK_RESPONSE_OK);
 
   dialog->priv->engine = ogmrip_profile_engine_get_default ();
   g_object_ref (dialog->priv->engine);
@@ -414,6 +422,9 @@ ogmrip_profile_manager_dialog_init (OGMRipProfileManagerDialog *dialog)
 
   dialog->priv->selection = gtk_tree_view_get_selection (GTK_TREE_VIEW (dialog->priv->profile_view));
 
+  g_signal_connect_swapped (dialog->priv->selection, "changed",
+      G_CALLBACK (ogmrip_encoding_manager_dialog_selection_changed_cb), dialog);
+
   g_signal_connect_swapped (dialog->priv->profile_view, "row-activated",
       G_CALLBACK (ogmrip_profile_manager_dialog_row_activated), dialog);
 
@@ -427,21 +438,23 @@ ogmrip_profile_manager_dialog_init (OGMRipProfileManagerDialog *dialog)
   builder = gtk_builder_new_from_resource (OGMRIP_MENU_RES);
 
   model = gtk_builder_get_object (builder, "menu");
-  gtk_widget_set_popup_menu (dialog->priv->profile_view, G_MENU_MODEL (model));
+  gtk_menu_button_set_menu_model (GTK_MENU_BUTTON (dialog->priv->gear_button), G_MENU_MODEL (model));
 
   g_object_unref (builder);
 
   gtk_actionable_set_action_name (GTK_ACTIONABLE (dialog->priv->add_button),    "profile.add");
   gtk_actionable_set_action_name (GTK_ACTIONABLE (dialog->priv->remove_button), "profile.remove");
-  gtk_actionable_set_action_name (GTK_ACTIONABLE (dialog->priv->import_button), "profile.import");
 
-  g_signal_connect (dialog->priv->name_buffer, "changed",
-      G_CALLBACK (ogmrip_profile_manager_dialog_profile_name_changed), dialog->priv->name_dialog);
+  action = g_action_map_lookup_action (G_ACTION_MAP (group), "remove");
+  g_object_bind_property (dialog->priv->gear_button, "sensitive", action, "enabled", G_BINDING_SYNC_CREATE);
+
+  g_signal_connect (dialog->priv->desc_buffer, "changed",
+      G_CALLBACK (ogmrip_profile_manager_dialog_profile_desc_changed), dialog->priv->name_dialog);
 }
 
 GtkWidget *
 ogmrip_profile_manager_dialog_new (void)
 {
-  return g_object_new (OGMRIP_TYPE_PROFILE_MANAGER_DIALOG, NULL);
+  return g_object_new (OGMRIP_TYPE_PROFILE_MANAGER_DIALOG, "use-header-bar", TRUE, NULL);
 }
 

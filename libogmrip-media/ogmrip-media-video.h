@@ -34,23 +34,26 @@ struct _OGMRipVideoStreamInterface
 {
   GTypeInterface base_iface;
 
-  void         (* get_aspect_ratio) (OGMRipVideoStream   *video,
-                                     guint               *numerator,
-                                     guint               *denominator);
-  gint         (* get_bitrate)      (OGMRipVideoStream   *video);
-  void         (* get_crop_size)    (OGMRipVideoStream   *video,
-                                     guint               *x,
-                                     guint               *y,
-                                     guint               *width,
-                                     guint               *height);
-  void         (* get_framerate)    (OGMRipVideoStream   *video,
-                                     guint               *numerator,
-                                     guint               *denominator);
-  void         (* get_resolution)   (OGMRipVideoStream   *video,
-                                     guint               *width,
-                                     guint               *height);
-  gint         (* get_standard)     (OGMRipVideoStream   *video);
-  gint         (* get_start_delay)  (OGMRipVideoStream   *video);
+  void     (* get_aspect_ratio) (OGMRipVideoStream   *video,
+                                 guint               *numerator,
+                                 guint               *denominator);
+  gint     (* get_bitrate)      (OGMRipVideoStream   *video);
+  void     (* get_crop_size)    (OGMRipVideoStream   *video,
+                                 guint               *x,
+                                 guint               *y,
+                                 guint               *width,
+                                 guint               *height);
+  void     (* get_framerate)    (OGMRipVideoStream   *video,
+                                 guint               *numerator,
+                                 guint               *denominator);
+  void     (* get_resolution)   (OGMRipVideoStream   *video,
+                                 guint               *width,
+                                 guint               *height);
+  gint     (* get_standard)     (OGMRipVideoStream   *video);
+  gint     (* get_start_delay)  (OGMRipVideoStream   *video);
+  gboolean (* get_progressive)  (OGMRipVideoStream   *video);
+  gboolean (* get_telecine)     (OGMRipVideoStream   *video);
+  gboolean (* get_interlaced)   (OGMRipVideoStream   *video);
 };
 
 GType        ogmrip_video_stream_get_type         (void) G_GNUC_CONST;
@@ -71,6 +74,9 @@ void         ogmrip_video_stream_get_resolution   (OGMRipVideoStream   *video,
                                                    guint               *height);
 gint         ogmrip_video_stream_get_standard     (OGMRipVideoStream   *video);
 gint         ogmrip_video_stream_get_start_delay  (OGMRipVideoStream   *video);
+gboolean     ogmrip_video_stream_get_progressive  (OGMRipVideoStream   *video);
+gboolean     ogmrip_video_stream_get_telecine     (OGMRipVideoStream   *video);
+gboolean     ogmrip_video_stream_get_interlaced   (OGMRipVideoStream   *video);
 gboolean     ogmrip_video_stream_equal            (OGMRipVideoStream   *video1,
                                                    OGMRipVideoStream   *video2);
 

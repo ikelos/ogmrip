@@ -75,8 +75,6 @@ ogmrip_subp_file_chooser_dialog_constructed (GObject *gobject)
   gtk_dialog_add_buttons (GTK_DIALOG (dialog),
       _("_Cancel"), GTK_RESPONSE_REJECT, _("_Open"), GTK_RESPONSE_ACCEPT, NULL);
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_ACCEPT);
-  gtk_dialog_set_alternative_button_order (GTK_DIALOG (dialog),
-      GTK_RESPONSE_ACCEPT, GTK_RESPONSE_REJECT, -1);
   gtk_window_set_title (GTK_WINDOW (dialog), _("Select a subtitles file"));
 
   filter = gtk_file_filter_new ();

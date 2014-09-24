@@ -24,7 +24,6 @@
 #include "ogmrip-helper.h"
 
 #include <ogmrip-job.h>
-#include <ogmrip-mplayer.h>
 
 #include <glib/gi18n.h>
 #include <glib/gstdio.h>
@@ -247,17 +246,8 @@ ogmrip_crop_dialog_dispose (GObject *gobject)
 {
   OGMRipCropDialog *dialog = OGMRIP_CROP_DIALOG (gobject);
 
-  if (dialog->priv->title)
-  {
-    g_object_unref (dialog->priv->title);
-    dialog->priv->title = NULL;
-  }
-
-  if (dialog->priv->pixbuf)
-  {
-    g_object_unref (dialog->priv->pixbuf);
-    dialog->priv->pixbuf = NULL;
-  }
+  g_clear_object (&dialog->priv->title);
+  g_clear_object (&dialog->priv->pixbuf);
 
   G_OBJECT_CLASS (ogmrip_crop_dialog_parent_class)->dispose (gobject);
 }
@@ -306,9 +296,11 @@ ogmrip_crop_dialog_class_init (OGMRipCropDialogClass *klass)
 static void
 ogmrip_crop_dialog_init (OGMRipCropDialog *dialog)
 {
+  gtk_widget_init_template (GTK_WIDGET (dialog));
+
   dialog->priv = ogmrip_crop_dialog_get_instance_private (dialog);
 
-  gtk_widget_init_template (GTK_WIDGET (dialog));
+  gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_OK);
 
   g_signal_connect_swapped (dialog->priv->left_spin, "value-changed",
       G_CALLBACK (ogmrip_crop_dialog_spin_value_changed), dialog);
@@ -347,7 +339,7 @@ g_initable_iface_init (GInitableIface *iface)
 GtkWidget *
 ogmrip_crop_dialog_new (OGMRipTitle *title, guint left, guint top, guint right, guint bottom)
 {
-  return g_object_new (OGMRIP_TYPE_CROP_DIALOG, "title", title,
+return g_object_new (OGMRIP_TYPE_CROP_DIALOG, "use-header-bar", TRUE, "title", title,
       "crop-left", left, "crop-top", top, "crop-right", right, "crop-bottom", bottom, NULL);
 }
 

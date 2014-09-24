@@ -446,11 +446,7 @@ ogmrip_x264_dialog_dispose (GObject *gobject)
 {
   OGMRipX264Dialog *dialog = OGMRIP_X264_DIALOG (gobject);
 
-  if (dialog->profile)
-  {
-    g_object_unref (dialog->profile);
-    dialog->profile = NULL;
-  }
+  g_clear_object (&dialog->profile);
 
   G_OBJECT_CLASS (ogmrip_x264_dialog_parent_class)->dispose (gobject);
 }

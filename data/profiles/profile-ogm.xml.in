@@ -1,5 +1,6 @@
 <profile name="default-ogm" version="(1,0)">
-  <key name="name">'&lt;b&gt;PC, Low Quality&lt;/b&gt;&#xA;1-pass, 1x700MB (OGM + Lavc + Vorbis)'</key>
+  <key name="name">'PC, Low Quality'</key>
+  <key name="description">'1-pass, 1x700MB (OGM + Lavc + Vorbis)'</key>
   <section name="general">
     <key name="container">'ogm'</key>
     <key name="ensure-sync">false</key>

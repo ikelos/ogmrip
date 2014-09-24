@@ -1,4 +1,4 @@
-/* OGMRipMplayer - A library around mplayer/mencoder for OGMRip
+/* OGMRipMedia - A media library for OGMRip
  * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -16,25 +16,18 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-/**
- * SECTION:ogmrip-player
- * @title: OGMRipPlayer
- * @short_description: Simple video player
- * @include: ogmrip-player.h
- */
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
 
-#include "ogmrip-mplayer-player.h"
-#include "ogmrip-mplayer-version.h"
-#include "ogmrip-mplayer-commands.h"
+#include "ogmrip-media-player.h"
+#include "ogmrip-media-object.h"
+#include "ogmrip-media-title.h"
+#include "ogmrip-media-stream.h"
+#include "ogmrip-media-audio.h"
+#include "ogmrip-media-subp.h"
 
 #include <unistd.h>
-
-#define OGMRIP_PLAYER_GET_PRIVATE(o) \
-    (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_PLAYER, OGMRipPlayerPriv))
 
 struct _OGMRipPlayerPriv
 {
@@ -58,35 +51,32 @@ enum
   LAST_SIGNAL
 };
 
-static void ogmrip_player_dispose (GObject *gobject);
-
 static guint signals[LAST_SIGNAL] = { 0 };
-/*
-static gint
-ogmrip_mplayer_map_audio_id (OGMRipStream *astream)
+
+static void
+ogmrip_mplayer_set_input (OGMRipTitle *title, GPtrArray *argv)
 {
-  gint aid;
+  const gchar *uri;
 
-  aid = ogmrip_stream_get_id (astream);
-
-  switch (ogmrip_stream_get_format (astream))
+  uri = ogmrip_media_get_uri (ogmrip_title_get_media (title));
+  if (g_str_has_prefix (uri, "file://"))
+    g_ptr_array_add (argv, g_strdup (uri + 7));
+  else if (g_str_has_prefix (uri, "dvd://"))
   {
-    case OGMRIP_FORMAT_AC3:
-      aid += 128;
-      break;
-    case OGMRIP_FORMAT_DTS:
-      aid += 136;
-      break;
-    case OGMRIP_FORMAT_PCM:
-      aid += 160;
-      break;
-    default:
-      break;
+    g_ptr_array_add (argv, g_strdup ("-dvd-device"));
+    g_ptr_array_add (argv, g_strdup (uri + 6));
+    g_ptr_array_add (argv, g_strdup_printf ("dvd://%d", ogmrip_title_get_id (title) + 1));
   }
-
-  return aid;
+  else if (g_str_has_prefix (uri, "br://"))
+  {
+    g_ptr_array_add (argv, g_strdup ("-bluray-device"));
+    g_ptr_array_add (argv, g_strdup (uri + 5));
+    g_ptr_array_add (argv, g_strdup_printf ("br://%d", ogmrip_title_get_id (title) + 1));
+  }
+  else
+    g_warning ("Unknown scheme for '%s'", uri);
 }
-*/
+
 static gchar **
 ogmrip_mplayer_play_command (OGMRipPlayer *player)
 {
@@ -149,14 +139,28 @@ ogmrip_mplayer_play_command (OGMRipPlayer *player)
       g_ptr_array_add (argv, g_strdup_printf ("%d", player->priv->start_chap + 1));
   }
 
-  ogmrip_mplayer_set_input (argv, player->priv->title, 0);
+  ogmrip_mplayer_set_input (player->priv->title, argv);
 
   g_ptr_array_add (argv, NULL);
 
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
-G_DEFINE_TYPE (OGMRipPlayer, ogmrip_player, G_TYPE_OBJECT)
+G_DEFINE_TYPE_WITH_PRIVATE (OGMRipPlayer, ogmrip_player, G_TYPE_OBJECT)
+
+static void
+ogmrip_player_dispose (GObject *gobject)
+{
+  OGMRipPlayer *player;
+
+  player = OGMRIP_PLAYER (gobject);
+
+  g_clear_object (&player->priv->title);
+  g_clear_object (&player->priv->astream);
+  g_clear_object (&player->priv->sstream);
+
+  G_OBJECT_CLASS (ogmrip_player_parent_class)->dispose (gobject);
+}
 
 static void
 ogmrip_player_class_init (OGMRipPlayerClass *klass)
@@ -190,45 +194,15 @@ ogmrip_player_class_init (OGMRipPlayerClass *klass)
       G_STRUCT_OFFSET (OGMRipPlayerClass, stop), NULL, NULL,
       g_cclosure_marshal_VOID__VOID,
       G_TYPE_NONE, 0);
-
-  g_type_class_add_private (klass, sizeof (OGMRipPlayerPriv));
 }
 
 static void
 ogmrip_player_init (OGMRipPlayer *player)
 {
-  player->priv = OGMRIP_PLAYER_GET_PRIVATE (player);
+  player->priv = ogmrip_player_get_instance_private (player);
 
   player->priv->start_chap = 0;
   player->priv->end_chap = -1;
-}
-
-static void
-ogmrip_player_dispose (GObject *gobject)
-{
-  OGMRipPlayer *player;
-
-  player = OGMRIP_PLAYER (gobject);
-
-  if (player->priv->title)
-  {
-    g_object_unref (player->priv->title);
-    player->priv->title = NULL;
-  }
-
-  if (player->priv->astream)
-  {
-    g_object_unref (player->priv->astream);
-    player->priv->astream = NULL;
-  }
-
-  if (player->priv->sstream)
-  {
-    g_object_unref (player->priv->sstream);
-    player->priv->sstream = NULL;
-  }
-
-  G_OBJECT_CLASS (ogmrip_player_parent_class)->dispose (gobject);
 }
 
 /**

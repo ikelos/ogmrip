@@ -153,6 +153,7 @@ ogmrip_pref_dialog_init (OGMRipPrefDialog *dialog)
 
   dialog->priv = ogmrip_pref_dialog_get_instance_private (dialog);
 
+  gtk_container_set_border_width (GTK_CONTAINER (dialog), 0);
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
 
   model = gtk_combo_box_get_model (GTK_COMBO_BOX (dialog->priv->audio_lang_chooser));
@@ -223,6 +224,6 @@ ogmrip_pref_dialog_init (OGMRipPrefDialog *dialog)
 GtkWidget *
 ogmrip_pref_dialog_new (void)
 {
-  return g_object_new (OGMRIP_TYPE_PREF_DIALOG, NULL);
+  return g_object_new (OGMRIP_TYPE_PREF_DIALOG, "use-header-bar", TRUE, NULL);
 }
 

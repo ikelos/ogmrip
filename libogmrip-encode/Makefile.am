@@ -50,6 +50,7 @@ libogmrip_encode_la_HEADERS = \
   ogmrip-profile-engine.h   \
   ogmrip-profile-keys.h     \
   ogmrip-profile-parser.h   \
+  ogmrip-stub.h             \
   ogmrip-subp-codec.h       \
   ogmrip-test.h             \
   ogmrip-version.h          \
@@ -75,7 +76,6 @@ ogmrip-marshal.c: ogmrip-marshal.list $(GLIB_GENMARSHAL)
 
 EXTRA_DIST = \
   ogmrip-marshal.list \
-  ogmrip-stub.h       \
   ogmrip-version.h.in
 
 libogmrip_encode_la_CPPFLAGS = \

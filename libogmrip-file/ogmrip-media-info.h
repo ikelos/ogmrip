@@ -30,14 +30,14 @@ G_BEGIN_DECLS
 #define OGMRIP_IS_MEDIA_INFO_CLASS(obj) (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_MEDIA_INFO))
 
 typedef struct _OGMRipMediaInfo      OGMRipMediaInfo;
-typedef struct _OGMRipMediaInfoPriv  OGMRipMediaInfoPriv;
 typedef struct _OGMRipMediaInfoClass OGMRipMediaInfoClass;
+typedef struct _OGMRipMediaInfoPriv  OGMRipMediaInfoPrivate;
 
 struct _OGMRipMediaInfo
 {
   GObject parent_instance;
 
-  OGMRipMediaInfoPriv *priv;
+  OGMRipMediaInfoPrivate *priv;
 };
 
 struct _OGMRipMediaInfoClass
@@ -65,6 +65,10 @@ const gchar *     ogmrip_media_info_get         (OGMRipMediaInfo    *info,
                                                  OGMRipCategoryType category,
                                                  guint              stream,
                                                  const gchar        *name);
+const gchar *     ogmrip_media_info_geti        (OGMRipMediaInfo    *info,
+                                                 OGMRipCategoryType category,
+                                                 guint              stream,
+                                                 guint              param);
 
 G_END_DECLS
 

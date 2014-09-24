@@ -33,7 +33,7 @@ G_BEGIN_DECLS
 #define OGMJOB_IS_SPAWN_CLASS(obj) (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMJOB_TYPE_SPAWN))
 
 typedef struct _OGMJobSpawn      OGMJobSpawn;
-typedef struct _OGMJobSpawnPriv  OGMJobSpawnPriv;
+typedef struct _OGMJobSpawnPriv  OGMJobSpawnPrivate;
 typedef struct _OGMJobSpawnClass OGMJobSpawnClass;
 
 /**
@@ -52,11 +52,17 @@ typedef gboolean (* OGMJobWatch) (OGMJobSpawn *spawn,
                                   gpointer    data,
                                   GError      **error);
 
+typedef enum
+{
+  OGMJOB_STREAM_OUTPUT,
+  OGMJOB_STREAM_ERROR
+} OGMJobStream;
+
 struct _OGMJobSpawn
 {
   OGMJobTask parent_instance;
 
-  OGMJobSpawnPriv *priv;
+  OGMJobSpawnPrivate *priv;
 };
 
 struct _OGMJobSpawnClass
@@ -64,16 +70,15 @@ struct _OGMJobSpawnClass
   OGMJobTaskClass parent_class;
 };
 
-GType        ogmjob_spawn_get_type         (void);
-OGMJobTask * ogmjob_spawn_new              (const gchar *command_line);
-OGMJobTask * ogmjob_spawn_newv             (gchar       **argv);
-gint         ogmjob_spawn_get_status       (OGMJobSpawn *spawn);
-void         ogmjob_spawn_set_watch_stdout (OGMJobSpawn *spawn,
-                                            OGMJobWatch watch_func,
-                                            gpointer    watch_data);
-void         ogmjob_spawn_set_watch_stderr (OGMJobSpawn *spawn,
-                                            OGMJobWatch watch_func,
-                                            gpointer    watch_data);
+GType        ogmjob_spawn_get_type   (void);
+OGMJobTask * ogmjob_spawn_new        (const gchar    *command_line);
+OGMJobTask * ogmjob_spawn_newv       (gchar          **argv);
+gint         ogmjob_spawn_get_status (OGMJobSpawn    *spawn);
+void         ogmjob_spawn_set_watch  (OGMJobSpawn    *spawn,
+                                      OGMJobStream   stream,
+                                      OGMJobWatch    func,
+                                      gpointer       data,
+                                      GDestroyNotify notify);
 
 G_END_DECLS
 

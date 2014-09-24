@@ -172,6 +172,7 @@ ogmrip_profile_dump (OGMRipProfile *profile, OGMRipXML *xml, GError **error)
   g_variant_unref (variant);
 
   ogmrip_profile_dump_key (G_SETTINGS (profile), xml, OGMRIP_PROFILE_NAME);
+  ogmrip_profile_dump_key (G_SETTINGS (profile), xml, OGMRIP_PROFILE_DESCRIPTION);
 
   ogmrip_profile_dump_section (profile, xml, OGMRIP_PROFILE_GENERAL);
 

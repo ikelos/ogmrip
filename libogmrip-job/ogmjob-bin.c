@@ -30,7 +30,7 @@ struct _OGMJobBinPriv
   OGMJobTask *child;
 };
 
-G_DEFINE_ABSTRACT_TYPE (OGMJobBin, ogmjob_bin, OGMJOB_TYPE_CONTAINER)
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (OGMJobBin, ogmjob_bin, OGMJOB_TYPE_CONTAINER)
 
 static void
 ogmjob_bin_run_async (OGMJobTask *task, GCancellable *cancellable, GAsyncReadyCallback callback, gpointer user_data)
@@ -124,14 +124,12 @@ ogmjob_bin_class_init (OGMJobBinClass *klass)
   container_class->add = ogmjob_bin_add;
   container_class->remove = ogmjob_bin_remove;
   container_class->forall = ogmjob_bin_forall;
-
-  g_type_class_add_private (klass, sizeof (OGMJobBinPriv));
 }
 
 static void
 ogmjob_bin_init (OGMJobBin *bin)
 {
-  bin->priv = G_TYPE_INSTANCE_GET_PRIVATE (bin, OGMJOB_TYPE_BIN, OGMJobBinPriv);
+  bin->priv = ogmjob_bin_get_instance_private (bin);
 }
 
 /**

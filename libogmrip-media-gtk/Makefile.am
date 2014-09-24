@@ -38,7 +38,32 @@ libogmrip_media_gtk_la_LIBADD = \
   $(top_builddir)/libogmrip-base/libogmrip-base.la \
   $(top_builddir)/libogmrip-media/libogmrip-media.la
 
+resourcefiles = \
+  ogmrip-media.gresource.xml
+
+ogmrip_RESOURCES = \
+  $(resourcefiles:.gresource.xml=-gresource.c)
+
+libogmrip_media_gtk_la_SOURCES += \
+  $(ogmrip_RESOURCES)
+
+BUILT_SOURCES = \
+  $(ogmrip_RESOURCES)
+
+ui_FILES = \
+  ogmrip-media-chooser-dialog.ui
+
+ogmrip-media-gresource.c: ogmrip-media.gresource.xml $(ui_FILES) $(GLIB_COMPILE_RESOURCES)
+	$(GLIB_COMPILE_RESOURCES) --sourcedir=$(top_srcdir)/libogmrip-media-gtk --generate-source --target=$@ $<
+
 libogmrip_media_gtk_la_CPPFLAGS = \
   -I$(top_srcdir)/libogmrip-base \
   -I$(top_srcdir)/libogmrip-media
+
+CLEANFILES = \
+  $(BUILT_SOURCES)
+
+EXTRA_DIST =  \
+  $(ui_FILES) \
+  $(resourcefiles)
 

@@ -31,13 +31,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipCli      OGMRipCli;
 typedef struct _OGMRipCliClass OGMRipCliClass;
-typedef struct _OGMRipCliPriv  OGMRipCliPriv;
+typedef struct _OGMRipCliPriv  OGMRipCliPrivate;
 
 struct _OGMRipCli
 {
   GApplication parent_instance;
 
-  OGMRipCliPriv *priv;
+  OGMRipCliPrivate *priv;
 };
 
 struct _OGMRipCliClass

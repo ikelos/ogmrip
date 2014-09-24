@@ -131,11 +131,7 @@ ogmrip_list_item_dispose (GObject *gobject)
 {
   OGMRipListItem *item = OGMRIP_LIST_ITEM (gobject);
 
-  if (item->priv->group)
-  {
-    g_object_unref (item->priv->group);
-    item->priv->group = NULL;
-  }
+  g_clear_object (&item->priv->group);
 
   G_OBJECT_CLASS (ogmrip_list_item_parent_class)->dispose (gobject);
 }

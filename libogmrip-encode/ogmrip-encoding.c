@@ -243,19 +243,10 @@ ogmrip_encoding_dispose (GObject *gobject)
 
   ogmrip_encoding_clear (encoding);
 
-  if (encoding->priv->title)
-  {
-    g_object_unref (encoding->priv->title);
-    encoding->priv->title = NULL;
-  }
+  g_clear_object (&encoding->priv->title);
+  g_clear_object (&encoding->priv->media);
 
-  if (encoding->priv->media)
-  {
-    g_object_unref (encoding->priv->media);
-    encoding->priv->media = NULL;
-  }
-
-  (*G_OBJECT_CLASS (ogmrip_encoding_parent_class)->dispose) (gobject);
+  G_OBJECT_CLASS (ogmrip_encoding_parent_class)->dispose (gobject);
 }
 
 static void
@@ -1374,9 +1365,6 @@ ogmrip_encoding_get_audio_overhead (OGMRipEncoding *encoding, OGMRipAudioCodec *
   output = ogmrip_codec_get_output (OGMRIP_CODEC (codec));
   samples_per_frame = ogmrip_audio_stream_get_samples_per_frame (OGMRIP_AUDIO_STREAM (output));
 
-  sample_rate = 48000;
-  channels = 1;
-
   if (ogmrip_codec_format (G_OBJECT_TYPE (codec)) == OGMRIP_FORMAT_COPY)
   {
     OGMRipStream *stream;
@@ -1751,12 +1739,17 @@ ogmrip_encoding_analyze (OGMRipEncoding *encoding, GCancellable *cancellable, GE
 
   if (result)
   {
-    ogmrip_log_printf ("\nTelecine: %s\n",
-        ogmrip_title_get_telecine (encoding->priv->title) ? "true" : "false");
-    ogmrip_log_printf ("Progressive: %s\n",
-        ogmrip_title_get_progressive (encoding->priv->title) ? "true" : "false");
-    ogmrip_log_printf ("Interlaced: %s\n\n",
-        ogmrip_title_get_interlaced (encoding->priv->title) ? "true" : "false");
+    OGMRipVideoStream *stream = ogmrip_title_get_video_stream (encoding->priv->title);
+
+    if (stream)
+    {
+      ogmrip_log_printf ("\nTelecine: %s\n",
+          ogmrip_video_stream_get_telecine (stream) ? "true" : "false");
+      ogmrip_log_printf ("Progressive: %s\n",
+          ogmrip_video_stream_get_progressive (stream) ? "true" : "false");
+      ogmrip_log_printf ("Interlaced: %s\n\n",
+          ogmrip_video_stream_get_interlaced (stream) ? "true" : "false");
+    }
   }
 
   return result;
@@ -1944,7 +1937,7 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GCancellable *cancellable, GEr
   }
 
   /*
-   * Extract all subtitles except harsubed ones
+   * Extract all subtitles except hardsubed ones
    */
   for (link = encoding->priv->subp_codecs; link; link = link->next)
   {
@@ -2095,32 +2088,17 @@ void
 ogmrip_encoding_clean (OGMRipEncoding *encoding, gboolean temporary, gboolean copy, gboolean log)
 {
   g_return_if_fail (OGMRIP_IS_ENCODING (encoding));
-/*
+
   if (temporary)
   {
-    OGMRipCodec *codec;
-    GList *list, *link;
+    if (encoding->priv->video_codec)
+      ogmrip_codec_clean (OGMRIP_CODEC (encoding->priv->video_codec));
 
-    codec = ogmrip_encoding_get_video_codec (encoding);
-    if (codec)
-      ogmrip_file_delete (ogmrip_codec_get_output (codec), NULL);
-
-    list = ogmrip_encoding_get_audio_codecs (encoding);
-    for (link = list; link; link = link->next)
-      ogmrip_file_delete (ogmrip_codec_get_output (link->data), NULL);
-    g_list_free (list);
-
-    list = ogmrip_encoding_get_subp_codecs (encoding);
-    for (link = list; link; link = link->next)
-      ogmrip_file_delete (ogmrip_codec_get_output (link->data), NULL);
-    g_list_free (list);
-
-    list = ogmrip_encoding_get_chapters (encoding);
-    for (link = list; link; link = link->next)
-      ogmrip_file_delete (ogmrip_codec_get_output (link->data), NULL);
-    g_list_free (list);
+    g_list_foreach (encoding->priv->audio_codecs, (GFunc) ogmrip_codec_clean, NULL);
+    g_list_foreach (encoding->priv->subp_codecs, (GFunc) ogmrip_codec_clean, NULL);
+    g_list_foreach (encoding->priv->chapters, (GFunc) ogmrip_codec_clean, NULL);
   }
-*/
+
   if (copy && encoding->priv->copy)
   {
     const gchar *uri;

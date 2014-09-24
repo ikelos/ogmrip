@@ -39,18 +39,21 @@ enum
 {
   PROP_0,
   PROP_STATE,
-  PROP_PROGRESS
+  PROP_PROGRESS,
+  LAST_PROP
 };
+
+static GParamSpec *props[LAST_PROP] = { NULL, };
 
 static void
 ogmjob_task_set_state (OGMJobTask *task, OGMJobState state)
 {
   task->priv->state = state;
 
-  g_object_notify (G_OBJECT (task), "state");
+  g_object_notify_by_pspec (G_OBJECT (task), props[PROP_STATE]);
 }
 
-G_DEFINE_ABSTRACT_TYPE (OGMJobTask, ogmjob_task, G_TYPE_OBJECT)
+G_DEFINE_ABSTRACT_TYPE_WITH_PRIVATE (OGMJobTask, ogmjob_task, G_TYPE_OBJECT)
 
 static void
 ogmjob_task_finalize (GObject *gobject)
@@ -138,22 +141,30 @@ ogmjob_task_class_init (OGMJobTaskClass *klass)
   klass->run_async = ogmjob_task_real_run_async;
   klass->run_finish = ogmjob_task_real_run_finish;
 
-  g_object_class_install_property (gobject_class, PROP_STATE,
-      g_param_spec_uint ("state", "State", "The state of the task",
-        OGMJOB_STATE_IDLE, OGMJOB_STATE_SUSPENDED, OGMJOB_STATE_RUNNING,
-        G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+  props[PROP_STATE] =
+    g_param_spec_uint ("state",
+                       "State",
+                       "The state of the task",
+                       OGMJOB_STATE_IDLE,
+                       OGMJOB_STATE_SUSPENDED,
+                       OGMJOB_STATE_RUNNING,
+                       G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
 
-  g_object_class_install_property (gobject_class, PROP_PROGRESS,
-      g_param_spec_double ("progress", "Progress", "The fraction of total work that has been completed",
-        0.0, 1.0, 0.0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+  props[PROP_PROGRESS] =
+    g_param_spec_double ("progress",
+                         "Progress", "The fraction of total work that has been completed",
+                         0.0,
+                         1.0,
+                         0.0,
+                         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
 
-  g_type_class_add_private (klass, sizeof (OGMJobTaskPriv));
+  g_object_class_install_properties (gobject_class, LAST_PROP, props);
 }
 
 static void
 ogmjob_task_init (OGMJobTask *task)
 {
-  task->priv = G_TYPE_INSTANCE_GET_PRIVATE (task, OGMJOB_TYPE_TASK, OGMJobTaskPriv);
+  task->priv = ogmjob_task_get_instance_private (task);
 }
 
 void
@@ -268,8 +279,11 @@ ogmjob_task_set_progress (OGMJobTask *task, gdouble progress)
 {
   g_return_if_fail (OGMJOB_IS_TASK (task));
 
-  task->priv->progress = progress;
+  if (progress > task->priv->progress)
+  {
+    task->priv->progress = progress;
 
-  g_object_notify (G_OBJECT (task), "progress");
+    g_object_notify_by_pspec (G_OBJECT (task), props[PROP_PROGRESS]);
+  }
 }
 

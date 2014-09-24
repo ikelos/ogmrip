@@ -32,13 +32,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipFile      OGMRipFile;
 typedef struct _OGMRipFileClass OGMRipFileClass;
-typedef struct _OGMRipFilePriv  OGMRipFilePriv;
+typedef struct _OGMRipFilePriv  OGMRipFilePrivate;
 
 struct _OGMRipFile
 {
   GObject parent_instance;
 
-  OGMRipFilePriv *priv;
+  OGMRipFilePrivate *priv;
 };
 
 struct _OGMRipFileClass

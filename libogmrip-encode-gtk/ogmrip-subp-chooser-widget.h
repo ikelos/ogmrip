@@ -33,13 +33,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipSubpChooserWidget      OGMRipSubpChooserWidget;
 typedef struct _OGMRipSubpChooserWidgetClass OGMRipSubpChooserWidgetClass;
-typedef struct _OGMRipSubpChooserWidgetPriv  OGMRipSubpChooserWidgetPriv;
+typedef struct _OGMRipSubpChooserWidgetPriv  OGMRipSubpChooserWidgetPrivate;
 
 struct _OGMRipSubpChooserWidget
 {
   OGMRipListItem parent_instance;
 
-  OGMRipSubpChooserWidgetPriv *priv;
+  OGMRipSubpChooserWidgetPrivate *priv;
 };
 
 struct _OGMRipSubpChooserWidgetClass

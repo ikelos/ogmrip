@@ -31,13 +31,13 @@ G_BEGIN_DECLS
 
 typedef struct _OGMRipTypeInfo      OGMRipTypeInfo;
 typedef struct _OGMRipTypeInfoClass OGMRipTypeInfoClass;
-typedef struct _OGMRipTypeInfoPriv  OGMRipTypeInfoPriv;
+typedef struct _OGMRipTypeInfoPriv  OGMRipTypeInfoPrivate;
 
 struct _OGMRipTypeInfo
 {
   GInitiallyUnowned parent_instance;
 
-  OGMRipTypeInfoPriv *priv;
+  OGMRipTypeInfoPrivate *priv;
 };
 
 struct _OGMRipTypeInfoClass

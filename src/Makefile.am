@@ -15,8 +15,12 @@ ogmrip_SOURCES += \
   ogmrip-helper.c         \
   ogmrip-main-window.c    \
   ogmrip-options-dialog.c \
-  ogmrip-pref-dialog.c    \
+  ogmrip-pref-dialog.c
+
+if HAVE_ENCHANT_SUPPORT
+ogmrip_SOURCES += \
   ogmrip-spell-dialog.c
+endif
 
 resourcefiles += \
   ogmrip.gresource.xml

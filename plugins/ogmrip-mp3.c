@@ -140,8 +140,6 @@ ogmrip_mp3_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   gchar *fifo;
   gboolean result;
 
-  result = FALSE;
-
   fifo = ogmrip_fs_mkftemp ("fifo.XXXXXX", error);
   if (!fifo)
     return FALSE;
@@ -150,7 +148,7 @@ ogmrip_mp3_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   ogmjob_container_add (OGMJOB_CONTAINER (task), pipeline);
   g_object_unref (pipeline);
 
-  child = ogmrip_mplayer_wav_command (OGMRIP_AUDIO_CODEC (task), FALSE, fifo);
+  child = ogmrip_audio_encoder_new (OGMRIP_AUDIO_CODEC (task), OGMRIP_ENCODER_PCM, NULL, fifo);
   ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
   g_object_unref (child);
 

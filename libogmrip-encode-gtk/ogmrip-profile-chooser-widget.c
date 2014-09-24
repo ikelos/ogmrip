@@ -64,11 +64,7 @@ ogmrip_profile_chooser_widget_dispose (GObject *gobject)
 {
   OGMRipProfileChooserWidget *chooser = OGMRIP_PROFILE_CHOOSER_WIDGET (gobject);
 
-  if (chooser->priv->store)
-  {
-    g_object_unref (chooser->priv->store);
-    chooser->priv->store = NULL;
-  }
+  g_clear_object (&chooser->priv->store);
 
   G_OBJECT_CLASS (ogmrip_profile_chooser_widget_parent_class)->dispose (gobject);
 }
@@ -110,7 +106,7 @@ ogmrip_profile_chooser_widget_init (OGMRipProfileChooserWidget *chooser)
 
   cell = gtk_cell_renderer_text_new ();
   gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (chooser), cell, TRUE);
-  gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (chooser), cell, "markup", OGMRIP_PROFILE_STORE_NAME_COLUMN, NULL);
+  gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (chooser), cell, "markup", OGMRIP_PROFILE_STORE_INFO_COLUMN, NULL);
 }
 
 GtkWidget *

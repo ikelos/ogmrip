@@ -463,8 +463,7 @@ ogmrip_encoding_manager_dialog_dispose (GObject *gobject)
     g_signal_handlers_disconnect_by_func (dialog->priv->manager,
         ogmrip_encoding_manager_dialog_remove_encoding, dialog);
 
-    g_object_unref (dialog->priv->manager);
-    dialog->priv->manager = NULL;
+    g_clear_object (&dialog->priv->manager);
   }
 
   G_OBJECT_CLASS (ogmrip_encoding_manager_dialog_parent_class)->dispose (gobject);
@@ -596,6 +595,6 @@ ogmrip_encoding_manager_dialog_init (OGMRipEncodingManagerDialog *dialog)
 GtkWidget *
 ogmrip_encoding_manager_dialog_new (OGMRipEncodingManager *manager)
 {
-  return g_object_new (OGMRIP_TYPE_ENCODING_MANAGER_DIALOG, "manager", manager, NULL);
+  return g_object_new (OGMRIP_TYPE_ENCODING_MANAGER_DIALOG, "manager", manager, "use-header-bar", TRUE, NULL);
 }
 

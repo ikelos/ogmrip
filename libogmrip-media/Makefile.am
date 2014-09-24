@@ -7,6 +7,7 @@ libogmrip_media_la_SOURCES = \
   ogmrip-media-chapters.c \
   ogmrip-media-labels.c   \
   ogmrip-media-object.c   \
+	ogmrip-media-player.c   \
   ogmrip-media-stream.c   \
   ogmrip-media-subp.c     \
   ogmrip-media-time.c     \
@@ -20,6 +21,7 @@ libogmrip_media_la_HEADERS = \
   ogmrip-media-enums.h    \
   ogmrip-media-labels.h   \
   ogmrip-media-object.h   \
+	ogmrip-media-player.h   \
   ogmrip-media-stream.h   \
   ogmrip-media-subp.h     \
   ogmrip-media-time.h     \

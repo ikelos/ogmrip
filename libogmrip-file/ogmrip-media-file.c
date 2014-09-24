@@ -50,12 +50,13 @@ struct _OGMRipMediaFileStreamClass
 
 typedef struct _OGMRipMediaFileAudio      OGMRipMediaFileAudio;
 typedef struct _OGMRipMediaFileAudioClass OGMRipMediaFileAudioClass;
+typedef struct _OGMRipAudioFilePriv       OGMRipMediaFileAudioPrivate;
 
 struct _OGMRipMediaFileAudio
 {
   OGMRipMediaFileStream parent_instance;
 
-  OGMRipAudioFilePriv *priv;
+  OGMRipAudioFilePrivate *priv;
 };
 
 struct _OGMRipMediaFileAudioClass
@@ -68,12 +69,13 @@ struct _OGMRipMediaFileAudioClass
 
 typedef struct _OGMRipMediaFileSubp      OGMRipMediaFileSubp;
 typedef struct _OGMRipMediaFileSubpClass OGMRipMediaFileSubpClass;
+typedef struct _OGMRipSubpFilePriv       OGMRipMediaFileSubpPrivate;
 
 struct _OGMRipMediaFileSubp
 {
   OGMRipMediaFileStream parent_instance;
 
-  OGMRipSubpFilePriv *priv;
+  OGMRipSubpFilePrivate *priv;
 };
 
 struct _OGMRipMediaFileSubpClass
@@ -127,18 +129,18 @@ ogmrip_stream_iface_init (OGMRipStreamInterface *iface)
 }
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipMediaFileAudio, ogmrip_media_file_audio, OGMRIP_TYPE_MEDIA_FILE_STREAM,
+    G_ADD_PRIVATE (OGMRipMediaFileAudio)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_AUDIO_STREAM, ogmrip_audio_stream_iface_init));
 
 static void
 ogmrip_media_file_audio_init (OGMRipMediaFileAudio *audio)
 {
-  audio->priv = G_TYPE_INSTANCE_GET_PRIVATE (audio, OGMRIP_TYPE_MEDIA_FILE_AUDIO, OGMRipAudioFilePriv);
+  audio->priv = ogmrip_media_file_audio_get_instance_private (audio);
 }
 
 static void
 ogmrip_media_file_audio_class_init (OGMRipMediaFileAudioClass *klass)
 {
-  g_type_class_add_private (klass, sizeof (OGMRipAudioFilePriv));
 }
 
 static gint
@@ -182,18 +184,18 @@ ogmrip_audio_stream_iface_init (OGMRipAudioStreamInterface *iface)
 }
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipMediaFileSubp, ogmrip_media_file_subp, OGMRIP_TYPE_MEDIA_FILE_STREAM,
+    G_ADD_PRIVATE (OGMRipMediaFileSubp)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_SUBP_STREAM, ogmrip_subp_stream_iface_init));
 
 static void
 ogmrip_media_file_subp_init (OGMRipMediaFileSubp *subp)
 {
-  subp->priv = G_TYPE_INSTANCE_GET_PRIVATE (subp, OGMRIP_TYPE_MEDIA_FILE_SUBP, OGMRipSubpFilePriv);
+  subp->priv = ogmrip_media_file_subp_get_instance_private (subp);
 }
 
 static void
 ogmrip_media_file_subp_class_init (OGMRipMediaFileSubpClass *klass)
 {
-  g_type_class_add_private (klass, sizeof (OGMRipSubpFilePriv));
 }
 
 static const gchar *
@@ -217,26 +219,27 @@ ogmrip_subp_stream_iface_init (OGMRipSubpStreamInterface *iface)
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipMediaFile, ogmrip_media_file, OGMRIP_TYPE_VIDEO_FILE,
     G_IMPLEMENT_INTERFACE (G_TYPE_INITABLE, g_initable_iface_init)
-    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_TITLE, ogmrip_title_iface_init));
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_TITLE, ogmrip_title_iface_init)
+    G_ADD_PRIVATE (OGMRipMediaFile));
 
 static void
 ogmrip_media_file_init (OGMRipMediaFile *media)
 {
-  media->priv = G_TYPE_INSTANCE_GET_PRIVATE (media, OGMRIP_TYPE_MEDIA_FILE, OGMRipMediaFilePriv);
+  media->priv = ogmrip_media_file_get_instance_private (media);
 }
 
 static void
 ogmrip_media_file_class_init (OGMRipMediaFileClass *klass)
 {
-  g_type_class_add_private (klass, sizeof (OGMRipMediaFilePriv));
 }
 
 static gboolean
 ogmrip_media_file_initable_init (GInitable *initable, GCancellable *cancellable, GError **error)
 {
+  OGMRipMediaFile *media = OGMRIP_MEDIA_FILE (initable);
+
   GFile *file;
   OGMRipMediaInfo *info;
-  OGMRipMediaFile *media;
   OGMRipMediaFileStream *stream;
   const gchar *str;
   gint i, n;
@@ -255,7 +258,24 @@ ogmrip_media_file_initable_init (GInitable *initable, GCancellable *cancellable,
   if (!ogmrip_media_info_open (info, OGMRIP_FILE (initable)->priv->path))
     return FALSE;
 
-  media = OGMRIP_MEDIA_FILE (initable);
+  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "VideoCount");
+  if (!str || !g_str_equal (str, "1"))
+  {
+    g_object_unref (info);
+    return FALSE;
+  }
+
+  OGMRIP_FILE (initable)->priv->format = ogmrip_media_info_get_video_format (info, 0);
+  if (OGMRIP_FILE (initable)->priv->format < 0)
+  {
+    g_object_unref (info);
+    return FALSE;
+  }
+
+  ogmrip_media_info_get_file_info (info,  OGMRIP_FILE (initable)->priv);
+  ogmrip_media_info_get_video_info (info, 0, OGMRIP_VIDEO_FILE (initable)->priv);
+
+  OGMRIP_FILE (initable)->priv->title_size = OGMRIP_VIDEO_FILE (initable)->priv->size;
 
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "AudioCount");
 
@@ -288,6 +308,12 @@ ogmrip_media_file_initable_init (GInitable *initable, GCancellable *cancellable,
 
     media->priv->subp_streams = g_list_append (media->priv->subp_streams, stream);
   }
+
+  str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "MenuCount");
+
+  n = str ? atoi (str) : 0;
+  for (i = 0; i < n; i ++)
+    ogmrip_media_info_get_chapters_info (info, i, media->priv);
 
   ogmrip_media_info_close (info);
 
@@ -336,6 +362,27 @@ ogmrip_media_file_get_subp_streams (OGMRipTitle *title)
   return g_list_copy (OGMRIP_MEDIA_FILE (title)->priv->subp_streams);
 }
 
+static gint
+ogmrip_media_file_get_n_chapters (OGMRipTitle *title)
+{
+  return OGMRIP_MEDIA_FILE (title)->priv->nr_of_chapters;
+}
+
+static gdouble
+ogmrip_media_file_get_chapters_length (OGMRipTitle *title, guint start, guint end, OGMRipTime *length)
+{
+  OGMRipMediaFile *file = OGMRIP_MEDIA_FILE (title);
+  gulong total;
+
+  for (total = 0; start <= end; start ++)
+    total += file->priv->length_of_chapters[start];
+
+  if (length)
+    ogmrip_msec_to_time (total, length);
+
+  return total / 1000.0;
+}
+
 static void
 ogmrip_title_iface_init (OGMRipTitleInterface *iface)
 {
@@ -345,6 +392,8 @@ ogmrip_title_iface_init (OGMRipTitleInterface *iface)
   iface->get_n_subp_streams = ogmrip_media_file_get_n_subp_streams;
   iface->get_subp_stream = ogmrip_media_file_get_subp_stream;
   iface->get_subp_streams = ogmrip_media_file_get_subp_streams;
+  iface->get_n_chapters = ogmrip_media_file_get_n_chapters;
+  iface->get_chapters_length = ogmrip_media_file_get_chapters_length;
 }
 
 OGMRipMedia *

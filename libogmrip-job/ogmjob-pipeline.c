@@ -108,7 +108,7 @@ ogmjob_pipeline_forall (OGMJobContainer *container, OGMJobCallback callback, gpo
   }
 }
 
-G_DEFINE_TYPE (OGMJobPipeline, ogmjob_pipeline, OGMJOB_TYPE_CONTAINER)
+G_DEFINE_TYPE_WITH_PRIVATE (OGMJobPipeline, ogmjob_pipeline, OGMJOB_TYPE_CONTAINER)
 
 static void
 ogmjob_pipeline_class_init (OGMJobPipelineClass *klass)
@@ -123,14 +123,12 @@ ogmjob_pipeline_class_init (OGMJobPipelineClass *klass)
   container_class->add = ogmjob_pipeline_add;
   container_class->remove = ogmjob_pipeline_remove;
   container_class->forall = ogmjob_pipeline_forall;
-
-  g_type_class_add_private (klass, sizeof (OGMJobPipelinePriv));
 }
 
 static void
 ogmjob_pipeline_init (OGMJobPipeline *pipeline)
 {
-  pipeline->priv = G_TYPE_INSTANCE_GET_PRIVATE (pipeline, OGMJOB_TYPE_PIPELINE, OGMJobPipelinePriv);
+  pipeline->priv = ogmjob_pipeline_get_instance_private (pipeline);
 }
 
 /**

@@ -41,10 +41,6 @@
 
 #include <locale.h>
 
-#ifdef HAVE_LIBNOTIFY_SUPPORT
-#include <libnotify/notify.h>
-#endif /* HAVE_LIBNOTIFY_SUPPORT */
-
 GSettings *settings = NULL;
 
 static void
@@ -95,7 +91,7 @@ ogmrip_startup_thread (GTask *task, GApplication *app, gpointer data, GCancellab
 {
   OGMRipModuleEngine *module_engine;
   OGMRipProfileEngine *profile_engine;
-  gchar *path;
+  gchar *str;
 
   ogmrip_dvd_register_media ();
 #ifdef HAVE_BLURAY_SUPPORT
@@ -109,21 +105,21 @@ ogmrip_startup_thread (GTask *task, GApplication *app, gpointer data, GCancellab
   module_engine = ogmrip_module_engine_get_default ();
   g_object_set_data_full (G_OBJECT (app), "module-engine", module_engine, g_object_unref);
 
-  path = g_build_filename (OGMRIP_LIB_DIR, "ogmrip", "plugins", NULL);
-  ogmrip_module_engine_add_path (module_engine, path, NULL);
-  g_free (path);
+  str = g_build_filename (OGMRIP_LIB_DIR, "ogmrip", "plugins", NULL);
+  ogmrip_module_engine_add_path (module_engine, str, NULL);
+  g_free (str);
 
-  path = g_build_filename (g_get_user_data_dir (), "ogmrip", "plugins", NULL);
-  ogmrip_module_engine_add_path (module_engine, path, NULL);
-  g_free (path);
+  str = g_build_filename (g_get_user_data_dir (), "ogmrip", "plugins", NULL);
+  ogmrip_module_engine_add_path (module_engine, str, NULL);
+  g_free (str);
 
-  path = g_build_filename (OGMRIP_LIB_DIR, "ogmrip", "extensions", NULL);
-  ogmrip_module_engine_add_path (module_engine, path, NULL);
-  g_free (path);
+  str = g_build_filename (OGMRIP_LIB_DIR, "ogmrip", "extensions", NULL);
+  ogmrip_module_engine_add_path (module_engine, str, NULL);
+  g_free (str);
 
-  path = g_build_filename (g_get_user_data_dir (), "ogmrip", "extensions", NULL);
-  ogmrip_module_engine_add_path (module_engine, path, NULL);
-  g_free (path);
+  str = g_build_filename (g_get_user_data_dir (), "ogmrip", "extensions", NULL);
+  ogmrip_module_engine_add_path (module_engine, str, NULL);
+  g_free (str);
 
   profile_engine = ogmrip_profile_engine_get_default ();
   g_object_set_data_full (G_OBJECT (app), "profile-engine", profile_engine, g_object_unref);
@@ -133,13 +129,31 @@ ogmrip_startup_thread (GTask *task, GApplication *app, gpointer data, GCancellab
       G_CALLBACK (ogmrip_profile_engine_update_cb), NULL);
 #endif
 
-  path = g_build_filename (OGMRIP_DATA_DIR, "ogmrip", "profiles", NULL);
-  ogmrip_profile_engine_add_path (profile_engine, path);
-  g_free (path);
+  str = g_build_filename (OGMRIP_DATA_DIR, "ogmrip", "profiles", NULL);
+  ogmrip_profile_engine_add_path (profile_engine, str);
+  g_free (str);
 
-  path = g_build_filename (g_get_user_data_dir (), "ogmrip", "profiles", NULL);
-  ogmrip_profile_engine_add_path (profile_engine, path);
-  g_free (path);
+  str = g_build_filename (g_get_user_data_dir (), "ogmrip", "profiles", NULL);
+  ogmrip_profile_engine_add_path (profile_engine, str);
+  g_free (str);
+
+  str = g_settings_get_string (settings, OGMRIP_SETTINGS_PROFILE);
+  if (!strlen (str) || !ogmrip_profile_engine_get (profile_engine, str))
+  {
+    GSList *list;
+
+    list = ogmrip_profile_engine_get_list (profile_engine);
+    if (list)
+    {
+      gchar *name;
+
+      g_object_get (list->data, "name", &name, NULL);
+      g_settings_set_string (settings, OGMRIP_SETTINGS_PROFILE, name);
+      g_free (name);
+    }
+    g_slist_free (list);
+  }
+  g_free (str);
 
   g_main_context_invoke (NULL, (GSourceFunc) ogmrip_startup_finish, app);
 
@@ -203,10 +217,6 @@ ogmrip_gui_startup_cb (GApplication *app)
 
   g_signal_connect (settings, "changed::" OGMRIP_SETTINGS_TMP_DIR,
       G_CALLBACK (ogmrip_tmp_dir_changed_cb), NULL);
-
-#ifdef HAVE_LIBNOTIFY_SUPPORT
-  notify_init (PACKAGE_NAME);
-#endif /* HAVE_LIBNOTIFY_SUPPORT */
 
   task = g_task_new (app, NULL, NULL, NULL);
   g_task_run_in_thread (task, (GTaskThreadFunc) ogmrip_startup_thread);

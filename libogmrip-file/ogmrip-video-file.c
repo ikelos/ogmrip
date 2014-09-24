@@ -26,13 +26,14 @@ static void g_initable_iface_init           (GInitableIface             *iface);
 static void ogmrip_video_stream_iface_init  (OGMRipVideoStreamInterface *iface);
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipVideoFile, ogmrip_video_file, OGMRIP_TYPE_FILE,
+    G_ADD_PRIVATE (OGMRipVideoFile)
     G_IMPLEMENT_INTERFACE (G_TYPE_INITABLE, g_initable_iface_init)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_VIDEO_STREAM, ogmrip_video_stream_iface_init));
 
 static void
 ogmrip_video_file_init (OGMRipVideoFile *stream)
 {
-  stream->priv = G_TYPE_INSTANCE_GET_PRIVATE (stream, OGMRIP_TYPE_VIDEO_FILE, OGMRipVideoFilePriv);
+  stream->priv = ogmrip_video_file_get_instance_private (stream);
 
   stream->priv->bitrate = -1;
   stream->priv->framerate_denom = 1;
@@ -42,7 +43,6 @@ ogmrip_video_file_init (OGMRipVideoFile *stream)
 static void
 ogmrip_video_file_class_init (OGMRipVideoFileClass *klass)
 {
-  g_type_class_add_private (klass, sizeof (OGMRipVideoFilePriv));
 }
 
 static gboolean
@@ -154,6 +154,12 @@ ogmrip_video_file_get_resolution (OGMRipVideoStream *video, guint *w, guint *h)
     *h = OGMRIP_VIDEO_FILE (video)->priv->height;
 }
 
+static gboolean
+ogmrip_video_file_get_progressive (OGMRipVideoStream *video)
+{
+  return OGMRIP_VIDEO_FILE (video)->priv->progressive;
+}
+
 static void
 ogmrip_video_stream_iface_init (OGMRipVideoStreamInterface *iface)
 {
@@ -163,6 +169,7 @@ ogmrip_video_stream_iface_init (OGMRipVideoStreamInterface *iface)
   iface->get_framerate = ogmrip_video_file_get_framerate;
   iface->get_standard = ogmrip_video_file_get_standard;
   iface->get_resolution = ogmrip_video_file_get_resolution;
+  iface->get_progressive = ogmrip_video_file_get_progressive;
 }
 
 OGMRipMedia *

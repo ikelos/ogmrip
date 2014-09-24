@@ -34,9 +34,6 @@
 
 #include <glib/gi18n-lib.h>
 
-#define OGMRIP_MEDIA_CHOOSER_WIDGET_GET_PRIVATE(o) \
-  (G_TYPE_INSTANCE_GET_PRIVATE ((o), OGMRIP_TYPE_MEDIA_CHOOSER_WIDGET, OGMRipMediaChooserWidgetPriv))
-
 enum
 {
   TEXT_COLUMN,
@@ -64,9 +61,8 @@ struct _OGMRipMediaChooserWidgetPriv
   GtkTreeRowReference *last_row;
 };
 
-static void ogmrip_media_chooser_init (OGMRipMediaChooserInterface *iface);
-static void ogmrip_media_chooser_widget_dispose (GObject     *gobject);
 static void ogmrip_media_chooser_widget_changed (GtkComboBox *combo);
+static void ogmrip_media_chooser_init           (OGMRipMediaChooserInterface *iface);
 
 static OGMRipMedia *
 ogmrip_media_chooser_widget_get_media (OGMRipMediaChooser *chooser)
@@ -237,103 +233,51 @@ ogmrip_media_chooser_widget_volume_added (OGMRipMediaChooserWidget *chooser, GVo
     g_object_unref (drive);
 }
 
-G_DEFINE_TYPE_WITH_CODE (OGMRipMediaChooserWidget, ogmrip_media_chooser_widget, GTK_TYPE_COMBO_BOX,
-    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_MEDIA_CHOOSER, ogmrip_media_chooser_init))
-
-static void
-ogmrip_media_chooser_widget_class_init (OGMRipMediaChooserWidgetClass *klass)
+static OGMRipMedia *
+ogmrip_media_chooser_widget_select_file (GtkComboBox *combo, gboolean file)
 {
-  GObjectClass *gobject_class;
-  GtkComboBoxClass *combo_box_class;
+  OGMRipMedia *media = NULL;
+  GtkWidget *dialog, *toplevel;
 
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->dispose = ogmrip_media_chooser_widget_dispose;
+  dialog = gtk_file_chooser_dialog_new (file ? _("Select an media file") : _("Select a media directory"),
+      NULL, file ? GTK_FILE_CHOOSER_ACTION_OPEN : GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
+      _("_Cancel"), GTK_RESPONSE_CANCEL, _("_Open"), GTK_RESPONSE_OK, NULL);
 
-  combo_box_class = GTK_COMBO_BOX_CLASS (klass);
-  combo_box_class->changed = ogmrip_media_chooser_widget_changed;
-
-  g_type_class_add_private (klass, sizeof (OGMRipMediaChooserWidgetPriv));
-}
-
-static void
-ogmrip_media_chooser_init (OGMRipMediaChooserInterface  *iface)
-{
-  iface->get_media = ogmrip_media_chooser_widget_get_media;
-}
-
-static void
-ogmrip_media_chooser_widget_init (OGMRipMediaChooserWidget *chooser)
-{
-  GtkCellRenderer *cell;
-  GtkListStore *store;
-  GtkTreeIter iter;
-
-  GList *volumes, *volume;
-
-  chooser->priv = OGMRIP_MEDIA_CHOOSER_WIDGET_GET_PRIVATE (chooser);
-
-  store = gtk_list_store_new (N_COLUMNS, G_TYPE_STRING, G_TYPE_INT, OGMRIP_TYPE_MEDIA, G_TYPE_VOLUME);
-  gtk_combo_box_set_model (GTK_COMBO_BOX (chooser), GTK_TREE_MODEL (store));
-  g_object_unref (store);
-
-  gtk_combo_box_set_row_separator_func (GTK_COMBO_BOX (chooser),
-      ogmrip_media_chooser_widget_sep_func, NULL, NULL);
-
-  cell = gtk_cell_renderer_text_new ();
-  gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (chooser), cell, TRUE);
-  gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (chooser), cell, "markup", TEXT_COLUMN, NULL);
-
-  chooser->priv->monitor = g_volume_monitor_get ();
-  g_signal_connect_swapped (chooser->priv->monitor, "volume-added",
-      G_CALLBACK (ogmrip_media_chooser_widget_volume_added), chooser);
-
-  volumes = g_volume_monitor_get_volumes (chooser->priv->monitor);
-  for (volume = volumes; volume; volume = volume->next)
-    ogmrip_media_chooser_widget_volume_added (chooser, volume->data, chooser->priv->monitor);
-
-  g_list_foreach (volumes, (GFunc) g_object_unref, NULL);
-  g_list_free (volumes);
-
-  if (gtk_tree_model_iter_n_children (GTK_TREE_MODEL (store), NULL) == 0)
+  toplevel = gtk_widget_get_toplevel (GTK_WIDGET (combo));
+  if (gtk_widget_is_toplevel (toplevel) && GTK_IS_WINDOW (toplevel))
   {
-    gtk_list_store_append (store, &iter);
-    gtk_list_store_set (store, &iter,
-        TEXT_COLUMN, _("<b>No media</b>\nNo drive"), TYPE_COLUMN, NONE_ROW, -1);
+    gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (toplevel));
+    gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
   }
 
-  gtk_list_store_append (store, &iter);
-  gtk_list_store_set (store, &iter,
-      TEXT_COLUMN, NULL, TYPE_COLUMN, SEL_SEP_ROW, -1);
-
-  gtk_list_store_append (store, &iter);
-  gtk_list_store_set (store, &iter,
-      TEXT_COLUMN, _("Select a media directory..."), TYPE_COLUMN, DIR_SEL_ROW, -1);
-
-  gtk_list_store_append (store, &iter);
-  gtk_list_store_set (store, &iter,
-      TEXT_COLUMN, _("Select a media file..."), TYPE_COLUMN, FILE_SEL_ROW, -1);
-}
-
-static void
-ogmrip_media_chooser_widget_dispose (GObject *gobject)
-{
-  OGMRipMediaChooserWidget *chooser = OGMRIP_MEDIA_CHOOSER_WIDGET (gobject);
-
-  if (chooser->priv->monitor)
+  if (file)
   {
-    g_signal_handlers_disconnect_by_func (chooser->priv->monitor,
-        ogmrip_media_chooser_widget_volume_added, chooser);
-    g_object_unref (chooser->priv->monitor);
-    chooser->priv->monitor = NULL;
+    GtkFileFilter *filter;
+
+    filter = gtk_file_filter_new ();
+    gtk_file_filter_set_name (filter, _("Supported files"));
+    gtk_file_filter_add_mime_type (filter, "video/*");
+    gtk_file_filter_add_mime_type (filter, "application/x-cd-image");
+    gtk_file_chooser_add_filter (GTK_FILE_CHOOSER (dialog), filter);
   }
 
-  if (chooser->priv->last_row)
+  if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_OK)
   {
-    gtk_tree_row_reference_free (chooser->priv->last_row);
-    chooser->priv->last_row = NULL;
+    gchar *path;
+
+    gtk_widget_hide (dialog);
+
+    path = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
+    if (path)
+    {
+      media = ogmrip_media_new (path);
+      g_free (path);
+    }
   }
 
-  G_OBJECT_CLASS (ogmrip_media_chooser_widget_parent_class)->dispose (gobject);
+  gtk_widget_destroy (dialog);
+
+  return media;
 }
 
 static gboolean
@@ -391,51 +335,28 @@ ogmrip_media_chooser_widget_add_media (GtkComboBox *combo, OGMRipMedia *media, g
   return TRUE;
 }
 
-static OGMRipMedia *
-ogmrip_media_chooser_widget_select_file (GtkComboBox *combo, gboolean file)
+G_DEFINE_TYPE_WITH_CODE (OGMRipMediaChooserWidget, ogmrip_media_chooser_widget, GTK_TYPE_COMBO_BOX,
+    G_ADD_PRIVATE (OGMRipMediaChooserWidget)
+    G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_MEDIA_CHOOSER, ogmrip_media_chooser_init))
+
+static void
+ogmrip_media_chooser_widget_dispose (GObject *gobject)
 {
-  OGMRipMedia *media = NULL;
-  GtkWidget *dialog, *toplevel;
+  OGMRipMediaChooserWidget *chooser = OGMRIP_MEDIA_CHOOSER_WIDGET (gobject);
 
-  dialog = gtk_file_chooser_dialog_new (file ? _("Select an media file") : _("Select a media directory"),
-      NULL, file ? GTK_FILE_CHOOSER_ACTION_OPEN : GTK_FILE_CHOOSER_ACTION_SELECT_FOLDER,
-      _("_Cancel"), GTK_RESPONSE_CANCEL, _("_Open"), GTK_RESPONSE_OK, NULL);
+  if (chooser->priv->monitor)
+    g_signal_handlers_disconnect_by_func (chooser->priv->monitor,
+        ogmrip_media_chooser_widget_volume_added, chooser);
 
-  toplevel = gtk_widget_get_toplevel (GTK_WIDGET (combo));
-  if (gtk_widget_is_toplevel (toplevel) && GTK_IS_WINDOW (toplevel))
+  g_clear_object (&chooser->priv->monitor);
+
+  if (chooser->priv->last_row)
   {
-    gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (toplevel));
-    gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
+    gtk_tree_row_reference_free (chooser->priv->last_row);
+    chooser->priv->last_row = NULL;
   }
 
-  if (file)
-  {
-    GtkFileFilter *filter;
-
-    filter = gtk_file_filter_new ();
-    gtk_file_filter_set_name (filter, _("Supported files"));
-    gtk_file_filter_add_mime_type (filter, "video/*");
-    gtk_file_filter_add_mime_type (filter, "application/x-cd-image");
-    gtk_file_chooser_add_filter (GTK_FILE_CHOOSER (dialog), filter);
-  }
-
-  if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_OK)
-  {
-    gchar *path;
-
-    gtk_widget_hide (dialog);
-
-    path = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
-    if (path)
-    {
-      media = ogmrip_media_new (path);
-      g_free (path);
-    }
-  }
-
-  gtk_widget_destroy (dialog);
-
-  return media;
+  G_OBJECT_CLASS (ogmrip_media_chooser_widget_parent_class)->dispose (gobject);
 }
 
 static void
@@ -502,6 +423,78 @@ ogmrip_media_chooser_widget_changed (GtkComboBox *combo)
 
   if (media)
     g_object_unref (media);
+}
+
+static void
+ogmrip_media_chooser_widget_class_init (OGMRipMediaChooserWidgetClass *klass)
+{
+  GObjectClass *gobject_class;
+  GtkComboBoxClass *combo_box_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->dispose = ogmrip_media_chooser_widget_dispose;
+
+  combo_box_class = GTK_COMBO_BOX_CLASS (klass);
+  combo_box_class->changed = ogmrip_media_chooser_widget_changed;
+}
+
+static void
+ogmrip_media_chooser_init (OGMRipMediaChooserInterface  *iface)
+{
+  iface->get_media = ogmrip_media_chooser_widget_get_media;
+}
+
+static void
+ogmrip_media_chooser_widget_init (OGMRipMediaChooserWidget *chooser)
+{
+  GtkCellRenderer *cell;
+  GtkListStore *store;
+  GtkTreeIter iter;
+
+  GList *volumes, *volume;
+
+  chooser->priv = ogmrip_media_chooser_widget_get_instance_private (chooser);
+
+  store = gtk_list_store_new (N_COLUMNS, G_TYPE_STRING, G_TYPE_INT, OGMRIP_TYPE_MEDIA, G_TYPE_VOLUME);
+  gtk_combo_box_set_model (GTK_COMBO_BOX (chooser), GTK_TREE_MODEL (store));
+  g_object_unref (store);
+
+  gtk_combo_box_set_row_separator_func (GTK_COMBO_BOX (chooser),
+      ogmrip_media_chooser_widget_sep_func, NULL, NULL);
+
+  cell = gtk_cell_renderer_text_new ();
+  gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (chooser), cell, TRUE);
+  gtk_cell_layout_set_attributes (GTK_CELL_LAYOUT (chooser), cell, "markup", TEXT_COLUMN, NULL);
+
+  chooser->priv->monitor = g_volume_monitor_get ();
+  g_signal_connect_swapped (chooser->priv->monitor, "volume-added",
+      G_CALLBACK (ogmrip_media_chooser_widget_volume_added), chooser);
+
+  volumes = g_volume_monitor_get_volumes (chooser->priv->monitor);
+  for (volume = volumes; volume; volume = volume->next)
+    ogmrip_media_chooser_widget_volume_added (chooser, volume->data, chooser->priv->monitor);
+
+  g_list_foreach (volumes, (GFunc) g_object_unref, NULL);
+  g_list_free (volumes);
+
+  if (gtk_tree_model_iter_n_children (GTK_TREE_MODEL (store), NULL) == 0)
+  {
+    gtk_list_store_append (store, &iter);
+    gtk_list_store_set (store, &iter,
+        TEXT_COLUMN, _("<b>No media</b>\nNo drive"), TYPE_COLUMN, NONE_ROW, -1);
+  }
+
+  gtk_list_store_append (store, &iter);
+  gtk_list_store_set (store, &iter,
+      TEXT_COLUMN, NULL, TYPE_COLUMN, SEL_SEP_ROW, -1);
+
+  gtk_list_store_append (store, &iter);
+  gtk_list_store_set (store, &iter,
+      TEXT_COLUMN, _("Select a media directory..."), TYPE_COLUMN, DIR_SEL_ROW, -1);
+
+  gtk_list_store_append (store, &iter);
+  gtk_list_store_set (store, &iter,
+      TEXT_COLUMN, _("Select a media file..."), TYPE_COLUMN, FILE_SEL_ROW, -1);
 }
 
 /**

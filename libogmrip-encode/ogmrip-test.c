@@ -45,7 +45,7 @@ struct _OGMRipTestPriv
   OGMRipEncoding *encoding;
 
   gdouble fraction;
-  gdouble step; 
+  gdouble step;
 };
 
 enum
@@ -312,11 +312,7 @@ ogmrip_test_dispose (GObject *gobject)
 {
   OGMRipTest *test = OGMRIP_TEST (gobject);
 
-  if (test->priv->encoding)
-  {
-    g_object_unref (test->priv->encoding);
-    test->priv->encoding = NULL;
-  }
+  g_clear_object (&test->priv->encoding);
 
   G_OBJECT_CLASS (ogmrip_test_parent_class)->dispose (gobject);
 }
@@ -357,8 +353,9 @@ static gboolean
 ogmrip_test_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
   OGMRipTest *test = OGMRIP_TEST (task);
-  gboolean result = TRUE;
+  gboolean have_bitrate, result = TRUE;
 
+  OGMRipCodec *codec;
   OGMRipEncodingInfo info;
   guint files, optimal_bitrate = 0, user_bitrate = 0;
   gdouble start;
@@ -372,9 +369,14 @@ ogmrip_test_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
     return FALSE;
   }
 
+  codec = ogmrip_encoding_get_video_codec (test->priv->encoding);
+
+  user_bitrate = ogmrip_video_codec_get_bitrate (OGMRIP_VIDEO_CODEC (codec));
+  have_bitrate = info.method == OGMRIP_ENCODING_BITRATE || user_bitrate > 0;
+
   test->priv->fraction = 0.0;
   test->priv->step = SAMPLE_LENGTH / info.length;
-  if (info.method == OGMRIP_ENCODING_SIZE)
+  if (!have_bitrate)
     test->priv->step /= 1 +
       ogmrip_encoding_get_n_audio_codecs (test->priv->encoding) +
       ogmrip_encoding_get_n_subp_codecs (test->priv->encoding);
@@ -387,7 +389,9 @@ ogmrip_test_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   {
     gint bitrate;
 
-    if (info.method == OGMRIP_ENCODING_SIZE)
+    result = TRUE;
+
+    if (!have_bitrate)
     {
       /*
        * Encode subtitles
@@ -407,6 +411,18 @@ ogmrip_test_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
           break;
         g_clear_error (error);
       }
+
+      /*
+       * Compute user bitrate
+       */
+      if (result)
+      {
+        bitrate = ogmrip_encoding_autobitrate (test->priv->encoding);
+        result = bitrate > 0;
+      }
+
+      if (result)
+        user_bitrate += bitrate;
     }
 
     /*
@@ -421,44 +437,21 @@ ogmrip_test_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
     }
 
     /*
-     * Compute optimal and user bitrate
+     * Compute optimal bitrate
      */
     if (result && bitrate > 0)
     {
       optimal_bitrate += bitrate;
-
-      if (info.method == OGMRIP_ENCODING_SIZE)
-      {
-        bitrate = ogmrip_encoding_autobitrate (test->priv->encoding);
-        if (bitrate < 0)
-        {
-          g_set_error (error, OGMRIP_ENCODING_ERROR, OGMRIP_ENCODING_ERROR_VIDEO,
-              _("Cannot compute bitrate for video stream"));
-          result = FALSE;
-          break;
-        }
-        user_bitrate += bitrate;
-      }
-
       files ++;
     }
-
-    result = TRUE;
   }
 
   if (result && files > 0)
   {
     optimal_bitrate /= files;
 
-    if (info.method == OGMRIP_ENCODING_SIZE)
+    if (!have_bitrate)
       user_bitrate /= files;
-    else
-    {
-      OGMRipCodec *codec;
-
-      codec = ogmrip_encoding_get_video_codec (test->priv->encoding);
-      user_bitrate = ogmrip_video_codec_get_bitrate (OGMRIP_VIDEO_CODEC (codec));
-    }
 
     /*
      * Compute optimal scaling parameters

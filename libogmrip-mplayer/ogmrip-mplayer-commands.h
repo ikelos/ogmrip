@@ -23,30 +23,38 @@
 
 G_BEGIN_DECLS
 
-void        ogmrip_mplayer_set_input          (GPtrArray   *argc,
-                                               OGMRipTitle *title,
-                                               gint        angle);
-/*
- * Audio
- */
+typedef enum
+{
+  OGMRIP_ENCODER_XVID,
+  OGMRIP_ENCODER_LAVC,
+  OGMRIP_ENCODER_X264,
+  OGMRIP_ENCODER_YUV,
+  OGMRIP_ENCODER_PCM,
+  OGMRIP_ENCODER_WAV,
+  OGMRIP_ENCODER_VOBSUB,
+  OGMRIP_ENCODER_COPY
+} OGMRipEncoder;
 
-OGMJobTask * ogmrip_mplayer_wav_command      (OGMRipAudioCodec    *audio,
-                                              gboolean            header,
-                                              const gchar         *output);
-OGMJobTask * ogmrip_mencoder_audio_command   (OGMRipAudioCodec    *audio,
-                                              const gchar * const *options,
-                                              const gchar         *output);
-OGMJobTask * ogmrip_mencoder_vobsub_command  (OGMRipSubpCodec     *subp,
-                                              const gchar         *output);
-OGMJobTask * ogmrip_mplayer_video_command    (OGMRipVideoCodec    *video,
-                                              const gchar * const *options,
-                                              const gchar         *output);
-OGMJobTask * ogmrip_mencoder_video_command   (OGMRipVideoCodec    *video,
-                                              const gchar * const *options,
-                                              const gchar         *output);
-OGMJobTask * ogmrip_mencoder_extract_command (OGMRipContainer     *container,
-                                              const gchar         *input,
-                                              const gchar         *output);
+void         ogmrip_mplayer_set_input   (GPtrArray        *argc,
+                                         OGMRipTitle      *title,
+                                         gint             angle);
+OGMJobTask * ogmrip_video_encoder_new   (OGMRipVideoCodec *codec,
+                                         OGMRipEncoder    encoder,
+                                         const gchar      *options,
+                                         const gchar      *passlog,
+                                         const gchar      *output);
+OGMJobTask * ogmrip_audio_encoder_new   (OGMRipAudioCodec *codec,
+                                         OGMRipEncoder    encoder,
+                                         const gchar      *options,
+                                         const gchar      *output);
+OGMJobTask * ogmrip_subp_encoder_new    (OGMRipSubpCodec  *codec,
+                                         OGMRipEncoder    encoder,
+                                         const gchar      *options,
+                                         const gchar      *output);
+OGMJobTask * ogmrip_video_extractor_new (OGMRipContainer  *container,
+                                         OGMRipFile       *file,
+                                         const gchar      *output);
+
 
 G_END_DECLS
 
