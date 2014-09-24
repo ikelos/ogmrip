@@ -157,6 +157,24 @@ ogmbr_title_get_bitrate (OGMRipVideoStream *video)
   return OGMBR_TITLE (video)->priv->bitrate;
 }
 
+static gboolean
+ogmbr_title_get_progressive (OGMRipVideoStream *video)
+{
+  return OGMBR_TITLE (video)->priv->progressive;
+}
+
+static gboolean
+ogmbr_title_get_telecine (OGMRipVideoStream *video)
+{
+  return OGMBR_TITLE (video)->priv->telecine;
+}
+
+static gboolean
+ogmbr_title_get_interlaced (OGMRipVideoStream *video)
+{
+  return OGMBR_TITLE (video)->priv->interlaced;
+}
+
 static void
 ogmbr_video_stream_iface_init (OGMRipVideoStreamInterface *iface)
 {
@@ -166,6 +184,9 @@ ogmbr_video_stream_iface_init (OGMRipVideoStreamInterface *iface)
   iface->get_crop_size    = ogmbr_title_get_crop_size;
   iface->get_aspect_ratio = ogmbr_title_get_aspect_ratio;
   iface->get_bitrate      = ogmbr_title_get_bitrate;
+  iface->get_progressive  = ogmbr_title_get_progressive;
+  iface->get_telecine     = ogmbr_title_get_telecine;
+  iface->get_interlaced   = ogmbr_title_get_interlaced;
 }
 
 typedef struct
@@ -249,24 +270,6 @@ ogmbr_title_get_n_subp_streams (OGMRipTitle *title)
   return OGMBR_TITLE (title)->priv->nsubp_streams;
 }
 
-static gboolean
-ogmbr_title_get_progressive (OGMRipTitle *title)
-{
-  return OGMBR_TITLE (title)->priv->progressive;
-}
-
-static gboolean
-ogmbr_title_get_telecine (OGMRipTitle *title)
-{
-  return OGMBR_TITLE (title)->priv->telecine;
-}
-
-static gboolean
-ogmbr_title_get_interlaced (OGMRipTitle *title)
-{
-  return OGMBR_TITLE (title)->priv->interlaced;
-}
-
 typedef struct
 {
   OGMRipTitleCallback callback;
@@ -323,9 +326,6 @@ ogmbr_title_iface_init (OGMRipTitleInterface *iface)
   iface->get_video_stream    = ogmbr_title_get_video_stream;
   iface->get_n_audio_streams = ogmbr_title_get_n_audio_streams;
   iface->get_n_subp_streams  = ogmbr_title_get_n_subp_streams;
-  iface->get_progressive     = ogmbr_title_get_progressive;
-  iface->get_telecine        = ogmbr_title_get_telecine;
-  iface->get_interlaced      = ogmbr_title_get_interlaced;
   iface->analyze             = ogmbr_title_analyze;
 }
 

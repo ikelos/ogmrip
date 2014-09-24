@@ -643,7 +643,8 @@ ogmbr_makemkv_update_drives (OGMBrMakeMKV *mmkv, GCancellable *cancellable, GErr
   ogmjob_container_add (OGMJOB_CONTAINER (mmkv), spawn);
   g_object_unref (spawn);
 
-  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (spawn), (OGMJobWatch) ogmbr_makemkv_update_drives_watch, mmkv);
+  ogmjob_spawn_set_watch (OGMJOB_SPAWN (spawn), OGMJOB_STREAM_OUTPUT,
+      (OGMJobWatch) ogmbr_makemkv_update_drives_watch, mmkv, NULL);
 
   retval = ogmjob_task_run (OGMJOB_TASK (mmkv), cancellable, error);
   ogmjob_task_set_progress (spawn, 1.0);
@@ -700,7 +701,8 @@ ogmbr_makemkv_open_disc (OGMBrMakeMKV *mmkv, OGMBrDisc *disc, GCancellable *canc
   ogmjob_container_add (OGMJOB_CONTAINER (mmkv), spawn);
   g_object_unref (spawn);
 
-  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (spawn), (OGMJobWatch) ogmbr_makemkv_open_disc_watch, disc);
+  ogmjob_spawn_set_watch (OGMJOB_SPAWN (spawn), OGMJOB_STREAM_OUTPUT,
+      (OGMJobWatch) ogmbr_makemkv_open_disc_watch, disc, NULL);
 
   retval = ogmjob_task_run (OGMJOB_TASK (mmkv), cancellable, error);
   ogmjob_task_set_progress (spawn, 1.0);
@@ -751,7 +753,8 @@ ogmbr_makemkv_backup_disc (OGMBrMakeMKV *mmkv, OGMBrDisc *disc, const gchar *out
   ogmjob_container_add (OGMJOB_CONTAINER (mmkv), spawn);
   g_object_unref (spawn);
 
-  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (spawn), (OGMJobWatch) ogmbr_makemkv_backup_disc_watch, disc);
+  ogmjob_spawn_set_watch (OGMJOB_SPAWN (spawn), OGMJOB_STREAM_OUTPUT,
+      (OGMJobWatch) ogmbr_makemkv_backup_disc_watch, disc, NULL);
 
   retval = ogmjob_task_run (OGMJOB_TASK (mmkv), cancellable, error);
   ogmjob_task_set_progress (spawn, 1.0);
@@ -789,7 +792,8 @@ ogmbr_makemkv_copy_disc (OGMBrMakeMKV *mmkv, OGMBrDisc *disc, const gchar *outpu
   ogmjob_container_add (OGMJOB_CONTAINER (mmkv), spawn);
   g_object_unref (spawn);
 
-  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (spawn), (OGMJobWatch) ogmbr_makemkv_backup_disc_watch, disc);
+  ogmjob_spawn_set_watch (OGMJOB_SPAWN (spawn), OGMJOB_STREAM_OUTPUT,
+      (OGMJobWatch) ogmbr_makemkv_backup_disc_watch, disc, NULL);
 
   retval = ogmjob_task_run (OGMJOB_TASK (mmkv), cancellable, error);
   ogmjob_task_set_progress (spawn, 1.0);
@@ -828,7 +832,8 @@ ogmbr_makemkv_copy_title (OGMBrMakeMKV *mmkv, OGMBrTitle *title, const gchar *ou
   ogmjob_container_add (OGMJOB_CONTAINER (mmkv), spawn);
   g_object_unref (spawn);
 
-  ogmjob_spawn_set_watch_stdout (OGMJOB_SPAWN (spawn), (OGMJobWatch) ogmbr_makemkv_backup_disc_watch, disc);
+  ogmjob_spawn_set_watch (OGMJOB_SPAWN (spawn), OGMJOB_STREAM_OUTPUT,
+      (OGMJobWatch) ogmbr_makemkv_backup_disc_watch, disc, NULL);
 
   retval = ogmjob_task_run (OGMJOB_TASK (mmkv), cancellable, error);
   ogmjob_task_set_progress (spawn, 1.0);
