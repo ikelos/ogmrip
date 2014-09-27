@@ -73,7 +73,8 @@ struct _OGMRipMediaInterface
 GQuark        ogmrip_media_error_quark   (void);
 
 GType         ogmrip_media_get_type      (void) G_GNUC_CONST;
-OGMRipMedia * ogmrip_media_new           (const gchar         *path);
+OGMRipMedia * ogmrip_media_new           (const gchar         *path,
+                                          GError              **error);
 gboolean      ogmrip_media_open          (OGMRipMedia         *media,
                                           GCancellable        *cancellable,
                                           OGMRipMediaCallback callback,

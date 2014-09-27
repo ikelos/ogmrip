@@ -1769,7 +1769,7 @@ ogmrip_main_window_load_path (OGMRipMainWindow *window, const gchar *path)
   OGMRipMedia *media;
   gboolean res;
 
-  media = ogmrip_media_new (path);
+  media = ogmrip_media_new (path, NULL);
   if (!media)
   {
     ogmrip_run_error_dialog (GTK_WINDOW (window), NULL, _("Could not open '%s'"), path);

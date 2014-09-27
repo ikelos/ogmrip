@@ -482,7 +482,7 @@ ogmrip_cli_list (OGMRipCli *cli)
   OGMRipMedia *media = NULL;
   gboolean retval;
 
-  media = ogmrip_media_new (input);
+  media = ogmrip_media_new (input, NULL);
   if (!media || !ogmrip_media_open (media, NULL, ogmrip_cli_media_open_cb, NULL, NULL))
   {
     g_printerr (_("Couldn't open media: '%s'"), input);
@@ -771,7 +771,7 @@ ogmrip_cli_encode (OGMRipCli *cli)
     goto cleanup;
   }
 
-  media = ogmrip_media_new (input);
+  media = ogmrip_media_new (input, NULL);
   if (!media || !ogmrip_media_open (media, NULL, ogmrip_cli_media_open_cb, NULL, NULL))
   {
     g_printerr (_("Couldn't open media: '%s'"), input);

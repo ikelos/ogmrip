@@ -156,7 +156,7 @@ ogmrip_media_chooser_widget_volume_added (OGMRipMediaChooserWidget *chooser, GVo
     gchar *str;
 
     str = g_volume_get_identifier (volume, G_VOLUME_IDENTIFIER_KIND_UNIX_DEVICE);
-    media = ogmrip_media_new (str);
+    media = ogmrip_media_new (str, NULL);
     g_free (str);
 
     if (!media)
@@ -270,7 +270,7 @@ ogmrip_media_chooser_widget_select_file (GtkComboBox *combo, gboolean file)
     path = gtk_file_chooser_get_filename (GTK_FILE_CHOOSER (dialog));
     if (path)
     {
-      media = ogmrip_media_new (path);
+      media = ogmrip_media_new (path, NULL);
       g_free (path);
     }
   }

@@ -507,7 +507,7 @@ ogmrip_encoding_new_from_xml (OGMRipXML *xml, GError **error)
   if (!str)
     return NULL;
 
-  media = ogmrip_media_new (str);
+  media = ogmrip_media_new (str, NULL);
   g_free (str);
 
   if (!media)
