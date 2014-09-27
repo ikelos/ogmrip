@@ -38,8 +38,7 @@ struct _OGMRipMediaInfoPriv
 
 static OGMRipMediaInfo *default_media_info = NULL;
 
-static void ogmrip_media_info_constructed  (GObject *gobject);
-static void ogmrip_media_info_finalize     (GObject *gobject);
+static void g_initable_iface_init (GInitableIface *iface);
 
 #if defined(UNICODE) || defined (_UNICODE)
 static gchar *
@@ -81,38 +80,9 @@ g_locale_to_wstring (const gchar *str)
 }
 #endif
 
-G_DEFINE_TYPE_WITH_PRIVATE (OGMRipMediaInfo, ogmrip_media_info, G_TYPE_OBJECT)
-
-static void
-ogmrip_media_info_class_init (OGMRipMediaInfoClass *klass)
-{
-  GObjectClass *gobject_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->constructed = ogmrip_media_info_constructed;
-  gobject_class->finalize = ogmrip_media_info_finalize;
-}
-
-static void
-ogmrip_media_info_init (OGMRipMediaInfo *info)
-{
-  info->priv = ogmrip_media_info_get_instance_private (info);
-}
-
-static void
-ogmrip_media_info_constructed (GObject *gobject)
-{
-  OGMRipMediaInfo *info = OGMRIP_MEDIA_INFO (gobject);
-
-  MediaInfoDLL_Load ();
-
-  info->priv->handle = MediaInfo_New ();
-  if (!info->priv->handle)
-  {
-  }
-
-  G_OBJECT_CLASS (ogmrip_media_info_parent_class)->constructed (gobject);
-}
+G_DEFINE_TYPE_WITH_CODE (OGMRipMediaInfo, ogmrip_media_info, G_TYPE_OBJECT,
+    G_ADD_PRIVATE (OGMRipMediaInfo)
+    G_IMPLEMENT_INTERFACE (G_TYPE_INITABLE, g_initable_iface_init));
 
 static void
 ogmrip_media_info_finalize (GObject *gobject)
@@ -133,11 +103,47 @@ ogmrip_media_info_finalize (GObject *gobject)
   G_OBJECT_CLASS (ogmrip_media_info_parent_class)->finalize (gobject);
 }
 
+static void
+ogmrip_media_info_class_init (OGMRipMediaInfoClass *klass)
+{
+  GObjectClass *gobject_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->finalize = ogmrip_media_info_finalize;
+}
+
+static void
+ogmrip_media_info_init (OGMRipMediaInfo *info)
+{
+  info->priv = ogmrip_media_info_get_instance_private (info);
+}
+
+static gboolean
+ogmrip_media_info_initable_init (GInitable *initable, GCancellable *cancellable, GError **error)
+{
+  OGMRipMediaInfo *info = OGMRIP_MEDIA_INFO (initable);
+
+  MediaInfoDLL_Load ();
+
+  info->priv->handle = MediaInfo_New ();
+  if (!info->priv->handle)
+  {
+  }
+
+  return TRUE;
+}
+
+static void
+g_initable_iface_init (GInitableIface *iface)
+{
+  iface->init = ogmrip_media_info_initable_init;
+}
+
 OGMRipMediaInfo *
 ogmrip_media_info_get_default (void)
 {
   if (!default_media_info)
-    default_media_info = g_object_new (OGMRIP_TYPE_MEDIA_INFO, NULL);
+    default_media_info = g_initable_new (OGMRIP_TYPE_MEDIA_INFO, NULL, NULL, NULL);
 
   return default_media_info;
 }

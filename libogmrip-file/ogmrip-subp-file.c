@@ -48,6 +48,9 @@ ogmrip_subp_file_initable_init (GInitable *initable, GCancellable *cancellable, 
   OGMRipMediaInfo *info;
   const gchar *str;
 
+  if (!g_str_has_prefix (OGMRIP_FILE (initable)->priv->uri, "file://"))
+    return FALSE;
+
   info = ogmrip_media_info_get_default ();
   if (!info || !OGMRIP_FILE (initable)->priv->path)
     return FALSE;

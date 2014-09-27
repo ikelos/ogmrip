@@ -23,6 +23,17 @@
 
 G_BEGIN_DECLS
 
+#define OGMRIP_MEDIA_ERROR ogmrip_media_error_quark ()
+
+typedef enum
+{
+  OGMRIP_MEDIA_ERROR_ID,
+  OGMRIP_MEDIA_ERROR_OPEN,
+  OGMRIP_MEDIA_ERROR_TITLE,
+  OGMRIP_MEDIA_ERROR_FORMAT,
+  OGMRIP_MEDIA_ERROR_UNKNOWN
+} OGMRipMediaError;
+
 #define OGMRIP_TYPE_MEDIA            (ogmrip_media_get_type ())
 #define OGMRIP_MEDIA(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_MEDIA, OGMRipMedia))
 #define OGMRIP_IS_MEDIA(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), OGMRIP_TYPE_MEDIA))
@@ -58,6 +69,8 @@ struct _OGMRipMediaInterface
   gboolean      (* is_copy)       (OGMRipMedia         *media,
                                    OGMRipMedia         *copy);
 };
+
+GQuark        ogmrip_media_error_quark   (void);
 
 GType         ogmrip_media_get_type      (void) G_GNUC_CONST;
 OGMRipMedia * ogmrip_media_new           (const gchar         *path);

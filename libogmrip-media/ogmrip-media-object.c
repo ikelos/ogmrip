@@ -24,6 +24,17 @@
 
 static const gchar *untitled = N_("Untitled");
 
+GQuark
+ogmrip_media_error_quark (void)
+{
+  static GQuark quark = 0;
+
+  if (quark == 0)
+    quark = g_quark_from_static_string ("ogmrip-media-error-quark");
+
+  return quark;
+}
+
 G_DEFINE_INTERFACE (OGMRipMedia, ogmrip_media, G_TYPE_OBJECT)
 
 static void

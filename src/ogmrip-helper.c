@@ -109,7 +109,7 @@ ogmrip_open_title (GtkWindow *parent, OGMRipTitle *title, GError **error)
     if (ogmrip_title_open (title, NULL, NULL, NULL, error))
       break;
 
-    if (*error && (*error)->code != OGMDVD_DISC_ERROR_ID)
+    if (*error && (*error)->code != OGMRIP_MEDIA_ERROR_ID)
       break;
 
     g_clear_error (error);
