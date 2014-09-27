@@ -366,11 +366,12 @@ ogmrip_main_window_open_media (OGMRipMainWindow *window, OGMRipMedia *media)
 
   res = ogmrip_media_open (media, cancellable, ogmrip_media_open_progress_cb, pbar, NULL);
 
-  g_object_unref (cancellable);
   gtk_widget_destroy (dialog);
 
   if (!res && !g_cancellable_is_cancelled (cancellable))
     ogmrip_run_error_dialog (GTK_WINDOW (window), NULL, _("Could not open the media"));
+
+  g_object_unref (cancellable);
 
   return res;
 }
