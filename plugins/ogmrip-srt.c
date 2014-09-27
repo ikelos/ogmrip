@@ -54,11 +54,6 @@ struct _OGMRipSrtClass
   OGMRipSubpCodecClass parent_class;
 };
 
-GType           ogmrip_srt_get_type (void);
-static gboolean ogmrip_srt_run      (OGMJobTask   *task,
-                                     GCancellable *cancellable,
-                                     GError       **error);
-
 static gboolean use_gocr      = FALSE;
 static gboolean use_ocrad     = FALSE;
 static gboolean use_tesseract = FALSE;
@@ -150,7 +145,7 @@ ogmrip_subp2pgm_command (OGMRipSubpCodec *subp, const gchar *input)
 }
 
 static OGMJobTask *
-ogmrip_gocr_command (OGMRipSubpCodec *subp, const gchar *input)
+ogmrip_gocr_command (OGMRipSrt *srt, const gchar *input)
 {
   OGMJobTask *task;
   GPtrArray *argv;
@@ -161,7 +156,7 @@ ogmrip_gocr_command (OGMRipSubpCodec *subp, const gchar *input)
   g_ptr_array_add (argv, g_strdup ("1"));
   g_ptr_array_add (argv, g_strdup ("-f"));
 
-  switch (ogmrip_subp_codec_get_charset (subp))
+  switch (ogmrip_subp_codec_get_charset (OGMRIP_SUBP_CODEC (srt)))
   {
     case OGMRIP_CHARSET_UTF8:
       g_ptr_array_add (argv, g_strdup ("UTF8"));
@@ -187,13 +182,13 @@ ogmrip_gocr_command (OGMRipSubpCodec *subp, const gchar *input)
   g_ptr_array_free (argv, TRUE);
 
   ogmjob_spawn_set_watch (OGMJOB_SPAWN (task), OGMJOB_STREAM_ERROR,
-      (OGMJobWatch) ogmrip_gocr_watch, subp, NULL);
+      (OGMJobWatch) ogmrip_gocr_watch, srt, NULL);
 
   return task;
 }
 
 static OGMJobTask *
-ogmrip_ocrad_command (OGMRipSubpCodec *subp, const gchar *input)
+ogmrip_ocrad_command (OGMRipSrt *srt, const gchar *input)
 {
   OGMJobTask *task;
   GPtrArray *argv;
@@ -204,7 +199,7 @@ ogmrip_ocrad_command (OGMRipSubpCodec *subp, const gchar *input)
   g_ptr_array_add (argv, g_strdup ("-f"));
   g_ptr_array_add (argv, g_strdup ("-F"));
 
-  switch (ogmrip_subp_codec_get_charset (subp))
+  switch (ogmrip_subp_codec_get_charset (OGMRIP_SUBP_CODEC (srt)))
   {
     case OGMRIP_CHARSET_UTF8:
       g_ptr_array_add (argv, g_strdup ("utf8"));
@@ -226,13 +221,13 @@ ogmrip_ocrad_command (OGMRipSubpCodec *subp, const gchar *input)
   g_ptr_array_free (argv, TRUE);
 
   ogmjob_spawn_set_watch (OGMJOB_SPAWN (task), OGMJOB_STREAM_ERROR,
-      (OGMJobWatch) ogmrip_ocrad_watch, subp, NULL);
+      (OGMJobWatch) ogmrip_ocrad_watch, srt, NULL);
 
   return task;
 }
 
 static OGMJobTask *
-ogmrip_tesseract_command (OGMRipSubpCodec *subp, const gchar *input, gboolean lang)
+ogmrip_tesseract_command (OGMRipSrt *srt, const gchar *input, gboolean lang)
 {
   OGMJobTask *task;
   GPtrArray *argv;
@@ -242,16 +237,16 @@ ogmrip_tesseract_command (OGMRipSubpCodec *subp, const gchar *input, gboolean la
   g_ptr_array_add (argv, g_strdup (input));
   g_ptr_array_add (argv, g_strdup (input));
 
-  if (lang && OGMRIP_SRT (subp)->is_valid_lang)
+  if (lang && srt->is_valid_lang)
   {
     OGMRipStream *stream;
     const gchar *language;
 
-    stream = ogmrip_codec_get_input (OGMRIP_CODEC (subp));
+    stream = ogmrip_codec_get_input (OGMRIP_CODEC (srt));
     language = ogmrip_language_to_iso639_2 (ogmrip_subp_stream_get_language (OGMRIP_SUBP_STREAM (stream)));
 
     if (g_str_equal (language, "und"))
-      OGMRIP_SRT (subp)->is_valid_lang = FALSE;
+      srt->is_valid_lang = FALSE;
     else
     {
       if (g_str_equal (language, "fre"))
@@ -270,20 +265,20 @@ ogmrip_tesseract_command (OGMRipSubpCodec *subp, const gchar *input, gboolean la
   g_ptr_array_free (argv, TRUE);
 
   ogmjob_spawn_set_watch (OGMJOB_SPAWN (task), OGMJOB_STREAM_ERROR,
-      (OGMJobWatch) ogmrip_tesseract_watch, subp, NULL);
+      (OGMJobWatch) ogmrip_tesseract_watch, srt, NULL);
 
   return task;
 }
 
 static OGMJobTask *
-ogmrip_srt_command (OGMRipSubpCodec *subp, const gchar *input)
+ogmrip_srt_command (OGMRipSrt *srt, const gchar *input)
 {
   OGMJobTask *task;
 
   GPtrArray *argv;
   const gchar *output;
 
-  output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (subp)));
+  output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (srt)));
 
   argv = g_ptr_array_new_full (20, g_free);
   g_ptr_array_add (argv, g_strdup ("subptools"));
@@ -292,7 +287,7 @@ ogmrip_srt_command (OGMRipSubpCodec *subp, const gchar *input)
   g_ptr_array_add (argv, g_strdup ("-t"));
   g_ptr_array_add (argv, g_strdup ("srt"));
 
-  switch (ogmrip_subp_codec_get_newline (OGMRIP_SUBP_CODEC (subp)))
+  switch (ogmrip_subp_codec_get_newline (OGMRIP_SUBP_CODEC (srt)))
   {
     case OGMRIP_NEWLINE_LF:
       g_ptr_array_add (argv, g_strdup ("-n"));
@@ -323,38 +318,22 @@ ogmrip_srt_command (OGMRipSubpCodec *subp, const gchar *input)
 }
 
 static OGMJobTask *
-ogmrip_srt_ocr (OGMJobTask *task, const gchar *filename, gboolean lang)
+ogmrip_srt_ocr (OGMRipSrt *srt, const gchar *filename, gboolean lang)
 {
   OGMJobTask *child;
 
   if (use_tesseract)
-    child = ogmrip_tesseract_command (OGMRIP_SUBP_CODEC (task), filename, lang);
+    child = ogmrip_tesseract_command (srt, filename, lang);
   else if (use_ocrad)
-    child = ogmrip_ocrad_command (OGMRIP_SUBP_CODEC (task), filename);
+    child = ogmrip_ocrad_command (srt, filename);
   else
-    child = ogmrip_gocr_command (OGMRIP_SUBP_CODEC (task), filename);
+    child = ogmrip_gocr_command (srt, filename);
 
   return child;
 }
 
 
 G_DEFINE_TYPE (OGMRipSrt, ogmrip_srt, OGMRIP_TYPE_SUBP_CODEC)
-
-static void
-ogmrip_srt_class_init (OGMRipSrtClass *klass)
-{
-  OGMJobTaskClass *task_class;
-
-  task_class = OGMJOB_TASK_CLASS (klass);
-
-  task_class->run = ogmrip_srt_run;
-}
-
-static void
-ogmrip_srt_init (OGMRipSrt *srt)
-{
-  srt->is_valid_lang = TRUE;
-}
 
 static gboolean
 ogmrip_srt_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
@@ -412,7 +391,7 @@ ogmrip_srt_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
         if (g_pattern_match (pspec, strlen (name), name, NULL))
         {
           str = g_build_filename (ogmrip_fs_get_tmp_dir (), name, NULL);
-          if ((child = ogmrip_srt_ocr (task, str, TRUE)))
+          if ((child = ogmrip_srt_ocr (OGMRIP_SRT (task), str, TRUE)))
           {
             result = ogmjob_task_run (child, cancellable, error);
             g_object_unref (child);
@@ -424,7 +403,7 @@ ogmrip_srt_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 
               OGMRIP_SRT (task)->is_valid_lang = FALSE;
 
-              if ((child = ogmrip_srt_ocr (task, str, FALSE)))
+              if ((child = ogmrip_srt_ocr (OGMRIP_SRT (task), str, FALSE)))
               {
                 result = ogmjob_task_run (child, cancellable, error);
                 g_object_unref (child);
@@ -450,7 +429,7 @@ ogmrip_srt_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   {
     if (have_sub_files && g_file_test (xml_file, G_FILE_TEST_EXISTS))
     {
-      child = ogmrip_srt_command (OGMRIP_SUBP_CODEC (task), xml_file);
+      child = ogmrip_srt_command (OGMRIP_SRT (task), xml_file);
       result = ogmjob_task_run (child, cancellable, error);
       g_object_unref (child);
     }
@@ -498,6 +477,22 @@ ogmrip_srt_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   g_free (tmp_file);
 
   return result;
+}
+
+static void
+ogmrip_srt_class_init (OGMRipSrtClass *klass)
+{
+  OGMJobTaskClass *task_class;
+
+  task_class = OGMJOB_TASK_CLASS (klass);
+
+  task_class->run = ogmrip_srt_run;
+}
+
+static void
+ogmrip_srt_init (OGMRipSrt *srt)
+{
+  srt->is_valid_lang = TRUE;
 }
 
 void

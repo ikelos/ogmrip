@@ -46,10 +46,6 @@ struct _OGMRipOggClass
   OGMRipContainerClass parent_class;
 };
 
-static gboolean ogmrip_ogg_run (OGMJobTask   *task,
-                                GCancellable *cancellable,
-                                GError       **error);
-
 static gboolean
 ogmrip_ogg_merge_watch (OGMJobTask *task, const gchar *buffer, OGMRipContainer *ogg, GError **error)
 {
@@ -266,20 +262,6 @@ ogmrip_ogg_split_command (OGMRipContainer *ogg, const gchar *input)
 
 G_DEFINE_TYPE (OGMRipOgg, ogmrip_ogg, OGMRIP_TYPE_CONTAINER)
 
-static void
-ogmrip_ogg_class_init (OGMRipOggClass *klass)
-{
-  OGMJobTaskClass *task_class;
-
-  task_class = OGMJOB_TASK_CLASS (klass);
-  task_class->run = ogmrip_ogg_run;
-}
-
-static void
-ogmrip_ogg_init (OGMRipOgg *ogg)
-{
-}
-
 static gboolean
 ogmrip_ogg_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
@@ -333,6 +315,20 @@ ogmrip_ogg_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
     close (fd);
 
   return result;
+}
+
+static void
+ogmrip_ogg_class_init (OGMRipOggClass *klass)
+{
+  OGMJobTaskClass *task_class;
+
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_ogg_run;
+}
+
+static void
+ogmrip_ogg_init (OGMRipOgg *ogg)
+{
 }
 
 static OGMRipFormat formats[] =

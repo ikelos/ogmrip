@@ -86,18 +86,6 @@ enum
   FORMAT_PSP
 };
 
-static void     ogmrip_mp4_get_property (GObject      *gobject,
-                                         guint        property_id,
-                                         GValue       *value,
-                                         GParamSpec   *pspec);
-static void     ogmrip_mp4_set_property (GObject      *gobject,
-                                         guint        property_id,
-                                         const GValue *value,
-                                         GParamSpec   *pspec);
-static gboolean ogmrip_mp4_run          (OGMJobTask   *task,
-                                         GCancellable *cancellable,
-                                         GError       **error);
-
 static gboolean
 ogmrip_mp4_create_watch (OGMJobTask *task, const gchar *buffer, OGMRipMp4 *mp4, GError **error)
 {
@@ -427,35 +415,6 @@ G_DEFINE_TYPE_EXTENDED (OGMRipMp4, ogmrip_mp4, OGMRIP_TYPE_CONTAINER, 0,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_CONFIGURABLE, ogmrip_configurable_iface_init))
 
 static void
-ogmrip_mp4_class_init (OGMRipMp4Class *klass)
-{
-  GObjectClass *gobject_class;
-  OGMJobTaskClass *task_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->get_property = ogmrip_mp4_get_property;
-  gobject_class->set_property = ogmrip_mp4_set_property;
-
-  task_class = OGMJOB_TASK_CLASS (klass);
-  task_class->run = ogmrip_mp4_run;
-
-  g_object_class_install_property (gobject_class, PROP_HINT,
-      g_param_spec_boolean (OGMRIP_MP4_PROP_HINT, "hint property", "Set hint",
-        OGMRIP_MP4_DEFAULT_HINT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_FORMAT,
-      g_param_spec_uint (OGMRIP_MP4_PROP_FORMAT, "Format property", "Set format",
-        0, 3, OGMRIP_MP4_DEFAULT_FORMAT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-}
-
-static void
-ogmrip_mp4_init (OGMRipMp4 *mp4)
-{
-  mp4->format = OGMRIP_MP4_DEFAULT_FORMAT;
-  mp4->hint = OGMRIP_MP4_DEFAULT_HINT;
-}
-
-static void
 ogmrip_mp4_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
 {
   OGMRipMp4 *mp4 = OGMRIP_MP4 (gobject);
@@ -549,6 +508,35 @@ ogmrip_mp4_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
     g_file_delete (ogmrip_container_get_output (OGMRIP_CONTAINER (task)), NULL, NULL);
 
   return result;
+}
+
+static void
+ogmrip_mp4_class_init (OGMRipMp4Class *klass)
+{
+  GObjectClass *gobject_class;
+  OGMJobTaskClass *task_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->get_property = ogmrip_mp4_get_property;
+  gobject_class->set_property = ogmrip_mp4_set_property;
+
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_mp4_run;
+
+  g_object_class_install_property (gobject_class, PROP_HINT,
+      g_param_spec_boolean (OGMRIP_MP4_PROP_HINT, "hint property", "Set hint",
+        OGMRIP_MP4_DEFAULT_HINT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_FORMAT,
+      g_param_spec_uint (OGMRIP_MP4_PROP_FORMAT, "Format property", "Set format",
+        0, 3, OGMRIP_MP4_DEFAULT_FORMAT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+}
+
+static void
+ogmrip_mp4_init (OGMRipMp4 *mp4)
+{
+  mp4->format = OGMRIP_MP4_DEFAULT_FORMAT;
+  mp4->hint = OGMRIP_MP4_DEFAULT_HINT;
 }
 
 static OGMRipFormat formats[] = 

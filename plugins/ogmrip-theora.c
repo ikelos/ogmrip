@@ -55,24 +55,6 @@ enum
   PROP_PASSES
 };
 
-static void     ogmrip_theora_get_property (GObject      *gobject,
-                                            guint        property_id,
-                                            GValue       *value,
-                                            GParamSpec   *pspec);
-static void     ogmrip_theora_set_property (GObject      *gobject,
-                                            guint        property_id,
-                                            const GValue *value,
-                                            GParamSpec   *pspec);
-static gboolean ogmrip_theora_run          (OGMJobTask   *task,
-                                            GCancellable *cancellable,
-                                            GError       **error);
-
-static OGMJobTask *
-ogmrip_yuv4mpeg_command (OGMRipVideoCodec *video, const gchar *output)
-{
-  return ogmrip_video_encoder_new (video, OGMRIP_ENCODER_YUV, NULL, NULL, output);
-}
-
 static OGMJobTask *
 ogmrip_theora_command (OGMRipVideoCodec *video, const gchar *input)
 {
@@ -120,29 +102,6 @@ ogmrip_theora_command (OGMRipVideoCodec *video, const gchar *input)
 G_DEFINE_TYPE (OGMRipTheora, ogmrip_theora, OGMRIP_TYPE_VIDEO_CODEC)
 
 static void
-ogmrip_theora_class_init (OGMRipTheoraClass *klass)
-{
-  GObjectClass *gobject_class;
-  OGMJobTaskClass *task_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->get_property = ogmrip_theora_get_property;
-  gobject_class->set_property = ogmrip_theora_set_property;
-
-  task_class = OGMJOB_TASK_CLASS (klass);
-  task_class->run = ogmrip_theora_run;
-
-  g_object_class_install_property (gobject_class, PROP_PASSES, 
-        g_param_spec_uint ("passes", "Passes property", "Set the number of passes", 
-           1, 1, 1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-}
-
-static void
-ogmrip_theora_init (OGMRipTheora *theora)
-{
-}
-
-static void
 ogmrip_theora_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
 {
   switch (property_id)
@@ -187,7 +146,7 @@ ogmrip_theora_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   ogmjob_container_add (OGMJOB_CONTAINER (task), pipeline);
   g_object_unref (pipeline);
 
-  child = ogmrip_yuv4mpeg_command (OGMRIP_VIDEO_CODEC (task), fifo);
+  child = ogmrip_video_encoder_new (OGMRIP_VIDEO_CODEC (task), OGMRIP_ENCODER_YUV, NULL, NULL, fifo);
   ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
   g_object_unref (child);
 
@@ -203,6 +162,29 @@ ogmrip_theora_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   g_free (fifo);
 
   return result;
+}
+
+static void
+ogmrip_theora_class_init (OGMRipTheoraClass *klass)
+{
+  GObjectClass *gobject_class;
+  OGMJobTaskClass *task_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->get_property = ogmrip_theora_get_property;
+  gobject_class->set_property = ogmrip_theora_set_property;
+
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_theora_run;
+
+  g_object_class_install_property (gobject_class, PROP_PASSES, 
+        g_param_spec_uint ("passes", "Passes property", "Set the number of passes", 
+           1, 1, 1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+}
+
+static void
+ogmrip_theora_init (OGMRipTheora *theora)
+{
 }
 
 void

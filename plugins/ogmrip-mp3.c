@@ -49,10 +49,6 @@ struct _OGMRipMp3Class
   OGMRipAudioCodecClass parent_class;
 };
 
-static gboolean ogmrip_mp3_run (OGMJobTask   *task,
-                                GCancellable *cancellable,
-                                GError       **error);
-
 static OGMJobTask *
 ogmrip_mp3_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input)
 {
@@ -117,20 +113,6 @@ ogmrip_mp3_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input
 
 G_DEFINE_TYPE (OGMRipMp3, ogmrip_mp3, OGMRIP_TYPE_AUDIO_CODEC)
 
-static void
-ogmrip_mp3_class_init (OGMRipMp3Class *klass)
-{
-  OGMJobTaskClass *task_class;
-
-  task_class = OGMJOB_TASK_CLASS (klass);
-  task_class->run = ogmrip_mp3_run;
-}
-
-static void
-ogmrip_mp3_init (OGMRipMp3 *mp3)
-{
-}
-
 static gboolean
 ogmrip_mp3_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
@@ -164,6 +146,20 @@ ogmrip_mp3_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   g_free (fifo);
 
   return result;
+}
+
+static void
+ogmrip_mp3_class_init (OGMRipMp3Class *klass)
+{
+  OGMJobTaskClass *task_class;
+
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_mp3_run;
+}
+
+static void
+ogmrip_mp3_init (OGMRipMp3 *mp3)
+{
 }
 
 void

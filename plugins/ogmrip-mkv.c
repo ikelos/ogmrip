@@ -64,10 +64,6 @@ struct _OGMRipWebmClass
   OGMRipMatroskaClass parent_class;
 };
 
-static gboolean ogmrip_matroska_run (OGMJobTask   *task,
-                                     GCancellable *cancellable,
-                                     GError       **error);
-
 G_DEFINE_TYPE (OGMRipMatroska, ogmrip_matroska, OGMRIP_TYPE_CONTAINER)
 
 static gboolean
@@ -350,24 +346,6 @@ ogmrip_matroska_get_overhead (OGMRipContainer *container)
   return MKV_OVERHEAD;
 }
 
-static void
-ogmrip_matroska_class_init (OGMRipMatroskaClass *klass)
-{
-  OGMJobTaskClass *task_class;
-  OGMRipContainerClass *container_class;
-
-  task_class = OGMJOB_TASK_CLASS (klass);
-  task_class->run = ogmrip_matroska_run;
-
-  container_class = OGMRIP_CONTAINER_CLASS (klass);
-  container_class->get_overhead = ogmrip_matroska_get_overhead;
-}
-
-static void
-ogmrip_matroska_init (OGMRipMatroska *matroska)
-{
-}
-
 static gboolean
 ogmrip_matroska_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
@@ -395,6 +373,24 @@ ogmrip_matroska_run (OGMJobTask *task, GCancellable *cancellable, GError **error
   ogmjob_container_remove (OGMJOB_CONTAINER (task), child);
 
   return result;
+}
+
+static void
+ogmrip_matroska_class_init (OGMRipMatroskaClass *klass)
+{
+  OGMJobTaskClass *task_class;
+  OGMRipContainerClass *container_class;
+
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_matroska_run;
+
+  container_class = OGMRIP_CONTAINER_CLASS (klass);
+  container_class->get_overhead = ogmrip_matroska_get_overhead;
+}
+
+static void
+ogmrip_matroska_init (OGMRipMatroska *matroska)
+{
 }
 
 G_DEFINE_TYPE (OGMRipWebm, ogmrip_webm, OGMRIP_TYPE_MATROSKA)

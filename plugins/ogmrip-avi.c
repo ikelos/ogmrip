@@ -56,14 +56,6 @@ enum
   PROP_NSUBP
 };
 
-static void     ogmrip_avi_get_property (GObject      *gobject,
-                                         guint        property_id,
-                                         GValue       *value,
-                                         GParamSpec   *pspec);
-static gboolean ogmrip_avi_run          (OGMJobTask   *task,
-                                         GCancellable *cancellable,
-                                         GError       **error);
-
 static gboolean
 ogmrip_avi_watch (OGMJobTask *task, const gchar *buffer, OGMRipContainer *avi, GError **error)
 {
@@ -191,61 +183,6 @@ ogmrip_copy_command (OGMRipContainer *container, const gchar *input, const gchar
   return task;
 }
 
-static gint
-ogmrip_avi_get_overhead (OGMRipContainer *container)
-{
-  return AVI_OVERHEAD;
-}
-
-G_DEFINE_TYPE (OGMRipAvi, ogmrip_avi, OGMRIP_TYPE_CONTAINER)
-
-static void
-ogmrip_avi_class_init (OGMRipAviClass *klass)
-{
-  GObjectClass *gobject_class;
-  OGMJobTaskClass *task_class;
-  OGMRipContainerClass *container_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->get_property = ogmrip_avi_get_property;
-
-  task_class = OGMJOB_TASK_CLASS (klass);
-  task_class->run = ogmrip_avi_run;
-
-  container_class = OGMRIP_CONTAINER_CLASS (klass);
-  container_class->get_overhead = ogmrip_avi_get_overhead;
-
-  g_object_class_install_property (G_OBJECT_CLASS (klass), PROP_NAUDIO, 
-        g_param_spec_uint ("naudio", "Number of audio streams property", "Get number of audio streams", 
-           0, 8, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (G_OBJECT_CLASS (klass), PROP_NSUBP, 
-        g_param_spec_uint ("nsubp", "Number of subp streams property", "Get number of subp streams", 
-           0, 1, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-}
-
-static void
-ogmrip_avi_init (OGMRipAvi *avi)
-{
-}
-
-static void
-ogmrip_avi_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
-{
-  switch (property_id)
-  {
-    case PROP_NAUDIO:
-      G_OBJECT_CLASS (ogmrip_avi_parent_class)->get_property (gobject, property_id, value, pspec);
-      break;
-    case PROP_NSUBP:
-      G_OBJECT_CLASS (ogmrip_avi_parent_class)->get_property (gobject, property_id, value, pspec);
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
-      break;
-  }
-}
-
 static void
 ogmrip_avi_foreach_subp (OGMRipContainer *avi, OGMRipFile *file, OGMJobTask *queue)
 {
@@ -281,6 +218,31 @@ ogmrip_avi_foreach_subp (OGMRipContainer *avi, OGMRipFile *file, OGMJobTask *que
   }
 }
 
+static gint
+ogmrip_avi_get_overhead (OGMRipContainer *container)
+{
+  return AVI_OVERHEAD;
+}
+
+G_DEFINE_TYPE (OGMRipAvi, ogmrip_avi, OGMRIP_TYPE_CONTAINER)
+
+static void
+ogmrip_avi_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
+{
+  switch (property_id)
+  {
+    case PROP_NAUDIO:
+      G_OBJECT_CLASS (ogmrip_avi_parent_class)->get_property (gobject, property_id, value, pspec);
+      break;
+    case PROP_NSUBP:
+      G_OBJECT_CLASS (ogmrip_avi_parent_class)->get_property (gobject, property_id, value, pspec);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
+      break;
+  }
+}
+
 static gboolean
 ogmrip_avi_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
@@ -303,6 +265,36 @@ ogmrip_avi_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   ogmjob_container_remove (OGMJOB_CONTAINER (task), queue);
 
   return result;
+}
+
+static void
+ogmrip_avi_class_init (OGMRipAviClass *klass)
+{
+  GObjectClass *gobject_class;
+  OGMJobTaskClass *task_class;
+  OGMRipContainerClass *container_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->get_property = ogmrip_avi_get_property;
+
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_avi_run;
+
+  container_class = OGMRIP_CONTAINER_CLASS (klass);
+  container_class->get_overhead = ogmrip_avi_get_overhead;
+
+  g_object_class_install_property (G_OBJECT_CLASS (klass), PROP_NAUDIO, 
+        g_param_spec_uint ("naudio", "Number of audio streams property", "Get number of audio streams", 
+           0, 8, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (G_OBJECT_CLASS (klass), PROP_NSUBP, 
+        g_param_spec_uint ("nsubp", "Number of subp streams property", "Get number of subp streams", 
+           0, 1, 0, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+}
+
+static void
+ogmrip_avi_init (OGMRipAvi *avi)
+{
 }
 
 static OGMRipFormat formats[] = 
