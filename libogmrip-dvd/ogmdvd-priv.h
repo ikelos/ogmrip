@@ -82,6 +82,7 @@ struct _OGMDvdTitlePriv
   guint8 nr_of_chapters;
 
   guint64 vts_size;
+  guint nopen;
 
   uint32_t palette[16];
 
@@ -103,9 +104,7 @@ struct _OGMDvdTitlePriv
   dvd_time_t playback_time;
 
   OGMRipMedia *disc;
-/*
-  gboolean close_disc;
-*/
+
   guint8 ttn;
 
   guint8 title_set_nr;
