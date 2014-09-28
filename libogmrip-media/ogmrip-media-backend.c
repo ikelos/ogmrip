@@ -270,15 +270,13 @@ ogmrip_title_benchmark (OGMRipTitle *title, gboolean *progressive, gboolean *tel
   OGMRipProgress progress;
   OGMRipBenchmark benchmark;
 
-  gboolean is_open;
   gchar **argv;
   gint result;
 
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
 
-  is_open = ogmrip_title_is_open (title);
-  if (!is_open && !ogmrip_title_open (title, cancellable, callback, user_data, error))
+  if (!ogmrip_title_open (title, cancellable, callback, user_data, error))
     return FALSE;
 
   progress.title = title;
@@ -304,8 +302,7 @@ ogmrip_title_benchmark (OGMRipTitle *title, gboolean *progressive, gboolean *tel
 
   if (!result)
   {
-    if (!is_open)
-      ogmrip_title_close (title);
+    ogmrip_title_close (title);
 
     return FALSE;
   }
@@ -352,6 +349,8 @@ ogmrip_title_benchmark (OGMRipTitle *title, gboolean *progressive, gboolean *tel
 
   g_free (benchmark.prev_affinity);
   g_free (benchmark.cur_affinity);
+
+  ogmrip_title_close (title);
 
   return TRUE;
 }
@@ -479,15 +478,13 @@ ogmrip_title_crop_detect (OGMRipTitle *title, guint *crop_x, guint *crop_y, guin
 
   guint raw_w, raw_h;
   gdouble length, start, step;
-  gboolean is_open;
   gchar **argv;
   gint result;
 
   if (g_cancellable_set_error_if_cancelled (cancellable, error))
     return FALSE;
 
-  is_open = ogmrip_title_is_open (title);
-  if (!is_open && !ogmrip_title_open (title, cancellable, callback, user_data, error))
+  if (!ogmrip_title_open (title, cancellable, callback, user_data, error))
     return FALSE;
 
   progress.title = title;
@@ -524,8 +521,7 @@ ogmrip_title_crop_detect (OGMRipTitle *title, guint *crop_x, guint *crop_y, guin
 
   if (!result)
   {
-    if (!is_open)
-      ogmrip_title_close (title);
+    ogmrip_title_close (title);
 
     return FALSE;
   }
@@ -557,8 +553,7 @@ ogmrip_title_crop_detect (OGMRipTitle *title, guint *crop_x, guint *crop_y, guin
   if (*crop_y + *crop_h > raw_h)
     *crop_y = 0;
 
-  if (!is_open)
-    ogmrip_title_close (title);
+  ogmrip_title_close (title);
 
   return TRUE;
 }

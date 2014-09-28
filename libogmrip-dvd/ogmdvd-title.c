@@ -293,8 +293,6 @@ ogmdvd_title_open (OGMRipTitle *title, GCancellable *cancellable, OGMRipTitleCal
   OGMDvdTitle *dtitle = OGMDVD_TITLE (title);
   OGMDvdProgress progress = { title, callback, user_data };
 
-  dtitle->priv->close_disc = !ogmrip_media_is_open (dtitle->priv->disc);
-
   if (!ogmrip_media_open (dtitle->priv->disc, cancellable, callback ? ogmdvd_title_open_cb : NULL, &progress, error))
     return FALSE;
 
@@ -319,12 +317,8 @@ ogmdvd_title_close (OGMRipTitle *title)
   {
     ifoClose (dtitle->priv->vts_file);
     dtitle->priv->vts_file = NULL;
-  }
 
-  if (dtitle->priv->close_disc && dtitle->priv->disc)
-  {
     ogmrip_media_close (dtitle->priv->disc);
-    dtitle->priv->close_disc = FALSE;
   }
 }
 

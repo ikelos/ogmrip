@@ -56,6 +56,7 @@ struct _OGMDvdDiscPriv
 
   dvd_reader_t *reader;
   ifo_handle_t *vmg_file;
+  guint nopen;
 };
 
 /**
@@ -100,22 +101,15 @@ struct _OGMDvdTitlePriv
   dvd_time_t playback_time;
 
   OGMRipMedia *disc;
+/*
   gboolean close_disc;
-
+*/
   guint8 ttn;
 
   guint8 title_set_nr;
   ifo_handle_t *vts_file;
 
   gint *bitrates;
-/*
-  OGMDvdReader *reader;
-  OGMDvdParser *parser;
-
-  gint block_len;
-  guchar *buffer;
-  guchar *ptr;
-*/
 };
 
 /**
