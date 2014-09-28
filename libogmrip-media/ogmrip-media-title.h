@@ -68,14 +68,6 @@ struct _OGMRipTitleInterface
                                                 OGMRipTitleCallback callback,
                                                 gpointer            user_data,
                                                 GError              **error);
-  OGMRipMedia *       (* copy)                 (OGMRipTitle         *title,
-                                                const gchar         *path,
-                                                GCancellable        *cancellable,
-                                                OGMRipTitleCallback callback,
-                                                gpointer            user_data,
-                                                GError              **error);
-  gboolean            (* is_copy)              (OGMRipTitle         *title,
-                                                OGMRipTitle         *copy);
 };
 
 GType               ogmrip_title_get_type             (void) G_GNUC_CONST;
@@ -108,12 +100,6 @@ OGMRipSubpStream *  ogmrip_title_get_subp_stream      (OGMRipTitle         *titl
                                                        guint               id);
 GList *             ogmrip_title_get_subp_streams     (OGMRipTitle         *title);
 gboolean            ogmrip_title_analyze              (OGMRipTitle         *title,
-                                                       GCancellable        *cancellable,
-                                                       OGMRipTitleCallback callback,
-                                                       gpointer            user_data,
-                                                       GError              **error);
-OGMRipMedia *       ogmrip_title_copy                 (OGMRipTitle         *title,
-                                                       const gchar         *path,
                                                        GCancellable        *cancellable,
                                                        OGMRipTitleCallback callback,
                                                        gpointer            user_data,
