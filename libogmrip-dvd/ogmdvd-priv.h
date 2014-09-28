@@ -57,6 +57,8 @@ struct _OGMDvdDiscPriv
   dvd_reader_t *reader;
   ifo_handle_t *vmg_file;
   guint nopen;
+
+  OGMDvdDisc *copy;
 };
 
 /**
@@ -203,14 +205,6 @@ struct _OGMDvdParser
   /* const mpeg2_info_t *info; */
   guint width, height;
 };
-
-OGMDvdDisc * ogmdvd_disc_copy (OGMDvdDisc          *disc,
-                               OGMDvdTitle         *title,
-                               const gchar         *path,
-                               GCancellable        *cancellable,
-                               OGMRipMediaCallback callback,
-                               gpointer            user_data,
-                               GError              **error);
 
 gulong ogmdvd_time_to_msec (dvd_time_t *dtime);
 

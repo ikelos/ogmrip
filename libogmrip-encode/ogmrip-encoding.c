@@ -1655,7 +1655,7 @@ ogmrip_encoding_copy (OGMRipEncoding *encoding, GCancellable *cancellable, GErro
   output = g_build_filename (ogmrip_fs_get_tmp_dir (), name, NULL);
   g_free (name);
 
-  task = ogmrip_copy_new_from_title (encoding->priv->title, output);
+  task = ogmrip_copy_new (encoding->priv->media, output);
   g_free (output);
 
   id = g_signal_connect_swapped (task, "notify::progress",

@@ -219,7 +219,6 @@ ogmrip_media_copy (OGMRipMedia *media, const gchar *path, GCancellable *cancella
     OGMRipMediaCallback callback, gpointer user_data, GError **error)
 {
   OGMRipMediaInterface *iface;
-  OGMRipMedia *copy;
 
   g_return_val_if_fail (OGMRIP_IS_MEDIA (media), NULL);
   g_return_val_if_fail (path != NULL, NULL);
@@ -231,11 +230,7 @@ ogmrip_media_copy (OGMRipMedia *media, const gchar *path, GCancellable *cancella
   if (!iface->copy)
     return NULL;
 
-  copy = iface->copy (media, path, cancellable, callback, user_data, error);
-  if (copy)
-    g_object_set_data_full (G_OBJECT (copy), "__copy_from__", g_object_ref (media), g_object_unref);
-
-  return copy;
+  return iface->copy (media, path, cancellable, callback, user_data, error);
 }
 
 gboolean
@@ -248,10 +243,10 @@ ogmrip_media_is_copy (OGMRipMedia *media, OGMRipMedia *copy)
 
   iface = OGMRIP_MEDIA_GET_IFACE (media);
 
-  if (iface->is_copy)
-    return iface->is_copy (media, copy);
+  if (!iface->is_copy)
+    return FALSE;
 
-  return media == g_object_get_data (G_OBJECT (copy), "__copy_from__");
+  return iface->is_copy (media, copy);
 }
 
 OGMRipMedia *

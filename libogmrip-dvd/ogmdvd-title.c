@@ -517,25 +517,6 @@ ogmdvd_title_analyze (OGMRipTitle *title, GCancellable *cancellable, OGMRipTitle
 }
 
 static void
-ogmdvd_title_copy_cb (OGMRipMedia *media, gdouble percent, gpointer user_data)
-{
-  OGMDvdProgress *progress = user_data;
-
-  progress->callback (progress->title, percent, progress->user_data);
-}
-
-static OGMRipMedia *
-ogmdvd_title_copy (OGMRipTitle *title, const gchar *path, GCancellable *cancellable,
-    OGMRipTitleCallback callback, gpointer user_data, GError **error)
-{
-  OGMRipMedia *disc = OGMDVD_TITLE (title)->priv->disc;
-  OGMDvdProgress progress = { title, callback, user_data };
-
-  return (OGMRipMedia *) ogmdvd_disc_copy (OGMDVD_DISC (disc), OGMDVD_TITLE (title),
-      path, cancellable, ogmdvd_title_copy_cb, &progress, error);
-}
-
-static void
 ogmdvd_title_iface_init (OGMRipTitleInterface *iface)
 {
   iface->open                 = ogmdvd_title_open;
@@ -557,6 +538,5 @@ ogmdvd_title_iface_init (OGMRipTitleInterface *iface)
   iface->get_subp_stream      = ogmdvd_title_get_subp_stream;
   iface->get_subp_streams     = ogmdvd_title_get_subp_streams;
   iface->analyze              = ogmdvd_title_analyze;
-  iface->copy                 = ogmdvd_title_copy;
 }
 

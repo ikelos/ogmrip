@@ -47,9 +47,7 @@ struct _OGMRipCopyClass
 };
 
 GType         ogmrip_copy_get_type        (void);
-OGMJobTask *  ogmrip_copy_new_from_media  (OGMRipMedia *media,
-                                           const gchar *path);
-OGMJobTask *  ogmrip_copy_new_from_title  (OGMRipTitle *title,
+OGMJobTask *  ogmrip_copy_new             (OGMRipMedia *media,
                                            const gchar *path);
 OGMRipMedia * ogmrip_copy_get_source      (OGMRipCopy  *copy);
 OGMRipMedia * ogmrip_copy_get_destination (OGMRipCopy  *copy);
