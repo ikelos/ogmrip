@@ -42,7 +42,43 @@ ogmbr_audio_stream_class_init (OGMBrAudioStreamClass *klass)
 static gint
 ogmbr_audio_stream_get_format (OGMRipStream *stream)
 {
-  return OGMBR_AUDIO_STREAM (stream)->priv->format;
+  OGMRipFormat format = OGMRIP_FORMAT_UNDEFINED;
+
+  switch (OGMBR_AUDIO_STREAM (stream)->priv->type)
+  {
+    case BLURAY_STREAM_TYPE_AUDIO_MPEG1:
+      format = OGMRIP_FORMAT_MPEG1;
+      break;
+    case BLURAY_STREAM_TYPE_AUDIO_MPEG2:
+      format = OGMRIP_FORMAT_MPEG2;
+      break;
+    case BLURAY_STREAM_TYPE_AUDIO_LPCM:
+      format = OGMRIP_FORMAT_PCM;
+      break;
+    case BLURAY_STREAM_TYPE_AUDIO_AC3:
+      format = OGMRIP_FORMAT_AC3;
+      break;
+    case BLURAY_STREAM_TYPE_AUDIO_DTS:
+      format = OGMRIP_FORMAT_DTS;
+      break;
+    case BLURAY_STREAM_TYPE_AUDIO_TRUHD:
+      format = OGMRIP_FORMAT_TRUEHD;
+      break;
+    case BLURAY_STREAM_TYPE_AUDIO_AC3PLUS:
+      format = OGMRIP_FORMAT_EAC3;
+      break;
+    case BLURAY_STREAM_TYPE_AUDIO_DTSHD:
+      format = OGMRIP_FORMAT_DTS_HD;
+      break;
+    case BLURAY_STREAM_TYPE_AUDIO_DTSHD_MASTER:
+      format = OGMRIP_FORMAT_DTS_HD_MA;
+      break;
+    default:
+      g_assert_not_reached ();
+      break;
+  }
+
+  return format;
 }
 
 static gint
@@ -54,6 +90,8 @@ ogmbr_audio_stream_get_id (OGMRipStream *stream)
 static OGMRipTitle *
 ogmbr_audio_stream_get_title (OGMRipStream *stream)
 {
+  g_message ("get title");
+
   return OGMBR_AUDIO_STREAM (stream)->priv->title;
 }
 
@@ -68,47 +106,78 @@ ogmbr_stream_iface_init (OGMRipStreamInterface *iface)
 static gint
 ogmbr_audio_stream_get_bitrate (OGMRipAudioStream *audio)
 {
-  return OGMBR_AUDIO_STREAM (audio)->priv->bitrate;
+  /* TODO bitrate */
+  return 0;
 }
 
 static gint
 ogmbr_audio_stream_get_channels (OGMRipAudioStream *audio)
 {
-  switch (OGMBR_AUDIO_STREAM (audio)->priv->channels)
+  OGMRipChannels channels;
+
+  switch (OGMBR_AUDIO_STREAM (audio)->priv->format)
   {
-    case 1:
-      return OGMRIP_CHANNELS_MONO;
-    case 2:
-      return OGMRIP_CHANNELS_STEREO;
-    case 4:
-      return OGMRIP_CHANNELS_SURROUND;
-    case 6:
-      return OGMRIP_CHANNELS_5_1;
-    case 7:
-      return OGMRIP_CHANNELS_6_1;
-    case 8:
-      return OGMRIP_CHANNELS_7_1;
+    case BLURAY_AUDIO_FORMAT_MONO:
+      channels = OGMRIP_CHANNELS_MONO;
+      break;
+    case BLURAY_AUDIO_FORMAT_STEREO:
+      channels = OGMRIP_CHANNELS_STEREO;
+      break;
+    case BLURAY_AUDIO_FORMAT_MULTI_CHAN:
+      channels = OGMRIP_CHANNELS_5_1;
+      break;
+    case BLURAY_AUDIO_FORMAT_COMBO:
+      channels = OGMRIP_CHANNELS_UNDEFINED;
+      break;
     default:
-      return OGMRIP_CHANNELS_UNDEFINED;
+      g_assert_not_reached ();
+      break;
   }
+
+  return channels;
 }
 
 static gint
 ogmbr_audio_stream_get_content (OGMRipAudioStream *audio)
 {
-  return OGMBR_AUDIO_STREAM (audio)->priv->content;
+  /* TODO content */
+  return 0;
 }
 
 static gint
 ogmbr_audio_stream_get_language (OGMRipAudioStream *audio)
 {
-  return OGMBR_AUDIO_STREAM (audio)->priv->language;
+  return OGMBR_AUDIO_STREAM (audio)->priv->lang;
 }
 
 static gint
-ogmbr_audio_sterma_get_sample_rate (OGMRipAudioStream *audio)
+ogmbr_audio_stream_get_sample_rate (OGMRipAudioStream *audio)
 {
-  return OGMBR_AUDIO_STREAM (audio)->priv->samplerate;
+  gint rate;
+
+  switch (OGMBR_AUDIO_STREAM (audio)->priv->rate)
+  {
+    case BLURAY_AUDIO_RATE_48:
+      rate = 48000;
+      break;
+    case BLURAY_AUDIO_RATE_96:
+      rate = 96000;
+      break;
+    case BLURAY_AUDIO_RATE_192:
+      rate = 192000;
+      break;
+    case BLURAY_AUDIO_RATE_192_COMBO:
+      rate = 192000;
+      break;
+    case BLURAY_AUDIO_RATE_96_COMBO:
+      rate = 96000;
+      break;
+    default:
+      g_assert_not_reached ();
+      break;
+  }
+
+  return rate;
 }
 
 static void
@@ -118,6 +187,6 @@ ogmbr_audio_stream_iface_init (OGMRipAudioStreamInterface *iface)
   iface->get_channels    = ogmbr_audio_stream_get_channels;
   iface->get_content     = ogmbr_audio_stream_get_content;
   iface->get_language    = ogmbr_audio_stream_get_language;
-  iface->get_sample_rate = ogmbr_audio_sterma_get_sample_rate;
+  iface->get_sample_rate = ogmbr_audio_stream_get_sample_rate;
 }
 

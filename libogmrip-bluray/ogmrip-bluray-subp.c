@@ -42,7 +42,7 @@ ogmbr_subp_stream_class_init (OGMBrSubpStreamClass *klass)
 static gint
 ogmbr_subp_stream_get_format (OGMRipStream *stream)
 {
-  return OGMBR_SUBP_STREAM (stream)->priv->format;
+  return OGMRIP_FORMAT_PGS;
 }
 
 static gint
@@ -54,6 +54,8 @@ ogmbr_subp_stream_get_id (OGMRipStream *stream)
 static OGMRipTitle *
 ogmbr_subp_stream_get_title (OGMRipStream *stream)
 {
+  g_message ("get title");
+
   return OGMBR_SUBP_STREAM (stream)->priv->title;
 }
 
@@ -68,13 +70,14 @@ ogmbr_stream_iface_init (OGMRipStreamInterface *iface)
 static gint
 ogmbr_subp_stream_get_content (OGMRipSubpStream *subp)
 {
-  return OGMBR_SUBP_STREAM (subp)->priv->content;
+  /* TODO content */
+  return 0;
 }
 
 static gint
 ogmbr_subp_stream_get_language (OGMRipSubpStream *subp)
 {
-  return OGMBR_SUBP_STREAM (subp)->priv->language;
+  return OGMBR_SUBP_STREAM (subp)->priv->lang;
 }
 
 static void

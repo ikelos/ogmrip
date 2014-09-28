@@ -21,7 +21,6 @@
 
 #include <ogmrip-job.h>
 #include <ogmrip-bluray-disc.h>
-#include <ogmrip-bluray-title.h>
 
 G_BEGIN_DECLS
 
@@ -48,30 +47,13 @@ struct _OGMBrMakeMKVClass
   OGMJobBinClass parent_class;
 };
 
-GType          ogmbr_makemkv_get_type      (void);
-OGMBrMakeMKV * ogmbr_makemkv_get_default   (void);
-gboolean       ogmbr_makemkv_update_drives (OGMBrMakeMKV *mmkv,
-                                            GCancellable *cancellable,
-                                            GError       **error);
-gboolean       ogmbr_makemkv_open_disc     (OGMBrMakeMKV *mmkv,
-                                            OGMBrDisc    *disc,
-                                            GCancellable *cancellable,
-                                            GError       **error);
-gboolean       ogmbr_makemkv_backup_disc   (OGMBrMakeMKV *mmkv,
-                                            OGMBrDisc    *disc,
-                                            const gchar  *output,
-                                            GCancellable *cancellable,
-                                            GError       **error);
-gboolean       ogmbr_makemkv_copy_disc     (OGMBrMakeMKV *mmkv,
-                                            OGMBrDisc    *disc,
-                                            const gchar  *output,
-                                            GCancellable *cancellable,
-                                            GError       **error);
-gboolean       ogmbr_makemkv_copy_title    (OGMBrMakeMKV *mmkv,
-                                            OGMBrTitle   *title,
-                                            const gchar  *output,
-                                            GCancellable *cancellable,
-                                            GError       **error);
+GType          ogmbr_makemkv_get_type    (void);
+OGMBrMakeMKV * ogmbr_makemkv_get_default (void);
+gboolean       ogmbr_makemkv_backup_disc (OGMBrMakeMKV *mmkv,
+                                          OGMBrDisc    *disc,
+                                          const gchar  *output,
+                                          GCancellable *cancellable,
+                                          GError       **error);
 
 G_END_DECLS
 

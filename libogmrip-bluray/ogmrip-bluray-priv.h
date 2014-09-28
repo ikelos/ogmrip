@@ -20,6 +20,10 @@
 #define __OGMRIP_BLURAY_PRIV_H__
 
 #include <ogmrip-media.h>
+#include <ogmrip-bluray-disc.h>
+
+#include <libbluray/bluray.h>
+#include <libbluray/meta_data.h>
 
 G_BEGIN_DECLS
 
@@ -30,17 +34,15 @@ struct _OGMBrMakeMKVPriv
 
 struct _OGMBrDiscPriv
 {
-  guint nr;
-  gchar *id;
-  gchar *real_id;
   gchar *uri;
   gchar *device;
-  guint ntitles;
+  gchar *label;
   GList *titles;
 
-  guint type;
-  gchar *label;
-  gboolean is_open;
+  BLURAY *bd;
+  gint selected;
+
+  OGMBrDisc *copy;
 };
 
 struct _OGMBrTitlePriv
@@ -48,33 +50,35 @@ struct _OGMBrTitlePriv
   OGMRipMedia *media;
 
   guint id;
-  GList *streams;
+  guint nopen;
+
   GList *audio_streams;
-  guint naudio_streams;
   GList *subp_streams;
-  guint nsubp_streams;
+
   guint nchapters;
-  gdouble length;
+  guint64 *chapters;
+
+  guint nangles;
+
+  guint64 duration;
   guint64 size;
 
-  guint vid;
-  OGMRipFormat format;
-  guint aspect_num;
-  guint aspect_denom;
-  guint raw_width;
-  guint raw_height;
-  guint rate_num;
-  guint rate_denom;
+  bd_stream_type_e type;
+  bd_video_aspect_e aspect;
+  bd_video_rate_e rate;
+  bd_video_format_e format;
+
   guint crop_x;
   guint crop_y;
   guint crop_width;
   guint crop_height;
+/*
   gint bitrate;
-
+*/
   gboolean analyzed;
-  gboolean interlaced;
-  gboolean progressive;
+/*
   gboolean telecine;
+*/
 };
 
 struct _OGMBrAudioStreamPriv
@@ -82,12 +86,11 @@ struct _OGMBrAudioStreamPriv
   OGMRipTitle *title;
 
   guint id;
-  OGMRipFormat format;
-  guint channels;
-  guint samplerate;
-  guint content;
-  gint language;
-  gint bitrate;
+
+  bd_stream_type_e type;
+  bd_audio_format_e format;
+  bd_audio_rate_e rate;
+  gint lang;
 };
 
 struct _OGMBrSubpStreamPriv
@@ -95,9 +98,10 @@ struct _OGMBrSubpStreamPriv
   OGMRipTitle *title;
 
   guint id;
-  OGMRipFormat format;
+/*
   guint content;
-  gint language;
+*/
+  gint lang;
 };
 
 G_END_DECLS
