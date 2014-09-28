@@ -16,11 +16,17 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include "ogmrip-subp-file.h"
 #include "ogmrip-media-info.h"
 #include "ogmrip-file-priv.h"
 
 #include <stdlib.h>
+
+#include <glib/gi18n-lib.h>
 
 static void g_initable_iface_init         (GInitableIface            *iface);
 static void ogmrip_subp_stream_iface_init (OGMRipSubpStreamInterface *iface);
@@ -48,26 +54,40 @@ ogmrip_subp_file_initable_init (GInitable *initable, GCancellable *cancellable, 
   OGMRipMediaInfo *info;
   const gchar *str;
 
-  if (!g_str_has_prefix (OGMRIP_FILE (initable)->priv->uri, "file://"))
+  if (!OGMRIP_FILE (initable)->priv->uri || !g_str_has_prefix (OGMRIP_FILE (initable)->priv->uri, "file://"))
     return FALSE;
 
   info = ogmrip_media_info_get_default ();
-  if (!info || !OGMRIP_FILE (initable)->priv->path)
+  if (!info)
+  {
+    g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_FILE_ERROR_INFO,
+        _("Cannot get media info handle"));
     return FALSE;
+  }
 
   file = g_file_new_for_path (OGMRIP_FILE (initable)->priv->path);
   OGMRIP_FILE (initable)->priv->id = g_file_get_id (file);
   g_object_unref (file);
 
   if (!OGMRIP_FILE (initable)->priv->id)
+  {
+    g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_MEDIA_ERROR_ID,
+        _("Cannot retrieve identifier for '%s'"), OGMRIP_FILE (initable)->priv->uri);
     return FALSE;
+  }
 
   if (!ogmrip_media_info_open (info, OGMRIP_FILE (initable)->priv->path))
+  {
+    g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_MEDIA_ERROR_OPEN,
+        _("Cannot open '%s'"), OGMRIP_FILE (initable)->priv->uri);
     return FALSE;
+  }
 
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "TextCount");
   if (!str || !g_str_equal (str, "1"))
   {
+    g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_MEDIA_ERROR_SUBP,
+        _("No subtitles found for '%s'"), OGMRIP_FILE (initable)->priv->uri);
     g_object_unref (info);
     return FALSE;
   }
@@ -75,6 +95,8 @@ ogmrip_subp_file_initable_init (GInitable *initable, GCancellable *cancellable, 
   OGMRIP_FILE (initable)->priv->format = ogmrip_media_info_get_subp_format (info, 0);
   if (OGMRIP_FILE (initable)->priv->format < 0)
   {
+    g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_MEDIA_ERROR_SUBP,
+        _("Unknown subtitles format for '%s'"), OGMRIP_FILE (initable)->priv->uri);
     g_object_unref (info);
     return FALSE;
   }

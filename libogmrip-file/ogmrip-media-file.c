@@ -282,8 +282,8 @@ ogmrip_media_file_initable_init (GInitable *initable, GCancellable *cancellable,
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "VideoCount");
   if (!str || g_str_equal (str, "0"))
   {
-    g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_MEDIA_ERROR_TITLE,
-        _("No title found for '%s'"), OGMRIP_FILE (initable)->priv->uri);
+    g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_MEDIA_ERROR_VIDEO,
+        _("No video found for '%s'"), OGMRIP_FILE (initable)->priv->uri);
     g_object_unref (info);
     return FALSE;
   }
@@ -291,8 +291,8 @@ ogmrip_media_file_initable_init (GInitable *initable, GCancellable *cancellable,
   OGMRIP_FILE (initable)->priv->format = ogmrip_media_info_get_video_format (info, 0);
   if (OGMRIP_FILE (initable)->priv->format < 0)
   {
-    g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_MEDIA_ERROR_TITLE,
-        _("Unknown format for title %d of '%s'"), 1, OGMRIP_FILE (initable)->priv->uri);
+    g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_MEDIA_ERROR_VIDEO,
+        _("Unknown video format for '%s'"), OGMRIP_FILE (initable)->priv->uri);
     g_object_unref (info);
     return FALSE;
   }
