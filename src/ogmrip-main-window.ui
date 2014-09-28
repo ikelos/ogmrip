@@ -5,7 +5,7 @@
   <requires lib="OGMRipMedia" version="0.0"/>
   <template class="OGMRipMainWindow" parent="GtkApplicationWindow">
     <property name="can_focus">False</property>
-    <property name="title" translatable="yes">OGMRip</property>
+    <property name="title" translatable="no">OGMRip</property>
     <property name="default_width">550</property>
     <property name="default_height">700</property>
     <child>
@@ -184,7 +184,7 @@
                         <property name="can_focus">True</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
                         <property name="invisible_char">•</property>
-                        <property name="text" translatable="yes">1</property>
+                        <property name="text" translatable="no">1</property>
                         <property name="adjustment">adjustment1</property>
                         <property name="value">1</property>
                       </object>

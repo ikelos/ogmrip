@@ -366,41 +366,44 @@ ogmrip_main_window_open_media (OGMRipMainWindow *window, OGMRipMedia *media)
 
   res = ogmrip_media_open (media, cancellable, ogmrip_media_open_progress_cb, pbar, NULL);
 
-  g_object_unref (cancellable);
   gtk_widget_destroy (dialog);
 
   if (!res && !g_cancellable_is_cancelled (cancellable))
     ogmrip_run_error_dialog (GTK_WINDOW (window), NULL, _("Could not open the media"));
 
+  g_object_unref (cancellable);
+
   return res;
 }
 
-static void
+static gboolean
 ogmrip_main_window_load_media (OGMRipMainWindow *window, OGMRipMedia *media)
 {
-  if (ogmrip_main_window_open_media (window, media))
+  const gchar *label = NULL;
+  gint nvid;
+
+  if (!ogmrip_main_window_open_media (window, media))
+    return FALSE;
+
+  if (window->priv->media)
   {
-    gint nvid;
-    const gchar *label = NULL;
-
-    if (window->priv->media)
-    {
-      ogmrip_media_close (window->priv->media);
-      g_object_unref (window->priv->media);
-    }
-    window->priv->media = g_object_ref (media);
-
-    ogmrip_title_chooser_set_media (OGMRIP_TITLE_CHOOSER (window->priv->title_chooser), media);
-
-    nvid = ogmrip_media_get_n_titles (media);
-    if (nvid > 0)
-      label = ogmrip_media_get_label (media);
-
-    gtk_entry_set_text (GTK_ENTRY (window->priv->title_entry),
-        label ? label : _("Untitled"));
-
-    g_simple_action_set_enabled (G_SIMPLE_ACTION (window->priv->extract_action), window->priv->prepared);
+    ogmrip_media_close (window->priv->media);
+    g_object_unref (window->priv->media);
   }
+  window->priv->media = g_object_ref (media);
+
+  ogmrip_title_chooser_set_media (OGMRIP_TITLE_CHOOSER (window->priv->title_chooser), media);
+
+  nvid = ogmrip_media_get_n_titles (media);
+  if (nvid > 0)
+    label = ogmrip_media_get_label (media);
+
+  gtk_entry_set_text (GTK_ENTRY (window->priv->title_entry),
+      label ? label : _("Untitled"));
+
+  g_simple_action_set_enabled (G_SIMPLE_ACTION (window->priv->extract_action), window->priv->prepared);
+
+  return TRUE;
 }
 
 static void
@@ -1764,16 +1767,17 @@ gboolean
 ogmrip_main_window_load_path (OGMRipMainWindow *window, const gchar *path)
 {
   OGMRipMedia *media;
+  gboolean res;
 
-  media = ogmrip_media_new (path);
+  media = ogmrip_media_new (path, NULL);
   if (!media)
   {
-    ogmrip_run_error_dialog (GTK_WINDOW (window), NULL, _("Could not open the media"));
+    ogmrip_run_error_dialog (GTK_WINDOW (window), NULL, _("Could not open '%s'"), path);
     return FALSE;
   }
 
-  ogmrip_main_window_load_media (window, media);
+  res = ogmrip_main_window_load_media (window, media);
   g_object_unref (media);
 
-  return TRUE;
+  return res;
 }

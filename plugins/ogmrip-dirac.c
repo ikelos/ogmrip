@@ -46,15 +46,6 @@ enum
   PROP_PASSES
 };
 
-static void ogmrip_dirac_get_property (GObject      *gobject,
-                                       guint        property_id,
-                                       GValue       *value,
-                                       GParamSpec   *pspec);
-static void ogmrip_dirac_set_property (GObject      *gobject,
-                                       guint        property_id,
-                                       const GValue *value,
-                                       GParamSpec   *pspec);
-
 static gboolean have_dirac = FALSE;
 static gboolean have_schro = FALSE;
 
@@ -67,28 +58,7 @@ ogmrip_dirac_get_codec (void)
   return "libschroedinger";
 }
 
-static void
-ogmrip_dirac_class_init (OGMRipDiracClass *klass)
-{
-  GObjectClass *gobject_class;
-  OGMRipLavcClass *lavc_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->get_property = ogmrip_dirac_get_property;
-  gobject_class->set_property = ogmrip_dirac_set_property;
-
-  lavc_class = OGMRIP_LAVC_CLASS (klass);
-  lavc_class->get_codec = ogmrip_dirac_get_codec;
-
-  g_object_class_install_property (gobject_class, PROP_PASSES,
-        g_param_spec_uint ("passes", "Passes property", "Set the number of passes",
-           1, 1, 1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-}
-
-static void
-ogmrip_dirac_init (OGMRipDirac *nouveau)
-{
-}
+G_DEFINE_TYPE (OGMRipDirac, ogmrip_dirac, OGMRIP_TYPE_LAVC)
 
 static void
 ogmrip_dirac_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
@@ -118,7 +88,28 @@ ogmrip_dirac_set_property (GObject *gobject, guint property_id, const GValue *va
   }
 }
 
-G_DEFINE_TYPE (OGMRipDirac, ogmrip_dirac, OGMRIP_TYPE_LAVC)
+static void
+ogmrip_dirac_class_init (OGMRipDiracClass *klass)
+{
+  GObjectClass *gobject_class;
+  OGMRipLavcClass *lavc_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->get_property = ogmrip_dirac_get_property;
+  gobject_class->set_property = ogmrip_dirac_set_property;
+
+  lavc_class = OGMRIP_LAVC_CLASS (klass);
+  lavc_class->get_codec = ogmrip_dirac_get_codec;
+
+  g_object_class_install_property (gobject_class, PROP_PASSES,
+        g_param_spec_uint ("passes", "Passes property", "Set the number of passes",
+           1, 1, 1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+}
+
+static void
+ogmrip_dirac_init (OGMRipDirac *nouveau)
+{
+}
 
 void
 ogmrip_module_load (OGMRipModule *module)

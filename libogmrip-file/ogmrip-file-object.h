@@ -23,6 +23,11 @@
 
 G_BEGIN_DECLS
 
+typedef enum
+{
+  OGMRIP_FILE_ERROR_INFO
+} OGMRipFileError;
+
 #define OGMRIP_TYPE_FILE             (ogmrip_file_get_type ())
 #define OGMRIP_FILE(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_FILE, OGMRipFile))
 #define OGMRIP_IS_FILE(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), OGMRIP_TYPE_FILE))

@@ -47,7 +47,8 @@ struct _OGMRipSubpFileClass
 };
 
 GType         ogmrip_subp_file_get_type     (void);
-OGMRipMedia * ogmrip_subp_file_new          (const gchar *uri);
+OGMRipMedia * ogmrip_subp_file_new          (const gchar *uri,
+                                             GError      **error);
 void          ogmrip_subp_file_set_language (OGMRipSubpFile *file,
                                              guint          language);
 

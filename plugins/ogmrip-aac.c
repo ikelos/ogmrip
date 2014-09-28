@@ -49,10 +49,6 @@ struct _OGMRipAacClass
   OGMRipAudioCodecClass parent_class;
 };
 
-static gboolean ogmrip_aac_run (OGMJobTask   *task,
-                                GCancellable *cancellable,
-                                GError       **error);
-
 static OGMJobTask *
 ogmrip_aac_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input)
 {
@@ -99,21 +95,6 @@ ogmrip_aac_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input
 
 G_DEFINE_TYPE (OGMRipAac, ogmrip_aac, OGMRIP_TYPE_AUDIO_CODEC);
 
-static void
-ogmrip_aac_class_init (OGMRipAacClass *klass)
-{
-  OGMJobTaskClass *task_class;
-
-  task_class = OGMJOB_TASK_CLASS (klass);
-
-  task_class->run = ogmrip_aac_run;
-}
-
-static void
-ogmrip_aac_init (OGMRipAac *aac)
-{
-}
-
 static gboolean
 ogmrip_aac_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
@@ -147,6 +128,21 @@ ogmrip_aac_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   g_free (fifo);
 
   return result;
+}
+
+static void
+ogmrip_aac_class_init (OGMRipAacClass *klass)
+{
+  OGMJobTaskClass *task_class;
+
+  task_class = OGMJOB_TASK_CLASS (klass);
+
+  task_class->run = ogmrip_aac_run;
+}
+
+static void
+ogmrip_aac_init (OGMRipAac *aac)
+{
 }
 
 void

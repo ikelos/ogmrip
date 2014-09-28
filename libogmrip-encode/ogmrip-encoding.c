@@ -507,7 +507,7 @@ ogmrip_encoding_new_from_xml (OGMRipXML *xml, GError **error)
   if (!str)
     return NULL;
 
-  media = ogmrip_media_new (str);
+  media = ogmrip_media_new (str, NULL);
   g_free (str);
 
   if (!media)
@@ -522,8 +522,8 @@ ogmrip_encoding_new_from_xml (OGMRipXML *xml, GError **error)
 
   if (!g_str_equal (str, ogmrip_media_get_id (media)))
   {
-    g_set_error (error, OGMDVD_DISC_ERROR, OGMDVD_DISC_ERROR_ID,
-        _("Device does not contain the expected DVD"));
+    g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_MEDIA_ERROR_ID,
+        _("Device does not contain the expected media"));
     g_object_unref (media);
   }
   else

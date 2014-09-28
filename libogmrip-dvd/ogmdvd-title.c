@@ -293,16 +293,17 @@ ogmdvd_title_open (OGMRipTitle *title, GCancellable *cancellable, OGMRipTitleCal
   OGMDvdTitle *dtitle = OGMDVD_TITLE (title);
   OGMDvdProgress progress = { title, callback, user_data };
 
-  dtitle->priv->close_disc = !ogmrip_media_is_open (OGMRIP_MEDIA (dtitle->priv->disc));
+  dtitle->priv->close_disc = !ogmrip_media_is_open (dtitle->priv->disc);
 
-  if (!ogmrip_media_open (OGMRIP_MEDIA (dtitle->priv->disc), cancellable, callback ? ogmdvd_title_open_cb : NULL, &progress, error))
+  if (!ogmrip_media_open (dtitle->priv->disc, cancellable, callback ? ogmdvd_title_open_cb : NULL, &progress, error))
     return FALSE;
 
   dtitle->priv->vts_file = ifoOpen (OGMDVD_DISC (dtitle->priv->disc)->priv->reader, dtitle->priv->title_set_nr);
   if (!dtitle->priv->vts_file)
   {
-    ogmrip_media_close (OGMRIP_MEDIA (dtitle->priv->disc));
-    g_set_error (error, OGMDVD_DISC_ERROR, OGMDVD_DISC_ERROR_VTS, _("Cannot open video titleset"));
+    ogmrip_media_close (dtitle->priv->disc);
+    g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_MEDIA_ERROR_TITLE,
+        _("Cannot open title %d of '%s'"), dtitle->priv->nr, OGMDVD_DISC (dtitle->priv->disc)->priv->uri);
     return FALSE;
   }
 
@@ -322,7 +323,7 @@ ogmdvd_title_close (OGMRipTitle *title)
 
   if (dtitle->priv->close_disc && dtitle->priv->disc)
   {
-    ogmrip_media_close (OGMRIP_MEDIA (dtitle->priv->disc));
+    ogmrip_media_close (dtitle->priv->disc);
     dtitle->priv->close_disc = FALSE;
   }
 }

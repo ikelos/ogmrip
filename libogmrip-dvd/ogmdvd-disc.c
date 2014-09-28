@@ -115,24 +115,24 @@ dvd_open_reader (const gchar *device, GError **error)
     struct stat buf;
 
     if (g_stat (device, &buf))
-      g_set_error (error, OGMDVD_DISC_ERROR, OGMDVD_DISC_ERROR_EXIST, _("No such file or directory"));
+      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND, _("No such file or directory"));
     else
     {
       if (access (device, R_OK) < 0)
-        g_set_error (error, OGMDVD_DISC_ERROR, OGMDVD_DISC_ERROR_PERM, _("Permission denied to access device"));
+        g_set_error (error, G_IO_ERROR, G_IO_ERROR_PERMISSION_DENIED, _("Permission denied to access device"));
       else
       {
         if (S_ISBLK(buf.st_mode))
         {
           if (ogmdvd_device_tray_is_open (device))
-            g_set_error (error, OGMDVD_DISC_ERROR, OGMDVD_DISC_ERROR_TRAY, _("Tray seems to be open"));
+            g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_DVD_ERROR_TRAY, _("Tray seems to be open"));
           else
-            g_set_error (error, OGMDVD_DISC_ERROR, OGMDVD_DISC_ERROR_DEV, _("Device does not contain a valid DVD video"));
+            g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_DVD_ERROR_DEV, _("Device does not contain a valid DVD video"));
         }
         else if (S_ISDIR(buf.st_mode) || S_ISREG(buf.st_mode))
-          g_set_error (error, OGMDVD_DISC_ERROR, OGMDVD_DISC_ERROR_PATH, _("Path does not contain a valid DVD structure"));
+          g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_DVD_ERROR_PATH, _("Path does not contain a valid DVD structure"));
         else
-          g_set_error (error, OGMDVD_DISC_ERROR, OGMDVD_DISC_ERROR_ACCESS, _("No such directory, block device or iso file"));
+          g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_DVD_ERROR_ACCESS, _("No such directory, block device or iso file"));
       }
     }
   }
@@ -448,7 +448,7 @@ ogmdvd_disc_set_uri (OGMDvdDisc *disc, const gchar *str)
 
   if (g_str_has_prefix (path, "dvd://"))
     disc->priv->uri = g_strdup (path);
-  else
+  else if (!strstr (path, "://"))
     disc->priv->uri = g_strdup_printf ("dvd://%s", path);
 
   g_free (path);
@@ -563,17 +563,27 @@ ogmdvd_disc_initable_init (GInitable *initable, GCancellable *cancellable, GErro
     disc->priv->uri = g_strdup ("dvd:///dev/dvd");
 
   if (!g_str_has_prefix (disc->priv->uri, "dvd://"))
+  {
+    g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_MEDIA_ERROR_SCHEME,
+        _("Unknown scheme for '%s'"), disc->priv->uri);
     return FALSE;
+  }
 
   disc->priv->device = g_strdup (disc->priv->uri + 6);
 
   reader = dvd_open_reader (disc->priv->device, NULL);
   if (!reader)
+  {
+    g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_MEDIA_ERROR_OPEN,
+        _("Cannot open '%s'"), disc->priv->uri);
     return FALSE;
+  }
 
   id = dvd_reader_get_id (reader);
   if (!id)
   {
+    g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_MEDIA_ERROR_ID,
+        _("Cannot retrieve identifier for '%s'"), disc->priv->uri);
     DVDClose (reader);
     return FALSE;
   }
@@ -581,6 +591,8 @@ ogmdvd_disc_initable_init (GInitable *initable, GCancellable *cancellable, GErro
   vmg_file = ifoOpen (reader, 0);
   if (!vmg_file)
   {
+    g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_DVD_ERROR_VMG,
+        _("Cannot get manager for '%s'"), disc->priv->uri);
     DVDClose (reader);
     return FALSE;
   }
@@ -602,7 +614,11 @@ ogmdvd_disc_initable_init (GInitable *initable, GCancellable *cancellable, GErro
   DVDClose (reader);
 
   if (!disc->priv->titles)
+  {
+    g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_MEDIA_ERROR_TITLE,
+        _("No title found for '%s'"), disc->priv->uri);
     return FALSE;
+  }
 
   return TRUE;
 }
@@ -641,7 +657,7 @@ ogmdvd_disc_open (OGMRipMedia *media, GCancellable *cancellable, OGMRipMediaCall
   if (!current_id || !g_str_equal (id, current_id))
   {
     DVDClose (reader);
-    g_set_error (error, OGMDVD_DISC_ERROR, OGMDVD_DISC_ERROR_ID,
+    g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_MEDIA_ERROR_ID,
         _("Device does not contain the expected DVD"));
     return FALSE;
   }
@@ -743,24 +759,6 @@ ogmrip_media_iface_init (OGMRipMediaInterface *iface)
   iface->get_title     = ogmdvd_disc_get_title;
   iface->get_titles    = ogmdvd_disc_get_titles;
   iface->copy          = ogmdvd_disc_copy_internal;
-}
-
-/**
- * ogmdvd_error_quark:
- *
- * The function description goes here.
- *
- * Returns: the #GQuark
- */
-GQuark
-ogmdvd_error_quark (void)
-{
-  static GQuark quark = 0;
-
-  if (quark == 0)
-    quark = g_quark_from_static_string ("ogmdvd-error-quark");
-
-  return quark;
 }
 
 /**

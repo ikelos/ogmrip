@@ -63,29 +63,8 @@ enum
   PROP_PASSES,
 };
 
-static GType    ogmrip_vp8_get_type     (void);
-static void     ogmrip_vp8_notify       (GObject      *gobject,
-                                         GParamSpec   *pspec);
-static void     ogmrip_vp8_get_property (GObject      *gobject,
-                                         guint        property_id,
-                                         GValue       *value,
-                                         GParamSpec   *pspec);
-static void     ogmrip_vp8_set_property (GObject      *gobject,
-                                         guint        property_id,
-                                         const GValue *value,
-                                         GParamSpec   *pspec);
-static gboolean ogmrip_vp8_run          (OGMJobTask   *task,
-                                         GCancellable *cancellable,
-                                         GError       **error);
-
 static OGMJobTask *
-ogmrip_yuv4mpeg_command (OGMRipVideoCodec *video, const gchar *fifo)
-{
-  return ogmrip_video_encoder_new (video, OGMRIP_ENCODER_YUV, NULL, NULL, fifo);
-}
-
-static OGMJobTask *
-ogmrip_vp8_command (OGMRipVideoCodec *video, const gchar *fifo, guint pass, guint passes, const gchar *log_file)
+ogmrip_vp8_command (OGMRipVp8 *vp8, const gchar *fifo, guint pass, guint passes, const gchar *log_file)
 {
   OGMJobTask *task;
 
@@ -98,29 +77,29 @@ ogmrip_vp8_command (OGMRipVideoCodec *video, const gchar *fifo, guint pass, guin
 
   g_ptr_array_add (argv, g_strdup ("vpxenc"));
 
-  ogmrip_video_codec_get_scale_size (video, &width, &height);
+  ogmrip_video_codec_get_scale_size (OGMRIP_VIDEO_CODEC (vp8), &width, &height);
   g_ptr_array_add (argv, g_strdup_printf ("--width=%u", width));
   g_ptr_array_add (argv, g_strdup_printf ("--height=%u", height));
 
-  ogmrip_video_codec_get_framerate (video, &num, &denom);
+  ogmrip_video_codec_get_framerate (OGMRIP_VIDEO_CODEC (vp8), &num, &denom);
   g_ptr_array_add (argv, g_strdup_printf ("--timebase=%u/%u", denom, num));
 
-  bitrate = ogmrip_video_codec_get_bitrate (video);
+  bitrate = ogmrip_video_codec_get_bitrate (OGMRIP_VIDEO_CODEC (vp8));
   if (bitrate > 0)
   {
     g_ptr_array_add (argv, g_strdup_printf ("--target-bitrate=%d", bitrate / 1000));
 
-    if (OGMRIP_VP8 (video)->min_q >= 0)
-      g_ptr_array_add (argv, g_strdup_printf ("--min-q=%u", OGMRIP_VP8 (video)->min_q));
+    if (vp8->min_q >= 0)
+      g_ptr_array_add (argv, g_strdup_printf ("--min-q=%u", vp8->min_q));
 
-    if (OGMRIP_VP8 (video)->max_q >= 0)
-      g_ptr_array_add (argv, g_strdup_printf ("--max-q=%u", OGMRIP_VP8 (video)->max_q));
+    if (vp8->max_q >= 0)
+      g_ptr_array_add (argv, g_strdup_printf ("--max-q=%u", vp8->max_q));
   }
   else
   {
     gdouble quantizer;
 
-    quantizer = 48. * ogmrip_video_codec_get_quantizer (video) / 31.;
+    quantizer = 48. * ogmrip_video_codec_get_quantizer (OGMRIP_VIDEO_CODEC (vp8)) / 31.;
     g_ptr_array_add (argv, g_strdup_printf ("--min-q=%.0lf", quantizer));
     g_ptr_array_add (argv, g_strdup_printf ("--max-q=%.0lf", quantizer + 15.));
   }
@@ -132,11 +111,11 @@ ogmrip_vp8_command (OGMRipVideoCodec *video, const gchar *fifo, guint pass, guin
     g_ptr_array_add (argv, g_strdup_printf ("--pass=%u", pass));
     g_ptr_array_add (argv, g_strdup_printf ("--fpf=%s", log_file));
 
-    if (OGMRIP_VP8 (video)->minsection_pct >= 0)
-      g_ptr_array_add (argv, g_strdup_printf ("--minsection-pct=%u", OGMRIP_VP8 (video)->minsection_pct));
+    if (vp8->minsection_pct >= 0)
+      g_ptr_array_add (argv, g_strdup_printf ("--minsection-pct=%u", vp8->minsection_pct));
 
-    if (OGMRIP_VP8 (video)->maxsection_pct >= 0)
-      g_ptr_array_add (argv, g_strdup_printf ("--maxsection-pct=%u", OGMRIP_VP8 (video)->maxsection_pct));
+    if (vp8->maxsection_pct >= 0)
+      g_ptr_array_add (argv, g_strdup_printf ("--maxsection-pct=%u", vp8->maxsection_pct));
   }
 
   g_ptr_array_add (argv, g_strdup ("--end-usage=0"));
@@ -146,27 +125,27 @@ ogmrip_vp8_command (OGMRipVideoCodec *video, const gchar *fifo, guint pass, guin
   g_ptr_array_add (argv, g_strdup ("--kf-max-dist=360"));
   g_ptr_array_add (argv, g_strdup ("--static-thresh=0"));
 
-  g_ptr_array_add (argv, g_strdup (OGMRIP_VP8 (video)->best ? "--best" : "--good"));
+  g_ptr_array_add (argv, g_strdup (vp8->best ? "--best" : "--good"));
 
-  threads = ogmrip_video_codec_get_threads (video);
+  threads = ogmrip_video_codec_get_threads (OGMRIP_VIDEO_CODEC (vp8));
   if (!threads)
     threads = ogmrip_get_nprocessors ();
   if (threads > 0)
     g_ptr_array_add (argv, g_strdup_printf ("--threads=%u", threads));
 
-  if (OGMRIP_VP8 (video)->token_parts >= 0)
-    g_ptr_array_add (argv, g_strdup_printf ("--token-parts=%u", OGMRIP_VP8 (video)->token_parts));
+  if (vp8->token_parts >= 0)
+    g_ptr_array_add (argv, g_strdup_printf ("--token-parts=%u", vp8->token_parts));
 
-  if (OGMRIP_VP8 (video)->drop_frame >= 0)
-    g_ptr_array_add (argv, g_strdup_printf ("--drop-frame=%u", OGMRIP_VP8 (video)->drop_frame));
+  if (vp8->drop_frame >= 0)
+    g_ptr_array_add (argv, g_strdup_printf ("--drop-frame=%u", vp8->drop_frame));
 
-  if (OGMRIP_VP8 (video)->profile >= 0)
-    g_ptr_array_add (argv, g_strdup_printf ("--profile=%u", OGMRIP_VP8 (video)->profile));
+  if (vp8->profile >= 0)
+    g_ptr_array_add (argv, g_strdup_printf ("--profile=%u", vp8->profile));
 
-  if (OGMRIP_VP8 (video)->cpu_used >= 0)
-    g_ptr_array_add (argv, g_strdup_printf ("--cpu-used=%u", OGMRIP_VP8 (video)->cpu_used));
+  if (vp8->cpu_used >= 0)
+    g_ptr_array_add (argv, g_strdup_printf ("--cpu-used=%u", vp8->cpu_used));
 
-  output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (video)));
+  output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (vp8)));
   g_ptr_array_add (argv, g_strdup ("-o"));
   g_ptr_array_add (argv, g_strdup (output));
 
@@ -181,17 +160,17 @@ ogmrip_vp8_command (OGMRipVideoCodec *video, const gchar *fifo, guint pass, guin
 }
 
 static OGMJobTask *
-ogmrip_vp8_pipeline (OGMJobTask *task, const gchar *fifo, guint pass, guint passes, const gchar *log_file)
+ogmrip_vp8_pipeline (OGMRipVp8 *vp8, const gchar *fifo, guint pass, guint passes, const gchar *log_file)
 {
   OGMJobTask *pipeline, *child;
 
   pipeline = ogmjob_pipeline_new ();
 
-  child = ogmrip_yuv4mpeg_command (OGMRIP_VIDEO_CODEC (task), fifo);
+  child = ogmrip_video_encoder_new (OGMRIP_VIDEO_CODEC (vp8), OGMRIP_ENCODER_YUV, NULL, NULL, fifo);
   ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
   g_object_unref (child);
 
-  child = ogmrip_vp8_command (OGMRIP_VIDEO_CODEC (task), fifo, pass + 1, passes, log_file);
+  child = ogmrip_vp8_command (vp8, fifo, pass + 1, passes, log_file);
   ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
   g_object_unref (child);
 
@@ -199,39 +178,6 @@ ogmrip_vp8_pipeline (OGMJobTask *task, const gchar *fifo, guint pass, guint pass
 }
 
 G_DEFINE_TYPE (OGMRipVp8, ogmrip_vp8, OGMRIP_TYPE_VIDEO_CODEC)
-
-static void
-ogmrip_vp8_class_init (OGMRipVp8Class *klass)
-{
-  GObjectClass *gobject_class;
-  OGMJobTaskClass *task_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->notify = ogmrip_vp8_notify;
-  gobject_class->get_property = ogmrip_vp8_get_property;
-  gobject_class->set_property = ogmrip_vp8_set_property;
-
-  task_class = OGMJOB_TASK_CLASS (klass);
-  task_class->run = ogmrip_vp8_run;
-
-  g_object_class_install_property (gobject_class, PROP_PASSES,
-      g_param_spec_uint ("passes", "Passes property", "Set the number of passes",
-        1, 2, 1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-}
-
-static void
-ogmrip_vp8_init (OGMRipVp8 *vp8)
-{
-  vp8->best = FALSE;
-  vp8->minsection_pct = -1;
-  vp8->maxsection_pct = -1;
-  vp8->token_parts = -1;
-  vp8->drop_frame = -1;
-  vp8->min_q = -1;
-  vp8->max_q = -1;
-  vp8->profile = -1;
-  vp8->cpu_used = -1;
-}
 
 static void
 ogmrip_vp8_notify (GObject *gobject, GParamSpec *pspec)
@@ -340,7 +286,7 @@ ogmrip_vp8_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 
   for (pass = 0; pass < passes; pass ++)
   {
-    pipeline = ogmrip_vp8_pipeline (task, fifo, pass, passes, log_file);
+    pipeline = ogmrip_vp8_pipeline (OGMRIP_VP8 (task), fifo, pass, passes, log_file);
     ogmjob_container_add (OGMJOB_CONTAINER (queue), pipeline);
     g_object_unref (pipeline);
   }
@@ -356,6 +302,39 @@ ogmrip_vp8_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   g_free (log_file);
 
   return result;
+}
+
+static void
+ogmrip_vp8_class_init (OGMRipVp8Class *klass)
+{
+  GObjectClass *gobject_class;
+  OGMJobTaskClass *task_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->notify = ogmrip_vp8_notify;
+  gobject_class->get_property = ogmrip_vp8_get_property;
+  gobject_class->set_property = ogmrip_vp8_set_property;
+
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_vp8_run;
+
+  g_object_class_install_property (gobject_class, PROP_PASSES,
+      g_param_spec_uint ("passes", "Passes property", "Set the number of passes",
+        1, 2, 1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+}
+
+static void
+ogmrip_vp8_init (OGMRipVp8 *vp8)
+{
+  vp8->best = FALSE;
+  vp8->minsection_pct = -1;
+  vp8->maxsection_pct = -1;
+  vp8->token_parts = -1;
+  vp8->drop_frame = -1;
+  vp8->min_q = -1;
+  vp8->max_q = -1;
+  vp8->profile = -1;
+  vp8->cpu_used = -1;
 }
 
 void

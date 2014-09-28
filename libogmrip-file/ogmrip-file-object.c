@@ -36,43 +36,30 @@ enum
 static void ogmrip_media_iface_init  (OGMRipMediaInterface  *iface);
 static void ogmrip_title_iface_init  (OGMRipTitleInterface  *iface);
 static void ogmrip_stream_iface_init (OGMRipStreamInterface *iface);
-static void ogmrip_file_finalize     (GObject               *gobject);
-static void ogmrip_file_get_property (GObject               *gobject,
-                                      guint                 property_id,
-                                      GValue                *value,
-                                      GParamSpec            *pspec);
-static void ogmrip_file_set_property (GObject               *gobject,
-                                      guint                 property_id,
-                                      const GValue          *value,
-                                      GParamSpec            *pspec);
+
+static 
+void
+ogmrip_file_set_uri (OGMRipFile *file, const gchar *uri)
+{
+  g_return_if_fail (uri != NULL);
+
+  if (g_str_has_prefix (uri, "file://"))
+  {
+    file->priv->uri = g_strdup (uri);
+    file->priv->path = g_filename_from_uri (file->priv->uri, NULL, NULL);
+  }
+  else if (!strstr (uri, "://"))
+  {
+    file->priv->uri = g_strdup_printf ("file://%s", uri);
+    file->priv->path = g_strdup (uri);
+  }
+}
 
 G_DEFINE_ABSTRACT_TYPE_WITH_CODE (OGMRipFile, ogmrip_file, G_TYPE_OBJECT,
     G_ADD_PRIVATE (OGMRipFile)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_MEDIA, ogmrip_media_iface_init)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_TITLE, ogmrip_title_iface_init)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_STREAM, ogmrip_stream_iface_init));
-
-static void
-ogmrip_file_init (OGMRipFile *stream)
-{
-  stream->priv = ogmrip_file_get_instance_private (stream);
-
-  stream->priv->length = -1.0;
-  stream->priv->format = OGMRIP_FORMAT_UNDEFINED;
-}
-
-static void
-ogmrip_file_class_init (OGMRipFileClass *klass)
-{
-  GObjectClass *gobject_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->finalize = ogmrip_file_finalize;
-  gobject_class->get_property = ogmrip_file_get_property;
-  gobject_class->set_property = ogmrip_file_set_property;
-
-  g_object_class_override_property (gobject_class, PROP_URI, "uri");
-}
 
 static void
 ogmrip_file_finalize (GObject *gobject)
@@ -106,28 +93,37 @@ ogmrip_file_get_property (GObject *gobject, guint property_id, GValue *value, GP
 static void
 ogmrip_file_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
 {
-  OGMRipFile *file = OGMRIP_FILE (gobject);
-  const gchar *str;
-
   switch (property_id)
   {
     case PROP_URI:
-      str = g_value_get_string (value);
-      if (g_str_has_prefix (str, "file://"))
-      {
-        file->priv->uri = g_strdup (str);
-        file->priv->path = g_filename_from_uri (file->priv->uri, NULL, NULL);
-      }
-      else
-      {
-        file->priv->uri = g_strdup_printf ("file://%s", str);
-        file->priv->path = g_strdup (str);
-      }
+      ogmrip_file_set_uri (OGMRIP_FILE (gobject), g_value_get_string (value));
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
       break;
   }
+}
+
+static void
+ogmrip_file_init (OGMRipFile *stream)
+{
+  stream->priv = ogmrip_file_get_instance_private (stream);
+
+  stream->priv->length = -1.0;
+  stream->priv->format = OGMRIP_FORMAT_UNDEFINED;
+}
+
+static void
+ogmrip_file_class_init (OGMRipFileClass *klass)
+{
+  GObjectClass *gobject_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->get_property = ogmrip_file_get_property;
+  gobject_class->set_property = ogmrip_file_set_property;
+  gobject_class->finalize = ogmrip_file_finalize;
+
+  g_object_class_override_property (gobject_class, PROP_URI, "uri");
 }
 
 static const gchar *

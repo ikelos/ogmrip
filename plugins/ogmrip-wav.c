@@ -48,27 +48,7 @@ struct _OGMRipWavClass
   OGMRipAudioCodecClass parent_class;
 };
 
-static gboolean ogmrip_wav_run (OGMJobTask   *task,
-                                GCancellable *cancellable,
-                                GError       **error);
-
 G_DEFINE_TYPE (OGMRipWav, ogmrip_wav, OGMRIP_TYPE_AUDIO_CODEC)
-
-static void
-ogmrip_wav_class_init (OGMRipWavClass *klass)
-{
-  OGMJobTaskClass *task_class;
-
-  task_class = OGMJOB_TASK_CLASS (klass);
-
-  task_class->run = ogmrip_wav_run;
-}
-
-static void
-ogmrip_wav_init (OGMRipWav *wav)
-{
-  wav->header = TRUE;
-}
 
 static gboolean
 ogmrip_wav_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
@@ -86,6 +66,22 @@ ogmrip_wav_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   ogmjob_container_remove (OGMJOB_CONTAINER (task), child);
 
   return result;
+}
+
+static void
+ogmrip_wav_class_init (OGMRipWavClass *klass)
+{
+  OGMJobTaskClass *task_class;
+
+  task_class = OGMJOB_TASK_CLASS (klass);
+
+  task_class->run = ogmrip_wav_run;
+}
+
+static void
+ogmrip_wav_init (OGMRipWav *wav)
+{
+  wav->header = TRUE;
 }
 
 void

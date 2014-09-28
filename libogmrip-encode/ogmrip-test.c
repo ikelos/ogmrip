@@ -220,7 +220,7 @@ ogmrip_test_encode_video (OGMRipTest *test, gdouble start_position, gdouble play
 
   output = ogmrip_codec_get_output (codec);
 
-  file = ogmrip_video_file_new (ogmrip_stream_get_uri (OGMRIP_STREAM (output)));
+  file = ogmrip_video_file_new (ogmrip_stream_get_uri (OGMRIP_STREAM (output)), error);
   if (!file)
     return FALSE;
 

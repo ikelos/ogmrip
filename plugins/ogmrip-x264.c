@@ -150,21 +150,6 @@ enum
   PROFILE_HIGH
 };
 
-static void     ogmrip_x264_finalize     (GObject      *gobject);
-static void     ogmrip_x264_notify       (GObject      *gobject,
-                                          GParamSpec   *pspec);
-static void     ogmrip_x264_get_property (GObject      *gobject,
-                                          guint        property_id,
-                                          GValue       *value,
-                                          GParamSpec   *pspec);
-static void     ogmrip_x264_set_property (GObject      *gobject,
-                                          guint        property_id,
-                                          const GValue *value,
-                                          GParamSpec   *pspec);
-static gboolean ogmrip_x264_run          (OGMJobTask   *task,
-                                          GCancellable *cancellable,
-                                          GError       **error);
-
 static const gchar *me_name[] =
 {
   NULL, "dia", "hex", "umh", "esa", "tesa"
@@ -528,190 +513,6 @@ G_DEFINE_TYPE_EXTENDED (OGMRipX264, ogmrip_x264, OGMRIP_TYPE_VIDEO_CODEC, 0,
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_CONFIGURABLE, ogmrip_configurable_iface_init))
 
 static void
-ogmrip_x264_class_init (OGMRipX264Class *klass)
-{
-  GObjectClass *gobject_class;
-  OGMJobTaskClass *task_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->finalize = ogmrip_x264_finalize;
-  gobject_class->notify = ogmrip_x264_notify;
-  gobject_class->get_property = ogmrip_x264_get_property;
-  gobject_class->set_property = ogmrip_x264_set_property;
-
-  task_class = OGMJOB_TASK_CLASS (klass);
-  task_class->run = ogmrip_x264_run;
-
-  g_object_class_install_property (gobject_class, PROP_8X8DCT,
-      g_param_spec_boolean (OGMRIP_X264_PROP_8X8DCT, "8x8 dct property", "Set 8x8 dct",
-        OGMRIP_X264_DEFAULT_8X8DCT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_AQ_MODE,
-      g_param_spec_uint (OGMRIP_X264_PROP_AQ_MODE, "AQ mode property", "Set aq mode",
-        0, 2, OGMRIP_X264_DEFAULT_AQ_MODE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_AUD,
-      g_param_spec_boolean (OGMRIP_X264_PROP_AUD, "Aud property", "Set aud",
-        OGMRIP_X264_DEFAULT_AUD, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_B_ADAPT,
-      g_param_spec_uint (OGMRIP_X264_PROP_B_ADAPT, "B adapt property", "Set b adapt",
-        0, 2, OGMRIP_X264_DEFAULT_B_ADAPT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  if (x264_have_b_pyramid)
-    g_object_class_install_property (gobject_class, PROP_B_PYRAMID,
-        g_param_spec_uint (OGMRIP_X264_PROP_B_PYRAMID, "B pyramid property", "Set b pyramid",
-          B_PYRAMID_NONE, B_PYRAMID_NORMAL, OGMRIP_X264_DEFAULT_B_PYRAMID, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-  else
-    g_object_class_install_property (gobject_class, PROP_B_PYRAMID,
-        g_param_spec_boolean (OGMRIP_X264_PROP_B_PYRAMID, "B pyramid property", "Set b pyramid",
-          TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_BRDO,
-      g_param_spec_boolean (OGMRIP_X264_PROP_BRDO, "Brdo property", "Set brdo",
-        OGMRIP_X264_DEFAULT_BRDO, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_CABAC,
-      g_param_spec_boolean (OGMRIP_X264_PROP_CABAC, "Cabac property", "Set cabac",
-        OGMRIP_X264_DEFAULT_CABAC, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_CQM,
-      g_param_spec_uint (OGMRIP_X264_PROP_CQM, "Cqm property", "Set cqm",
-        0, 1, OGMRIP_X264_DEFAULT_CQM, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_DCT_DECIMATE,
-      g_param_spec_boolean (OGMRIP_X264_PROP_DCT_DECIMATE, "DCT decimate property", "Set dct decimate",
-        OGMRIP_X264_DEFAULT_DCT_DECIMATE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_DIRECT,
-      g_param_spec_uint (OGMRIP_X264_PROP_DIRECT, "Direct property", "Set direct",
-        DIRECT_NONE, DIRECT_AUTO, OGMRIP_X264_DEFAULT_DIRECT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_FAST_PSKIP,
-      g_param_spec_boolean (OGMRIP_X264_PROP_FAST_PSKIP, "Fast pskip property", "Set fast pskip",
-        OGMRIP_X264_DEFAULT_FAST_PSKIP, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_FORCE_CFR,
-      g_param_spec_boolean (OGMRIP_X264_PROP_FORCE_CFR, "Force CFR property", "Set force cfr",
-        OGMRIP_X264_DEFAULT_FORCE_CFR, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_FRAMEREF,
-      g_param_spec_uint (OGMRIP_X264_PROP_FRAMEREF, "Frameref property", "Set frameref",
-        1, 16, OGMRIP_X264_DEFAULT_FRAMEREF, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_GLOBAL_HEADER,
-      g_param_spec_boolean (OGMRIP_X264_PROP_GLOBAL_HEADER, "Global header property", "Set global header",
-        OGMRIP_X264_DEFAULT_GLOBAL_HEADER, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_KEYINT,
-      g_param_spec_uint (OGMRIP_X264_PROP_KEYINT, "Keyint property", "Set keyint",
-        0, G_MAXUINT, OGMRIP_X264_DEFAULT_KEYINT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_LEVEL_IDC,
-      g_param_spec_uint (OGMRIP_X264_PROP_LEVEL_IDC, "Level IDC property", "Set level IDC",
-        0, 51, OGMRIP_X264_DEFAULT_LEVEL_IDC, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_B_FRAMES,
-      g_param_spec_uint (OGMRIP_X264_PROP_B_FRAMES, "B-frames property", "Set B-frames",
-        0, 16, OGMRIP_X264_DEFAULT_B_FRAMES, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_ME,
-      g_param_spec_uint (OGMRIP_X264_PROP_ME, "Motion estimation property", "Set motion estimation",
-        ME_DIA, x264_have_me_tesa ? ME_TESA : ME_ESA, OGMRIP_X264_DEFAULT_ME, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_MERANGE,
-      g_param_spec_uint (OGMRIP_X264_PROP_MERANGE, "Motion estimation range property", "Set motion estimation range",
-        4, G_MAXUINT, OGMRIP_X264_DEFAULT_MERANGE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_MIXED_REFS,
-      g_param_spec_boolean (OGMRIP_X264_PROP_MIXED_REFS, "Mixed refs property", "Set mixed refs",
-        OGMRIP_X264_DEFAULT_MIXED_REFS, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_PARTITIONS,
-      g_param_spec_string (OGMRIP_X264_PROP_PARTITIONS, "Partitions property", "Set partitions",
-        OGMRIP_X264_DEFAULT_PARTITIONS, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_PROFILE,
-      g_param_spec_uint (OGMRIP_X264_PROP_PROFILE, "Profile property", "Set profile",
-        0, 2, OGMRIP_X264_DEFAULT_PROFILE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_PSY_RD,
-      g_param_spec_double (OGMRIP_X264_PROP_PSY_RD, "Psy RD property", "Set psy-rd",
-        0.0, 10.0, OGMRIP_X264_DEFAULT_PSY_RD, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_PSY_TRELLIS,
-      g_param_spec_double (OGMRIP_X264_PROP_PSY_TRELLIS, "Psy trellis property", "Set psy-trellis",
-        0.0, 10.0, OGMRIP_X264_DEFAULT_PSY_TRELLIS, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_RC_LOOKAHEAD,
-      g_param_spec_uint (OGMRIP_X264_PROP_RC_LOOKAHEAD, "RC look ahead property", "Set rc lookahead",
-        0, 250, OGMRIP_X264_DEFAULT_RC_LOOKAHEAD, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_SUBQ,
-      g_param_spec_uint (OGMRIP_X264_PROP_SUBQ, "Subpel quality property", "Set subpel quality",
-        0, 10, OGMRIP_X264_DEFAULT_SUBQ, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_TRELLIS,
-      g_param_spec_uint (OGMRIP_X264_PROP_TRELLIS, "Trellis property", "Set trellis",
-        0, 2, OGMRIP_X264_DEFAULT_TRELLIS, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_VBV_BUFSIZE,
-      g_param_spec_uint (OGMRIP_X264_PROP_VBV_BUFSIZE, "Buffer size property", "Set buffer size",
-        0, G_MAXUINT, OGMRIP_X264_DEFAULT_VBV_BUFSIZE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_VBV_MAXRATE,
-      g_param_spec_uint (OGMRIP_X264_PROP_VBV_MAXRATE, "Max rate property", "Set max rate",
-        0, G_MAXUINT, OGMRIP_X264_DEFAULT_VBV_MAXRATE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_WEIGHT_B,
-      g_param_spec_boolean (OGMRIP_X264_PROP_WEIGHT_B, "Weight B property", "Set weight B",
-        OGMRIP_X264_DEFAULT_WEIGHT_B, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_WEIGHT_P,
-      g_param_spec_uint (OGMRIP_X264_PROP_WEIGHT_P, "Weight P property", "Set weight P",
-        0, 2, OGMRIP_X264_DEFAULT_WEIGHT_P, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_DELAY,
-      g_param_spec_uint ("start-delay", "Start delay property", "Set start delay",
-        0, G_MAXUINT, 1, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-}
-
-static void
-ogmrip_x264_init (OGMRipX264 *x264)
-{
-  x264->aq_mode = OGMRIP_X264_DEFAULT_AQ_MODE;
-  x264->aud = OGMRIP_X264_DEFAULT_AUD;
-  x264->b_adapt = OGMRIP_X264_DEFAULT_B_ADAPT;
-  x264->b_frames = OGMRIP_X264_DEFAULT_B_FRAMES;
-  x264->b_pyramid = OGMRIP_X264_DEFAULT_B_PYRAMID;
-  x264->brdo = OGMRIP_X264_DEFAULT_BRDO;
-  x264->cabac = OGMRIP_X264_DEFAULT_CABAC;
-  x264->cqm = OGMRIP_X264_DEFAULT_CQM;
-  x264->dct_decimate = OGMRIP_X264_DEFAULT_DCT_DECIMATE;
-  x264->direct = OGMRIP_X264_DEFAULT_DIRECT;
-  x264->fast_pskip = OGMRIP_X264_DEFAULT_FAST_PSKIP;
-  x264->force_cfr = OGMRIP_X264_DEFAULT_FORCE_CFR;
-  x264->frameref = OGMRIP_X264_DEFAULT_FRAMEREF;
-  x264->global_header = OGMRIP_X264_DEFAULT_GLOBAL_HEADER;
-  x264->keyint = OGMRIP_X264_DEFAULT_KEYINT;
-  x264->level_idc = OGMRIP_X264_DEFAULT_LEVEL_IDC;
-  x264->me = OGMRIP_X264_DEFAULT_ME;
-  x264->merange = OGMRIP_X264_DEFAULT_MERANGE;
-  x264->mixed_refs = OGMRIP_X264_DEFAULT_MIXED_REFS;
-  x264->profile = OGMRIP_X264_DEFAULT_PROFILE;
-  x264->psy_rd = OGMRIP_X264_DEFAULT_PSY_RD;
-  x264->psy_trellis = OGMRIP_X264_DEFAULT_PSY_TRELLIS;
-  x264->rc_lookahead = OGMRIP_X264_DEFAULT_RC_LOOKAHEAD;
-  x264->subq = OGMRIP_X264_DEFAULT_SUBQ;
-  x264->trellis = OGMRIP_X264_DEFAULT_TRELLIS;
-  x264->vbv_bufsize = OGMRIP_X264_DEFAULT_VBV_BUFSIZE;
-  x264->vbv_maxrate = OGMRIP_X264_DEFAULT_VBV_MAXRATE;
-  x264->weight_b = OGMRIP_X264_DEFAULT_WEIGHT_B;
-  x264->weight_p = OGMRIP_X264_DEFAULT_WEIGHT_P;
-  x264->x88dct = OGMRIP_X264_DEFAULT_8X8DCT;
-}
-
-static void
 ogmrip_x264_finalize (GObject *gobject)
 {
   OGMRipX264 *x264 = OGMRIP_X264 (gobject);
@@ -1014,6 +815,190 @@ ogmrip_x264_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   g_free (log_file);
 
   return result;
+}
+
+static void
+ogmrip_x264_class_init (OGMRipX264Class *klass)
+{
+  GObjectClass *gobject_class;
+  OGMJobTaskClass *task_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->finalize = ogmrip_x264_finalize;
+  gobject_class->notify = ogmrip_x264_notify;
+  gobject_class->get_property = ogmrip_x264_get_property;
+  gobject_class->set_property = ogmrip_x264_set_property;
+
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_x264_run;
+
+  g_object_class_install_property (gobject_class, PROP_8X8DCT,
+      g_param_spec_boolean (OGMRIP_X264_PROP_8X8DCT, "8x8 dct property", "Set 8x8 dct",
+        OGMRIP_X264_DEFAULT_8X8DCT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_AQ_MODE,
+      g_param_spec_uint (OGMRIP_X264_PROP_AQ_MODE, "AQ mode property", "Set aq mode",
+        0, 2, OGMRIP_X264_DEFAULT_AQ_MODE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_AUD,
+      g_param_spec_boolean (OGMRIP_X264_PROP_AUD, "Aud property", "Set aud",
+        OGMRIP_X264_DEFAULT_AUD, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_B_ADAPT,
+      g_param_spec_uint (OGMRIP_X264_PROP_B_ADAPT, "B adapt property", "Set b adapt",
+        0, 2, OGMRIP_X264_DEFAULT_B_ADAPT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  if (x264_have_b_pyramid)
+    g_object_class_install_property (gobject_class, PROP_B_PYRAMID,
+        g_param_spec_uint (OGMRIP_X264_PROP_B_PYRAMID, "B pyramid property", "Set b pyramid",
+          B_PYRAMID_NONE, B_PYRAMID_NORMAL, OGMRIP_X264_DEFAULT_B_PYRAMID, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+  else
+    g_object_class_install_property (gobject_class, PROP_B_PYRAMID,
+        g_param_spec_boolean (OGMRIP_X264_PROP_B_PYRAMID, "B pyramid property", "Set b pyramid",
+          TRUE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_BRDO,
+      g_param_spec_boolean (OGMRIP_X264_PROP_BRDO, "Brdo property", "Set brdo",
+        OGMRIP_X264_DEFAULT_BRDO, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_CABAC,
+      g_param_spec_boolean (OGMRIP_X264_PROP_CABAC, "Cabac property", "Set cabac",
+        OGMRIP_X264_DEFAULT_CABAC, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_CQM,
+      g_param_spec_uint (OGMRIP_X264_PROP_CQM, "Cqm property", "Set cqm",
+        0, 1, OGMRIP_X264_DEFAULT_CQM, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_DCT_DECIMATE,
+      g_param_spec_boolean (OGMRIP_X264_PROP_DCT_DECIMATE, "DCT decimate property", "Set dct decimate",
+        OGMRIP_X264_DEFAULT_DCT_DECIMATE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_DIRECT,
+      g_param_spec_uint (OGMRIP_X264_PROP_DIRECT, "Direct property", "Set direct",
+        DIRECT_NONE, DIRECT_AUTO, OGMRIP_X264_DEFAULT_DIRECT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_FAST_PSKIP,
+      g_param_spec_boolean (OGMRIP_X264_PROP_FAST_PSKIP, "Fast pskip property", "Set fast pskip",
+        OGMRIP_X264_DEFAULT_FAST_PSKIP, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_FORCE_CFR,
+      g_param_spec_boolean (OGMRIP_X264_PROP_FORCE_CFR, "Force CFR property", "Set force cfr",
+        OGMRIP_X264_DEFAULT_FORCE_CFR, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_FRAMEREF,
+      g_param_spec_uint (OGMRIP_X264_PROP_FRAMEREF, "Frameref property", "Set frameref",
+        1, 16, OGMRIP_X264_DEFAULT_FRAMEREF, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_GLOBAL_HEADER,
+      g_param_spec_boolean (OGMRIP_X264_PROP_GLOBAL_HEADER, "Global header property", "Set global header",
+        OGMRIP_X264_DEFAULT_GLOBAL_HEADER, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_KEYINT,
+      g_param_spec_uint (OGMRIP_X264_PROP_KEYINT, "Keyint property", "Set keyint",
+        0, G_MAXUINT, OGMRIP_X264_DEFAULT_KEYINT, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_LEVEL_IDC,
+      g_param_spec_uint (OGMRIP_X264_PROP_LEVEL_IDC, "Level IDC property", "Set level IDC",
+        0, 51, OGMRIP_X264_DEFAULT_LEVEL_IDC, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_B_FRAMES,
+      g_param_spec_uint (OGMRIP_X264_PROP_B_FRAMES, "B-frames property", "Set B-frames",
+        0, 16, OGMRIP_X264_DEFAULT_B_FRAMES, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_ME,
+      g_param_spec_uint (OGMRIP_X264_PROP_ME, "Motion estimation property", "Set motion estimation",
+        ME_DIA, x264_have_me_tesa ? ME_TESA : ME_ESA, OGMRIP_X264_DEFAULT_ME, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_MERANGE,
+      g_param_spec_uint (OGMRIP_X264_PROP_MERANGE, "Motion estimation range property", "Set motion estimation range",
+        4, G_MAXUINT, OGMRIP_X264_DEFAULT_MERANGE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_MIXED_REFS,
+      g_param_spec_boolean (OGMRIP_X264_PROP_MIXED_REFS, "Mixed refs property", "Set mixed refs",
+        OGMRIP_X264_DEFAULT_MIXED_REFS, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_PARTITIONS,
+      g_param_spec_string (OGMRIP_X264_PROP_PARTITIONS, "Partitions property", "Set partitions",
+        OGMRIP_X264_DEFAULT_PARTITIONS, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_PROFILE,
+      g_param_spec_uint (OGMRIP_X264_PROP_PROFILE, "Profile property", "Set profile",
+        0, 2, OGMRIP_X264_DEFAULT_PROFILE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_PSY_RD,
+      g_param_spec_double (OGMRIP_X264_PROP_PSY_RD, "Psy RD property", "Set psy-rd",
+        0.0, 10.0, OGMRIP_X264_DEFAULT_PSY_RD, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_PSY_TRELLIS,
+      g_param_spec_double (OGMRIP_X264_PROP_PSY_TRELLIS, "Psy trellis property", "Set psy-trellis",
+        0.0, 10.0, OGMRIP_X264_DEFAULT_PSY_TRELLIS, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_RC_LOOKAHEAD,
+      g_param_spec_uint (OGMRIP_X264_PROP_RC_LOOKAHEAD, "RC look ahead property", "Set rc lookahead",
+        0, 250, OGMRIP_X264_DEFAULT_RC_LOOKAHEAD, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_SUBQ,
+      g_param_spec_uint (OGMRIP_X264_PROP_SUBQ, "Subpel quality property", "Set subpel quality",
+        0, 10, OGMRIP_X264_DEFAULT_SUBQ, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_TRELLIS,
+      g_param_spec_uint (OGMRIP_X264_PROP_TRELLIS, "Trellis property", "Set trellis",
+        0, 2, OGMRIP_X264_DEFAULT_TRELLIS, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_VBV_BUFSIZE,
+      g_param_spec_uint (OGMRIP_X264_PROP_VBV_BUFSIZE, "Buffer size property", "Set buffer size",
+        0, G_MAXUINT, OGMRIP_X264_DEFAULT_VBV_BUFSIZE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_VBV_MAXRATE,
+      g_param_spec_uint (OGMRIP_X264_PROP_VBV_MAXRATE, "Max rate property", "Set max rate",
+        0, G_MAXUINT, OGMRIP_X264_DEFAULT_VBV_MAXRATE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_WEIGHT_B,
+      g_param_spec_boolean (OGMRIP_X264_PROP_WEIGHT_B, "Weight B property", "Set weight B",
+        OGMRIP_X264_DEFAULT_WEIGHT_B, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_WEIGHT_P,
+      g_param_spec_uint (OGMRIP_X264_PROP_WEIGHT_P, "Weight P property", "Set weight P",
+        0, 2, OGMRIP_X264_DEFAULT_WEIGHT_P, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
+  g_object_class_install_property (gobject_class, PROP_DELAY,
+      g_param_spec_uint ("start-delay", "Start delay property", "Set start delay",
+        0, G_MAXUINT, 1, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
+}
+
+static void
+ogmrip_x264_init (OGMRipX264 *x264)
+{
+  x264->aq_mode = OGMRIP_X264_DEFAULT_AQ_MODE;
+  x264->aud = OGMRIP_X264_DEFAULT_AUD;
+  x264->b_adapt = OGMRIP_X264_DEFAULT_B_ADAPT;
+  x264->b_frames = OGMRIP_X264_DEFAULT_B_FRAMES;
+  x264->b_pyramid = OGMRIP_X264_DEFAULT_B_PYRAMID;
+  x264->brdo = OGMRIP_X264_DEFAULT_BRDO;
+  x264->cabac = OGMRIP_X264_DEFAULT_CABAC;
+  x264->cqm = OGMRIP_X264_DEFAULT_CQM;
+  x264->dct_decimate = OGMRIP_X264_DEFAULT_DCT_DECIMATE;
+  x264->direct = OGMRIP_X264_DEFAULT_DIRECT;
+  x264->fast_pskip = OGMRIP_X264_DEFAULT_FAST_PSKIP;
+  x264->force_cfr = OGMRIP_X264_DEFAULT_FORCE_CFR;
+  x264->frameref = OGMRIP_X264_DEFAULT_FRAMEREF;
+  x264->global_header = OGMRIP_X264_DEFAULT_GLOBAL_HEADER;
+  x264->keyint = OGMRIP_X264_DEFAULT_KEYINT;
+  x264->level_idc = OGMRIP_X264_DEFAULT_LEVEL_IDC;
+  x264->me = OGMRIP_X264_DEFAULT_ME;
+  x264->merange = OGMRIP_X264_DEFAULT_MERANGE;
+  x264->mixed_refs = OGMRIP_X264_DEFAULT_MIXED_REFS;
+  x264->profile = OGMRIP_X264_DEFAULT_PROFILE;
+  x264->psy_rd = OGMRIP_X264_DEFAULT_PSY_RD;
+  x264->psy_trellis = OGMRIP_X264_DEFAULT_PSY_TRELLIS;
+  x264->rc_lookahead = OGMRIP_X264_DEFAULT_RC_LOOKAHEAD;
+  x264->subq = OGMRIP_X264_DEFAULT_SUBQ;
+  x264->trellis = OGMRIP_X264_DEFAULT_TRELLIS;
+  x264->vbv_bufsize = OGMRIP_X264_DEFAULT_VBV_BUFSIZE;
+  x264->vbv_maxrate = OGMRIP_X264_DEFAULT_VBV_MAXRATE;
+  x264->weight_b = OGMRIP_X264_DEFAULT_WEIGHT_B;
+  x264->weight_p = OGMRIP_X264_DEFAULT_WEIGHT_P;
+  x264->x88dct = OGMRIP_X264_DEFAULT_8X8DCT;
 }
 
 static gboolean

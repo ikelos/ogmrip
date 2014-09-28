@@ -40,10 +40,6 @@ struct _OGMRipAudioCopyClass
   OGMRipAudioCodecClass parent_class;
 };
 
-static gboolean ogmrip_audio_copy_run (OGMJobTask   *task,
-                                       GCancellable *cancellable,
-                                       GError       **error);
-
 static OGMJobTask *
 ogmrip_audio_copy_command (OGMRipAudioCodec *audio)
 {
@@ -73,20 +69,6 @@ ogmrip_audio_copy_command (OGMRipAudioCodec *audio)
 
 G_DEFINE_TYPE (OGMRipAudioCopy, ogmrip_audio_copy, OGMRIP_TYPE_AUDIO_CODEC)
 
-static void
-ogmrip_audio_copy_class_init (OGMRipAudioCopyClass *klass)
-{
-  OGMJobTaskClass *task_class;
-
-  task_class = OGMJOB_TASK_CLASS (klass);
-  task_class->run = ogmrip_audio_copy_run;
-}
-
-static void
-ogmrip_audio_copy_init (OGMRipAudioCopy *audio_copy)
-{
-}
-
 static gboolean
 ogmrip_audio_copy_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
@@ -102,6 +84,20 @@ ogmrip_audio_copy_run (OGMJobTask *task, GCancellable *cancellable, GError **err
   ogmjob_container_remove (OGMJOB_CONTAINER (task), child);
 
   return result;
+}
+
+static void
+ogmrip_audio_copy_class_init (OGMRipAudioCopyClass *klass)
+{
+  OGMJobTaskClass *task_class;
+
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_audio_copy_run;
+}
+
+static void
+ogmrip_audio_copy_init (OGMRipAudioCopy *audio_copy)
+{
 }
 
 typedef struct _OGMRipVideoCopy OGMRipVideoCopy;

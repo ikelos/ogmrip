@@ -24,6 +24,17 @@
 
 static const gchar *untitled = N_("Untitled");
 
+GQuark
+ogmrip_media_error_quark (void)
+{
+  static GQuark quark = 0;
+
+  if (quark == 0)
+    quark = g_quark_from_static_string ("ogmrip-media-error-quark");
+
+  return quark;
+}
+
 G_DEFINE_INTERFACE (OGMRipMedia, ogmrip_media, G_TYPE_OBJECT)
 
 static void
@@ -244,11 +255,13 @@ ogmrip_media_is_copy (OGMRipMedia *media, OGMRipMedia *copy)
 }
 
 OGMRipMedia *
-ogmrip_media_new (const gchar *path)
+ogmrip_media_new (const gchar *path, GError **error)
 {
   OGMRipMedia *media = NULL;
   GType *types;
   guint i;
+
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
   if (!path)
     return NULL;
@@ -260,7 +273,7 @@ ogmrip_media_new (const gchar *path)
   for (i = 0; types[i] != G_TYPE_NONE; i ++)
   {
     if (g_type_is_a (types[i], G_TYPE_INITABLE))
-      media = g_initable_new (types[i], NULL, NULL, "uri", path, NULL);
+      media = g_initable_new (types[i], NULL, error, "uri", path, NULL);
     else
       media = g_object_new (types[i], "uri", path, NULL);
     if (media)

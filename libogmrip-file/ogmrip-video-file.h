@@ -47,7 +47,8 @@ struct _OGMRipVideoFileClass
 };
 
 GType         ogmrip_video_file_get_type (void);
-OGMRipMedia * ogmrip_video_file_new      (const gchar *uri);
+OGMRipMedia * ogmrip_video_file_new      (const gchar *uri,
+                                          GError      **error);
 
 G_END_DECLS
 

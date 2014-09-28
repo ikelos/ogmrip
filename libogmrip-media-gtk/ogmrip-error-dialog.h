@@ -26,7 +26,7 @@ G_BEGIN_DECLS
 void ogmrip_run_error_dialog (GtkWindow   *parent,
                               GError      *error,
                               const gchar *message_format,
-                              ...);
+                              ...) G_GNUC_PRINTF (3, 4);
 
 G_END_DECLS
 

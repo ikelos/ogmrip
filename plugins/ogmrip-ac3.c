@@ -49,10 +49,6 @@ struct _OGMRipAc3Class
   OGMRipAudioCodecClass parent_class;
 };
 
-static gboolean ogmrip_ac3_run (OGMJobTask   *task,
-                                GCancellable *cancellable,
-                                GError       **error);
-
 static const guint16 a52_bitratetab[] =
 {
    32,  40,  48,  56,  64,  80,  96, 112, 128, 160,
@@ -101,21 +97,6 @@ ogmrip_aften_command (OGMRipAudioCodec *audio, const gchar *input)
 
 G_DEFINE_TYPE (OGMRipAc3, ogmrip_ac3, OGMRIP_TYPE_AUDIO_CODEC);
 
-static void
-ogmrip_ac3_class_init (OGMRipAc3Class *klass)
-{
-  OGMJobTaskClass *task_class;
-
-  task_class = OGMJOB_TASK_CLASS (klass);
-
-  task_class->run = ogmrip_ac3_run;
-}
-
-static void
-ogmrip_ac3_init (OGMRipAc3 *ac3)
-{
-}
-
 static gboolean
 ogmrip_ac3_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
@@ -149,6 +130,21 @@ ogmrip_ac3_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   g_free (fifo);
 
   return result;
+}
+
+static void
+ogmrip_ac3_class_init (OGMRipAc3Class *klass)
+{
+  OGMJobTaskClass *task_class;
+
+  task_class = OGMJOB_TASK_CLASS (klass);
+
+  task_class->run = ogmrip_ac3_run;
+}
+
+static void
+ogmrip_ac3_init (OGMRipAc3 *ac3)
+{
 }
 
 void

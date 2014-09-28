@@ -47,11 +47,6 @@ struct _OGMRipFlacClass
   OGMRipAudioCodecClass parent_class;
 };
 
-GType           ogmrip_flac_get_type (void);
-static gboolean ogmrip_flac_run      (OGMJobTask   *task,
-                                      GCancellable *cancellable,
-                                      GError       **error);
-
 static OGMJobTask *
 ogmrip_flac_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input)
 {
@@ -96,20 +91,6 @@ ogmrip_flac_command (OGMRipAudioCodec *audio, gboolean header, const gchar *inpu
 
 G_DEFINE_TYPE (OGMRipFlac, ogmrip_flac, OGMRIP_TYPE_AUDIO_CODEC)
 
-static void
-ogmrip_flac_class_init (OGMRipFlacClass *klass)
-{
-  OGMJobTaskClass *task_class;
-
-  task_class = OGMJOB_TASK_CLASS (klass);
-  task_class->run = ogmrip_flac_run;
-}
-
-static void
-ogmrip_flac_init (OGMRipFlac *flac)
-{
-}
-
 static gboolean
 ogmrip_flac_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
@@ -143,6 +124,20 @@ ogmrip_flac_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   g_free (fifo);
 
   return result;
+}
+
+static void
+ogmrip_flac_class_init (OGMRipFlacClass *klass)
+{
+  OGMJobTaskClass *task_class;
+
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_flac_run;
+}
+
+static void
+ogmrip_flac_init (OGMRipFlac *flac)
+{
 }
 
 void

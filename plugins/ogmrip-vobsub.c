@@ -49,58 +49,6 @@ struct _OGMRipVobSubClass
   OGMRipSubpCodecClass parent_class;
 };
 
-static void     ogmrip_vobsub_finalize (GObject      *gobject);
-static gboolean ogmrip_vobsub_run      (OGMJobTask   *task,
-                                        GCancellable *cancellable,
-                                        GError       **error);
-
-G_DEFINE_TYPE (OGMRipVobSub, ogmrip_vobsub, OGMRIP_TYPE_SUBP_CODEC)
-
-static void
-ogmrip_vobsub_class_init (OGMRipVobSubClass *klass)
-{
-  GObjectClass *gobject_class;
-  OGMJobTaskClass *task_class;
-
-  gobject_class = G_OBJECT_CLASS (klass);
-  task_class = OGMJOB_TASK_CLASS (klass);
-
-  gobject_class->finalize = ogmrip_vobsub_finalize;
-  task_class->run = ogmrip_vobsub_run;
-}
-
-static void
-ogmrip_vobsub_init (OGMRipVobSub *vobsub)
-{
-}
-
-static void
-ogmrip_vobsub_finalize (GObject *gobject)
-{
-  const gchar *output;
-
-  output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (gobject)));
-  if (output)
-  {
-/*
-    if (ogmrip_codec_get_unlink_on_unref (OGMRIP_CODEC (gobject)))
-    {
-      gchar *filename;
-
-      filename = g_strconcat (output, ".idx", NULL);
-      g_unlink (filename);
-      g_free (filename);
-
-      filename = g_strconcat (output, ".sub", NULL);
-      g_unlink (filename);
-      g_free (filename);
-    }
-*/
-  }
-
-  G_OBJECT_CLASS (ogmrip_vobsub_parent_class)->finalize (gobject);
-}
-
 static gboolean
 ogmrip_vobsub_set_foo (OGMJobTask *task, const gchar *filename, GError **error)
 {
@@ -185,6 +133,35 @@ ogmrip_vobsub_set_forced (OGMJobTask *task, const gchar *filename, GError **erro
   return TRUE;
 }
 
+G_DEFINE_TYPE (OGMRipVobSub, ogmrip_vobsub, OGMRIP_TYPE_SUBP_CODEC)
+
+static void
+ogmrip_vobsub_finalize (GObject *gobject)
+{
+  const gchar *output;
+
+  output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (gobject)));
+  if (output)
+  {
+/*
+    if (ogmrip_codec_get_unlink_on_unref (OGMRIP_CODEC (gobject)))
+    {
+      gchar *filename;
+
+      filename = g_strconcat (output, ".idx", NULL);
+      g_unlink (filename);
+      g_free (filename);
+
+      filename = g_strconcat (output, ".sub", NULL);
+      g_unlink (filename);
+      g_free (filename);
+    }
+*/
+  }
+
+  G_OBJECT_CLASS (ogmrip_vobsub_parent_class)->finalize (gobject);
+}
+
 static gboolean
 ogmrip_vobsub_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
@@ -225,6 +202,24 @@ ogmrip_vobsub_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   ogmjob_container_remove (OGMJOB_CONTAINER (task), child);
 
   return result;
+}
+
+static void
+ogmrip_vobsub_class_init (OGMRipVobSubClass *klass)
+{
+  GObjectClass *gobject_class;
+  OGMJobTaskClass *task_class;
+
+  gobject_class = G_OBJECT_CLASS (klass);
+  task_class = OGMJOB_TASK_CLASS (klass);
+
+  gobject_class->finalize = ogmrip_vobsub_finalize;
+  task_class->run = ogmrip_vobsub_run;
+}
+
+static void
+ogmrip_vobsub_init (OGMRipVobSub *vobsub)
+{
 }
 
 void

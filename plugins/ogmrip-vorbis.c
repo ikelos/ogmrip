@@ -49,10 +49,6 @@ struct _OGMRipVorbisClass
   OGMRipAudioCodecClass parent_class;
 };
 
-static gboolean ogmrip_vorbis_run (OGMJobTask   *task,
-                                   GCancellable *cancellable,
-                                   GError       **error);
-
 static OGMJobTask *
 ogmrip_vorbis_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input)
 {
@@ -96,21 +92,6 @@ ogmrip_vorbis_command (OGMRipAudioCodec *audio, gboolean header, const gchar *in
 
 G_DEFINE_TYPE (OGMRipVorbis, ogmrip_vorbis, OGMRIP_TYPE_AUDIO_CODEC)
 
-static void
-ogmrip_vorbis_class_init (OGMRipVorbisClass *klass)
-{
-  OGMJobTaskClass *task_class;
-
-  task_class = OGMJOB_TASK_CLASS (klass);
-
-  task_class->run = ogmrip_vorbis_run;
-}
-
-static void
-ogmrip_vorbis_init (OGMRipVorbis *vorbis)
-{
-}
-
 static gboolean
 ogmrip_vorbis_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
@@ -144,6 +125,21 @@ ogmrip_vorbis_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   g_free (fifo);
 
   return result;
+}
+
+static void
+ogmrip_vorbis_class_init (OGMRipVorbisClass *klass)
+{
+  OGMJobTaskClass *task_class;
+
+  task_class = OGMJOB_TASK_CLASS (klass);
+
+  task_class->run = ogmrip_vorbis_run;
+}
+
+static void
+ogmrip_vorbis_init (OGMRipVorbis *vorbis)
+{
 }
 
 void
