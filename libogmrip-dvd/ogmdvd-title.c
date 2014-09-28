@@ -291,19 +291,25 @@ static gboolean
 ogmdvd_title_open (OGMRipTitle *title, GCancellable *cancellable, OGMRipTitleCallback callback, gpointer user_data, GError **error)
 {
   OGMDvdTitle *dtitle = OGMDVD_TITLE (title);
-  OGMDvdProgress progress = { title, callback, user_data };
 
-  if (!ogmrip_media_open (dtitle->priv->disc, cancellable, callback ? ogmdvd_title_open_cb : NULL, &progress, error))
-    return FALSE;
-
-  dtitle->priv->vts_file = ifoOpen (OGMDVD_DISC (dtitle->priv->disc)->priv->reader, dtitle->priv->title_set_nr);
-  if (!dtitle->priv->vts_file)
+  if (!dtitle->priv->nopen)
   {
-    ogmrip_media_close (dtitle->priv->disc);
-    g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_MEDIA_ERROR_TITLE,
-        _("Cannot open title %d of '%s'"), dtitle->priv->nr, OGMDVD_DISC (dtitle->priv->disc)->priv->uri);
-    return FALSE;
+    OGMDvdProgress progress = { title, callback, user_data };
+
+    if (!ogmrip_media_open (dtitle->priv->disc, cancellable, callback ? ogmdvd_title_open_cb : NULL, &progress, error))
+      return FALSE;
+
+    dtitle->priv->vts_file = ifoOpen (OGMDVD_DISC (dtitle->priv->disc)->priv->reader, dtitle->priv->title_set_nr);
+    if (!dtitle->priv->vts_file)
+    {
+      ogmrip_media_close (dtitle->priv->disc);
+      g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_MEDIA_ERROR_TITLE,
+          _("Cannot open title %d of '%s'"), dtitle->priv->nr, OGMDVD_DISC (dtitle->priv->disc)->priv->uri);
+      return FALSE;
+    }
   }
+
+  dtitle->priv->nopen ++;
 
   return TRUE;
 }
@@ -313,12 +319,17 @@ ogmdvd_title_close (OGMRipTitle *title)
 {
   OGMDvdTitle *dtitle = OGMDVD_TITLE (title);
 
-  if (dtitle->priv->vts_file)
+  if (dtitle->priv->nopen)
   {
-    ifoClose (dtitle->priv->vts_file);
-    dtitle->priv->vts_file = NULL;
+    dtitle->priv->nopen --;
 
-    ogmrip_media_close (dtitle->priv->disc);
+    if (!dtitle->priv->nopen && dtitle->priv->vts_file)
+    {
+      ifoClose (dtitle->priv->vts_file);
+      dtitle->priv->vts_file = NULL;
+
+      ogmrip_media_close (dtitle->priv->disc);
+    }
   }
 }
 
