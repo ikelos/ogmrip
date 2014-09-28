@@ -67,7 +67,6 @@ enum
 
 static void g_initable_iface_init    (GInitableIface        *iface);
 static void ogmrip_media_iface_init  (OGMRipMediaInterface  *iface);
-static void ogmdvd_disc_close        (OGMRipMedia           *media);
 
 static gboolean
 ogmdvd_device_tray_is_open (const gchar *device)
@@ -454,6 +453,22 @@ ogmdvd_disc_set_uri (OGMDvdDisc *disc, const gchar *str)
   g_free (path);
 }
 
+static void
+ogmdvd_disc_real_close (OGMDvdDisc *disc)
+{
+  if (disc->priv->vmg_file)
+  {
+    ifoClose (disc->priv->vmg_file);
+    disc->priv->vmg_file = NULL;
+  }
+
+  if (disc->priv->reader)
+  {
+    DVDClose (disc->priv->reader);
+    disc->priv->reader = NULL;
+  }
+}
+
 G_DEFINE_TYPE_WITH_CODE (OGMDvdDisc, ogmdvd_disc, G_TYPE_OBJECT,
     G_IMPLEMENT_INTERFACE (G_TYPE_INITABLE, g_initable_iface_init)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_MEDIA, ogmrip_media_iface_init)
@@ -483,7 +498,7 @@ ogmdvd_disc_finalize (GObject *gobject)
   g_debug ("Finalizing %s", G_OBJECT_TYPE_NAME (gobject));
 #endif
 
-  ogmdvd_disc_close (OGMRIP_MEDIA (disc));
+  ogmdvd_disc_real_close (disc);
 
   g_free (disc->priv->uri);
   g_free (disc->priv->device);
@@ -639,31 +654,32 @@ static gboolean
 ogmdvd_disc_open (OGMRipMedia *media, GCancellable *cancellable, OGMRipMediaCallback callback, gpointer user_data, GError **error)
 {
   OGMDvdDisc *disc = OGMDVD_DISC (media);
-  dvd_reader_t *reader;
-  const gchar *id, *current_id;
 
-  if (ogmdvd_disc_is_open (media))
-    return TRUE;
-
-  ogmdvd_disc_close (media);
-
-  reader = dvd_open_reader (disc->priv->device, error);
-  if (!reader)
-    return FALSE;
-
-  id = disc->priv->real_id ? disc->priv->real_id : disc->priv->id;
-  current_id = dvd_reader_get_id (reader);
-
-  if (!current_id || !g_str_equal (id, current_id))
+  if (!disc->priv->nopen)
   {
-    DVDClose (reader);
-    g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_MEDIA_ERROR_ID,
-        _("Device does not contain the expected DVD"));
-    return FALSE;
+    dvd_reader_t *reader;
+    const gchar *id, *current_id;
+
+    reader = dvd_open_reader (disc->priv->device, error);
+    if (!reader)
+      return FALSE;
+
+    id = disc->priv->real_id ? disc->priv->real_id : disc->priv->id;
+    current_id = dvd_reader_get_id (reader);
+
+    if (!current_id || !g_str_equal (id, current_id))
+    {
+      DVDClose (reader);
+      g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_MEDIA_ERROR_ID,
+          _("Device does not contain the expected DVD"));
+      return FALSE;
+    }
+
+    disc->priv->reader = reader;
+    disc->priv->vmg_file = ifoOpen (disc->priv->reader, 0);
   }
 
-  disc->priv->reader = reader;
-  disc->priv->vmg_file = ifoOpen (disc->priv->reader, 0);
+  disc->priv->nopen ++;
 
   return TRUE;
 }
@@ -673,16 +689,12 @@ ogmdvd_disc_close (OGMRipMedia *media)
 {
   OGMDvdDisc *disc = OGMDVD_DISC (media);
 
-  if (disc->priv->vmg_file)
+  if (disc->priv->nopen)
   {
-    ifoClose (disc->priv->vmg_file);
-    disc->priv->vmg_file = NULL;
-  }
+    disc->priv->nopen --;
 
-  if (disc->priv->reader)
-  {
-    DVDClose (disc->priv->reader);
-    disc->priv->reader = NULL;
+    if (!disc->priv->nopen)
+      ogmdvd_disc_real_close (disc);
   }
 }
 
