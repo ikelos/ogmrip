@@ -35,16 +35,10 @@ ogmrip_audio_file_chooser_dialog_get_file (OGMRipFileChooserDialog *dialog, GErr
   gchar *uri;
 
   uri = gtk_file_chooser_get_uri (GTK_FILE_CHOOSER (dialog));
-  file = ogmrip_audio_file_new (uri);
+  file = ogmrip_audio_file_new (uri, error);
   g_free (uri);
 
-  if (!file)
-  {
-    g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Could not open '%s'"), uri);
-    return NULL;
-  }
-
-  return OGMRIP_FILE (file);
+  return file ? OGMRIP_FILE (file) : NULL;
 }
 
 G_DEFINE_TYPE (OGMRipAudioFileChooserDialog, ogmrip_audio_file_chooser_dialog, OGMRIP_TYPE_FILE_CHOOSER_DIALOG);

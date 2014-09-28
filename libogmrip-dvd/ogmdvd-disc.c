@@ -563,7 +563,11 @@ ogmdvd_disc_initable_init (GInitable *initable, GCancellable *cancellable, GErro
     disc->priv->uri = g_strdup ("dvd:///dev/dvd");
 
   if (!g_str_has_prefix (disc->priv->uri, "dvd://"))
+  {
+    g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_MEDIA_ERROR_SCHEME,
+        _("Unknown scheme for '%s'"), disc->priv->uri);
     return FALSE;
+  }
 
   disc->priv->device = g_strdup (disc->priv->uri + 6);
 

@@ -47,7 +47,8 @@ struct _OGMRipAudioFileClass
 };
 
 GType         ogmrip_audio_file_get_type     (void);
-OGMRipMedia * ogmrip_audio_file_new          (const gchar     *uri);
+OGMRipMedia * ogmrip_audio_file_new          (const gchar     *uri,
+                                              GError          **error);
 void          ogmrip_audio_file_set_language (OGMRipAudioFile *file,
                                               guint           language);
 

@@ -374,7 +374,6 @@ ogmrip_encoding_parse_files (OGMRipEncoding *encoding, OGMRipXML *xml, GError **
 {
   if (ogmrip_xml_children (xml))
   {
-    OGMRipMedia *file;
     gchar *utf8, *type, *uri;
 
     do
@@ -387,28 +386,27 @@ ogmrip_encoding_parse_files (OGMRipEncoding *encoding, OGMRipXML *xml, GError **
 
         if (uri)
         {
+          OGMRipMedia *file = NULL;
+          gboolean retval = FALSE;
+
           type = ogmrip_xml_get_string (xml, "type");
 
           if (type && g_str_equal (type, "audio"))
-            file = ogmrip_audio_file_new (uri);
+            file = ogmrip_audio_file_new (uri, error);
           else if (type && g_str_equal (type, "subp"))
-            file = ogmrip_subp_file_new (uri);
-          else
-            file = NULL;
+            file = ogmrip_subp_file_new (uri, error);
 
           if (file)
           {
-            gboolean retval;
-
             retval = ogmrip_encoding_add_file (encoding, OGMRIP_FILE (file), error);
             g_object_unref (file);
-
-            if (!retval)
-              return FALSE;
           }
 
           g_free (type);
           g_free (uri);
+
+          if (!retval)
+            return FALSE;
         }
       }
     }

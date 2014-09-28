@@ -250,8 +250,12 @@ ogmrip_media_file_initable_init (GInitable *initable, GCancellable *cancellable,
   const gchar *str;
   gint i, n;
 
-  if (!OGMRIP_FILE (initable)->priv->uri || !g_str_has_prefix (OGMRIP_FILE (initable)->priv->uri, "file://"))
+  if (!g_str_has_prefix (OGMRIP_FILE (initable)->priv->uri, "file://"))
+  {
+    g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_MEDIA_ERROR_SCHEME,
+        _("Unknown scheme for '%s'"), OGMRIP_FILE (initable)->priv->uri);
     return FALSE;
+  }
 
   info = ogmrip_media_info_get_default ();
   if (!info)
@@ -422,11 +426,12 @@ ogmrip_title_iface_init (OGMRipTitleInterface *iface)
 }
 
 OGMRipMedia *
-ogmrip_media_file_new (const gchar *uri)
+ogmrip_media_file_new (const gchar *uri, GError **error)
 {
   g_return_val_if_fail (uri != NULL, NULL);
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
-  return g_initable_new (OGMRIP_TYPE_MEDIA_FILE, NULL, NULL, "uri", uri, NULL);
+  return g_initable_new (OGMRIP_TYPE_MEDIA_FILE, NULL, error, "uri", uri, NULL);
 }
 
 void

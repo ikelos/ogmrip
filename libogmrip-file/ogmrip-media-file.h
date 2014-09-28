@@ -49,7 +49,8 @@ struct _OGMRipMediaFileClass
 void          ogmrip_file_register_media (void);
 
 GType         ogmrip_media_file_get_type (void);
-OGMRipMedia * ogmrip_media_file_new      (const gchar *uri);
+OGMRipMedia * ogmrip_media_file_new      (const gchar *uri,
+                                          GError      **error);
 
 G_END_DECLS
 
