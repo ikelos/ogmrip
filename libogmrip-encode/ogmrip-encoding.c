@@ -1645,16 +1645,13 @@ ogmrip_encoding_copy (OGMRipEncoding *encoding, GCancellable *cancellable, GErro
 {
   OGMJobTask *task;
 
-  gchar *name, *output;
   gboolean result;
+  gchar *output;
   gulong id;
 
   ogmrip_log_printf ("Copying %s\n\n", ogmrip_media_get_label (encoding->priv->media));
 
-  name = g_strdup_printf ("%s-%d", ogmrip_media_get_id (encoding->priv->media), ogmrip_title_get_id (encoding->priv->title));
-  output = g_build_filename (ogmrip_fs_get_tmp_dir (), name, NULL);
-  g_free (name);
-
+  output = g_build_filename (ogmrip_fs_get_tmp_dir (), ogmrip_media_get_id (encoding->priv->media), NULL);
   task = ogmrip_copy_new (encoding->priv->media, output);
   g_free (output);
 
