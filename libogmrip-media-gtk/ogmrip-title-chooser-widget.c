@@ -123,7 +123,7 @@ ogmrip_title_chooser_widget_set_media (OGMRipTitleChooserWidget *chooser, OGMRip
           ID_COLUMN, ogmrip_title_get_id (link->data), -1);
       g_string_free (string, TRUE);
 
-      if (length <= 0 || length > longest)
+      if (!longest || length > longest)
       {
         longest = length;
         gtk_combo_box_set_active_iter (GTK_COMBO_BOX (chooser), &iter);
