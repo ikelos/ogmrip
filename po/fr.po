@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OGMRip\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-27 08:04+0200\n"
+"POT-Creation-Date: 2014-09-28 12:16+0200\n"
 "PO-Revision-Date: 2008-01-11 21:30+0100\n"
 "Last-Translator: Olivier Rolland <billl@users.sourceforge.net>\n"
 "Language-Team: French <fr@li.org>\n"
@@ -26,8 +26,8 @@ msgstr "Sélectionner un média"
 #: ../libogmrip-encode-gtk/ogmrip-progress-dialog.ui.h:4
 #: ../libogmrip-encode-gtk/ogmrip-progress-menu.ui.h:3
 #: ../libogmrip-media-gtk/ogmrip-media-chooser-widget.c:244
-#: ../libogmrip-file-gtk/ogmrip-audio-file-chooser-dialog.c:78
-#: ../libogmrip-file-gtk/ogmrip-subp-file-chooser-dialog.c:76
+#: ../libogmrip-file-gtk/ogmrip-audio-file-chooser-dialog.c:72
+#: ../libogmrip-file-gtk/ogmrip-subp-file-chooser-dialog.c:70
 #: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:326
 #: ../libogmrip-encode-gtk/ogmrip-encoding-manager-dialog.c:390
 #: ../libogmrip-encode-gtk/ogmrip-profile-manager-dialog.c:257
@@ -114,7 +114,7 @@ msgid "Automatic"
 msgstr "Automatique"
 
 #: ../libogmrip-encode-gtk/ogmrip-profile-editor-dialog.ui.h:10
-#: ../plugins/ogmrip-xvid.c:909
+#: ../plugins/ogmrip-xvid.c:895
 msgid "XviD"
 msgstr "XviD"
 
@@ -1642,7 +1642,7 @@ msgid "A media encoder"
 msgstr "Un encodeur de média"
 
 #: ../libogmrip-base/ogmrip-fs.c:134
-#: ../libogmrip-file/ogmrip-file-object.c:344
+#: ../libogmrip-file/ogmrip-file-object.c:340
 #, c-format
 msgid "Failed to unlink file '%s': %s"
 msgstr "Impossible de supprimer le lien '%s': %s"
@@ -1711,16 +1711,40 @@ msgstr "Le dossier ne contient pas une structure de DVD valide"
 msgid "No such directory, block device or iso file"
 msgstr "Répertoire, périphérique ou fichier iso inéxistant"
 
-#: ../libogmrip-dvd/ogmdvd-disc.c:645
-#: ../libogmrip-encode/ogmrip-encoding.c:526
+#: ../libogmrip-dvd/ogmdvd-disc.c:568
+#, c-format
+msgid "Unknown scheme for '%s'"
+msgstr "Schéma inconnu pour '%s'"
+
+#: ../libogmrip-dvd/ogmdvd-disc.c:578
+#, c-format
+msgid "Cannot open '%s'"
+msgstr "Impossible d'ouvrir '%s'"
+
+#: ../libogmrip-dvd/ogmdvd-disc.c:586
+#, c-format
+msgid "Cannot retrieve identifier for '%s'"
+msgstr "Impossible de récupérer l'identificateur de '%'"
+
+#: ../libogmrip-dvd/ogmdvd-disc.c:595
+#, c-format
+msgid "Cannot get manager for '%s'"
+msgstr "Impossible d'obtenir le gestionnaire pour '%s'"
+
+#: ../libogmrip-dvd/ogmdvd-disc.c:619
+#, c-format
+msgid "No title found for '%s'"
+msgstr "Aucun titre trouvé pour '%s'"
+
+#: ../libogmrip-dvd/ogmdvd-disc.c:661
 #, c-format
 msgid "Device does not contain the expected DVD"
 msgstr "Le périphérique ne contient pas le DVD attendu"
 
-#: ../libogmrip-dvd/ogmdvd-title.c:305
+#: ../libogmrip-dvd/ogmdvd-title.c:306
 #, c-format
-msgid "Cannot open video titleset"
-msgstr "Impossible d'ouvrir le titleset vidéo"
+msgid "Cannot open title %d of '%s'"
+msgstr "Impossible d'ouvrir le titre %d of '%s'"
 
 #: ../libogmrip-encode/ogmrip-container.c:445
 #: ../libogmrip-encode/ogmrip-encoding.c:678
@@ -1741,6 +1765,11 @@ msgid "The container cannot contain more than %d subp codecs and files"
 msgstr ""
 "Le conteneur ne peut pas contenir plus de %d codecs et fichiers de sous-"
 "titres"
+
+#: ../libogmrip-encode/ogmrip-encoding.c:526
+#, c-format
+msgid "Device does not contain the expected media"
+msgstr "Le périphérique ne contient pas le média attendu"
 
 #: ../libogmrip-encode/ogmrip-encoding.c:571
 #, c-format
@@ -1830,8 +1859,8 @@ msgid "Select a media directory"
 msgstr "Sélectionner un répertoire média"
 
 #: ../libogmrip-media-gtk/ogmrip-media-chooser-widget.c:244
-#: ../libogmrip-file-gtk/ogmrip-audio-file-chooser-dialog.c:78
-#: ../libogmrip-file-gtk/ogmrip-subp-file-chooser-dialog.c:76
+#: ../libogmrip-file-gtk/ogmrip-audio-file-chooser-dialog.c:72
+#: ../libogmrip-file-gtk/ogmrip-subp-file-chooser-dialog.c:70
 #: ../src/ogmrip-main-window.c:1353
 msgid "_Open"
 msgstr "_Ouvrir"
@@ -1860,14 +1889,7 @@ msgstr "minutes"
 msgid "seconds"
 msgstr "secondes"
 
-#: ../libogmrip-file-gtk/ogmrip-audio-file-chooser-dialog.c:43
-#: ../libogmrip-file-gtk/ogmrip-subp-file-chooser-dialog.c:41
-#: ../src/ogmrip-main-window.c:1775
-#, c-format
-msgid "Could not open '%s'"
-msgstr "Impossible d'ouvrir '%s'"
-
-#: ../libogmrip-file-gtk/ogmrip-audio-file-chooser-dialog.c:80
+#: ../libogmrip-file-gtk/ogmrip-audio-file-chooser-dialog.c:74
 msgid "Select an audio file"
 msgstr "Sélectionner un fichier audio"
 
@@ -1906,7 +1928,7 @@ msgstr "Aucun sous-titres"
 msgid "Subtitle"
 msgstr "Sous-titres"
 
-#: ../libogmrip-file-gtk/ogmrip-subp-file-chooser-dialog.c:78
+#: ../libogmrip-file-gtk/ogmrip-subp-file-chooser-dialog.c:72
 msgid "Select a subtitles file"
 msgstr "Sélectionner un fichier de sous-titres"
 
@@ -2387,6 +2409,11 @@ msgstr "Sélectionner un fichier"
 msgid "Can't play title"
 msgstr "Impossible de jouer le titre"
 
+#: ../src/ogmrip-main-window.c:1775
+#, c-format
+msgid "Could not open '%s'"
+msgstr "Impossible d'ouvrir '%s'"
+
 #: ../src/ogmrip-pref-dialog.c:162
 msgid "No favorite audio language"
 msgstr "Pas de langue préférée pour l'audio"
@@ -2399,77 +2426,77 @@ msgstr "Pas de langue préférée pour les sous-titres"
 msgid "No chapters language"
 msgstr "Aucune"
 
-#: ../plugins/ogmrip-aac.c:166
+#: ../plugins/ogmrip-aac.c:162
 msgid "MPlayer and FAAC are missing"
 msgstr "MPlayer et FAAC sont manquants"
 
-#: ../plugins/ogmrip-aac.c:172 ../plugins/ogmrip-ac3.c:174
-#: ../plugins/ogmrip-dirac.c:136 ../plugins/ogmrip-flac.c:168
-#: ../plugins/ogmrip-mp3.c:189 ../plugins/ogmrip-theora.c:228
-#: ../plugins/ogmrip-vorbis.c:169 ../plugins/ogmrip-wav.c:95
+#: ../plugins/ogmrip-aac.c:168 ../plugins/ogmrip-ac3.c:170
+#: ../plugins/ogmrip-dirac.c:127 ../plugins/ogmrip-flac.c:163
+#: ../plugins/ogmrip-mp3.c:185 ../plugins/ogmrip-theora.c:210
+#: ../plugins/ogmrip-vorbis.c:165 ../plugins/ogmrip-wav.c:91
 msgid "MPlayer is missing"
 msgstr "MPlayer est manquant"
 
-#: ../plugins/ogmrip-aac.c:178
+#: ../plugins/ogmrip-aac.c:174
 msgid "FAAC is missing"
 msgstr "FAAC est manquant"
 
-#: ../plugins/ogmrip-aac.c:183
+#: ../plugins/ogmrip-aac.c:179
 msgid "Advanced Audio Coding (AAC)"
 msgstr "Advanced Audio Coding (AAC)"
 
-#: ../plugins/ogmrip-ac3.c:168
+#: ../plugins/ogmrip-ac3.c:164
 msgid "MPlayer and aften are missing"
 msgstr "MPlayer et aften sont manquants"
 
-#: ../plugins/ogmrip-ac3.c:180
+#: ../plugins/ogmrip-ac3.c:176
 msgid "aften is missing"
 msgstr "aften est manquant"
 
-#: ../plugins/ogmrip-ac3.c:185
+#: ../plugins/ogmrip-ac3.c:181
 msgid "Dolby Digital (AC3)"
 msgstr "Dolby Digital (AC3)"
 
-#: ../plugins/ogmrip-avi.c:334
+#: ../plugins/ogmrip-avi.c:326
 msgid "avibox is missing"
 msgstr "avibox est manquant"
 
-#: ../plugins/ogmrip-avi.c:337
+#: ../plugins/ogmrip-avi.c:329
 msgid "Audio-Video Interlace (AVI)"
 msgstr "Audio-Video Interlace (AVI)"
 
-#: ../plugins/ogmrip-copy.c:223 ../plugins/ogmrip-dirac.c:130
-#: ../plugins/ogmrip-lavc-mpeg.c:152 ../plugins/ogmrip-srt.c:512
-#: ../plugins/ogmrip-vobsub.c:235 ../plugins/ogmrip-x264.c:1082
-#: ../plugins/ogmrip-xvid.c:893
+#: ../plugins/ogmrip-copy.c:219 ../plugins/ogmrip-dirac.c:121
+#: ../plugins/ogmrip-lavc-mpeg.c:152 ../plugins/ogmrip-srt.c:507
+#: ../plugins/ogmrip-vobsub.c:230 ../plugins/ogmrip-x264.c:1067
+#: ../plugins/ogmrip-xvid.c:879
 msgid "MEncoder is missing"
 msgstr "MEncoder est manquant"
 
-#: ../plugins/ogmrip-copy.c:227
+#: ../plugins/ogmrip-copy.c:223
 msgid "Copy (for AC3 or DTS)"
 msgstr "Copie (pour l'AC3 ou le DTS)"
 
-#: ../plugins/ogmrip-copy.c:229
+#: ../plugins/ogmrip-copy.c:225
 msgid "Video Copy"
 msgstr "Copie Vidéo"
 
-#: ../plugins/ogmrip-dirac.c:150
+#: ../plugins/ogmrip-dirac.c:141
 msgid "MPlayer is built without Dirac support"
 msgstr "MPlayer est compilé sans support Dirac"
 
-#: ../plugins/ogmrip-dirac.c:155
+#: ../plugins/ogmrip-dirac.c:146
 msgid "Dirac"
 msgstr "Dirac"
 
-#: ../plugins/ogmrip-flac.c:162
+#: ../plugins/ogmrip-flac.c:157
 msgid "MPlayer and FLAC are missing"
 msgstr "MPlayer et FLAC sont manquants"
 
-#: ../plugins/ogmrip-flac.c:174
+#: ../plugins/ogmrip-flac.c:169
 msgid "FLAC is missing"
 msgstr "FLAC est manquant"
 
-#: ../plugins/ogmrip-flac.c:179
+#: ../plugins/ogmrip-flac.c:174
 msgid "Free Lossless Audio Codec (FLAC)"
 msgstr "Free Lossless Audio Codec (FLAC)"
 
@@ -2489,107 +2516,107 @@ msgstr "Lavc Mpeg-2"
 msgid "Lavc Mpeg-4"
 msgstr "Lavc Mpeg-4"
 
-#: ../plugins/ogmrip-mkv.c:449
+#: ../plugins/ogmrip-mkv.c:445
 msgid "mkvmerge is missing"
 msgstr "mkvmerge est manquant"
 
-#: ../plugins/ogmrip-mkv.c:470
+#: ../plugins/ogmrip-mkv.c:466
 msgid "Matroska Media (MKV)"
 msgstr "Matroska Media (MKV)"
 
-#: ../plugins/ogmrip-mkv.c:474
+#: ../plugins/ogmrip-mkv.c:470
 msgid "WebM Media (webm)"
 msgstr "WebM Media (webm)"
 
-#: ../plugins/ogmrip-mp3.c:183
+#: ../plugins/ogmrip-mp3.c:179
 msgid "MPlayer and LAME are missing"
 msgstr "MPlayer et LAME sont manquants"
 
-#: ../plugins/ogmrip-mp3.c:195
+#: ../plugins/ogmrip-mp3.c:191
 msgid "LAME is missing"
 msgstr "LAME est manquant"
 
-#: ../plugins/ogmrip-mp3.c:200
+#: ../plugins/ogmrip-mp3.c:196
 msgid "MPEG-1 layer III (MP3)"
 msgstr "MPEG-1 layer III (MP3)"
 
-#: ../plugins/ogmrip-mp4.c:603
+#: ../plugins/ogmrip-mp4.c:591
 msgid "MP4Box is missing"
 msgstr "MP4Box est manquant"
 
-#: ../plugins/ogmrip-mp4.c:628
+#: ../plugins/ogmrip-mp4.c:616
 msgid "Mpeg-4 Media (MP4)"
 msgstr "Mpeg-4 Media (MP4)"
 
-#: ../plugins/ogmrip-ogg.c:367
+#: ../plugins/ogmrip-ogg.c:363
 msgid "ogmmerge and ogmsplit are missing"
 msgstr "ogmmerge et ogmsplit sont manquants"
 
-#: ../plugins/ogmrip-ogg.c:373
+#: ../plugins/ogmrip-ogg.c:369
 msgid "ogmmerge is missing"
 msgstr "ogmmerge est manquant"
 
-#: ../plugins/ogmrip-ogg.c:379
+#: ../plugins/ogmrip-ogg.c:375
 msgid "ogmsplit is missing"
 msgstr "ogmsplit est manquant"
 
-#: ../plugins/ogmrip-ogg.c:384
+#: ../plugins/ogmrip-ogg.c:380
 msgid "Ogg Media (OGM)"
 msgstr "Ogg Media (OGM)"
 
-#: ../plugins/ogmrip-srt.c:549
+#: ../plugins/ogmrip-srt.c:544
 msgid "GOCR, Ocrad and Tesseract are missing"
 msgstr "GOCR, Ocrad et Tesseract sont manquants"
 
-#: ../plugins/ogmrip-srt.c:554
+#: ../plugins/ogmrip-srt.c:549
 msgid "SRT text"
 msgstr "SRT texte"
 
-#: ../plugins/ogmrip-theora.c:222
+#: ../plugins/ogmrip-theora.c:204
 msgid "MPlayer and theoraenc are missing"
 msgstr "MPlayer et theoraenc sont manquants"
 
-#: ../plugins/ogmrip-theora.c:234
+#: ../plugins/ogmrip-theora.c:216
 msgid "theoraenc is missing"
 msgstr "theoraenc est manquant"
 
-#: ../plugins/ogmrip-theora.c:239
+#: ../plugins/ogmrip-theora.c:221
 msgid "Ogg Theora"
 msgstr "Ogg Theora"
 
-#: ../plugins/ogmrip-vobsub.c:240
+#: ../plugins/ogmrip-vobsub.c:235
 msgid "VobSub"
 msgstr "VobSub"
 
-#: ../plugins/ogmrip-vorbis.c:163
+#: ../plugins/ogmrip-vorbis.c:159
 msgid "MPlayer and OggEnc are missing"
 msgstr "MPlayer et OggEnc sont manquants"
 
-#: ../plugins/ogmrip-vorbis.c:175
+#: ../plugins/ogmrip-vorbis.c:171
 msgid "OggEnc is missing"
 msgstr "OggEnc est manquant"
 
-#: ../plugins/ogmrip-vorbis.c:180
+#: ../plugins/ogmrip-vorbis.c:176
 msgid "Ogg Vorbis"
 msgstr "Ogg Vorbis"
 
-#: ../plugins/ogmrip-vp8.c:369
+#: ../plugins/ogmrip-vp8.c:348
 msgid "vpxenc is missing"
 msgstr "vpxenc est manquant"
 
-#: ../plugins/ogmrip-vp8.c:375
+#: ../plugins/ogmrip-vp8.c:354
 msgid "Vp8"
 msgstr "Vp8"
 
-#: ../plugins/ogmrip-wav.c:98
+#: ../plugins/ogmrip-wav.c:94
 msgid "Wave (uncompressed PCM)"
 msgstr "Wave (PCM non compressé)"
 
-#: ../plugins/ogmrip-x264.c:1094
+#: ../plugins/ogmrip-x264.c:1079
 msgid "MEncoder is build without X264 support"
 msgstr "MEncoder est compilé sans support X264"
 
-#: ../plugins/ogmrip-x264.c:1114
+#: ../plugins/ogmrip-x264.c:1099
 msgid "X264"
 msgstr "X264"
 
@@ -2597,7 +2624,13 @@ msgstr "X264"
 msgid "Transformed Exhaustive search (tesa - even slower)"
 msgstr "Recherche exhaustive transformée (tesa - encore plus lent)"
 
-#: ../plugins/ogmrip-xvid.c:905
+#: ../plugins/ogmrip-xvid.c:891
 msgid "MEncoder is built without XviD support"
 msgstr "MEncoder est compilé sans support XviD"
 
+#, fuzzy
+#~ msgid "Cannot open: '%s'"
+#~ msgstr "Impossible d'ouvrir '%s'"
+
+#~ msgid "Cannot open video titleset"
+#~ msgstr "Impossible d'ouvrir le titleset vidéo"
