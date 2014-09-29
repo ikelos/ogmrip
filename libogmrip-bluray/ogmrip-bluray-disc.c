@@ -306,8 +306,6 @@ ogmbr_disc_class_init (OGMBrDiscClass *klass)
 static gboolean
 ogmbr_disc_is_open (OGMRipMedia *media)
 {
-  g_message ("disc is open");
-
   return OGMBR_DISC (media)->priv->bd != NULL;;
 }
 
@@ -321,8 +319,6 @@ ogmbr_disc_open (OGMRipMedia *media, GCancellable *cancellable, OGMRipMediaCallb
     BLURAY *bd;
     const BLURAY_DISC_INFO *dinfo;
     const META_DL *meta;
-
-    g_message ("disc open");
 
     bd = bd_open (disc->priv->device, NULL);
     if (!bd)
@@ -365,8 +361,6 @@ static void
 ogmbr_disc_close (OGMRipMedia *media)
 {
   OGMBrDisc *disc = OGMBR_DISC (media);
-
-  g_message ("disc close");
 
   if (disc->priv->bd)
   {

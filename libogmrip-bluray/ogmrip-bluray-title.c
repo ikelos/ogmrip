@@ -328,8 +328,6 @@ ogmbr_title_is_open (OGMRipTitle *title)
 {
   OGMRipMedia *media = OGMBR_TITLE (title)->priv->media;
 
-  g_message ("title is open");
-
   return ogmrip_media_is_open (media) &&
     OGMBR_DISC (media)->priv->selected == OGMBR_TITLE (title)->priv->id;
 }
@@ -357,8 +355,6 @@ ogmbr_title_open (OGMRipTitle *title, GCancellable *cancellable, OGMRipTitleCall
   {
     OpenData data = { title, callback, user_data };
     guint ntitles;
-
-    g_message ("title open");
 
     if (ogmrip_media_is_open (btitle->priv->media))
     {
@@ -403,10 +399,7 @@ ogmbr_title_close (OGMRipTitle *title)
     btitle->priv->nopen --;
 
     if (!btitle->priv->nopen)
-    {
-      g_message ("title close");
       ogmrip_media_close (OGMBR_TITLE (title)->priv->media);
-    }
   }
 }
 
@@ -419,8 +412,6 @@ ogmbr_title_get_id (OGMRipTitle *title)
 static OGMRipMedia *
 ogmbr_title_get_media (OGMRipTitle *title)
 {
-  g_message ("get media");
-
   return OGMBR_TITLE (title)->priv->media;
 }
 

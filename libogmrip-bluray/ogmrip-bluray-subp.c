@@ -54,8 +54,6 @@ ogmbr_subp_stream_get_id (OGMRipStream *stream)
 static OGMRipTitle *
 ogmbr_subp_stream_get_title (OGMRipStream *stream)
 {
-  g_message ("get title");
-
   return OGMBR_SUBP_STREAM (stream)->priv->title;
 }
 
