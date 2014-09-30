@@ -36,6 +36,8 @@
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
 
+const guint MIN_DURATION = 120 * 90 * 1000;
+
 enum
 {
   PROP_0,
@@ -86,7 +88,7 @@ ogmbr_title_new (OGMBrDisc *disc, BLURAY *bd, BLURAY_TITLE_INFO *info, guint nr)
   OGMBrTitle *title;
   guint i;
 
-  if (!info->clip_count || !info->clips[0].video_stream_count)
+  if (!info->clip_count || !info->clips[0].video_stream_count || info->duration < MIN_DURATION)
     return NULL;
 
   title = g_object_new (OGMBR_TYPE_TITLE, NULL);
