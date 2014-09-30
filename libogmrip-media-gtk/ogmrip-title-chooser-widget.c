@@ -78,15 +78,15 @@ ogmrip_title_chooser_widget_set_media (OGMRipTitleChooserWidget *chooser, OGMRip
 
     gint standard;
     glong length, longest = 0;
-    guint num, denom;
+    guint nr, num, denom;
 
     list = ogmrip_media_get_titles (media);
-    for (link = list; link; link = link->next)
+    for (link = list, nr = 1; link; link = link->next, nr ++)
     {
       stream = ogmrip_title_get_video_stream (link->data);
 
       string = g_string_new (NULL);
-      g_string_printf (string, "%s %02d", _("Title"), ogmrip_title_get_id (link->data) + 1);
+      g_string_printf (string, "%s %02d", _("Title"), nr);
 
       length = ogmrip_title_get_length (link->data, &time_);
       if (length > 0)
