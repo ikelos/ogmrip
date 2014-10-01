@@ -956,7 +956,7 @@ ogmrip_main_window_run_options_dialog (OGMRipMainWindow *window, OGMRipEncoding 
   profile = ogmrip_encoding_get_profile (encoding);
 
   ogmrip_encoding_set_copy (encoding,
-      g_settings_get_boolean (settings, OGMRIP_SETTINGS_COPY_DVD));
+      g_settings_get_boolean (settings, OGMRIP_SETTINGS_COPY_MEDIA));
 
   ogmrip_profile_get (profile, OGMRIP_PROFILE_GENERAL, OGMRIP_PROFILE_ENCODING_METHOD, "u", &method);
   ogmrip_encoding_set_method (encoding, method);

@@ -40,9 +40,16 @@ struct _OGMRipProfilePriv
   gboolean is_valid;
 
   GSettings *general_settings;
+  gulong general_handler;
+
   GSettings *video_settings;
+  gulong video_handler;
+
   GSettings *audio_settings;
+  gulong audio_handler;
+
   GSettings *subp_settings;
+  gulong subp_handler;
 
   gchar *name, *path;
   GFile *file;
@@ -172,6 +179,24 @@ ogmrip_profile_check (OGMRipProfile *profile)
   }
 }
 
+static void
+ogmrip_profile_block_handlers (OGMRipProfile *profile)
+{
+  g_signal_handler_block (profile->priv->general_settings, profile->priv->general_handler);
+  g_signal_handler_block (profile->priv->video_settings, profile->priv->video_handler);
+  g_signal_handler_block (profile->priv->audio_settings, profile->priv->audio_handler);
+  g_signal_handler_block (profile->priv->subp_settings, profile->priv->subp_handler);
+}
+
+static void
+ogmrip_profile_unblock_handlers (OGMRipProfile *profile)
+{
+  g_signal_handler_unblock (profile->priv->general_settings, profile->priv->general_handler);
+  g_signal_handler_unblock (profile->priv->video_settings, profile->priv->video_handler);
+  g_signal_handler_unblock (profile->priv->audio_settings, profile->priv->audio_handler);
+  g_signal_handler_unblock (profile->priv->subp_settings, profile->priv->subp_handler);
+}
+
 G_DEFINE_TYPE_WITH_PRIVATE (OGMRipProfile, ogmrip_profile, G_TYPE_SETTINGS)
 
 static void
@@ -193,9 +218,6 @@ ogmrip_profile_constructed (GObject *gobject)
       g_settings_set_string (profile->priv->general_settings, OGMRIP_PROFILE_CONTAINER, ogmrip_type_name (container));
   }
 
-  g_signal_connect_swapped (profile->priv->general_settings, "changed::" OGMRIP_PROFILE_CONTAINER,
-      G_CALLBACK (ogmrip_profile_check), profile);
-
   profile->priv->video_settings = g_settings_get_child (G_SETTINGS (profile), OGMRIP_PROFILE_VIDEO);
 
   codec = ogmrip_profile_get_video_codec (profile);
@@ -205,9 +227,6 @@ ogmrip_profile_constructed (GObject *gobject)
     if (codec != G_TYPE_NONE)
       g_settings_set_string (profile->priv->video_settings, OGMRIP_PROFILE_CODEC, ogmrip_type_name (codec));
   }
-
-  g_signal_connect_swapped (profile->priv->video_settings, "changed::" OGMRIP_PROFILE_CODEC,
-      G_CALLBACK (ogmrip_profile_check), profile);
 
   profile->priv->audio_settings = g_settings_get_child (G_SETTINGS (profile), OGMRIP_PROFILE_AUDIO);
 
@@ -219,9 +238,6 @@ ogmrip_profile_constructed (GObject *gobject)
       g_settings_set_string (profile->priv->audio_settings, OGMRIP_PROFILE_CODEC, ogmrip_type_name (codec));
   }
 
-  g_signal_connect_swapped (profile->priv->audio_settings, "changed::" OGMRIP_PROFILE_CODEC,
-      G_CALLBACK (ogmrip_profile_check), profile);
-
   profile->priv->subp_settings = g_settings_get_child (G_SETTINGS (profile), OGMRIP_PROFILE_SUBP);
 
   codec = ogmrip_profile_get_subp_codec (profile);
@@ -232,14 +248,27 @@ ogmrip_profile_constructed (GObject *gobject)
       g_settings_set_string (profile->priv->subp_settings, OGMRIP_PROFILE_CODEC, ogmrip_type_name (codec));
   }
 
-  g_signal_connect_swapped (profile->priv->subp_settings, "changed::" OGMRIP_PROFILE_CODEC,
-      G_CALLBACK (ogmrip_profile_check), profile);
-
   g_object_get (profile, "path", &profile->priv->path, NULL);
 
   str = g_path_get_dirname (profile->priv->path);
   profile->priv->name = g_path_get_basename (str);
   g_free (str);
+
+  profile->priv->general_handler =
+    g_signal_connect_swapped (profile->priv->general_settings, "changed::" OGMRIP_PROFILE_CONTAINER,
+        G_CALLBACK (ogmrip_profile_check), profile);
+
+  profile->priv->video_handler = 
+    g_signal_connect_swapped (profile->priv->video_settings, "changed::" OGMRIP_PROFILE_CODEC,
+        G_CALLBACK (ogmrip_profile_check), profile);
+
+  profile->priv->audio_handler =
+    g_signal_connect_swapped (profile->priv->audio_settings, "changed::" OGMRIP_PROFILE_CODEC,
+        G_CALLBACK (ogmrip_profile_check), profile);
+
+  profile->priv->subp_handler =
+    g_signal_connect_swapped (profile->priv->subp_settings, "changed::" OGMRIP_PROFILE_CODEC,
+        G_CALLBACK (ogmrip_profile_check), profile);
 
   ogmrip_profile_check (profile);
 }
@@ -250,26 +279,22 @@ ogmrip_profile_dispose (GObject *gobject)
   OGMRipProfile *profile = OGMRIP_PROFILE (gobject);
 
   if (profile->priv->general_settings)
-    g_signal_handlers_disconnect_by_func (profile->priv->general_settings,
-        ogmrip_profile_check, profile);
+    g_signal_handler_disconnect (profile->priv->general_settings, profile->priv->general_handler);
 
   g_clear_object (&profile->priv->general_settings);
 
   if (profile->priv->video_settings)
-    g_signal_handlers_disconnect_by_func (profile->priv->video_settings,
-        ogmrip_profile_check, profile);
+    g_signal_handler_disconnect (profile->priv->video_settings, profile->priv->video_handler);
 
   g_clear_object (&profile->priv->video_settings);
 
   if (profile->priv->audio_settings)
-    g_signal_handlers_disconnect_by_func (profile->priv->audio_settings,
-        ogmrip_profile_check, profile);
+    g_signal_handler_disconnect (profile->priv->audio_settings, profile->priv->audio_handler);
 
   g_clear_object (&profile->priv->audio_settings);
 
   if (profile->priv->subp_settings)
-    g_signal_handlers_disconnect_by_func (profile->priv->subp_settings,
-        ogmrip_profile_check, profile);
+    g_signal_handler_disconnect (profile->priv->subp_settings, profile->priv->subp_handler);
 
   g_clear_object (&profile->priv->subp_settings);
 
@@ -447,6 +472,8 @@ ogmrip_profile_copy (OGMRipProfile *profile, gchar *name)
   if (!new_profile)
     return NULL;
 
+  ogmrip_profile_block_handlers (new_profile);
+
   ogmrip_profile_copy_section (profile, new_profile, OGMRIP_PROFILE_GENERAL);
 
   str = g_settings_get_string (profile->priv->general_settings, OGMRIP_PROFILE_CONTAINER);
@@ -471,6 +498,8 @@ ogmrip_profile_copy (OGMRipProfile *profile, gchar *name)
   ogmrip_profile_copy_section (profile, new_profile, str);
   g_free (str);
 
+  ogmrip_profile_unblock_handlers (new_profile);
+
   return new_profile;
 }
 
@@ -489,7 +518,11 @@ ogmrip_profile_new_from_xml (OGMRipXML *xml, GError **error)
 
   profile = ogmrip_profile_new (str);
   if (profile)
+  {
+    ogmrip_profile_block_handlers (profile);
     ogmrip_profile_parse (profile, xml, error);
+    ogmrip_profile_unblock_handlers (profile);
+  }
 
   g_free (str);
 

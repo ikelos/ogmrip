@@ -249,7 +249,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkCheckButton" id="copy_dvd_check">
+                  <object class="GtkCheckButton" id="copy_media_check">
                     <property name="label" translatable="yes">_Copy media on hard drive before encoding</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>

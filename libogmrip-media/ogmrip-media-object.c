@@ -214,6 +214,21 @@ ogmrip_media_get_titles (OGMRipMedia *media)
   return iface->get_titles (media);
 }
 
+gboolean
+ogmrip_media_get_require_copy (OGMRipMedia *media)
+{
+  OGMRipMediaInterface *iface;
+
+  g_return_val_if_fail (OGMRIP_IS_MEDIA (media), FALSE);
+
+  iface = OGMRIP_MEDIA_GET_IFACE (media);
+
+  if (!iface->get_require_copy)
+    return FALSE;
+
+  return iface->get_require_copy (media);
+}
+
 OGMRipMedia *
 ogmrip_media_copy (OGMRipMedia *media, const gchar *path, GCancellable *cancellable,
     OGMRipMediaCallback callback, gpointer user_data, GError **error)

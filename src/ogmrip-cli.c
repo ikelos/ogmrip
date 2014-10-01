@@ -531,7 +531,7 @@ ogmrip_cli_create_encoding (OGMRipTitle *title, OGMRipProfile *profile)
   ogmrip_encoding_set_profile (encoding, profile);
 
   ogmrip_encoding_set_copy (encoding,
-      g_settings_get_boolean (settings, OGMRIP_SETTINGS_COPY_DVD));
+      g_settings_get_boolean (settings, OGMRIP_SETTINGS_COPY_MEDIA));
 
   ogmrip_profile_get (profile, OGMRIP_PROFILE_GENERAL,
       OGMRIP_PROFILE_ENCODING_METHOD, "u", &method);

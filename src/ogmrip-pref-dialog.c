@@ -41,7 +41,7 @@ struct _OGMRipPrefDialogPriv
   GtkWidget *filename_combo;
   GtkWidget *after_enc_combo;
   GtkWidget *threads_spin;
-  GtkWidget *copy_dvd_check;
+  GtkWidget *copy_media_check;
   GtkWidget *keep_tmp_check;
   GtkWidget *log_check;
 };
@@ -136,7 +136,7 @@ ogmrip_pref_dialog_class_init (OGMRipPrefDialogClass *klass)
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipPrefDialog, filename_combo);
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipPrefDialog, after_enc_combo);
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipPrefDialog, threads_spin);
-  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipPrefDialog, copy_dvd_check);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipPrefDialog, copy_media_check);
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipPrefDialog, keep_tmp_check);
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipPrefDialog, log_check);
 }
@@ -204,8 +204,8 @@ ogmrip_pref_dialog_init (OGMRipPrefDialog *dialog)
   g_settings_bind (settings, OGMRIP_SETTINGS_FILENAME,
                    dialog->priv->filename_combo, "active",
                    G_SETTINGS_BIND_DEFAULT);
-  g_settings_bind (settings, OGMRIP_SETTINGS_COPY_DVD,
-                   dialog->priv->copy_dvd_check, "active",
+  g_settings_bind (settings, OGMRIP_SETTINGS_COPY_MEDIA,
+                   dialog->priv->copy_media_check, "active",
                    G_SETTINGS_BIND_DEFAULT);
   g_settings_bind (settings, OGMRIP_SETTINGS_AFTER_ENC,
                    dialog->priv->after_enc_combo, "active",

@@ -49,59 +49,61 @@ struct _OGMRipMediaInterface
 {
   GTypeInterface base_iface;
 
-  gboolean      (* open)          (OGMRipMedia         *media,
-                                   GCancellable        *cancellable,
-                                   OGMRipMediaCallback callback,
-                                   gpointer            user_data,
-                                   GError              **error);
-  void          (* close)         (OGMRipMedia         *media);
-  gboolean      (* is_open)       (OGMRipMedia         *media);
-  const gchar * (* get_label)     (OGMRipMedia         *media);
-  const gchar * (* get_id)        (OGMRipMedia         *media);
-  const gchar * (* get_uri)       (OGMRipMedia         *media);
-  gint64        (* get_size)      (OGMRipMedia         *media);
-  gint          (* get_n_titles)  (OGMRipMedia         *media);
-  OGMRipTitle * (* get_title)     (OGMRipMedia         *media,
-                                   guint               id);
-  GList *       (* get_titles)    (OGMRipMedia         *media);
-  OGMRipMedia * (* copy)          (OGMRipMedia         *media,
-                                   const gchar         *path,
-                                   GCancellable        *cancellable,
-                                   OGMRipMediaCallback callback,
-                                   gpointer            user_data,
-                                   GError              **error);
-  gboolean      (* is_copy)       (OGMRipMedia         *media,
-                                   OGMRipMedia         *copy);
+  gboolean      (* open)             (OGMRipMedia         *media,
+                                      GCancellable        *cancellable,
+                                      OGMRipMediaCallback callback,
+                                      gpointer            user_data,
+                                      GError              **error);
+  void          (* close)            (OGMRipMedia         *media);
+  gboolean      (* is_open)          (OGMRipMedia         *media);
+  const gchar * (* get_label)        (OGMRipMedia         *media);
+  const gchar * (* get_id)           (OGMRipMedia         *media);
+  const gchar * (* get_uri)          (OGMRipMedia         *media);
+  gint64        (* get_size)         (OGMRipMedia         *media);
+  gint          (* get_n_titles)     (OGMRipMedia         *media);
+  OGMRipTitle * (* get_title)        (OGMRipMedia         *media,
+                                      guint               id);
+  GList *       (* get_titles)       (OGMRipMedia         *media);
+  gboolean      (* get_require_copy) (OGMRipMedia         *media);
+  OGMRipMedia * (* copy)             (OGMRipMedia         *media,
+                                      const gchar         *path,
+                                      GCancellable        *cancellable,
+                                      OGMRipMediaCallback callback,
+                                      gpointer            user_data,
+                                      GError              **error);
+  gboolean      (* is_copy)          (OGMRipMedia         *media,
+                                      OGMRipMedia         *copy);
 };
 
-GQuark        ogmrip_media_error_quark   (void);
+GQuark        ogmrip_media_error_quark      (void);
 
-GType         ogmrip_media_get_type      (void) G_GNUC_CONST;
-OGMRipMedia * ogmrip_media_new           (const gchar         *path,
-                                          GError              **error);
-gboolean      ogmrip_media_open          (OGMRipMedia         *media,
-                                          GCancellable        *cancellable,
-                                          OGMRipMediaCallback callback,
-                                          gpointer            user_data,
-                                          GError              **error);
-void          ogmrip_media_close         (OGMRipMedia         *media);
-gboolean      ogmrip_media_is_open       (OGMRipMedia         *media);
-const gchar * ogmrip_media_get_label     (OGMRipMedia         *media);
-const gchar * ogmrip_media_get_id        (OGMRipMedia         *media);
-const gchar * ogmrip_media_get_uri       (OGMRipMedia         *media);
-gint64        ogmrip_media_get_size      (OGMRipMedia         *media);
-gint          ogmrip_media_get_n_titles  (OGMRipMedia         *media);
-OGMRipTitle * ogmrip_media_get_title     (OGMRipMedia         *media,
-                                          guint               id);
-GList *       ogmrip_media_get_titles    (OGMRipMedia         *media);
-OGMRipMedia * ogmrip_media_copy          (OGMRipMedia         *media,
-                                          const gchar         *path,
-                                          GCancellable        *cancellable,
-                                          OGMRipMediaCallback callback,
-                                          gpointer            user_data,
-                                          GError              **error);
-gboolean      ogmrip_media_is_copy       (OGMRipMedia         *media,
-                                          OGMRipMedia         *copy);
+GType         ogmrip_media_get_type         (void) G_GNUC_CONST;
+OGMRipMedia * ogmrip_media_new              (const gchar         *path,
+                                             GError              **error);
+gboolean      ogmrip_media_open             (OGMRipMedia         *media,
+                                             GCancellable        *cancellable,
+                                             OGMRipMediaCallback callback,
+                                             gpointer            user_data,
+                                             GError              **error);
+void          ogmrip_media_close            (OGMRipMedia         *media);
+gboolean      ogmrip_media_is_open          (OGMRipMedia         *media);
+const gchar * ogmrip_media_get_label        (OGMRipMedia         *media);
+const gchar * ogmrip_media_get_id           (OGMRipMedia         *media);
+const gchar * ogmrip_media_get_uri          (OGMRipMedia         *media);
+gint64        ogmrip_media_get_size         (OGMRipMedia         *media);
+gint          ogmrip_media_get_n_titles     (OGMRipMedia         *media);
+OGMRipTitle * ogmrip_media_get_title        (OGMRipMedia         *media,
+                                             guint               id);
+GList *       ogmrip_media_get_titles       (OGMRipMedia         *media);
+gboolean      ogmrip_media_get_require_copy (OGMRipMedia         *media);
+OGMRipMedia * ogmrip_media_copy             (OGMRipMedia         *media,
+                                             const gchar         *path,
+                                             GCancellable        *cancellable,
+                                             OGMRipMediaCallback callback,
+                                             gpointer            user_data,
+                                             GError              **error);
+gboolean      ogmrip_media_is_copy          (OGMRipMedia         *media,
+                                             OGMRipMedia         *copy);
 
 G_END_DECLS
 
