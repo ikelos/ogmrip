@@ -43,6 +43,7 @@ struct _OGMBrDiscPriv
   gint selected;
 
   OGMBrDisc *copy;
+  gboolean require_copy;
 };
 
 struct _OGMBrTitlePriv

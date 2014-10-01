@@ -188,6 +188,9 @@ ogmbr_disc_initable_init (GInitable *initable, GCancellable *cancellable, GError
   meta = bd_get_meta (bd);
 
   disc->priv->label = meta->di_name ? g_strdup (meta->di_name) : NULL;
+  disc->priv->require_copy =
+    (dinfo->aacs_detected && (!dinfo->libaacs_detected || !dinfo->aacs_handled)) ||
+    (dinfo->bdplus_detected && (!dinfo->libbdplus_detected || !dinfo->bdplus_handled));
 
   ntitles = bd_get_titles (bd, TITLES_RELEVANT, 0);
   for (nr = 0; nr < ntitles; nr ++)
@@ -471,6 +474,12 @@ ogmbr_disc_action_progress_cb (OGMJobTask *task, GParamSpec *pspec, ProgressData
   data->callback (data->media, ogmjob_task_get_progress (task), data->user_data);
 }
 
+static gboolean
+ogmbr_disc_get_require_copy (OGMRipMedia *media)
+{
+  return OGMBR_DISC (media)->priv->require_copy;
+}
+
 static OGMRipMedia *
 ogmbr_disc_copy (OGMRipMedia *media, const gchar *path, GCancellable *cancellable,
     OGMRipMediaCallback callback, gpointer user_data, GError **error)
@@ -526,17 +535,18 @@ ogmbr_initable_iface_init (GInitableIface *iface)
 static void
 ogmbr_media_iface_init (OGMRipMediaInterface *iface)
 {
-  iface->open         = ogmbr_disc_open;
-  iface->close        = ogmbr_disc_close;
-  iface->is_open      = ogmbr_disc_is_open;
-  iface->get_label    = ogmbr_disc_get_label;
-  iface->get_id       = ogmbr_disc_get_id;
-  iface->get_uri      = ogmbr_disc_get_uri;
-  iface->get_size     = ogmbr_disc_get_size;
-  iface->get_n_titles = ogmbr_disc_get_n_titles;
-  iface->get_title    = ogmbr_disc_get_title;
-  iface->get_titles   = ogmbr_disc_get_titles;
-  iface->copy         = ogmbr_disc_copy;
+  iface->open             = ogmbr_disc_open;
+  iface->close            = ogmbr_disc_close;
+  iface->is_open          = ogmbr_disc_is_open;
+  iface->get_label        = ogmbr_disc_get_label;
+  iface->get_id           = ogmbr_disc_get_id;
+  iface->get_uri          = ogmbr_disc_get_uri;
+  iface->get_size         = ogmbr_disc_get_size;
+  iface->get_n_titles     = ogmbr_disc_get_n_titles;
+  iface->get_title        = ogmbr_disc_get_title;
+  iface->get_titles       = ogmbr_disc_get_titles;
+  iface->get_require_copy = ogmbr_disc_get_require_copy;
+  iface->copy             = ogmbr_disc_copy;
 }
 
 void
