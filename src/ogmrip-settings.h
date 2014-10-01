@@ -30,7 +30,7 @@ G_BEGIN_DECLS
 #define OGMRIP_SETTINGS_PREF_SUBP    "prefered-subp-language"
 #define OGMRIP_SETTINGS_CHAPTER_LANG "chapters-language"
 #define OGMRIP_SETTINGS_TMP_DIR      "temporary-directory"
-#define OGMRIP_SETTINGS_COPY_DVD     "copy-dvd"
+#define OGMRIP_SETTINGS_COPY_MEDIA   "copy-media"
 #define OGMRIP_SETTINGS_AFTER_ENC    "after-encoding"
 #define OGMRIP_SETTINGS_KEEP_TMP     "keep-temporary-files"
 #define OGMRIP_SETTINGS_LOG_OUTPUT   "create-log-file"

@@ -37,9 +37,9 @@
       <default>0</default>
       <summary>What to do after the encoding</summary>
     </key>
-    <key name="copy-dvd" type="b">
+    <key name="copy-media" type="b">
       <default>true</default>
-      <summary>If copy DVD on hard drive before encoding</summary>
+      <summary>If media must be copied the on hard drive before encoding</summary>
     </key>
     <key name="create-log-file" type="b">
       <default>false</default>
