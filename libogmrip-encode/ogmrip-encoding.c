@@ -1901,7 +1901,7 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GCancellable *cancellable, GEr
   /*
    * Copy the media
    */
-  if (encoding->priv->copy)
+  if (encoding->priv->copy || ogmrip_media_get_require_copy (encoding->priv->media))
   {
     result = ogmrip_encoding_copy (encoding, cancellable, error);
     if (!result)
