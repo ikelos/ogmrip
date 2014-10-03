@@ -17,6 +17,7 @@
  */
 
 #include "ogmrip-media-object.h"
+#include "ogmrip-media-title.h"
 
 #include <ogmrip-base.h>
 
@@ -152,18 +153,17 @@ ogmrip_media_get_size (OGMRipMedia *media)
 
   if (!iface->get_size)
   {
-/*
-    OGMRipTitle *title;
+    GList *titles, *link;
+    guint64 size;
 
-    if (ogmrip_media_get_n_titles (media) != 1)
-      return -1;
+    titles = ogmrip_media_get_titles (media);
 
-    title = ogmrip_media_get_nth_title (media, 0);
-    if (!title)
-      return -1;
+    for (link = titles; link; link = link->next)
+      size += ogmrip_title_get_size (link->data);
 
-    return ogmrip_title_get_size (title);
-*/
+    g_list_free (titles);
+
+    return size;
   }
 
   return iface->get_size (media);
