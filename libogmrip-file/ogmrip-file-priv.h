@@ -34,8 +34,8 @@ struct _OGMRipFilePriv
   gchar *path;
   gchar *label;
   gdouble length;
-  gint64 media_size;
-  gint64 title_size;
+  guint64 media_size;
+  guint64 title_size;
   gint format;
 };
 
@@ -49,7 +49,7 @@ struct _OGMRipVideoFilePriv
   guint framerate_denom;
   guint aspect_num;
   guint aspect_denom;
-  gint64 size;
+  guint64 size;
   gboolean progressive;
 };
 
@@ -59,14 +59,14 @@ struct _OGMRipAudioFilePriv
   gint channels;
   gint language;
   gint samplerate;
-  gint64 size;
+  guint64 size;
   gchar *label;
 };
 
 struct _OGMRipSubpFilePriv
 {
   gint language;
-  gint64 size;
+  guint64 size;
   gchar *label;
 };
 

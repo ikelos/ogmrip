@@ -141,7 +141,7 @@ ogmrip_media_get_id (OGMRipMedia *media)
   return id;
 }
 
-gint64
+guint64
 ogmrip_media_get_size (OGMRipMedia *media)
 {
   OGMRipMediaInterface *iface;

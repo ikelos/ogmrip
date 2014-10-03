@@ -59,7 +59,7 @@ struct _OGMRipMediaInterface
   const gchar * (* get_label)        (OGMRipMedia         *media);
   const gchar * (* get_id)           (OGMRipMedia         *media);
   const gchar * (* get_uri)          (OGMRipMedia         *media);
-  gint64        (* get_size)         (OGMRipMedia         *media);
+  guint64       (* get_size)         (OGMRipMedia         *media);
   gint          (* get_n_titles)     (OGMRipMedia         *media);
   OGMRipTitle * (* get_title)        (OGMRipMedia         *media,
                                       guint               id);
@@ -90,7 +90,7 @@ gboolean      ogmrip_media_is_open          (OGMRipMedia         *media);
 const gchar * ogmrip_media_get_label        (OGMRipMedia         *media);
 const gchar * ogmrip_media_get_id           (OGMRipMedia         *media);
 const gchar * ogmrip_media_get_uri          (OGMRipMedia         *media);
-gint64        ogmrip_media_get_size         (OGMRipMedia         *media);
+guint64       ogmrip_media_get_size         (OGMRipMedia         *media);
 gint          ogmrip_media_get_n_titles     (OGMRipMedia         *media);
 OGMRipTitle * ogmrip_media_get_title        (OGMRipMedia         *media,
                                              guint               id);

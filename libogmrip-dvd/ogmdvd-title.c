@@ -351,7 +351,7 @@ ogmdvd_title_get_id (OGMRipTitle *title)
   return OGMDVD_TITLE (title)->priv->nr;
 }
 
-static gint64
+static guint64
 ogmdvd_title_get_vts_size (OGMRipTitle *title)
 {
   return OGMDVD_TITLE (title)->priv->vts_size;

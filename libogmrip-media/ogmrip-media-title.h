@@ -43,7 +43,7 @@ struct _OGMRipTitleInterface
   void                (* close)                (OGMRipTitle         *title);
   gboolean            (* is_open)              (OGMRipTitle         *title);
   OGMRipMedia *       (* get_media)            (OGMRipTitle         *title);
-  gint64              (* get_size)             (OGMRipTitle         *title);
+  guint64             (* get_size)             (OGMRipTitle         *title);
   gint                (* get_id)               (OGMRipTitle         *title);
   gdouble             (* get_length)           (OGMRipTitle         *title,
                                                 OGMRipTime          *length);
@@ -79,7 +79,7 @@ gboolean            ogmrip_title_open                 (OGMRipTitle         *titl
 void                ogmrip_title_close                (OGMRipTitle         *title);
 gboolean            ogmrip_title_is_open              (OGMRipTitle         *title);
 OGMRipMedia *       ogmrip_title_get_media            (OGMRipTitle         *title);
-gint64              ogmrip_title_get_size             (OGMRipTitle         *title);
+guint64             ogmrip_title_get_size             (OGMRipTitle         *title);
 gint                ogmrip_title_get_id               (OGMRipTitle         *title);
 gdouble             ogmrip_title_get_length           (OGMRipTitle         *title,
                                                        OGMRipTime          *length);

@@ -100,7 +100,7 @@ ogmrip_title_get_id (OGMRipTitle *title)
   return iface->get_id (title);
 }
 
-gint64
+guint64
 ogmrip_title_get_size (OGMRipTitle *title)
 {
   OGMRipTitleInterface *iface;

@@ -1259,7 +1259,7 @@ ogmrip_encoding_set_relative (OGMRipEncoding *encoding, gboolean relative)
   g_object_notify (G_OBJECT (encoding), "relative");
 }
 
-static gint64
+static guint64
 ogmrip_encoding_get_rip_size (OGMRipEncoding *encoding)
 {
   guint number, size;
@@ -1295,7 +1295,7 @@ ogmrip_encoding_get_rip_size (OGMRipEncoding *encoding)
   return 0;
 }
 
-static gint64
+static guint64
 ogmrip_encoding_get_file_size (OGMRipCodec *codec)
 {
   struct stat buf;
@@ -1309,11 +1309,11 @@ ogmrip_encoding_get_file_size (OGMRipCodec *codec)
   return size;
 }
 
-static gint64
+static guint64
 ogmrip_encoding_get_nonvideo_size (OGMRipEncoding *encoding)
 {
   GList *link;
-  gint64 nonvideo = 0;
+  guint64 nonvideo = 0;
 
   for (link = encoding->priv->audio_codecs; link; link = link->next)
     nonvideo += ogmrip_encoding_get_file_size (link->data);
@@ -1330,7 +1330,7 @@ ogmrip_encoding_get_nonvideo_size (OGMRipEncoding *encoding)
   return nonvideo;
 }
 
-static gint64
+static guint64
 ogmrip_encoding_get_video_overhead (OGMRipEncoding *encoding)
 {
   OGMRipStream *stream;
@@ -1350,10 +1350,10 @@ ogmrip_encoding_get_video_overhead (OGMRipEncoding *encoding)
 
   overhead = ogmrip_container_get_overhead (encoding->priv->container);
 
-  return (gint64) (frames * overhead);
+  return (guint64) (frames * overhead);
 }
 
-static gint64
+static guint64
 ogmrip_encoding_get_audio_overhead (OGMRipEncoding *encoding, OGMRipAudioCodec *codec)
 {
   OGMRipFile *output;
@@ -1383,16 +1383,16 @@ ogmrip_encoding_get_audio_overhead (OGMRipEncoding *encoding, OGMRipAudioCodec *
 
   overhead = ogmrip_container_get_overhead (encoding->priv->container);
 
-  return (gint64) (audio_frames * overhead);
+  return (guint64) (audio_frames * overhead);
 }
 
-static gint64
+static guint64
 ogmrip_encoding_get_subp_overhead (OGMRipEncoding *encoding, OGMRipSubpCodec *codec)
 {
   return 0;
 }
 
-static gint64
+static guint64
 ogmrip_encoding_get_file_overhead (OGMRipEncoding *encoding, OGMRipFile *file)
 {
   glong length, audio_frames;
@@ -1413,14 +1413,14 @@ ogmrip_encoding_get_file_overhead (OGMRipEncoding *encoding, OGMRipFile *file)
 
   overhead = ogmrip_container_get_overhead (encoding->priv->container);
 
-  return (gint64) (audio_frames * overhead);
+  return (guint64) (audio_frames * overhead);
 }
 
-static gint64
+static guint64
 ogmrip_encoding_get_overhead_size (OGMRipEncoding *encoding)
 {
   GList *link;
-  gint64 overhead = 0;
+  guint64 overhead = 0;
 
   overhead = ogmrip_encoding_get_video_overhead (encoding);
 

@@ -36,21 +36,21 @@ enum
   PROP_CODEC
 };
 
-static gint64
+static guint64
 ogmrip_codec_get_size (OGMRipCodec *codec)
 {
   const gchar *output;
   struct stat buf;
-  gint64 size = 0;
+  guint64 size = 0;
 
   output = ogmrip_file_get_path (ogmrip_codec_get_output (codec));
-  if (g_stat (output, &buf) == 0)
-    size = buf.st_size;
+  if (output && g_stat (output, &buf) == 0)
+      size = (guint64) buf.st_size;
 
   return size;
 }
 
-static gint64
+static guint64
 ogmrip_stub_get_media_size (OGMRipMedia *media)
 {
   OGMRipStub *stub = OGMRIP_STUB (media);
@@ -97,7 +97,7 @@ ogmrip_stub_get_n_chapters (OGMRipTitle *title)
   return end - start + 1;
 }
 
-static gint64
+static guint64
 ogmrip_stub_get_title_size (OGMRipTitle *title)
 {
   OGMRipStub *stub = OGMRIP_STUB (title);
