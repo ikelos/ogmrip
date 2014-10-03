@@ -735,9 +735,17 @@ ogmdvd_disc_get_uri (OGMRipMedia *media)
 }
 
 static guint64
-ogmdvd_disc_get_vmg_size (OGMRipMedia *media)
+ogmdvd_disc_get_size (OGMRipMedia *media)
 {
-  return OGMDVD_DISC (media)->priv->vmg_size;
+  GList *link;
+  guint64 size;
+
+  size = OGMDVD_DISC (media)->priv->vmg_size;
+
+  for (link = OGMDVD_DISC (media)->priv->titles; link; link = link->next)
+    size += OGMDVD_TITLE (link->data)->priv->vts_size;
+
+  return size;
 }
 
 static gint
@@ -752,12 +760,8 @@ ogmdvd_disc_get_title (OGMRipMedia *media, guint id)
   GList *link;
 
   for (link = OGMDVD_DISC (media)->priv->titles; link; link = link->next)
-  {
-    OGMDvdTitle *title = link->data;
-
-    if (title->priv->nr == id)
+    if (OGMDVD_TITLE (link->data)->priv->nr == id)
       return link->data;
-  }
 
   return NULL;
 }
@@ -909,7 +913,7 @@ ogmrip_media_iface_init (OGMRipMediaInterface *iface)
   iface->get_label     = ogmdvd_disc_get_label;
   iface->get_id        = ogmdvd_disc_get_id;
   iface->get_uri       = ogmdvd_disc_get_uri;
-  iface->get_size      = ogmdvd_disc_get_vmg_size;
+  iface->get_size      = ogmdvd_disc_get_size;
   iface->get_n_titles  = ogmdvd_disc_get_n_titles;
   iface->get_title     = ogmdvd_disc_get_title;
   iface->get_titles    = ogmdvd_disc_get_titles;

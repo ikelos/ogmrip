@@ -352,7 +352,7 @@ ogmdvd_title_get_id (OGMRipTitle *title)
 }
 
 static guint64
-ogmdvd_title_get_vts_size (OGMRipTitle *title)
+ogmdvd_title_get_size (OGMRipTitle *title)
 {
   return OGMDVD_TITLE (title)->priv->vts_size;
 }
@@ -535,7 +535,7 @@ ogmdvd_title_iface_init (OGMRipTitleInterface *iface)
   iface->is_open              = ogmdvd_title_is_open;
   iface->get_media            = ogmdvd_title_get_media;
   iface->get_id               = ogmdvd_title_get_id;
-  iface->get_size             = ogmdvd_title_get_vts_size;
+  iface->get_size             = ogmdvd_title_get_size;
   iface->get_length           = ogmdvd_title_get_length;
   iface->get_chapters_length  = ogmdvd_title_get_chapters_length;
   iface->get_palette          = ogmdvd_title_get_palette;
