@@ -1296,6 +1296,30 @@ ogmrip_encoding_get_rip_size (OGMRipEncoding *encoding)
 }
 
 static guint64
+ogmrip_encoding_get_sync_size (OGMRipEncoding *encoding)
+{
+  gdouble length;
+
+  if (!encoding->priv->ensure_sync)
+    return 0;
+
+  length = ogmrip_codec_get_length (OGMRIP_CODEC (encoding->priv->video_codec), NULL);
+  if (length < 0.0)
+    return 0;
+
+  return (guint64) (length * 16000);
+}
+
+static guint64
+ogmrip_encoding_get_copy_size (OGMRipEncoding *encoding)
+{
+  if (!encoding->priv->copy && !ogmrip_media_get_require_copy (encoding->priv->media))
+    return 0;
+
+  return ogmrip_media_get_size (encoding->priv->media);
+}
+
+static guint64
 ogmrip_encoding_get_file_size (OGMRipCodec *codec)
 {
   struct stat buf;
@@ -1551,6 +1575,9 @@ get_space_left_for_file (GFile *file, guint64 *space, gchar **id, GCancellable *
       G_FILE_ATTRIBUTE_FILESYSTEM_FREE "," G_FILE_ATTRIBUTE_ID_FILESYSTEM,
       G_FILE_QUERY_INFO_NONE, cancellable, error);
 
+  if (!info)
+    return FALSE;
+
   *space = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE);
   *id = g_strdup (g_file_info_get_attribute_string (info, G_FILE_ATTRIBUTE_ID_FILESYSTEM));
 
@@ -1573,15 +1600,17 @@ get_space_left (const gchar *path, guint64 *space, gchar **id, GCancellable *can
 }
 
 static gboolean
-ogmrip_encoding_check_space (OGMRipEncoding *encoding, guint64 output_size, guint64 tmp_size, GCancellable *cancellable, GError **error)
+ogmrip_encoding_check_space (OGMRipEncoding *encoding, GCancellable *cancellable, GError **error)
 {
   OGMRipContainer *container;
-  guint64 output_space, tmp_space;
+  guint64 output_size, tmp_size, output_space, tmp_space;
   gchar *output_id, *tmp_id, *str;
   gboolean retval = FALSE;
 
-  if (output_size + tmp_size == 0)
-    return TRUE;
+  output_size = ogmrip_encoding_get_rip_size (encoding);
+  tmp_size = output_size +
+    ogmrip_encoding_get_sync_size (encoding) +
+    ogmrip_encoding_get_copy_size (encoding);
 
   container = ogmrip_encoding_get_container (encoding);
 
@@ -1895,7 +1924,7 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GCancellable *cancellable, GEr
   if (!ogmrip_encoding_check_output (encoding, cancellable, error))
     goto encode_cleanup;
 
-  if (!ogmrip_encoding_check_space (encoding, 0, 0, cancellable, error))
+  if (!ogmrip_encoding_check_space (encoding, cancellable, error))
     goto encode_cleanup;
 
   /*
