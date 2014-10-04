@@ -155,88 +155,103 @@ dvd_reader_get_id (dvd_reader_t *reader)
   return str;
 }
 
-static gint64
+static guint64
 dvd_reader_get_ifo_size (dvd_reader_t *reader, guint vts)
 {
   dvd_file_t *file;
-  gint size;
+  guint64 size;
 
   file = DVDOpenFile (reader, vts, DVD_READ_INFO_FILE);
-  size = DVDFileSize (file) * DVD_VIDEO_LB_LEN;
+  size = DVDFileSize (file);
   DVDCloseFile (file);
 
   if (size < 0)
     return 0;
 
-  return (gint64) size;
+  return size * DVD_VIDEO_LB_LEN;
 }
 
-static gint64
+static guint64
 dvd_reader_get_bup_size (dvd_reader_t *reader, guint vts)
 {
   dvd_file_t *file;
-  gint size;
+  guint64 size;
 
   file = DVDOpenFile (reader, vts, DVD_READ_INFO_BACKUP_FILE);
-  size = DVDFileSize (file) * DVD_VIDEO_LB_LEN;
+  size = DVDFileSize (file);
   DVDCloseFile (file);
 
   if (size < 0)
     return 0;
 
-  return (gint64) size;
+  return size * DVD_VIDEO_LB_LEN;
 }
 
-static gint64
+static guint64
 dvd_reader_get_menu_size (dvd_reader_t *reader, guint vts)
 {
   dvd_file_t *file;
-  gint size;
+  guint64 size;
 
   file = DVDOpenFile (reader, vts, DVD_READ_MENU_VOBS);
-  size = DVDFileSize (file) * DVD_VIDEO_LB_LEN;
+  size = DVDFileSize (file);
   DVDCloseFile (file);
 
   if (size < 0)
     return 0;
 
-  return (gint64) size;
+  return size * DVD_VIDEO_LB_LEN;
 }
 
-static gint64
+static guint64
 dvd_reader_get_vob_size (dvd_reader_t *reader, guint vts)
 {
-  gint64 fullsize;
-
   dvd_file_t *file;
+  ssize_t size;
 
   file = DVDOpenFile (reader, vts, DVD_READ_TITLE_VOBS);
-  fullsize = DVDFileSize (file) * DVD_VIDEO_LB_LEN;
+  size = DVDFileSize (file);
   DVDCloseFile (file);
 
-  if (fullsize < 0)
+  if (size < 0)
     return 0;
 
-  return fullsize;
+  return size * DVD_VIDEO_LB_LEN;
 }
 
 static guint64
 dvd_reader_get_vts_size (dvd_reader_t *reader, guint vts)
 {
-  guint64 size, fullsize;
+  guint64 size, vts_size = 0;
 
-  fullsize  = dvd_reader_get_ifo_size  (reader, vts);
-  fullsize += dvd_reader_get_bup_size  (reader, vts);
-  fullsize += dvd_reader_get_menu_size (reader, vts);
+  size = dvd_reader_get_ifo_size (reader, vts);
+  if (size < 0)
+    return 0;
+
+  vts_size += size;
+
+  size = dvd_reader_get_bup_size (reader, vts);
+  if (size < 0)
+    return 0;
+
+  vts_size += size;
+
+  size = dvd_reader_get_menu_size (reader, vts);
+  if (size < 0)
+    return 0;
+
+  vts_size += size;
 
   if (vts > 0)
   {
-    if ((size = dvd_reader_get_vob_size (reader, vts)) == 0)
+    size = dvd_reader_get_vob_size (reader, vts);
+    if (size < 0)
       return 0;
-    fullsize += size;
+
+    vts_size += size;
   }
 
-  return fullsize;
+  return vts_size;
 }
 
 static gchar *
@@ -389,6 +404,7 @@ ogmdvd_title_new (OGMDvdDisc *disc, dvd_reader_t *reader, ifo_handle_t *vmg_file
   title->priv->nr_of_chapters = vts_file->vts_ptt_srpt->title[title->priv->ttn - 1].nr_of_ptts;
   title->priv->nr_of_angles = vmg_file->tt_srpt->title[nr].nr_of_angles;
   title->priv->title_set_nr = vmg_file->tt_srpt->title[nr].title_set_nr;
+
   title->priv->vts_size = dvd_reader_get_vts_size (reader, title->priv->title_set_nr);
 
   title->priv->video_format = vts_file->vtsi_mat->vts_video_attr.video_format;
@@ -718,10 +734,18 @@ ogmdvd_disc_get_uri (OGMRipMedia *media)
   return OGMDVD_DISC (media)->priv->uri;
 }
 
-static gint64
-ogmdvd_disc_get_vmg_size (OGMRipMedia *media)
+static guint64
+ogmdvd_disc_get_size (OGMRipMedia *media)
 {
-  return OGMDVD_DISC (media)->priv->vmg_size;
+  GList *link;
+  guint64 size;
+
+  size = OGMDVD_DISC (media)->priv->vmg_size;
+
+  for (link = OGMDVD_DISC (media)->priv->titles; link; link = link->next)
+    size += OGMDVD_TITLE (link->data)->priv->vts_size;
+
+  return size;
 }
 
 static gint
@@ -736,12 +760,8 @@ ogmdvd_disc_get_title (OGMRipMedia *media, guint id)
   GList *link;
 
   for (link = OGMDVD_DISC (media)->priv->titles; link; link = link->next)
-  {
-    OGMDvdTitle *title = link->data;
-
-    if (title->priv->nr == id)
+    if (OGMDVD_TITLE (link->data)->priv->nr == id)
       return link->data;
-  }
 
   return NULL;
 }
@@ -893,7 +913,7 @@ ogmrip_media_iface_init (OGMRipMediaInterface *iface)
   iface->get_label     = ogmdvd_disc_get_label;
   iface->get_id        = ogmdvd_disc_get_id;
   iface->get_uri       = ogmdvd_disc_get_uri;
-  iface->get_size      = ogmdvd_disc_get_vmg_size;
+  iface->get_size      = ogmdvd_disc_get_size;
   iface->get_n_titles  = ogmdvd_disc_get_n_titles;
   iface->get_title     = ogmdvd_disc_get_title;
   iface->get_titles    = ogmdvd_disc_get_titles;

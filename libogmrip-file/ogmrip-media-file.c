@@ -317,7 +317,14 @@ ogmrip_media_file_initable_init (GInitable *initable, GCancellable *cancellable,
     stream->id = i;
 
     ogmrip_media_info_get_audio_info (info, i, OGMRIP_MEDIA_FILE_AUDIO (stream)->priv);
-    OGMRIP_FILE (initable)->priv->title_size += OGMRIP_MEDIA_FILE_AUDIO (stream)->priv->size;
+
+    if (OGMRIP_FILE (initable)->priv->title_size > 0)
+    {
+      if (OGMRIP_MEDIA_FILE_AUDIO (stream)->priv->size > 0)
+        OGMRIP_FILE (initable)->priv->title_size += OGMRIP_MEDIA_FILE_AUDIO (stream)->priv->size;
+      else
+        OGMRIP_FILE (initable)->priv->title_size = 0;
+    }
 
     media->priv->audio_streams = g_list_append (media->priv->audio_streams, stream);
   }
@@ -333,7 +340,14 @@ ogmrip_media_file_initable_init (GInitable *initable, GCancellable *cancellable,
     stream->id = i;
 
     ogmrip_media_info_get_subp_info (info, i, OGMRIP_MEDIA_FILE_SUBP (stream)->priv);
-    OGMRIP_FILE (initable)->priv->title_size += OGMRIP_MEDIA_FILE_SUBP (stream)->priv->size;
+
+    if (OGMRIP_FILE (initable)->priv->title_size > 0)
+    {
+      if (OGMRIP_MEDIA_FILE_SUBP (stream)->priv->size > 0)
+        OGMRIP_FILE (initable)->priv->title_size += OGMRIP_MEDIA_FILE_SUBP (stream)->priv->size;
+      else
+        OGMRIP_FILE (initable)->priv->title_size = 0;
+    }
 
     media->priv->subp_streams = g_list_append (media->priv->subp_streams, stream);
   }

@@ -145,7 +145,7 @@ ogmrip_file_get_uri (OGMRipMedia *media)
   return OGMRIP_FILE (media)->priv->uri;
 }
 
-static gint64
+static guint64
 ogmrip_file_get_media_size (OGMRipMedia *media)
 {
   return OGMRIP_FILE (media)->priv->media_size;
@@ -187,7 +187,7 @@ ogmrip_file_get_media (OGMRipTitle *title)
   return OGMRIP_MEDIA (title);
 }
 
-static gint64
+static guint64
 ogmrip_file_get_title_size (OGMRipTitle *title)
 {
   return OGMRIP_FILE (title)->priv->title_size;

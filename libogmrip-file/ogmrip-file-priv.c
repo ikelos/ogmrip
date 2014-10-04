@@ -20,6 +20,7 @@
 
 #include <ogmrip-media.h>
 
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -32,7 +33,7 @@ ogmrip_media_info_get_file_info (OGMRipMediaInfo *info, OGMRipFilePrivate *file)
   file->length = str ? atoi (str) / 1000. : -1.0;
 
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "FileSize");
-  file->media_size = str ? atoll (str) : -1;
+  file->media_size = str ? strtoull (str, NULL, 10) : -1;
 
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "Title");
   file->label = str ? g_strdup (str) : NULL;
@@ -174,7 +175,11 @@ ogmrip_media_info_get_video_info (OGMRipMediaInfo *info, guint track, OGMRipVide
   video->progressive = g_str_equal (str, "Progressive");
 
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_VIDEO, track, "StreamSize");
-  video->size = str ? atoll (str) : -1;
+
+  errno = 0;
+  video->size = str ? strtoull (str, NULL, 10) : 0;
+  if (errno)
+    video->size = 0;
 }
 
 gint
@@ -263,7 +268,11 @@ ogmrip_media_info_get_audio_info (OGMRipMediaInfo *info, guint track, OGMRipAudi
   audio->language = str ? (str[0] << 8) | str[1] : 0;
 
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_AUDIO, track, "StreamSize");
-  audio->size = str ? atoll (str) : -1;
+
+  errno = 0;
+  audio->size = str ? strtoull (str, NULL, 10) : 0;
+  if (errno)
+    audio->size = 0;
 
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_AUDIO, track, "Title");
   audio->label = str ? g_strdup (str) : NULL;
@@ -299,7 +308,11 @@ ogmrip_media_info_get_subp_info (OGMRipMediaInfo *info, guint track, OGMRipSubpF
   subp->language = str ? (str[0] << 8) | str[1] : 0;
 
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_TEXT, track, "StreamSize");
-  subp->size = str ? atoll (str) : -1;
+
+  errno = 0;
+  subp->size = str ? strtoull (str, NULL, 10) : 0;
+  if (errno)
+    subp->size = 0;
 
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_TEXT, track, "Title");
   subp->label = str ? g_strdup (str) : NULL;
