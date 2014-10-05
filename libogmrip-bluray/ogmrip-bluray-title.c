@@ -415,7 +415,7 @@ ogmbr_title_get_media (OGMRipTitle *title)
   return OGMBR_TITLE (title)->priv->media;
 }
 
-static gint64
+static guint64
 ogmbr_title_get_size (OGMRipTitle *title)
 {
   return OGMBR_TITLE (title)->priv->size;

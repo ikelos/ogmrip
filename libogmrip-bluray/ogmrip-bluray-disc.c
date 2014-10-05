@@ -393,7 +393,7 @@ ogmbr_disc_get_uri (OGMRipMedia *media)
   return OGMBR_DISC (media)->priv->uri;
 }
 
-static gint64
+static guint64
 ogmbr_disc_get_size (OGMRipMedia *media)
 {
   GList *link;
