@@ -31,6 +31,9 @@ libogmrip-media/ogmrip-media-object.c
 libogmrip-dvd/ogmdvd-disc.c
 libogmrip-dvd/ogmdvd-title.c
 
+libogmrip-bluray/ogmrip-bluray-disc.c
+libogmrip-bluray/ogmrip-bluray-title.c
+
 libogmrip-file/ogmrip-audio-file.c
 libogmrip-file/ogmrip-file-object.c
 libogmrip-file/ogmrip-media-file.c
