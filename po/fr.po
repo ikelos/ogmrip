@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OGMRip\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-06 21:20+0200\n"
+"POT-Creation-Date: 2014-10-06 21:29+0200\n"
 "PO-Revision-Date: 2008-01-11 21:30+0100\n"
 "Last-Translator: Olivier Rolland <billl@users.sourceforge.net>\n"
 "Language-Team: French <fr@li.org>\n"
@@ -1633,7 +1633,7 @@ msgstr "Ignorer _tout"
 msgid "A_dd Word"
 msgstr "_Ajouter le mot"
 
-#: ../data/ui/ogmrip.desktop.in.h:1 ../src/ogmrip-main.c:236
+#: ../data/ui/ogmrip.desktop.in.h:1 ../src/ogmrip-main.c:243
 msgid "OGMRip"
 msgstr "OGMRip"
 
@@ -1711,7 +1711,9 @@ msgstr "Le dossier ne contient pas une structure de DVD valide"
 msgid "No such directory, block device or iso file"
 msgstr "Répertoire, périphérique ou fichier iso inéxistant"
 
-#: ../libogmrip-dvd/ogmdvd-disc.c:601 ../libogmrip-file/ogmrip-audio-file.c:63
+#: ../libogmrip-dvd/ogmdvd-disc.c:601
+#: ../libogmrip-bluray/ogmrip-bluray-disc.c:161
+#: ../libogmrip-file/ogmrip-audio-file.c:63
 #: ../libogmrip-file/ogmrip-media-file.c:256
 #: ../libogmrip-file/ogmrip-subp-file.c:60
 #: ../libogmrip-file/ogmrip-video-file.c:64
@@ -1719,7 +1721,10 @@ msgstr "Répertoire, périphérique ou fichier iso inéxistant"
 msgid "Unknown scheme for '%s'"
 msgstr "Schéma inconnu pour '%s'"
 
-#: ../libogmrip-dvd/ogmdvd-disc.c:611 ../libogmrip-file/ogmrip-audio-file.c:89
+#: ../libogmrip-dvd/ogmdvd-disc.c:611
+#: ../libogmrip-bluray/ogmrip-bluray-disc.c:171
+#: ../libogmrip-bluray/ogmrip-bluray-disc.c:332
+#: ../libogmrip-file/ogmrip-audio-file.c:89
 #: ../libogmrip-file/ogmrip-media-file.c:282
 #: ../libogmrip-file/ogmrip-subp-file.c:86
 #: ../libogmrip-file/ogmrip-video-file.c:90
@@ -1754,6 +1759,16 @@ msgstr "Le périphérique ne contient pas le DVD attendu"
 #, c-format
 msgid "Cannot open title %d of '%s'"
 msgstr "Impossible d'ouvrir le titre %d of '%s'"
+
+#: ../libogmrip-bluray/ogmrip-bluray-disc.c:354
+#, c-format
+msgid "Device does not contain the expected Blu-ray"
+msgstr "Le périphérique ne contient pas le Blu-ray attendu"
+
+#: ../libogmrip-bluray/ogmrip-bluray-title.c:370
+#, c-format
+msgid "Title already openened"
+msgstr "Titre déjà ouvert"
 
 #: ../libogmrip-file/ogmrip-audio-file.c:71
 #: ../libogmrip-file/ogmrip-media-file.c:264
