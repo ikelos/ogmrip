@@ -1548,7 +1548,7 @@ ogmrip_main_window_player_play (OGMRipMainWindow *window)
   image = gtk_bin_get_child (GTK_BIN (window->priv->play_button));
   gtk_container_remove (GTK_CONTAINER (window->priv->play_button), image);
 
-  image = gtk_image_new_from_icon_name ("media-playback-stop", GTK_ICON_SIZE_MENU);
+  image = gtk_image_new_from_icon_name ("media-playback-stop-symbolic", GTK_ICON_SIZE_MENU);
 
   gtk_container_add (GTK_CONTAINER (window->priv->play_button), image);
   gtk_widget_show (image);
@@ -1562,7 +1562,7 @@ ogmrip_main_window_player_stop (OGMRipMainWindow *window)
   image = gtk_bin_get_child (GTK_BIN (window->priv->play_button));
   gtk_container_remove (GTK_CONTAINER (window->priv->play_button), image);
 
-  image = gtk_image_new_from_icon_name ("media-playback-start", GTK_ICON_SIZE_MENU);
+  image = gtk_image_new_from_icon_name ("media-playback-start-symbolic", GTK_ICON_SIZE_MENU);
 
   gtk_container_add (GTK_CONTAINER (window->priv->play_button), image);
   gtk_widget_show (image);
