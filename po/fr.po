@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OGMRip\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-09-28 12:16+0200\n"
+"POT-Creation-Date: 2014-10-06 21:20+0200\n"
 "PO-Revision-Date: 2008-01-11 21:30+0100\n"
 "Last-Translator: Olivier Rolland <billl@users.sourceforge.net>\n"
 "Language-Team: French <fr@li.org>\n"
@@ -1677,74 +1677,123 @@ msgstr "Gabarit '%s' invalide, ne peut contenir de '/'"
 msgid "'%s' is not a valid XML file"
 msgstr "'%s' n'est pas un fichier XML valide"
 
-#: ../libogmrip-media/ogmrip-media-object.c:25 ../src/ogmrip-main-window.c:402
+#: ../libogmrip-media/ogmrip-media-object.c:26 ../src/ogmrip-main-window.c:402
 msgid "Untitled"
 msgstr "Sans titre"
 
-#: ../libogmrip-dvd/ogmdvd-disc.c:118
+#: ../libogmrip-dvd/ogmdvd-disc.c:117
 #, c-format
 msgid "No such file or directory"
 msgstr "Fichier ou répertoire inéxistant"
 
-#: ../libogmrip-dvd/ogmdvd-disc.c:122
+#: ../libogmrip-dvd/ogmdvd-disc.c:121
 #, c-format
 msgid "Permission denied to access device"
 msgstr "Permission non accordée pour accéder au périphérique"
 
-#: ../libogmrip-dvd/ogmdvd-disc.c:128
+#: ../libogmrip-dvd/ogmdvd-disc.c:127
 #, c-format
 msgid "Tray seems to be open"
 msgstr "Le tiroir semble ouvert"
 
-#: ../libogmrip-dvd/ogmdvd-disc.c:130
+#: ../libogmrip-dvd/ogmdvd-disc.c:129
 #, c-format
 msgid "Device does not contain a valid DVD video"
 msgstr "Le périphérique ne contient pas un DVD vidéo valide"
 
-#: ../libogmrip-dvd/ogmdvd-disc.c:133
+#: ../libogmrip-dvd/ogmdvd-disc.c:132
 #, c-format
 msgid "Path does not contain a valid DVD structure"
 msgstr "Le dossier ne contient pas une structure de DVD valide"
 
-#: ../libogmrip-dvd/ogmdvd-disc.c:135
+#: ../libogmrip-dvd/ogmdvd-disc.c:134
 #, c-format
 msgid "No such directory, block device or iso file"
 msgstr "Répertoire, périphérique ou fichier iso inéxistant"
 
-#: ../libogmrip-dvd/ogmdvd-disc.c:568
+#: ../libogmrip-dvd/ogmdvd-disc.c:601 ../libogmrip-file/ogmrip-audio-file.c:63
+#: ../libogmrip-file/ogmrip-media-file.c:256
+#: ../libogmrip-file/ogmrip-subp-file.c:60
+#: ../libogmrip-file/ogmrip-video-file.c:64
 #, c-format
 msgid "Unknown scheme for '%s'"
 msgstr "Schéma inconnu pour '%s'"
 
-#: ../libogmrip-dvd/ogmdvd-disc.c:578
+#: ../libogmrip-dvd/ogmdvd-disc.c:611 ../libogmrip-file/ogmrip-audio-file.c:89
+#: ../libogmrip-file/ogmrip-media-file.c:282
+#: ../libogmrip-file/ogmrip-subp-file.c:86
+#: ../libogmrip-file/ogmrip-video-file.c:90
 #, c-format
 msgid "Cannot open '%s'"
 msgstr "Impossible d'ouvrir '%s'"
 
-#: ../libogmrip-dvd/ogmdvd-disc.c:586
+#: ../libogmrip-dvd/ogmdvd-disc.c:619 ../libogmrip-file/ogmrip-audio-file.c:82
+#: ../libogmrip-file/ogmrip-media-file.c:275
+#: ../libogmrip-file/ogmrip-subp-file.c:79
+#: ../libogmrip-file/ogmrip-video-file.c:83
 #, c-format
 msgid "Cannot retrieve identifier for '%s'"
 msgstr "Impossible de récupérer l'identificateur de '%'"
 
-#: ../libogmrip-dvd/ogmdvd-disc.c:595
+#: ../libogmrip-dvd/ogmdvd-disc.c:628
 #, c-format
 msgid "Cannot get manager for '%s'"
 msgstr "Impossible d'obtenir le gestionnaire pour '%s'"
 
-#: ../libogmrip-dvd/ogmdvd-disc.c:619
+#: ../libogmrip-dvd/ogmdvd-disc.c:652
 #, c-format
 msgid "No title found for '%s'"
 msgstr "Aucun titre trouvé pour '%s'"
 
-#: ../libogmrip-dvd/ogmdvd-disc.c:661
+#: ../libogmrip-dvd/ogmdvd-disc.c:692
 #, c-format
 msgid "Device does not contain the expected DVD"
 msgstr "Le périphérique ne contient pas le DVD attendu"
 
-#: ../libogmrip-dvd/ogmdvd-title.c:306
+#: ../libogmrip-dvd/ogmdvd-title.c:307
 #, c-format
 msgid "Cannot open title %d of '%s'"
 msgstr "Impossible d'ouvrir le titre %d of '%s'"
+
+#: ../libogmrip-file/ogmrip-audio-file.c:71
+#: ../libogmrip-file/ogmrip-media-file.c:264
+#: ../libogmrip-file/ogmrip-subp-file.c:68
+#: ../libogmrip-file/ogmrip-video-file.c:72
+#, c-format
+msgid "Cannot get media info handle"
+msgstr "Impossible d'obtenir une référence vers média info"
+
+#: ../libogmrip-file/ogmrip-audio-file.c:97
+#, c-format
+msgid "No audio found for '%s'"
+msgstr "Aucune piste audio trouvée pour '%s'"
+
+#: ../libogmrip-file/ogmrip-audio-file.c:106
+#, c-format
+msgid "Unknown audio format for '%s'"
+msgstr "Format audio inconnu pour '%s'"
+
+#: ../libogmrip-file/ogmrip-media-file.c:290
+#: ../libogmrip-file/ogmrip-video-file.c:98
+#, c-format
+msgid "No video found for '%s'"
+msgstr "Aucune piste video trouvée pour '%s'"
+
+#: ../libogmrip-file/ogmrip-media-file.c:299
+#: ../libogmrip-file/ogmrip-video-file.c:107
+#, c-format
+msgid "Unknown video format for '%s'"
+msgstr "Format vidéo inconnu pour '%s'"
+
+#: ../libogmrip-file/ogmrip-subp-file.c:94
+#, c-format
+msgid "No subtitles found for '%s'"
+msgstr "Aucune piste de sous-titres trouvée pour '%s'"
+
+#: ../libogmrip-file/ogmrip-subp-file.c:103
+#, c-format
+msgid "Unknown subtitles format for '%s'"
+msgstr "Format de sous-titres inconnu pour '%s'"
 
 #: ../libogmrip-encode/ogmrip-container.c:445
 #: ../libogmrip-encode/ogmrip-encoding.c:678
@@ -1776,26 +1825,26 @@ msgstr "Le périphérique ne contient pas le média attendu"
 msgid "'%s' does not contain a valid encoding"
 msgstr "'%s' ne contient pas un encodage valide"
 
-#: ../libogmrip-encode/ogmrip-encoding.c:1604
+#: ../libogmrip-encode/ogmrip-encoding.c:1633
 #, c-format
 msgid "Not enough space to store output and temporary files (%s needed)."
 msgstr ""
 "Pas assez d'espace pour stocker le fichier de sortie et les fichiers "
 "temporaires (%sMo nécessaires)."
 
-#: ../libogmrip-encode/ogmrip-encoding.c:1615
+#: ../libogmrip-encode/ogmrip-encoding.c:1644
 #, c-format
 msgid "Not enough space to store the output file (%s needed)."
 msgstr ""
 "Pas assez d'espace pour stocker le fichier de sortie (%sMo nécessaires)."
 
-#: ../libogmrip-encode/ogmrip-encoding.c:1625
+#: ../libogmrip-encode/ogmrip-encoding.c:1654
 #, c-format
 msgid "Not enough space to store the temporary files (%s needed)."
 msgstr ""
 "Pas assez d'espace pour stocker les fichiers temporaires (%sMo nécessaires)."
 
-#: ../libogmrip-encode/ogmrip-encoding.c:1863
+#: ../libogmrip-encode/ogmrip-encoding.c:1889
 #, c-format
 msgid "Cannot compute bitrate for video stream"
 msgstr "Impossible de calculer le taux d'échantillonage du flux vidéo"
@@ -1808,7 +1857,7 @@ msgstr "Sous-titres incrustés"
 msgid "No Video"
 msgstr "Pas de vidéo"
 
-#: ../libogmrip-encode/ogmrip-profile.c:522
+#: ../libogmrip-encode/ogmrip-profile.c:555
 #, c-format
 msgid "'%s' does not contain a valid profile"
 msgstr "'%s' ne contient pas un profil valide"
@@ -2628,7 +2677,6 @@ msgstr "Recherche exhaustive transformée (tesa - encore plus lent)"
 msgid "MEncoder is built without XviD support"
 msgstr "MEncoder est compilé sans support XviD"
 
-#, fuzzy
 #~ msgid "Cannot open: '%s'"
 #~ msgstr "Impossible d'ouvrir '%s'"
 
