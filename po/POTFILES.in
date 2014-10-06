@@ -31,7 +31,11 @@ libogmrip-media/ogmrip-media-object.c
 libogmrip-dvd/ogmdvd-disc.c
 libogmrip-dvd/ogmdvd-title.c
 
+libogmrip-file/ogmrip-audio-file.c
 libogmrip-file/ogmrip-file-object.c
+libogmrip-file/ogmrip-media-file.c
+libogmrip-file/ogmrip-subp-file.c
+libogmrip-file/ogmrip-video-file.c
 
 libogmrip-encode/ogmrip-container.c
 libogmrip-encode/ogmrip-encoding.c
