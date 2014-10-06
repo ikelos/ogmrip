@@ -30,7 +30,6 @@
 #include "ogmrip-helper.h"
 
 #include <glib/gi18n-lib.h>
-#include <ogmrip-dvd.h>
 
 static void
 gtk_dialog_response_accept (GtkDialog *dialog)
