@@ -1567,33 +1567,45 @@ ogmrip_encoding_check_output (OGMRipEncoding *encoding, GCancellable *cancellabl
 }
 
 static gboolean
-get_space_left_for_file (GFile *file, guint64 *space, gchar **id, GCancellable *cancellable, GError **error)
+get_space_left (GFile *file, guint64 *space, gchar **id, GCancellable *cancellable, GError **error)
 {
   GFileInfo *info;
 
-  info = g_file_query_info (file,
-      G_FILE_ATTRIBUTE_FILESYSTEM_FREE "," G_FILE_ATTRIBUTE_ID_FILESYSTEM,
-      G_FILE_QUERY_INFO_NONE, cancellable, error);
-
+  info = g_file_query_filesystem_info (file, G_FILE_ATTRIBUTE_FILESYSTEM_FREE, cancellable, error);
   if (!info)
     return FALSE;
 
   *space = g_file_info_get_attribute_uint64 (info, G_FILE_ATTRIBUTE_FILESYSTEM_FREE);
+
+  g_object_unref (info);
+
+  info = g_file_query_info (file, G_FILE_ATTRIBUTE_ID_FILESYSTEM, 0, cancellable, error);
+  if (!info)
+    return FALSE;
+
   *id = g_strdup (g_file_info_get_attribute_string (info, G_FILE_ATTRIBUTE_ID_FILESYSTEM));
 
   g_object_unref (info);
+
+  g_message ("%s = %lu", *id, *space);
 
   return TRUE;
 }
 
 static gboolean
-get_space_left (const gchar *path, guint64 *space, gchar **id, GCancellable *cancellable, GError **error)
+get_space_left_for_file (GFile *file, guint64 *space, gchar **id, GCancellable *cancellable, GError **error)
+{
+  return get_space_left (g_file_get_parent (file), space, id, cancellable, error);
+}
+
+static gboolean
+get_space_left_for_path (const gchar *path, guint64 *space, gchar **id, GCancellable *cancellable, GError **error)
 {
   GFile *file;
   gboolean retval;
 
   file = g_file_new_for_path (path);
-  retval = get_space_left_for_file (file, space, id, cancellable, error);
+  retval = get_space_left (file, space, id, cancellable, error);
   g_object_unref (file);
 
   return retval;
@@ -1617,11 +1629,14 @@ ogmrip_encoding_check_space (OGMRipEncoding *encoding, GCancellable *cancellable
   if (!get_space_left_for_file (ogmrip_container_get_output (container), &output_space, &output_id, cancellable, error))
     return FALSE;
 
-  if (!get_space_left (ogmrip_fs_get_tmp_dir (), &tmp_space, &tmp_id, cancellable, error))
+  if (!get_space_left_for_path (ogmrip_fs_get_tmp_dir (), &tmp_space, &tmp_id, cancellable, error))
   {
     g_free (tmp_id);
     return FALSE;
   }
+
+  g_message ("output = %lu/%lu", output_size, output_space);
+  g_message ("tmp = %lu/%lu", tmp_size, tmp_space);
 
   if (g_str_equal (output_id, tmp_id))
   {

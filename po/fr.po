@@ -1830,19 +1830,19 @@ msgstr "'%s' ne contient pas un encodage valide"
 msgid "Not enough space to store output and temporary files (%s needed)."
 msgstr ""
 "Pas assez d'espace pour stocker le fichier de sortie et les fichiers "
-"temporaires (%sMo nécessaires)."
+"temporaires (%s nécessaires)."
 
 #: ../libogmrip-encode/ogmrip-encoding.c:1644
 #, c-format
 msgid "Not enough space to store the output file (%s needed)."
 msgstr ""
-"Pas assez d'espace pour stocker le fichier de sortie (%sMo nécessaires)."
+"Pas assez d'espace pour stocker le fichier de sortie (%s nécessaires)."
 
 #: ../libogmrip-encode/ogmrip-encoding.c:1654
 #, c-format
 msgid "Not enough space to store the temporary files (%s needed)."
 msgstr ""
-"Pas assez d'espace pour stocker les fichiers temporaires (%sMo nécessaires)."
+"Pas assez d'espace pour stocker les fichiers temporaires (%s nécessaires)."
 
 #: ../libogmrip-encode/ogmrip-encoding.c:1889
 #, c-format
