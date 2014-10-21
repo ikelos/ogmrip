@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OGMRip\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-10-06 21:20+0200\n"
+"POT-Creation-Date: 2014-10-19 14:09+0200\n"
 "PO-Revision-Date: 2008-01-11 21:30+0100\n"
 "Last-Translator: Olivier Rolland <billl@users.sourceforge.net>\n"
 "Language-Team: French <fr@li.org>\n"
@@ -23,7 +23,6 @@ msgid "Select media"
 msgstr "Sélectionner un média"
 
 #: ../libogmrip-media-gtk/ogmrip-media-chooser-dialog.ui.h:2
-#: ../libogmrip-encode-gtk/ogmrip-progress-dialog.ui.h:4
 #: ../libogmrip-encode-gtk/ogmrip-progress-menu.ui.h:3
 #: ../libogmrip-media-gtk/ogmrip-media-chooser-widget.c:244
 #: ../libogmrip-file-gtk/ogmrip-audio-file-chooser-dialog.c:72
@@ -80,12 +79,12 @@ msgid "Extreme"
 msgstr "Extrême"
 
 #: ../libogmrip-encode-gtk/ogmrip-profile-editor-dialog.ui.h:2
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:7
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:8
 msgid "High"
 msgstr "Haut"
 
 #: ../libogmrip-encode-gtk/ogmrip-profile-editor-dialog.ui.h:3
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:51
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:52
 msgid "Normal"
 msgstr "Normal"
 
@@ -171,7 +170,7 @@ msgid "kbps"
 msgstr "kbps"
 
 #: ../libogmrip-encode-gtk/ogmrip-profile-editor-dialog.ui.h:24
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:25
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:26
 #: ../src/ogmrip-pref-dialog.ui.h:14
 msgid "_General"
 msgstr "_Générales"
@@ -492,224 +491,244 @@ msgid "Progress"
 msgstr "Progression"
 
 #: ../libogmrip-encode-gtk/ogmrip-progress-dialog.ui.h:2
+msgid "Suspend"
+msgstr "Suspendre"
+
+#: ../libogmrip-encode-gtk/ogmrip-progress-dialog.ui.h:3
+msgid "Resume"
+msgstr "Continuer"
+
+#: ../libogmrip-encode-gtk/ogmrip-progress-dialog.ui.h:4
+#: ../src/ogmrip-crop-dialog.ui.h:2 ../src/ogmrip-options-dialog.ui.h:11
+#: ../src/ogmrip-spell-dialog.ui.h:2
+msgid "Cancel"
+msgstr "Annuler"
+
+#: ../libogmrip-encode-gtk/ogmrip-progress-dialog.ui.h:5
+msgid "Estimated time left:"
+msgstr "Temps restant estimé :"
+
+#: ../libogmrip-encode-gtk/ogmrip-progress-dialog.ui.h:6
+msgid "Unknown"
+msgstr "Inconnu"
+
+#: ../libogmrip-encode-gtk/ogmrip-progress-dialog.ui.h:7
+msgid "_Close the application if the encoding is successful"
+msgstr "_Fermer l'application si l'encodage s'effectue avec succès"
+
 #: ../libogmrip-encode-gtk/ogmrip-progress-menu.ui.h:1
 msgid "_Suspend"
 msgstr "_Suspendre"
 
-#: ../libogmrip-encode-gtk/ogmrip-progress-dialog.ui.h:3
 #: ../libogmrip-encode-gtk/ogmrip-progress-menu.ui.h:2
 msgid "_Resume"
 msgstr "_Continuer"
-
-#: ../libogmrip-encode-gtk/ogmrip-progress-dialog.ui.h:5
-msgid "_Close the application if the encoding is successful"
-msgstr "_Fermer l'application si l'encodage s'effectue avec succès"
-
-#: ../libogmrip-encode-gtk/ogmrip-progress-dialog.ui.h:6
-msgid "Estimated time left:"
-msgstr "Temps restant estimé :"
-
-#: ../libogmrip-encode-gtk/ogmrip-progress-dialog.ui.h:7
-msgid "Unknown"
-msgstr "Inconnu"
 
 #: ../plugins/ogmrip-lavc-options-dialog.ui.h:1
 msgid "Lavc Options"
 msgstr "Lavc Options"
 
 #: ../plugins/ogmrip-lavc-options-dialog.ui.h:2
+#: ../plugins/ogmrip-mp4-options-dialog.ui.h:2
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:2
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:2
+#: ../src/ogmrip-options-dialog.ui.h:10
+msgid "Close"
+msgstr "Fermer"
+
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:3
 msgid "<b>Standard</b>"
 msgstr "<b>Standard</b>"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:3
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:4
 msgid "_Grayscale only decoding"
 msgstr "Décodage en niveaux de _gris"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:4
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:38
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:5
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:39
 msgid "<b>Frame type</b>"
 msgstr "<b>Type des trames</b>"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:5
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:6
 msgid "Maximum number of B-frames between non-B-frames (vmax_b_frames):"
 msgstr ""
 "Nombre maximum de trames-B consécutives entre les trames-I et -P "
 "(vmax_b_frames) :"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:6
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:7
 msgid "_Maximum interval between keyframes in frames (keyint):"
 msgstr "Intervalle _maximum entre trames-clées (keyint) :"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:7
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:8
 msgid "_Amount of motion predictors from the previous frame (last__pred):"
 msgstr ""
 "_Quantité de prédicteurs de mouvement à partir de la trame précédente "
 "(last__pred) :"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:8
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:9
 msgid "Strategy to choose between I/P/B-frames (vb__strategy):"
 msgstr "Stratégie à choisir entre les trames-I/P/B (vb__strategy) :"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:9
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:10
 msgid "Always use the maximum number of B-frames"
 msgstr "Toujours utiliser le nombre maximum de trames-B"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:10
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:11
 msgid "Avoid B-frames in high motion scenes"
 msgstr "Evite les trames-B dans les scènes avec beaucoup de mouvements"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:11
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:12
 msgid "Places B-frames more or less optimally to yield maximum quality"
 msgstr ""
 "Place les trames-B plus ou moins optimalement pour obtenir la meilleure "
 "qualité"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:12
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:13
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:13
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:14
 msgid "<b>Quantization</b>"
 msgstr "<b>Quantification</b>"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:13
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:14
 msgid "_Quantizer noise shaping (qns):"
 msgstr "_Quantification d'après un modèle de bruit (qns) :"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:14
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:14
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:15
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:15
 msgid "Disabled"
 msgstr "Désactivé"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:15
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:16
 msgid "Only lower the absolute value of coefficients"
 msgstr "Baisse uniquemement la valeur absolue des coefficients"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:16
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:17
 msgid "Only change coefficients before the last non-zero coefficient + 1"
 msgstr "Change uniquement les coefficients avant le coefficient non null + 1"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:17
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:18
 msgid "Try all"
 msgstr "Essaie tout"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:18
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:19
 msgid "Quantizer _compression (vqcomp):"
 msgstr "Quantum de _compression (vqcomp) :"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:19
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:20
 msgid "Intra DC _precision in bits (dc):"
 msgstr "_Précision DC intra en bits (dc) :"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:20
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:21
 msgid "_Trellis searched quantization (trellis)"
 msgstr "Recherche de quantification par treillis (trellis)"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:21
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:22
 msgid "_Strict standard compliance (vstrict):"
 msgstr "Conformité stricte au _standard (vstrict) :"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:22
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:23
 msgid "Mpeg-4 reference decoder"
 msgstr "Décodeur MPEG-4 de référence"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:23
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:24
 msgid "Libavcodec specific extensions"
 msgstr "Extensions spécifiques à libavcodec"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:24
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:25
 msgid "Experimental codecs and features"
 msgstr "Codecs et fonctionnalités expérimentals"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:26
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:27
 msgid "<b>Motion estimation</b>"
 msgstr "<b>Estimation des mouvements</b>"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:27
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:28
 msgid "_Comparison function for full pel motion estimation (cmp):"
 msgstr ""
 "Fonction de _comparaison pour l'estimation de mouvement full pel (cmp) :"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:28
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:29
 msgid "Comparison function for _sub pel motion estimation (subcmp):"
 msgstr ""
 "Fonction de comparaison pour l'estimation de mouvement _sub pel (subcmp) :"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:29
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:30
 msgid "Comparison function for motion estimation _pre pass (precmp):"
 msgstr ""
 "Fonction  de comparaison pour la _pre-passe de l'estimation de mouvement "
 "(precmp) :"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:30
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:31
 msgid "_Diamond type and size for motion estimation (dia):"
 msgstr "Type et taille de _diamant pour l'estimation de mouvement (dia) :"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:31
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:32
 msgid "Diamond type and size for motion estimation _pre-pass (predia):"
 msgstr ""
 "Type et taille de diamant pour la _pre-passe d'estimation de mouvement "
 "(predia) :"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:32
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:33
 msgid "Use _quarter pel motion compensation"
 msgstr "Utilisation de la compensation de mouvement par _quart de pixel"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:33
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:45
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:34
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:46
 msgid "<b>Rate control</b>"
 msgstr "<b>Contrôle du débit</b>"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:34
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:35
 msgid "_Buffer size in kbit (vrc__buf__size):"
 msgstr "_Taille du tampon en kbit (vrc__buf__size) :"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:35
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:36
 msgid "M_aximum bitrate in kbit/sec (vrc__maxrate):"
 msgstr "Débit m_aximum en kbit/sec (vrc__maxrate) :"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:36
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:37
 msgid "M_inimum bitrate in kbit/sec (vrc__minrate):"
 msgstr "Débit m_inimum en kbit/sec (vrc__minrate) :"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:37
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:38
 msgid "<b>Macroblock</b>"
 msgstr "<b>MAcroblock</b>"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:38
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:39
 msgid "_Macroblock decision algorithm (mbd):"
 msgstr "Algorithme de décision de _macro-block (mbd) :"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:39
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:40
 msgid "Use comparison function given by mbcmp"
 msgstr "Utilise la fonction de comparaison donnée par mbcmp"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:40
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:41
 msgid "Select the MB mode which needs the fewest bits"
 msgstr "Sélectionne le mode MB qui requiert le moins de bits"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:41
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:42
 msgid "Select the MB mode which has the best rate distortion"
 msgstr "Sélectionne le mode MB qui est le plus fidèle à l'original"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:42
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:43
 msgid "Try to encode each MB with MV=<0,0> and choose the better one"
 msgstr "Essaie d'encoder chaque MB avec MV=<0,0> et choisit le meilleur"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:43
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:44
 msgid "Allow 4 motion vectors per macroblock (v4mv)"
 msgstr "Autorise 4 vecteurs de mouvement par macro-bloc (v4mv)"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:44
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:45
 msgid "Motion _estimation pre-pass (preme):"
 msgstr "Pre-passe d'_estimation de mouvement (preme) :"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:45
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:46
 msgid "Only after I-frames"
 msgstr "Uniquement après les trames-I"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:46
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:47
 msgid "Always"
 msgstr "Toujours"
 
-#: ../plugins/ogmrip-lavc-options-dialog.ui.h:47
+#: ../plugins/ogmrip-lavc-options-dialog.ui.h:48
 msgid "Motion _Estimation"
 msgstr "_Estimation de mouvement"
 
@@ -717,28 +736,28 @@ msgstr "_Estimation de mouvement"
 msgid "MP4 Options"
 msgstr "MP4 Options"
 
-#: ../plugins/ogmrip-mp4-options-dialog.ui.h:2 ../src/ogmrip-cli.c:307
+#: ../plugins/ogmrip-mp4-options-dialog.ui.h:3 ../src/ogmrip-cli.c:307
 #: ../src/ogmrip-cli.c:348 ../src/ogmrip-cli.c:383
 msgid "Format"
 msgstr "Format"
 
-#: ../plugins/ogmrip-mp4-options-dialog.ui.h:3
+#: ../plugins/ogmrip-mp4-options-dialog.ui.h:4
 msgid "Standard"
 msgstr "Standard"
 
-#: ../plugins/ogmrip-mp4-options-dialog.ui.h:4
+#: ../plugins/ogmrip-mp4-options-dialog.ui.h:5
 msgid "ISMA"
 msgstr "ISMA"
 
-#: ../plugins/ogmrip-mp4-options-dialog.ui.h:5
+#: ../plugins/ogmrip-mp4-options-dialog.ui.h:6
 msgid "iPod/iPhone"
 msgstr "iPod/iPhone"
 
-#: ../plugins/ogmrip-mp4-options-dialog.ui.h:6
+#: ../plugins/ogmrip-mp4-options-dialog.ui.h:7
 msgid "PSP"
 msgstr "PSP"
 
-#: ../plugins/ogmrip-mp4-options-dialog.ui.h:7
+#: ../plugins/ogmrip-mp4-options-dialog.ui.h:8
 msgid "Hint for RTP/RTSP"
 msgstr "Informations pour RTP/RTSP"
 
@@ -746,131 +765,131 @@ msgstr "Informations pour RTP/RTSP"
 msgid "X264 Options"
 msgstr "X264 Options"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:2
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:3
 msgid "<b>Presets</b>"
 msgstr "<b>Présélections</b>"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:3
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:4
 msgid "Profile of the output stream (profile)"
 msgstr "Profil du flux de sortie (profile)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:4
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:5
 msgid "Set the bitstream's level (level_idc)"
 msgstr "Définit le niveau du flux (level_idc)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:5
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:6
 msgid "Baseline"
 msgstr ""
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:6
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:7
 msgid "Main"
 msgstr ""
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:8
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:9
 msgid "Strength of trellis psychovisual optimization (psy-trellis)"
 msgstr "Force de l'optimisation psychovisuelle par trellis (psy-trellis)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:9
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:10
 msgid "Strength of rate-distortion psychovisual optimization (psy-rd)"
 msgstr "Force de l'optimisation psychovisuelle du taux de distortion"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:10
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:11
 msgid "Adaptative quantization bits distribution (aq_mode)"
 msgstr "Distribution des bits de la quantization adaptative (aq_mode)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:11
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:12
 msgid "Preset quantization matrices (cqm)"
 msgstr "Matrices de quantization prédéfinies (cqm)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:12
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:13
 msgid "Trellis searched quantization (trellis)"
 msgstr "Recherche de quantification par treillis (trellis)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:15
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:16
 msgid "Only for the final encode"
 msgstr "Seulement pour l'encodage final"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:16
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:17
 msgid "During all mode decisions"
 msgstr "Pour tout les modes de décisions"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:17
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:18
 msgid "Flat"
 msgstr "Plat"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:18
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:19
 msgid "JVM"
 msgstr "JVM"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:19
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:20
 msgid "Avoid moving bits between frames"
 msgstr "Évite de déplacer des bits entre les trames"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:20
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:21
 msgid "Move bits between frames"
 msgstr "Déplace des bits entre les trames"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:21
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:22
 msgid "General"
 msgstr "Général"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:22
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:23
 msgid "<b>Analysis</b>"
 msgstr "<b>Analyse</b>"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:23
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:24
 msgid "Weighted prediction for P-frames (weightp)"
 msgstr "Prédictions pondérées dans les trames-B (weightp)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:24
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:25
 msgid "Subpel refinement quality (subq)"
 msgstr "Qualité de raffinement subpel (subq)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:25
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:26
 msgid "Use weighted prediction in B-frames (weightb)"
 msgstr "Utilise des prédictions pondérées dans les trames-B (weightb)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:26
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:27
 msgid "Adaptive spatial transform size (8x8dct)"
 msgstr "Taille de transformée spatiale adaptative (8x8dct)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:27
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:28
 msgid "Blind offset"
 msgstr "Blind offset"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:28
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:29
 msgid "Smart analysis"
 msgstr "Analyse intelligente"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:29
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:30
 msgid "<b>Partitions</b>"
 msgstr "<b>Partitions</b>"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:30
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:31
 msgid "Enable types b16x8, b8x16, b8x8 (b8x8)"
 msgstr "Autorise les types b16x8, b8x16, b8x8 (b8x8)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:31
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:32
 msgid "Enable type i8x8 (i8x8)"
 msgstr "Autorise le type i8x8 (i8x8)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:32
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:33
 msgid "Enable types p16x8, p8x16, p8x8 (p8x8)"
 msgstr "Autorise les types p16x8, p8x16, p8x8 (p8x8)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:33
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:34
 msgid "Enable types p8x4, p4x8, p4x4 (p4x4)"
 msgstr "Autorise les types p8x4, p4x8, p4x4 (p4x4)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:34
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:35
 msgid "Enable type i4x4 (i4x4)"
 msgstr "Autorise les types i4x4 (i4x4)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:35
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:36
 msgid "Early skip detection in P-frames (fast_pskip)"
 msgstr "Détection de skip au plus tôt des trames-P"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:36
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:37
 msgid ""
 "Eliminate DCT blocks in P-frames containing only a small single coefficient "
 "(dct_decimate)"
@@ -878,11 +897,11 @@ msgstr ""
 "Élimine les blocs DCT des trames-P contenant uniquement un petit coefficient "
 "isolé (dct_decimate)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:37
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:38
 msgid "Analysis"
 msgstr "Analyse"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:39
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:40
 msgid ""
 "Allows B-frames to be used as references for predicting other frames (b-"
 "pyramid)"
@@ -890,66 +909,66 @@ msgstr ""
 "Autorise les trames-B a servir de reference pour predire d'autres trames (b-"
 "pyramid)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:40
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:41
 msgid ""
 "Maximum number of consecutive B-frames between I- and P-frames (bframes)"
 msgstr ""
 "Nombre maximum de trames-B consécutives entre les trames-I et -P (bframes)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:41
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:42
 msgid "Number of previous frames used as predictors in B- and  P-frames (ref)"
 msgstr ""
 "Nombre des trames précédentes à utiliser pour prédire les trames-B et -P "
 "(ref)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:42
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:43
 msgid "Adaptive B-frame placement decision algorithm (b-adapt)"
 msgstr ""
 "Algorithme de décision adaptif pour le placement des trames-B  (b-adapt)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:43
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:44
 msgid "Maximum GOP size (keyint)"
 msgstr "Taille maximum du GOP (keyint)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:44
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:45
 msgid "Use context-adaptive binary arithmetic coding (cabac)"
 msgstr "Utilise un codage adaptée en fonction du contexte (cabac)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:46
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:47
 msgid "Maximum local bitrate, in kbits/second (vbv-maxrate)"
 msgstr "Pic maximum de débit binaire, en kbits/secondes (vbv-maxrate)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:47
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:48
 msgid "Averaging period for vbv_maxrate, in kbits (vbv-bufsize)"
 msgstr "Période moyenne de vbv_maxrate, en kbits (vbv-bufsize)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:48
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:49
 msgid "Number of frames for frametype lookahead (rc-lookahead)"
 msgstr "Nombre de trames pour l'anticipation du type (rc-lookahead)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:49
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:68
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:50
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:69
 #: ../src/ogmrip-options-dialog.ui.h:1
-#: ../libogmrip-file-gtk/ogmrip-file-chooser-dialog.c:81
+#: ../libogmrip-file-gtk/ogmrip-file-chooser-dialog.c:77
 #: ../libogmrip-encode-gtk/ogmrip-audio-options-dialog.c:236
 #: ../libogmrip-encode-gtk/ogmrip-subp-options-dialog.c:239
 msgid "None"
 msgstr "Aucun"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:50
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:51
 msgid "Strict"
 msgstr "Strict"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:52
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:53
 msgid "Encoding"
 msgstr "Encodage"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:53
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:42
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:54
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:43
 msgid "<b>Other</b>"
 msgstr "<b>Autres</b>"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:54
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:55
 msgid ""
 "Allows each 8x8 or 16x8 motion partition to independently select a reference "
 "frame (mixed_refs)"
@@ -957,70 +976,70 @@ msgstr ""
 "Permet à chaque partition de mouvement 8x8 ou 16x8 de choisir indépendamment "
 "leur trame de référence (mixed_refs)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:55
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:56
 msgid "Fullpixel motion estimation algorithm (me)"
 msgstr "Algorithme d'estimation du mouvement fullpixel (me)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:56
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:57
 msgid "<b>Motion</b>"
 msgstr "<b>Mouvements</b>"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:57
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:58
 msgid ""
 "Enable rate-distortion optimization of macroblock types in B-frames (brdo)"
 msgstr ""
 "Active l'optimisation du taux de distorsion des types de macroblock dans les "
 "trames-B (brdo)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:58
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:59
 msgid "Use access unit delimiters (aud)"
 msgstr "Utilise les délimiteurs d'unité d'accès (aud)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:59
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:60
 msgid "Force generation of timecodes (force_cfr)"
 msgstr "Force la génération de timecodes (force_cfr)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:60
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:61
 msgid "Spatial"
 msgstr "Spatial"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:61
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:62
 msgid "Temporal"
 msgstr "Temporel"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:62
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:63
 msgid "Auto"
 msgstr "Auto"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:63
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:64
 msgid "Diamond search, radius 1 (dia - fast)"
 msgstr "Recherche diamant de rayon 1 (dia - rapide)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:64
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:65
 msgid "Hexagon search, radius 2 (hex)"
 msgstr "Recherche hexagonale de rayon 2 (hex)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:65
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:66
 msgid "Uneven multi-hexagon search (umh - slow)"
 msgstr "Recherche multi-hexagonale irrégulière (umh - lent)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:66
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:67
 msgid "Exhaustive search (esa - very slow)"
 msgstr "Recherche exhaustive (esa - très lent)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:67
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:68
 msgid "Prediction mode for 'direct' motion vectors (direct)"
 msgstr "Mode de prédiction des vecteurs de mouvement 'directs' (direct)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:68
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:69
 msgid "Maximum motion vector search range (merange)"
 msgstr "Interval maximum de recherche des vecteurs de mouvement (merange)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:69
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:70
 msgid "Use a global header (global_header)"
 msgstr "Utilise une entête globale (global_header)"
 
-#: ../plugins/ogmrip-x264-options-dialog.ui.h:70
+#: ../plugins/ogmrip-x264-options-dialog.ui.h:71
 msgid "Miscellaneous"
 msgstr "Divers"
 
@@ -1028,291 +1047,291 @@ msgstr "Divers"
 msgid "XviD Options"
 msgstr "XviD Options"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:2
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:3
 msgid "<b>General</b>"
 msgstr "<b>Général</b>"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:3
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:4
 msgid "Profile (profile):"
 msgstr "Profil (profile):"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:4
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:5
 msgid "Quantization type (quant_type):"
 msgstr "Type de quantum (quant_type):"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:5
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:6
 msgid "Adaptive quantization (lumi_mask)"
 msgstr "Quantization adaptative (lumi-mask)"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:6
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:7
 msgid "Interlaced encoding (interlacing)"
 msgstr "Encodage entrelacé (interlacing)"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:7
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:8
 msgid "Quarter pixel (qpel)"
 msgstr "Quart de pixel (qpel)"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:8
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:9
 msgid "Global motion compensation (gmc)"
 msgstr "Compensation globale de mouvement (gmc)"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:9
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:10
 msgid "Trellis quantization (trellis)"
 msgstr "Recherche de quantification par treillis (trellis)"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:10
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:11
 msgid "<b>Restrictions</b>"
 msgstr "<b>Restrictions</b>"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:11
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:12
 msgid "I-frame quantizer (iquant):"
 msgstr "Quantum pour les trames-I (iquant):"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:12
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:13
 msgid "P-frame quantizer (pquant):"
 msgstr "Quantum pour les trames-P (pquant):"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:13
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:14
 msgid "B-frame quantizer (bquant):"
 msgstr "Quantum pour les trames-B (bquant):"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:14
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:15
 msgid "No restrictions"
 msgstr "Pas de restrictions"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:15
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:16
 msgid "Simple level 0"
 msgstr "Simple niveau 0"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:16
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:17
 msgid "Simple level 1"
 msgstr "Simple niveau 1"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:17
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:18
 msgid "Simple level 2"
 msgstr "Simple niveau 2"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:18
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:19
 msgid "Simple level 3"
 msgstr "Simple niveau 3"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:19
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:20
 msgid "Advanced simple level 0"
 msgstr "Simple avancé niveau 0"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:20
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:21
 msgid "Advanced simple level 1"
 msgstr "Simple avancé niveau 1"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:21
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:22
 msgid "Advanced simple level 2"
 msgstr "Simple avancé niveau 2"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:22
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:23
 msgid "Advanced simple level 3"
 msgstr "Simple avancé niveau 3"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:23
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:24
 msgid "Advanced simple level 4"
 msgstr "Simple avancé niveau 4"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:24
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:25
 msgid "Advanced simple level 5"
 msgstr "Simple avancé niveau 5"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:25
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:26
 msgid "DXN handheld"
 msgstr "DivX pour appareil de poche"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:26
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:27
 msgid "DXN portable NTSC"
 msgstr "DivX NTSC pour appareil mobile"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:27
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:28
 msgid "DXN portable PAL"
 msgstr "DivX PAL pour appareil mobile"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:28
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:29
 msgid "DXN home theater NTSC"
 msgstr "DivX NTSC pour home cinéma"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:29
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:30
 msgid "DXN home theater PAL"
 msgstr "DivX PAL pour home cinéma"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:30
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:31
 msgid "DXN HDTV"
 msgstr "DivX pour TV HD"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:31
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:32
 msgid "h263"
 msgstr "h263"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:32
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:33
 msgid "mpeg"
 msgstr "mpeg"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:33
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:34
 msgid "Min"
 msgstr "Min"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:34
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:35
 msgid "Max"
 msgstr "Max"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:35 ../src/ogmrip-cli.c:354
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:36 ../src/ogmrip-cli.c:354
 msgid "Quantization"
 msgstr "Quantum"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:36
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:37
 msgid "<b>Motion Precision</b>"
 msgstr "<b>Précision des mouvements</b>"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:37
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:38
 msgid "Motion search precision (me_quality):"
 msgstr "Précision de la détection de mouvements (me_quality):"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:38
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:39
 msgid "VHQ mode (vhq):"
 msgstr "Mode VHQ (vhq):"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:39
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:40
 msgid "Use chroma motion (chroma_me)"
 msgstr "Utilisation des mouvements chroma (chroma_me)"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:40
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:41
 msgid "Enable  a  chroma  optimizer  prefilter (chroma_opt)"
 msgstr "Active un préfiltre d’optimisation chroma (chroma_opt)"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:41
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:42
 msgid "Allow vector candidates for B-frames (bvhq)"
 msgstr "Autorise différents vecteurs de mouvement pour les trames-B (bvhq)"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:43
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:44
 msgid "Frame drop ratio (frame_drop_ratio):"
 msgstr "Taux de diminution des trames (frame_drop_ratio):"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:44
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:45
 msgid "Maximum I-frame interval (max_key_interval):"
 msgstr "Interval maximum entre trames-I (max_key_interval):"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:45
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:46
 msgid "Grayscale mode (grayscale)"
 msgstr "Mode noir et blanc (grayscale)"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:46
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:47
 msgid "Cartoon mode (cartoon)"
 msgstr "Dessin _animé (cartoon)"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:47
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:48
 msgid "0 - Off"
 msgstr "0 - Désactivé"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:48
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:49
 msgid "1 - Very low"
 msgstr "1 - Très lent"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:49
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:50
 msgid "2 - Low"
 msgstr "2 - Lent"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:50
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:51
 msgid "3 - Medium"
 msgstr "3 - Moyen"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:51
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:52
 msgid "4 - High"
 msgstr "4 - Haut"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:52
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:53
 msgid "5 - Very high"
 msgstr "5 - Très haut"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:53
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:54
 msgid "6 - Ultra high"
 msgstr "6 - Ultra haut"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:54
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:55
 msgid "1 - Mode decision"
 msgstr "1 - Sélection du mode"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:55
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:56
 msgid "2 - Limited search"
 msgstr "2 - Recherche limitée"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:56
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:57
 msgid "3 - Medium search"
 msgstr "3 - Recherche en moyenne"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:57
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:58
 msgid "4 - Wide search"
 msgstr "4 - Recherche élargie"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:58
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:59
 msgid "Motion"
 msgstr "Mouvements"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:59
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:60
 msgid "<b>B-VOPs</b>"
 msgstr "<b>B-VOPs</b>"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:60
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:61
 msgid "Max consecutive B-VOPs (max_bframes):"
 msgstr "Nombre max de B-VOPs consécutifs (max_bframes):"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:61
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:62
 msgid "Quantizer ratio (bquant_ratio):"
 msgstr "Rapport de quantum (bquant_ratio):"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:62
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:63
 msgid "Quantizer offset (bquant_offset):"
 msgstr "Offset de quantum (bquant_offset):"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:63
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:64
 msgid "Packed bitstream (packed)"
 msgstr "Empaquetage du flux (packed)"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:64
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:65
 msgid "Closed GOP (closed_gop)"
 msgstr "Fermeture des GOP (closed_gop)"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:65
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:66
 msgid "<b>Pixel aspect ratio</b>"
 msgstr "<b>Rapport largeur/hauteur des pixels</b>"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:66
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:67
 msgid "Pixel aspect ratio (par):"
 msgstr "Rapport largeur/hauteur des pixels (par):"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:67
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:68
 msgid "Width x height:"
 msgstr "Largeur x hauteur:"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:69
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:70
 msgid "PC content"
 msgstr "Format PC"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:70
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:71
 msgid "PAL standard 4:3 PAR"
 msgstr "PAL standard 4:3 PAR"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:71
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:72
 msgid "PAL standard 16:9 PAR"
 msgstr "PAL standard 16:9 PAR"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:72
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:73
 msgid "NTSC standard 4:3 PAR"
 msgstr "NTSC standard 4:3 PAR"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:73
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:74
 msgid "NTSC standard 16:9 PAR"
 msgstr "NTSC standard 16:9 PAR"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:74
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:75
 msgid "Custom"
 msgstr "Personnalisé"
 
-#: ../plugins/ogmrip-xvid-options-dialog.ui.h:75
+#: ../plugins/ogmrip-xvid-options-dialog.ui.h:76
 msgid "Misc"
 msgstr "Divers"
 
@@ -1337,7 +1356,7 @@ msgid "_Quit"
 msgstr "_Quitter"
 
 #: ../src/ogmrip-menu.ui.h:7 ../src/ogmrip-main-window.ui.h:9
-#: ../src/ogmrip-options-dialog.ui.h:11
+#: ../src/ogmrip-options-dialog.ui.h:12
 msgid "E_xtract"
 msgstr "E_xtraire"
 
@@ -1365,19 +1384,23 @@ msgstr "_Fermer"
 msgid "Cropping"
 msgstr "Découpage"
 
-#: ../src/ogmrip-crop-dialog.ui.h:2
+#: ../src/ogmrip-crop-dialog.ui.h:3
+msgid "Apply"
+msgstr "Appliquer"
+
+#: ../src/ogmrip-crop-dialog.ui.h:4
 msgid "_Top"
 msgstr "_Haut"
 
-#: ../src/ogmrip-crop-dialog.ui.h:3
+#: ../src/ogmrip-crop-dialog.ui.h:5
 msgid "_Left"
 msgstr "_Gauche"
 
-#: ../src/ogmrip-crop-dialog.ui.h:4
+#: ../src/ogmrip-crop-dialog.ui.h:6
 msgid "_Bottom"
 msgstr "_Bas"
 
-#: ../src/ogmrip-crop-dialog.ui.h:5
+#: ../src/ogmrip-crop-dialog.ui.h:7
 msgid "_Right"
 msgstr "_Droite"
 
@@ -1443,37 +1466,29 @@ msgstr "Personnalisé"
 msgid "Options"
 msgstr "Options"
 
-#: ../src/ogmrip-options-dialog.ui.h:10
+#: ../src/ogmrip-options-dialog.ui.h:13
 msgid "En_queue"
 msgstr ""
 
-#: ../src/ogmrip-options-dialog.ui.h:12
-msgid "_Profile:"
-msgstr "_Profil :"
+#: ../src/ogmrip-options-dialog.ui.h:14
+msgid "<b>_Profile</b>"
+msgstr "<b>_Profile</b>"
 
-#: ../src/ogmrip-options-dialog.ui.h:13
+#: ../src/ogmrip-options-dialog.ui.h:15
 msgid "Automatic _cropping"
 msgstr "_Découpage automatique"
 
-#: ../src/ogmrip-options-dialog.ui.h:14
+#: ../src/ogmrip-options-dialog.ui.h:16
 msgid "Automatic _scaling"
 msgstr "_Redimensionnement automatique"
 
-#: ../src/ogmrip-options-dialog.ui.h:15
+#: ../src/ogmrip-options-dialog.ui.h:17
 msgid "Automatic c_ompressibility check"
 msgstr "Test de compressibilité automatique"
 
-#: ../src/ogmrip-options-dialog.ui.h:16
-msgid "Compressibility Check"
-msgstr "Test de Compressibilité"
-
-#: ../src/ogmrip-options-dialog.ui.h:17
+#: ../src/ogmrip-options-dialog.ui.h:18
 msgid "_Deinterlace"
 msgstr "_Désentrelacement"
-
-#: ../src/ogmrip-options-dialog.ui.h:18
-msgid "Edit profile"
-msgstr "Éditer le profil"
 
 #: ../src/ogmrip-options-dialog.ui.h:19
 msgid "_Crop"
@@ -1498,6 +1513,14 @@ msgstr "_Largeur :"
 #: ../src/ogmrip-options-dialog.ui.h:23
 msgid "_Height:"
 msgstr "_Hauteur :"
+
+#: ../src/ogmrip-options-dialog.ui.h:24
+msgid "Compressibility Check"
+msgstr "Test de Compressibilité"
+
+#: ../src/ogmrip-options-dialog.ui.h:25
+msgid "Edit profile"
+msgstr "Éditer le profil"
 
 #: ../src/ogmrip-pref-dialog.ui.h:1
 msgid "Preferences"
@@ -1609,27 +1632,27 @@ msgstr "_Avancées"
 msgid "Spell Checking"
 msgstr "Vérification orthographique"
 
-#: ../src/ogmrip-spell-dialog.ui.h:2
+#: ../src/ogmrip-spell-dialog.ui.h:3
 msgid "Mispelled word:"
 msgstr "Mot mal orthographié :"
 
-#: ../src/ogmrip-spell-dialog.ui.h:3
+#: ../src/ogmrip-spell-dialog.ui.h:4
 msgid "Replace _with:"
 msgstr "Remplacer _par :"
 
-#: ../src/ogmrip-spell-dialog.ui.h:4
+#: ../src/ogmrip-spell-dialog.ui.h:5
 msgid "_Replace"
 msgstr "_Remplacer"
 
-#: ../src/ogmrip-spell-dialog.ui.h:5
+#: ../src/ogmrip-spell-dialog.ui.h:6
 msgid "_Ignore"
 msgstr "_Ignorer"
 
-#: ../src/ogmrip-spell-dialog.ui.h:6
+#: ../src/ogmrip-spell-dialog.ui.h:7
 msgid "Ignore _All"
 msgstr "Ignorer _tout"
 
-#: ../src/ogmrip-spell-dialog.ui.h:7
+#: ../src/ogmrip-spell-dialog.ui.h:8
 msgid "A_dd Word"
 msgstr "_Ajouter le mot"
 
@@ -1825,26 +1848,25 @@ msgstr "Le périphérique ne contient pas le média attendu"
 msgid "'%s' does not contain a valid encoding"
 msgstr "'%s' ne contient pas un encodage valide"
 
-#: ../libogmrip-encode/ogmrip-encoding.c:1633
+#: ../libogmrip-encode/ogmrip-encoding.c:1648
 #, c-format
 msgid "Not enough space to store output and temporary files (%s needed)."
 msgstr ""
 "Pas assez d'espace pour stocker le fichier de sortie et les fichiers "
 "temporaires (%s nécessaires)."
 
-#: ../libogmrip-encode/ogmrip-encoding.c:1644
+#: ../libogmrip-encode/ogmrip-encoding.c:1659
 #, c-format
 msgid "Not enough space to store the output file (%s needed)."
-msgstr ""
-"Pas assez d'espace pour stocker le fichier de sortie (%s nécessaires)."
+msgstr "Pas assez d'espace pour stocker le fichier de sortie (%s nécessaires)."
 
-#: ../libogmrip-encode/ogmrip-encoding.c:1654
+#: ../libogmrip-encode/ogmrip-encoding.c:1669
 #, c-format
 msgid "Not enough space to store the temporary files (%s needed)."
 msgstr ""
 "Pas assez d'espace pour stocker les fichiers temporaires (%s nécessaires)."
 
-#: ../libogmrip-encode/ogmrip-encoding.c:1889
+#: ../libogmrip-encode/ogmrip-encoding.c:1904
 #, c-format
 msgid "Cannot compute bitrate for video stream"
 msgstr "Impossible de calculer le taux d'échantillonage du flux vidéo"
@@ -1942,7 +1964,11 @@ msgstr "secondes"
 msgid "Select an audio file"
 msgstr "Sélectionner un fichier audio"
 
-#: ../libogmrip-file-gtk/ogmrip-file-chooser-dialog.c:70
+#: ../libogmrip-file-gtk/ogmrip-audio-file-chooser-dialog.c:77
+msgid "Audio files"
+msgstr "Fichiers audio"
+
+#: ../libogmrip-file-gtk/ogmrip-file-chooser-dialog.c:66
 #: ../libogmrip-encode-gtk/ogmrip-audio-options-dialog.c:222
 #: ../libogmrip-encode-gtk/ogmrip-subp-options-dialog.c:225
 msgid "_Language:"
@@ -1980,6 +2006,10 @@ msgstr "Sous-titres"
 #: ../libogmrip-file-gtk/ogmrip-subp-file-chooser-dialog.c:72
 msgid "Select a subtitles file"
 msgstr "Sélectionner un fichier de sous-titres"
+
+#: ../libogmrip-file-gtk/ogmrip-subp-file-chooser-dialog.c:75
+msgid "Subtitle files"
+msgstr "Fichiers de sous-titres"
 
 #: ../libogmrip-encode-gtk/ogmrip-audio-chooser-widget.c:244
 msgid "Add an audio stream"
@@ -2392,7 +2422,7 @@ msgstr "Olivier Rolland <billl@users.sourceforge.net>"
 msgid "A Media Encoder for GNOME"
 msgstr "Un encodeur de Média pour GNOME"
 
-#: ../src/ogmrip-helper.c:87
+#: ../src/ogmrip-helper.c:86
 msgid "Please insert the media required to encode this title."
 msgstr "Veuillez insérer le média requis pour encoder ce titre."
 
@@ -2676,6 +2706,12 @@ msgstr "Recherche exhaustive transformée (tesa - encore plus lent)"
 #: ../plugins/ogmrip-xvid.c:891
 msgid "MEncoder is built without XviD support"
 msgstr "MEncoder est compilé sans support XviD"
+
+#~ msgid "Ok"
+#~ msgstr "Ok"
+
+#~ msgid "_Profile"
+#~ msgstr "_Profil :"
 
 #~ msgid "Cannot open: '%s'"
 #~ msgstr "Impossible d'ouvrir '%s'"

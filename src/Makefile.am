@@ -1,5 +1,6 @@
 bin_PROGRAMS = \
-  ogmrip
+  ogmrip \
+  test
 
 ogmrip_SOURCES = \
   ogmrip-application.c \
@@ -105,4 +106,24 @@ endif
 CLEANFILES = \
   $(ogmrip_RESOURCES) \
   *~ *.bak
+
+test_SOURCES = \
+  test.c \
+  ogmrip-helper.c \
+  ogmrip-crop-dialog.c \
+  ogmrip-options-dialog.c \
+  $(ogmrip_RESOURCES)
+
+test_CPPFLAGS = \
+  -I$(top_srcdir)/libogmrip-base      \
+  -I$(top_srcdir)/libogmrip-job       \
+  -I$(top_srcdir)/libogmrip-media     \
+  -I$(top_srcdir)/libogmrip-file      \
+  -I$(top_srcdir)/libogmrip-encode    \
+  -I$(top_srcdir)/libogmrip-media-gtk \
+  -I$(top_srcdir)/libogmrip-file-gtk  \
+  -I$(top_srcdir)/libogmrip-encode-gtk
+
+test_LDADD = \
+  $(top_builddir)/libogmrip-encode-gtk/libogmrip-encode-gtk.la
 

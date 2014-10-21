@@ -414,7 +414,6 @@ ogmrip_profile_manager_dialog_init (OGMRipProfileManagerDialog *dialog)
 
   context = gtk_widget_get_style_context (dialog->priv->toolbar);
   gtk_style_context_set_junction_sides (context, GTK_JUNCTION_TOP);
-  gtk_style_context_add_class (context, GTK_STYLE_CLASS_INLINE_TOOLBAR);
 
   dialog->priv->profile_view = ogmrip_profile_view_new ();
   gtk_container_add (GTK_CONTAINER (dialog->priv->profile_swin), dialog->priv->profile_view);
