@@ -1587,8 +1587,6 @@ get_space_left (GFile *file, guint64 *space, gchar **id, GCancellable *cancellab
 
   g_object_unref (info);
 
-  g_message ("%s = %lu", *id, *space);
-
   return TRUE;
 }
 
