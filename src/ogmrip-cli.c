@@ -667,7 +667,7 @@ ogmrip_cli_add_subp_codec (OGMRipEncoding *encoding, OGMRipProfile *profile, OGM
       /*
        * label, language
        */
-      status = ogmrip_encoding_add_subp_codec (encoding, OGMRIP_SUBP_CODEC (codec), NULL);
+      status = ogmrip_encoding_add_subp_codec (encoding, OGMRIP_SUBP_CODEC (codec), &error);
       g_object_unref (codec);
 
       if (!status)
