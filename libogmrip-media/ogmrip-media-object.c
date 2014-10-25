@@ -154,7 +154,7 @@ ogmrip_media_get_size (OGMRipMedia *media)
   if (!iface->get_size)
   {
     GList *titles, *link;
-    guint64 size;
+    guint64 size = 0;
 
     titles = ogmrip_media_get_titles (media);
 
