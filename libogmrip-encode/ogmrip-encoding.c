@@ -1633,9 +1633,6 @@ ogmrip_encoding_check_space (OGMRipEncoding *encoding, GCancellable *cancellable
     return FALSE;
   }
 
-  g_message ("output = %lu/%lu", output_size, output_space);
-  g_message ("tmp = %lu/%lu", tmp_size, tmp_space);
-
   if (g_str_equal (output_id, tmp_id))
   {
     retval = output_size + tmp_size < output_space;
