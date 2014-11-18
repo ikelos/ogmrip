@@ -339,7 +339,7 @@ ogmrip_main_window_open_media (OGMRipMainWindow *window, OGMRipMedia *media)
   gboolean res;
 
   dialog = gtk_dialog_new_with_buttons (_("Opening media"),
-      GTK_WINDOW (window), GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+      GTK_WINDOW (window), GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_USE_HEADER_BAR,
       _("_Cancel"), GTK_RESPONSE_CANCEL,
       NULL);
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
