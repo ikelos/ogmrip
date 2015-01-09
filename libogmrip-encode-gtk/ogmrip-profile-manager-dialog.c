@@ -404,6 +404,12 @@ ogmrip_profile_manager_dialog_init (OGMRipProfileManagerDialog *dialog)
   dialog->priv = ogmrip_profile_manager_dialog_get_instance_private (dialog);
 
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
+
+  gtk_dialog_add_buttons (GTK_DIALOG (dialog->priv->name_dialog),
+      "Action",    GTK_RESPONSE_OK,
+      _("Cancel"), GTK_RESPONSE_CANCEL,
+      NULL);
+
   gtk_dialog_set_default_response (GTK_DIALOG (dialog->priv->name_dialog), GTK_RESPONSE_OK);
 
   dialog->priv->engine = ogmrip_profile_engine_get_default ();
