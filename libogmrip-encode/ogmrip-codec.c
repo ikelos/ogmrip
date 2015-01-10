@@ -310,9 +310,11 @@ ogmrip_codec_set_output (OGMRipCodec *codec, OGMRipFile *file)
 
   if (codec->priv->output != file)
   {
+    g_object_ref (file);
     if (codec->priv->output)
       g_object_unref (codec->priv->output);
-    codec->priv->output = g_object_ref (file);
+
+    codec->priv->output = file;
     codec->priv->internal = FALSE;
 
     g_object_notify (G_OBJECT (codec), "output");
