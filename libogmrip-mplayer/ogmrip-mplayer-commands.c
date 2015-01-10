@@ -753,7 +753,7 @@ ogmrip_mencoder_vobsub_command (OGMRipSubpCodec *subp, const gchar *output)
   g_return_val_if_fail (OGMRIP_IS_SUBP_CODEC (subp), NULL);
   g_return_val_if_fail (output != NULL, NULL);
 
-  argv = ogmrip_mencoder_command_new ("/dev/null", TRUE);
+  argv = ogmrip_mencoder_command_new ("/dev/null", FALSE);
 
   g_ptr_array_add (argv, g_strdup ("-of"));
   g_ptr_array_add (argv, g_strdup ("rawaudio"));
