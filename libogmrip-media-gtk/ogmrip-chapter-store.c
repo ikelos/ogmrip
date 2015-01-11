@@ -153,6 +153,42 @@ ogmrip_chapter_store_get_title (OGMRipChapterStore *store)
   return store->priv->title;
 }
 
+static void
+ogmrip_chapter_store_set_chapter (OGMRipChapterStore *store, OGMRipTitle *title, gint chap)
+{
+  GtkTreeIter iter;
+  OGMRipTime time_;
+
+  gdouble length;
+  gchar *str;
+
+  gtk_list_store_append (GTK_LIST_STORE (store), &iter);
+
+  str = g_strdup_printf ("%s %02d", _("Chapter"), MAX (chap, 1));
+  gtk_list_store_set (GTK_LIST_STORE (store), &iter,
+      OGMRIP_CHAPTER_STORE_SELECTED_COLUMN, TRUE,
+      OGMRIP_CHAPTER_STORE_CHAPTER_COLUMN, MAX (chap, 1),
+      OGMRIP_CHAPTER_STORE_LABEL_COLUMN, str,
+      -1);
+  g_free (str);
+
+  if (chap > 0)
+    length = ogmrip_title_get_chapters_length (title, chap - 1, chap - 1, &time_);
+  else
+    length = ogmrip_title_get_length (title, &time_);
+
+  if (length > 0)
+  {
+    str = g_strdup_printf ("%02lu:%02lu:%02lu", time_.hour, time_.min, time_.sec);
+    gtk_list_store_set (GTK_LIST_STORE (store), &iter,
+        OGMRIP_CHAPTER_STORE_DURATION_COLUMN, str,
+        -1);
+    g_free (str);
+  }
+  else
+    store->priv->editable = FALSE;
+}
+
 /**
  * ogmrip_chapter_store_set_title:
  * @store: An #OGMRipChapterStore
@@ -163,12 +199,7 @@ ogmrip_chapter_store_get_title (OGMRipChapterStore *store)
 void
 ogmrip_chapter_store_set_title (OGMRipChapterStore *store, OGMRipTitle *title)
 {
-  GtkTreeIter iter;
-  OGMRipTime time_;
-
   gint chap, nchap;
-  gdouble seconds;
-  gchar *str;
 
   g_return_if_fail (OGMRIP_IS_CHAPTER_STORE (store));
   g_return_if_fail (title == NULL || OGMRIP_IS_TITLE (title));
@@ -185,28 +216,12 @@ ogmrip_chapter_store_set_title (OGMRipChapterStore *store, OGMRipTitle *title)
   if (title)
   {
     nchap = ogmrip_title_get_n_chapters (title);
-    for (chap = 0; chap < nchap; chap++)
+    if (nchap <= 0)
+      ogmrip_chapter_store_set_chapter (store, title, 0);
+    else
     {
-      gtk_list_store_append (GTK_LIST_STORE (store), &iter);
-
-      str = g_strdup_printf ("%s %02d", _("Chapter"), chap + 1);
-      gtk_list_store_set (GTK_LIST_STORE (store), &iter,
-          OGMRIP_CHAPTER_STORE_SELECTED_COLUMN, TRUE,
-          OGMRIP_CHAPTER_STORE_CHAPTER_COLUMN, chap + 1,
-          OGMRIP_CHAPTER_STORE_LABEL_COLUMN, str,
-          -1);
-      g_free (str);
-
-      if ((seconds = ogmrip_title_get_chapters_length (title, chap, chap, &time_)) > 0)
-      {
-        str = g_strdup_printf ("%02lu:%02lu:%02lu", time_.hour, time_.min, time_.sec);
-        gtk_list_store_set (GTK_LIST_STORE (store), &iter,
-            OGMRIP_CHAPTER_STORE_DURATION_COLUMN, str,
-            -1);
-        g_free (str);
-      }
-      else
-        store->priv->editable = FALSE;
+      for (chap = 0; chap < nchap; chap++)
+        ogmrip_chapter_store_set_chapter (store, title, chap + 1);
     }
   }
 

@@ -358,6 +358,9 @@ ogmrip_media_file_initable_init (GInitable *initable, GCancellable *cancellable,
   for (i = 0; i < n; i ++)
     ogmrip_media_info_get_chapters_info (info, i, media->priv);
 
+  if (n <= 0)
+    media->priv->nr_of_chapters = 1;
+
   ogmrip_media_info_close (info);
 
   return TRUE;
