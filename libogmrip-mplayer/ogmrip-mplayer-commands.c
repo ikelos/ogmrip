@@ -411,7 +411,7 @@ ogmrip_mencoder_watch_stdout (OGMJobTask *task, const gchar *buffer, glong *tota
   return TRUE;
 }
 
-OGMJobTask *
+static OGMJobTask *
 ogmrip_mencoder_video_command (OGMRipVideoCodec *video, OGMRipEncoder encoder,
     const gchar *options, const gchar *passlog, const gchar *output)
 {
@@ -431,6 +431,9 @@ ogmrip_mencoder_video_command (OGMRipVideoCodec *video, OGMRipEncoder encoder,
 
     if (astream)
       ogmrip_command_set_audio (argv, OGMRIP_STREAM (astream));
+
+    g_ptr_array_add (argv, g_strdup ("-oac"));
+    g_ptr_array_add (argv, g_strdup ("copy"));
   }
   else
   {
@@ -485,12 +488,10 @@ ogmrip_mencoder_video_command (OGMRipVideoCodec *video, OGMRipEncoder encoder,
         g_ptr_array_add (argv, g_strdup ("-x264encopts"));
       break;
     case OGMRIP_ENCODER_COPY:
-      g_ptr_array_add (argv, "copy");
-      g_ptr_array_add (argv, "-oac");
-      g_ptr_array_add (argv, "copy");
-      g_ptr_array_add (argv, "-mc");
-      g_ptr_array_add (argv, "0");
-      g_ptr_array_add (argv, "-noskip");
+      g_ptr_array_add (argv, g_strdup ("copy"));
+      g_ptr_array_add (argv, g_strdup ("-mc"));
+      g_ptr_array_add (argv, g_strdup ("0"));
+      g_ptr_array_add (argv, g_strdup ("-noskip"));
       break;
     default:
       g_assert_not_reached ();
