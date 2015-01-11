@@ -200,7 +200,7 @@ ogmrip_file_get_length (OGMRipTitle *title, OGMRipTime *time_)
 
   length = OGMRIP_FILE (title)->priv->length;
   if (time_ != NULL && length >= 0.0)
-    ogmrip_msec_to_time (length, time_);
+    ogmrip_msec_to_time (length * 1000, time_);
 
   return length;
 }
