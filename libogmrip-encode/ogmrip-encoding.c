@@ -2024,7 +2024,7 @@ ogmrip_encoding_encode (OGMRipEncoding *encoding, GCancellable *cancellable, GEr
     /*
      * Compute scaling parameters
      */
-    if (encoding->priv->autoscale &&
+    if (encoding->priv->autoscale && !encoding->priv->test &&
         ogmrip_video_codec_get_scaler (encoding->priv->video_codec) != OGMRIP_SCALER_NONE)
     {
       gdouble bpp;
