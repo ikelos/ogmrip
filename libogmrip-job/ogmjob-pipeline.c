@@ -35,20 +35,21 @@ static gboolean
 ogmjob_pipeline_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
   OGMJobPipeline *pipeline = OGMJOB_PIPELINE (task);
-  GList *child;
-  gboolean result;
+  gboolean result = TRUE;
 
-  if (!pipeline->priv->children)
-    return TRUE;
-
-  pipeline->priv->progress = 0.0;
-
-  for (child = pipeline->priv->children; child; child = child->next)
+  if (pipeline->priv->children)
   {
-    if (child->next)
-      ogmjob_task_run_async (OGMJOB_TASK (child->data), cancellable, NULL, NULL);
-    else
-      result = ogmjob_task_run (OGMJOB_TASK (child->data), cancellable, error);
+    GList *child;
+
+    pipeline->priv->progress = 0.0;
+
+    for (child = pipeline->priv->children; child; child = child->next)
+    {
+      if (child->next)
+        ogmjob_task_run_async (OGMJOB_TASK (child->data), cancellable, NULL, NULL);
+      else
+        result = ogmjob_task_run (OGMJOB_TASK (child->data), cancellable, error);
+    }
   }
 
   return result;
