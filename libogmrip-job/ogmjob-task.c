@@ -215,6 +215,8 @@ ogmjob_task_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   if (!klass->run)
     return TRUE;
 
+  task->priv->progress = 0.0;
+
   ogmjob_task_set_state (task, OGMJOB_STATE_RUNNING);
   result = klass->run (task, cancellable, error);
   ogmjob_task_set_state (task, OGMJOB_STATE_IDLE);
