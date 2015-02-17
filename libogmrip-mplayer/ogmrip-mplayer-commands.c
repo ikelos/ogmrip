@@ -135,7 +135,7 @@ ogmrip_command_set_fps (GPtrArray *argv, OGMRipTitle *title)
     denom2 = denom1;
   }
 
-  if (num1 != num2 || denom2 != denom2)
+  if (num1 != num2 || denom1 != denom2)
   {
     g_ptr_array_add (argv, g_strdup ("-fps"));
     g_ptr_array_add (argv, g_strdup_printf ("%d/%d", num1, denom1));
