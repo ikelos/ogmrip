@@ -650,7 +650,7 @@ static gboolean
 ogmrip_xvid_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
   OGMJobTask *queue, *child;
-  gchar *log_file, *cwd = NULL;
+  gchar *log_file;
   gint pass, passes;
   gboolean result;
 
@@ -676,15 +676,6 @@ ogmrip_xvid_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   }
 
   result = OGMJOB_TASK_CLASS (ogmrip_xvid_parent_class)->run (task, cancellable, error);
-
-  if (cwd)
-  {
-    /*
-     * Return in cwd
-     */
-    g_chdir (cwd);
-    g_free (cwd);
-  }
 
   ogmjob_container_remove (OGMJOB_CONTAINER (task), queue);
 
