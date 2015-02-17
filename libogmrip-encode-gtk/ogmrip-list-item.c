@@ -156,8 +156,8 @@ ogmrip_list_item_get_property (GObject *gobject, guint prop_id, GValue *value, G
       g_value_set_string (value, item->priv->add_tooltip);
       break;
     case PROP_REMOVE_TOOLTIP:
-      break;
       g_value_set_string (value, item->priv->remove_tooltip);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
       break;
