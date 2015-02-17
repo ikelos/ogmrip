@@ -487,7 +487,7 @@ ogmrip_mp4_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   ogmjob_container_add (OGMJOB_CONTAINER (queue), child);
   g_object_unref (child);
 
-  if (mp4->nsplits > 1 && result)
+  if (mp4->nsplits > 1)
   {
     mp4->split_percent = 0;
     mp4->splits = 0;
