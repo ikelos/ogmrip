@@ -113,6 +113,7 @@ id_file (char *f)
   ret = fread (buffer, 1, 4, test);
   if (ret < 4)
   {
+    fclose (test);
     fprintf (stderr, "EOF determining file type of file %s.\n", f);
     return -1;
   }
