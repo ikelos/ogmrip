@@ -268,7 +268,7 @@ ogmrip_profile_manager_dialog_import_activated (GSimpleAction *action, GVariant 
 
     file = gtk_file_chooser_get_file (GTK_FILE_CHOOSER (dialog));
 
-    profile = ogmrip_profile_new_from_file (file, NULL);
+    profile = ogmrip_profile_new_from_file (file, &error);
     if (profile)
     {
       ogmrip_profile_engine_add (parent->priv->engine, profile);
