@@ -243,7 +243,7 @@ ogmrip_options_dialog_update_scale_combo (OGMRipOptionsDialog *dialog)
       }
       else
       {
-        scale_to_size (cw, ch, f, i, &sh, &sw);
+        scale_to_size (cw, ch, f, i, &sw, &sh);
         str = g_strdup_printf ("%u x %u", sw, sh);
       }
 
