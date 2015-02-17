@@ -266,7 +266,7 @@ ogmrip_profile_engine_get_default (void)
 }
 
 static gboolean
-ogmrip_profile_is_new_version (OGMRipProfile *profile, OGMRipXML *xml, guint *new_minor, guint *new_major)
+ogmrip_profile_is_new_version (OGMRipProfile *profile, OGMRipXML *xml, guint *new_major, guint *new_minor)
 {
   GVariant *variant;
   guint current_major, current_minor;
