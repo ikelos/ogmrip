@@ -159,7 +159,7 @@ static int
 make_pathes (const char *path1, ...)
 {
   va_list ap;
-  char path[FILENAME_MAX];
+  char path[FILENAME_MAX + 1];
   size_t len;
 
   strncpy (path, path1, FILENAME_MAX);
@@ -365,7 +365,7 @@ dvd_get_size (dvd_reader_t *reader, ifo_handle_t *vmg_file, unsigned int vmg, un
 static ssize_t
 dvd_copy_ifo (dvd_reader_t *reader, unsigned int vts, const char *output)
 {
-  char filename[FILENAME_MAX];
+  char filename[FILENAME_MAX + 1];
   ssize_t size, copied;
   struct stat buf;
   int fd;
@@ -432,7 +432,7 @@ dvd_copy_ifo (dvd_reader_t *reader, unsigned int vts, const char *output)
 static ssize_t
 dvd_copy_bup (dvd_reader_t *reader, unsigned int vts, const char *output)
 {
-  char filename[FILENAME_MAX];
+  char filename[FILENAME_MAX + 1];
   ssize_t size, copied;
   struct stat buf;
   int fd;
@@ -493,7 +493,7 @@ dvd_copy_bup (dvd_reader_t *reader, unsigned int vts, const char *output)
 static ssize_t
 dvd_copy_menu (dvd_reader_t *reader, unsigned int vts, const char *output)
 {
-  char filename[FILENAME_MAX];
+  char filename[FILENAME_MAX + 1];
   ssize_t size, copied;
   struct stat buf;
   int fd;
@@ -554,7 +554,7 @@ dvd_copy_menu (dvd_reader_t *reader, unsigned int vts, const char *output)
 static long long
 dvd_copy_vob (dvd_reader_t *reader, unsigned int vts, const char *output)
 {
-  char filename[FILENAME_MAX];
+  char filename[FILENAME_MAX + 1];
   struct stat buf;
   ssize_t size, copied;
   size_t offset;
