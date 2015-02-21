@@ -140,12 +140,16 @@ write_png (char *file_name, int x0, int y0, int w, int h, unsigned char *src, un
   png_ptr = png_create_write_struct (PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 
   if (!png_ptr)
+  {
+    fclose (fp);
     return -1;
+  }
 
   info_ptr = png_create_info_struct (png_ptr);
   if (!info_ptr)
   {
     png_destroy_write_struct (&png_ptr, (png_infopp) NULL);
+    fclose (fp);
     return -1;
   }
 
