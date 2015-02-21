@@ -95,7 +95,7 @@ static const char *newline = LF;
 
 static subp_time_t adjustment;
 
-static unsigned int
+static int
 parse_shift (const char *value)
 {
   if (sscanf (value, "%lf", &offset) != 1)
