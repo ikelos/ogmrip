@@ -130,8 +130,6 @@ ogmrip_subp2pgm_command (OGMRipSubpCodec *subp, const gchar *input)
   if (ogmrip_subp_codec_get_forced_only (subp))
     g_ptr_array_add (argv, g_strdup ("--forced"));
 
-  g_ptr_array_add (argv, g_strdup ("--normalize"));
-
   g_ptr_array_add (argv, g_strdup (input));
   g_ptr_array_add (argv, NULL);
 
@@ -236,6 +234,8 @@ ogmrip_tesseract_command (OGMRipSrt *srt, const gchar *input, gboolean lang)
   g_ptr_array_add (argv, g_strdup ("tesseract"));
   g_ptr_array_add (argv, g_strdup (input));
   g_ptr_array_add (argv, g_strdup (input));
+  g_ptr_array_add (argv, g_strdup ("-psm"));
+  g_ptr_array_add (argv, g_strdup ("6"));
 
   if (lang && srt->is_valid_lang)
   {

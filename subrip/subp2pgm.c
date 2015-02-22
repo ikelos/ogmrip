@@ -76,7 +76,6 @@ unsigned int vobsub_id = 0;
 static unsigned int expand = 0;
 static unsigned int width = 720;
 static unsigned int height = 576;
-static unsigned int normalize = 0;
 
 static int debug, forced, format;
 static unsigned int subno;
@@ -463,7 +462,6 @@ usage (const char *name)
   fprintf (stderr, "  -e, --expand[=<w>x<h>]      Expand the subtitle to the given resolution\n");
   fprintf (stderr, "                              (default: don't expand or expand to 720x576\n");
   fprintf (stderr, "  -f, --forced                Extract only forced subtitles\n");
-  fprintf (stderr, "  -n, --normalize             Normalize the palette\n");
   fprintf (stderr, "  -v, --verbose               Increase verbosity level\n");
   fprintf (stdout, "\n");
 }
@@ -473,7 +471,6 @@ static const struct option longopts[] =
 {
   { "help",      no_argument,       NULL, 'h' },
   { "forced",    no_argument,       NULL, 'f' },
-  { "normalize", no_argument,       NULL, 'n' },
   { "verbose",   no_argument,       NULL, 'v' },
   { "expand",    optional_argument, NULL, 'e' },
   { "sid",       required_argument, NULL, 's' },
@@ -519,9 +516,6 @@ main (int argc, char **argv)
         break;
       case 'v':
         debug ++;
-        break;
-      case 'n':
-        normalize = 1;
         break;
       case 'e':
         parse_expand (optarg);
@@ -577,7 +571,6 @@ main (int argc, char **argv)
   }
 
   spudec_set_forced_subs_only (spudec, forced);
-  spudec_set_normalize_palette (spudec, normalize);
 
   fprintf (xml_file, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
   fprintf (xml_file, "<subtitles>\n");
