@@ -214,8 +214,6 @@ task_watch (GIOChannel *channel, TaskAsyncData *data, gchar **partial, OGMJobWat
     g_free (buffer);
     return status == G_IO_STATUS_AGAIN;
   }
-
-  ogmrip_log_write (buffer);
 /*
 #ifdef G_ENABLE_DEBUG
   g_print ("%s", buffer);
@@ -239,10 +237,14 @@ task_watch (GIOChannel *channel, TaskAsyncData *data, gchar **partial, OGMJobWat
     else
     {
       if (!(*partial) && strv[i][0] != '\0')
+      {
+        ogmrip_log_printf ("%s\n", strv[i]);
         retval = watch_func (data->spawn, strv[i], watch_data, &data->error);
+      }
       else if (*partial)
       {
         str = g_strconcat (*partial, strv[i], NULL);
+        ogmrip_log_printf ("%s\n", str);
         retval = watch_func (data->spawn, str, watch_data, &data->error);
         g_free (str);
 
