@@ -64,6 +64,7 @@ struct _OGMRipX264
   gboolean b_adapt;
   gboolean brdo;
   gboolean cabac;
+  gboolean cartoon;
   gboolean dct_decimate;
   gboolean fast_pskip;
   gboolean force_cfr;
@@ -92,6 +93,7 @@ enum
   PROP_B_PYRAMID,
   PROP_BRDO,
   PROP_CABAC,
+  PROP_CARTOON,
   PROP_CQM,
   PROP_DCT_DECIMATE,
   PROP_DIRECT,
@@ -214,19 +216,16 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
 
   const gchar *output;
   gint quality, bitrate, threads;
-  gboolean cartoon;
 
   output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (video)));
 
-  cartoon = FALSE;
-
   quality = ogmrip_video_codec_get_quality (video);
 
-  options = g_string_new (cartoon ? "deblock=1,1:aq_strength=0.6" : "deblock");
+  options = g_string_new (x264->cartoon ? "deblock=1,1:aq_strength=0.6" : "deblock");
   g_string_append_printf (options, ":subq=%u:direct_pred=%s",
       x264_have_brdo ? CLAMP (x264->subq, 1, 6) : x264->subq,
       direct_name[CLAMP (x264->direct, DIRECT_NONE, DIRECT_AUTO)]);
-  g_string_append_printf (options, ":frameref=%u", cartoon ? x264->frameref * 2 : x264->frameref);
+  g_string_append_printf (options, ":frameref=%u", x264->cartoon ? x264->frameref * 2 : x264->frameref);
   g_string_append_printf (options, ":b_adapt=%u", x264->b_adapt);
 
   if (passes > 1 && x264_have_nombtree)
@@ -250,7 +249,7 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   if (x264_have_lookahead)
     g_string_append_printf (options, ":rc_lookahead=%u", x264->rc_lookahead);
 
-  g_string_append_printf (options, ":bframes=%d", cartoon ? x264->b_frames + 2 : x264->b_frames);
+  g_string_append_printf (options, ":bframes=%d", x264->cartoon ? x264->b_frames + 2 : x264->b_frames);
 
   if (pass != passes)
   {
@@ -328,8 +327,8 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
     {
       gchar psy_rd[G_ASCII_DTOSTR_BUF_SIZE], psy_trellis[G_ASCII_DTOSTR_BUF_SIZE];
 
-      g_ascii_formatd (psy_rd, G_ASCII_DTOSTR_BUF_SIZE, "%.2f", cartoon ? 0.4 : x264->psy_rd);
-      g_ascii_formatd (psy_trellis, G_ASCII_DTOSTR_BUF_SIZE, "%.2f", cartoon ? 0 : x264->psy_trellis);
+      g_ascii_formatd (psy_rd, G_ASCII_DTOSTR_BUF_SIZE, "%.2f", x264->cartoon ? 0.4 : x264->psy_rd);
+      g_ascii_formatd (psy_trellis, G_ASCII_DTOSTR_BUF_SIZE, "%.2f", x264->cartoon ? 0 : x264->psy_trellis);
 
       if (x264->trellis)
         g_string_append_printf (options, ":psy-rd=%s,%s", psy_rd, psy_trellis);
@@ -448,6 +447,8 @@ ogmrip_x264_configure (OGMRipConfigurable *configurable, OGMRipProfile *profile)
     g_settings_bind (settings, "brdo", configurable, OGMRIP_X264_PROP_BRDO,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
     g_settings_bind (settings, "cabac", configurable, OGMRIP_X264_PROP_CABAC,
+        G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
+    g_settings_bind (settings, "cartoon", configurable, OGMRIP_X264_PROP_CARTOON,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
     g_settings_bind (settings, "cqm", configurable, OGMRIP_X264_PROP_CQM,
         G_SETTINGS_BIND_GET | G_SETTINGS_BIND_GET_NO_CHANGES);
@@ -589,6 +590,9 @@ ogmrip_x264_get_property (GObject *gobject, guint property_id, GValue *value, GP
     case PROP_CABAC:
       g_value_set_boolean (value, x264->cabac);
       break;
+    case PROP_CARTOON:
+      g_value_set_boolean (value, x264->cartoon);
+      break;
     case PROP_CQM:
       g_value_set_uint (value, x264->cqm);
       break;
@@ -697,6 +701,9 @@ ogmrip_x264_set_property (GObject *gobject, guint property_id, const GValue *val
       break;
     case PROP_CABAC:
       x264->cabac = g_value_get_boolean (value);
+      break;
+    case PROP_CARTOON:
+      x264->cartoon = g_value_get_boolean (value);
       break;
     case PROP_CQM:
       x264->cqm = g_value_get_uint (value);
@@ -865,6 +872,10 @@ ogmrip_x264_class_init (OGMRipX264Class *klass)
       g_param_spec_boolean (OGMRIP_X264_PROP_CABAC, "Cabac property", "Set cabac",
         OGMRIP_X264_DEFAULT_CABAC, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
+  g_object_class_install_property (gobject_class, PROP_CARTOON,
+      g_param_spec_boolean (OGMRIP_X264_PROP_CARTOON, "Cartoon property", "Set cartoon",
+        OGMRIP_X264_DEFAULT_CARTOON, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+
   g_object_class_install_property (gobject_class, PROP_CQM,
       g_param_spec_uint (OGMRIP_X264_PROP_CQM, "Cqm property", "Set cqm",
         0, 1, OGMRIP_X264_DEFAULT_CQM, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
@@ -976,6 +987,7 @@ ogmrip_x264_init (OGMRipX264 *x264)
   x264->b_pyramid = OGMRIP_X264_DEFAULT_B_PYRAMID;
   x264->brdo = OGMRIP_X264_DEFAULT_BRDO;
   x264->cabac = OGMRIP_X264_DEFAULT_CABAC;
+  x264->cartoon = OGMRIP_X264_DEFAULT_CARTOON;
   x264->cqm = OGMRIP_X264_DEFAULT_CQM;
   x264->dct_decimate = OGMRIP_X264_DEFAULT_DCT_DECIMATE;
   x264->direct = OGMRIP_X264_DEFAULT_DIRECT;
