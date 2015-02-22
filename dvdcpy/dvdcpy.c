@@ -367,7 +367,6 @@ dvd_copy_ifo (dvd_reader_t *reader, unsigned int vts, const char *output)
 {
   char filename[FILENAME_MAX + 1];
   ssize_t size, copied;
-  struct stat buf;
   int fd;
 
   dvd_file_t *file;
@@ -384,18 +383,7 @@ dvd_copy_ifo (dvd_reader_t *reader, unsigned int vts, const char *output)
   else
     snprintf (filename, FILENAME_MAX, "%s/VIDEO_TS/VTS_%02u_0.IFO", output, vts);
 
-  if (stat (filename, &buf) < 0)
-    fd = open (filename, O_WRONLY | O_CREAT, 0644);
-  else
-  {
-    if (!S_ISREG (buf.st_mode))
-    {
-      fprintf (stderr, "Error: %s already exists and is not a regular file\n", filename);
-      return -1;
-    }
-    fd = open (filename, O_WRONLY | O_TRUNC, 0644);
-  }
-
+  fd = open (filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
   if (fd < 0)
   {
     fprintf (stderr, "Error: Cannot open %s\n", filename);
@@ -434,7 +422,6 @@ dvd_copy_bup (dvd_reader_t *reader, unsigned int vts, const char *output)
 {
   char filename[FILENAME_MAX + 1];
   ssize_t size, copied;
-  struct stat buf;
   int fd;
 
   dvd_file_t *file;
@@ -447,18 +434,7 @@ dvd_copy_bup (dvd_reader_t *reader, unsigned int vts, const char *output)
   else
     snprintf (filename, FILENAME_MAX, "%s/VIDEO_TS/VTS_%02u_0.BUP", output, vts);
 
-  if (stat (filename, &buf) < 0)
-    fd = open (filename, O_WRONLY | O_CREAT, 0644);
-  else
-  {
-    if (!S_ISREG (buf.st_mode))
-    {
-      fprintf (stderr, "Error: %s already exists and is not a regular file\n", filename);
-      return -1;
-    }
-    fd = open (filename, O_WRONLY | O_TRUNC, 0644);
-  }
-
+  fd = open (filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
   if (fd < 0)
   {
     fprintf (stderr, "Error: Cannot open %s\n", filename);
@@ -495,7 +471,6 @@ dvd_copy_menu (dvd_reader_t *reader, unsigned int vts, const char *output)
 {
   char filename[FILENAME_MAX + 1];
   ssize_t size, copied;
-  struct stat buf;
   int fd;
 
   dvd_file_t *file;
@@ -508,16 +483,9 @@ dvd_copy_menu (dvd_reader_t *reader, unsigned int vts, const char *output)
   else
     snprintf (filename, FILENAME_MAX, "%s/VIDEO_TS/VTS_%02u_0.VOB", output, vts);
 
-  if (stat (filename, &buf) < 0)
-    fd = open (filename, O_WRONLY | O_CREAT, 0644);
-  else
+  fd = open (filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+  if (fd < 0)
   {
-    if (!S_ISREG (buf.st_mode))
-    {
-      fprintf (stderr, "Error: %s already exists and is not a regular file\n", filename);
-      return -1;
-    }
-    fd = open (filename, O_WRONLY | O_TRUNC, 0644);
   }
 
   if (fd < 0)
@@ -555,7 +523,6 @@ static long long
 dvd_copy_vob (dvd_reader_t *reader, unsigned int vts, const char *output)
 {
   char filename[FILENAME_MAX + 1];
-  struct stat buf;
   ssize_t size, copied;
   size_t offset;
   int vob, fd;
@@ -580,20 +547,7 @@ dvd_copy_vob (dvd_reader_t *reader, unsigned int vts, const char *output)
   {
     snprintf (filename, FILENAME_MAX, "%s/VIDEO_TS/VTS_%02u_%u.VOB", output, vts, vob + 1);
 
-    if (stat (filename, &buf) < 0)
-      fd = open (filename, O_WRONLY | O_CREAT, 0644);
-    else
-    {
-      if (!S_ISREG (buf.st_mode))
-      {
-        DVDCloseFile (dvd_file);
-
-        fprintf (stderr, "Error: %s already exists and is not a regular file\n", filename);
-        return -1;
-      }
-      fd = open (filename, O_WRONLY | O_TRUNC, 0644);
-    }
-
+    fd = open (filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (fd < 0)
     {
       DVDCloseFile (dvd_file);
