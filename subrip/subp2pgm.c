@@ -269,7 +269,6 @@ write_tiff (char *file_name, int x0, int y0, int w, int h, unsigned char *src, u
   unsigned int x, y;
   unsigned char *buf;
   uint16_t compression = COMPRESSION_NONE; /* COMPRESSION_CCITTFAX3 */
-  uint32_t g3opts = 0;
 
   out = TIFFOpen (file_name, "w");
 
