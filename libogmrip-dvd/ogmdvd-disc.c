@@ -296,7 +296,7 @@ ogmdvd_subp_stream_new (OGMDvdTitle *title, ifo_handle_t *vts_file, guint nr, gu
   g_object_add_weak_pointer (G_OBJECT (title), (gpointer *) &stream->priv->title);
 
   attr = &vts_file->vtsi_mat->vts_subp_attr[real_nr];
-  stream->priv->lang_extension = attr->lang_extension;
+  stream->priv->code_extension = attr->code_extension;
   stream->priv->lang_code = attr->lang_code;
 
   pgcn = vts_file->vts_ptt_srpt->title[title->priv->ttn - 1].ptt[0].pgcn;
