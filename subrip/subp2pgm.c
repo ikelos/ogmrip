@@ -281,16 +281,6 @@ write_tiff (char *file_name, int x0, int y0, int w, int h, unsigned char *src, u
   TIFFSetField (out, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
   TIFFSetField (out, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK);
   TIFFSetField (out, TIFFTAG_COMPRESSION, compression);
-
-  if (compression == COMPRESSION_CCITTFAX3)
-  {
-/*
-    g3opts = GROUP3OPT_2DENCODING;
-    g3opts |= GROUP3OPT_FILLBITS;
-*/
-    TIFFSetField (out, TIFFTAG_GROUP3OPTIONS, g3opts);
-  }
-
   TIFFSetField (out, TIFFTAG_ROWSPERSTRIP, TIFFDefaultStripSize (out, (uint32_t) -1));
 
   if (TIFFScanlineSize (out) > w)
