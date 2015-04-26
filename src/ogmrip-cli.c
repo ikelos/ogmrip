@@ -852,15 +852,6 @@ ogmrip_cli_prepare_cb (OGMRipCli *cli)
 }
 
 static void
-ogmrip_cli_activate_cb (GApplication *app)
-{
-  g_application_hold (app);
-
-  g_signal_connect (app, "prepare",
-      G_CALLBACK (ogmrip_cli_prepare_cb), NULL);
-}
-
-static void
 ogmrip_application_iface_init (OGMRipApplicationInterface *iface)
 {
 }
@@ -935,6 +926,15 @@ ogmrip_cli_dispose (GObject *gobject)
   g_clear_object (&cli->priv->cancellable);
 
   G_OBJECT_CLASS (ogmrip_cli_parent_class)->dispose (gobject);
+}
+
+static void
+ogmrip_cli_activate (GApplication *app)
+{
+  g_signal_connect (app, "prepare",
+      G_CALLBACK (ogmrip_cli_prepare_cb), NULL);
+
+  g_application_hold (app);
 }
 
 static gboolean
@@ -1044,13 +1044,14 @@ static void
 ogmrip_cli_class_init (OGMRipCliClass *klass)
 {
   GObjectClass *gobject_class;
-  GApplicationClass *cli_class;
+  GApplicationClass *application_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
   gobject_class->dispose = ogmrip_cli_dispose;
 
-  cli_class = G_APPLICATION_CLASS (klass);
-  cli_class->local_command_line = ogmrip_cli_local_cmdline;
+  application_class = G_APPLICATION_CLASS (klass);
+  application_class->activate = ogmrip_cli_activate;
+  application_class->local_command_line = ogmrip_cli_local_cmdline;
 }
 
 static void
@@ -1064,18 +1065,11 @@ ogmrip_cli_init (OGMRipCli *app)
 GApplication *
 ogmrip_cli_new (const gchar *app_id)
 {
-  GApplication *app;
-
   g_return_val_if_fail (g_application_id_is_valid (app_id), NULL);
 
-  app = g_object_new (OGMRIP_TYPE_CLI,
+  return g_object_new (OGMRIP_TYPE_CLI,
       "application-id", app_id,
       NULL);
-
-  g_signal_connect (app, "activate",
-      G_CALLBACK (ogmrip_cli_activate_cb), NULL);
-
-  return app;
 }
 
 void
