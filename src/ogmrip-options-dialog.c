@@ -428,6 +428,8 @@ ogmrip_options_dialog_crop_button_clicked (OGMRipOptionsDialog *parent)
     ogmrip_options_dialog_get_crop (parent, &l, &t, &r, &b);
 
     dialog = ogmrip_crop_dialog_new (parent->priv->title, l, t, r, b);
+    gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (parent));
+
     ogmrip_crop_dialog_set_deinterlacer (OGMRIP_CROP_DIALOG (dialog),
         gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (parent->priv->deint_check)));
 
