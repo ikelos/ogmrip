@@ -363,12 +363,8 @@ ogmrip_srt_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 
   ogmjob_container_remove (OGMJOB_CONTAINER (task), child);
 
-  g_message ("1");
-
   if (result)
   {
-    g_message ("2");
-
     child = ogmrip_subp2pgm_command (OGMRIP_SUBP_CODEC (task), tmp_file);
     result = ogmjob_task_run (child, cancellable, error);
     g_object_unref (child);
@@ -376,8 +372,6 @@ ogmrip_srt_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 
   if (result)
   {
-    g_message ("3");
-
     dir = g_dir_open (ogmrip_fs_get_tmp_dir (), 0, NULL);
     if (dir)
     {
@@ -433,8 +427,6 @@ ogmrip_srt_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 
   if (result)
   {
-    g_message ("4");
-
     if (have_sub_files && g_file_test (xml_file, G_FILE_TEST_EXISTS))
     {
       child = ogmrip_srt_command (OGMRIP_SRT (task), xml_file);
