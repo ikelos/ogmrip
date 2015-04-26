@@ -31,6 +31,7 @@ G_BEGIN_DECLS
 #define OGMRIP_X264_PROP_B_PYRAMID        "b-pyramid"
 #define OGMRIP_X264_PROP_BRDO             "brdo"
 #define OGMRIP_X264_PROP_CABAC            "cabac"
+#define OGMRIP_X264_PROP_CARTOON          "cartoon"
 #define OGMRIP_X264_PROP_CQM              "cqm"
 #define OGMRIP_X264_PROP_DCT_DECIMATE     "dct-decimate"
 #define OGMRIP_X264_PROP_DIRECT           "direct"
@@ -63,6 +64,7 @@ G_BEGIN_DECLS
 #define OGMRIP_X264_DEFAULT_B_PYRAMID     2
 #define OGMRIP_X264_DEFAULT_BRDO          FALSE
 #define OGMRIP_X264_DEFAULT_CABAC         TRUE
+#define OGMRIP_X264_DEFAULT_CARTOON       FALSE
 #define OGMRIP_X264_DEFAULT_CQM           0
 #define OGMRIP_X264_DEFAULT_DCT_DECIMATE  TRUE
 #define OGMRIP_X264_DEFAULT_DIRECT        3

@@ -268,7 +268,7 @@ ogmrip_profile_manager_dialog_import_activated (GSimpleAction *action, GVariant 
 
     file = gtk_file_chooser_get_file (GTK_FILE_CHOOSER (dialog));
 
-    profile = ogmrip_profile_new_from_file (file, NULL);
+    profile = ogmrip_profile_new_from_file (file, &error);
     if (profile)
     {
       ogmrip_profile_engine_add (parent->priv->engine, profile);
@@ -404,6 +404,12 @@ ogmrip_profile_manager_dialog_init (OGMRipProfileManagerDialog *dialog)
   dialog->priv = ogmrip_profile_manager_dialog_get_instance_private (dialog);
 
   gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_CLOSE);
+
+  gtk_dialog_add_buttons (GTK_DIALOG (dialog->priv->name_dialog),
+      "Action",    GTK_RESPONSE_OK,
+      _("Cancel"), GTK_RESPONSE_CANCEL,
+      NULL);
+
   gtk_dialog_set_default_response (GTK_DIALOG (dialog->priv->name_dialog), GTK_RESPONSE_OK);
 
   dialog->priv->engine = ogmrip_profile_engine_get_default ();
@@ -414,7 +420,6 @@ ogmrip_profile_manager_dialog_init (OGMRipProfileManagerDialog *dialog)
 
   context = gtk_widget_get_style_context (dialog->priv->toolbar);
   gtk_style_context_set_junction_sides (context, GTK_JUNCTION_TOP);
-  gtk_style_context_add_class (context, GTK_STYLE_CLASS_INLINE_TOOLBAR);
 
   dialog->priv->profile_view = ogmrip_profile_view_new ();
   gtk_container_add (GTK_CONTAINER (dialog->priv->profile_swin), dialog->priv->profile_view);

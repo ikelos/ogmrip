@@ -20,11 +20,10 @@
             <property name="layout_style">end</property>
             <child>
               <object class="GtkButton" id="close_button">
-                <property name="label">gtk-close</property>
+                <property name="label" translatable="yes">Close</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -57,7 +56,7 @@
                   <object class="GtkLabel" id="label25">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">&lt;b&gt;Standard&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
@@ -73,9 +72,9 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
-                    <property name="margin_left">12</property>
+                    <property name="margin_start">12</property>
                     <property name="use_underline">True</property>
-                    <property name="xalign">0</property>
+                    <property name="halign">start</property>
                     <property name="draw_indicator">True</property>
                   </object>
                   <packing>
@@ -89,7 +88,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="margin_top">6</property>
-                    <property name="xalign">0</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">&lt;b&gt;Frame type&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
@@ -103,9 +102,9 @@
                   <object class="GtkLabel" id="label22">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_left">12</property>
+                    <property name="margin_start">12</property>
                     <property name="hexpand">True</property>
-                    <property name="xalign">0</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">Maximum number of B-frames between non-B-frames (vmax_b_frames):</property>
                   </object>
                   <packing>
@@ -118,9 +117,9 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="margin_left">12</property>
+                    <property name="margin_start">12</property>
                     <property name="hexpand">True</property>
-                    <property name="xalign">0</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">_Maximum interval between keyframes in frames (keyint):</property>
                     <property name="use_underline">True</property>
                     <property name="mnemonic_widget">keyint_spin</property>
@@ -135,9 +134,9 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="margin_left">12</property>
+                    <property name="margin_start">12</property>
                     <property name="hexpand">True</property>
-                    <property name="xalign">0</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">_Amount of motion predictors from the previous frame (last__pred):</property>
                     <property name="use_underline">True</property>
                     <property name="mnemonic_widget">last_pred_spin</property>
@@ -152,8 +151,8 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">Strategy to choose between I/P/B-frames (vb__strategy):</property>
                     <property name="use_underline">True</property>
                   </object>
@@ -167,7 +166,7 @@
                   <object class="GtkComboBoxText" id="vb_strategy_combo">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_left">12</property>
+                    <property name="margin_start">12</property>
                     <property name="hexpand">True</property>
                     <items>
                       <item translatable="yes">Always use the maximum number of B-frames</item>
@@ -228,7 +227,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="margin_top">6</property>
-                    <property name="xalign">0</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">&lt;b&gt;Quantization&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
@@ -243,8 +242,8 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">_Quantizer noise shaping (qns):</property>
                     <property name="use_underline">True</property>
                   </object>
@@ -258,7 +257,7 @@
                   <object class="GtkComboBoxText" id="qns_combo">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_left">12</property>
+                    <property name="margin_start">12</property>
                     <property name="hexpand">True</property>
                     <items>
                       <item translatable="yes">Disabled</item>
@@ -278,9 +277,9 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="margin_left">12</property>
+                    <property name="margin_start">12</property>
                     <property name="hexpand">True</property>
-                    <property name="xalign">0</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">Quantizer _compression (vqcomp):</property>
                     <property name="use_underline">True</property>
                     <property name="mnemonic_widget">vqcomp_spin</property>
@@ -295,9 +294,9 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="margin_left">12</property>
+                    <property name="margin_start">12</property>
                     <property name="hexpand">True</property>
-                    <property name="xalign">0</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">Intra DC _precision in bits (dc):</property>
                     <property name="use_underline">True</property>
                     <property name="mnemonic_widget">dc_spin</property>
@@ -313,9 +312,9 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
-                    <property name="margin_left">12</property>
+                    <property name="margin_start">12</property>
                     <property name="use_underline">True</property>
-                    <property name="xalign">0</property>
+                    <property name="halign">start</property>
                     <property name="draw_indicator">True</property>
                   </object>
                   <packing>
@@ -365,8 +364,8 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                        <property name="margin_left">12</property>
-                        <property name="xalign">0</property>
+                        <property name="margin_start">12</property>
+                        <property name="halign">start</property>
                         <property name="label" translatable="yes">_Strict standard compliance (vstrict):</property>
                         <property name="use_underline">True</property>
                         <property name="mnemonic_widget">strict_combo</property>
@@ -425,7 +424,7 @@
                   <object class="GtkLabel" id="label20">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">&lt;b&gt;Motion estimation&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
@@ -440,8 +439,8 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">_Comparison function for full pel motion estimation (cmp):</property>
                     <property name="use_underline">True</property>
                     <property name="mnemonic_widget">cmp_spin</property>
@@ -456,8 +455,8 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">Comparison function for _sub pel motion estimation (subcmp):</property>
                     <property name="use_underline">True</property>
                     <property name="mnemonic_widget">subcmp_spin</property>
@@ -472,8 +471,8 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">Comparison function for motion estimation _pre pass (precmp):</property>
                     <property name="use_underline">True</property>
                     <property name="mnemonic_widget">precmp_spin</property>
@@ -488,8 +487,8 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">_Diamond type and size for motion estimation (dia):</property>
                     <property name="use_underline">True</property>
                     <property name="mnemonic_widget">dia_spin</property>
@@ -504,8 +503,8 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">Diamond type and size for motion estimation _pre-pass (predia):</property>
                     <property name="use_underline">True</property>
                     <property name="mnemonic_widget">predia_spin</property>
@@ -521,9 +520,9 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
-                    <property name="margin_left">12</property>
+                    <property name="margin_start">12</property>
                     <property name="use_underline">True</property>
-                    <property name="xalign">0</property>
+                    <property name="halign">start</property>
                     <property name="draw_indicator">True</property>
                   </object>
                   <packing>
@@ -612,7 +611,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="margin_top">6</property>
-                    <property name="xalign">0</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">&lt;b&gt;Rate control&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
@@ -627,8 +626,8 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">_Buffer size in kbit (vrc__buf__size):</property>
                     <property name="use_underline">True</property>
                     <property name="mnemonic_widget">buf_size_spin</property>
@@ -643,8 +642,8 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">M_aximum bitrate in kbit/sec (vrc__maxrate):</property>
                     <property name="use_underline">True</property>
                     <property name="mnemonic_widget">max_rate_spin</property>
@@ -659,8 +658,8 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">M_inimum bitrate in kbit/sec (vrc__minrate):</property>
                     <property name="use_underline">True</property>
                     <property name="mnemonic_widget">min_rate_spin</property>
@@ -717,7 +716,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="margin_top">6</property>
-                    <property name="xalign">0</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">&lt;b&gt;Macroblock&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
@@ -732,8 +731,8 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">_Macroblock decision algorithm (mbd):</property>
                     <property name="use_underline">True</property>
                     <property name="mnemonic_widget">mbd_combo</property>
@@ -748,7 +747,7 @@
                   <object class="GtkComboBoxText" id="mbd_combo">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_left">12</property>
+                    <property name="margin_start">12</property>
                     <property name="hexpand">True</property>
                     <items>
                       <item translatable="yes">Use comparison function given by mbcmp</item>
@@ -769,9 +768,9 @@
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="margin_left">12</property>
+                    <property name="margin_start">12</property>
                     <property name="hexpand">True</property>
-                    <property name="xalign">0</property>
+                    <property name="halign">start</property>
                     <property name="draw_indicator">True</property>
                   </object>
                   <packing>
@@ -787,9 +786,9 @@
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
                     <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                    <property name="margin_left">12</property>
+                    <property name="margin_start">12</property>
                     <property name="hexpand">True</property>
-                    <property name="xalign">0</property>
+                    <property name="halign">start</property>
                     <property name="draw_indicator">True</property>
                   </object>
                   <packing>
@@ -808,8 +807,8 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
-                        <property name="margin_left">12</property>
-                        <property name="xalign">0</property>
+                        <property name="margin_start">12</property>
+                        <property name="halign">start</property>
                         <property name="label" translatable="yes">Motion _estimation pre-pass (preme):</property>
                         <property name="use_underline">True</property>
                       </object>

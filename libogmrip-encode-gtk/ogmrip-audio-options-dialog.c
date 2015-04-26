@@ -176,7 +176,7 @@ ogmrip_audio_options_dialog_init (OGMRipAudioOptionsDialog *dialog)
 {
   GError *error = NULL;
 
-  GtkWidget *area, *grid1, *grid2, *label;
+  GtkWidget *area, *grid1, *grid2, *label, *parent;
   GtkBuilder *builder;
 
   GtkTreeModel *model;
@@ -201,13 +201,13 @@ ogmrip_audio_options_dialog_init (OGMRipAudioOptionsDialog *dialog)
   gtk_widget_show (grid1);
 
   label = gtk_label_new (_("<b>Track</b>"));
+  gtk_widget_set_halign (label, GTK_ALIGN_START);
   gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
-  gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
   gtk_grid_attach (GTK_GRID (grid1), label, 0, 0, 2, 1);
   gtk_widget_show (label);
 
   label = gtk_label_new_with_mnemonic (_("_Name:"));
-  gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
+  gtk_widget_set_halign (label, GTK_ALIGN_START);
   gtk_grid_attach (GTK_GRID (grid1), label, 0, 1, 1, 1);
   gtk_widget_set_margin_start (label, 12);
   gtk_widget_show (label);
@@ -220,7 +220,7 @@ ogmrip_audio_options_dialog_init (OGMRipAudioOptionsDialog *dialog)
   gtk_label_set_mnemonic_widget (GTK_LABEL (label), dialog->priv->label_entry);
 
   label = gtk_label_new_with_mnemonic (_("_Language:"));
-  gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
+  gtk_widget_set_halign (label, GTK_ALIGN_START);
   gtk_grid_attach (GTK_GRID (grid1), label, 0, 2, 1, 1);
   gtk_widget_set_margin_start (label, 12);
   gtk_widget_show (label);
@@ -243,10 +243,11 @@ ogmrip_audio_options_dialog_init (OGMRipAudioOptionsDialog *dialog)
 
   grid2 = gtk_builder_get_widget (builder, OGMRIP_UI_ROOT);
   gtk_container_set_border_width (GTK_CONTAINER (grid2), 0);
-  gtk_widget_reparent (grid2, grid1);
-  gtk_widget_show (grid2);
 
-  gtk_container_child_set (GTK_CONTAINER (grid1), grid2, "left-attach", 0, "top-attach", 4, "width", 2, NULL);
+  parent = gtk_widget_get_parent (grid2);
+  gtk_container_remove (GTK_CONTAINER (parent), grid2);
+  gtk_grid_attach (GTK_GRID (grid1), grid2, 0, 4, 2, 1);
+  gtk_widget_show (grid2);
 
   g_object_bind_property (dialog->priv->default_check, "active", grid2, "visible", G_BINDING_INVERT_BOOLEAN);
 

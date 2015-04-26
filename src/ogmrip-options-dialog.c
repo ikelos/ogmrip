@@ -243,7 +243,7 @@ ogmrip_options_dialog_update_scale_combo (OGMRipOptionsDialog *dialog)
       }
       else
       {
-        scale_to_size (cw, ch, f, i, &sh, &sw);
+        scale_to_size (cw, ch, f, i, &sw, &sh);
         str = g_strdup_printf ("%u x %u", sw, sh);
       }
 
@@ -428,6 +428,8 @@ ogmrip_options_dialog_crop_button_clicked (OGMRipOptionsDialog *parent)
     ogmrip_options_dialog_get_crop (parent, &l, &t, &r, &b);
 
     dialog = ogmrip_crop_dialog_new (parent->priv->title, l, t, r, b);
+    gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (parent));
+
     ogmrip_crop_dialog_set_deinterlacer (OGMRIP_CROP_DIALOG (dialog),
         gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (parent->priv->deint_check)));
 
@@ -528,12 +530,13 @@ ogmrip_options_dialog_autoscale_button_clicked (OGMRipOptionsDialog *dialog)
 
   GType codec;
   guint x, y, w, h;
+  gdouble bpp;
   gchar *name;
 
   profile = ogmrip_profile_chooser_get_active (GTK_COMBO_BOX (dialog->priv->profile_chooser));
 
   ogmrip_profile_get (profile, OGMRIP_PROFILE_VIDEO, OGMRIP_PROFILE_CODEC, "s", &name);
-  codec = g_type_from_name (name);
+  codec = ogmrip_type_from_name (name);
   g_free (name);
 
   encoding = ogmrip_encoding_new (dialog->priv->title);
@@ -545,9 +548,11 @@ ogmrip_options_dialog_autoscale_button_clicked (OGMRipOptionsDialog *dialog)
   ogmrip_options_dialog_get_crop_full (dialog, &x, &y, &w, &h);
   ogmrip_video_codec_set_crop_size (OGMRIP_VIDEO_CODEC (spawn), x, y, w, h);
 
-  ogmrip_encoding_autoscale (encoding, 0.25, &w, &h);
+  bpp = ogmrip_video_codec_get_bits_per_pixel (OGMRIP_VIDEO_CODEC (spawn));
+  ogmrip_encoding_autoscale (encoding, bpp, &w, &h);
   g_object_unref (encoding);
 
+  gtk_combo_box_set_active (GTK_COMBO_BOX (dialog->priv->scale_combo), OGMRIP_SCALE_USER);
   ogmrip_options_dialog_set_scale (dialog, w, h);
 
   gtk_widget_set_sensitive (dialog->priv->autoscale_button, FALSE);

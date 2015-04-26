@@ -72,6 +72,7 @@ ogmrip_subp_file_chooser_dialog_constructed (GObject *gobject)
   gtk_window_set_title (GTK_WINDOW (dialog), _("Select a subtitles file"));
 
   filter = gtk_file_filter_new ();
+  gtk_file_filter_set_name (filter, _("Subtitle files"));
   gtk_file_filter_add_mime_type (filter, "application/x-subrip"); /* *.srt */
   gtk_file_filter_add_mime_type (filter, "text/plain"); /* *.asc, *.txt */
   gtk_file_filter_add_mime_type (filter, "application/x-sami"); /* *.smi, *.sami */
@@ -79,6 +80,7 @@ ogmrip_subp_file_chooser_dialog_constructed (GObject *gobject)
   gtk_file_filter_add_mime_type (filter, "text/x-mpsub"); /* *.sub */
   gtk_file_filter_add_mime_type (filter, "text/x-ssa"); /* *.ssa, *.ass */
   gtk_file_filter_add_mime_type (filter, "text/x-subviewer"); /* *.sub */
+  gtk_file_chooser_add_filter (GTK_FILE_CHOOSER (dialog), filter);
   gtk_file_chooser_set_filter (GTK_FILE_CHOOSER (dialog), filter);
 
   G_OBJECT_CLASS (ogmrip_subp_file_chooser_dialog_parent_class)->constructed (gobject);

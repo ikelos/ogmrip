@@ -12,10 +12,8 @@
       <object class="GtkBox" id="dialog-vbox1">
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
-        <property name="border_width">0</property>
         <child internal-child="action_area">
           <object class="GtkButtonBox" id="dialog-action_area1">
-            <property name="visible">False</property>
             <property name="can_focus">False</property>
             <property name="layout_style">end</property>
             <child>
@@ -112,7 +110,6 @@
                               <object class="GtkImage" id="image2">
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
-                                <property name="margin_right">1</property>
                                 <property name="icon_name">list-remove-symbolic</property>
                                 <property name="icon_size">1</property>
                               </object>
@@ -223,6 +220,9 @@
                     <property name="homogeneous">True</property>
                   </packing>
                 </child>
+                <style>
+                  <class name="inline-toolbar"/>
+                </style>
               </object>
               <packing>
                 <property name="expand">False</property>

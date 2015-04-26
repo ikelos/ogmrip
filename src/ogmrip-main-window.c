@@ -339,7 +339,7 @@ ogmrip_main_window_open_media (OGMRipMainWindow *window, OGMRipMedia *media)
   gboolean res;
 
   dialog = gtk_dialog_new_with_buttons (_("Opening media"),
-      GTK_WINDOW (window), GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+      GTK_WINDOW (window), GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT | GTK_DIALOG_USE_HEADER_BAR,
       _("_Cancel"), GTK_RESPONSE_CANCEL,
       NULL);
   gtk_window_set_resizable (GTK_WINDOW (dialog), FALSE);
@@ -351,7 +351,7 @@ ogmrip_main_window_open_media (OGMRipMainWindow *window, OGMRipMedia *media)
   gtk_container_add (GTK_CONTAINER (area), box);
 
   label = gtk_label_new (_("Opening media"));
-  gtk_misc_set_alignment (GTK_MISC (label), 0.0, -1.0);
+  gtk_widget_set_halign (label, GTK_ALIGN_START);
   gtk_container_add (GTK_CONTAINER (box), label);
 
   pbar = gtk_progress_bar_new ();
@@ -1673,10 +1673,10 @@ ogmrip_main_window_init (OGMRipMainWindow *window)
   builder = gtk_builder_new ();
   if (!gtk_builder_add_from_resource (builder, OGMRIP_MENU_RES, &error))
     g_error ("Couldn't load builder file: %s", error->message);
-  menu = gtk_builder_get_object (builder, "win-menu");
-  g_object_unref (builder);
 
+  menu = gtk_builder_get_object (builder, "win-menu");
   gtk_menu_button_set_menu_model (GTK_MENU_BUTTON (button), G_MENU_MODEL (menu));
+  g_object_unref (builder);
 
   g_signal_connect_swapped (window->priv->title_chooser, "changed",
       G_CALLBACK (ogmrip_main_window_title_chooser_changed), window);

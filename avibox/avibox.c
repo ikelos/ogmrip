@@ -24,7 +24,7 @@ struct _media_file_t
   avi_t *avi;
 
   char *codec;
-  int tracks, chan, bits, format, width, height, head_len, error;
+  int tracks, chan, bits, format, width, height, head_len;
   long mp3_rate, rate;
   double fps, aud_ms;
 };
@@ -104,6 +104,7 @@ media_file_open_avi (media_file_t *file, int wrt)
     file->avi = AVI_open_output_file (file->name);
   else
     file->avi = AVI_open_input_file (file->name, 1);
+
   if (!file->avi)
     return -1;
 
@@ -115,21 +116,16 @@ media_file_open_avi (media_file_t *file, int wrt)
       fflush (stdout);
     }
 
-    file->tracks = AVI_audio_tracks (file->avi);
-
-    file->width = AVI_video_width (file->avi);
-    file->height = AVI_video_height (file->avi);
-
-    file->rate = AVI_audio_rate (file->avi);
-    file->chan = AVI_audio_channels (file->avi);
-    file->bits = AVI_audio_bits (file->avi);
-
-    file->format = AVI_audio_format (file->avi);
-    file->mp3_rate = AVI_audio_mp3rate (file->avi);
-
-    file->fps =  AVI_frame_rate (file->avi);
-
-    file->codec = AVI_video_compressor (file->avi);
+    file->tracks   = AVI_audio_tracks     (file->avi);
+    file->width    = AVI_video_width      (file->avi);
+    file->height   = AVI_video_height     (file->avi);
+    file->rate     = AVI_audio_rate       (file->avi);
+    file->chan     = AVI_audio_channels   (file->avi);
+    file->bits     = AVI_audio_bits       (file->avi);
+    file->format   = AVI_audio_format     (file->avi);
+    file->mp3_rate = AVI_audio_mp3rate    (file->avi);
+    file->fps      =  AVI_frame_rate      (file->avi);
+    file->codec    = AVI_video_compressor (file->avi);
   }
 
   return 0;
@@ -138,49 +134,48 @@ media_file_open_avi (media_file_t *file, int wrt)
 static int
 media_file_open_mp3 (media_file_t *file)
 {
+  unsigned char *c, head[1024];
   int ret = -1;
 
   if (!file)
     return -1;
 
   file->f = fopen (file->name, "r");
-  if (file->f)
+  if (!file->f)
+    return -1;
+
+  c = head;
+  if (fread (head, 1, 1024, file->f) == 1024)
   {
-    unsigned char *c, head[1024];
+    while ((c - head < 1024 - 8) && (ret = tc_probe_audio_header (c, 8)) <= 0)
+      c ++;
 
-    c = head;
-    if (fread (head, 1, 1024, file->f) == 1024)
+    if (ret > 0)
     {
-      while ((c - head < 1024 - 8) && (ret = tc_probe_audio_header (c, 8)) <= 0)
-        c ++;
+      int len, rate, mp3_rate;
+      long offset;
 
-      if (ret > 0)
+      offset = c - head;
+
+      fseek (file->f, offset, SEEK_SET);
+      len = fread (head, 1, 8, file->f);
+
+      file->format  = tc_probe_audio_header (head, len);
+      file->head_len = tc_get_audio_header (head, len, file->format, &file->chan, &rate, &mp3_rate);
+
+      if (verbose)
+        fprintf (stdout, "%s looks like a %s track\n", file->name, file->format == 0x55 ? "MP3" : "AC3");
+
+      fseek (file->f, offset, SEEK_SET);
+
+      if (file->format == 0x55 || file->format == 0x2000)
       {
-        int len, rate, mp3_rate;
-        long offset;
-        
-        offset = c - head;
+        file->tracks = 1;
+        file->mp3_rate = mp3_rate;
+        file->rate = rate;
+        file->bits = 16;
 
-        fseek (file->f, offset, SEEK_SET);
-        len = fread (head, 1, 8, file->f);
-
-        file->format  = tc_probe_audio_header (head, len);
-        file->head_len = tc_get_audio_header (head, len, file->format, &file->chan, &rate, &mp3_rate);
-
-        if (verbose)
-          fprintf (stdout, "%s looks like a %s track\n", file->name, file->format == 0x55 ? "MP3" : "AC3");
-
-        fseek (file->f, offset, SEEK_SET);
-
-        if (file->format == 0x55 || file->format == 0x2000)
-        {
-          file->tracks = 1;
-          file->mp3_rate = mp3_rate;
-          file->rate = rate;
-          file->bits = 16;
-
-          ret = 0;
-        }
+        ret = 0;
       }
     }
   }
@@ -198,7 +193,6 @@ media_file_open (media_file_t *file, int wrt)
   if (!file)
     return -1;
 
-  file->error = 0;
   file->aud_ms = 0.0;
   file->head_len = 0;
 
@@ -248,10 +242,8 @@ media_file_set_audio_track (media_file_t *file, unsigned int track)
 static int
 media_file_merge_avi (media_file_t *output, media_file_t *audio, double vid_ms)
 {
-  double aud_ms;
-
   if (audio->chan)
-    sync_audio_video_avi2avi (vid_ms, &aud_ms, audio->avi, output->avi);
+    sync_audio_video_avi2avi (vid_ms, &audio->aud_ms, audio->avi, output->avi);
 
   return 0;
 }
@@ -259,42 +251,49 @@ media_file_merge_avi (media_file_t *output, media_file_t *audio, double vid_ms)
 static int
 media_file_merge_mp3 (media_file_t *output, media_file_t *audio, double vid_ms)
 {
-  if (audio->head_len > 4 && !audio->error)
+  if (audio->head_len > 4)
   {
     unsigned char head[8];
-    int len, mp3_rate;
-    off_t pos;
+    int mp3_rate;
+    size_t len;
+    fpos_t pos;
 
     while (audio->aud_ms < vid_ms)
     {
-      pos = ftell (audio->f);
+      if (fgetpos (audio->f, &pos) < 0)
+      {
+        fprintf (stderr, "EOF in %s; continuing ..\n", audio->name);
+        return -1;
+      }
 
       len = fread (head, 1, 8, audio->f);
       if (len <= 0)
       {
         fprintf (stderr, "EOF in %s; continuing ..\n", audio->name);
-        audio->error = 1;
-        break;
+        return -1;
       }
 
       audio->head_len = tc_get_audio_header (head, len, audio->format, NULL, NULL, &mp3_rate);
 
       if (audio->head_len < 0)
       {
-        audio->aud_ms = vid_ms;
-        audio->error = 1;
+        fprintf (stderr, "EOF in %s; continuing ..\n", audio->name);
+        return -1;
       }
-      else
-        audio->aud_ms += audio->head_len * 8.0 / mp3_rate;
 
-      fseek (audio->f, pos, SEEK_SET);
+      audio->aud_ms += audio->head_len * 8.0 / mp3_rate;
+
+      if (fsetpos (audio->f, &pos) < 0)
+      {
+        fprintf (stderr, "EOF in %s; continuing ..\n", audio->name);
+        return -1;
+      }
 
       len = fread (data, audio->head_len, 1, audio->f);
       if (len <= 0)
       {
         fprintf (stderr, "EOF in %s; continuing ..\n", audio->name);
-        audio->error = 1;
-        break;
+        return -1;
       }
 
       if (AVI_write_audio (output->avi, data, audio->head_len) < 0)
@@ -353,7 +352,7 @@ media_file_merge (media_file_t *input, media_list_t *list, const char *basename,
     }
 
     /* is there enough space in the output file ? */
-    if (output && key && chunk > 0 && AVI_bytes_written (output->avi) + bytes > (uint64_t) (chunk * MBYTE))
+    if (output && key && chunk > 0 && AVI_bytes_written (output->avi) + bytes > ((uint64_t) chunk) * MBYTE)
     {
       media_file_free (output);
       output = NULL;
@@ -373,7 +372,7 @@ media_file_merge (media_file_t *input, media_list_t *list, const char *basename,
       if (media_file_open (output, 1) < 0)
       {
         AVI_print_error ("AVI open");
-        return -1;
+        goto merge_cleanup;
       }
 
       /* configuring video from input file */
@@ -580,7 +579,7 @@ main (int argc, char *argv[])
   int optidx, optelt, noaudio = 0, chunk = 0;
 
   basename[0] = '\0';
-  
+
   while ((optelt = getopt_long (argc, argv, shortopts, longopts, &optidx)) != EOF)
   {
     switch (optelt)

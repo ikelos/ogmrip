@@ -88,15 +88,14 @@ ogmrip_list_item_constructed (GObject *gobject)
   if (!item->priv->remove_tooltip)
     item->priv->remove_tooltip = g_strdup (_("Remove the item"));
 
-  hbox = gtk_grid_new ();
+  hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
   gtk_box_pack_end (GTK_BOX (item), hbox, FALSE, FALSE, 0);
   gtk_widget_show (hbox);
 
   item->priv->add_button = gtk_button_new ();
-  gtk_widget_set_no_show_all (item->priv->add_button, TRUE);
-  gtk_grid_attach (GTK_GRID (hbox), item->priv->add_button, 0, 0, 1, 1);
+  gtk_box_pack_start (GTK_BOX (hbox), item->priv->add_button, TRUE, FALSE, 0);
   gtk_widget_set_tooltip_text (item->priv->add_button, item->priv->add_tooltip);
-  gtk_widget_set_vexpand (item->priv->add_button, TRUE);
+  gtk_widget_set_no_show_all (item->priv->add_button, TRUE);
   gtk_widget_show (item->priv->add_button);
 
   gtk_size_group_add_widget (item->priv->group, item->priv->add_button);
@@ -109,10 +108,9 @@ ogmrip_list_item_constructed (GObject *gobject)
   gtk_widget_show (image);
 
   item->priv->remove_button = gtk_button_new ();
-  gtk_widget_set_no_show_all (item->priv->remove_button, TRUE);
-  gtk_grid_attach (GTK_GRID (hbox), item->priv->remove_button, 1, 0, 1, 1);
+  gtk_box_pack_start (GTK_BOX (hbox), item->priv->remove_button, TRUE, FALSE, 0);
   gtk_widget_set_tooltip_text (item->priv->remove_button, item->priv->remove_tooltip);
-  gtk_widget_set_vexpand (item->priv->remove_button, TRUE);
+  gtk_widget_set_no_show_all (item->priv->remove_button, TRUE);
 
   gtk_size_group_add_widget (item->priv->group, item->priv->remove_button);
 
@@ -158,8 +156,8 @@ ogmrip_list_item_get_property (GObject *gobject, guint prop_id, GValue *value, G
       g_value_set_string (value, item->priv->add_tooltip);
       break;
     case PROP_REMOVE_TOOLTIP:
-      break;
       g_value_set_string (value, item->priv->remove_tooltip);
+      break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
       break;

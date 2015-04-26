@@ -76,7 +76,6 @@ unsigned int vobsub_id = 0;
 static unsigned int expand = 0;
 static unsigned int width = 720;
 static unsigned int height = 576;
-static unsigned int normalize = 0;
 
 static int debug, forced, format;
 static unsigned int subno;
@@ -140,12 +139,16 @@ write_png (char *file_name, int x0, int y0, int w, int h, unsigned char *src, un
   png_ptr = png_create_write_struct (PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
 
   if (!png_ptr)
+  {
+    fclose (fp);
     return -1;
+  }
 
   info_ptr = png_create_info_struct (png_ptr);
   if (!info_ptr)
   {
     png_destroy_write_struct (&png_ptr, (png_infopp) NULL);
+    fclose (fp);
     return -1;
   }
 
@@ -266,7 +269,6 @@ write_tiff (char *file_name, int x0, int y0, int w, int h, unsigned char *src, u
   unsigned int x, y;
   unsigned char *buf;
   uint16_t compression = COMPRESSION_NONE; /* COMPRESSION_CCITTFAX3 */
-  uint32_t g3opts = 0;
 
   out = TIFFOpen (file_name, "w");
 
@@ -278,16 +280,6 @@ write_tiff (char *file_name, int x0, int y0, int w, int h, unsigned char *src, u
   TIFFSetField (out, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
   TIFFSetField (out, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK);
   TIFFSetField (out, TIFFTAG_COMPRESSION, compression);
-
-  if (compression == COMPRESSION_CCITTFAX3)
-  {
-/*
-    g3opts = GROUP3OPT_2DENCODING;
-    g3opts |= GROUP3OPT_FILLBITS;
-*/
-    TIFFSetField (out, TIFFTAG_GROUP3OPTIONS, g3opts);
-  }
-
   TIFFSetField (out, TIFFTAG_ROWSPERSTRIP, TIFFDefaultStripSize (out, (uint32_t) -1));
 
   if (TIFFScanlineSize (out) > w)
@@ -459,7 +451,6 @@ usage (const char *name)
   fprintf (stderr, "  -e, --expand[=<w>x<h>]      Expand the subtitle to the given resolution\n");
   fprintf (stderr, "                              (default: don't expand or expand to 720x576\n");
   fprintf (stderr, "  -f, --forced                Extract only forced subtitles\n");
-  fprintf (stderr, "  -n, --normalize             Normalize the palette\n");
   fprintf (stderr, "  -v, --verbose               Increase verbosity level\n");
   fprintf (stdout, "\n");
 }
@@ -469,7 +460,6 @@ static const struct option longopts[] =
 {
   { "help",      no_argument,       NULL, 'h' },
   { "forced",    no_argument,       NULL, 'f' },
-  { "normalize", no_argument,       NULL, 'n' },
   { "verbose",   no_argument,       NULL, 'v' },
   { "expand",    optional_argument, NULL, 'e' },
   { "sid",       required_argument, NULL, 's' },
@@ -515,9 +505,6 @@ main (int argc, char **argv)
         break;
       case 'v':
         debug ++;
-        break;
-      case 'n':
-        normalize = 1;
         break;
       case 'e':
         parse_expand (optarg);
@@ -573,7 +560,6 @@ main (int argc, char **argv)
   }
 
   spudec_set_forced_subs_only (spudec, forced);
-  spudec_set_normalize_palette (spudec, normalize);
 
   fprintf (xml_file, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
   fprintf (xml_file, "<subtitles>\n");

@@ -37,6 +37,10 @@
       <default>true</default>
       <summary>Use context-adaptive binary arithmetic coding</summary>
     </key>
+    <key name="cartoon" type="b">
+      <default>true</default>
+      <summary>Encode anime/cartoon</summary>
+    </key>
     <key name="cqm" type="u">
       <range min="0" max="1"/>
       <default>0</default>

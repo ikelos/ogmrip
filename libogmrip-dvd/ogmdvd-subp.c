@@ -110,7 +110,7 @@ ogmrip_stream_iface_init (OGMRipStreamInterface *iface)
 static gint
 ogmdvd_subp_stream_get_content (OGMRipSubpStream *subp)
 {
-  return OGMDVD_SUBP_STREAM (subp)->priv->lang_extension - 1;
+  return OGMDVD_SUBP_STREAM (subp)->priv->code_extension - 1;
 }
 
 static gint

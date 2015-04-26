@@ -40,22 +40,23 @@ static gboolean
 ogmjob_queue_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
   OGMJobQueue *queue = OGMJOB_QUEUE (task);
-  GList *child;
-  gboolean result;
+  gboolean result = TRUE;
 
-  if (!queue->priv->children)
-    return TRUE;
-
-  queue->priv->nchildren = g_list_length (queue->priv->children);
-  queue->priv->completed = 0;
-
-  for (child = queue->priv->children; child; child = child->next)
+  if (queue->priv->children)
   {
-    result = ogmjob_task_run (child->data, cancellable, error);
-    if (!result)
-      break;
+    GList *child;
 
-    queue->priv->completed ++;
+    queue->priv->nchildren = g_list_length (queue->priv->children);
+    queue->priv->completed = 0;
+
+    for (child = queue->priv->children; child; child = child->next)
+    {
+      result = ogmjob_task_run (child->data, cancellable, error);
+      if (!result)
+        break;
+
+      queue->priv->completed ++;
+    }
   }
 
   return result;

@@ -181,7 +181,7 @@ ogmrip_encoding_manager_dialog_add_encoding (OGMRipEncodingManagerDialog *dialog
   profile = ogmrip_encoding_get_profile (encoding);
 
   label = gtk_label_new (ogmrip_container_get_label (ogmrip_encoding_get_container (encoding)));
-  gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
+  gtk_widget_set_halign (label, GTK_ALIGN_START);
   gtk_grid_attach (GTK_GRID (grid), label, 0, 0, 1, 1);
   gtk_widget_show (label);
 
@@ -190,7 +190,7 @@ ogmrip_encoding_manager_dialog_add_encoding (OGMRipEncodingManagerDialog *dialog
   g_free (str);
 
   gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
-  gtk_misc_set_alignment (GTK_MISC (label), 0.0, 0.5);
+  gtk_widget_set_halign (label, GTK_ALIGN_START);
   gtk_grid_attach (GTK_GRID (grid), label, 0, 1, 1, 1);
   gtk_widget_show (label);
 
@@ -548,7 +548,7 @@ ogmrip_encoding_manager_dialog_init (OGMRipEncodingManagerDialog *dialog)
 
   context = gtk_widget_get_style_context (dialog->priv->toolbar);
   gtk_style_context_set_junction_sides (context, GTK_JUNCTION_TOP);
-  gtk_style_context_add_class (context, GTK_STYLE_CLASS_INLINE_TOOLBAR);
+  // gtk_style_context_add_class (context, GTK_STYLE_CLASS_INLINE_TOOLBAR);
 
   dialog->priv->list_box = gtk_list_box_new ();
   gtk_container_add (GTK_CONTAINER (dialog->priv->swin), dialog->priv->list_box);

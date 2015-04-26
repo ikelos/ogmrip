@@ -240,9 +240,7 @@ ogmrip_title_benchmark_watch (OGMJobTask *spawn, const gchar *buffer, OGMRipBenc
       else if (g_str_has_prefix (buffer, "duration: "))
       {
         info->prev_duration = info->cur_duration;
-        sscanf (buffer, "duration: %u", &info->cur_duration);
-
-        if (info->prev_duration == 3 && info->cur_duration == 2)
+        if (sscanf (buffer, "duration: %u", &info->cur_duration) == 1 && info->prev_duration == 3 && info->cur_duration == 2)
         {
           info->npatterns ++;
 

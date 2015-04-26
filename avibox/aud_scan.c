@@ -204,8 +204,6 @@ int get_ac3_framesize(unsigned char *buf)
 
   tmp=get_ac3_header(buf);
   
-  if(tmp<0) return(-1);
-  
   fscod      = (tmp >> 6) & 0x3;
   frmsizecod = tmp & 0x3f;
 
@@ -231,7 +229,7 @@ int get_ac3_nfchans(unsigned char *buf)
 	  lfe=1;
   }
 
-  if (acmod < 0 || acmod > 11) return -1;
+  if (acmod < 0 || acmod > 10) return -1;
 
   return(nfchans[acmod]+lfe);
 }
@@ -277,8 +275,7 @@ int get_ac3_samplerate(unsigned char *buf)
 
 int tc_get_ac3_header(unsigned char *_buf, int len, int *chans, int *srate, int *bitrate )
 {
-
-  int j=0, i=0, fsize, nfchans;
+  int i=0, fsize, nfchans;
 
   unsigned char *buffer;
 
@@ -302,9 +299,9 @@ int tc_get_ac3_header(unsigned char *_buf, int len, int *chans, int *srate, int 
   nfchans = get_ac3_nfchans(&buffer[i+4]);
   if (chans) *chans = nfchans;
 
-  fsize = 2*get_ac3_framesize(&buffer[i+1]);
+  fsize = 2 * get_ac3_framesize(&buffer[i+1]);
   
-  if(j<0 || bitrate <0) return(-1);
+  if(bitrate && *bitrate < 0) return(-1);
 
   return(fsize);
 }

@@ -138,7 +138,7 @@ struct _OGMDvdSubpStreamPriv
 {
   OGMRipTitle *title;
   guint id;
-  guint lang_extension;
+  guint code_extension;
   guint lang_code;
 };
 

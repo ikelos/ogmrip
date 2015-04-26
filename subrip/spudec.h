@@ -20,7 +20,6 @@ void spudec_calc_bbox(void *me, unsigned int dxs, unsigned int dys, unsigned int
 void spudec_set_forced_subs_only(void * const this, const unsigned int flag);
 void spudec_update (void *this, void *draw_alpha);
 void spudec_get_pts (void *this, unsigned int *start_pts, unsigned int *end_pts);
-void spudec_set_normalize_palette (void *this, unsigned int flag);
 int spudec_forced (void *this);
 
 #endif /* MPLAYER_SPUDEC_H */

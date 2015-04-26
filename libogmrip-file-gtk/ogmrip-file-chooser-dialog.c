@@ -54,17 +54,13 @@ static void
 ogmrip_file_chooser_dialog_constructed (GObject *gobject)
 {
   OGMRipFileChooserDialog *dialog = OGMRIP_FILE_CHOOSER_DIALOG (gobject);
-  GtkWidget *alignment, *hbox, *label;
+  GtkWidget *hbox, *label;
 
   GtkTreeModel *model;
   GtkTreeIter iter;
 
-  alignment = gtk_alignment_new (1.0, 0.5, 0.0, 0.0);
-  gtk_file_chooser_set_extra_widget (GTK_FILE_CHOOSER (dialog), alignment);
-  gtk_widget_show (alignment);
-
   hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
-  gtk_container_add (GTK_CONTAINER (alignment), hbox);
+  gtk_file_chooser_set_extra_widget (GTK_FILE_CHOOSER (dialog), hbox);
   gtk_widget_show (hbox);
 
   label = gtk_label_new_with_mnemonic (_("_Language:"));

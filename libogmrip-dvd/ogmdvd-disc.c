@@ -165,9 +165,6 @@ dvd_reader_get_ifo_size (dvd_reader_t *reader, guint vts)
   size = DVDFileSize (file);
   DVDCloseFile (file);
 
-  if (size < 0)
-    return 0;
-
   return size * DVD_VIDEO_LB_LEN;
 }
 
@@ -180,9 +177,6 @@ dvd_reader_get_bup_size (dvd_reader_t *reader, guint vts)
   file = DVDOpenFile (reader, vts, DVD_READ_INFO_BACKUP_FILE);
   size = DVDFileSize (file);
   DVDCloseFile (file);
-
-  if (size < 0)
-    return 0;
 
   return size * DVD_VIDEO_LB_LEN;
 }
@@ -197,9 +191,6 @@ dvd_reader_get_menu_size (dvd_reader_t *reader, guint vts)
   size = DVDFileSize (file);
   DVDCloseFile (file);
 
-  if (size < 0)
-    return 0;
-
   return size * DVD_VIDEO_LB_LEN;
 }
 
@@ -213,43 +204,20 @@ dvd_reader_get_vob_size (dvd_reader_t *reader, guint vts)
   size = DVDFileSize (file);
   DVDCloseFile (file);
 
-  if (size < 0)
-    return 0;
-
   return size * DVD_VIDEO_LB_LEN;
 }
 
 static guint64
 dvd_reader_get_vts_size (dvd_reader_t *reader, guint vts)
 {
-  guint64 size, vts_size = 0;
+  guint64 vts_size = 0;
 
-  size = dvd_reader_get_ifo_size (reader, vts);
-  if (size < 0)
-    return 0;
-
-  vts_size += size;
-
-  size = dvd_reader_get_bup_size (reader, vts);
-  if (size < 0)
-    return 0;
-
-  vts_size += size;
-
-  size = dvd_reader_get_menu_size (reader, vts);
-  if (size < 0)
-    return 0;
-
-  vts_size += size;
+  vts_size  = dvd_reader_get_ifo_size  (reader, vts);
+  vts_size += dvd_reader_get_bup_size  (reader, vts);
+  vts_size += dvd_reader_get_menu_size (reader, vts);
 
   if (vts > 0)
-  {
-    size = dvd_reader_get_vob_size (reader, vts);
-    if (size < 0)
-      return 0;
-
-    vts_size += size;
-  }
+    vts_size = +dvd_reader_get_vob_size (reader, vts);
 
   return vts_size;
 }
@@ -328,7 +296,7 @@ ogmdvd_subp_stream_new (OGMDvdTitle *title, ifo_handle_t *vts_file, guint nr, gu
   g_object_add_weak_pointer (G_OBJECT (title), (gpointer *) &stream->priv->title);
 
   attr = &vts_file->vtsi_mat->vts_subp_attr[real_nr];
-  stream->priv->lang_extension = attr->lang_extension;
+  stream->priv->code_extension = attr->code_extension;
   stream->priv->lang_code = attr->lang_code;
 
   pgcn = vts_file->vts_ptt_srpt->title[title->priv->ttn - 1].ptt[0].pgcn;

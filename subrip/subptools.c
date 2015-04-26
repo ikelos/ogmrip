@@ -83,8 +83,8 @@ static unsigned int adjust;
 static unsigned int subst;
 static unsigned int strip;
 static unsigned int help;
-static char input_file[FILENAME_MAX];
-static char output_file[FILENAME_MAX];
+static char input_file[FILENAME_MAX + 1];
+static char output_file[FILENAME_MAX + 1];
 static double offset = 0.0;
 static double factor = 1.0;
 
@@ -95,7 +95,7 @@ static const char *newline = LF;
 
 static subp_time_t adjustment;
 
-static unsigned int
+static int
 parse_shift (const char *value)
 {
   if (sscanf (value, "%lf", &offset) != 1)
@@ -110,7 +110,7 @@ parse_shift (const char *value)
   return 0;
 }
 
-static unsigned int
+static int
 parse_cut (const char *value)
 {
   if (sscanf (value, "%u,%u", &first_tag_number, &last_tag_number) == 0)
@@ -132,7 +132,7 @@ parse_cut (const char *value)
   return 0;
 }
 
-static unsigned int
+static int
 parse_adjust (const char *value)
 {
   if (sscanf (value, "%u:%u:%u,%u", &adjustment.hour, 
@@ -148,10 +148,10 @@ parse_adjust (const char *value)
 
   adjust = TRUE;
 
-  return TRUE;
+  return 0;
 }
 
-static unsigned int
+static int
 parse_expand (const char *value)
 {
   double expansion;

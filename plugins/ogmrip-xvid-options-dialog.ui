@@ -100,11 +100,10 @@
             <property name="layout_style">end</property>
             <child>
               <object class="GtkButton" id="close_button">
-                <property name="label">gtk-close</property>
+                <property name="label" translatable="yes">Close</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
-                <property name="use_stock">True</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -137,7 +136,7 @@
                   <object class="GtkLabel" id="label">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">&lt;b&gt;General&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
@@ -151,8 +150,8 @@
                   <object class="GtkLabel" id="label2">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">Profile (profile):</property>
                   </object>
                   <packing>
@@ -164,8 +163,8 @@
                   <object class="GtkLabel" id="label1">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">Quantization type (quant_type):</property>
                   </object>
                   <packing>
@@ -179,8 +178,8 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="draw_indicator">True</property>
                   </object>
                   <packing>
@@ -195,8 +194,8 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="draw_indicator">True</property>
                   </object>
                   <packing>
@@ -211,8 +210,8 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="draw_indicator">True</property>
                   </object>
                   <packing>
@@ -227,8 +226,8 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="draw_indicator">True</property>
                   </object>
                   <packing>
@@ -243,8 +242,8 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="draw_indicator">True</property>
                   </object>
                   <packing>
@@ -258,7 +257,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="margin_top">6</property>
-                    <property name="xalign">0</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">&lt;b&gt;Restrictions&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
@@ -271,8 +270,8 @@
                   <object class="GtkLabel" id="label4">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">I-frame quantizer (iquant):</property>
                   </object>
                   <packing>
@@ -284,8 +283,8 @@
                   <object class="GtkLabel" id="label6">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">P-frame quantizer (pquant):</property>
                   </object>
                   <packing>
@@ -297,8 +296,8 @@
                   <object class="GtkLabel" id="label8">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">B-frame quantizer (bquant):</property>
                   </object>
                   <packing>
@@ -490,7 +489,7 @@
                   <object class="GtkLabel" id="label11">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">&lt;b&gt;Motion Precision&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
@@ -504,8 +503,8 @@
                   <object class="GtkLabel" id="label13">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">Motion search precision (me_quality):</property>
                   </object>
                   <packing>
@@ -517,8 +516,8 @@
                   <object class="GtkLabel" id="label12">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">VHQ mode (vhq):</property>
                   </object>
                   <packing>
@@ -532,8 +531,8 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="draw_indicator">True</property>
                   </object>
                   <packing>
@@ -548,8 +547,8 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="draw_indicator">True</property>
                   </object>
                   <packing>
@@ -564,8 +563,8 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="draw_indicator">True</property>
                   </object>
                   <packing>
@@ -579,7 +578,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="margin_top">6</property>
-                    <property name="xalign">0</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">&lt;b&gt;Other&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
@@ -593,8 +592,8 @@
                   <object class="GtkLabel" id="label16">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">Frame drop ratio (frame_drop_ratio):</property>
                   </object>
                   <packing>
@@ -606,8 +605,8 @@
                   <object class="GtkLabel" id="label15">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">Maximum I-frame interval (max_key_interval):</property>
                   </object>
                   <packing>
@@ -621,8 +620,8 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="draw_indicator">True</property>
                   </object>
                   <packing>
@@ -637,8 +636,8 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="draw_indicator">True</property>
                   </object>
                   <packing>
@@ -740,7 +739,7 @@
                   <object class="GtkLabel" id="label18">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="xalign">0</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">&lt;b&gt;B-VOPs&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
@@ -754,8 +753,8 @@
                   <object class="GtkLabel" id="label21">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">Max consecutive B-VOPs (max_bframes):</property>
                   </object>
                   <packing>
@@ -767,8 +766,8 @@
                   <object class="GtkLabel" id="label20">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">Quantizer ratio (bquant_ratio):</property>
                   </object>
                   <packing>
@@ -780,8 +779,8 @@
                   <object class="GtkLabel" id="label19">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">Quantizer offset (bquant_offset):</property>
                   </object>
                   <packing>
@@ -795,8 +794,8 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="draw_indicator">True</property>
                   </object>
                   <packing>
@@ -811,8 +810,8 @@
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="draw_indicator">True</property>
                   </object>
                   <packing>
@@ -826,7 +825,7 @@
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="margin_top">6</property>
-                    <property name="xalign">0</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">&lt;b&gt;Pixel aspect ratio&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
@@ -840,8 +839,8 @@
                   <object class="GtkLabel" id="label23">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">Pixel aspect ratio (par):</property>
                   </object>
                   <packing>
@@ -853,8 +852,8 @@
                   <object class="GtkLabel" id="label24">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_left">12</property>
-                    <property name="xalign">0</property>
+                    <property name="margin_start">12</property>
+                    <property name="halign">start</property>
                     <property name="label" translatable="yes">Width x height:</property>
                   </object>
                   <packing>

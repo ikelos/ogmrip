@@ -135,7 +135,7 @@ ogmrip_command_set_fps (GPtrArray *argv, OGMRipTitle *title)
     denom2 = denom1;
   }
 
-  if (num1 != num2 || denom2 != denom2)
+  if (num1 != num2 || denom1 != denom2)
   {
     g_ptr_array_add (argv, g_strdup ("-fps"));
     g_ptr_array_add (argv, g_strdup_printf ("%d/%d", num1, denom1));
@@ -411,7 +411,7 @@ ogmrip_mencoder_watch_stdout (OGMJobTask *task, const gchar *buffer, glong *tota
   return TRUE;
 }
 
-OGMJobTask *
+static OGMJobTask *
 ogmrip_mencoder_video_command (OGMRipVideoCodec *video, OGMRipEncoder encoder,
     const gchar *options, const gchar *passlog, const gchar *output)
 {
@@ -431,6 +431,9 @@ ogmrip_mencoder_video_command (OGMRipVideoCodec *video, OGMRipEncoder encoder,
 
     if (astream)
       ogmrip_command_set_audio (argv, OGMRIP_STREAM (astream));
+
+    g_ptr_array_add (argv, g_strdup ("-oac"));
+    g_ptr_array_add (argv, g_strdup ("copy"));
   }
   else
   {
@@ -485,12 +488,10 @@ ogmrip_mencoder_video_command (OGMRipVideoCodec *video, OGMRipEncoder encoder,
         g_ptr_array_add (argv, g_strdup ("-x264encopts"));
       break;
     case OGMRIP_ENCODER_COPY:
-      g_ptr_array_add (argv, "copy");
-      g_ptr_array_add (argv, "-oac");
-      g_ptr_array_add (argv, "copy");
-      g_ptr_array_add (argv, "-mc");
-      g_ptr_array_add (argv, "0");
-      g_ptr_array_add (argv, "-noskip");
+      g_ptr_array_add (argv, g_strdup ("copy"));
+      g_ptr_array_add (argv, g_strdup ("-mc"));
+      g_ptr_array_add (argv, g_strdup ("0"));
+      g_ptr_array_add (argv, g_strdup ("-noskip"));
       break;
     default:
       g_assert_not_reached ();
@@ -753,7 +754,7 @@ ogmrip_mencoder_vobsub_command (OGMRipSubpCodec *subp, const gchar *output)
   g_return_val_if_fail (OGMRIP_IS_SUBP_CODEC (subp), NULL);
   g_return_val_if_fail (output != NULL, NULL);
 
-  argv = ogmrip_mencoder_command_new ("/dev/null", TRUE);
+  argv = ogmrip_mencoder_command_new ("/dev/null", FALSE);
 
   g_ptr_array_add (argv, g_strdup ("-of"));
   g_ptr_array_add (argv, g_strdup ("rawaudio"));
