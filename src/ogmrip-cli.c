@@ -270,10 +270,10 @@ parse_chap (const gchar *name, const gchar *value, gpointer data, GError **error
     return FALSE;
 
   errno = 0;
-  start_chap = strtoul (value, &str, 10);
+  start_chap = strtoul (value, &str, 10) - 1;
 
   if (!errno && *str == '-')
-    end_chap = strtoul (str + 1, &str, 10);
+    end_chap = strtoul (str + 1, &str, 10) - 1;
 
   if (errno == ERANGE || *str != '\0')
   {
