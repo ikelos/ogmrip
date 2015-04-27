@@ -76,6 +76,7 @@ ogmrip_vp8_command (OGMRipVp8 *vp8, const gchar *fifo, guint pass, guint passes,
   argv = g_ptr_array_new_full (20, g_free);
 
   g_ptr_array_add (argv, g_strdup ("vpxenc"));
+  g_ptr_array_add (argv, g_strdup ("--ivf"));
 
   ogmrip_video_codec_get_scale_size (OGMRIP_VIDEO_CODEC (vp8), &width, &height);
   g_ptr_array_add (argv, g_strdup_printf ("--width=%u", width));
