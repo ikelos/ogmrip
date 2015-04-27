@@ -201,6 +201,9 @@ ogmrip_register_codec (GType gtype, const gchar *name, const gchar *description,
   g_return_if_fail (g_type_is_a (gtype, OGMRIP_TYPE_CODEC));
   g_return_if_fail (name != NULL);
 
+  info = (OGMRipPluginInfo *) ogmrip_type_info_lookup (gtype);
+  g_assert (info == NULL);
+
   va_start (args, property);
   info = ogmrip_plugin_info_new (name, description, property, args);
   va_end (args);
