@@ -758,6 +758,8 @@ ogmrip_cli_encode (OGMRipCli *cli)
   OGMRipProfile *profile;
   OGMRipTitle *title;
 
+  gchar *log;
+
   engine = ogmrip_profile_engine_get_default ();
 
   if (!preset)
@@ -800,6 +802,10 @@ ogmrip_cli_encode (OGMRipCli *cli)
   if (!ogmrip_cli_add_subp_codec (encoding, profile, title))
     goto cleanup;
 
+  log = ogmrip_fs_set_extension (output, "log");
+  ogmrip_encoding_set_log_file (encoding, log);
+  g_free (log);
+
   g_signal_connect (encoding, "run",
       G_CALLBACK (ogmrip_cli_encoding_run_cb), NULL);
   g_signal_connect (encoding, "progress",
@@ -821,7 +827,10 @@ ogmrip_cli_encode (OGMRipCli *cli)
 cleanup:
   if (encoding)
   {
-    ogmrip_encoding_clean (encoding, TRUE, TRUE, FALSE);
+    if (!error && !g_settings_get_boolean (settings, OGMRIP_SETTINGS_LOG_OUTPUT))
+      ogmrip_encoding_clean (encoding, TRUE, TRUE, TRUE);
+    else
+      ogmrip_encoding_clean (encoding, TRUE, TRUE, FALSE);
     g_object_unref (encoding);
   }
 
