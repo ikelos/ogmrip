@@ -204,6 +204,7 @@ ogmrip_audio_codec_init (OGMRipAudioCodec *audio)
   audio->priv->channels = OGMRIP_CHANNELS_STEREO;
   audio->priv->srate = 48000;
   audio->priv->quality = 3;
+  audio->priv->fast = TRUE;
 }
 
 GType
