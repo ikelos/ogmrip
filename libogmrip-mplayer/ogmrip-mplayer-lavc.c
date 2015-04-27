@@ -154,8 +154,12 @@ ogmrip_lavc_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   else
     g_string_printf (options, "vcodec=%s", codec);
 
-  g_string_append_printf (options, ":autoaspect:mbd=%u:qns=%u:vb_strategy=%u:last_pred=%u:preme=%u",
-      lavc->priv->mbd, lavc->priv->qns, lavc->priv->vb_strategy, lavc->priv->last_pred, lavc->priv->preme);
+  g_string_append_printf (options, ":o=quantizer_noise_shaping=%u", lavc->priv->qns);
+  if (lavc->priv->trellis)
+    g_string_append (options, ",mpv_flags=+cbp_rd");
+
+  g_string_append_printf (options, ":autoaspect:mbd=%u:vb_strategy=%u:last_pred=%u:preme=%u",
+      lavc->priv->mbd, lavc->priv->vb_strategy, lavc->priv->last_pred, lavc->priv->preme);
 
   if (pass != passes && ogmrip_video_codec_get_turbo (video))
     g_string_append (options, ":turbo");
@@ -170,7 +174,7 @@ ogmrip_lavc_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
     g_string_append (options, ":v4mv");
 
   if (lavc->priv->trellis)
-    g_string_append (options, ":trell:cbp");
+    g_string_append (options, ":trell");
   if (lavc->priv->grayscale)
     g_string_append (options, ":gray");
 
