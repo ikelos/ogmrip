@@ -1,4 +1,4 @@
-/* OGMRipVp8 - A VP8 plugin for OGMRip
+/* OGMRipVpx - A VPX plugin for OGMRip
  * Copyright (C) 2004-2014 Olivier Rolland <billl@users.sourceforge.net>
  *
  * This library is free software; you can redistribute it and/or
@@ -28,18 +28,26 @@
 #include <glib/gstdio.h>
 #include <glib/gi18n-lib.h>
 
-#define OGMRIP_TYPE_VP8          (ogmrip_vp8_get_type ())
-#define OGMRIP_VP8(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_VP8, OGMRipVp8))
-#define OGMRIP_VP8_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_VP8, OGMRipVp8Class))
-#define OGMRIP_IS_VP8(obj)       (G_TYPE_CHECK_INSTANCE_TYPE ((obj), OGMRIP_TYPE_VP8))
-#define OGMRIP_IS_VP8_CLASS(obj) (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_VP8))
+#define OGMRIP_TYPE_VPX          (ogmrip_vpx_get_type ())
+#define OGMRIP_VPX(obj)          (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_VPX, OGMRipVpx))
+#define OGMRIP_VPX_CLASS(klass)  (G_TYPE_CHECK_CLASS_CAST ((klass), OGMRIP_TYPE_VPX, OGMRipVpxClass))
+#define OGMRIP_IS_VPX(obj)       (G_TYPE_CHECK_INSTANCE_TYPE ((obj), OGMRIP_TYPE_VPX))
+#define OGMRIP_IS_VPX_CLASS(obj) (G_TYPE_CHECK_CLASS_TYPE ((klass), OGMRIP_TYPE_VPX))
 
-typedef struct _OGMRipVp8      OGMRipVp8;
-typedef struct _OGMRipVp8Class OGMRipVp8Class;
+typedef enum
+{
+  OGMRIP_VP8,
+  OGMRIP_VP9
+} OGMRipVpxCodec;
 
-struct _OGMRipVp8
+typedef struct _OGMRipVpx      OGMRipVpx;
+typedef struct _OGMRipVpxClass OGMRipVpxClass;
+
+struct _OGMRipVpx
 {
   OGMRipVideoCodec parent_instance;
+
+  OGMRipVpxCodec codec;
 
   gboolean best;
   gint minsection_pct;
@@ -52,7 +60,7 @@ struct _OGMRipVp8
   gint cpu_used;
 };
 
-struct _OGMRipVp8Class
+struct _OGMRipVpxClass
 {
   OGMRipVideoCodecClass parent_class;
 };
@@ -61,10 +69,11 @@ enum
 {
   PROP_0,
   PROP_PASSES,
+  PROP_CODEC
 };
 
 static OGMJobTask *
-ogmrip_vp8_command (OGMRipVp8 *vp8, const gchar *fifo, guint pass, guint passes, const gchar *log_file)
+ogmrip_vpx_command (OGMRipVpx *vpx, const gchar *fifo, guint pass, guint passes, const gchar *log_file)
 {
   OGMJobTask *task;
 
@@ -78,29 +87,39 @@ ogmrip_vp8_command (OGMRipVp8 *vp8, const gchar *fifo, guint pass, guint passes,
   g_ptr_array_add (argv, g_strdup ("vpxenc"));
   g_ptr_array_add (argv, g_strdup ("--ivf"));
 
-  ogmrip_video_codec_get_scale_size (OGMRIP_VIDEO_CODEC (vp8), &width, &height);
+  switch (vpx->codec)
+  {
+    case OGMRIP_VP8:
+      g_ptr_array_add (argv, g_strdup ("--codec=vp8"));
+      break;
+    case OGMRIP_VP9:
+      g_ptr_array_add (argv, g_strdup ("--codec=vp9"));
+      break;
+  }
+
+  ogmrip_video_codec_get_scale_size (OGMRIP_VIDEO_CODEC (vpx), &width, &height);
   g_ptr_array_add (argv, g_strdup_printf ("--width=%u", width));
   g_ptr_array_add (argv, g_strdup_printf ("--height=%u", height));
 
-  ogmrip_video_codec_get_framerate (OGMRIP_VIDEO_CODEC (vp8), &num, &denom);
+  ogmrip_video_codec_get_framerate (OGMRIP_VIDEO_CODEC (vpx), &num, &denom);
   g_ptr_array_add (argv, g_strdup_printf ("--timebase=%u/%u", denom, num));
 
-  bitrate = ogmrip_video_codec_get_bitrate (OGMRIP_VIDEO_CODEC (vp8));
+  bitrate = ogmrip_video_codec_get_bitrate (OGMRIP_VIDEO_CODEC (vpx));
   if (bitrate > 0)
   {
     g_ptr_array_add (argv, g_strdup_printf ("--target-bitrate=%d", bitrate / 1000));
 
-    if (vp8->min_q >= 0)
-      g_ptr_array_add (argv, g_strdup_printf ("--min-q=%u", vp8->min_q));
+    if (vpx->min_q >= 0)
+      g_ptr_array_add (argv, g_strdup_printf ("--min-q=%u", vpx->min_q));
 
-    if (vp8->max_q >= 0)
-      g_ptr_array_add (argv, g_strdup_printf ("--max-q=%u", vp8->max_q));
+    if (vpx->max_q >= 0)
+      g_ptr_array_add (argv, g_strdup_printf ("--max-q=%u", vpx->max_q));
   }
   else
   {
     gdouble quantizer;
 
-    quantizer = 48. * ogmrip_video_codec_get_quantizer (OGMRIP_VIDEO_CODEC (vp8)) / 31.;
+    quantizer = 48. * ogmrip_video_codec_get_quantizer (OGMRIP_VIDEO_CODEC (vpx)) / 31.;
     g_ptr_array_add (argv, g_strdup_printf ("--min-q=%.0lf", quantizer));
     g_ptr_array_add (argv, g_strdup_printf ("--max-q=%.0lf", quantizer + 15.));
   }
@@ -112,11 +131,11 @@ ogmrip_vp8_command (OGMRipVp8 *vp8, const gchar *fifo, guint pass, guint passes,
     g_ptr_array_add (argv, g_strdup_printf ("--pass=%u", pass));
     g_ptr_array_add (argv, g_strdup_printf ("--fpf=%s", log_file));
 
-    if (vp8->minsection_pct >= 0)
-      g_ptr_array_add (argv, g_strdup_printf ("--minsection-pct=%u", vp8->minsection_pct));
+    if (vpx->minsection_pct >= 0)
+      g_ptr_array_add (argv, g_strdup_printf ("--minsection-pct=%u", vpx->minsection_pct));
 
-    if (vp8->maxsection_pct >= 0)
-      g_ptr_array_add (argv, g_strdup_printf ("--maxsection-pct=%u", vp8->maxsection_pct));
+    if (vpx->maxsection_pct >= 0)
+      g_ptr_array_add (argv, g_strdup_printf ("--maxsection-pct=%u", vpx->maxsection_pct));
   }
 
   g_ptr_array_add (argv, g_strdup ("--end-usage=0"));
@@ -126,27 +145,27 @@ ogmrip_vp8_command (OGMRipVp8 *vp8, const gchar *fifo, guint pass, guint passes,
   g_ptr_array_add (argv, g_strdup ("--kf-max-dist=360"));
   g_ptr_array_add (argv, g_strdup ("--static-thresh=0"));
 
-  g_ptr_array_add (argv, g_strdup (vp8->best ? "--best" : "--good"));
+  g_ptr_array_add (argv, g_strdup (vpx->best ? "--best" : "--good"));
 
-  threads = ogmrip_video_codec_get_threads (OGMRIP_VIDEO_CODEC (vp8));
+  threads = ogmrip_video_codec_get_threads (OGMRIP_VIDEO_CODEC (vpx));
   if (!threads)
     threads = ogmrip_get_nprocessors ();
   if (threads > 0)
     g_ptr_array_add (argv, g_strdup_printf ("--threads=%u", threads));
 
-  if (vp8->token_parts >= 0)
-    g_ptr_array_add (argv, g_strdup_printf ("--token-parts=%u", vp8->token_parts));
+  if (vpx->token_parts >= 0)
+    g_ptr_array_add (argv, g_strdup_printf ("--token-parts=%u", vpx->token_parts));
 
-  if (vp8->drop_frame >= 0)
-    g_ptr_array_add (argv, g_strdup_printf ("--drop-frame=%u", vp8->drop_frame));
+  if (vpx->drop_frame >= 0)
+    g_ptr_array_add (argv, g_strdup_printf ("--drop-frame=%u", vpx->drop_frame));
 
-  if (vp8->profile >= 0)
-    g_ptr_array_add (argv, g_strdup_printf ("--profile=%u", vp8->profile));
+  if (vpx->profile >= 0)
+    g_ptr_array_add (argv, g_strdup_printf ("--profile=%u", vpx->profile));
 
-  if (vp8->cpu_used >= 0)
-    g_ptr_array_add (argv, g_strdup_printf ("--cpu-used=%u", vp8->cpu_used));
+  if (vpx->cpu_used >= 0)
+    g_ptr_array_add (argv, g_strdup_printf ("--cpu-used=%u", vpx->cpu_used));
 
-  output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (vp8)));
+  output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (vpx)));
   g_ptr_array_add (argv, g_strdup ("-o"));
   g_ptr_array_add (argv, g_strdup (output));
 
@@ -161,73 +180,73 @@ ogmrip_vp8_command (OGMRipVp8 *vp8, const gchar *fifo, guint pass, guint passes,
 }
 
 static OGMJobTask *
-ogmrip_vp8_pipeline (OGMRipVp8 *vp8, const gchar *fifo, guint pass, guint passes, const gchar *log_file)
+ogmrip_vpx_pipeline (OGMRipVpx *vpx, const gchar *fifo, guint pass, guint passes, const gchar *log_file)
 {
   OGMJobTask *pipeline, *child;
 
   pipeline = ogmjob_pipeline_new ();
 
-  child = ogmrip_video_encoder_new (OGMRIP_VIDEO_CODEC (vp8), OGMRIP_ENCODER_YUV, NULL, NULL, fifo);
+  child = ogmrip_video_encoder_new (OGMRIP_VIDEO_CODEC (vpx), OGMRIP_ENCODER_YUV, NULL, NULL, fifo);
   ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
   g_object_unref (child);
 
-  child = ogmrip_vp8_command (vp8, fifo, pass + 1, passes, log_file);
+  child = ogmrip_vpx_command (vpx, fifo, pass + 1, passes, log_file);
   ogmjob_container_add (OGMJOB_CONTAINER (pipeline), child);
   g_object_unref (child);
 
   return pipeline;
 }
 
-G_DEFINE_TYPE (OGMRipVp8, ogmrip_vp8, OGMRIP_TYPE_VIDEO_CODEC)
+G_DEFINE_TYPE (OGMRipVpx, ogmrip_vpx, OGMRIP_TYPE_VIDEO_CODEC)
 
 static void
-ogmrip_vp8_notify (GObject *gobject, GParamSpec *pspec)
+ogmrip_vpx_notify (GObject *gobject, GParamSpec *pspec)
 {
   if (g_str_equal (pspec->name, "quality"))
   {
-    OGMRipVp8 *vp8 = OGMRIP_VP8 (gobject);
+    OGMRipVpx *vpx = OGMRIP_VPX (gobject);
 
-    switch (ogmrip_video_codec_get_quality (OGMRIP_VIDEO_CODEC (vp8)))
+    switch (ogmrip_video_codec_get_quality (OGMRIP_VIDEO_CODEC (vpx)))
     {
       case OGMRIP_QUALITY_EXTREME:
-        vp8->best = FALSE;
-        vp8->minsection_pct = 5;
-        vp8->maxsection_pct = 800;
-        vp8->token_parts = 2;
-        vp8->drop_frame = 0;
-        vp8->min_q = 0;
-        vp8->max_q = 60;
-        vp8->profile = -1;
-        vp8->cpu_used = 0;
+        vpx->best = FALSE;
+        vpx->minsection_pct = 5;
+        vpx->maxsection_pct = 800;
+        vpx->token_parts = 2;
+        vpx->drop_frame = 0;
+        vpx->min_q = 0;
+        vpx->max_q = 60;
+        vpx->profile = -1;
+        vpx->cpu_used = 0;
         break;
       case OGMRIP_QUALITY_HIGH:
-        vp8->best = FALSE;
-        vp8->minsection_pct = 5;
-        vp8->maxsection_pct = 800;
-        vp8->token_parts = 2;
-        vp8->drop_frame = -1;
-        vp8->min_q = 0;
-        vp8->max_q = 60;
-        vp8->profile = -1;
-        vp8->cpu_used = 1;
+        vpx->best = FALSE;
+        vpx->minsection_pct = 5;
+        vpx->maxsection_pct = 800;
+        vpx->token_parts = 2;
+        vpx->drop_frame = -1;
+        vpx->min_q = 0;
+        vpx->max_q = 60;
+        vpx->profile = -1;
+        vpx->cpu_used = 1;
         break;
       default:
-        vp8->best = FALSE;
-        vp8->minsection_pct = 15;
-        vp8->maxsection_pct = 400;
-        vp8->token_parts = -1;
-        vp8->drop_frame = -1;
-        vp8->min_q = 4;
-        vp8->max_q = 63;
-        vp8->profile = 1;
-        vp8->cpu_used = 0;
+        vpx->best = FALSE;
+        vpx->minsection_pct = 15;
+        vpx->maxsection_pct = 400;
+        vpx->token_parts = -1;
+        vpx->drop_frame = -1;
+        vpx->min_q = 4;
+        vpx->max_q = 63;
+        vpx->profile = 1;
+        vpx->cpu_used = 0;
         break;
     }
   }
 }
 
 static void
-ogmrip_vp8_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
+ogmrip_vpx_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
 {
   switch (property_id)
   {
@@ -241,7 +260,7 @@ ogmrip_vp8_get_property (GObject *gobject, guint property_id, GValue *value, GPa
 }
 
 static void
-ogmrip_vp8_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
+ogmrip_vpx_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
 {
   switch (property_id)
   {
@@ -255,7 +274,7 @@ ogmrip_vp8_set_property (GObject *gobject, guint property_id, const GValue *valu
 }
 
 static gboolean
-ogmrip_vp8_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
+ogmrip_vpx_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
   OGMJobTask *queue, *pipeline;
   gchar *fifo, *log_file;
@@ -287,12 +306,12 @@ ogmrip_vp8_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 
   for (pass = 0; pass < passes; pass ++)
   {
-    pipeline = ogmrip_vp8_pipeline (OGMRIP_VP8 (task), fifo, pass, passes, log_file);
+    pipeline = ogmrip_vpx_pipeline (OGMRIP_VPX (task), fifo, pass, passes, log_file);
     ogmjob_container_add (OGMJOB_CONTAINER (queue), pipeline);
     g_object_unref (pipeline);
   }
 
-  result = OGMJOB_TASK_CLASS (ogmrip_vp8_parent_class)->run (task, cancellable, error);
+  result = OGMJOB_TASK_CLASS (ogmrip_vpx_parent_class)->run (task, cancellable, error);
 
   ogmjob_container_remove (OGMJOB_CONTAINER (task), queue);
 
@@ -306,18 +325,18 @@ ogmrip_vp8_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 }
 
 static void
-ogmrip_vp8_class_init (OGMRipVp8Class *klass)
+ogmrip_vpx_class_init (OGMRipVpxClass *klass)
 {
   GObjectClass *gobject_class;
   OGMJobTaskClass *task_class;
 
   gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->notify = ogmrip_vp8_notify;
-  gobject_class->get_property = ogmrip_vp8_get_property;
-  gobject_class->set_property = ogmrip_vp8_set_property;
+  gobject_class->notify = ogmrip_vpx_notify;
+  gobject_class->get_property = ogmrip_vpx_get_property;
+  gobject_class->set_property = ogmrip_vpx_set_property;
 
   task_class = OGMJOB_TASK_CLASS (klass);
-  task_class->run = ogmrip_vp8_run;
+  task_class->run = ogmrip_vpx_run;
 
   g_object_class_install_property (gobject_class, PROP_PASSES,
       g_param_spec_uint ("passes", "Passes property", "Set the number of passes",
@@ -325,17 +344,46 @@ ogmrip_vp8_class_init (OGMRipVp8Class *klass)
 }
 
 static void
-ogmrip_vp8_init (OGMRipVp8 *vp8)
+ogmrip_vpx_init (OGMRipVpx *vpx)
 {
-  vp8->best = FALSE;
-  vp8->minsection_pct = -1;
-  vp8->maxsection_pct = -1;
-  vp8->token_parts = -1;
-  vp8->drop_frame = -1;
-  vp8->min_q = -1;
-  vp8->max_q = -1;
-  vp8->profile = -1;
-  vp8->cpu_used = -1;
+  vpx->codec = OGMRIP_VP8;
+  vpx->best = FALSE;
+  vpx->minsection_pct = -1;
+  vpx->maxsection_pct = -1;
+  vpx->token_parts = -1;
+  vpx->drop_frame = -1;
+  vpx->min_q = -1;
+  vpx->max_q = -1;
+  vpx->profile = -1;
+  vpx->cpu_used = -1;
+}
+
+#define OGMRIP_TYPE_VP9 (ogmrip_vp9_get_type ())
+
+typedef struct _OGMRipVp9      OGMRipVp9;
+typedef struct _OGMRipVp9Class OGMRipVp9Class;
+
+struct _OGMRipVp9
+{
+  OGMRipVpx parent_instance;
+};
+
+struct _OGMRipVp9Class
+{
+  OGMRipVpxClass parent_class;
+};
+
+G_DEFINE_TYPE (OGMRipVp9, ogmrip_vp9, OGMRIP_TYPE_VPX)
+
+static void
+ogmrip_vp9_class_init (OGMRipVp9Class *klass)
+{
+}
+
+static void
+ogmrip_vp9_init (OGMRipVp9 *vp9)
+{
+  OGMRIP_VPX (vp9)->codec = OGMRIP_VP9;
 }
 
 void
@@ -351,7 +399,10 @@ ogmrip_module_load (OGMRipModule *module)
   }
   g_free (filename);
 
-  ogmrip_register_codec (OGMRIP_TYPE_VP8,
+  ogmrip_register_codec (OGMRIP_TYPE_VPX,
       "vp8", _("Vp8"), OGMRIP_FORMAT_VP8, NULL);
+
+  ogmrip_register_codec (OGMRIP_TYPE_VP9,
+      "vp9", _("Vp9"), OGMRIP_FORMAT_VP9, NULL);
 }
 
