@@ -86,13 +86,6 @@ ogmrip_matroska_append_video_file (OGMRipContainer *matroska, OGMRipFile *file, 
   g_ptr_array_add (argv, g_strdup ("--command-line-charset"));
   g_ptr_array_add (argv, g_strdup ("UTF-8"));
 
-  g_ptr_array_add (argv, g_strdup ("-d"));
-
-  if (ogmrip_stream_get_format (OGMRIP_STREAM (file)) == OGMRIP_FORMAT_VP8)
-    g_ptr_array_add (argv, g_strdup ("1"));
-  else
-    g_ptr_array_add (argv, g_strdup ("0"));
-
   g_ptr_array_add (argv, g_strdup ("-A"));
   g_ptr_array_add (argv, g_strdup ("-S"));
   g_ptr_array_add (argv, g_strdup (ogmrip_file_get_path (file)));
@@ -233,8 +226,6 @@ ogmrip_matroska_append_subp_file (OGMRipContainer *matroska, OGMRipFile *file, G
         break;
     }
 
-    g_ptr_array_add (argv, g_strdup ("-s"));
-    g_ptr_array_add (argv, g_strdup ("0"));
     g_ptr_array_add (argv, g_strdup ("-D"));
     g_ptr_array_add (argv, g_strdup ("-A"));
 
