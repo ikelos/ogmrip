@@ -206,6 +206,7 @@ typedef enum
  * @OGMRIP_FORMAT_MJPEG: The MJPEG video format
  * @OGMRIP_FORMAT_FLAC: The Flac audio format
  * @OGMRIP_FORMAT_VP8: The VP8 video format
+ * @OGMRIP_FORMAT_VP9: The VP9 video format
  * @OGMRIP_FORMAT_CHAPTERS: The chapters format
  *
  * The formats supported by OGMRip.
@@ -233,6 +234,7 @@ typedef enum
   OGMRIP_FORMAT_MJPEG,
   OGMRIP_FORMAT_FLAC,
   OGMRIP_FORMAT_VP8,
+  OGMRIP_FORMAT_VP9,
   OGMRIP_FORMAT_CHAPTERS,
   OGMRIP_FORMAT_PGS,
   OGMRIP_FORMAT_VC1,
@@ -251,6 +253,7 @@ typedef enum
                                            (format) == OGMRIP_FORMAT_DIRAC  || \
                                            (format) == OGMRIP_FORMAT_MJPEG  || \
                                            (format) == OGMRIP_FORMAT_VP8    || \
+                                           (format) == OGMRIP_FORMAT_VP9    || \
                                            (format) == OGMRIP_FORMAT_VC1)
 
 #define OGMRIP_IS_AUDIO_FORMAT(format)    ((format) == OGMRIP_FORMAT_PCM    || \

@@ -274,11 +274,11 @@ AM_CONDITIONAL(HAVE_DIRAC_SUPPORT, [test x"$have_dirac_support" = x"yes"])
 
 dnl **************************************************************
 
-AC_ARG_ENABLE(vp8-support,
-  AC_HELP_STRING([--disable-vp8-support], [disable VP8 support]),
-  [have_vp8_support="$enableval"], [have_vp8_support="yes"])
+AC_ARG_ENABLE(vpx-support,
+  AC_HELP_STRING([--disable-vpx-support], [disable VPX support]),
+  [have_vpx_support="$enableval"], [have_vpx_support="yes"])
 
-AM_CONDITIONAL(HAVE_VP8_SUPPORT, [test x"$have_vp8_support" = x"yes"])
+AM_CONDITIONAL(HAVE_VPX_SUPPORT, [test x"$have_vpx_support" = x"yes"])
 
 dnl **************************************************************
 
@@ -522,10 +522,10 @@ else
   AC_MSG_NOTICE([   Dirac support disabled])
 fi
 
-if test x"$have_vp8_support" = xyes; then
-  AC_MSG_NOTICE([** VP8 support enabled])
+if test x"$have_vpx_support" = xyes; then
+  AC_MSG_NOTICE([** VPX support enabled])
 else
-  AC_MSG_NOTICE([   VP8 support disabled])
+  AC_MSG_NOTICE([   VPX support disabled])
 fi
 
 if test x"$have_mp3_support" = xyes; then
