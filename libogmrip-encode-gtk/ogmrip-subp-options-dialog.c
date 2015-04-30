@@ -100,18 +100,6 @@ ogmrip_subp_options_dialog_set_codec (OGMRipSubpOptionsDialog *dialog, GType cod
   ogmrip_type_chooser_widget_set_active (GTK_COMBO_BOX (dialog->priv->codec_combo), codec);
 }
 
-static gboolean
-ogmrip_subp_options_dialog_get_forced_only (OGMRipSubpOptionsDialog *dialog)
-{
-  return gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (dialog->priv->forced_subs_check));
-}
-
-static void
-ogmrip_subp_options_dialog_set_forced_only (OGMRipSubpOptionsDialog *dialog, gboolean forced_only)
-{
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->forced_subs_check), forced_only);
-}
-
 static OGMRipNewline
 ogmrip_subp_options_dialog_get_newline (OGMRipSubpOptionsDialog *dialog)
 {
@@ -151,7 +139,6 @@ ogmrip_subp_options_dialog_class_init (OGMRipSubpOptionsDialogClass *klass)
 
   g_object_class_override_property (gobject_class, PROP_CHARSET, "charset");
   g_object_class_override_property (gobject_class, PROP_CODEC, "codec");
-  g_object_class_override_property (gobject_class, PROP_FORCED_ONLY, "forced-only");
   g_object_class_override_property (gobject_class, PROP_NEWLINE, "newline");
   g_object_class_override_property (gobject_class, PROP_SPELL_CHECK, "spell-check");
 
@@ -239,8 +226,14 @@ ogmrip_subp_options_dialog_init (OGMRipSubpOptionsDialog *dialog)
       OGMRIP_LANGUAGE_STORE_NAME_COLUMN, _("None"),
       OGMRIP_LANGUAGE_STORE_CODE_COLUMN, 0, -1);
 
+  dialog->priv->forced_subs_check = gtk_check_button_new_with_mnemonic (_("_Forced subtitles only"));
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->forced_subs_check), FALSE);
+  gtk_grid_attach (GTK_GRID (grid1), dialog->priv->forced_subs_check, 0, 3, 2, 1);
+  gtk_widget_set_margin_start (dialog->priv->forced_subs_check, 12);
+  gtk_widget_show (dialog->priv->forced_subs_check);
+
   dialog->priv->default_check = gtk_check_button_new_with_mnemonic (_("Use _profile settings"));
-  gtk_grid_attach (GTK_GRID (grid1), dialog->priv->default_check, 0, 3, 2, 1);
+  gtk_grid_attach (GTK_GRID (grid1), dialog->priv->default_check, 0, 4, 2, 1);
   gtk_widget_set_margin_start (dialog->priv->default_check, 12);
   gtk_widget_show (dialog->priv->default_check);
 
@@ -249,7 +242,7 @@ ogmrip_subp_options_dialog_init (OGMRipSubpOptionsDialog *dialog)
 
   parent = gtk_widget_get_parent (grid2);
   gtk_container_remove (GTK_CONTAINER (parent), grid2);
-  gtk_grid_attach (GTK_GRID (grid1), grid2, 0, 4, 2, 1);
+  gtk_grid_attach (GTK_GRID (grid1), grid2, 0, 5, 2, 1);
   gtk_widget_show (grid2);
 
   g_object_bind_property (dialog->priv->default_check, "active", grid2, "visible", G_BINDING_INVERT_BOOLEAN);
@@ -265,9 +258,6 @@ ogmrip_subp_options_dialog_init (OGMRipSubpOptionsDialog *dialog)
 
   dialog->priv->spell_check = gtk_builder_get_widget (builder, "spell-check");
   gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->spell_check), FALSE);
-
-  dialog->priv->forced_subs_check = gtk_builder_get_widget (builder, "forced-subs-check");
-  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->forced_subs_check), TRUE);
 
   grid2 = gtk_builder_get_widget (builder, "subp-options-table");
   g_signal_connect (dialog->priv->codec_combo, "changed",
@@ -391,5 +381,17 @@ void
 ogmrip_subp_options_dialog_set_language (OGMRipSubpOptionsDialog *dialog, gint lang)
 {
   ogmrip_language_chooser_widget_set_active (OGMRIP_LANGUAGE_CHOOSER_WIDGET (dialog->priv->lang_chooser), lang);
+}
+
+gboolean
+ogmrip_subp_options_dialog_get_forced_only (OGMRipSubpOptionsDialog *dialog)
+{
+  return gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (dialog->priv->forced_subs_check));
+}
+
+void
+ogmrip_subp_options_dialog_set_forced_only (OGMRipSubpOptionsDialog *dialog, gboolean forced_only)
+{
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->forced_subs_check), forced_only);
 }
 

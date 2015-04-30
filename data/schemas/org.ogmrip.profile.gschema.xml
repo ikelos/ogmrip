@@ -152,10 +152,6 @@
       <default>''</default>
       <summary>The subp codec</summary>
     </key>
-    <key name="forced-only" type="b">
-      <default>true</default>
-      <summary>Whether to encode forced subtitles only</summary>
-    </key>
     <key name="character-set" type="u">
       <range min="0" max="2"/>
       <default>0</default>

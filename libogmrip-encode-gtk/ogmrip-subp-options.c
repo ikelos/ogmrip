@@ -34,10 +34,6 @@ ogmrip_subp_options_default_init (OGMRipSubpOptionsInterface *iface)
         OGMRIP_TYPE_SUBP_CODEC, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_interface_install_property (iface,
-      g_param_spec_boolean ("forced-only", "Forced only property", "Set forced only",
-        FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-
-  g_object_interface_install_property (iface,
       g_param_spec_uint ("newline", "Newline style property", "Set newline style",
         OGMRIP_NEWLINE_LF, OGMRIP_NEWLINE_CR, OGMRIP_NEWLINE_LF,
         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
@@ -87,26 +83,6 @@ ogmrip_subp_options_set_codec (OGMRipSubpOptions *options, GType codec)
   g_return_if_fail (g_type_is_a (codec, OGMRIP_TYPE_SUBP_CODEC));
 
   g_object_set (options, "codec", codec, NULL);
-}
-
-gboolean
-ogmrip_subp_options_get_forced_only (OGMRipSubpOptions *options)
-{
-  gboolean forced_only;
-
-  g_return_val_if_fail (OGMRIP_IS_SUBP_OPTIONS (options), FALSE);
-
-  g_object_get (options, "forced-only", &forced_only, NULL);
-
-  return forced_only;
-}
-
-void
-ogmrip_subp_options_set_forced_only (OGMRipSubpOptions *options, gboolean forced_only)
-{
-  g_return_if_fail (OGMRIP_IS_SUBP_OPTIONS (options));
-
-  g_object_set (options, "forced-only", forced_only, NULL);
 }
 
 OGMRipNewline

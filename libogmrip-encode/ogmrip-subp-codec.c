@@ -147,9 +147,9 @@ ogmrip_subp_codec_class_init (OGMRipSubpCodecClass *klass)
   gobject_class->set_property = ogmrip_subp_codec_set_property;
   gobject_class->get_property = ogmrip_subp_codec_get_property;
 
-  g_object_class_install_property (gobject_class, PROP_FORCED_ONLY, 
-        g_param_spec_boolean ("forced-only", "Forced only property", "Set forced only", 
-           FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+  g_object_class_install_property (gobject_class, PROP_FORCED_ONLY,
+      g_param_spec_boolean ("forced-only", "Forced only property", "Set forced only",
+        FALSE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_CHARSET,
       g_param_spec_int ("charset", "Charset property", "Set charset",
@@ -161,13 +161,13 @@ ogmrip_subp_codec_class_init (OGMRipSubpCodecClass *klass)
         OGMRIP_NEWLINE_UNDEFINED, OGMRIP_NEWLINE_CR_LF, OGMRIP_NEWLINE_UNDEFINED,
         G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
-  g_object_class_install_property (gobject_class, PROP_LABEL, 
-        g_param_spec_string ("label", "Label property", "Set label", 
-           NULL, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+  g_object_class_install_property (gobject_class, PROP_LABEL,
+      g_param_spec_string ("label", "Label property", "Set label",
+        NULL, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
-  g_object_class_install_property (gobject_class, PROP_LANGUAGE, 
-        g_param_spec_uint ("language", "Language property", "Set language", 
-           0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+  g_object_class_install_property (gobject_class, PROP_LANGUAGE,
+      g_param_spec_uint ("language", "Language property", "Set language",
+        0, G_MAXUINT, 0, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 }
 
 static void
@@ -227,8 +227,6 @@ ogmrip_subp_codec_new_from_profile (OGMRipSubpStream *stream, OGMRipProfile *pro
       g_settings_get_uint (settings, OGMRIP_PROFILE_CHARACTER_SET));
   ogmrip_subp_codec_set_newline (OGMRIP_SUBP_CODEC (codec),
       g_settings_get_uint (settings, OGMRIP_PROFILE_NEWLINE_STYLE));
-  ogmrip_subp_codec_set_forced_only (OGMRIP_SUBP_CODEC (codec),
-      g_settings_get_boolean (settings, OGMRIP_PROFILE_FORCED_ONLY));
 
   g_object_unref (settings);
 

@@ -796,6 +796,8 @@ ogmrip_main_window_create_subp_codec (OGMRipMainWindow *window, OGMRipProfile *p
       ogmrip_subp_chooser_widget_get_label (OGMRIP_SUBP_CHOOSER_WIDGET (chooser)));
   ogmrip_subp_codec_set_language (OGMRIP_SUBP_CODEC (codec),
       ogmrip_subp_chooser_widget_get_language (OGMRIP_SUBP_CHOOSER_WIDGET (chooser)));
+  ogmrip_subp_codec_set_forced_only (OGMRIP_SUBP_CODEC (codec),
+      ogmrip_subp_chooser_widget_get_forced_only (OGMRIP_SUBP_CHOOSER_WIDGET (chooser)));
 
   if (options)
   {
@@ -803,8 +805,6 @@ ogmrip_main_window_create_subp_codec (OGMRipMainWindow *window, OGMRipProfile *p
         ogmrip_subp_options_get_charset (options));
     ogmrip_subp_codec_set_newline (OGMRIP_SUBP_CODEC (codec),
         ogmrip_subp_options_get_newline (options));
-    ogmrip_subp_codec_set_forced_only (OGMRIP_SUBP_CODEC (codec),
-        ogmrip_subp_options_get_forced_only (options));
   }
 
   return codec;

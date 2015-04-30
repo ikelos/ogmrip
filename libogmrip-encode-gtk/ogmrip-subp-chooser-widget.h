@@ -47,11 +47,12 @@ struct _OGMRipSubpChooserWidgetClass
   OGMRipListItemClass parent_class;
 };
 
-GType               ogmrip_subp_chooser_widget_get_type     (void);
-GtkWidget *         ogmrip_subp_chooser_widget_new          (void);
-OGMRipSubpOptions * ogmrip_subp_chooser_widget_get_options  (OGMRipSubpChooserWidget *chooser);
-const gchar *       ogmrip_subp_chooser_widget_get_label    (OGMRipSubpChooserWidget *chooser);
-gint                ogmrip_subp_chooser_widget_get_language (OGMRipSubpChooserWidget *chooser);
+GType               ogmrip_subp_chooser_widget_get_type        (void);
+GtkWidget *         ogmrip_subp_chooser_widget_new             (void);
+OGMRipSubpOptions * ogmrip_subp_chooser_widget_get_options     (OGMRipSubpChooserWidget *chooser);
+const gchar *       ogmrip_subp_chooser_widget_get_label       (OGMRipSubpChooserWidget *chooser);
+gint                ogmrip_subp_chooser_widget_get_language    (OGMRipSubpChooserWidget *chooser);
+gboolean            ogmrip_subp_chooser_widget_get_forced_only (OGMRipSubpChooserWidget *chooser);
 
 G_END_DECLS
 

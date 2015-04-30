@@ -44,9 +44,6 @@ void          ogmrip_subp_options_set_charset     (OGMRipSubpOptions *options,
 GType         ogmrip_subp_options_get_codec       (OGMRipSubpOptions *dialog);
 void          ogmrip_subp_options_set_codec       (OGMRipSubpOptions *dialog,
                                                    GType             type);
-gboolean      ogmrip_subp_options_get_forced_only (OGMRipSubpOptions *options);
-void          ogmrip_subp_options_set_forced_only (OGMRipSubpOptions *options,
-                                                   gboolean          forced_only);
 OGMRipNewline ogmrip_subp_options_get_newline     (OGMRipSubpOptions *options);
 void          ogmrip_subp_options_set_newline     (OGMRipSubpOptions *options,
                                                    OGMRipNewline     newline);

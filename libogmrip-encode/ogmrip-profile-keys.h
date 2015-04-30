@@ -64,7 +64,6 @@ G_BEGIN_DECLS
 #define OGMRIP_PROFILE_SUBP                  "subp"
 
 #define OGMRIP_PROFILE_CODEC                 "codec"
-#define OGMRIP_PROFILE_FORCED_ONLY           "forced-only"
 #define OGMRIP_PROFILE_CHARACTER_SET         "character-set"
 #define OGMRIP_PROFILE_NEWLINE_STYLE         "newline-style"
 #define OGMRIP_PROFILE_SPELL_CHECK           "spell-check"

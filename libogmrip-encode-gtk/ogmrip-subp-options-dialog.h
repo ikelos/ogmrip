@@ -53,6 +53,9 @@ void          ogmrip_subp_options_dialog_set_label        (OGMRipSubpOptionsDial
 gint          ogmrip_subp_options_dialog_get_language     (OGMRipSubpOptionsDialog *dialog);
 void          ogmrip_subp_options_dialog_set_language     (OGMRipSubpOptionsDialog *dialog,
                                                            gint                    lang);
+gboolean      ogmrip_subp_options_dialog_get_forced_only  (OGMRipSubpOptionsDialog *dialog);
+void          ogmrip_subp_options_dialog_set_forced_only  (OGMRipSubpOptionsDialog *dialog,
+                                                           gboolean                forced_only);
 gboolean      ogmrip_subp_options_dialog_get_use_defaults (OGMRipSubpOptionsDialog *dialog);
 void          ogmrip_subp_options_dialog_set_use_defaults (OGMRipSubpOptionsDialog *dialog,
                                                            gboolean                use_defaults);

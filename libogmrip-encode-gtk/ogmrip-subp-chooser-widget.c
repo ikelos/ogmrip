@@ -273,3 +273,11 @@ ogmrip_subp_chooser_widget_get_language (OGMRipSubpChooserWidget *chooser)
   return ogmrip_subp_options_dialog_get_language (OGMRIP_SUBP_OPTIONS_DIALOG (chooser->priv->dialog));
 }
 
+gboolean
+ogmrip_subp_chooser_widget_get_forced_only (OGMRipSubpChooserWidget *chooser)
+{
+  g_return_val_if_fail (OGMRIP_IS_SUBP_CHOOSER_WIDGET (chooser), FALSE);
+
+  return ogmrip_subp_options_dialog_get_forced_only (OGMRIP_SUBP_OPTIONS_DIALOG (chooser->priv->dialog));
+}
+

@@ -813,9 +813,6 @@ ogmrip_profile_editor_dialog_constructed (GObject *gobject)
   g_signal_connect_swapped (widget, "clicked",
       G_CALLBACK (ogmrip_profile_editor_subp_options_button_clicked), dialog);
 
-  widget = gtk_builder_get_widget (builder, "forced-subs-check");
-  g_settings_bind (settings, OGMRIP_PROFILE_FORCED_ONLY, widget, "active", G_SETTINGS_BIND_DEFAULT);
-
   widget = gtk_builder_get_widget (builder, "charset-combo");
   g_settings_bind (settings, OGMRIP_PROFILE_CHARACTER_SET, widget, "active", G_SETTINGS_BIND_DEFAULT);
 
