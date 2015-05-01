@@ -853,6 +853,14 @@ ogmrip_options_dialog_new_at_scale (OGMRipEncoding *encoding, guint width, guint
 }
 
 void
+ogmrip_options_dialog_set_test (OGMRipOptionsDialog *dialog, gboolean do_check)
+{
+  g_return_if_fail (OGMRIP_IS_OPTIONS_DIALOG (dialog));
+
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (dialog->priv->test_check), do_check);
+}
+
+void
 ogmrip_options_dialog_get_scale_size (OGMRipOptionsDialog *dialog, guint *width, guint *height)
 {
   guint active;

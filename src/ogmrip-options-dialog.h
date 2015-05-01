@@ -58,6 +58,8 @@ GtkWidget * ogmrip_options_dialog_new              (OGMRipEncoding      *encodin
 GtkWidget * ogmrip_options_dialog_new_at_scale     (OGMRipEncoding      *encoding,
                                                     guint               width,
                                                     guint               height);
+void        ogmrip_options_dialog_set_test         (OGMRipOptionsDialog *dialog,
+                                                    gboolean            do_check);
 void        ogmrip_options_dialog_get_scale_size   (OGMRipOptionsDialog *dialog,
                                                     guint               *width,
                                                     guint               *height);

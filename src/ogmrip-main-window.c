@@ -923,6 +923,8 @@ ogmrip_main_window_run_options_dialog (OGMRipMainWindow *window, OGMRipEncoding 
 
   title = ogmrip_title_chooser_get_active (OGMRIP_TITLE_CHOOSER (window->priv->title_chooser));
 
+  ogmrip_chapter_store_get_selection (OGMRIP_CHAPTER_STORE (window->priv->chapter_store), &start_chap, &end_chap);
+
   if (encoding)
   {
     ogmrip_encoding_clear_audio_codecs (encoding);
@@ -944,6 +946,8 @@ ogmrip_main_window_run_options_dialog (OGMRipMainWindow *window, OGMRipEncoding 
 
   gtk_window_set_transient_for (GTK_WINDOW (dialog), GTK_WINDOW (window));
   gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), TRUE);
+
+  ogmrip_options_dialog_set_test (OGMRIP_OPTIONS_DIALOG (dialog), start_chap == 0 && end_chap == -1);
 
   response = gtk_dialog_run (GTK_DIALOG (dialog));
   if (response != OGMRIP_RESPONSE_EXTRACT && response != OGMRIP_RESPONSE_ENQUEUE && response != OGMRIP_RESPONSE_TEST)
@@ -974,8 +978,6 @@ ogmrip_main_window_run_options_dialog (OGMRipMainWindow *window, OGMRipEncoding 
     g_object_unref (encoding);
     return FALSE;
   }
-
-  ogmrip_chapter_store_get_selection (OGMRIP_CHAPTER_STORE (window->priv->chapter_store), &start_chap, &end_chap);
 
   vcodec = ogmrip_main_window_create_video_codec (window, profile,
       ogmrip_title_get_video_stream (title), start_chap, end_chap);
