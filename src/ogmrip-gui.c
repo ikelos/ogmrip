@@ -174,14 +174,37 @@ G_DEFINE_TYPE_WITH_CODE (OGMRipGui, ogmrip_gui, GTK_TYPE_APPLICATION,
     G_ADD_PRIVATE (OGMRipGui)
     G_IMPLEMENT_INTERFACE (OGMRIP_TYPE_APPLICATION, ogmrip_application_iface_init));
 
-static GActionEntry app_entries[] =
+static void
+ogmrip_gui_map_action_entries (GApplication *app)
 {
-  { "profiles",    ogmrip_gui_profiles_activated,  NULL, NULL, NULL },
-  { "encodings",   ogmrip_gui_encodings_activated, NULL, NULL, NULL },
-  { "preferences", ogmrip_gui_pref_activated,      NULL, NULL, NULL },
-  { "about",       ogmrip_gui_about_activated,     NULL, NULL, NULL },
-  { "quit",        ogmrip_gui_quit_activated,      NULL, NULL, NULL }
-};
+  static GActionEntry app_entries[] =
+  {
+    { "profiles",    ogmrip_gui_profiles_activated,  NULL, NULL, NULL },
+    { "encodings",   ogmrip_gui_encodings_activated, NULL, NULL, NULL },
+    { "preferences", ogmrip_gui_pref_activated,      NULL, NULL, NULL },
+    { "about",       ogmrip_gui_about_activated,     NULL, NULL, NULL },
+    { "quit",        ogmrip_gui_quit_activated,      NULL, NULL, NULL }
+  };
+
+  static const gchar * const app_accels[][3] =
+  {
+    { "app.profiles",     "<Ctrl>F",      NULL },
+    { "app.encodings",    "<Ctrl>E",      NULL },
+    { "win.load",         "<Ctrl>L",      NULL },
+    { "win.extract",      "<Ctrl>Return", NULL },
+    { "win.select_all",   "<Ctrl>A",      NULL },
+    { "win.deselect_all", "<Ctrl>D",      NULL },
+    { "win.close",        "<Ctrl>W",      NULL }
+  };
+
+  guint i;
+
+  g_action_map_add_action_entries (G_ACTION_MAP (app),
+      app_entries, G_N_ELEMENTS (app_entries), app);
+
+  for (i = 0; i < G_N_ELEMENTS (app_accels); i ++)
+    gtk_application_set_accels_for_action (GTK_APPLICATION (app), app_accels[i][0], &app_accels[i][1]);
+}
 
 static void
 ogmrip_gui_startup (GApplication *app)
@@ -195,8 +218,7 @@ ogmrip_gui_startup (GApplication *app)
   g_signal_connect (app, "prepare",
       G_CALLBACK (ogmrip_gui_prepare_cb), NULL);
 
-  g_action_map_add_action_entries (G_ACTION_MAP (app),
-      app_entries, G_N_ELEMENTS (app_entries), app);
+  ogmrip_gui_map_action_entries (app);
 
   builder = gtk_builder_new ();
   if (!gtk_builder_add_from_resource (builder, OGMRIP_MENU_RES, &error))
