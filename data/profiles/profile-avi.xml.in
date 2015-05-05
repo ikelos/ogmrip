@@ -1,4 +1,4 @@
-<profile name="default-avi" version="(1,0)">
+<profile name="default-avi">
   <key name="name">'DivX for Standalone Player'</key>
   <key name="description">'2-pass, 1x700MB (AVI + XviD + MP3)'</key>
   <section name="general">

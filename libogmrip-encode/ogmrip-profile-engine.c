@@ -202,12 +202,6 @@ ogmrip_profile_engine_remove_internal (OGMRipProfileEngine *engine, OGMRipProfil
   g_free (name);
 }
 
-static gboolean
-ogmrip_profile_engine_update_internal (OGMRipProfileEngine *engine, OGMRipProfile *profile)
-{
-  return TRUE;
-}
-
 static void
 ogmrip_profile_engine_init (OGMRipProfileEngine *engine)
 {
@@ -234,7 +228,6 @@ ogmrip_profile_engine_class_init (OGMRipProfileEngineClass *klass)
 
   klass->add = ogmrip_profile_engine_add_internal;
   klass->remove = ogmrip_profile_engine_remove_internal;
-  klass->update = ogmrip_profile_engine_update_internal;
 
   g_object_class_install_property (gobject_class, PROP_PROFILES,
       g_param_spec_boxed ("profiles", "profiles", "profiles",
@@ -253,7 +246,7 @@ ogmrip_profile_engine_class_init (OGMRipProfileEngineClass *klass)
   signals[UPDATE] = g_signal_new ("update", G_TYPE_FROM_CLASS (klass),
       G_SIGNAL_RUN_LAST | G_SIGNAL_NO_RECURSE | G_SIGNAL_NO_HOOKS,
       G_STRUCT_OFFSET (OGMRipProfileEngineClass, update), NULL, NULL,
-      ogmrip_cclosure_marshal_BOOLEAN__OBJECT, G_TYPE_BOOLEAN, 1, OGMRIP_TYPE_PROFILE);
+      g_cclosure_marshal_VOID__OBJECT, G_TYPE_NONE, 1, OGMRIP_TYPE_PROFILE);
 }
 
 OGMRipProfileEngine *
@@ -263,21 +256,6 @@ ogmrip_profile_engine_get_default (void)
     return g_object_new (OGMRIP_TYPE_PROFILE_ENGINE, NULL);
 
   return default_engine;
-}
-
-static gboolean
-ogmrip_profile_is_new_version (OGMRipProfile *profile, OGMRipXML *xml, guint *new_major, guint *new_minor)
-{
-  GVariant *variant;
-  guint current_major, current_minor;
-
-  g_settings_get (G_SETTINGS (profile), OGMRIP_PROFILE_VERSION, "(uu)", &current_major, &current_minor);
-
-  variant = ogmrip_xml_get_variant (xml, OGMRIP_PROFILE_VERSION, "(uu)");
-  g_variant_get (variant, "(uu)", new_major, new_minor);
-  g_variant_unref (variant);
-
-  return *new_major > current_major || (*new_major == current_major && *new_minor > current_minor);
 }
 
 static void
@@ -299,23 +277,7 @@ ogmrip_profile_engine_load_file (OGMRipProfileEngine *engine, const gchar *filen
       OGMRipProfile *profile;
 
       profile = ogmrip_profile_engine_get (engine, name);
-      if (profile)
-      {
-        guint major, minor;
-
-        g_object_set (profile, "file", file, NULL);
-
-        if (ogmrip_profile_is_new_version (profile, xml, &major, &minor))
-        {
-          gboolean load = FALSE;
-
-          g_signal_emit (engine, signals[UPDATE], 0, profile, &load);
-          if (load)
-            ogmrip_profile_reset (profile);
-          g_settings_set (G_SETTINGS (profile), OGMRIP_PROFILE_VERSION, "(uu)", major, minor);
-        }
-      }
-      else
+      if (!profile)
       {
         profile = ogmrip_profile_new_from_file (file, NULL);
         ogmrip_profile_engine_add (engine, profile);

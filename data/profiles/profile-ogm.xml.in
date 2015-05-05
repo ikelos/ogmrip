@@ -1,4 +1,4 @@
-<profile name="default-ogm" version="(1,0)">
+<profile name="default-ogm">
   <key name="name">'PC, Low Quality'</key>
   <key name="description">'1-pass, 1x700MB (OGM + Lavc + Vorbis)'</key>
   <section name="general">

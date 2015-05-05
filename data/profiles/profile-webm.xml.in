@@ -1,4 +1,4 @@
-<profile name="default-webm" version="(1,0)">
+<profile name="default-webm">
   <key name="name">'WebM Video'</key>
   <key name="description">'2-pass, 1x700MB (WebM + VP8 + Vorbis)'</key>
   <section name="general">

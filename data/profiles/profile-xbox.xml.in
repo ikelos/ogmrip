@@ -1,4 +1,4 @@
-<profile name="default-xbox" version="(1,0)">
+<profile name="default-xbox">
   <key name="name">'Microsoft Xbox 360'</key>
   <key name="description">'Quantizer 2 (MP4 + X264 + AAC)'</key>
   <section name="general">

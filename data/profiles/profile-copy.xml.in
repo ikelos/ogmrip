@@ -1,4 +1,4 @@
-<profile name="default-copy" version="(1,0)">
+<profile name="default-copy">
   <key name="name">'Copy'</key>
   <key name="description">'No reencoding'</key>
   <section name="general">

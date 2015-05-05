@@ -76,15 +76,9 @@ ogmrip_profile_parse_section (OGMRipProfile *profile, OGMRipXML *xml)
 gboolean
 ogmrip_profile_parse (OGMRipProfile *profile, OGMRipXML *xml, GError **error)
 {
-  GVariant *variant;
-
   g_return_val_if_fail (OGMRIP_IS_PROFILE (profile), FALSE);
   g_return_val_if_fail (xml != NULL, FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
-
-  variant = ogmrip_xml_get_variant (xml, "version", "(uu)");
-  if (variant)
-    g_settings_set_value (G_SETTINGS (profile), OGMRIP_PROFILE_VERSION, variant);
 
   if (ogmrip_xml_children (xml))
   {
@@ -154,7 +148,6 @@ ogmrip_profile_dump_section (OGMRipProfile *profile, OGMRipXML *xml, const gchar
 gboolean
 ogmrip_profile_dump (OGMRipProfile *profile, OGMRipXML *xml, GError **error)
 {
-  GVariant *variant;
   gchar *str;
 
   g_return_val_if_fail (OGMRIP_IS_PROFILE (profile), FALSE);
@@ -166,10 +159,6 @@ ogmrip_profile_dump (OGMRipProfile *profile, OGMRipXML *xml, GError **error)
   g_object_get (profile, "name", &str, NULL);
   ogmrip_xml_set_string (xml, "name", str);
   g_free (str);
-
-  variant = g_settings_get_value (G_SETTINGS (profile), OGMRIP_PROFILE_VERSION);
-  ogmrip_xml_set_variant (xml, "version", variant);
-  g_variant_unref (variant);
 
   ogmrip_profile_dump_key (G_SETTINGS (profile), xml, OGMRIP_PROFILE_NAME);
   ogmrip_profile_dump_key (G_SETTINGS (profile), xml, OGMRIP_PROFILE_DESCRIPTION);

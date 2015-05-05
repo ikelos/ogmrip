@@ -1,4 +1,4 @@
-<profile name="default-mkv" version="(1,0)">
+<profile name="default-mkv">
   <key name="name">'PC, High Quality'</key>
   <key name="description">'Quantizer 2 (MKV + X264 + AAC)'</key>
   <section name="general">

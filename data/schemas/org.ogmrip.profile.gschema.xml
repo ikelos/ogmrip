@@ -12,10 +12,6 @@
       <default>''</default>
       <summary>The name of the profile</summary>
     </key>
-    <key name="version" type="(uu)">
-      <default>(0,0)</default>
-      <summary>The version of the profile</summary>
-    </key>
     <key name="description" type="s">
       <default>''</default>
       <summary>The description of the profile</summary>
