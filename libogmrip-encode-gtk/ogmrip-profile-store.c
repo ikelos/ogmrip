@@ -275,8 +275,11 @@ ogmrip_profile_store_reload (OGMRipProfileStore *store)
 
   list = ogmrip_profile_engine_get_list (store->priv->engine);
   for (link = list; link; link = link->next)
+  {
     if (!store->priv->valid_only || ogmrip_profile_is_valid (link->data))
       ogmrip_profile_store_add (store, link->data);
+    g_object_unref (link->data);
+  }
   g_slist_free (list);
 }
 

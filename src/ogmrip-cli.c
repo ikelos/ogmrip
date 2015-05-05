@@ -750,12 +750,12 @@ ogmrip_cli_encoding_complete_cb (OGMRipEncoding *encoding, OGMJobSpawn *spawn, O
 static void
 ogmrip_cli_encode (OGMRipCli *cli)
 {
+  OGMRipProfile *profile = NULL;
   OGMRipEncoding *encoding = NULL;
   OGMRipMedia *media = NULL;
   GError *error = NULL;
 
   OGMRipProfileEngine *engine;
-  OGMRipProfile *profile;
   OGMRipTitle *title;
 
   gchar *log;
@@ -833,6 +833,9 @@ cleanup:
       ogmrip_encoding_clean (encoding, TRUE, TRUE, FALSE);
     g_object_unref (encoding);
   }
+
+  if (profile)
+    g_object_unref (profile);
 
   if (media)
     g_object_unref (media);

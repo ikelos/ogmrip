@@ -79,7 +79,7 @@ ogmrip_gui_encodings_activated (GSimpleAction *action, GVariant *parameter, gpoi
     list = ogmrip_encoding_manager_get_list (gui->priv->manager);
     for (link = list; link; link = link->next)
       if (ogmrip_encoding_manager_get_status (gui->priv->manager, link->data) != OGMRIP_ENCODING_SUCCESS)
-        ogmrip_main_window_encode (OGMRIP_MAIN_WINDOW (window), g_object_ref (link->data));
+        ogmrip_main_window_encode (OGMRIP_MAIN_WINDOW (window), link->data);
     g_slist_free (list);
   }
 }

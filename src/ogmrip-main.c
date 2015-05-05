@@ -91,6 +91,7 @@ ogmrip_startup_thread (GTask *task, GApplication *app, gpointer data, GCancellab
 {
   OGMRipModuleEngine *module_engine;
   OGMRipProfileEngine *profile_engine;
+  OGMRipProfile *default_profile;
   gchar *str;
 
   ogmrip_dvd_register_media ();
@@ -138,7 +139,12 @@ ogmrip_startup_thread (GTask *task, GApplication *app, gpointer data, GCancellab
   g_free (str);
 
   str = g_settings_get_string (settings, OGMRIP_SETTINGS_PROFILE);
-  if (!strlen (str) || !ogmrip_profile_engine_get (profile_engine, str))
+  default_profile = strlen (str) > 0 ? ogmrip_profile_engine_get (profile_engine, str) : NULL;
+  g_free (str);
+
+  if (default_profile)
+    g_object_unref (default_profile);
+  else
   {
     GSList *list;
 
@@ -151,9 +157,9 @@ ogmrip_startup_thread (GTask *task, GApplication *app, gpointer data, GCancellab
       g_settings_set_string (settings, OGMRIP_SETTINGS_PROFILE, name);
       g_free (name);
     }
+    g_slist_foreach (list, (GFunc) g_object_unref, NULL);
     g_slist_free (list);
   }
-  g_free (str);
 
   g_main_context_invoke (NULL, (GSourceFunc) ogmrip_startup_finish, app);
 

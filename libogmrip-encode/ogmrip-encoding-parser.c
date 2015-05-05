@@ -45,7 +45,10 @@ ogmrip_encoding_parse_property (OGMRipXML *xml, gpointer gobject, gpointer klass
       g_free (str);
 
       if (profile)
+      {
         ogmrip_encoding_set_profile (gobject, profile);
+        g_object_unref (profile);
+      }
     }
     else if (g_str_equal (property, "log-file") && OGMRIP_IS_ENCODING (gobject))
     {

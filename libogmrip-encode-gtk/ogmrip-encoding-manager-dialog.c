@@ -265,7 +265,10 @@ ogmrip_encoding_manager_dialog_set_manager (OGMRipEncodingManagerDialog *dialog,
 
   list = ogmrip_encoding_manager_get_list (manager);
   for (link = list; link; link = link->next)
+  {
     ogmrip_encoding_manager_dialog_add_encoding (dialog, link->data);
+    g_object_unref (link->data);
+  }
   g_slist_free (list);
 
   g_signal_connect_swapped (manager, "add",

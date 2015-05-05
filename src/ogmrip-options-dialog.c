@@ -352,7 +352,7 @@ ogmrip_options_dialog_get_profile_mapping (GValue *value, GVariant *variant, gpo
   name = g_variant_get_string (variant, NULL);
   profile = name ? ogmrip_profile_engine_get (engine, name) : NULL;
 
-  g_value_set_object (value, profile);
+  g_value_take_object (value, profile);
 
   return TRUE;
 }

@@ -62,7 +62,7 @@ ogmrip_profile_add_name (const gchar *key, OGMRipProfile *profile, GArray *array
 static void
 ogmrip_profile_add_profile (const gchar *key, OGMRipProfile *profile, GSList **list)
 {
-  *list = g_slist_prepend (*list, profile);
+  *list = g_slist_prepend (*list, g_object_ref (profile));
 }
 
 static gchar **
@@ -319,9 +319,9 @@ ogmrip_profile_engine_load_file (OGMRipProfileEngine *engine, const gchar *filen
       {
         profile = ogmrip_profile_new_from_file (file, NULL);
         ogmrip_profile_engine_add (engine, profile);
-        g_object_unref (profile);
       }
 
+      g_object_unref (profile);
       g_free (name);
     }
 
@@ -382,9 +382,16 @@ ogmrip_profile_engine_add_path (OGMRipProfileEngine *engine, const gchar *path)
 OGMRipProfile *
 ogmrip_profile_engine_get (OGMRipProfileEngine *engine, const gchar *name)
 {
+  OGMRipProfile *profile;
+
   g_return_val_if_fail (OGMRIP_IS_PROFILE_ENGINE (engine), NULL);
 
-  return g_hash_table_lookup (engine->priv->profiles, name);
+  profile = g_hash_table_lookup (engine->priv->profiles, name);
+
+  if (profile)
+    g_object_ref (profile);
+
+  return profile;
 }
 
 void

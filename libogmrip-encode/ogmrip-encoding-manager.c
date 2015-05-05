@@ -295,7 +295,7 @@ ogmrip_encoding_manager_get_list (OGMRipEncodingManager *manager)
   {
     OGMRipEncodingData *data = link->data;
 
-    list = g_slist_prepend (list, data->encoding);
+    list = g_slist_prepend (list, g_object_ref (data->encoding));
   }
 
   return g_slist_reverse (list);
