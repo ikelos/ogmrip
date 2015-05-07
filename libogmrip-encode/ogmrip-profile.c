@@ -52,14 +52,12 @@ struct _OGMRipProfilePriv
   gulong subp_handler;
 
   gchar *name, *path;
-  GFile *file;
 };
 
 enum
 {
   PROP_0,
   PROP_NAME,
-  PROP_FILE,
   PROP_VALID
 };
 
@@ -298,8 +296,6 @@ ogmrip_profile_dispose (GObject *gobject)
 
   g_clear_object (&profile->priv->subp_settings);
 
-  g_clear_object (&profile->priv->file);
-
   G_OBJECT_CLASS (ogmrip_profile_parent_class)->dispose (gobject);
 }
 
@@ -326,28 +322,8 @@ ogmrip_profile_get_property (GObject *gobject, guint property_id, GValue *value,
     case PROP_NAME:
       g_value_set_string (value, profile->priv->name);
       break;
-    case PROP_FILE:
-      g_value_set_object (value, profile->priv->file);
-      break;
     case PROP_VALID:
       g_value_set_boolean (value, profile->priv->is_valid);
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
-      break;
-  }
-}
-
-static void
-ogmrip_profile_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
-{
-  OGMRipProfile *profile = OGMRIP_PROFILE (gobject);
-
-  switch (property_id)
-  {
-    case PROP_FILE:
-      if (!profile->priv->file)
-        profile->priv->file = g_value_dup_object (value);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, property_id, pspec);
@@ -365,15 +341,10 @@ ogmrip_profile_class_init (OGMRipProfileClass *klass)
   gobject_class->dispose = ogmrip_profile_dispose;
   gobject_class->finalize = ogmrip_profile_finalize;
   gobject_class->get_property = ogmrip_profile_get_property;
-  gobject_class->set_property = ogmrip_profile_set_property;
 
   g_object_class_install_property (gobject_class, PROP_NAME,
       g_param_spec_string ("name", "Name property", "Get name",
         NULL, G_PARAM_READABLE | G_PARAM_STATIC_STRINGS));
-
-  g_object_class_install_property (gobject_class, PROP_FILE,
-      g_param_spec_object ("file", "File property", "Get file",
-        G_TYPE_FILE, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
 
   g_object_class_install_property (gobject_class, PROP_VALID,
       g_param_spec_boolean ("validity", "Validity property", "Get validity",
@@ -503,6 +474,18 @@ ogmrip_profile_copy (OGMRipProfile *profile, gchar *name)
   return new_profile;
 }
 
+static gboolean
+ogmrip_profile_load_xml (OGMRipProfile *profile, OGMRipXML *xml, GError **error)
+{
+  gboolean retval;
+
+  ogmrip_profile_block_handlers (profile);
+  retval = ogmrip_profile_parse (profile, xml, error);
+  ogmrip_profile_unblock_handlers (profile);
+
+  return retval;
+}
+
 static OGMRipProfile *
 ogmrip_profile_new_from_xml (OGMRipXML *xml, GError **error)
 {
@@ -518,11 +501,7 @@ ogmrip_profile_new_from_xml (OGMRipXML *xml, GError **error)
 
   profile = ogmrip_profile_new (str);
   if (profile)
-  {
-    ogmrip_profile_block_handlers (profile);
-    ogmrip_profile_parse (profile, xml, error);
-    ogmrip_profile_unblock_handlers (profile);
-  }
+    ogmrip_profile_load_xml (profile, xml, error);
 
   g_free (str);
 
@@ -537,16 +516,14 @@ ogmrip_profile_new_from_file (GFile *file, GError **error)
   OGMRipProfile *profile;
 
   g_return_val_if_fail (G_IS_FILE (file), NULL);
-  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, NULL);
 
   xml = ogmrip_xml_new_from_file (file, error);
   if (!xml)
     return NULL;
 
   profile = ogmrip_profile_new_from_xml (xml, error);
-  if (profile)
-    g_object_set (profile, "file", file, NULL);
-  else if (error != NULL && *error == NULL)
+  if (!profile && error != NULL && *error == NULL)
   {
     gchar *filename;
 
@@ -561,14 +538,69 @@ ogmrip_profile_new_from_file (GFile *file, GError **error)
   return profile;
 }
 
+static void
+ogmrip_profile_reset_section (OGMRipProfile *profile, const gchar *section)
+{
+  GSettings *settings;
+  gchar **keys;
+  guint i;
+
+  settings = ogmrip_profile_get_child (profile, section);
+  keys = g_settings_list_keys (settings);
+  for (i = 0; keys[i]; i ++)
+    g_settings_reset (settings, keys[i]);
+  g_strfreev (keys);
+}
+
+static void
+ogmrip_profile_reset_internal (OGMRipProfile *profile)
+{
+  ogmrip_profile_reset_section (profile, OGMRIP_PROFILE_GENERAL);
+  ogmrip_profile_reset_section (profile, OGMRIP_PROFILE_VIDEO);
+  ogmrip_profile_reset_section (profile, OGMRIP_PROFILE_AUDIO);
+  ogmrip_profile_reset_section (profile, OGMRIP_PROFILE_SUBP);
+}
+
 gboolean
-ogmrip_profile_export (OGMRipProfile *profile, GFile *file, GError **error)
+ogmrip_profile_load (OGMRipProfile *profile, GFile *file, GError **error)
 {
   OGMRipXML *xml;
   gboolean retval;
 
-  g_return_val_if_fail (OGMRIP_IS_PROFILE (profile), FALSE);
   g_return_val_if_fail (G_IS_FILE (file), FALSE);
+  g_return_val_if_fail (OGMRIP_IS_PROFILE (profile), FALSE);
+  g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
+
+  xml = ogmrip_xml_new_from_file (file, error);
+  if (!xml)
+    return FALSE;
+
+  ogmrip_profile_reset_internal (profile);
+
+  retval = ogmrip_profile_load_xml (profile, xml, error);
+  if (!retval && error != NULL && *error == NULL)
+  {
+    gchar *filename;
+
+    filename = g_file_get_basename (file);
+    g_set_error (error, OGMRIP_PROFILE_ERROR, OGMRIP_PROFILE_ERROR_INVALID,
+        _("'%s' does not contain a valid profile"), filename);
+    g_free (filename);
+  }
+
+  ogmrip_xml_free (xml);
+
+  return retval;
+}
+
+gboolean
+ogmrip_profile_save (OGMRipProfile *profile, GFile *file, GError **error)
+{
+  OGMRipXML *xml;
+  gboolean retval;
+
+  g_return_val_if_fail (G_IS_FILE (file), FALSE);
+  g_return_val_if_fail (OGMRIP_IS_PROFILE (profile), FALSE);
   g_return_val_if_fail (error == NULL || *error == NULL, FALSE);
 
   xml = ogmrip_xml_new ();
@@ -579,24 +611,6 @@ ogmrip_profile_export (OGMRipProfile *profile, GFile *file, GError **error)
   ogmrip_xml_free (xml);
 
   return retval;
-}
-
-void
-ogmrip_profile_reset (OGMRipProfile *profile)
-{
-  g_return_if_fail (OGMRIP_IS_PROFILE (profile));
-
-  if (profile->priv->file)
-  {
-    OGMRipXML *xml;
-
-    xml = ogmrip_xml_new_from_file (profile->priv->file, NULL);
-    if (xml)
-    {
-      ogmrip_profile_parse (profile, xml, NULL);
-      ogmrip_xml_free (xml);
-    }
-  }
 }
 
 void

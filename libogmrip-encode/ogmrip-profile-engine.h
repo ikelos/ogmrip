@@ -63,6 +63,8 @@ void                  ogmrip_profile_engine_add         (OGMRipProfileEngine *en
                                                          OGMRipProfile       *profile);
 void                  ogmrip_profile_engine_remove      (OGMRipProfileEngine *engine,
                                                          OGMRipProfile       *profile);
+void                  ogmrip_profile_engine_update      (OGMRipProfileEngine *engine,
+                                                         OGMRipProfile       *profile);
 GSList *              ogmrip_profile_engine_get_list    (OGMRipProfileEngine *engine);
 
 G_END_DECLS

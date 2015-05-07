@@ -236,17 +236,6 @@ ogmrip_profile_manager_dialog_rename_activated (GSimpleAction *action, GVariant 
 }
 
 static void
-ogmrip_profile_manager_dialog_reset_activated (GSimpleAction *action, GVariant *parameter, gpointer data)
-{
-  OGMRipProfileManagerDialog *dialog = data;
-  GtkTreeModel *model;
-  GtkTreeIter iter;
-
-  if (gtk_tree_selection_get_selected (dialog->priv->selection, &model, &iter))
-    ogmrip_profile_reset (ogmrip_profile_store_get_profile (OGMRIP_PROFILE_STORE (model), &iter));
-}
-
-static void
 ogmrip_profile_manager_dialog_import_activated (GSimpleAction *action, GVariant *parameter, gpointer data)
 {
   OGMRipProfileManagerDialog *parent = data;
@@ -261,19 +250,59 @@ ogmrip_profile_manager_dialog_import_activated (GSimpleAction *action, GVariant 
   if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_OK)
   {
     GError *error = NULL;
-    OGMRipProfile *profile;
+    OGMRipProfile *profile = NULL;
+
+    OGMRipXML *xml;
     GFile *file;
 
     gtk_widget_hide (dialog);
 
     file = gtk_file_chooser_get_file (GTK_FILE_CHOOSER (dialog));
 
-    profile = ogmrip_profile_new_from_file (file, &error);
-    if (profile)
+    xml = ogmrip_xml_new_from_file (file, &error);
+    if (xml && g_str_equal (ogmrip_xml_get_name (xml), "profile"))
     {
-      ogmrip_profile_engine_add (parent->priv->engine, profile);
-      g_object_unref (profile);
+      gchar *str;
+
+      str = ogmrip_xml_get_string (xml, "name");
+      if (str)
+      {
+        profile = ogmrip_profile_engine_get (parent->priv->engine, str);
+        g_free (str);
+
+        if (profile)
+        {
+          str = g_settings_get_string (G_SETTINGS (profile), OGMRIP_PROFILE_NAME);
+
+          gtk_widget_destroy (dialog);
+          dialog = gtk_message_dialog_new (GTK_WINDOW (parent),
+              GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+              GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, _("Profile '%s' already exists"), str);
+          gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog), _("Do you want to update it?"));
+          g_clear_error (&error);
+
+          g_free (str);
+
+          if (gtk_dialog_run (GTK_DIALOG (dialog)) == GTK_RESPONSE_YES)
+          {
+            ogmrip_profile_load (profile, file, &error);
+            ogmrip_profile_engine_update (parent->priv->engine, profile);
+          }
+        }
+        else
+        {
+          profile = ogmrip_profile_new_from_file (file, &error);
+          if (profile)
+            ogmrip_profile_engine_add (parent->priv->engine, profile);
+        }
+      }
     }
+
+    if (xml)
+      ogmrip_xml_free (xml);
+
+    if (profile)
+      g_object_unref (profile);
     else
     {
       gtk_widget_destroy (dialog);
@@ -291,6 +320,7 @@ ogmrip_profile_manager_dialog_import_activated (GSimpleAction *action, GVariant 
   }
   gtk_widget_destroy (dialog);
 }
+
 static void
 ogmrip_profile_manager_dialog_export_activated (GSimpleAction *action, GVariant *parameter, gpointer data)
 {
@@ -320,7 +350,7 @@ ogmrip_profile_manager_dialog_export_activated (GSimpleAction *action, GVariant 
         GFile *file;
 
         file = gtk_file_chooser_get_file (GTK_FILE_CHOOSER (dialog));
-        if (!ogmrip_profile_export (profile, file, &error))
+        if (!ogmrip_profile_save (profile, file, &error))
         {
           ogmrip_run_error_dialog (GTK_WINDOW (dialog), error, _("Could not export the profile"));
           g_clear_error (&error);
@@ -385,8 +415,7 @@ static GActionEntry entries[] =
   { "copy",   ogmrip_profile_manager_dialog_copy_activated,   NULL, NULL, NULL },
   { "import", ogmrip_profile_manager_dialog_import_activated, NULL, NULL, NULL },
   { "export", ogmrip_profile_manager_dialog_export_activated, NULL, NULL, NULL },
-  { "rename", ogmrip_profile_manager_dialog_rename_activated, NULL, NULL, NULL },
-  { "reset",  ogmrip_profile_manager_dialog_reset_activated,  NULL, NULL, NULL }
+  { "rename", ogmrip_profile_manager_dialog_rename_activated, NULL, NULL, NULL }
 };
 
 static void

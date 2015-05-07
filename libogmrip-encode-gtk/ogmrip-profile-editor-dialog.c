@@ -868,6 +868,30 @@ static void
 ogmrip_profile_editor_dialog_dispose (GObject *gobject)
 {
   OGMRipProfileEditorDialog *dialog = OGMRIP_PROFILE_EDITOR_DIALOG (gobject);
+  if (dialog->priv->profile)
+  {
+    GSettings *settings;
+
+    settings = ogmrip_profile_get_child (dialog->priv->profile, OGMRIP_PROFILE_GENERAL);
+
+    g_signal_handlers_disconnect_by_func (settings,
+        ogmrip_profile_editor_dialog_container_setting_changed, dialog->priv->container_chooser);
+
+    settings = ogmrip_profile_get_child (dialog->priv->profile, OGMRIP_PROFILE_VIDEO);
+
+    g_signal_handlers_disconnect_by_func (settings,
+        ogmrip_profile_editor_dialog_codec_setting_changed, dialog->priv->video_chooser);
+
+    settings = ogmrip_profile_get_child (dialog->priv->profile, OGMRIP_PROFILE_AUDIO);
+
+    g_signal_handlers_disconnect_by_func (settings,
+        ogmrip_profile_editor_dialog_codec_setting_changed, dialog->priv->audio_chooser);
+
+    settings = ogmrip_profile_get_child (dialog->priv->profile, OGMRIP_PROFILE_SUBP);
+
+    g_signal_handlers_disconnect_by_func (settings,
+        ogmrip_profile_editor_dialog_codec_setting_changed, dialog->priv->subp_chooser);
+  }
 
   g_clear_object (&dialog->priv->profile);
 

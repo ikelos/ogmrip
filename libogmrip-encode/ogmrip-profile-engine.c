@@ -374,6 +374,15 @@ ogmrip_profile_engine_remove (OGMRipProfileEngine *engine, OGMRipProfile *profil
   g_signal_emit (engine, signals[REMOVE], 0, profile);
 }
 
+void
+ogmrip_profile_engine_update (OGMRipProfileEngine *engine, OGMRipProfile *profile)
+{
+  g_return_if_fail (OGMRIP_IS_PROFILE_ENGINE (engine));
+  g_return_if_fail (OGMRIP_IS_PROFILE (profile));
+
+  g_signal_emit (engine, signals[UPDATE], 0, profile);
+}
+
 GSList *
 ogmrip_profile_engine_get_list (OGMRipProfileEngine *engine)
 {
