@@ -73,6 +73,7 @@ struct _OGMJobSpawnClass
 GType        ogmjob_spawn_get_type   (void);
 OGMJobTask * ogmjob_spawn_new        (const gchar    *command_line);
 OGMJobTask * ogmjob_spawn_newv       (gchar          **argv);
+void         ogmjob_spawn_kill       (OGMJobSpawn    *spawn);
 gint         ogmjob_spawn_get_status (OGMJobSpawn    *spawn);
 void         ogmjob_spawn_set_watch  (OGMJobSpawn    *spawn,
                                       OGMJobStream   stream,
