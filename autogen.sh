@@ -6,6 +6,7 @@ PKG_NAME=OMGRip
 test "$srcdir" || srcdir=.
 
 # default version requirements ...
+test "$REQUIRED_AUTOMAKE_VERSION" || REQUIRED_AUTOMAKE_VERSION=1.11.2
 test "$REQUIRED_AUTORECONF_VERSION" || REQUIRED_AUTORECONF_VERSION=2.53
 test "$REQUIRED_GLIB_GETTEXT_VERSION" || REQUIRED_GLIB_GETTEXT_VERSION=2.2.0
 test "$REQUIRED_INTLTOOL_VERSION" || REQUIRED_INTLTOOL_VERSION=0.25
@@ -16,7 +17,6 @@ test "$REQUIRED_GNOME_DOC_UTILS_VERSION" || REQUIRED_GNOME_DOC_UTILS_VERSION=0.4
 
 # a list of required m4 macros.  Package can set an initial value
 test "$REQUIRED_M4MACROS" || REQUIRED_M4MACROS=
-test "$FORBIDDEN_M4MACROS" || FORBIDDEN_M4MACROS=
 
 # Not all echo versions allow -n, so we check what is possible. This test is
 # based on the one in autoconf.
@@ -33,7 +33,7 @@ case `echo -n x` in
 esac
 
 # some terminal codes ...
-if tty < /dev/null 1>/dev/null 2>&1; then
+if tty 1>/dev/null 2>&1; then
     boldface="`tput bold 2>/dev/null`"
     normal="`tput sgr0 2>/dev/null`"
 else
@@ -56,7 +56,7 @@ compare_versions() {
     ch_min_version=$1
     ch_actual_version=$2
     ch_status=0
-    IFS="${IFS=         }"; ch_save_IFS="$IFS"; IFS="."
+    IFS="${IFS=	 }"; ch_save_IFS="$IFS"; IFS="."
     set $ch_actual_version
     for ch_min in $ch_min_version; do
         ch_cur=`echo $1 | sed 's/[^0-9].*$//'`; shift # remove letter suffixes
@@ -79,6 +79,7 @@ version_check() {
     vc_min_version=$4
     vc_source=$5
     vc_status=1
+    local ${vc_variable}_VERSION
 
     vc_checkprog=`eval echo "\\$$vc_variable"`
     if [ -n "$vc_checkprog" ]; then
@@ -127,13 +128,6 @@ require_m4macro() {
     esac
 }
 
-forbid_m4macro() {
-    case "$FORBIDDEN_M4MACROS" in
-	$1\ * | *\ $1\ * | *\ $1) ;;
-	*) FORBIDDEN_M4MACROS="$FORBIDDEN_M4MACROS $1" ;;
-    esac
-}
-
 # Usage:
 #     add_to_cm_macrodirs dirname
 # Adds the dir to $cm_macrodirs, if it's not there yet.
@@ -151,23 +145,22 @@ print_m4macros_error() {
     printerr "***Error***: some autoconf macros required to build $PKG_NAME"
     printerr "  were not found in your aclocal path, or some forbidden"
     printerr "  macros were found.  Perhaps you need to adjust your"
-    printerr "  ACLOCAL_FLAGS?"
+    printerr "  ACLOCAL_PATH?"
     printerr
 }
 
 # Usage:
 #     check_m4macros
 # Checks that all the requested macro files are in the aclocal macro path
-# Uses REQUIRED_M4MACROS and ACLOCAL variables.
+# Uses REQUIRED_M4MACROS and ACLOCAL_PATH variables.
 check_m4macros() {
     # construct list of macro directories
     cm_macrodirs=`aclocal --print-ac-dir`
     # aclocal also searches a version specific dir, eg. /usr/share/aclocal-1.9
     # but it contains only Automake's own macros, so we can ignore it.
 
-    # Read the dirlist file, supported by Automake >= 1.7.
-    # If AUTOMAKE was defined, no version was detected.
-    if [ -z "$AUTOMAKE_VERSION" ] || compare_versions 1.7 $AUTOMAKE_VERSION && [ -s $cm_macrodirs/dirlist ]; then
+    # Read the dirlist file
+    if [ -s $cm_macrodirs/dirlist ]; then
 	cm_dirlist=`sed 's/[ 	]*#.*//;/^$/d' $cm_macrodirs/dirlist`
 	if [ -n "$cm_dirlist" ] ; then
 	    for cm_dir in $cm_dirlist; do
@@ -178,15 +171,12 @@ check_m4macros() {
 	fi
     fi
 
-    # Parse $ACLOCAL_FLAGS
-    set - $ACLOCAL_FLAGS
-    while [ $# -gt 0 ]; do
-	if [ "$1" = "-I" ]; then
-	    add_to_cm_macrodirs "$2"
-	    shift
-	fi
-	shift
+    # Parse $ACLOCAL_PATH
+    IFS="${IFS=	 }"; save_IFS="$IFS"; IFS=":"
+    for dir in ${ACLOCAL_PATH}; do
+	add_to_cm_macrodirs "$dir"
     done
+    IFS="$save_IFS"
 
     cm_status=0
     if [ -n "$REQUIRED_M4MACROS" ]; then
@@ -222,31 +212,11 @@ check_m4macros() {
         print_m4macros_error
         exit $cm_status
     fi
-    if [ -n "$FORBIDDEN_M4MACROS" ]; then
-	printbold "Checking for forbidden M4 macros..."
-	# check that each macro file is in one of the macro dirs
-	for cm_macro in $FORBIDDEN_M4MACROS; do
-	    cm_macrofound=false
-	    for cm_dir in $cm_macrodirs; do
-		if [ -f "$cm_dir/$cm_macro" ]; then
-		    cm_macrofound=true
-		    break
-		fi
-	    done
-	    if $cm_macrofound; then
-		printerr "  $cm_macro found (should be cleared from macros dir)"
-		cm_status=1
-	    fi
-	done
-    fi
     if [ "$cm_status" != 0 ]; then
         print_m4macros_error
 	exit $cm_status
     fi
 }
-
-# try to catch the case where the macros2/ directory hasn't been cleared out.
-forbid_m4macro gnome-cxx-check.m4
 
 want_glib_gettext=false
 want_intltool=false
@@ -254,6 +224,9 @@ want_pkg_config=false
 want_gtk_doc=false
 want_gnome_doc_utils=false
 want_maintainer_mode=false
+
+version_check automake AUTOMAKE automake $REQUIRED_AUTOMAKE_VERSION \
+    "http://ftp.gnu.org/pub/gnu/automake/automake-$REQUIRED_AUTOMAKE_VERSION.tar.xz"
 
 version_check autoreconf AUTORECONF autoreconf $REQUIRED_AUTORECONF_VERSION \
     "http://ftp.gnu.org/pub/gnu/autoconf/autoconf-$REQUIRED_AUTORECONF_VERSION.tar.xz"
@@ -305,6 +278,14 @@ for configure_ac in $configure_files; do
 
     if grep "^YELP_HELP_INIT" $configure_ac >/dev/null; then
         require_m4macro yelp.m4
+    fi
+
+    if grep "^APPDATA_XML" $configure_ac >/dev/null; then
+        require_m4macro appdata-xml.m4
+    fi
+
+    if grep "^APPSTREAM_XML" $configure_ac >/dev/null; then
+        require_m4macro appstream-xml.m4
     fi
 
     # check to make sure gnome-common macros can be found ...
