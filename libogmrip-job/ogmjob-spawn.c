@@ -43,7 +43,6 @@ struct _OGMJobSpawnPriv
 {
   GPid pid;
   gint status;
-  gboolean result;
   gchar **argv;
 
   OGMJobWatch watch_out;
@@ -63,8 +62,6 @@ enum
 
 typedef struct
 {
-  OGMJobSpawn *spawn;
-  GTask *task;
   GError *error;
 
   GCancellable *cancellable;
@@ -76,125 +73,92 @@ typedef struct
   guint src_out;
   guint src_err;
   guint src_pid;
-} TaskAsyncData;
-
-typedef struct
-{
-  gboolean complete;
-  GError *error;
-  gboolean retval;
-} TaskSyncData;
+} TaskData;
 
 static void
-task_kill (TaskAsyncData *data)
+free_data (TaskData *data)
 {
-  if (data->spawn->priv->pid > 0)
+  if (data->cancellable)
   {
-    kill (data->spawn->priv->pid, SIGCONT);
-    kill (data->spawn->priv->pid, SIGINT);
-  }
-}
-
-static void
-task_cancel_cb (GCancellable *cancellable, TaskAsyncData *data)
-{
-  task_kill (data);
-}
-
-static TaskAsyncData *
-new_task (OGMJobTask *spawn, GCancellable *cancellable, GAsyncReadyCallback callback, gpointer user_data)
-{
-  TaskAsyncData *data;
-
-  data = g_new0 (TaskAsyncData, 1);
-
-  /* No need to take a reference because g_task_new does */
-  data->spawn = OGMJOB_SPAWN (spawn);
-
-  data->task = g_task_new (spawn, cancellable, callback, user_data);
-
-  if (cancellable)
-  {
-    data->cancellable = g_object_ref (cancellable);
-    data->handler = g_cancellable_connect (cancellable,
-        G_CALLBACK (task_cancel_cb), data, NULL);
+    g_cancellable_disconnect (data->cancellable, data->handler);
+    g_object_unref (data->cancellable);
   }
 
-  return data;
+  if (data->error)
+    g_error_free (data->error);
+
+  g_free (data->partial_out);
+  g_free (data->partial_err);
+
+  g_slice_free (TaskData, data);
 }
 
 static void
-complete_task (TaskAsyncData *data)
+task_complete (GTask *task)
 {
-  if (!data->spawn->priv->pid && !data->src_out && !data->src_err)
+  OGMJobSpawn *spawn = g_task_get_source_object (task);
+  TaskData *data = g_task_get_task_data (task);
+
+  if (!spawn->priv->pid && !data->src_out && !data->src_err)
   {
     if (!data->error)
       g_cancellable_set_error_if_cancelled (data->cancellable, &data->error);
 
     if (data->error)
     {
-      g_task_return_error (data->task, data->error);
+      g_task_return_error (task, data->error);
       data->error = NULL;
     }
     else
-      g_task_return_boolean (data->task, WIFEXITED (data->spawn->priv->status) && WEXITSTATUS (data->spawn->priv->status) == 0);
-
-    if (data->cancellable)
-    {
-      g_cancellable_disconnect (data->cancellable, data->handler);
-      g_object_unref (data->cancellable);
-    }
-
-    if (data->error)
-      g_error_free (data->error);
-
-    g_free (data->partial_out);
-    g_free (data->partial_err);
-
-    g_object_unref (data->task);
-
-    g_free (data);
+      g_task_return_boolean (task, WIFEXITED (spawn->priv->status));
   }
+
+  g_object_unref (task);
 }
 
 static void
-task_pid_watch (GPid pid, gint status, TaskAsyncData *data)
+task_pid_watch (GPid pid, gint status, GTask *task)
 {
-  OGMJobSpawn *spawn = data->spawn;
+  OGMJobSpawn *spawn = g_task_get_source_object (task);
 
   g_spawn_close_pid (spawn->priv->pid);
   spawn->priv->pid = 0;
-/*
-  data->spawn->priv->status = -1;
-  if (WIFEXITED (status))
-    data->spawn->priv->status = WEXITSTATUS (status);
-*/
-  data->spawn->priv->status = status;
+
+  spawn->priv->status = status;
 }
 
 static void
-task_stdout_notify (TaskAsyncData *data)
+task_stdout_notify (GTask *task)
 {
-  if (data->spawn->priv->notify_out)
-    (* data->spawn->priv->notify_out) (data->spawn->priv->data_out);
+  OGMJobSpawn *spawn = g_task_get_source_object (task);
+  TaskData *data = g_task_get_task_data (task);
+
+  if (spawn->priv->notify_out)
+    (* spawn->priv->notify_out) (spawn->priv->data_out);
 
   data->src_out = 0;
-  complete_task (data);
+
+  task_complete (task);
 }
 
 static void
-task_stderr_notify (TaskAsyncData *data)
+task_stderr_notify (GTask *task)
 {
-  if (data->spawn->priv->notify_err)
-    (* data->spawn->priv->notify_err) (data->spawn->priv->data_err);
+  OGMJobSpawn *spawn = g_task_get_source_object (task);
+  TaskData *data = g_task_get_task_data (task);
+
+  if (spawn->priv->notify_err)
+    (* spawn->priv->notify_err) (spawn->priv->data_err);
 
   data->src_err = 0;
-  complete_task (data);
+
+  task_complete (task);
 }
 
 static gboolean
-task_watch (GIOChannel *channel, TaskAsyncData *data, gchar **partial, OGMJobWatch watch_func, gpointer watch_data)
+task_watch (GTask *task, GIOChannel *channel, gchar **partial, OGMJobWatch watch_func, gpointer watch_data, GError **error)
 {
+  OGMJobSpawn *spawn = g_task_get_source_object (task);
   GIOStatus status;
 
   gboolean is_partial, retval = TRUE;
@@ -202,23 +166,19 @@ task_watch (GIOChannel *channel, TaskAsyncData *data, gchar **partial, OGMJobWat
   gsize size, len;
   guint i;
 
-  if (data->error)
+  if (*error)
     return FALSE;
 
   size = g_io_channel_get_buffer_size (channel);
   buffer = g_new0 (char, size + 1);
 
-  status = g_io_channel_read_chars (channel, buffer, size, &len, &data->error);
+  status = g_io_channel_read_chars (channel, buffer, size, &len, error);
   if (status != G_IO_STATUS_NORMAL)
   {
     g_free (buffer);
     return status == G_IO_STATUS_AGAIN;
   }
-/*
-#ifdef G_ENABLE_DEBUG
-  g_print ("%s", buffer);
-#endif
-*/
+
   if (!watch_func)
   {
     g_free (buffer);
@@ -239,13 +199,13 @@ task_watch (GIOChannel *channel, TaskAsyncData *data, gchar **partial, OGMJobWat
       if (!(*partial) && strv[i][0] != '\0')
       {
         ogmrip_log_printf ("%s\n", strv[i]);
-        retval = watch_func (data->spawn, strv[i], watch_data, &data->error);
+        retval = watch_func (spawn, strv[i], watch_data, error);
       }
       else if (*partial)
       {
         str = g_strconcat (*partial, strv[i], NULL);
         ogmrip_log_printf ("%s\n", str);
-        retval = watch_func (data->spawn, str, watch_data, &data->error);
+        retval = watch_func (spawn, str, watch_data, error);
         g_free (str);
 
         g_free (*partial);
@@ -253,7 +213,7 @@ task_watch (GIOChannel *channel, TaskAsyncData *data, gchar **partial, OGMJobWat
       }
 
       if (!retval)
-        task_kill (data);
+        ogmjob_spawn_kill (spawn);
     }
   }
   g_strfreev (strv);
@@ -262,23 +222,118 @@ task_watch (GIOChannel *channel, TaskAsyncData *data, gchar **partial, OGMJobWat
 }
 
 static gboolean
-task_watch_stdout (GIOChannel *channel, GIOCondition condition, TaskAsyncData *data)
+task_watch_stdout (GIOChannel *channel, GIOCondition condition, GTask *task)
 {
-  return task_watch (channel, data, &data->partial_out, data->spawn->priv->watch_out, data->spawn->priv->data_out);
+  OGMJobSpawn *spawn = g_task_get_source_object (task);
+  TaskData *data = g_task_get_task_data (task);
+
+  return task_watch (task, channel, &data->partial_out, spawn->priv->watch_out, spawn->priv->data_out, &data->error);
 }
 
 static gboolean
-task_watch_stderr (GIOChannel *channel, GIOCondition condition, TaskAsyncData *data)
+task_watch_stderr (GIOChannel *channel, GIOCondition condition, GTask *task)
 {
-  return task_watch (channel, data, &data->partial_err, data->spawn->priv->watch_err, data->spawn->priv->data_err);
+  OGMJobSpawn *spawn = g_task_get_source_object (task);
+  TaskData *data = g_task_get_task_data (task);
+
+  return task_watch (task, channel, &data->partial_err, spawn->priv->watch_err, spawn->priv->data_err, &data->error);
+}
+
+static guint
+create_pipe_watch (gint fd, GIOFunc func, gpointer user_data, GDestroyNotify notify)
+{
+  GIOChannel *channel;
+  GSource *source;
+  guint id;
+
+  fcntl (fd, F_SETFL, O_NONBLOCK);
+  channel = g_io_channel_unix_new (fd);
+  g_io_channel_set_close_on_unref (channel, TRUE);
+  g_io_channel_set_encoding (channel, NULL, NULL);
+
+  source = g_io_create_watch (channel, G_IO_IN | G_IO_HUP | G_IO_ERR);
+  g_io_channel_unref (channel);
+
+  g_source_set_priority (source, G_PRIORITY_DEFAULT_IDLE);
+  g_source_set_callback (source, (GSourceFunc) func, user_data, notify);
+  id = g_source_attach (source, g_main_context_get_thread_default ());
+  g_source_unref (source);
+
+  return id;
+}
+
+static guint
+create_child_watch (GPid pid, GChildWatchFunc func, gpointer user_data, GDestroyNotify notify)
+{
+  GSource *source;
+  guint id;
+
+  source = g_child_watch_source_new (pid);
+  g_source_set_priority (source, G_PRIORITY_DEFAULT_IDLE);
+  g_source_set_callback (source, (GSourceFunc) func, user_data, notify);
+  id = g_source_attach (source, g_main_context_get_thread_default ());
+  g_source_unref (source);
+
+  return id;
 }
 
 static void
-task_ready_cb (OGMJobTask *task, GAsyncResult *res, TaskSyncData *data)
+ogmjob_spawn_ready_cb (OGMJobSpawn *spawn, GAsyncResult *res, GAsyncResult **result)
 {
-  data->retval = ogmjob_task_run_finish (task, res, &data->error);
+  *result = g_object_ref (res);
+}
 
-  data->complete = TRUE;
+static void
+ogmjob_spawn_cancel_cb (GCancellable *cancellable, OGMJobSpawn *spawn)
+{
+  ogmjob_spawn_kill (spawn);
+}
+
+static void
+ogmjob_spawn_run_internal (OGMJobSpawn *spawn, GCancellable *cancellable, GAsyncReadyCallback callback, gpointer user_data)
+{
+  GTask *task;
+  TaskData *data;
+  gint fdout, fderr;
+  guint i;
+
+  g_return_if_fail (spawn->priv->pid == 0);
+
+  data = g_slice_new0 (TaskData);
+
+  task = g_task_new (spawn, cancellable, callback, user_data);
+  g_task_set_task_data (task, data, (GDestroyNotify) free_data);
+
+  if (cancellable)
+  {
+    data->cancellable = g_object_ref (cancellable);
+    data->handler = g_cancellable_connect (cancellable,
+        G_CALLBACK (ogmjob_spawn_cancel_cb), spawn, NULL);
+  }
+
+  for (i = 0; spawn->priv->argv[i]; i++)
+    ogmrip_log_printf ("%s ", spawn->priv->argv[i]);
+  ogmrip_log_write ("\n");
+
+  if (!g_spawn_async_with_pipes (NULL, spawn->priv->argv, NULL,
+        G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD, NULL, NULL, 
+        &spawn->priv->pid, NULL, &fdout, &fderr, &data->error))
+  {
+    g_task_return_error (task, data->error);
+    task_complete (task);
+  }
+  else
+  {
+    data->src_pid = create_child_watch (spawn->priv->pid,
+        (GChildWatchFunc) task_pid_watch, g_object_ref (task), (GDestroyNotify) task_complete);
+
+    data->src_out = create_pipe_watch (fdout,
+        (GIOFunc) task_watch_stdout, g_object_ref (task), (GDestroyNotify) task_stdout_notify);
+    data->src_err = create_pipe_watch (fderr,
+        (GIOFunc) task_watch_stderr, g_object_ref (task), (GDestroyNotify) task_stderr_notify);
+  }
+
+  g_object_unref (task);
 }
 
 G_DEFINE_TYPE_WITH_PRIVATE (OGMJobSpawn, ogmjob_spawn, OGMJOB_TYPE_TASK);
@@ -286,68 +341,32 @@ G_DEFINE_TYPE_WITH_PRIVATE (OGMJobSpawn, ogmjob_spawn, OGMJOB_TYPE_TASK);
 static void
 ogmjob_spawn_run_async (OGMJobTask *task, GCancellable *cancellable, GAsyncReadyCallback callback, gpointer user_data)
 {
-  TaskAsyncData *data;
-  gint fdout, fderr;
-  guint i;
-
-  data = new_task (task, cancellable, callback, user_data);
-
-  for (i = 0; data->spawn->priv->argv[i]; i++)
-    ogmrip_log_printf ("%s ", data->spawn->priv->argv[i]);
-  ogmrip_log_write ("\n");
-
-  if (!g_spawn_async_with_pipes (NULL, data->spawn->priv->argv, NULL,
-        G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD, NULL, NULL, 
-        &data->spawn->priv->pid, NULL, &fdout, &fderr, &data->error))
-  {
-    g_task_return_error (data->task, data->error);
-    complete_task (data);
-  }
-  else
-  {
-    GIOChannel *channel;
-
-    data->src_pid = g_child_watch_add_full (G_PRIORITY_DEFAULT_IDLE, data->spawn->priv->pid, 
-        (GChildWatchFunc) task_pid_watch, data, (GDestroyNotify) complete_task);
-
-    fcntl (fdout, F_SETFL, O_NONBLOCK);
-    channel = g_io_channel_unix_new (fdout);
-    g_io_channel_set_close_on_unref (channel, TRUE);
-    g_io_channel_set_encoding (channel, NULL, NULL);
-    data->src_out = g_io_add_watch_full (channel, G_PRIORITY_DEFAULT_IDLE,
-        G_IO_IN | G_IO_HUP | G_IO_ERR, (GIOFunc) task_watch_stdout, data, 
-        (GDestroyNotify) task_stdout_notify);
-    g_io_channel_unref (channel);
-
-    fcntl (fderr, F_SETFL, O_NONBLOCK);
-    channel = g_io_channel_unix_new (fderr);
-    g_io_channel_set_close_on_unref (channel, TRUE);
-    g_io_channel_set_encoding (channel, NULL, NULL);
-    data->src_err = g_io_add_watch_full (channel, G_PRIORITY_DEFAULT_IDLE,
-        G_IO_IN | G_IO_HUP | G_IO_ERR, (GIOFunc) task_watch_stderr, data, 
-        (GDestroyNotify) task_stderr_notify);
-    g_io_channel_unref (channel);
-  }
+  ogmjob_spawn_run_internal (OGMJOB_SPAWN (task), cancellable, callback, user_data);
 }
 
 static gboolean
 ogmjob_spawn_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
-  TaskSyncData data = { FALSE, NULL, FALSE };
+  GAsyncResult *result = NULL;
+  GMainContext *context;
+  gboolean retval;
 
-  g_object_ref (task);
+  context = g_main_context_new ();
+  g_main_context_push_thread_default (context);
 
-  ogmjob_spawn_run_async (task, cancellable, (GAsyncReadyCallback) task_ready_cb, &data);
+  ogmjob_spawn_run_internal (OGMJOB_SPAWN (task), cancellable, (GAsyncReadyCallback) ogmjob_spawn_ready_cb, &result);
 
-  while (!data.complete)
-    g_main_context_iteration (NULL, TRUE);
+  while (!result)
+    g_main_context_iteration (context, TRUE);
 
-  if (data.error)
-    g_propagate_error (error, data.error);
+  g_main_context_pop_thread_default (context);
+  g_main_context_unref (context);
 
-  g_object_unref (task);
+  retval = ogmjob_task_run_finish (task, result, error);
 
-  return data.retval;
+  g_object_unref (result);
+
+  return retval;
 }
 
 static void
@@ -458,10 +477,23 @@ ogmjob_spawn_newv (gchar **argv)
 }
 
 void
+ogmjob_spawn_kill (OGMJobSpawn *spawn)
+{
+  g_return_if_fail (OGMJOB_IS_SPAWN (spawn));
+
+  if (spawn->priv->pid > 0)
+  {
+    kill (spawn->priv->pid, SIGCONT);
+    kill (spawn->priv->pid, SIGINT);
+  }
+}
+
+void
 ogmjob_spawn_set_watch (OGMJobSpawn *spawn, OGMJobStream stream,
     OGMJobWatch func, gpointer data, GDestroyNotify notify)
 {
   g_return_if_fail (OGMJOB_IS_SPAWN (spawn));
+  g_return_val_if_fail (spawn->priv->pid == 0, 0);
 
   switch (stream)
   {
@@ -478,11 +510,26 @@ ogmjob_spawn_set_watch (OGMJobSpawn *spawn, OGMJobStream stream,
   }
 }
 
+/*
+ * Check if the subprocess terminated in response to a signal
+ * WIFSIGNALED (spawn->priv->status)
+ *
+ * Get the signal number that caused the subprocess to terminate
+ * WTERMSIG (spawn->priv->status)
+ */
+
 gint
 ogmjob_spawn_get_status (OGMJobSpawn *spawn)
 {
   g_return_val_if_fail (OGMJOB_IS_SPAWN (spawn), 0);
+  g_return_val_if_fail (spawn->priv->pid == 0, 0);
 
+#ifdef G_OS_UNIX
+  g_return_val_if_fail (WIFEXITED (spawn->priv->status), 0);
+
+  return WEXITSTATUS (spawn->priv->status);
+#else
   return spawn->priv->status;
+#endif
 }
 
