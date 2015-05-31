@@ -197,6 +197,7 @@ ogmrip_encoding_manager_dialog_add_encoding (OGMRipEncodingManagerDialog *dialog
   progress = gtk_progress_bar_new ();
   gtk_widget_set_hexpand (progress, TRUE);
   gtk_widget_set_vexpand (progress, TRUE);
+  gtk_widget_set_valign (progress, GTK_ALIGN_CENTER);
   gtk_grid_attach (GTK_GRID (grid), progress, 1, 0, 1, 2);
   gtk_widget_show (progress);
 
