@@ -36,12 +36,10 @@ struct _OGMRipPlayerPriv
   OGMRipAudioStream *astream;
   OGMRipSubpStream *sstream;
 
+  GSubprocess *subprocess;
+
   guint start_chap;
   gint end_chap;
-
-  GPid pid;
-  guint src;
-  gint fd;
 };
 
 enum
@@ -144,6 +142,46 @@ ogmrip_mplayer_play_command (OGMRipPlayer *player)
   g_ptr_array_add (argv, NULL);
 
   return (gchar **) g_ptr_array_free (argv, FALSE);
+}
+
+static void
+ogmrip_player_ready_cb (GSubprocess *subprocess, GAsyncResult *res, OGMRipPlayer *player)
+{
+  g_subprocess_wait_finish (subprocess, res, NULL);
+  g_clear_object (&player->priv->subprocess);
+
+  g_signal_emit (player, signals[STOP], 0);
+}
+
+static gboolean
+ogmrip_player_spawn (OGMRipPlayer *player, GError **error)
+{
+  gchar **argv;
+
+#ifdef G_ENABLE_DEBUG
+  gint i;
+#endif
+
+  argv = ogmrip_mplayer_play_command (player);
+
+#ifdef G_ENABLE_DEBUG
+  for (i = 0; argv[i]; i++)
+    g_print ("%s ", argv[i]);
+  g_print ("\n");
+#endif
+
+  player->priv->subprocess = g_subprocess_newv ((const gchar * const *) argv,
+      G_SUBPROCESS_FLAGS_STDIN_PIPE | G_SUBPROCESS_FLAGS_STDOUT_SILENCE | G_SUBPROCESS_FLAGS_STDERR_SILENCE, error);
+
+  g_strfreev (argv);
+
+  if (!player->priv->subprocess)
+    return FALSE;
+
+  g_subprocess_wait_async (player->priv->subprocess, NULL,
+      (GAsyncReadyCallback) ogmrip_player_ready_cb, player);
+
+  return TRUE;
 }
 
 G_DEFINE_TYPE_WITH_PRIVATE (OGMRipPlayer, ogmrip_player, G_TYPE_OBJECT)
@@ -299,58 +337,6 @@ ogmrip_player_set_chapters (OGMRipPlayer *player, guint start, gint end)
   player->priv->end_chap = end;
 }
 
-static void
-ogmrip_player_pid_watch (GPid pid, gint status, OGMRipPlayer *player)
-{
-  if (player->priv->fd > 0)
-  {
-    close (player->priv->fd);
-    player->priv->fd = -1;
-  }
-
-  g_signal_emit (player, signals[STOP], 0);
-}
-
-static void
-ogmrip_player_pid_notify (OGMRipPlayer *player)
-{
-  if (player->priv->pid)
-  {
-    g_spawn_close_pid (player->priv->pid);
-    player->priv->pid = 0;
-  }
-}
-
-static gboolean
-ogmrip_player_spawn (OGMRipPlayer *player, GError **error)
-{
-  gchar **argv;
-  gboolean retval;
-#ifdef G_ENABLE_DEBUG
-  gint i;
-#endif
-
-  argv = ogmrip_mplayer_play_command (player);
-
-#ifdef G_ENABLE_DEBUG
-  for (i = 0; argv[i]; i++)
-    g_print ("%s ", argv[i]);
-  g_print ("\n");
-#endif
-
-  retval = g_spawn_async_with_pipes (NULL, argv, NULL,
-      G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD | G_SPAWN_STDOUT_TO_DEV_NULL | G_SPAWN_STDERR_TO_DEV_NULL,
-      NULL, NULL, &player->priv->pid, &player->priv->fd, NULL, NULL, error);
-
-  g_strfreev (argv);
-
-  if (retval)
-    player->priv->src = g_child_watch_add_full (G_PRIORITY_DEFAULT_IDLE, player->priv->pid,
-        (GChildWatchFunc) ogmrip_player_pid_watch, player, (GDestroyNotify) ogmrip_player_pid_notify);
-
-  return retval;
-}
-
 /**
  * ogmrip_player_play:
  * @player: an #OGMRipPlayer
@@ -363,7 +349,6 @@ ogmrip_player_spawn (OGMRipPlayer *player, GError **error)
 gboolean
 ogmrip_player_play (OGMRipPlayer *player, GError **error)
 {
-  GError *tmp_error = NULL;
   gboolean retval;
 
   g_return_val_if_fail (OGMRIP_IS_PLAYER (player), FALSE);
@@ -372,11 +357,9 @@ ogmrip_player_play (OGMRipPlayer *player, GError **error)
   if (!player->priv->title)
     return FALSE;
 
-  retval = ogmrip_player_spawn (player, &tmp_error);
+  retval = ogmrip_player_spawn (player, error);
   if (retval)
     g_signal_emit (player, signals[PLAY], 0);
-  else
-    g_propagate_error (error, tmp_error);
 
   return retval;
 }
@@ -392,9 +375,12 @@ ogmrip_player_stop (OGMRipPlayer *player)
 {
   g_return_if_fail (OGMRIP_IS_PLAYER (player));
 
-  if (player->priv->fd > 0)
+  if (player->priv->subprocess)
   {
-    if (write (player->priv->fd, "stop\n", 5) != 5)
+    GOutputStream *stream;
+
+    stream = g_subprocess_get_stdin_pipe (player->priv->subprocess);
+    if (!g_output_stream_write_all (stream, "stop\n", 5, NULL, NULL, NULL))
       g_warning ("Couldn't write to file descriptor");
   }
 }
