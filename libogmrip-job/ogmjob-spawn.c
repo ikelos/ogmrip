@@ -256,7 +256,7 @@ create_pipe_watch (gint fd, GIOFunc func, gpointer user_data, GDestroyNotify not
 
   g_source_set_priority (source, G_PRIORITY_DEFAULT_IDLE);
   g_source_set_callback (source, (GSourceFunc) func, user_data, notify);
-  id = g_source_attach (source, g_main_context_get_thread_default ());
+  id = g_source_attach (source, NULL);
   g_source_unref (source);
 
   return id;
@@ -271,7 +271,7 @@ create_child_watch (GPid pid, GChildWatchFunc func, gpointer user_data, GDestroy
   source = g_child_watch_source_new (pid);
   g_source_set_priority (source, G_PRIORITY_DEFAULT_IDLE);
   g_source_set_callback (source, (GSourceFunc) func, user_data, notify);
-  id = g_source_attach (source, g_main_context_get_thread_default ());
+  id = g_source_attach (source, NULL);
   g_source_unref (source);
 
   return id;
@@ -348,19 +348,12 @@ static gboolean
 ogmjob_spawn_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
 {
   GAsyncResult *result = NULL;
-  GMainContext *context;
   gboolean retval;
-
-  context = g_main_context_new ();
-  g_main_context_push_thread_default (context);
 
   ogmjob_spawn_run_internal (OGMJOB_SPAWN (task), cancellable, (GAsyncReadyCallback) ogmjob_spawn_ready_cb, &result);
 
   while (!result)
-    g_main_context_iteration (context, TRUE);
-
-  g_main_context_pop_thread_default (context);
-  g_main_context_unref (context);
+    g_main_context_iteration (NULL, TRUE);
 
   retval = ogmjob_task_run_finish (task, result, error);
 
