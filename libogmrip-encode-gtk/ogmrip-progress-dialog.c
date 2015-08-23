@@ -32,6 +32,7 @@ struct _OGMRipProgressDialogPriv
   GtkWidget *message_label;
   GtkWidget *eta_label;
   GtkWidget *progress_bar;
+  GtkWidget *progress_label;
   GtkWidget *cancel_button;
   GtkWidget *resume_button;
   GtkWidget *suspend_button;
@@ -81,6 +82,7 @@ ogmrip_progress_dialog_class_init (OGMRipProgressDialogClass *klass)
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipProgressDialog, message_label);
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipProgressDialog, eta_label);
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipProgressDialog, progress_bar);
+  gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipProgressDialog, progress_label);
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipProgressDialog, cancel_button);
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipProgressDialog, suspend_button);
   gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), OGMRipProgressDialog, resume_button);
@@ -182,16 +184,22 @@ ogmrip_progress_dialog_set_fraction (OGMRipProgressDialog *dialog, gdouble fract
   {
     gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (dialog->priv->progress_bar), fraction);
 
+    str = g_strdup_printf ("(%.0f%%)", fraction * 100);
+    gtk_label_set_text (GTK_LABEL (dialog->priv->progress_label), str);
+    g_free (str);
+
+    str = NULL;
+
     if (fraction > 0.0)
     {
       eta = (1.0 - fraction) * (tv.tv_sec - dialog->priv->start_time) / fraction;
 
       if (eta >= 3600)
-        str = g_strdup_printf ("%ld hour(s) %ld minute(s)", eta / 3600, (eta % 3600) / 60);
+        str = g_strdup_printf ("About %ld hour(s) %ld minute(s)", eta / 3600, (eta % 3600) / 60);
       else if (eta >= 60)
-        str = g_strdup_printf ("%ld minute(s)", eta / 60);
+        str = g_strdup_printf ("About %ld minute(s)", eta / 60);
       else
-        str = g_strdup_printf ("%ld second(s)", eta);
+        str = g_strdup_printf ("Less than 1 minute");
     }
   }
 
