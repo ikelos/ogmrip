@@ -128,15 +128,7 @@ static void ogmrip_options_editable_init (OGMRipOptionsEditableInterface *iface)
 static gboolean
 ogmrip_x264_get_b8x8 (GValue *value, GVariant *variant, gpointer user_data)
 {
-  const gchar **strv;
-  guint i;
-
-  strv = g_variant_get_strv (variant, NULL);
-  for (i = 0; strv[i]; i ++)
-    if (g_str_equal (strv[i], "b8x8"))
-      break;
-
-  g_value_set_boolean (value, strv[i] != NULL);
+  g_value_set_boolean (value, g_strv_contains (g_variant_get_strv (variant, NULL), "b8x8"));
 
   return TRUE;
 }
@@ -144,15 +136,7 @@ ogmrip_x264_get_b8x8 (GValue *value, GVariant *variant, gpointer user_data)
 static gboolean
 ogmrip_x264_get_i8x8 (GValue *value, GVariant *variant, gpointer user_data)
 {
-  const gchar **strv;
-  guint i;
-
-  strv = g_variant_get_strv (variant, NULL);
-  for (i = 0; strv[i]; i ++)
-    if (g_str_equal (strv[i], "i8x8"))
-      break;
-
-  g_value_set_boolean (value, strv[i] != NULL);
+  g_value_set_boolean (value, g_strv_contains (g_variant_get_strv (variant, NULL), "i8x8"));
 
   return TRUE;
 }
@@ -160,15 +144,7 @@ ogmrip_x264_get_i8x8 (GValue *value, GVariant *variant, gpointer user_data)
 static gboolean
 ogmrip_x264_get_p8x8 (GValue *value, GVariant *variant, gpointer user_data)
 {
-  const gchar **strv;
-  guint i;
-
-  strv = g_variant_get_strv (variant, NULL);
-  for (i = 0; strv[i]; i ++)
-    if (g_str_equal (strv[i], "p8x8"))
-      break;
-
-  g_value_set_boolean (value, strv[i] != NULL);
+  g_value_set_boolean (value, g_strv_contains (g_variant_get_strv (variant, NULL), "p8x8"));
 
   return TRUE;
 }
@@ -176,15 +152,7 @@ ogmrip_x264_get_p8x8 (GValue *value, GVariant *variant, gpointer user_data)
 static gboolean
 ogmrip_x264_get_i4x4 (GValue *value, GVariant *variant, gpointer user_data)
 {
-  const gchar **strv;
-  guint i;
-
-  strv = g_variant_get_strv (variant, NULL);
-  for (i = 0; strv[i]; i ++)
-    if (g_str_equal (strv[i], "i4x4"))
-      break;
-
-  g_value_set_boolean (value, strv[i] != NULL);
+  g_value_set_boolean (value, g_strv_contains (g_variant_get_strv (variant, NULL), "i4x4"));
 
   return TRUE;
 }
@@ -192,15 +160,7 @@ ogmrip_x264_get_i4x4 (GValue *value, GVariant *variant, gpointer user_data)
 static gboolean
 ogmrip_x264_get_p4x4 (GValue *value, GVariant *variant, gpointer user_data)
 {
-  const gchar **strv;
-  guint i;
-
-  strv = g_variant_get_strv (variant, NULL);
-  for (i = 0; strv[i]; i ++)
-    if (g_str_equal (strv[i], "p4x4"))
-      break;
-
-  g_value_set_boolean (value, strv[i] != NULL);
+  g_value_set_boolean (value, g_strv_contains (g_variant_get_strv (variant, NULL), "p4x4"));
 
   return TRUE;
 }
