@@ -118,13 +118,13 @@ ogmrip_spell_dialog_row_activated (OGMRipSpellDialog *dialog, GtkTreePath *path,
   ogmrip_spell_dialog_replace (dialog);
 }
 
-void
+static void
 ogmrip_spell_dialog_set_text (OGMRipSpellDialog *dialog, const gchar *text)
 {
   gtk_text_buffer_set_text (dialog->priv->text_buffer, text, -1);
 }
 
-void
+static void
 ogmrip_spell_dialog_set_word (OGMRipSpellDialog *dialog, const gchar *word, gint offset, gchar **suggs, guint n_suggs)
 {
   GtkTreeIter iter;
@@ -160,7 +160,7 @@ ogmrip_spell_dialog_set_word (OGMRipSpellDialog *dialog, const gchar *word, gint
     gtk_entry_set_text (GTK_ENTRY (dialog->priv->replace_entry), word);
 }
 
-gchar *
+static gchar *
 ogmrip_spell_dialog_get_word (OGMRipSpellDialog *dialog)
 {
   return g_strdup (dialog->priv->word);

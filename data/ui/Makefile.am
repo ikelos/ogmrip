@@ -15,3 +15,5 @@ EXTRA_DIST =     \
 DISTCLEANFILES = \
   $(desktop_DATA)
 
+MAINTAINERCLEANFILES = \
+  Makefile.in

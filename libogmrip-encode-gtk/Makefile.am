@@ -8,11 +8,11 @@ libogmrip_encode_gtk_la_SOURCES =    \
   ogmrip-encoding-manager-dialog.c   \
   ogmrip-list-item.c                 \
   ogmrip-options-editable.c          \
-	ogmrip-profile-chooser-widget.c    \
+  ogmrip-profile-chooser-widget.c    \
   ogmrip-profile-editor-dialog.c     \
   ogmrip-profile-manager-dialog.c    \
   ogmrip-profile-store.c             \
-	ogmrip-profile-view.c              \
+  ogmrip-profile-view.c              \
   ogmrip-progress-dialog.c           \
   ogmrip-subp-chooser-widget.c       \
   ogmrip-subp-options.c              \
@@ -30,11 +30,11 @@ libogmrip_encode_gtk_la_HEADERS =    \
   ogmrip-encoding-manager-dialog.h   \
   ogmrip-list-item.h                 \
   ogmrip-options-editable.h          \
-	ogmrip-profile-chooser-widget.h    \
+  ogmrip-profile-chooser-widget.h    \
   ogmrip-profile-editor-dialog.h     \
   ogmrip-profile-manager-dialog.h    \
   ogmrip-profile-store.h             \
-	ogmrip-profile-view.h              \
+  ogmrip-profile-view.h              \
   ogmrip-progress-dialog.h           \
   ogmrip-subp-chooser-widget.h       \
   ogmrip-subp-options.h              \
@@ -42,8 +42,25 @@ libogmrip_encode_gtk_la_HEADERS =    \
   ogmrip-type-store.h                \
   ogmrip-encode-gtk.h
 
+libogmrip_encode_gtk_la_CPPFLAGS = \
+  -I$(top_srcdir)/libogmrip-base      \
+  -I$(top_srcdir)/libogmrip-job       \
+  -I$(top_srcdir)/libogmrip-media     \
+  -I$(top_srcdir)/libogmrip-media-gtk \
+  -I$(top_srcdir)/libogmrip-file      \
+  -I$(top_srcdir)/libogmrip-file-gtk  \
+  -I$(top_srcdir)/libogmrip-dvd       \
+  -I$(top_srcdir)/libogmrip-encode    \
+  -I$(top_builddir)/libogmrip-encode  \
+  -DOGMRIP_LIB_DIR=\""$(libdir)"\"    \
+  -DOGMRIP_DATA_DIR=\""$(datadir)"\"
+
+libogmrip_encode_gtk_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 libogmrip_encode_gtk_la_LDFLAGS = \
-  -version-info $(OGMRIP_ENCODE_LT_VERSION)
+  -version-info $(OGMRIP_ENCODE_LT_VERSION) \
+  $(WARN_LDFLAGS)
 
 libogmrip_encode_gtk_la_LIBADD = \
   $(top_builddir)/libogmrip-base/libogmrip-base.la           \
@@ -78,19 +95,6 @@ ui_FILES = \
 ogmrip-encode-gresource.c: ogmrip-encode.gresource.xml $(ui_FILES) $(GLIB_COMPILE_RESOURCES)
 	$(GLIB_COMPILE_RESOURCES) --sourcedir=$(top_srcdir)/libogmrip-encode-gtk --generate-source --target=$@ $<
 
-libogmrip_encode_gtk_la_CPPFLAGS = \
-  -I$(top_srcdir)/libogmrip-base      \
-  -I$(top_srcdir)/libogmrip-job       \
-  -I$(top_srcdir)/libogmrip-media     \
-  -I$(top_srcdir)/libogmrip-media-gtk \
-  -I$(top_srcdir)/libogmrip-file      \
-  -I$(top_srcdir)/libogmrip-file-gtk  \
-  -I$(top_srcdir)/libogmrip-dvd       \
-  -I$(top_srcdir)/libogmrip-encode    \
-  -I$(top_builddir)/libogmrip-encode  \
-  -DOGMRIP_LIB_DIR=\""$(libdir)"\"    \
-  -DOGMRIP_DATA_DIR=\""$(datadir)"\"
-
 CLEANFILES = \
   $(BUILT_SOURCES)
 
@@ -99,3 +103,5 @@ EXTRA_DIST =  \
   $(resourcefiles) \
   ogmrip-type-chooser-widget.h
 
+MAINTAINERCLEANFILES = \
+  Makefile.in

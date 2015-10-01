@@ -331,7 +331,7 @@ void
 ogmrip_player_set_chapters (OGMRipPlayer *player, guint start, gint end)
 {
   g_return_if_fail (OGMRIP_IS_PLAYER (player));
-  g_return_if_fail (end == -1 || start <= end);
+  g_return_if_fail (end < 0 || start <= (guint) end);
 
   player->priv->start_chap = start;
   player->priv->end_chap = end;

@@ -500,6 +500,9 @@ ogmjob_spawn_set_watch (OGMJobSpawn *spawn, OGMJobStream stream,
       spawn->priv->data_err = data;
       spawn->priv->notify_err = notify;
       break;
+    default:
+      g_assert_not_reached ();
+      break;
   }
 }
 

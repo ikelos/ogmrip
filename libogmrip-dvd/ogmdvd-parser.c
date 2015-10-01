@@ -166,7 +166,8 @@ ogmdvd_parser_demux_block (guchar *buffer, gint *id, gint64 *pts)
 static gint
 ogmdvd_parser_ac3 (guchar *buffer, gsize len, gint *flags, gint *rate, gint *bitrate)
 {
-  gint i, ret = 0;
+  gint ret = 0;
+  gsize i;
     
   for (i = 0; i < len - 7; i++)
     if ((ret = a52_syncinfo (buffer + i, flags, rate, bitrate)))
@@ -179,7 +180,8 @@ static gint
 ogmdvd_parser_dts (guchar *buffer, gsize len, gint *flags, gint *rate, gint *bitrate)
 {   
   dca_state_t *state;
-  gint i, frame_length, ret = 0;
+  gint frame_length, ret = 0;
+  gsize i;
 
   state = dca_init ();
   for (i = 0; i < len - 7; i++)
@@ -195,7 +197,7 @@ ogmdvd_parser_spu_assemble (OGMDvdParser *parser, gsize len, const guchar *buffe
 {
   if (!parser->size_sub || parser->size_sub == parser->size_got)
   {
-    gint size_sub, size_rle;
+    gsize size_sub, size_rle;
 
     size_sub = (buffer[0] << 8 ) | buffer[1];
     size_rle = (buffer[2] << 8 ) | buffer[3];
@@ -273,6 +275,9 @@ ogmdvd_parser_spu_analyze (OGMDvdParser *parser)
           break;
         case 0x06:
           i += 4;
+          break;
+        default:
+          g_assert_not_reached ();
           break;
       }
     }
@@ -529,6 +534,7 @@ ogmdvd_parser_analyze (OGMDvdParser *parser, guchar *buffer)
  *
  * Returns: The number of frames, or -1
  */
+/*
 glong
 ogmdvd_parser_get_video_frames (OGMDvdParser *parser)
 {
@@ -536,7 +542,7 @@ ogmdvd_parser_get_video_frames (OGMDvdParser *parser)
 
   return parser->video_frames;
 }
-/*
+
 gboolean
 ogmdvd_parser_get_progressive (OGMDvdParser *parser)
 {
@@ -560,7 +566,7 @@ ogmdvd_parser_get_audio_bitrate (OGMDvdParser *parser, guint nr)
 {
   g_return_val_if_fail (parser != NULL, -1);
   g_return_val_if_fail (parser->naudio_streams == parser->nbitrates, -1);
-  g_return_val_if_fail (nr < parser->naudio_streams, -1);
+  g_return_val_if_fail (nr < (guint) parser->naudio_streams, -1);
 
   return parser->bitrates[nr];
 }

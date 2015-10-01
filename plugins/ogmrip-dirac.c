@@ -46,10 +46,12 @@ enum
   PROP_PASSES
 };
 
+GType ogmrip_dirac_get_type (void);
+
 static gboolean have_dirac = FALSE;
 static gboolean have_schro = FALSE;
 
-const gchar *
+static const gchar *
 ogmrip_dirac_get_codec (void)
 {
   if (have_dirac)

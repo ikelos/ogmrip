@@ -160,11 +160,13 @@ ogmrip_media_info_open (OGMRipMediaInfo *info, const gchar *filename)
     return FALSE;
 
 #if defined(UNICODE) || defined (_UNICODE)
-  wchar_t *wstr;
+  {
+    wchar_t *wstr;
 
-  wstr = g_locale_to_wstring (filename);
-  info->priv->is_open = MediaInfo_Open (info->priv->handle, wstr);
-  g_free (wstr);
+    wstr = g_locale_to_wstring (filename);
+    info->priv->is_open = MediaInfo_Open (info->priv->handle, wstr);
+    g_free (wstr);
+  }
 #else
   info->priv->is_open = MediaInfo_Open (info->priv->handle, filename);
 #endif
@@ -196,20 +198,22 @@ ogmrip_media_info_get (OGMRipMediaInfo *info, OGMRipCategoryType category, guint
     return NULL;
 
 #if defined(UNICODE) || defined (_UNICODE)
-  wchar_t *wstr1;
-  const wchar_t *wstr2;
-  char *str;
+  {
+    wchar_t *wstr1;
+    const wchar_t *wstr2;
+    char *str;
 
-  wstr1 = g_locale_to_wstring (name);
-  wstr2 = MediaInfo_Get (info->priv->handle, category, stream, wstr1, MediaInfo_Info_Text, MediaInfo_Info_Name);
-  g_free (wstr1);
+    wstr1 = g_locale_to_wstring (name);
+    wstr2 = MediaInfo_Get (info->priv->handle, category, stream, wstr1, MediaInfo_Info_Text, MediaInfo_Info_Name);
+    g_free (wstr1);
 
-  if (info->priv->value)
-    g_free (info->priv->value);
+    if (info->priv->value)
+      g_free (info->priv->value);
 
-  str = g_locale_from_wstring (wstr2);
-  value = info->priv->value = g_locale_to_utf8 (str, -1, NULL, NULL, NULL);
-  g_free (str);
+    str = g_locale_from_wstring (wstr2);
+    value = info->priv->value = g_locale_to_utf8 (str, -1, NULL, NULL, NULL);
+    g_free (str);
+  }
 #else
   value = MediaInfo_Get (info->priv->handle, category, stream, name, MediaInfo_Info_Text, MediaInfo_Info_Name);
 #endif
@@ -228,17 +232,19 @@ ogmrip_media_info_geti (OGMRipMediaInfo *info, OGMRipCategoryType category, guin
     return NULL;
 
 #if defined(UNICODE) || defined (_UNICODE)
-  const wchar_t *wstr;
-  char *str;
+  {
+    const wchar_t *wstr;
+    char *str;
 
-  wstr = MediaInfo_GetI (info->priv->handle, category, stream, param, MediaInfo_Info_Text);
+    wstr = MediaInfo_GetI (info->priv->handle, category, stream, param, MediaInfo_Info_Text);
 
-  if (info->priv->value)
-    g_free (info->priv->value);
+    if (info->priv->value)
+      g_free (info->priv->value);
 
-  str = g_locale_from_wstring (wstr);
-  value = info->priv->value = g_locale_to_utf8 (str, -1, NULL, NULL, NULL);
-  g_free (str);
+    str = g_locale_from_wstring (wstr);
+    value = info->priv->value = g_locale_to_utf8 (str, -1, NULL, NULL, NULL);
+    g_free (str);
+  }
 #else
   value = MediaInfo_GetI (info->priv->handle, category, stream, param, MediaInfo_Info_Text);
 #endif

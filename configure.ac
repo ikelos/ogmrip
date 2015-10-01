@@ -1,6 +1,4 @@
-dnl Process this file with autoconf to produce a configure script.
-
-AC_PREREQ(2.53)
+AC_PREREQ(2.64)
 
 m4_define([ogmrip_major_version], [1])
 m4_define([ogmrip_minor_version], [9])
@@ -8,11 +6,13 @@ m4_define([ogmrip_micro_version], [0])
 m4_define([ogmrip_version], [ogmrip_major_version.ogmrip_minor_version.ogmrip_micro_version])
 
 AC_INIT([OGMRip], [ogmrip_version])
-AC_CONFIG_SRCDIR(src/ogmrip-main.c)
-AM_INIT_AUTOMAKE
+AX_IS_RELEASE([git-directory])
 
+AC_CONFIG_SRCDIR(src/ogmrip-main.c)
 AC_CONFIG_HEADERS(config.h)
 AC_CONFIG_MACRO_DIR(m4)
+
+AM_INIT_AUTOMAKE([1.11.1])
 
 dnl **************************************************************
 
@@ -27,6 +27,11 @@ AC_SUBST(OGMRIP_VERSION)
 
 dnl **************************************************************
 
+AX_CHECK_ENABLE_DEBUG([yes],[GNOME_ENABLE_DEBUG])
+AX_COMPILER_FLAGS([WARN_CFLAGS],[WARN_LDFLAGS])
+# CFLAGS="$CFLAGS $WARN_CFLAGS"
+# LDFLAGS="$LDFLAGS $WARN_LDFLAGS"
+
 AC_PROG_CC
 AM_PROG_CC_C_O
 AC_PROG_INSTALL
@@ -37,32 +42,12 @@ AC_HEADER_STDC
 AC_C_BIGENDIAN
 AC_SYS_LARGEFILE
 
-AM_MAINTAINER_MODE
-
 PKG_PROG_PKG_CONFIG
-
-CFLAGS="-g -I/usr/local/include -I.. -Wall -Werror"
-CFLAGS="$CFLAGS -DG_DISABLE_DEPRECATED -DGDK_PIXBUF_DISABLE_DEPRECATED -DGTK_DISABLE_DEPRECATED"
-CFLAGS="$CFLAGS -DG_DISABLE_SINGLE_INCLUDES -DGTK_DISABLE_SINGLE_INCLUDES"
-LDFLAGS="$LDFLAGS -Wl,--export-dynamic -L/usr/local/lib -L/usr/pkg/lib"
 
 dnl **************************************************************
 
 AC_CHECK_HEADERS(sys/statvfs.h mntent.h sys/mnttab.h sys/vfstab.h sys/cdio.h)
 AC_CHECK_FUNCS(statvfs)
-
-dnl **************************************************************
-
-GTK_DOC_CHECK(1.0)
-
-if test x"$enable_gtk_doc" = x"yes"; then
-  AC_PATH_PROG(XSLTPROC_PROG, xsltproc)
-  if test x"$XSLTPROC_PROG" = x; then
-    AC_MSG_ERROR(Unable to find xsltproc in the PATH. You need xsltproc to build the tutorial. Find it on http://www.xmlsoft.org)
-  fi
-fi
-
-AM_CONDITIONAL(HAVE_XSLTPROC_PROG, [test x"$XSLTPROC_PROG" != x""])
 
 dnl **************************************************************
 
@@ -362,8 +347,11 @@ fi
 
 dnl **************************************************************
 
+LT_PREREQ([2.2.6])
+LT_INIT
+
+IT_PROG_INTLTOOL([0.40.6])
 AM_GLIB_GNU_GETTEXT
-IT_PROG_INTLTOOL([0.40.0], [no-xml])
 
 GETTEXT_PACKAGE=ogmrip
 AC_SUBST(GETTEXT_PACKAGE)
@@ -410,7 +398,7 @@ AC_SUBST(OGMRIP_MPLAYER_LT_VERSION)
 
 dnl **************************************************************
 
-AC_OUTPUT([
+AC_CONFIG_FILES([
 src/Makefile
 avibox/Makefile
 subrip/Makefile
@@ -449,6 +437,7 @@ data/ui/Makefile
 po/Makefile.in
 Makefile
 ])
+AC_OUTPUT
 
 AC_MSG_NOTICE([OGMRip was configured with the following options:])
 

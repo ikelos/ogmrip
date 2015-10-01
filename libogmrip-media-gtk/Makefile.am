@@ -14,6 +14,15 @@ libogmrip_media_gtk_la_SOURCES =   \
   ogmrip-title-chooser.c           \
   ogmrip-title-chooser-widget.c
 
+resourcefiles = \
+  ogmrip-media.gresource.xml
+
+ogmrip_RESOURCES = \
+  $(resourcefiles:.gresource.xml=-gresource.c)
+
+libogmrip_media_gtk_la_SOURCES += \
+  $(ogmrip_RESOURCES)
+
 libogmrip_media_gtk_ladir = \
   $(includedir)/ogmrip-media
 
@@ -31,21 +40,20 @@ libogmrip_media_gtk_la_HEADERS =   \
   ogmrip-title-chooser-widget.h    \
   ogmrip-media-gtk.h
 
+libogmrip_media_gtk_la_CPPFLAGS = \
+  -I$(top_srcdir)/libogmrip-base \
+  -I$(top_srcdir)/libogmrip-media
+
+libogmrip_media_gtk_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 libogmrip_media_gtk_la_LDFLAGS = \
-  -version-info $(OGMRIP_MEDIA_LT_VERSION)
+  -version-info $(OGMRIP_MEDIA_LT_VERSION) \
+  $(WARN_LDFLAGS)
 
 libogmrip_media_gtk_la_LIBADD = \
   $(top_builddir)/libogmrip-base/libogmrip-base.la \
   $(top_builddir)/libogmrip-media/libogmrip-media.la
-
-resourcefiles = \
-  ogmrip-media.gresource.xml
-
-ogmrip_RESOURCES = \
-  $(resourcefiles:.gresource.xml=-gresource.c)
-
-libogmrip_media_gtk_la_SOURCES += \
-  $(ogmrip_RESOURCES)
 
 BUILT_SOURCES = \
   $(ogmrip_RESOURCES)
@@ -56,12 +64,11 @@ ui_FILES = \
 ogmrip-media-gresource.c: ogmrip-media.gresource.xml $(ui_FILES) $(GLIB_COMPILE_RESOURCES)
 	$(GLIB_COMPILE_RESOURCES) --sourcedir=$(top_srcdir)/libogmrip-media-gtk --generate-source --target=$@ $<
 
-libogmrip_media_gtk_la_CPPFLAGS = \
-  -I$(top_srcdir)/libogmrip-base \
-  -I$(top_srcdir)/libogmrip-media
-
 CLEANFILES = \
   $(BUILT_SOURCES)
+
+MAINTAINERCLEANFILES = \
+  Makefile.in
 
 EXTRA_DIST =  \
   $(ui_FILES) \

@@ -316,19 +316,6 @@ ogmrip_profile_engine_load_dir (OGMRipProfileEngine *engine, const gchar *path)
 }
 
 void
-ogmrip_profile_engine_rescan (OGMRipProfileEngine *engine)
-{
-  GList *link;
-
-  g_return_if_fail (OGMRIP_IS_PROFILE_ENGINE (engine));
-
-  g_object_freeze_notify (G_OBJECT (engine));
-  for (link = engine->priv->paths; link; link = link->next)
-    ogmrip_profile_engine_load_dir (engine, link->data);
-  g_object_thaw_notify (G_OBJECT (engine));
-}
-
-void
 ogmrip_profile_engine_add_path (OGMRipProfileEngine *engine, const gchar *path)
 {
   g_return_if_fail (OGMRIP_IS_PROFILE_ENGINE (engine));

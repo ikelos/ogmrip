@@ -106,6 +106,21 @@ ogmbr_title_get_format (OGMRipStream *stream)
     case BLURAY_STREAM_TYPE_VIDEO_H264:
       format = OGMRIP_FORMAT_H264;
       break;
+    case BLURAY_STREAM_TYPE_AUDIO_MPEG1:
+    case BLURAY_STREAM_TYPE_AUDIO_MPEG2:
+    case BLURAY_STREAM_TYPE_AUDIO_LPCM:
+    case BLURAY_STREAM_TYPE_AUDIO_AC3:
+    case BLURAY_STREAM_TYPE_AUDIO_DTS:
+    case BLURAY_STREAM_TYPE_AUDIO_TRUHD:
+    case BLURAY_STREAM_TYPE_AUDIO_AC3PLUS:
+    case BLURAY_STREAM_TYPE_AUDIO_DTSHD:
+    case BLURAY_STREAM_TYPE_AUDIO_DTSHD_MASTER:
+    case BLURAY_STREAM_TYPE_SUB_PG:
+    case BLURAY_STREAM_TYPE_SUB_IG:
+    case BLURAY_STREAM_TYPE_SUB_TEXT:
+    case BLURAY_STREAM_TYPE_AUDIO_AC3PLUS_SECONDARY:
+    case BLURAY_STREAM_TYPE_AUDIO_DTSHD_SECONDARY:
+      g_assert_not_reached ();
     default:
       g_assert_not_reached ();
       break;
@@ -274,6 +289,11 @@ ogmbr_title_get_progressive (OGMRipVideoStream *video)
     case BLURAY_VIDEO_FORMAT_1080P:
       progressive = TRUE;
       break;
+    case BLURAY_VIDEO_FORMAT_480I:
+    case BLURAY_VIDEO_FORMAT_576I:
+    case BLURAY_VIDEO_FORMAT_1080I:
+      progressive = FALSE;
+      break;
     default:
       progressive = FALSE;
       break;
@@ -300,6 +320,12 @@ ogmbr_title_get_interlaced (OGMRipVideoStream *video)
     case BLURAY_VIDEO_FORMAT_576I:
     case BLURAY_VIDEO_FORMAT_1080I:
       interlaced = TRUE;
+      break;
+    case BLURAY_VIDEO_FORMAT_480P:
+    case BLURAY_VIDEO_FORMAT_576P:
+    case BLURAY_VIDEO_FORMAT_720P:
+    case BLURAY_VIDEO_FORMAT_1080P:
+      interlaced = FALSE;
       break;
     default:
       interlaced = FALSE;
@@ -363,8 +389,7 @@ ogmbr_title_open (OGMRipTitle *title, GCancellable *cancellable, OGMRipTitleCall
         btitle->priv->nopen ++;
         return TRUE;
       }
-
-      if (disc->priv->selected >= 0)
+      else
       {
         g_set_error (error, OGMRIP_MEDIA_ERROR, OGMRIP_MEDIA_ERROR_OPEN,
             _("Title already openened"));

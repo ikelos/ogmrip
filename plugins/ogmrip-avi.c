@@ -56,6 +56,8 @@ enum
   PROP_NSUBP
 };
 
+GType ogmrip_avi_get_type (void);
+
 static gboolean
 ogmrip_avi_watch (OGMJobTask *task, const gchar *buffer, OGMRipContainer *avi, GError **error)
 {

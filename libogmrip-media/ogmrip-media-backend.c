@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include "ogmrip-media-backend.h"
 #include "ogmrip-media-title.h"
 #include "ogmrip-media-object.h"
 #include "ogmrip-media-video.h"

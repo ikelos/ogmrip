@@ -54,6 +54,8 @@ struct _OGMRipSrtClass
   OGMRipSubpCodecClass parent_class;
 };
 
+GType ogmrip_srt_get_type (void);
+
 static gboolean use_gocr      = FALSE;
 static gboolean use_ocrad     = FALSE;
 static gboolean use_tesseract = FALSE;
@@ -165,6 +167,9 @@ ogmrip_gocr_command (OGMRipSrt *srt, const gchar *input)
     case OGMRIP_CHARSET_ASCII:
       g_ptr_array_add (argv, g_strdup ("ASCII"));
       break;
+    default:
+      g_assert_not_reached ();
+      break;
   }
 
   g_ptr_array_add (argv, g_strdup ("-m"));
@@ -205,6 +210,9 @@ ogmrip_ocrad_command (OGMRipSrt *srt, const gchar *input)
     case OGMRIP_CHARSET_ISO8859_1:
     case OGMRIP_CHARSET_ASCII:
       g_ptr_array_add (argv, g_strdup ("byte"));
+      break;
+    default:
+      g_assert_not_reached ();
       break;
   }
 

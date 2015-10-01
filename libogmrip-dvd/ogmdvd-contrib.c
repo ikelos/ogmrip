@@ -169,7 +169,7 @@ bitstream_get (dca_state_t * state, uint32_t num_bits)
   return dca_bitstream_get_bh (state, num_bits);
 }
 
-void
+static void
 dca_bitstream_init (dca_state_t * state, uint8_t * buf, int word_mode, int bigendian_mode)
 {
   intptr_t align;

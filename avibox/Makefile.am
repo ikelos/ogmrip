@@ -24,3 +24,5 @@ EXTRA_DIST =  \
 
 CLEANFILES = *~ *.bak
 
+MAINTAINERCLEANFILES = \
+  Makefile.in

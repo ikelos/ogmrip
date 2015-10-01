@@ -7,7 +7,7 @@ libogmrip_media_la_SOURCES = \
   ogmrip-media-chapters.c \
   ogmrip-media-labels.c   \
   ogmrip-media-object.c   \
-	ogmrip-media-player.c   \
+  ogmrip-media-player.c   \
   ogmrip-media-stream.c   \
   ogmrip-media-subp.c     \
   ogmrip-media-time.c     \
@@ -21,7 +21,7 @@ libogmrip_media_la_HEADERS = \
   ogmrip-media-enums.h    \
   ogmrip-media-labels.h   \
   ogmrip-media-object.h   \
-	ogmrip-media-player.h   \
+  ogmrip-media-player.h   \
   ogmrip-media-stream.h   \
   ogmrip-media-subp.h     \
   ogmrip-media-time.h     \
@@ -30,17 +30,23 @@ libogmrip_media_la_HEADERS = \
   ogmrip-media-video.h    \
   ogmrip-media.h
 
-libogmrip_media_la_LDFLAGS = \
-  -version-info $(OGMRIP_MEDIA_LT_VERSION)
-
 libogmrip_media_ladir = \
   $(includedir)/ogmrip-media
-
-libogmrip_media_la_LIBADD = \
-  $(top_builddir)/libogmrip-base/libogmrip-base.la \
-  $(top_builddir)/libogmrip-job/libogmrip-job.la
 
 libogmrip_media_la_CPPFLAGS = \
   -I$(top_srcdir)/libogmrip-base \
   -I$(top_srcdir)/libogmrip-job
 
+libogmrip_media_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
+libogmrip_media_la_LDFLAGS = \
+  -version-info $(OGMRIP_MEDIA_LT_VERSION) \
+  $(WARN_LDFLAGS)
+
+libogmrip_media_la_LIBADD = \
+  $(top_builddir)/libogmrip-base/libogmrip-base.la \
+  $(top_builddir)/libogmrip-job/libogmrip-job.la
+
+MAINTAINERCLEANFILES = \
+  Makefile.in

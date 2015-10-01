@@ -301,7 +301,7 @@ ogmrip_xvid_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
     guint height;
 
     ogmrip_video_codec_get_scale_size (video, NULL, &height);
-    threads = CLAMP (threads, 1, height / 16);
+    threads = CLAMP (threads, (gint) 1, (gint) (height / 16));
   }
   g_string_append_printf (options, ":threads=%u", threads);
 

@@ -44,11 +44,11 @@
 GSettings *settings = NULL;
 
 static void
-ogmrip_tmp_dir_changed_cb (GSettings *settings, const gchar *key)
+ogmrip_tmp_dir_changed_cb (GSettings *gsettings, const gchar *key)
 {
   gchar *path;
 
-  path = g_settings_get_string (settings, key);
+  path = g_settings_get_string (gsettings, key);
   ogmrip_fs_set_tmp_dir (path);
   g_free (path);
 }

@@ -123,6 +123,8 @@ static gboolean x264_have_mixed_refs = FALSE;
 static gboolean x264_have_psy        = FALSE;
 static gboolean x264_have_weight_p   = FALSE;
 
+GType ogmrip_x264_dialog_get_type (void);
+
 static void ogmrip_options_editable_init (OGMRipOptionsEditableInterface *iface);
 
 static gboolean

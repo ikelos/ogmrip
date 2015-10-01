@@ -51,6 +51,8 @@ struct _OGMRipMediaFileStreamClass
   GObjectClass parent_class;
 };
 
+GType ogmrip_media_file_stream_get_type (void);
+
 #define OGMRIP_TYPE_MEDIA_FILE_AUDIO (ogmrip_media_file_audio_get_type ())
 #define OGMRIP_MEDIA_FILE_AUDIO(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_MEDIA_FILE_AUDIO, OGMRipMediaFileAudio))
 
@@ -70,6 +72,8 @@ struct _OGMRipMediaFileAudioClass
   OGMRipMediaFileStreamClass parent_class;
 };
 
+GType ogmrip_media_file_audio_get_type (void);
+
 #define OGMRIP_TYPE_MEDIA_FILE_SUBP (ogmrip_media_file_subp_get_type ())
 #define OGMRIP_MEDIA_FILE_SUBP(obj) (G_TYPE_CHECK_INSTANCE_CAST ((obj), OGMRIP_TYPE_MEDIA_FILE_SUBP, OGMRipMediaFileSubp))
 
@@ -88,6 +92,8 @@ struct _OGMRipMediaFileSubpClass
 {
   OGMRipMediaFileStreamClass parent_class;
 };
+
+GType ogmrip_media_file_subp_get_type (void);
 
 static void      g_initable_iface_init          (GInitableIface             *iface);
 static void      ogmrip_title_iface_init        (OGMRipTitleInterface       *iface);
@@ -120,7 +126,7 @@ ogmrip_media_file_get_format (OGMRipStream *stream)
   return OGMRIP_MEDIA_FILE_STREAM (stream)->format;
 }
 
-OGMRipTitle *
+static OGMRipTitle *
 ogmrip_media_file_get_title (OGMRipStream *stream)
 {
   return OGMRIP_MEDIA_FILE_STREAM (stream)->title;

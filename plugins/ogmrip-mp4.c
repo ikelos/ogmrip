@@ -267,6 +267,9 @@ ogmrip_mp4_create_command (OGMRipContainer *container, const gchar *input)
       if (mp4->naudio <= 1 && mp4->nsubp < 1)
         g_ptr_array_add (argv, g_strdup ("-isma"));
       break;
+    default:
+      g_assert_not_reached ();
+      break;
   }
 
   if (mp4->hint)

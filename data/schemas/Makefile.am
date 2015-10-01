@@ -11,3 +11,5 @@ gsettings_SCHEMAS = \
 EXTRA_DIST =      \
   $(gsettings_SCHEMAS)
 
+MAINTAINERCLEANFILES = \
+  Makefile.in

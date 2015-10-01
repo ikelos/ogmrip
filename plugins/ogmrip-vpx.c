@@ -72,6 +72,8 @@ enum
   PROP_CODEC
 };
 
+GType ogmrip_vpx_get_type (void);
+
 static OGMJobTask *
 ogmrip_vpx_command (OGMRipVpx *vpx, const gchar *fifo, guint pass, guint passes, const gchar *log_file)
 {
@@ -94,6 +96,9 @@ ogmrip_vpx_command (OGMRipVpx *vpx, const gchar *fifo, guint pass, guint passes,
       break;
     case OGMRIP_VP9:
       g_ptr_array_add (argv, g_strdup ("--codec=vp9"));
+      break;
+    default:
+      g_assert_not_reached ();
       break;
   }
 
@@ -372,6 +377,8 @@ struct _OGMRipVp9Class
 {
   OGMRipVpxClass parent_class;
 };
+
+GType ogmrip_vp9_get_type (void);
 
 G_DEFINE_TYPE (OGMRipVp9, ogmrip_vp9, OGMRIP_TYPE_VPX)
 

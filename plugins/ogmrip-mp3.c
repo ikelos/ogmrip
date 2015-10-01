@@ -49,10 +49,12 @@ struct _OGMRipMp3Class
   OGMRipAudioCodecClass parent_class;
 };
 
+GType ogmrip_mp3_get_type (void);
+
 static OGMJobTask *
 ogmrip_mp3_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input)
 {
-  static gchar *presets[][2] =
+  static const gchar *presets[][2] =
   {
     { "96",       NULL      },
     { "112",      NULL      },

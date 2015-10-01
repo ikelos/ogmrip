@@ -8,3 +8,5 @@ SUBDIRS += \
   ui
 endif # HAVE_GTK_SUPPORT
 
+MAINTAINERCLEANFILES = \
+  Makefile.in

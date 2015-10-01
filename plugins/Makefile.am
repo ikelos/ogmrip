@@ -22,8 +22,12 @@ plugins_LTLIBRARIES += \
 ogmrip_lavc_mpeg_la_SOURCES = \
   ogmrip-lavc-mpeg.c
   
+ogmrip_lavc_mpeg_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 ogmrip_lavc_mpeg_la_LDFLAGS = \
-  -export-dynamic -module -avoid-version
+  -export-dynamic -module -avoid-version \
+  $(WARN_LDFLAGS)
 
 ogmrip_lavc_mpeg_la_LIBTOOLFLAGS = \
   --tag=disable-static
@@ -40,8 +44,12 @@ plugins_LTLIBRARIES += \
 ogmrip_xvid_la_SOURCES = \
   ogmrip-xvid.c
 
+ogmrip_xvid_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 ogmrip_xvid_la_LDFLAGS = \
-  -export-dynamic -module -avoid-version
+  -export-dynamic -module -avoid-version \
+  $(WARN_LDFLAGS)
 
 ogmrip_xvid_la_LIBTOOLFLAGS = \
   --tag=disable-static
@@ -62,8 +70,12 @@ plugins_LTLIBRARIES += \
 ogmrip_theora_la_SOURCES = \
   ogmrip-theora.c
 
+ogmrip_theora_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 ogmrip_theora_la_LDFLAGS = \
-  -export-dynamic -module -avoid-version
+  -export-dynamic -module -avoid-version \
+  $(WARN_LDFLAGS)
 
 ogmrip_theora_la_LIBTOOLFLAGS = \
   --tag=disable-static
@@ -82,8 +94,12 @@ plugins_LTLIBRARIES += \
 ogmrip_x264_la_SOURCES = \
   ogmrip-x264.c
 
+ogmrip_x264_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 ogmrip_x264_la_LDFLAGS = \
-  -export-dynamic -module -avoid-version
+  -export-dynamic -module -avoid-version \
+  $(WARN_LDFLAGS)
 
 ogmrip_x264_la_LIBTOOLFLAGS = \
   --tag=disable-static
@@ -105,8 +121,12 @@ plugins_LTLIBRARIES += \
 ogmrip_vpx_la_SOURCES = \
   ogmrip-vpx.c
 
+ogmrip_vpx_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 ogmrip_vpx_la_LDFLAGS = \
-  -export-dynamic -module -avoid-version
+  -export-dynamic -module -avoid-version \
+  $(WARN_LDFLAGS)
 
 ogmrip_vpx_la_LIBTOOLFLAGS = \
   --tag=disable-static
@@ -125,8 +145,12 @@ plugins_LTLIBRARIES += \
 ogmrip_dirac_la_SOURCES = \
   ogmrip-dirac.c
 
+ogmrip_dirac_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 ogmrip_dirac_la_LDFLAGS = \
-  -export-dynamic -module -avoid-version
+  -export-dynamic -module -avoid-version \
+  $(WARN_LDFLAGS)
 
 ogmrip_dirac_la_LIBTOOLFLAGS = \
   --tag=disable-static
@@ -148,8 +172,12 @@ plugins_LTLIBRARIES += \
 ogmrip_copy_la_SOURCES = \
   ogmrip-copy.c
 
+ogmrip_copy_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 ogmrip_copy_la_LDFLAGS = \
-  -export-dynamic -module -avoid-version
+  -export-dynamic -module -avoid-version \
+  $(WARN_LDFLAGS)
 
 ogmrip_copy_la_LIBTOOLFLAGS = \
   --tag=disable-static
@@ -162,8 +190,12 @@ ogmrip_copy_la_LIBADD = \
 ogmrip_wav_la_SOURCES = \
   ogmrip-wav.c
 
+ogmrip_wav_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 ogmrip_wav_la_LDFLAGS = \
-  -export-dynamic -module -avoid-version
+  -export-dynamic -module -avoid-version \
+  $(WARN_LDFLAGS)
 
 ogmrip_wav_la_LIBTOOLFLAGS = \
   --tag=disable-static
@@ -180,8 +212,12 @@ plugins_LTLIBRARIES += \
 ogmrip_mp3_la_SOURCES = \
   ogmrip-mp3.c
 
+ogmrip_mp3_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 ogmrip_mp3_la_LDFLAGS = \
-  -export-dynamic -module -avoid-version
+  -export-dynamic -module -avoid-version \
+  $(WARN_LDFLAGS)
 
 ogmrip_mp3_la_LIBTOOLFLAGS = \
   --tag=disable-static
@@ -200,8 +236,12 @@ plugins_LTLIBRARIES += \
 ogmrip_vorbis_la_SOURCES = \
   ogmrip-vorbis.c
 
+ogmrip_vorbis_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 ogmrip_vorbis_la_LDFLAGS = \
-  -export-dynamic -module -avoid-version
+  -export-dynamic -module -avoid-version \
+  $(WARN_LDFLAGS)
 
 ogmrip_vorbis_la_LIBTOOLFLAGS = \
   --tag=disable-static
@@ -220,8 +260,12 @@ plugins_LTLIBRARIES += \
 ogmrip_aac_la_SOURCES = \
   ogmrip-aac.c
 
+ogmrip_aac_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 ogmrip_aac_la_LDFLAGS = \
-  -export-dynamic -module -avoid-version
+  -export-dynamic -module -avoid-version \
+  $(WARN_LDFLAGS)
 
 ogmrip_aac_la_LIBTOOLFLAGS = \
   --tag=disable-static
@@ -240,8 +284,12 @@ plugins_LTLIBRARIES += \
 ogmrip_flac_la_SOURCES = \
   ogmrip-flac.c
 
+ogmrip_flac_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 ogmrip_flac_la_LDFLAGS = \
-  -export-dynamic -module -avoid-version
+  -export-dynamic -module -avoid-version \
+  $(WARN_LDFLAGS)
 
 ogmrip_flac_la_LIBTOOLFLAGS = \
   --tag=disable-static
@@ -260,8 +308,12 @@ plugins_LTLIBRARIES += \
 ogmrip_ac3_la_SOURCES = \
   ogmrip-ac3.c
 
+ogmrip_ac3_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 ogmrip_ac3_la_LDFLAGS = \
-  -export-dynamic -module -avoid-version
+  -export-dynamic -module -avoid-version \
+  $(WARN_LDFLAGS)
 
 ogmrip_ac3_la_LIBTOOLFLAGS = \
   --tag=disable-static
@@ -283,8 +335,12 @@ plugins_LTLIBRARIES += \
 ogmrip_vobsub_la_SOURCES = \
   ogmrip-vobsub.c
 
+ogmrip_vobsub_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 ogmrip_vobsub_la_LDFLAGS = \
-  -export-dynamic -module -avoid-version
+  -export-dynamic -module -avoid-version \
+  $(WARN_LDFLAGS)
 
 ogmrip_vobsub_la_LIBTOOLFLAGS = \
   --tag=disable-static
@@ -301,8 +357,12 @@ plugins_LTLIBRARIES += \
 ogmrip_srt_la_SOURCES = \
   ogmrip-srt.c
 
+ogmrip_srt_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 ogmrip_srt_la_LDFLAGS = \
-  -export-dynamic -module -avoid-version
+  -export-dynamic -module -avoid-version \
+  $(WARN_LDFLAGS)
 
 ogmrip_srt_la_LIBTOOLFLAGS = \
   --tag=disable-static
@@ -326,8 +386,12 @@ plugins_LTLIBRARIES += \
 ogmrip_avi_la_SOURCES = \
   ogmrip-avi.c
 
+ogmrip_avi_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 ogmrip_avi_la_LDFLAGS = \
-  -export-dynamic -module -avoid-version
+  -export-dynamic -module -avoid-version \
+  $(WARN_LDFLAGS)
 
 ogmrip_avi_la_LIBTOOLFLAGS = \
   --tag=disable-static
@@ -345,8 +409,12 @@ plugins_LTLIBRARIES += \
 ogmrip_ogg_la_SOURCES = \
   ogmrip-ogg.c
 
+ogmrip_ogg_la_CFLAGS = \
+  $(WARN_CLFAGS)
+
 ogmrip_ogg_la_LDFLAGS = \
-  -export-dynamic -module -avoid-version
+  -export-dynamic -module -avoid-version \
+  $(WARN_LDFLAGS)
 
 ogmrip_ogg_la_LIBTOOLFLAGS = \
   --tag=disable-static
@@ -366,8 +434,12 @@ plugins_LTLIBRARIES += \
 ogmrip_mkv_la_SOURCES = \
   ogmrip-mkv.c
 
+ogmrip_mkv_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 ogmrip_mkv_la_LDFLAGS = \
-  -export-dynamic -module -avoid-version
+  -export-dynamic -module -avoid-version \
+  $(WARN_LDFLAGS)
 
 ogmrip_mkv_la_LIBTOOLFLAGS = \
   --tag=disable-static
@@ -387,8 +459,12 @@ plugins_LTLIBRARIES += \
 ogmrip_mp4_la_SOURCES = \
   ogmrip-mp4.c
 
+ogmrip_mp4_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 ogmrip_mp4_la_LDFLAGS = \
-  -export-dynamic -module -avoid-version
+  -export-dynamic -module -avoid-version \
+  $(WARN_LDFLAGS)
 
 ogmrip_mp4_la_LIBTOOLFLAGS = \
   --tag=disable-static
@@ -423,8 +499,12 @@ ogmrip_lavc_options_la_SOURCES = \
   ogmrip-lavc-options.c \
   ogmrip-lavc-gresource.c
 
+ogmrip_lavc_options_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 ogmrip_lavc_options_la_LDFLAGS = \
-  -export-dynamic -module -avoid-version
+  -export-dynamic -module -avoid-version \
+  $(WARN_LDFLAGS)
 
 ogmrip_lavc_options_la_LIBTOOLFLAGS = \
   --tag=disable-static
@@ -454,8 +534,12 @@ ogmrip_xvid_options_la_SOURCES = \
   ogmrip-xvid-options.c \
   ogmrip-xvid-gresource.c
 
+ogmrip_xvid_options_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 ogmrip_xvid_options_la_LDFLAGS = \
-  -export-dynamic -module -avoid-version
+  -export-dynamic -module -avoid-version \
+  $(WARN_LDFLAGS)
 
 ogmrip_xvid_options_la_LIBTOOLFLAGS = \
   --tag=disable-static
@@ -484,8 +568,12 @@ ogmrip_x264_options_la_SOURCES = \
   ogmrip-x264-options.c \
   ogmrip-x264-gresource.c
 
+ogmrip_x264_options_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 ogmrip_x264_options_la_LDFLAGS = \
-  -export-dynamic -module -avoid-version
+  -export-dynamic -module -avoid-version \
+  $(WARN_LDFLAGS)
 
 ogmrip_x264_options_la_LIBTOOLFLAGS = \
   --tag=disable-static
@@ -514,8 +602,12 @@ ogmrip_mp4_options_la_SOURCES = \
   ogmrip-mp4-options.c \
   ogmrip-mp4-gresource.c
 
+ogmrip_mp4_options_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 ogmrip_mp4_options_la_LDFLAGS = \
-  -export-dynamic -module -avoid-version
+  -export-dynamic -module -avoid-version \
+  $(WARN_LDFLAGS)
 
 ogmrip_mp4_options_la_LIBTOOLFLAGS = \
   --tag=disable-static
@@ -568,13 +660,11 @@ AM_CPPFLAGS += \
   -I$(top_srcdir)/libogmrip-encode-gtk
 endif
 
-if MAINTAINER_MODE
-AM_CPPFLAGS += \
-  -DG_ENABLE_DEBUG
-endif
-
 CLEANFILES = \
   $(RESOURCES)
+
+MAINTAINERCLEANFILES = \
+  Makefile.in
 
 EXTRA_DIST = \
   $(resourcefiles) \

@@ -88,6 +88,8 @@ enum
   PROP_PROFILE
 };
 
+GType ogmrip_xvid_dialog_get_type (void);
+
 static void ogmrip_options_editable_init (OGMRipOptionsEditableInterface *iface);
 
 static gboolean

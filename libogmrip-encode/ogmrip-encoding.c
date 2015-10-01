@@ -107,6 +107,8 @@ enum
 
 static guint signals[LAST_SIGNAL] = { 0 };
 
+GType ogmrip_codec_array_get_type (void);
+
 static OGMRipCodec **
 ogmrip_codec_array_copy (OGMRipCodec **array)
 {
@@ -1685,8 +1687,8 @@ ogmrip_encoding_copy (OGMRipEncoding *encoding, GCancellable *cancellable, GErro
   OGMJobTask *task;
 
   gboolean result;
+  gulong handler_id;
   gchar *output;
-  gulong id;
 
   ogmrip_log_printf ("Copying %s\n\n", ogmrip_media_get_label (encoding->priv->media));
 
@@ -1694,7 +1696,7 @@ ogmrip_encoding_copy (OGMRipEncoding *encoding, GCancellable *cancellable, GErro
   task = ogmrip_copy_new (encoding->priv->media, output);
   g_free (output);
 
-  id = g_signal_connect_swapped (task, "notify::progress",
+  handler_id = g_signal_connect_swapped (task, "notify::progress",
       G_CALLBACK (ogmrip_encoding_task_progressed), encoding);
 
   g_signal_emit (encoding, signals[RUN], 0, task);
@@ -1746,7 +1748,7 @@ ogmrip_encoding_copy (OGMRipEncoding *encoding, GCancellable *cancellable, GErro
     g_object_unref (new_media);
   }
 
-  g_signal_handler_disconnect (task, id);
+  g_signal_handler_disconnect (task, handler_id);
   g_object_unref (task);
 
   return result;
@@ -1909,6 +1911,9 @@ ogmrip_encoding_set_video_method (OGMRipEncoding *encoding, GError **error)
     case OGMRIP_ENCODING_QUANTIZER:
       ogmrip_log_printf ("Constant quantizer: %lf\n\n",
           ogmrip_video_codec_get_quantizer (encoding->priv->video_codec));
+      break;
+    default:
+      g_assert_not_reached ();
       break;
   }
 

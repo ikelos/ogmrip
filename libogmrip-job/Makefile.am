@@ -21,17 +21,18 @@ libogmrip_job_la_HEADERS = \
   ogmjob-task.h      \
   ogmrip-job.h
 
+libogmrip_job_la_CPPFLAGS = \
+  -I$(top_srcdir)/libogmrip-base
+
+libogmrip_job_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 libogmrip_job_la_LDFLAGS = \
-  -version-info $(OGMRIP_JOB_LT_VERSION)
+  -version-info $(OGMRIP_JOB_LT_VERSION) \
+  $(WARN_LDFLAGS)
 
 libogmrip_job_la_LIBADD = \
   $(top_builddir)/libogmrip-base/libogmrip-base.la
 
-libogmrip_job_la_CPPFLAGS = \
-  -I$(top_srcdir)/libogmrip-base
-
-if MAINTAINER_MODE
-libogmrip_job_la_CPPFLAGS += \
-  -DG_ENABLE_DEBUG
-endif
-
+MAINTAINERCLEANFILES = \
+  Makefile.in

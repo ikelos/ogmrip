@@ -137,7 +137,7 @@ ogmrip_title_get_chapters_length (OGMRipTitle *title, guint start, gint end, OGM
   gint nchapters;
 
   g_return_val_if_fail (OGMRIP_IS_TITLE (title), -1.0);
-  g_return_val_if_fail ((start <= end && end < ogmrip_title_get_n_chapters (title)) || end < 0, -1.0);
+  g_return_val_if_fail (end < 0 || (start <= (guint) end && end < ogmrip_title_get_n_chapters (title)), -1.0);
 
   iface = OGMRIP_TITLE_GET_IFACE (title);
 

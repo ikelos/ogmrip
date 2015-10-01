@@ -804,7 +804,7 @@ ogmdvd_disc_copy_command (OGMDvdDisc *disc, const gchar *path)
   return (gchar **) g_ptr_array_free (argv, FALSE);
 }
 
-OGMRipMedia *
+static OGMRipMedia *
 ogmdvd_disc_copy (OGMRipMedia *media, const gchar *path, GCancellable *cancellable,
     OGMRipMediaCallback callback, gpointer user_data, GError **error)
 {

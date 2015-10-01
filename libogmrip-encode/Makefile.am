@@ -57,8 +57,22 @@ libogmrip_encode_la_HEADERS = \
   ogmrip-video-codec.h      \
   ogmrip-encode.h
 
+libogmrip_encode_la_CPPFLAGS = \
+  -I$(top_srcdir)/libogmrip-base     \
+  -I$(top_srcdir)/libogmrip-job      \
+  -I$(top_srcdir)/libogmrip-media    \
+  -I$(top_srcdir)/libogmrip-file     \
+  -I$(top_srcdir)/libogmrip-dvd      \
+  -I$(top_builddir)/libogmrip-encode \
+  -DOGMRIP_LIB_DIR=\""$(libdir)"\" \
+  -DOGMRIP_DATA_DIR=\""$(datadir)"\"
+
+libogmrip_encode_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 libogmrip_encode_la_LDFLAGS = \
-  -version-info $(OGMRIP_ENCODE_LT_VERSION)
+  -version-info $(OGMRIP_ENCODE_LT_VERSION) \
+  $(WARN_LDFLAGS)
 
 libogmrip_encode_la_LIBADD = \
   $(top_builddir)/libogmrip-base/libogmrip-base.la   \
@@ -78,21 +92,6 @@ EXTRA_DIST = \
   ogmrip-marshal.list \
   ogmrip-version.h.in
 
-libogmrip_encode_la_CPPFLAGS = \
-  -I$(top_srcdir)/libogmrip-base     \
-  -I$(top_srcdir)/libogmrip-job      \
-  -I$(top_srcdir)/libogmrip-media    \
-  -I$(top_srcdir)/libogmrip-file     \
-  -I$(top_srcdir)/libogmrip-dvd      \
-  -I$(top_builddir)/libogmrip-encode \
-  -DOGMRIP_LIB_DIR=\""$(libdir)"\" \
-  -DOGMRIP_DATA_DIR=\""$(datadir)"\"
-
-if MAINTAINER_MODE
-libogmrip_encode_la_CPPFLAGS += \
-  -DG_ENABLE_DEBUG
-endif
-
 ogmripincdir = \
   $(includedir)/ogmrip-encode
 
@@ -105,3 +104,5 @@ CLEANFILES = \
 DISTCLEANFILES = \
   ogmrip-version.h
 
+MAINTAINERCLEANFILES = \
+  Makefile.in

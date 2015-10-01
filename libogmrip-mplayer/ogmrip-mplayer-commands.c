@@ -159,11 +159,11 @@ ogmrip_command_set_chapters (GPtrArray *argv, OGMRipCodec *codec)
 
   n_chapters = ogmrip_title_get_n_chapters (title);
 
-  if (first_chapter != 0 || last_chapter != n_chapters - 1)
+  if (n_chapters > 0 && (first_chapter != 0 || last_chapter != (guint) n_chapters - 1))
   {
     gchar *str;
 
-    if (last_chapter != n_chapters - 1)
+    if (last_chapter != (guint) n_chapters - 1)
       str = g_strdup_printf ("%d-%d", first_chapter + 1, last_chapter + 1);
     else
       str = g_strdup_printf ("%d", first_chapter + 1);
@@ -493,6 +493,10 @@ ogmrip_mencoder_video_command (OGMRipVideoCodec *video, OGMRipEncoder encoder,
       g_ptr_array_add (argv, g_strdup ("0"));
       g_ptr_array_add (argv, g_strdup ("-noskip"));
       break;
+    case OGMRIP_ENCODER_YUV:
+    case OGMRIP_ENCODER_PCM:
+    case OGMRIP_ENCODER_WAV:
+    case OGMRIP_ENCODER_VOBSUB:
     default:
       g_assert_not_reached ();
       break;
@@ -525,7 +529,7 @@ ogmrip_mencoder_video_command (OGMRipVideoCodec *video, OGMRipEncoder encoder,
   return task;
 }
 
-OGMJobTask *
+static OGMJobTask *
 ogmrip_mplayer_video_command (OGMRipVideoCodec *video, OGMRipEncoder encoder, const gchar *output)
 {
   OGMJobTask *task;
@@ -538,6 +542,7 @@ ogmrip_mplayer_video_command (OGMRipVideoCodec *video, OGMRipEncoder encoder, co
   gboolean forced;
 
   g_return_val_if_fail (OGMRIP_IS_VIDEO_CODEC (video), NULL);
+  g_return_val_if_fail (encoder == OGMRIP_ENCODER_YUV, NULL);
   g_return_val_if_fail (output != NULL, NULL);
 
   argv = ogmrip_mplayer_command_new (TRUE);
@@ -561,16 +566,7 @@ ogmrip_mplayer_video_command (OGMRipVideoCodec *video, OGMRipEncoder encoder, co
   g_ptr_array_add (argv, g_strdup (scale ? "-zoom" : "-nozoom"));
 
   g_ptr_array_add (argv, g_strdup ("-vo"));
-
-  switch (encoder)
-  {
-    case OGMRIP_ENCODER_YUV:
-      g_ptr_array_add (argv, g_strdup_printf ("yuv4mpeg:file=%s", output));
-      break;
-    default:
-      g_assert_not_reached ();
-      break;
-  }
+  g_ptr_array_add (argv, g_strdup_printf ("yuv4mpeg:file=%s", output));
 
   input = ogmrip_codec_get_input (OGMRIP_CODEC (video));
 
@@ -604,7 +600,7 @@ ogmrip_video_encoder_new (OGMRipVideoCodec *codec, OGMRipEncoder encoder,
   return ogmrip_mencoder_video_command (codec, encoder, options, passlog, output);
 }
 
-OGMJobTask *
+static OGMJobTask *
 ogmrip_mplayer_wav_command (OGMRipAudioCodec *audio, OGMRipEncoder encoder, const gchar *output)
 {
   OGMJobTask *task;
@@ -614,6 +610,7 @@ ogmrip_mplayer_wav_command (OGMRipAudioCodec *audio, OGMRipEncoder encoder, cons
   GString *options;
 
   g_return_val_if_fail (OGMRIP_IS_AUDIO_CODEC (audio), NULL);
+  g_return_val_if_fail (encoder == OGMRIP_ENCODER_PCM || encoder == OGMRIP_ENCODER_WAV, NULL);
   g_return_val_if_fail (output != NULL, NULL);
 
   input = ogmrip_codec_get_input (OGMRIP_CODEC (audio));
@@ -633,18 +630,10 @@ ogmrip_mplayer_wav_command (OGMRipAudioCodec *audio, OGMRipEncoder encoder, cons
   if (ogmrip_audio_codec_get_fast (audio))
     g_string_append (options, ":fast");
 
-  switch (encoder)
-  {
-    case OGMRIP_ENCODER_PCM:
-      g_string_append (options, ":nowaveheader");
-      break;
-    case OGMRIP_ENCODER_WAV:
-      g_string_append (options, ":waveheader");
-      break;
-    default:
-      g_assert_not_reached ();
-      break;
-  }
+  if (encoder == OGMRIP_ENCODER_PCM)
+    g_string_append (options, ":nowaveheader");
+  else
+    g_string_append (options, ":waveheader");
 
   g_string_append_printf (options, ":file=%s", output);
 
@@ -683,7 +672,7 @@ ogmrip_mplayer_wav_command (OGMRipAudioCodec *audio, OGMRipEncoder encoder, cons
   return task;
 }
 
-OGMJobTask *
+static OGMJobTask *
 ogmrip_mencoder_audio_command (OGMRipAudioCodec *audio, OGMRipEncoder encoder, const gchar *output)
 {
   OGMJobTask *task;
@@ -691,6 +680,7 @@ ogmrip_mencoder_audio_command (OGMRipAudioCodec *audio, OGMRipEncoder encoder, c
   GPtrArray *argv;
 
   g_return_val_if_fail (OGMRIP_IS_AUDIO_CODEC (audio), NULL);
+  g_return_val_if_fail (encoder == OGMRIP_ENCODER_COPY, NULL);
 
   input = ogmrip_codec_get_input (OGMRIP_CODEC (audio));
 
@@ -699,21 +689,13 @@ ogmrip_mencoder_audio_command (OGMRipAudioCodec *audio, OGMRipEncoder encoder, c
   g_ptr_array_add (argv, g_strdup ("-of"));
   g_ptr_array_add (argv, g_strdup ("rawaudio"));
 
-  switch (encoder)
-  {
-    case OGMRIP_ENCODER_COPY:
-      g_ptr_array_add (argv, g_strdup ("-mc"));
-      g_ptr_array_add (argv, g_strdup ("0"));
-      g_ptr_array_add (argv, g_strdup ("-noskip"));
-      g_ptr_array_add (argv, g_strdup ("-ovc"));
-      g_ptr_array_add (argv, g_strdup ("copy"));
-      g_ptr_array_add (argv, g_strdup ("-oac"));
-      g_ptr_array_add (argv, g_strdup ("copy"));
-      break;
-    default:
-      g_assert_not_reached ();
-      break;
-  }
+  g_ptr_array_add (argv, g_strdup ("-mc"));
+  g_ptr_array_add (argv, g_strdup ("0"));
+  g_ptr_array_add (argv, g_strdup ("-noskip"));
+  g_ptr_array_add (argv, g_strdup ("-ovc"));
+  g_ptr_array_add (argv, g_strdup ("copy"));
+  g_ptr_array_add (argv, g_strdup ("-oac"));
+  g_ptr_array_add (argv, g_strdup ("copy"));
 
   ogmrip_command_set_audio (argv, input);
   ogmrip_command_set_fps (argv, ogmrip_stream_get_title (input));
@@ -743,7 +725,7 @@ ogmrip_audio_encoder_new (OGMRipAudioCodec *codec, OGMRipEncoder encoder,
   return ogmrip_mplayer_wav_command (codec, encoder, output);
 }
 
-OGMJobTask *
+static OGMJobTask *
 ogmrip_mencoder_vobsub_command (OGMRipSubpCodec *subp, const gchar *output)
 {
   OGMJobTask *task;

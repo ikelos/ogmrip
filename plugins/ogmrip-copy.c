@@ -40,6 +40,8 @@ struct _OGMRipAudioCopyClass
   OGMRipAudioCodecClass parent_class;
 };
 
+GType ogmrip_audio_copy_get_type (void);
+
 static OGMJobTask *
 ogmrip_audio_copy_command (OGMRipAudioCodec *audio)
 {
@@ -119,45 +121,12 @@ enum
   PROP_PASSES
 };
 
-static void     ogmrip_copy_get_property (GObject      *gobject,
-                                          guint        property_id,
-                                          GValue       *value,
-                                          GParamSpec   *pspec);
-static void     ogmrip_copy_set_property (GObject      *gobject,
-                                          guint        property_id,
-                                          const GValue *value,
-                                          GParamSpec   *pspec);
-static gboolean ogmrip_video_copy_run    (OGMJobTask   *task,
-                                          GCancellable *cancellable,
-                                          GError       **error);
+GType ogmrip_video_copy_get_type (void);
 
 G_DEFINE_TYPE (OGMRipVideoCopy, ogmrip_video_copy, OGMRIP_TYPE_VIDEO_CODEC)
 
 static void
-ogmrip_video_copy_class_init (OGMRipVideoCopyClass *klass)
-{
-  GObjectClass *gobject_class;
-  OGMJobTaskClass *task_class;
-  
-  gobject_class = G_OBJECT_CLASS (klass);
-  gobject_class->get_property = ogmrip_copy_get_property;
-  gobject_class->set_property = ogmrip_copy_set_property;
-
-  task_class = OGMJOB_TASK_CLASS (klass);
-  task_class->run = ogmrip_video_copy_run;
-
-  g_object_class_install_property (gobject_class, PROP_PASSES,
-        g_param_spec_uint ("passes", "Passes property", "Set the number of passes",
-           1, 1, 1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
-}
-
-static void
-ogmrip_video_copy_init (OGMRipVideoCopy *nouveau)
-{
-}
-
-static void
-ogmrip_copy_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
+ogmrip_video_copy_get_property (GObject *gobject, guint property_id, GValue *value, GParamSpec *pspec)
 {
   switch (property_id)
   {
@@ -171,7 +140,7 @@ ogmrip_copy_get_property (GObject *gobject, guint property_id, GValue *value, GP
 }
 
 static void
-ogmrip_copy_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
+ogmrip_video_copy_set_property (GObject *gobject, guint property_id, const GValue *value, GParamSpec *pspec)
 {
   switch (property_id)
   {
@@ -210,6 +179,29 @@ ogmrip_video_copy_run (OGMJobTask *task, GCancellable *cancellable, GError **err
   ogmjob_container_remove (OGMJOB_CONTAINER (task), child);
 
   return result;
+}
+
+static void
+ogmrip_video_copy_class_init (OGMRipVideoCopyClass *klass)
+{
+  GObjectClass *gobject_class;
+  OGMJobTaskClass *task_class;
+  
+  gobject_class = G_OBJECT_CLASS (klass);
+  gobject_class->get_property = ogmrip_video_copy_get_property;
+  gobject_class->set_property = ogmrip_video_copy_set_property;
+
+  task_class = OGMJOB_TASK_CLASS (klass);
+  task_class->run = ogmrip_video_copy_run;
+
+  g_object_class_install_property (gobject_class, PROP_PASSES,
+        g_param_spec_uint ("passes", "Passes property", "Set the number of passes",
+           1, 1, 1, G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS));
+}
+
+static void
+ogmrip_video_copy_init (OGMRipVideoCopy *nouveau)
+{
 }
 
 void

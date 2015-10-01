@@ -39,9 +39,11 @@ struct _OGMRipLavcMpeg1Class
   OGMRipLavcClass parent_class;
 };
 
+GType ogmrip_lavc_mpeg1_get_type (void);
+
 G_DEFINE_TYPE (OGMRipLavcMpeg1, ogmrip_lavc_mpeg1, OGMRIP_TYPE_LAVC)
 
-const gchar *
+static const gchar *
 ogmrip_lavc_mpeg1_get_codec (void)
 {
   const gchar *codec = "mpeg1video";
@@ -76,13 +78,15 @@ struct _OGMRipLavcMpeg2Class
   OGMRipLavcClass parent_class;
 };
 
+GType ogmrip_lavc_mpeg2_get_type (void);
+
 static gboolean ogmrip_lavc_mpeg2_run (OGMJobTask   *task,
                                        GCancellable *cancellable,
                                        GError       **error);
 
 G_DEFINE_TYPE (OGMRipLavcMpeg2, ogmrip_lavc_mpeg2, OGMRIP_TYPE_LAVC)
 
-const gchar *
+static const gchar *
 ogmrip_lavc_mpeg2_get_codec (void)
 {
   const gchar *codec = "mpeg2video";
@@ -128,6 +132,8 @@ struct _OGMRipLavcMpeg4Class
 {
   OGMRipLavcClass parent_class;
 };
+
+GType ogmrip_lavc_mpeg4_get_type (void);
 
 G_DEFINE_TYPE (OGMRipLavcMpeg4, ogmrip_lavc_mpeg4, OGMRIP_TYPE_LAVC)
 

@@ -656,6 +656,9 @@ ogmrip_lavc_set_quality (OGMRipLavc *lavc, OGMRipQualityType quality)
       break;
     case OGMRIP_QUALITY_USER:
       break;
+    default:
+      g_assert_not_reached ();
+      break;
   }
 }
 
@@ -705,24 +708,6 @@ ogmrip_lavc_run (OGMJobTask *task, GCancellable *cancellable, GError **error)
   g_free (log_file);
 
   return result;
-}
-
-/**
- * ogmrip_lavc_new:
- * @title: An #OGMRipTitle
- * @output: The output file
- *
- * Creates a new #OGMRipLavc
- *
- * Returns: The new #OGMRipLavc
- */
-OGMJobTask *
-ogmrip_lavc_new (OGMRipTitle *title, const gchar *output)
-{
-  g_return_val_if_fail (title != NULL, NULL);
-  g_return_val_if_fail (output && *output, NULL);
-
-  return g_object_new (OGMRIP_TYPE_LAVC, "input", title, "output", output, NULL);
 }
 
 /**
@@ -845,7 +830,7 @@ ogmrip_lavc_set_keyint (OGMRipLavc *lavc, guint keyint)
 {
   g_return_if_fail (OGMRIP_IS_LAVC (lavc));
 
-  lavc->priv->keyint = CLAMP (keyint, 0, 300);
+  lavc->priv->keyint = MIN (keyint, 300);
 }
 
 /**
@@ -1000,7 +985,7 @@ ogmrip_lavc_set_strict (OGMRipLavc *lavc, guint strict)
 {
   g_return_if_fail (OGMRIP_IS_LAVC (lavc));
 
-  lavc->priv->strict = CLAMP (strict, 0, 3);
+  lavc->priv->strict = MIN (strict, 3);
 }
 
 /**

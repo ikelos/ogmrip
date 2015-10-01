@@ -316,16 +316,16 @@ ogmrip_cli_video_info (OGMRipTitle *title)
 static void
 ogmrip_cli_palette_info (OGMRipTitle *title)
 {
-  const guint *palette;
+  const guint *pal;
 
-  palette = ogmrip_title_get_palette (title);
-  if (palette)
+  pal = ogmrip_title_get_palette (title);
+  if (pal)
   {
     guint i;
 
     g_print ("\t%s:", ("Palette"));
     for (i = 0; i < 16; i++)
-      printf (" %06x", palette[i]);
+      printf (" %06x", pal[i]);
     printf ("\n");
   }
 }
@@ -856,6 +856,9 @@ ogmrip_cli_prepare_cb (OGMRipCli *cli)
         ogmrip_cli_encode (cli);
       break;
     case NONE:
+      g_assert_not_reached ();
+      break;
+    default:
       g_assert_not_reached ();
       break;
   }

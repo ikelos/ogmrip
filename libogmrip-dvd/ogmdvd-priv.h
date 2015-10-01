@@ -192,9 +192,9 @@ struct _OGMDvdParser
   gint nsubp_streams;
   
   /* SPU specific */
-  int size_sub;
-  int size_rle;
-  int size_got;
+  gsize size_sub;
+  gsize size_rle;
+  gsize size_got;
   int pts_forced;
   gint64 pts;
   guchar *data;

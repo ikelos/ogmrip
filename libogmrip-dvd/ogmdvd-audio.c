@@ -114,7 +114,7 @@ ogmdvd_audio_stream_get_id (OGMRipStream *stream)
   return OGMDVD_AUDIO_STREAM (stream)->priv->id;
 }
 
-OGMRipTitle *
+static OGMRipTitle *
 ogmdvd_audio_stream_get_title (OGMRipStream *stream)
 {
   return OGMDVD_AUDIO_STREAM (stream)->priv->title;

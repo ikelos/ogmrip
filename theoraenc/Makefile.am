@@ -9,3 +9,5 @@ theoraenc_LDADD = \
 
 CLEANFILES = *~ *.bak
 
+MAINTAINERCLEANFILES = \
+  Makefile.in

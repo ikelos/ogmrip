@@ -49,6 +49,8 @@ struct _OGMRipVorbisClass
   OGMRipAudioCodecClass parent_class;
 };
 
+GType ogmrip_vorbis_get_type (void);
+
 static OGMJobTask *
 ogmrip_vorbis_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input)
 {

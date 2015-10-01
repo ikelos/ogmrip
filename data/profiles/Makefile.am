@@ -23,3 +23,5 @@ EXTRA_DIST = \
 DISTCLEANFILES = \
   $(profiles_DATA)
 
+MAINTAINERCLEANFILES = \
+  Makefile.in

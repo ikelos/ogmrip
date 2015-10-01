@@ -139,8 +139,11 @@ ogmrip_encoding_manager_dialog_encoding_complete_cb (OGMRipEncoding *encoding, O
       case OGMRIP_ENCODING_FAILURE:
         gtk_progress_bar_set_text (GTK_PROGRESS_BAR (progress), _("Encoding failed"));
         break;
-      default:
+      case OGMRIP_ENCODING_NOT_RUN:
         gtk_progress_bar_set_show_text (GTK_PROGRESS_BAR (progress), FALSE);
+        break;
+      default:
+        g_assert_not_reached ();
         break;
     }
   }

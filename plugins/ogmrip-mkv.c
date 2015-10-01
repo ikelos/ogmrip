@@ -64,6 +64,9 @@ struct _OGMRipWebmClass
   OGMRipMatroskaClass parent_class;
 };
 
+GType ogmrip_matroska_get_type (void);
+GType ogmrip_webm_get_type     (void);
+
 G_DEFINE_TYPE (OGMRipMatroska, ogmrip_matroska, OGMRIP_TYPE_CONTAINER)
 
 static gboolean

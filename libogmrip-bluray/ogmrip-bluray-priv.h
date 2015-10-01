@@ -40,7 +40,7 @@ struct _OGMBrDiscPriv
   GList *titles;
 
   BLURAY *bd;
-  gint selected;
+  guint selected;
 
   OGMBrDisc *copy;
   gboolean require_copy;

@@ -177,7 +177,7 @@ ogmrip_pref_dialog_init (OGMRipPrefDialog *dialog)
   ogmrip_pref_dialog_folder_setting_changed (dialog->priv->output_dir_chooser, OGMRIP_SETTINGS_OUTPUT_DIR);
 
   g_signal_connect (dialog->priv->output_dir_chooser, "current-folder-changed",
-      G_CALLBACK (ogmrip_pref_dialog_folder_chooser_changed), OGMRIP_SETTINGS_OUTPUT_DIR);
+      G_CALLBACK (ogmrip_pref_dialog_folder_chooser_changed), (gchar *) OGMRIP_SETTINGS_OUTPUT_DIR);
   g_signal_connect_swapped (settings, "changed::" OGMRIP_SETTINGS_OUTPUT_DIR,
       G_CALLBACK (ogmrip_pref_dialog_folder_setting_changed), dialog->priv->output_dir_chooser);
   g_signal_connect (dialog->priv->output_dir_chooser, "destroy",
@@ -186,7 +186,7 @@ ogmrip_pref_dialog_init (OGMRipPrefDialog *dialog)
   ogmrip_pref_dialog_folder_setting_changed (dialog->priv->tmp_dir_chooser, OGMRIP_SETTINGS_TMP_DIR);
 
   g_signal_connect (dialog->priv->tmp_dir_chooser, "current-folder-changed",
-      G_CALLBACK (ogmrip_pref_dialog_folder_chooser_changed), OGMRIP_SETTINGS_TMP_DIR);
+      G_CALLBACK (ogmrip_pref_dialog_folder_chooser_changed), (gchar *) OGMRIP_SETTINGS_TMP_DIR);
   g_signal_connect_swapped (settings, "changed::" OGMRIP_SETTINGS_TMP_DIR,
       G_CALLBACK (ogmrip_pref_dialog_folder_setting_changed), dialog->priv->tmp_dir_chooser);
   g_signal_connect (dialog->priv->tmp_dir_chooser, "destroy",

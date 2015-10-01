@@ -635,13 +635,13 @@ ogmrip_video_codec_set_ensure_sync (OGMRipVideoCodec *video, OGMRipAudioStream *
 void
 ogmrip_video_codec_set_angle (OGMRipVideoCodec *video, guint angle)
 {
-  OGMRipTitle *title;
+  gint nangles;
 
   g_return_if_fail (OGMRIP_IS_VIDEO_CODEC (video));
 
-  title = ogmrip_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video)));
+  nangles = ogmrip_title_get_n_angles (ogmrip_stream_get_title (ogmrip_codec_get_input (OGMRIP_CODEC (video))));
 
-  g_return_if_fail (angle > 0 && angle <= ogmrip_title_get_n_angles (title));
+  g_return_if_fail (angle > 0 && nangles > 0 && angle <= (guint) nangles);
 
   video->priv->angle = angle;
 

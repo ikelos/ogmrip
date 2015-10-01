@@ -49,6 +49,8 @@ struct _OGMRipAacClass
   OGMRipAudioCodecClass parent_class;
 };
 
+GType ogmrip_aac_get_type (void);
+
 static OGMJobTask *
 ogmrip_aac_command (OGMRipAudioCodec *audio, gboolean header, const gchar *input)
 {

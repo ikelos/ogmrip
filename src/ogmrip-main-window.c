@@ -1112,10 +1112,10 @@ ogmrip_main_window_run_options_dialog (OGMRipMainWindow *window, OGMRipEncoding 
   }
   else if (response == OGMRIP_RESPONSE_TEST)
   {
-    guint width, height;
+    guint w, h;
 
-    ogmrip_main_window_test (window, encoding, &width, &height);
-    status = ogmrip_main_window_run_options_dialog (window, encoding, width, height, error);
+    ogmrip_main_window_test (window, encoding, &w, &h);
+    status = ogmrip_main_window_run_options_dialog (window, encoding, w, h, error);
   }
 
   return status;

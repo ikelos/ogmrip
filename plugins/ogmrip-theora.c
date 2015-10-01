@@ -55,6 +55,8 @@ enum
   PROP_PASSES
 };
 
+static GType ogmrip_theora_get_type (void);
+
 static OGMJobTask *
 ogmrip_theora_command (OGMRipVideoCodec *video, const gchar *input)
 {

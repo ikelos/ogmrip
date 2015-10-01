@@ -173,6 +173,9 @@ ogmrip_encoding_manager_move_internal (OGMRipEncodingManager *manager, OGMRipEnc
         manager->priv->encodings = g_list_delete_link (manager->priv->encodings, link);
         manager->priv->encodings = g_list_append (manager->priv->encodings, encoding);
         break;
+      default:
+        g_assert_not_reached ();
+        break;
     }
   }
 }

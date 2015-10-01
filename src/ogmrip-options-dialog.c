@@ -92,9 +92,6 @@ struct _OGMRipOptionsDialogPriv
 
 extern GSettings *settings;
 
-static const guint m[] = { 0, 1, 1, 1, 3, 5, 1 };
-static const guint d[] = { 0, 8, 4, 2, 4, 6, 1 };
-
 static void
 gtk_label_set_int (GtkLabel *label, gint value)
 {
@@ -111,7 +108,7 @@ gtk_label_get_int (GtkLabel *label)
   return atoi (gtk_label_get_text (label));
 }
 
-OGMRipProfile *
+static OGMRipProfile *
 ogmrip_profile_chooser_get_active (GtkComboBox *chooser)
 {
   GtkTreeModel *model;
@@ -124,7 +121,7 @@ ogmrip_profile_chooser_get_active (GtkComboBox *chooser)
 
   return ogmrip_profile_store_get_profile (OGMRIP_PROFILE_STORE (model), &iter);
 }
-
+/*
 void
 ogmrip_profile_chooser_set_active (GtkComboBox *chooser, OGMRipProfile *profile)
 {
@@ -142,10 +139,13 @@ ogmrip_profile_chooser_set_active (GtkComboBox *chooser, OGMRipProfile *profile)
       gtk_combo_box_set_active (chooser, 0);
   }
 }
-
+*/
 static void
 scale_to_size (guint cw, guint ch, gdouble r, guint s, guint *sw, guint *sh)
 {
+  static const guint m[] = { 0, 1, 1, 1, 3, 5, 1 };
+  static const guint d[] = { 0, 8, 4, 2, 4, 6, 1 };
+
   *sw = cw * m[s] / d[s];
   *sw += *sw % 2;
 
@@ -263,13 +263,13 @@ ogmrip_options_dialog_set_sensitivity (OGMRipOptionsDialog *dialog, OGMRipProfil
 
   if (profile)
   {
-    GSettings *settings;
+    GSettings *gsettings;
     GType codec;
     gchar *str;
 
-    settings = ogmrip_profile_get_child (profile, OGMRIP_PROFILE_VIDEO);
+    gsettings = ogmrip_profile_get_child (profile, OGMRIP_PROFILE_VIDEO);
 
-    str = g_settings_get_string (settings, OGMRIP_PROFILE_CODEC);
+    str = g_settings_get_string (gsettings, OGMRIP_PROFILE_CODEC);
     codec = ogmrip_type_from_name (str);
     g_free (str);
 
@@ -279,14 +279,14 @@ ogmrip_options_dialog_set_sensitivity (OGMRipOptionsDialog *dialog, OGMRipProfil
     if (format == OGMRIP_FORMAT_COPY)
       format = OGMRIP_FORMAT_UNDEFINED;
 
-    scaler = g_settings_get_uint (settings, OGMRIP_PROFILE_SCALER);
-    can_crop = g_settings_get_boolean (settings, OGMRIP_PROFILE_CAN_CROP);
+    scaler = g_settings_get_uint (gsettings, OGMRIP_PROFILE_SCALER);
+    can_crop = g_settings_get_boolean (gsettings, OGMRIP_PROFILE_CAN_CROP);
 
-    g_object_unref (settings); 
+    g_object_unref (gsettings); 
 
-    settings = ogmrip_profile_get_child (profile, OGMRIP_PROFILE_GENERAL);
-    method = g_settings_get_uint (settings, OGMRIP_PROFILE_ENCODING_METHOD);
-    g_object_unref (settings); 
+    gsettings = ogmrip_profile_get_child (profile, OGMRIP_PROFILE_GENERAL);
+    method = g_settings_get_uint (gsettings, OGMRIP_PROFILE_ENCODING_METHOD);
+    g_object_unref (gsettings); 
   }
 
   sensitive = gtk_widget_is_sensitive (dialog->priv->crop_check);

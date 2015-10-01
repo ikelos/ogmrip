@@ -291,7 +291,6 @@ static void
 ogmbr_disc_init (OGMBrDisc *disc)
 {
   disc->priv = ogmbr_disc_get_instance_private (disc);
-  disc->priv->selected = -1;
 }
 
 static void
@@ -370,7 +369,6 @@ ogmbr_disc_close (OGMRipMedia *media)
   if (disc->priv->bd)
   {
     bd_close (disc->priv->bd);
-    disc->priv->selected = -1;
     disc->priv->bd = NULL;
   }
 }

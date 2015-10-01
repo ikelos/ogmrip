@@ -48,6 +48,8 @@ struct _OGMRipWavClass
   OGMRipAudioCodecClass parent_class;
 };
 
+GType ogmrip_wav_get_type (void);
+
 G_DEFINE_TYPE (OGMRipWav, ogmrip_wav, OGMRIP_TYPE_AUDIO_CODEC)
 
 static gboolean

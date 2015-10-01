@@ -73,6 +73,16 @@ ogmbr_audio_stream_get_format (OGMRipStream *stream)
     case BLURAY_STREAM_TYPE_AUDIO_DTSHD_MASTER:
       format = OGMRIP_FORMAT_DTS_HD_MA;
       break;
+    case BLURAY_STREAM_TYPE_VIDEO_MPEG1:
+    case BLURAY_STREAM_TYPE_VIDEO_MPEG2:
+    case BLURAY_STREAM_TYPE_VIDEO_VC1:
+    case BLURAY_STREAM_TYPE_VIDEO_H264:
+    case BLURAY_STREAM_TYPE_SUB_PG:
+    case BLURAY_STREAM_TYPE_SUB_IG:
+    case BLURAY_STREAM_TYPE_SUB_TEXT:
+    case BLURAY_STREAM_TYPE_AUDIO_AC3PLUS_SECONDARY:
+    case BLURAY_STREAM_TYPE_AUDIO_DTSHD_SECONDARY:
+      g_assert_not_reached ();
     default:
       g_assert_not_reached ();
       break;

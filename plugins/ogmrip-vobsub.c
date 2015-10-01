@@ -49,6 +49,8 @@ struct _OGMRipVobSubClass
   OGMRipSubpCodecClass parent_class;
 };
 
+GType ogmrip_vobsub_get_type (void);
+
 static gboolean
 ogmrip_vobsub_set_foo (OGMJobTask *task, const gchar *filename, GError **error)
 {

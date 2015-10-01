@@ -20,8 +20,17 @@ libogmrip_dvd_la_HEADERS = \
   ogmdvd-title.h  \
   ogmrip-dvd.h
 
+libogmrip_dvd_la_CPPFLAGS = \
+  -I$(top_srcdir)/libogmrip-base  \
+  -I$(top_srcdir)/libogmrip-media \
+  -I$(top_srcdir)/libogmrip-job
+
+libogmrip_dvd_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 libogmrip_dvd_la_LDFLAGS = \
-  -version-info $(OGMRIP_MEDIA_LT_VERSION)
+  -version-info $(OGMRIP_MEDIA_LT_VERSION) \
+  $(WARN_LDFLABS)
 
 libogmrip_dvd_la_LIBADD = \
   $(top_builddir)/libogmrip-base/libogmrip-base.la   \
@@ -35,13 +44,5 @@ EXTRA_DIST = \
   ogmdvd-contrib.h   \
   ogmdvd-priv.h
 
-libogmrip_dvd_la_CPPFLAGS = \
-  -I$(top_srcdir)/libogmrip-base  \
-  -I$(top_srcdir)/libogmrip-media \
-  -I$(top_srcdir)/libogmrip-job
-
-if MAINTAINER_MODE
-libogmrip_dvd_la_CPPFLAGS += \
-  -DG_ENABLE_DEBUG
-endif
-
+MAINTAINERCLEANFILES = \
+  Makefile.in

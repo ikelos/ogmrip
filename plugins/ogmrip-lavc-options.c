@@ -80,6 +80,8 @@ enum
   PROP_PROFILE
 };
 
+GType ogmrip_lavc_dialog_get_type (void);
+
 static void ogmrip_options_editable_init (OGMRipOptionsEditableInterface *iface);
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipLavcDialog, ogmrip_lavc_dialog, GTK_TYPE_DIALOG,

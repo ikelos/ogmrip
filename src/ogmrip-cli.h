@@ -47,6 +47,7 @@ struct _OGMRipCliClass
 
 GType          ogmrip_cli_get_type (void);
 GApplication * ogmrip_cli_new      (const gchar *app_id);
+void           ogmrip_cli_cancel   (OGMRipCli   *cli);
 
 G_END_DECLS
 

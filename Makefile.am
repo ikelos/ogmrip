@@ -1,3 +1,5 @@
+ACLOCAL_AMFLAGS = -I m4 ${ACLOCAL_FLAGS}
+
 SUBDIRS = \
   libogmrip-base    \
   libogmrip-job     \
@@ -49,6 +51,25 @@ DISTCLEANFILES = \
   intltool-update  \
   intltool-extract \
   intltool-merge
+
+MAINTAINERCLEANFILES = \
+  aclocal.m4 \
+  compile \
+  config.guess \
+  config.h.in \
+  config.h.in~ \
+  config.rpath \
+  config.sub \
+  configure \
+  depcomp \
+  gtk-doc.make \
+  install-sh \
+  intltool-extract.in \
+  intltool-merge.in \
+  intltool-update.in \
+  ltmain.sh \
+  missing \
+  Makefile.in
 
 DISTCHECK_CONFIGURE_FLAGS = \
   --enable-gtk-doc=yes

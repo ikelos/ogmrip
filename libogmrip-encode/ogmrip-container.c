@@ -243,7 +243,7 @@ ogmrip_container_new (GType type)
   return g_object_new (type, NULL);
 }
 
-static const gchar *fourcc[] =
+static const gchar *fourcc_str[] =
 {
   NULL,
   "XVID",
@@ -273,7 +273,7 @@ ogmrip_container_new_from_profile (OGMRipProfile *profile)
 
   settings = ogmrip_profile_get_child (profile, OGMRIP_PROFILE_GENERAL);
   ogmrip_container_set_fourcc (container,
-      fourcc[g_settings_get_uint (settings, OGMRIP_PROFILE_FOURCC)]);
+      fourcc_str[g_settings_get_uint (settings, OGMRIP_PROFILE_FOURCC)]);
   ogmrip_container_set_split (container,
       g_settings_get_uint (settings, OGMRIP_PROFILE_TARGET_NUMBER),
       g_settings_get_uint (settings, OGMRIP_PROFILE_TARGET_SIZE));

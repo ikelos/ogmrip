@@ -56,7 +56,7 @@ ogmdvd_reader_new (OGMDvdTitle *title, guint start_chap, gint end_chap, guint an
   dvd_file_t *file;
 
   g_return_val_if_fail (title != NULL, NULL);
-  g_return_val_if_fail (end_chap < 0 || start_chap <= end_chap, NULL);
+  g_return_val_if_fail (end_chap < 0 || start_chap <= (guint) end_chap, NULL);
 
   vts = disc->priv->vmg_file ? disc->priv->vmg_file->tt_srpt->title[title->priv->nr].title_set_nr : 1;
   file = DVDOpenFile (disc->priv->reader, vts, DVD_READ_TITLE_VOBS);
@@ -112,7 +112,7 @@ ogmdvd_reader_new_by_cells (OGMDvdTitle *title, guint start_cell, gint end_cell,
   dvd_file_t *file;
 
   g_return_val_if_fail (title != NULL, NULL);
-  g_return_val_if_fail (end_cell < 0 || start_cell <= end_cell, NULL);
+  g_return_val_if_fail (end_cell < 0 || start_cell <= (guint) end_cell, NULL);
 
   pgcn = title->priv->vts_file->vts_ptt_srpt->title[title->priv->ttn - 1].ptt[0].pgcn;
   pgc = title->priv->vts_file->vts_pgcit->pgci_srp[pgcn - 1].pgc;
@@ -346,7 +346,7 @@ ogmdvd_reader_get_block (OGMDvdReader *reader, gsize len, guchar *buffer)
   if (len > reader->packs_left)
     len = reader->packs_left;
 
-  if (DVDReadBlocks (reader->file, reader->cell_cur_pack, len, buffer) != len)
+  if (DVDReadBlocks (reader->file, reader->cell_cur_pack, len, buffer) != (gint) len)
     return -1;
 
   reader->cell_cur_pack += len;

@@ -49,6 +49,8 @@ struct _OGMRipAc3Class
   OGMRipAudioCodecClass parent_class;
 };
 
+GType ogmrip_ac3_get_type (void);
+
 static const guint16 a52_bitratetab[] =
 {
    32,  40,  48,  56,  64,  80,  96, 112, 128, 160,

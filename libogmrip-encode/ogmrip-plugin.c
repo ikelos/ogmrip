@@ -55,6 +55,8 @@ enum
   PROP_SCHEMA_NAME
 };
 
+GType ogmrip_plugin_info_get_type (void);
+
 G_DEFINE_TYPE (OGMRipPluginInfo, ogmrip_plugin_info, OGMRIP_TYPE_TYPE_INFO);
 
 static void

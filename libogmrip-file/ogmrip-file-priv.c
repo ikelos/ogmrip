@@ -33,7 +33,7 @@ ogmrip_media_info_get_file_info (OGMRipMediaInfo *info, OGMRipFilePrivate *file)
   file->length = str ? atoi (str) / 1000. : -1.0;
 
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "FileSize");
-  file->media_size = str ? strtoull (str, NULL, 10) : -1;
+  file->media_size = str ? strtoull (str, NULL, 10) : 0;
 
   str = ogmrip_media_info_get (info, OGMRIP_CATEGORY_GENERAL, 0, "Title");
   file->label = str ? g_strdup (str) : NULL;

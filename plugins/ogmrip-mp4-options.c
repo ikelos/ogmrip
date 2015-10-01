@@ -60,6 +60,8 @@ enum
   PROP_PROFILE
 };
 
+GType ogmrip_mp4_dialog_get_type (void);
+
 static void ogmrip_options_editable_init (OGMRipOptionsEditableInterface *iface);
 
 G_DEFINE_TYPE_WITH_CODE (OGMRipMp4Dialog, ogmrip_mp4_dialog, GTK_TYPE_DIALOG,

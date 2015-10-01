@@ -46,38 +46,6 @@ ui_FILES = \
 ogmrip-gresource.c: ogmrip.gresource.xml $(ui_FILES) $(GLIB_COMPILE_RESOURCES)
 	$(GLIB_COMPILE_RESOURCES) --sourcedir=$(top_srcdir)/src --generate-source --target=$@ $<
 
-EXTRA_DIST = \
-  $(ui_FILES)             \
-  $(resourcefiles)        \
-  ogmrip-application.h    \
-  ogmrip-cli.h            \
-  ogmrip-crop-dialog.h    \
-  ogmrip-gui.h            \
-  ogmrip-helper.h         \
-  ogmrip-main-window.h    \
-  ogmrip-options-dialog.h \
-  ogmrip-pref-dialog.h    \
-  ogmrip-settings.h       \
-  ogmrip-spell-dialog.h
-
-ogmrip_LDADD = \
-  $(top_builddir)/libogmrip-base/libogmrip-base.la             \
-  $(top_builddir)/libogmrip-job/libogmrip-job.la               \
-  $(top_builddir)/libogmrip-media/libogmrip-media.la           \
-  $(top_builddir)/libogmrip-file/libogmrip-file.la             \
-  $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la               \
-  $(top_builddir)/libogmrip-bluray/libogmrip-bluray.la         \
-  $(top_builddir)/libogmrip-encode/libogmrip-encode.la         \
-  $(top_builddir)/libogmrip-mplayer/libogmrip-mplayer.la       \
-  $(top_builddir)/libogmrip-module/libogmrip-module.la
-
-if HAVE_GTK_SUPPORT
-ogmrip_LDADD += \
-  $(top_builddir)/libogmrip-media-gtk/libogmrip-media-gtk.la   \
-  $(top_builddir)/libogmrip-file-gtk/libogmrip-file-gtk.la     \
-  $(top_builddir)/libogmrip-encode-gtk/libogmrip-encode-gtk.la
-endif
-
 ogmrip_CPPFLAGS = \
   -I$(top_srcdir)/libogmrip-base       \
   -I$(top_srcdir)/libogmrip-job        \
@@ -99,12 +67,47 @@ ogmrip_CPPFLAGS += \
   -I$(top_srcdir)/libogmrip-encode-gtk
 endif
 
-if MAINTAINER_MODE
-ogmrip_CPPFLAGS += \
-  -DG_ENABLE_DEBUG
+ogmrip_CFLAGS = \
+  $(WARN_CFLAGS)
+
+ogmrip_LDFLAGS = \
+  $(WARN_LDFLAGS)
+
+ogmrip_LDADD = \
+  $(top_builddir)/libogmrip-base/libogmrip-base.la             \
+  $(top_builddir)/libogmrip-job/libogmrip-job.la               \
+  $(top_builddir)/libogmrip-media/libogmrip-media.la           \
+  $(top_builddir)/libogmrip-file/libogmrip-file.la             \
+  $(top_builddir)/libogmrip-dvd/libogmrip-dvd.la               \
+  $(top_builddir)/libogmrip-bluray/libogmrip-bluray.la         \
+  $(top_builddir)/libogmrip-encode/libogmrip-encode.la         \
+  $(top_builddir)/libogmrip-mplayer/libogmrip-mplayer.la       \
+  $(top_builddir)/libogmrip-module/libogmrip-module.la
+
+if HAVE_GTK_SUPPORT
+ogmrip_LDADD += \
+  $(top_builddir)/libogmrip-media-gtk/libogmrip-media-gtk.la   \
+  $(top_builddir)/libogmrip-file-gtk/libogmrip-file-gtk.la     \
+  $(top_builddir)/libogmrip-encode-gtk/libogmrip-encode-gtk.la
 endif
+
+EXTRA_DIST = \
+  $(ui_FILES)             \
+  $(resourcefiles)        \
+  ogmrip-application.h    \
+  ogmrip-cli.h            \
+  ogmrip-crop-dialog.h    \
+  ogmrip-gui.h            \
+  ogmrip-helper.h         \
+  ogmrip-main-window.h    \
+  ogmrip-options-dialog.h \
+  ogmrip-pref-dialog.h    \
+  ogmrip-settings.h       \
+  ogmrip-spell-dialog.h
 
 CLEANFILES = \
   $(ogmrip_RESOURCES) \
   *~ *.bak
 
+MAINTAINERCLEANFILES = \
+  Makefile.in

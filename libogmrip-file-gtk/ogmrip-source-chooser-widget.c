@@ -330,9 +330,6 @@ ogmrip_source_chooser_widget_changed (GtkComboBox *combo)
           ogmrip_source_chooser_widget_set_file (chooser, file);
         else
         {
-          GtkWidget *toplevel;
-
-          toplevel = gtk_widget_get_toplevel (GTK_WIDGET (chooser));
           ogmrip_run_error_dialog (GTK_WINDOW (toplevel), error, _("Cannot open file"));
           g_clear_error (&error);
         }
@@ -341,8 +338,6 @@ ogmrip_source_chooser_widget_changed (GtkComboBox *combo)
 
       if (select_prev)
       {
-        GtkTreeIter iter;
-
         if (chooser->priv->prev_path &&
             gtk_tree_model_get_iter (GTK_TREE_MODEL (chooser->priv->store), &iter, chooser->priv->prev_path))
           gtk_combo_box_set_active_iter (GTK_COMBO_BOX (chooser), &iter);

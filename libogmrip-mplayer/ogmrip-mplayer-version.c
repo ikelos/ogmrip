@@ -20,7 +20,7 @@
 #include "config.h"
 #endif
 
-#include "ogmrip-version.h"
+#include "ogmrip-mplayer-version.h"
 
 #include <stdlib.h>
 

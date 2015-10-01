@@ -131,9 +131,8 @@ ogmrip_chapters_run (OGMJobTask *task, GCancellable *cancellable, GError **error
   OGMRipStream *stream;
 
   const gchar *output;
-  guint start_chapter, end_chapter;
+  guint i, start_chapter, end_chapter;
   gdouble seconds, length;
-  gint i;
 
   output = ogmrip_file_get_path (ogmrip_codec_get_output (OGMRIP_CODEC (task)));
   channel = g_io_channel_new_file (output, "w", error);
@@ -215,7 +214,7 @@ void
 ogmrip_chapters_set_label (OGMRipChapters *chapters, guint n, const gchar *label)
 {
   g_return_if_fail (OGMRIP_IS_CHAPTERS (chapters));
-  g_return_if_fail (n < chapters->priv->nchapters);
+  g_return_if_fail (chapters->priv->nchapters > 0 && n < (guint) chapters->priv->nchapters);
 
   if (chapters->priv->labels[n])
     g_free (chapters->priv->labels[n]);
@@ -238,7 +237,7 @@ const gchar *
 ogmrip_chapters_get_label (OGMRipChapters *chapters, guint n)
 {
   g_return_val_if_fail (OGMRIP_IS_CHAPTERS (chapters), NULL);
-  g_return_val_if_fail (n < chapters->priv->nchapters, NULL);
+  g_return_val_if_fail (chapters->priv->nchapters > 0 && n < (guint) chapters->priv->nchapters, NULL);
 
   return chapters->priv->labels[n];
 }

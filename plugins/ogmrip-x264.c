@@ -224,7 +224,7 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   options = g_string_new (x264->cartoon ? "deblock=1,1:aq_strength=0.6" : "deblock");
   g_string_append_printf (options, ":subq=%u:direct_pred=%s",
       x264_have_brdo ? CLAMP (x264->subq, 1, 6) : x264->subq,
-      direct_name[CLAMP (x264->direct, DIRECT_NONE, DIRECT_AUTO)]);
+      direct_name[MIN (x264->direct, DIRECT_AUTO)]);
   g_string_append_printf (options, ":frameref=%u", x264->cartoon ? x264->frameref * 2 : x264->frameref);
   g_string_append_printf (options, ":b_adapt=%u", x264->b_adapt);
 
@@ -273,10 +273,10 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
   if (quality == OGMRIP_QUALITY_USER)
   {
     g_string_append_printf (options, ":profile=%s",
-        profile_name[CLAMP (x264->profile, PROFILE_BASELINE, PROFILE_HIGH)]);
+        profile_name[MIN (x264->profile, PROFILE_HIGH)]);
 
     g_string_append_printf (options, ":keyint=%u", x264->keyint);
-    g_string_append_printf (options, ":cqm=%s", cqm_name[CLAMP (x264->cqm, 0, 1)]);
+    g_string_append_printf (options, ":cqm=%s", cqm_name[MIN (x264->cqm, 1)]);
     g_string_append_printf (options, ":aq_mode=%u", x264->aq_mode);
 
     g_string_append (options, x264->weight_b ? ":weight_b" : ":noweight_b");
@@ -286,18 +286,8 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
     g_string_append (options, x264->force_cfr ? ":force_cfr" : ":noforce_cfr");
     g_string_append (options, x264->global_header ? ":global_header" : ":noglobal_header");
 
-    switch (x264->profile)
-    {
-      case 0:
-        break;
-      case 1:
-        break;
-      case 2:
-        break;
-    }
-
     if (x264_have_weight_p)
-      g_string_append_printf (options, ":weightp=%d", CLAMP (x264->weight_p, 0, 2));
+      g_string_append_printf (options, ":weightp=%d", MIN (x264->weight_p, 2));
 
     if (x264_have_8x8dct)
       g_string_append (options, x264->x88dct ? ":8x8dct" : ":no8x8dct");
@@ -309,7 +299,7 @@ ogmrip_x264_command (OGMRipVideoCodec *video, guint pass, guint passes, const gc
       g_string_append_printf (options, ":level_idc=%d", CLAMP (x264->level_idc, 10, 51));
 
     if (x264_have_b_pyramid)
-      g_string_append_printf (options, ":b_pyramid=%s", b_pyramid_name[CLAMP (x264->b_pyramid, B_PYRAMID_NONE, B_PYRAMID_NORMAL)]);
+      g_string_append_printf (options, ":b_pyramid=%s", b_pyramid_name[MIN (x264->b_pyramid, B_PYRAMID_NORMAL)]);
     else
       g_string_append (options, x264->b_pyramid ? ":b_pyramid" : ":nob_pyramid");
 
@@ -1022,26 +1012,26 @@ ogmrip_x264_check_option (const gchar *option)
 
   argv = g_ptr_array_new_full (20, NULL);
 
-  g_ptr_array_add (argv, "mencoder");
-  g_ptr_array_add (argv, "-nocache");
-  g_ptr_array_add (argv, "-nosound");
-  g_ptr_array_add (argv, "-quiet");
-  g_ptr_array_add (argv, "-frames");
-  g_ptr_array_add (argv, "0");
-  g_ptr_array_add (argv, "-rawvideo");
-  g_ptr_array_add (argv, "pal:fps=25");
-  g_ptr_array_add (argv, "-demuxer");
-  g_ptr_array_add (argv, "rawvideo");
-  g_ptr_array_add (argv, "-o");
-  g_ptr_array_add (argv, "/dev/null");
-  g_ptr_array_add (argv, "-ovc");
-  g_ptr_array_add (argv, "x264");
-  g_ptr_array_add (argv, "-x264encopts");
+  g_ptr_array_add (argv, (gchar *) "mencoder");
+  g_ptr_array_add (argv, (gchar *) "-nocache");
+  g_ptr_array_add (argv, (gchar *) "-nosound");
+  g_ptr_array_add (argv, (gchar *) "-quiet");
+  g_ptr_array_add (argv, (gchar *) "-frames");
+  g_ptr_array_add (argv, (gchar *) "0");
+  g_ptr_array_add (argv, (gchar *) "-rawvideo");
+  g_ptr_array_add (argv, (gchar *) "pal:fps=25");
+  g_ptr_array_add (argv, (gchar *) "-demuxer");
+  g_ptr_array_add (argv, (gchar *) "rawvideo");
+  g_ptr_array_add (argv, (gchar *) "-o");
+  g_ptr_array_add (argv, (gchar *) "/dev/null");
+  g_ptr_array_add (argv, (gchar *) "-ovc");
+  g_ptr_array_add (argv, (gchar *) "x264");
+  g_ptr_array_add (argv, (gchar *) "-x264encopts");
 
   options = g_strdup_printf ("%s:bitrate=800:threads=1", option);
   g_ptr_array_add (argv, options);
 
-  g_ptr_array_add (argv, "/dev/zero");
+  g_ptr_array_add (argv, (gchar *) "/dev/zero");
   g_ptr_array_add (argv, NULL);
 
   g_spawn_sync (NULL, (gchar **) argv->pdata, NULL,

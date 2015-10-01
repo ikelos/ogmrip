@@ -17,15 +17,6 @@ libogmrip_file_gtk_la_HEADERS = \
   ogmrip-subp-file-chooser-dialog.h  \
   ogmrip-file-gtk.h
 
-libogmrip_file_gtk_la_LDFLAGS = \
-  -version-info $(OGMRIP_MEDIA_LT_VERSION)
-
-libogmrip_file_gtk_la_LIBADD = \
-  $(top_builddir)/libogmrip-base/libogmrip-base.la \
-  $(top_builddir)/libogmrip-file/libogmrip-file.la \
-  $(top_builddir)/libogmrip-media/libogmrip-media.la \
-  $(top_builddir)/libogmrip-media-gtk/libogmrip-media-gtk.la
-
 libogmrip_file_gtk_la_CPPFLAGS = \
   -I$(top_srcdir)/libogmrip-base      \
   -I$(top_srcdir)/libogmrip-media     \
@@ -34,3 +25,18 @@ libogmrip_file_gtk_la_CPPFLAGS = \
   -DOGMRIP_LIB_DIR=\""$(libdir)"\"    \
   -DOGMRIP_DATA_DIR=\""$(datadir)"\"
 
+libogmrip_file_gtk_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
+libogmrip_file_gtk_la_LDFLAGS = \
+  -version-info $(OGMRIP_MEDIA_LT_VERSION) \
+  $(WARN_LDFLAGS)
+
+libogmrip_file_gtk_la_LIBADD = \
+  $(top_builddir)/libogmrip-base/libogmrip-base.la \
+  $(top_builddir)/libogmrip-file/libogmrip-file.la \
+  $(top_builddir)/libogmrip-media/libogmrip-media.la \
+  $(top_builddir)/libogmrip-media-gtk/libogmrip-media-gtk.la
+
+MAINTAINERCLEANFILES = \
+  Makefile.in

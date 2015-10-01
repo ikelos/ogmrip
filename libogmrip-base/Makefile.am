@@ -21,11 +21,12 @@ libogmrip_base_la_HEADERS = \
   ogmrip-xml.h   \
   ogmrip-base.h
 
+libogmrip_base_la_CFLAGS = \
+  $(WARN_CFLAGS)
+
 libogmrip_base_la_LDFLAGS = \
-  -version-info $(OGMRIP_BASE_LT_VERSION)
+  -version-info $(OGMRIP_BASE_LT_VERSION) \
+  $(WARN_LDFLAGS)
 
-if MAINTAINER_MODE
-libogmrip_base_la_CPPFLAGS = \
-  -DG_ENABLE_DEBUG
-endif
-
+MAINTAINERCLEANFILES = \
+  Makefile.in
